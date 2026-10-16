@@ -26,8 +26,23 @@ ITEM_REQS={
  "at_least_one_exists_and_all_match":("at_least_one_item_exists","every_collected_item"),
  "at_least_one_exists_and_some_match":("at_least_one_item_exists","some_collected_item"),
  "may_be_absent_and_all_match":("items_may_be_absent","every_collected_item"),
+ "all_exist_and_all_match":("all_collected_items_exist","every_collected_item"),
+ "at_least_one_exists_and_only_one_matches":("at_least_one_item_exists","exactly_one_collected_item"),
+ "only_one_exists_and_only_one_matches":("exactly_one_item_exists","exactly_one_collected_item"),
+ "only_one_exists_and_matches":("exactly_one_item_exists","every_collected_item"),
+ "may_be_absent_and_none_match":("items_may_be_absent","no_collected_item"),
+ "may_be_absent_and_some_match":("items_may_be_absent","some_collected_item"),
+ "all_exist_and_none_match":("all_collected_items_exist","no_collected_item"),
 }
 REV_ITEMS={v:k for k,v in ITEM_REQS.items()}
+STATELESS_PRESENCE={
+ "at_least_one_exists":"at_least_one",
+ "only_one_exists":"exactly_one",
+ "none_exist":"none",
+ "all_exist":"all_exist",
+ "may_be_absent":"may_be_absent",
+}
+REV_STATELESS={v:k for k,v in STATELESS_PRESENCE.items()}
 
 def exact(node,keys,what):
  if not isinstance(node,dict) or set(node)!=set(keys):
@@ -165,7 +180,7 @@ def native_source(src):
    if not isinstance(item,dict) or set(item)-{"from","exclude_if"} or "from" not in item:raise ValueError("bad operand")
    orig={"object":native_source(item["from"])}
    if "exclude_if" in item:
-    if not isinstance(item["exclude_if"],list) or not item["exclude_if"]:raise ValueError("empty filters")
+    if not isinstance(item["exclude_if"],list):raise ValueError("filters must be a list")
     original=[]
     for f in item["exclude_if"]:
      if not isinstance(f,dict) or len(f)!=1:raise ValueError("invalid filter")
@@ -180,7 +195,19 @@ def human_test(test):
  supported={"test_title","capability","object","states","reported_elements",
             "collected_items_require","states_match","state_fields_require"}
  if set(test)-supported:raise ValueError("extra Test attributes "+repr(set(test)-supported))
- if test.get("reported_elements")!="all" or test.get("collected_items_require") not in ITEM_REQS:
+ if test.get("reported_elements")!="all":
+  raise ValueError("unproven output")
+ item_mode=test.get("collected_items_require")
+ if "states" not in test:
+  if item_mode not in STATELESS_PRESENCE or "states_match" in test or "state_fields_require" in test:
+   raise ValueError("unsupported State-free Item mode")
+  result={"check":test["test_title"],"inspect":test["capability"],
+          "require":{"collected_items":STATELESS_PRESENCE[item_mode]},
+          "report_elements":"all"}
+  if "object" in test:
+   result["gather"]=readable_source(test["object"])
+  return result
+ if item_mode not in ITEM_REQS:
   raise ValueError("unproven output or Item scope")
  states=test["states"]
  if not isinstance(states,list) or not states:raise ValueError("no States")
@@ -199,15 +226,16 @@ def human_test(test):
   raise ValueError("unproven State match")
  presence,scope=ITEM_REQS[test["collected_items_require"]]
  readable={"check":test["test_title"],"inspect":test["capability"],
-         "gather":readable_source(test["object"]),
          "require":{presence:True,scope:predicate},"report_elements":"all"}
+ if "object" in test:
+  readable["gather"]=readable_source(test["object"])
  if inherited:
   readable["all_state_fields_exist"]=True
  return readable
 
 def native_test(src):
- mandatory={"check","inspect","gather","require","report_elements"}
- permitted=mandatory|{"all_state_fields_exist"}
+ mandatory={"check","inspect","require","report_elements"}
+ permitted=mandatory|{"all_state_fields_exist","gather"}
  if not isinstance(src,dict) or set(src)-permitted or not mandatory.issubset(src):
   raise ValueError("unrecognized check shape")
  if src["report_elements"]!="all":raise ValueError("unsupported reporting")
@@ -215,9 +243,20 @@ def native_test(src):
  if inherited and src["all_state_fields_exist"] is not True:
   raise ValueError("state-fields inheritance must be explicit")
  require=src["require"]
- if not isinstance(require,dict) or len(require)!=2:raise ValueError("Item requirement")
- presence=[k for k in require if k in {"at_least_one_item_exists","items_may_be_absent"}]
- aggregation=[k for k in require if k in {"every_collected_item","some_collected_item"}]
+ if not isinstance(require,dict):raise ValueError("Item requirement")
+ if set(require)=={"collected_items"}:
+  if inherited:raise ValueError("State-free cannot define State fields")
+  item_mode=REV_STATELESS.get(require["collected_items"])
+  if item_mode is None:raise ValueError("unsupported State-free existence")
+  native={"test_title":src["check"],"capability":src["inspect"],
+          "reported_elements":"all","collected_items_require":item_mode}
+  if "gather" in src:native["object"]=native_source(src["gather"])
+  return native
+ if len(require)!=2:raise ValueError("Item existence and matching must be explicit")
+ presence=[k for k in require if k in {"at_least_one_item_exists","items_may_be_absent",
+                                       "all_collected_items_exist","exactly_one_item_exists"}]
+ aggregation=[k for k in require if k in {"every_collected_item","some_collected_item",
+                                          "exactly_one_collected_item","no_collected_item"}]
  if len(presence)!=1 or len(aggregation)!=1:raise ValueError("missing explicit Item axes")
  p,a=presence[0],aggregation[0]
  if require[p] is not True or (p,a) not in REV_ITEMS:raise ValueError("unsupported Item pair")
@@ -234,8 +273,10 @@ def native_test(src):
   states=[state_to_native(expr,inherited=inherited)]
   mode={}
  native={"test_title":src["check"],"capability":src["inspect"],
-         "object":native_source(src["gather"]),"states":states,
+         "states":states,
          "reported_elements":"all","collected_items_require":REV_ITEMS[(p,a)],**mode}
+ if "gather" in src:
+  native["object"]=native_source(src["gather"])
  if inherited:native["state_fields_require"]=FIELD_REQ
  return native
 
