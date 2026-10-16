@@ -52,6 +52,14 @@ FIELD_MODES={
  "at_least_one_exists_and_all_match":"ordinary",
  "may_be_absent_and_all_match":"when_present_",
  "only_one_exists_and_matches":"exactly_one_",
+ "at_least_one_exists_and_some_match":"some_values_",
+ "at_least_one_exists_and_none_match":"no_values_",
+ "may_be_absent_and_none_match":"when_present_no_values_",
+ "at_least_one_exists_and_only_one_matches":"exactly_one_matching_value_",
+ "only_one_exists_and_only_one_matches":"exactly_one_observed_value_",
+ "all_exist_and_all_match":"all_values_exist_and_",
+ "all_exist_and_none_match":"all_values_exist_and_no_",
+ "may_be_absent_and_some_match":"when_present_some_values_",
  "none_exist":"no_values_exist",
 }
 
@@ -85,13 +93,15 @@ def field_to_native(node, inherited=False):
  if inherited:
   if op not in REVERSE_OPS:raise ValueError("inherited State field op")
   return {REVERSE_OPS[op]:deepcopy(val)}
- for mode,req in (
-  ("when_present_","may_be_absent_and_all_match"),
-  ("exactly_one_","only_one_exists_and_matches"),
-  ("","at_least_one_exists_and_all_match")):
-  base=op[len(mode):] if op.startswith(mode) else None
+ prefixes=[(prefix,mode) for mode,prefix in FIELD_MODES.items()
+           if prefix not in {"ordinary","no_values_exist"}]
+ prefixes.sort(key=lambda pair:-len(pair[0]))
+ for prefix,mode in prefixes:
+  base=op[len(prefix):] if op.startswith(prefix) else None
   if base in REVERSE_OPS:
-   return {"require":req,REVERSE_OPS[base]:deepcopy(val)}
+   return {"require":mode,REVERSE_OPS[base]:deepcopy(val)}
+ if op in REVERSE_OPS:
+  return {"require":FIELD_REQ,REVERSE_OPS[op]:deepcopy(val)}
  raise ValueError("unsupported State field requirement or operator")
 
 def state_to_human(node, inherited=False):
