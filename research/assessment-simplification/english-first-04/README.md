@@ -5,6 +5,16 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
 
+## Six-state research checkpoint — 125,268 matched generic cases
+
+The [passing six-STIG and six-state workflow](https://github.com/vanderpol/scap-ng/actions/runs/38921900743) adds two independent implementations of **generic OVAL 5.12.3 Item outcome aggregation**, cross-checking **all 10 currently mapped existence × Item-match combinations plus five State-free presence modes** over complete/incomplete/not-collected/error/not-applicable/does-not-exist flags and six individual result statuses. **125,268 generic cases agreed**. **12 empty-population cases remain undefined by our generic reference helper** and are explicitly excluded, never treated as passes.
+
+The **single remaining source-shape exception** is the real Linux bootloader Assessment that requires `none_exist` but includes a State comparison. A [pinned-source boundary matrix](https://github.com/vanderpol/scap-ng/blob/main/tools/research_english_first_04_none_exist_state_boundary.py) verifies outcomes when Items exist or collection is incomplete/error/not collected, but does **not** settle the `complete + 0 Items + attached State` corner case. In that scenario the current generic reference raises because it cannot aggregate an empty State-result set. Do **not** silently drop the State or convert `none_exist` to `none_match`; independent interpretation and original XML evidence are required.
+
+The full source-structure census now stands at **871/872 complete unique automated Assessments**, representing **1,374/1,375 named Tests**. Research-only compact presentation of these 871 Assessments removes roughly **4.5% of YAML characters** without altering their original Assessment dictionaries. The human-readability judgment still requires actual reviewers and more work on complex Sets, WMI records, and Variable command graphs.
+
+**What passed:** reference-model equality of generic result aggregations and source-structure inversion. **What has not passed:** independent end-to-end OVAL XML → native collections → scanner/evidence parity, including real multi-valued States and missing data. The exact wording of the 0.4 normative authoring grammar remains open.
+
 ## Start with four diverse, complete research Assessments
 
 **[Concise external reviewer one-pager](RESEARCH-REVIEW-ONE-PAGER.md)** · **[Read the four-source example review](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md)** and [download all four complete candidate YAML Assessments](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856) (RHEL user→file collection with Sets/`for_each`, Windows role-dependent user-rights + WMI records, DNS zone-signing Variables, and Apache multi-file configuration). **All four complete Assessment source dictionaries reconstruct exactly** under the research lowerer, with source-backed CI. Neither a normative 0.4 grammar nor an independent scanner/OVAL semantic-equivalence proof.
