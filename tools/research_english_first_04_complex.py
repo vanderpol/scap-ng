@@ -202,6 +202,28 @@ def state_to_native(node, inherited=False):
    "require":source_mode}}}
  return {name:field_to_native(sub,inherited=inherited)}
 
+def readable_filter_predicate(condition):
+ if not isinstance(condition,dict) or len(condition)!=1:
+  raise ValueError("filter must have one named field or logical group")
+ name,value=next(iter(condition.items()))
+ if name in {"all","any"}:
+  if not isinstance(value,list) or not value:
+   raise ValueError("filter logical group cannot be empty")
+  return {("all_of" if name=="all" else "any_of"):[
+   readable_filter_predicate(child) for child in value]}
+ return {name:field_to_human(value)}
+
+def native_filter_predicate(condition):
+ if not isinstance(condition,dict) or len(condition)!=1:
+  raise ValueError("filter must have one field or logical group")
+ name,value=next(iter(condition.items()))
+ if name in {"all_of","any_of"}:
+  if not isinstance(value,list) or not value:
+   raise ValueError("filter logical group cannot be empty")
+  return {("all" if name=="all_of" else "any"):[
+   native_filter_predicate(child) for child in value]}
+ return {name:field_to_native(value)}
+
 def readable_source(src):
  if isinstance(src,str): return {"source":src}
  if not isinstance(src,dict) or "capability" not in src: raise ValueError("unsupported native source")
@@ -228,9 +250,7 @@ def readable_source(src):
      if not isinstance(x,dict) or len(x)!=1:raise ValueError("filter action")
      action,condition=next(iter(x.items()))
      if action not in {"include","exclude"}:raise ValueError("unsupported filter action")
-     if not isinstance(condition,dict) or len(condition)!=1:raise ValueError("filter field")
-     key,val=next(iter(condition.items()))
-     sequence.append((action,{key:field_to_human(val)}))
+     sequence.append((action,readable_filter_predicate(condition)))
     actions={action for action,_ in sequence}
     if len(actions)==1:
      action=sequence[0][0]
@@ -274,16 +294,14 @@ def native_source(src):
      mode=action[:-3]
      for field in item[action]:
       if not isinstance(field,dict) or len(field)!=1:raise ValueError("invalid filter")
-      key,val=next(iter(field.items()))
-      original.append({mode:{key:field_to_native(val)}})
+      original.append({mode:native_filter_predicate(field)})
     else:
      for entry in item[action]:
       if not isinstance(entry,dict) or len(entry)!=1:raise ValueError("invalid ordered filter")
       key,field=next(iter(entry.items()))
       if key not in {"exclude_if","include_if"} or not isinstance(field,dict) or len(field)!=1:
        raise ValueError("invalid ordered action")
-      name,value=next(iter(field.items()))
-      original.append({key[:-3]:{name:field_to_native(value)}})
+      original.append({key[:-3]:native_filter_predicate(field)})
     orig["filters"]=original
    operands.append(orig)
   out["set"]={"operator":op,"operands":operands}
