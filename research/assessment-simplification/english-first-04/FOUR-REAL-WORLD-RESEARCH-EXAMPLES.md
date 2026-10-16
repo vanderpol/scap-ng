@@ -4,6 +4,39 @@
 
 **[Download the four complete experimental YAML Assessments and verification JSON](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856)** (passing pinned-source CI run). Workflow artifacts include `english-first-04-complete-examples/*.research.yaml` plus the source-comparison report. The translator [source](../../../tools/research_english_first_04_complex.py) reversibly converts each *whole* pinned Assessment back to its unmodified 0.4 preview structure and rejects unsupported mutations. **Structural equality is not a six-state scanner or original OVAL execution proof.** Full files, not the abbreviated excerpts below, are the actual research output.
 
+## Start with two short, readable source-backed checks
+
+These are **research Test excerpts** (not independently runnable complete Assessments), included so a first-time reader can understand the intended order before examining the much larger four Assessments below. The pinned-source reconstructions are checked by [individual source inversion CI](https://github.com/vanderpol/scap-ng/actions/runs/38907309219) and the [full six-STIG native collector census](https://github.com/vanderpol/scap-ng/actions/runs/38909973142).
+
+**Windows 11 — minimum password length, SV-253303**
+
+~~~yaml
+check: "'Minimum password length' is set to at least '14' characters"
+inspect: windows.passwordpolicy
+require:
+  min_passwd_len:
+    at_least: 14
+~~~
+
+Here the `windows.passwordpolicy` capability is the **actual built-in collector**; it does not require a manufactured Object or `where`. The narrowly verified native research operator also reconstructs its source field/Item cardinality and reporting controls, which are omitted from this human-facing excerpt.
+
+**RHEL 9 — `/home` must use the `nosuid` mount option, SV-257851**
+
+~~~yaml
+check: /home is mounted with the nosuid option.
+inspect: linux.partition
+where:
+  mount_point:
+    matches_regex: '.*\/home'
+require:
+  mount_options:
+    includes_value: nosuid
+~~~
+
+This is the early **capability-specific** typed macro. It lowers to the original per-partition **all selected Items must satisfy**, but per-partition `mount_options` **at least one observed option must equal `nosuid`**. The source regex can select mounts beyond exactly `/home`; it has deliberately **not** been tightened. [Pinned real source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/home-mounted-nosuid-option.assessment.yaml).
+
+**Readability warning:** Both compact examples are supported by a **narrow, source-specific research compiler contract**; they are not an approved global default that would let any other capability omit Item/State quantifiers. Exact Test structure does not independently prove live scanner six-state outcomes.
+
 ## 1. Linux — account-derived file permissions
 
 Real source: [RHEL9 SV-257889 shared Assessment](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml). **Two complete Tests, three shared collections**. The original uses password-account Sets, filters, `for_each` from users to files, filesystem/traversal controls, eight permission predicates, and separate optional/nonoptional file populations.
