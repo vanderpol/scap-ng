@@ -4,6 +4,8 @@
 
 **[Download the four complete experimental YAML Assessments and verification JSON](https://github.com/vanderpol/scap-ng/actions/runs/38913249970/artifacts/12051575856)** (passing pinned-source CI run). Workflow artifacts include `english-first-04-complete-examples/*.research.yaml` plus the source-comparison report. The translator [source](../../../tools/research_english_first_04_complex.py) reversibly converts each *whole* pinned Assessment back to its unmodified 0.4 preview structure and rejects unsupported mutations. **Structural equality is not a six-state scanner or original OVAL execution proof.** Full files, not the abbreviated excerpts below, are the actual research output.
 
+**Working-draft authoring convention (not approved 0.4 syntax):** `inspect` names a capability and implicitly gathers ordinary data. `where` and `collect` sit beside it when needed. A check-level `from` references a named reusable source. Reserve `gather` for complex collection/Set composition, always alongside `inspect` rather than nested inside it. `union` already means combining operands; no additional `combine` wrapper is needed in the proposed spelling. **The shortened union excerpt below has not been verified by the converter.** The linked complete YAML remains the source-exact research artifact. Other compact layouts follow the [tested compact-layout experiment](../../../tools/research_english_first_04_compact_layout.py).
+
 ## Start with two short, readable source-backed checks
 
 These are **research Test excerpts** (not independently runnable complete Assessments), included so a first-time reader can understand the intended order before examining the much larger four Assessments below. The pinned-source reconstructions are checked by [individual source inversion CI](https://github.com/vanderpol/scap-ng/actions/runs/38907309219) and the [full six-STIG native collector census](https://github.com/vanderpol/scap-ng/actions/runs/38909973142).
@@ -42,33 +44,30 @@ This is the early **capability-specific** typed macro. It lowers to the original
 Real source: [RHEL9 SV-257889 shared Assessment](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml). **Two complete Tests, three shared collections**. The original uses password-account Sets, filters, `for_each` from users to files, filesystem/traversal controls, eight permission predicates, and separate optional/nonoptional file populations.
 
 ```yaml
-# Readable excerpt — original collection and requirement structure preserved
+# Abbreviated authoring sketch: one original Set operand (not the whole Assessment)
 check: Local initialization files for non-system users have mode 0740 or less permissive.
 inspect: unix.file
 gather:
-  inspect: unix.file
-  combine:
-    union:
-      - from:
-          inspect: unix.file
-          for_each_source:
-            item: user
-            in: only-non-system-users-uid-999-home-dirs-excluding-root-object
-          where:
-            directory:
-              from: user.home_dir
-            name:
-              matches_regex: '^\.[^\s\.]+'
-          filesystem: all
-          traversal:
-            max_depth: 1
-            recurse: symlinks
-        exclude_if:
-          - type:
-              is: directory
+  union:
+    - inspect: unix.file
+      for_each_source:
+        item: user
+        in: only-non-system-users-uid-999-home-dirs-excluding-root-object
+      where:
+        directory:
+          from: user.home_dir
+        name:
+          matches_regex: '^\.[^\s\.]+'
+      filesystem: all
+      traversal:
+        max_depth: 1
+        recurse: symlinks
+      exclude_if:
+        - type:
+            is: directory
 require:
   items_may_be_absent: true
-  every_collected_item:
+  every_item_must_match:
     all_of:
       - setuid:
           is: false
@@ -80,29 +79,33 @@ require:
 
 **What succeeds:** source account→file projection, Set union/filter and eight-field check are representable in one reversible YAML tree; the root-user Test separately requires at least one file.
 
-**Still awkward:** `for_each_source` and `every_collected_item` are different operations, and the shared Set/difference/filters remain verbose; no scanner has proved actual traversal behavior.
+**Still under review:** `for_each_source` expands collection from users, whereas `every_item_must_match` evaluates the collected files. The real source contains a **one-operand union**; this excerpt keeps it visible rather than silently deleting the source operation. Removing that union or replacing `combine.union` with `gather.union` needs a fail-closed round-trip proof. No scanner has proved actual traversal behavior.
 
 ## 2. Windows 11 — Remote Desktop rights depend on domain role
 
 Real source: [Windows 11 SV-253495](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml). **Seven real Tests and two shared collections.** WMI `DomainRole` records distinguish standalone from non-DC domain-joined systems; user-right assignment checks require *some* matching collected Items; the Assessment uses an OR of three alternatives.
 
 ```yaml
-# Readable excerpt — WMI record Test, plus the separate user-right Test
+# Abbreviated compact-layout excerpt; other five named Tests remain in the full YAML
 sources:
   windows-wmi57-object:
     inspect: windows.wmi.query
     collect:
       namespace: root\cimv2
       query: SELECT DomainRole FROM win32_computersystem
+  windows-userright-object:
+    inspect: windows.userright
+    where:
+      userright:
+        equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
 checks:
   system-non-dc-domain-joined-windows-server-or-workstation-test:
     check: The system is a non-DC domain-joined Windows server or workstation
     inspect: windows.wmi.query
-    gather:
-      source: windows-wmi57-object
+    from: windows-wmi57-object
     require:
       at_least_one_item_exists: true
-      every_collected_item:
+      every_item_must_match:
         any_of:
           - result:
               at_least_one_record_exists: true
@@ -117,38 +120,35 @@ checks:
   deny-log-on-through-remote-desktop-services-guests-test:
     check: Deny log on through Remote Desktop Services - Guests
     inspect: windows.userright
-    gather:
-      source: windows-userright-object
+    from: windows-userright-object
     require:
       at_least_one_item_exists: true
-      some_collected_item:
+      at_least_one_item_matches:
         trustee_name:
           equals_ignoring_case: Guests
 ```
 
 **What succeeds:** native WMI collection, explicit record/field scope, Windows user-right selectors, all seven Test definitions and their exact named-Test Boolean composition reconstruct without collapsing alternatives.
 
-**Critical counterexample:** two WMI records holding `domainrole=1` and `domainrole=3` do **not** behave like a single `domainrole in ['1','3']` predicate under the original OR-of-whole-States. The research suite rejects that tempting but lossy rewrite. The phrase `some_collected_item` also deserves another author readability round.
+**Critical counterexample:** two WMI records holding `domainrole=1` and `domainrole=3` do **not** behave like a single `domainrole in ['1','3']` predicate under the original OR-of-whole-States. The research suite rejects that tempting but lossy rewrite. The readable `at_least_one_item_matches` name retains the original *some-Item* requirement; it does not change the per-record or per-field quantifiers.
 
 ## 3. Windows Server DNS — dynamic zone names and three passing alternatives
 
 Real source: [DNS SV-259345](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/ms_windows_server_dns/assessments/automated/SV-259345.automated.yaml). **Five Tests, three local command-building Variables, one shared zone collection**.
 
 ```yaml
-# Excerpt: an actual command populated from the source Variable graph
+# Shortened layout; the source Variable graph is still required
 check: All forward lookup zones are DNSSEC signed
 inspect: independent.shellcommand
-gather:
-  inspect: independent.shellcommand
-  collect:
-    shell: powershell
-    command:
-      variable: command-get-issigned-setting-each-forward-lookup-zone-variable
-    error_if_exit_status_not_0: false
-    error_if_stderr_exists: false
+collect:
+  shell: powershell
+  command:
+    variable: command-get-issigned-setting-each-forward-lookup-zone-variable
+  error_if_exit_status_not_0: false
+  error_if_stderr_exists: false
 require:
   at_least_one_item_exists: true
-  every_collected_item:
+  every_item_must_match:
     stdout_line:
       exactly_one_is: 'True'
 
@@ -172,21 +172,19 @@ evaluate:
 Real source: [Apache SV-214228](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml). **Four Tests and 18 local Variables**, including installation discovery and `Include`/`IncludeOptional` configuration processing.
 
 ```yaml
-# Excerpt of the optional KeepAlive Test
+# Shortened layout of the optional KeepAlive Test
 check: If the KeepAlive directive is defined in other loaded configuration files, verify it is configured to On
 inspect: independent.shellcommand
-gather:
-  inspect: independent.shellcommand
-  collect:
-    shell: bash
-    command:
-      variable: shell-command-check-keepalive-in-all-loaded-conf-files-variable
-    pattern: .+
-    error_if_exit_status_not_0: false
-    error_if_stderr_exists: false
+collect:
+  shell: bash
+  command:
+    variable: shell-command-check-keepalive-in-all-loaded-conf-files-variable
+  pattern: .+
+  error_if_exit_status_not_0: false
+  error_if_stderr_exists: false
 require:
   at_least_one_item_exists: true
-  every_collected_item:
+  every_item_must_match:
     stdout_line:
       when_present_matches_regex: '\s*KeepAlive On'
 
@@ -202,10 +200,10 @@ require:
 
 | Gate | Current evidence |
 | --- | --- |
-| Actual source reconstruction | **PASS** — all four *complete* Assessment dictionaries, including Variables, Objects, State/Item requirements and named-Test evaluation trees, round-trip exactly |
+| Actual source reconstruction | **PASS** — the linked four *complete* experimental Assessments, including Variables, Objects, State/Item requirements and named-Test evaluation trees, round-trip exactly. The proposed union simplification in this page is **not** part of that proof |
 | Negative source constraints | **PASS** — unsupported Set operators, missing Item requirements and unrecognized predicates rejected |
 | Exact original OVAL runtime outcomes | **NOT PROVEN** — no independent SCAP-NG 0.4 scanner or six-state system-evidence parity |
-| Human comprehension | **NOT YET TESTED** — especially `some_collected_item`, `any_of` whole-State scope, and source-derived Variables |
+| Human comprehension | **NOT YET TESTED** — especially collected-Item vs record scope, `any_of` whole-State alternatives, and derived command Variables |
 | Official v0.4 grammar / new signed bundle | **NOT CHANGED** — existing review releases remain immutable |
 
 **Research judgment:** this goes significantly farther than one-line examples: a *single reversible research format* now represents four genuinely complex Assessment graphs, but its readability is uneven. The next design task is to make account/file and dynamic command acquisition human-readable without silently erasing Items, statuses, Variables, or evidence. Do not ask reviewers to approve this grammar yet.
