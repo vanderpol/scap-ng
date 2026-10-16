@@ -62,6 +62,60 @@ This is attractive: “the `mount_options` field **includes** `nosuid`.” But `
 
 Before adding such a key, disprove mismatches for missing field, empty/partial Item collection, errors, duplicate observed values, unexpected datatype, and expected-value arrays/Variables (`value_match`). A general `contains` or `includes` synonym is **not recommended** without that proof. Nor should the author be offered both A and B as optional legal ways to spell one normative 0.4 Assessment.
 
+## D. User-proposed direction: scope is in the noun, not in a 50-character phrase
+
+A promising refinement of B is to make **observed field values** and **collected Items** use different, self-documenting nouns *and* verbs, while still retaining both exact OVAL axes:
+
+```yaml
+# RESEARCH ONLY — not currently accepted or schema-valid 0.4
+states:
+  - mount_options:
+      equals: nosuid
+      observed_values:
+        exist: at_least_one
+        matching: at_least_one
+
+collected_items:
+  exist: at_least_one
+  satisfying: all
+```
+
+Reading naturally:
+- **Observed values:** at least one `mount_options` value exists and at least one **matches** `equals: nosuid`.
+- **Collected Items:** at least one partition Item exists and **all satisfy** the Test's State expression(s).
+
+This may outperform both A (one long `require` phrase at each level) and B (the same `{exists, matches}` verb pair under different enclosing scopes). Although it requires more lines than A, the *scope* is explicit at a glance and no reader needs to infer whether `some_match` means “some options” or “some partitions”.
+
+**Critical boundaries:** `satisfying` must be *defined* to lower **exactly** to the existing Test-level OVAL matching/check aggregator, even when the Test has alternative States, nested Boolean `evaluate`, partial/error Items and six technical outcomes. It must not silently introduce ordinary two-valued success/failure semantics. `matching` must lower exactly to the field's OVAL entity `match`; `exist` retains the original five existence modes. Keep `value_match` for comparison operands independent. Where a field is itself a record, the record and its nested field populations are distinct; `observed_values` cannot simply be inherited into them.
+
+**Potential downside:** serializing existence and matching as two fields revives some longhand, and `satisfying: all` may not obviously communicate “all collected Items' **State outcomes**” until defined. It needs a novice comprehension test, not only a schema designer's preference.
+
+### Other real examples under D (illustrative, not executable)
+
+```yaml
+# DNS SV-259345: exactly one observed stdout_line value, and it matches
+states:
+  - stdout_line:
+      equals: 'True'
+      observed_values: {exist: exactly_one, matching: all}
+
+# Windows registry SV-253254: all observed type/value fields within each
+# permitted State alternative must match; all collected registry Items satisfy
+state_fields_require: {exist: at_least_one, matching: all}
+collected_items: {exist: at_least_one, satisfying: all}
+
+# Absent stderr_line: presence and matching must not be conflated
+# (original State may retain a comparison even when absence is required)
+states:
+  - stderr_line:
+      equals: ''
+      observed_values: {exist: none, matching: all}
+```
+
+The draft's `state_fields_require` map in this illustration would need to inherit only into **ordinary scalar State fields**, never record/record-field nodes; it is not a newly approved scope rule. Full examples must also preserve `states_match` and `value_match`. Neither `matching` nor `satisfying` implies hidden defaults.
+
+**Narrow recommendation:** compare A, B and D with a human exercise first; C (`includes_value`) is an operator/computed-membership feature and can be considered separately. Choose **one** normative spelling for 0.4 once proven. This is not a request to add a second dialect.
+
 ## Apply the same idea to harder real content
 
 | Real example | Existing label | Candidate structured form | Important scope |
@@ -77,12 +131,12 @@ These are **syntactic translations**, not newly executed scan examples. Preservi
 
 ## Proposed decision gate — before freezing 0.4
 
-1. Test **A vs B**, blind, with novice readers and at least one original author/OVAL implementer. Ask them to predict outcomes for: `[rw,nosuid]`, `[rw]`, two selected mounts with one failing, no mounts, and incomplete/error collection.
-2. Exhaustively round-trip every current **20 State-bearing requirement names** and **5 State-free presence names** between current 0.4 candidate and B. Reject missing/conflicting keys. Compare results against existing pinned six-state reference fixtures, **not just byte-equivalent serialization**.
+1. Test **A vs B vs D**, blind, with novice readers and at least one original author/OVAL implementer. Ask them to predict outcomes for: `[rw,nosuid]`, `[rw]`, two selected mounts with one failing, no mounts, and incomplete/error collection.
+2. Exhaustively round-trip every current **20 State-bearing requirement names** and **5 State-free presence names** between current 0.4 candidate and B/D. Reject missing/conflicting keys. Compare results against existing pinned six-state reference fixtures, **not just byte-equivalent serialization**.
 3. Include Windows nested records, alternative registry States, source `none`/exact-one conditions and array `value_match`. Be able to point to the exact OVAL source graph and collection status for each.
-4. If B is genuinely clearer, promote **one** structured form everywhere in the 0.4 schema, native capability schemas, converter, examples and editor. Do not expose A and B as permanent mutually accepted dialects.
+4. If B or D is genuinely clearer, promote **one** structured form everywhere in the 0.4 schema, native capability schemas, converter, examples and editor. Do not expose A and B as permanent mutually accepted dialects.
 5. Treat C as a later candidate only if it clearly improves author comprehension *and* has a strict source/capability proof. Otherwise stop at B and retain `equals` plus explicit scoped requirements.
 
-**Provisional recommendation:** B deserves a real readability/semantic proof before 0.4 becomes normative. A has enough validated source coverage to be a comparison baseline, not necessarily the best human-facing syntax. A reviewer's inability to explain the original pair is a genuine authoring-design warning, **not** grounds for weakening the source assessment meaning.
+**Provisional recommendation:** Compare B and D against A in a real readability/semantic proof before 0.4 becomes normative. D may be particularly promising because it names Items and observed values separately. A has enough validated source coverage to be a comparison baseline, not necessarily the best human-facing syntax. A reviewer's inability to explain the original pair is a genuine authoring-design warning, **not** grounds for weakening the source assessment meaning.
 
 Tracking: [vocabulary / semantics #227](https://github.com/vanderpol/scap-ng/issues/227) · [semantics gate #229](https://github.com/vanderpol/scap-ng/issues/229) · [scope inheritance research](SCOPED-FIELD-REQUIRE-REVIEW.md) · [source pair census](../slang-feedback-04/EXISTENCE-MATCH-CATALOG.md).
