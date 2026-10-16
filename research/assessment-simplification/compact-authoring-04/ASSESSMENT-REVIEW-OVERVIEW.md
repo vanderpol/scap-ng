@@ -7,11 +7,38 @@
 - **[Ten real OVAL XML → SCAP-NG comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)** — best short pre-read. Includes source-backed YAML/JSON and a `SHOWCASE-START-HERE.md` guide. Additional `for_each` and `if/else` illustrations are separately labeled research, **not automatically emitted lossless conversions**.
 - **[Six complete STIGs: YAML and JSON authoring, corrected r3](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3)** — optional deeper inspection. Includes RHEL 9, Oracle Linux 9, Windows 11, Windows Server 2025, DNS and Apache. All 2,958 Rule Assessment-choice links resolve.
 
+## What became more like resource-oriented checks
+
+A reviewer in [Discussion #213](https://github.com/vanderpol/scap-ng/discussions/213#discussioncomment-18935232) recalled **Slang**: select a schema-defined resource, state what must exist and match, then compose checks with AND/OR/XOR. **SCAP-NG 0.4 moves in that direction, but does not claim to implement Slang.**
+
+- **Collect/select:** a native capability and Object selector identify the system facts to inspect.
+- **Expect:** observed field names and comparisons sit beside collection in the same Test, not in a distant named State registry.
+- **Require:** explicit human-readable cardinality names distinguish *collected Items* from *field values*, so a shorter check does not silently change an OVAL verdict.
+- **Compose:** `evaluate` combines named Tests with `all`/`any`/`one`/`odd`; retaining it permits reusable and complex source-faithful logic.
+
+This is still more explicit than Slang's sketch: a Test and its private Object may both declare a capability, cardinality phrases are longer, and the compiler cannot assume a `suid: false` field means exactly the same as the real `mount_options: nosuid` check. Those differences are deliberate until equivalence can be proven. See the [precise source comparison and limits](../slang-feedback-04/README.md).
+
 ## Three NG examples from the actual six-STIG r3 content
 
 These are source-backed excerpts inside automated Tests, not standalone Assessments. **The Linux sample omits only `object_title: null` for readability**; the linked published source is unchanged. Other excerpts are verbatim.
 
 **1. Linux — `/home` must use `nosuid`** ([RHEL 9 shared Assessment](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/home-mounted-nosuid-option.assessment.yaml)). The Test title explains the assertion. A private Object selects the mount, and the State checks its options. There is no need to repeat the Test title on the private Object.
+
+**Compared with 0.3,** the same real State and Test requirements previously appeared as:
+
+```yaml
+# Source-derived 0.3 State + Test requirements (surrounding fields omitted)
+states:
+  - field: mount_options
+    value: nosuid
+    operation: equals
+    existence: one_or_more
+    match: one_or_more
+existence: one_or_more
+match: all
+```
+
+In 0.4, `mount_options` and `equals` are directly readable, and the two `require` keys keep the **different scopes** intact. This is a readability change, not a claim that every mount option must be `nosuid`. [0.3 source-derived comparison](BOARD-PREVIEW.md#same-check-rhel-9-sv-257851-home-nosuid).
 
 ```yaml
     home-mounted-nosuid-option-test:
