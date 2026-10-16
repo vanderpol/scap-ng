@@ -64,6 +64,7 @@ def census(archive):
                                 "test_keys": sorted(test_node),
                                 "test_variable": repr(test_node.get("variable"))[:300],
                                 "states": repr(test_node.get("states"))[:1800],
+                                "object": repr(test_node.get("object"))[:2800],
                                 "item_mode": test_node.get("collected_items_require"),
                                 "state_fields_mode": test_node.get("state_fields_require"),
                             })
