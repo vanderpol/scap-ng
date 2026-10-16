@@ -14,10 +14,13 @@ from research_english_first_04_evaluate import TO_ENGLISH, TO_SOURCE, transform,
 CASES={
  "rhel9_initialization":"focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml",
  "win11_remote_desktop":"focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml",
+ "dns_zone_signing":"focused-fixtures/source-backed/authoring/ms_windows_server_dns/assessments/automated/SV-259345.automated.yaml",
+ "apache_configuration":"focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml",
 }
 FIELD_REQ="at_least_one_exists_and_all_match"
 FIELD_OPS={"equals":"is","case_insensitive_equals":"equals_ignoring_case",
-           "matches_regex":"matches_regex","greater_than":"greater_than","less_than":"less_than"}
+           "matches_regex":"matches_regex","greater_than":"greater_than","less_than":"less_than",
+           "greater_than_or_equal":"at_least","less_than_or_equal":"at_most"}
 REVERSE_OPS={v:k for k,v in FIELD_OPS.items()}
 ITEM_REQS={
  "at_least_one_exists_and_all_match":("at_least_one_item_exists","every_collected_item"),
@@ -30,22 +33,51 @@ def exact(node,keys,what):
  if not isinstance(node,dict) or set(node)!=set(keys):
   raise ValueError("unexpected "+what+": "+repr(node)[:160])
 
+FIELD_MODES={
+ "at_least_one_exists_and_all_match":"ordinary",
+ "may_be_absent_and_all_match":"when_present_",
+ "only_one_exists_and_matches":"exactly_one_",
+ "none_exist":"no_values_exist",
+}
+
 def field_to_human(node, inherited=False):
- if not isinstance(node,dict): raise ValueError("field must be a mapping")
- if inherited:
-  if "require" in node:raise ValueError("group-inherited State field cannot override")
- else:
-  if node.get("require")!=FIELD_REQ:raise ValueError("wrong field scope")
- ops=set(node)-{"require"}
- if len(ops)!=1 or next(iter(ops)) not in FIELD_OPS: raise ValueError("unsupported field op")
- op=next(iter(ops))
- return {FIELD_OPS[op]:deepcopy(node[op])}
+ if not isinstance(node,dict):raise ValueError("State field not a mapping")
+ mode = ("inherited" if inherited else FIELD_MODES.get(node.get("require")))
+ if mode is None:raise ValueError("unverified field presence/cardinality")
+ if inherited and "require" in node:raise ValueError("cannot silently override inherited fields")
+ operations=set(node)-{"require"}
+ if len(operations)!=1 or next(iter(operations)) not in FIELD_OPS:
+  raise ValueError("unmodeled field comparator")
+ op=next(iter(operations))
+ value=deepcopy(node[op])
+ if mode=="no_values_exist":
+  return {"no_values_exist":True,"source_comparison":{FIELD_OPS[op]:value}}
+ if mode=="ordinary" or mode=="inherited":
+  return {FIELD_OPS[op]:value}
+ return {mode+FIELD_OPS[op]:value}
 
 def field_to_native(node, inherited=False):
- if not isinstance(node,dict) or len(node)!=1: raise ValueError("invalid human field")
+ if not isinstance(node,dict) or not node:raise ValueError("empty human field")
+ if set(node)=={"no_values_exist","source_comparison"}:
+  if inherited or node["no_values_exist"] is not True:raise ValueError("invalid absence mode")
+  expr=node["source_comparison"]
+  if not isinstance(expr,dict) or len(expr)!=1:raise ValueError("must retain source absent comparison")
+  op,val=next(iter(expr.items()))
+  if op not in REVERSE_OPS:raise ValueError("unsupported absence comparator")
+  return {"require":"none_exist",REVERSE_OPS[op]:deepcopy(val)}
+ if len(node)!=1:raise ValueError("field expects one value operator")
  op,val=next(iter(node.items()))
- if op not in REVERSE_OPS: raise ValueError("unknown field operator")
- return ({REVERSE_OPS[op]:deepcopy(val)} if inherited else {"require":FIELD_REQ,REVERSE_OPS[op]:deepcopy(val)})
+ if inherited:
+  if op not in REVERSE_OPS:raise ValueError("inherited State field op")
+  return {REVERSE_OPS[op]:deepcopy(val)}
+ for mode,req in (
+  ("when_present_","may_be_absent_and_all_match"),
+  ("exactly_one_","only_one_exists_and_matches"),
+  ("","at_least_one_exists_and_all_match")):
+  base=op[len(mode):] if op.startswith(mode) else None
+  if base in REVERSE_OPS:
+   return {"require":req,REVERSE_OPS[base]:deepcopy(val)}
+ raise ValueError("unsupported State field requirement or operator")
 
 def state_to_human(node, inherited=False):
  if not isinstance(node,dict): raise ValueError("State not a mapping")
@@ -146,26 +178,42 @@ def native_source(src):
 
 def human_test(test):
  supported={"test_title","capability","object","states","reported_elements",
-            "collected_items_require","states_match"}
+            "collected_items_require","states_match","state_fields_require"}
  if set(test)-supported:raise ValueError("extra Test attributes "+repr(set(test)-supported))
  if test.get("reported_elements")!="all" or test.get("collected_items_require") not in ITEM_REQS:
   raise ValueError("unproven output or Item scope")
  states=test["states"]
  if not isinstance(states,list) or not states:raise ValueError("no States")
- if "states_match" in test:
-  if test["states_match"]!="any" or len(states)<2:raise ValueError("unproven State alternatives")
-  predicate={"any_of":[state_to_human(x) for x in states]}
+ inherited=("state_fields_require" in test)
+ if inherited and test["state_fields_require"]!=FIELD_REQ:
+  raise ValueError("unproven Test-level field inheritance")
+ mode=test.get("states_match")
+ if mode in {"any","all"}:
+  if len(states)<2:raise ValueError("State aggregation needs at least two States")
+  readable_key="any_of" if mode=="any" else "all_states"
+  predicate={readable_key:[state_to_human(x,inherited=inherited) for x in states]}
+ elif mode is None:
+  if len(states)!=1:raise ValueError("multi-State requires explicit mode")
+  predicate=state_to_human(states[0],inherited=inherited)
  else:
-  if len(states)!=1:raise ValueError("multi State without mode")
-  predicate=state_to_human(states[0])
+  raise ValueError("unproven State match")
  presence,scope=ITEM_REQS[test["collected_items_require"]]
- return {"check":test["test_title"],"inspect":test["capability"],
+ readable={"check":test["test_title"],"inspect":test["capability"],
          "gather":readable_source(test["object"]),
          "require":{presence:True,scope:predicate},"report_elements":"all"}
+ if inherited:
+  readable["all_state_fields_exist"]=True
+ return readable
 
 def native_test(src):
- exact(src,("check","inspect","gather","require","report_elements"),"human Test")
+ mandatory={"check","inspect","gather","require","report_elements"}
+ permitted=mandatory|{"all_state_fields_exist"}
+ if not isinstance(src,dict) or set(src)-permitted or not mandatory.issubset(src):
+  raise ValueError("unrecognized check shape")
  if src["report_elements"]!="all":raise ValueError("unsupported reporting")
+ inherited=("all_state_fields_exist" in src)
+ if inherited and src["all_state_fields_exist"] is not True:
+  raise ValueError("state-fields inheritance must be explicit")
  require=src["require"]
  if not isinstance(require,dict) or len(require)!=2:raise ValueError("Item requirement")
  presence=[k for k in require if k in {"at_least_one_item_exists","items_may_be_absent"}]
@@ -175,15 +223,21 @@ def native_test(src):
  if require[p] is not True or (p,a) not in REV_ITEMS:raise ValueError("unsupported Item pair")
  expr=require[a]
  if isinstance(expr,dict) and set(expr)=={"any_of"}:
-  if len(expr["any_of"])<2:raise ValueError("bad alternative states")
-  states=[state_to_native(x) for x in expr["any_of"]]
+  if len(expr["any_of"])<2:raise ValueError("bad alternative States")
+  states=[state_to_native(x,inherited=inherited) for x in expr["any_of"]]
   mode={"states_match":"any"}
+ elif isinstance(expr,dict) and set(expr)=={"all_states"}:
+  if len(expr["all_states"])<2:raise ValueError("bad conjunctive States")
+  states=[state_to_native(x,inherited=inherited) for x in expr["all_states"]]
+  mode={"states_match":"all"}
  else:
-  states=[state_to_native(expr)]
+  states=[state_to_native(expr,inherited=inherited)]
   mode={}
- return {"test_title":src["check"],"capability":src["inspect"],
+ native={"test_title":src["check"],"capability":src["inspect"],
          "object":native_source(src["gather"]),"states":states,
          "reported_elements":"all","collected_items_require":REV_ITEMS[(p,a)],**mode}
+ if inherited:native["state_fields_require"]=FIELD_REQ
+ return native
 
 def to_human(a):
  meta=deepcopy(a)
