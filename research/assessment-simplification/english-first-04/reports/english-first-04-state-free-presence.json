@@ -1,0 +1,514 @@
+{
+  "capabilities_proven": {
+    "linux.partition": 5,
+    "linux.rpminfo": 41,
+    "windows.cmdlet": 6,
+    "windows.registry": 5,
+    "windows.service": 1,
+    "windows.wmi.query": 5
+  },
+  "counts": {
+    "exact_state_free_test_inversion": 63,
+    "rejected_complex_object_set_or_metadata": 324,
+    "source_state_free_tests": 387
+  },
+  "examples": [
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Local volumes use NTFS",
+        "collect": {
+          "namespace": "root\\cimv2",
+          "query": "SELECT deviceid FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!=\"NTFS\""
+        },
+        "inspect": "windows.wmi.query",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-253265.automated.yaml",
+      "test": "local-volumes-use-ntfs-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Accounts must be configured to require password expiration.",
+        "collect": {
+          "module_id": null,
+          "module_name": "CimCmdlets",
+          "module_version": null,
+          "noun": "CimInstance",
+          "parameters": {
+            "fields": {
+              "class": {
+                "equals": "Win32_Useraccount",
+                "selection_match": "all"
+              },
+              "filter": {
+                "equals": "PasswordExpires=False and LocalAccount=True and Disabled=false",
+                "selection_match": "all"
+              }
+            }
+          },
+          "select": {
+            "fields": {
+              "unique": {
+                "equals": "Name,PasswordExpires,Disabled,LocalAccount",
+                "selection_match": "all"
+              }
+            }
+          },
+          "verb": "Get"
+        },
+        "inspect": "windows.cmdlet",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-253273.automated.yaml",
+      "test": "accounts-configured-require-password-expiration-test"
+    },
+    {
+      "collection": [
+        "where"
+      ],
+      "readable": {
+        "check": "SNMP Shall Not Be Installed",
+        "inspect": "windows.service",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        },
+        "where": {
+          "service_name": {
+            "equals": "SNMP"
+          }
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-253276.automated.yaml",
+      "test": "snmp-shall-not-installed-test"
+    },
+    {
+      "collection": [
+        "where"
+      ],
+      "readable": {
+        "check": "HKLM\\SOFTWARE\\Microsoft\\Cryptography\\Calais\\Readers exists and contains at least one key.",
+        "inspect": "windows.registry",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "at_least_one"
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "matches_regex": "SOFTWARE\\\\Microsoft\\\\Cryptography\\\\Calais\\\\Readers\\\\\\S+"
+          },
+          "name": null
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-253470.automated.yaml",
+      "test": "hklm-software-microsoft-cryptography-calais-readers-exists-contains-at-least-test"
+    },
+    {
+      "collection": [
+        "where"
+      ],
+      "readable": {
+        "check": "HKLM\\SOFTWARE\\Microsoft\\Cryptography\\Calais\\SmartCards exists and contains at least one key.",
+        "inspect": "windows.registry",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "at_least_one"
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "matches_regex": "SOFTWARE\\\\Microsoft\\\\Cryptography\\\\Calais\\\\SmartCards\\\\\\S+"
+          },
+          "name": null
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-253470.automated.yaml",
+      "test": "hklm-software-microsoft-cryptography-calais-smartcards-exists-contains-at-least-test"
+    },
+    {
+      "collection": [
+        "where"
+      ],
+      "readable": {
+        "check": "Windows 11 must not have portproxy enabled or in use.",
+        "inspect": "windows.registry",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "matches_regex": "SYSTEM\\\\CurrentControlSet\\\\Services\\\\PortProxy\\\\v.tov.\\\\.*"
+          },
+          "name": {
+            "matches_regex": ".*"
+          }
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-257592.automated.yaml",
+      "test": "windows-11-not-have-portproxy-enabled-or-in-use-test"
+    },
+    {
+      "collection": [
+        "where"
+      ],
+      "readable": {
+        "check": "Windows 11 must not have portproxy enabled or in use.",
+        "inspect": "windows.registry",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SYSTEM\\CurrentControlSet\\Services\\PortProxy\\v4tov4\\tcp"
+          },
+          "name": null
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/automated/SV-257592.automated.yaml",
+      "test": "windows-11-not-have-portproxy-enabled-or-in-use-2-test"
+    },
+    {
+      "collection": [
+        "where"
+      ],
+      "readable": {
+        "check": "OpenSSH Server is installed",
+        "inspect": "windows.registry",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "at_least_one"
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "matches_regex": "^(?i)SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Component\\sBased\\sServicing\\\\Packages\\\\OpenSSH-Server-Package~.+$"
+          },
+          "name": null
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/applicability/condition.windows-openssh.yaml",
+      "test": "openssh-server-installed-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "local volumes are formatted using NTFS, ReFS or CSVFS",
+        "collect": {
+          "namespace": "root\\cimv2",
+          "query": "SELECT filesystem FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!='NTFS' AND filesystem!='ReFS' AND filesystem!='CSVFS'"
+        },
+        "inspect": "windows.wmi.query",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-277997.automated.yaml",
+      "test": "local-volumes-formatted-using-ntfs-refs-or-csvfs-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Windows Server - Accounts must require passwords.",
+        "collect": {
+          "module_id": null,
+          "module_name": "CimCmdlets",
+          "module_version": null,
+          "noun": "CimInstance",
+          "parameters": {
+            "fields": {
+              "class": {
+                "equals": "Win32_Useraccount",
+                "selection_match": "all"
+              },
+              "filter": {
+                "equals": "PasswordRequired=False and LocalAccount=True and Disabled=false",
+                "selection_match": "all"
+              }
+            }
+          },
+          "select": {
+            "fields": {
+              "first": {
+                "equals": "100",
+                "selection_match": "all"
+              }
+            }
+          },
+          "verb": "Get"
+        },
+        "inspect": "windows.cmdlet",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278004.automated.yaml",
+      "test": "windows-server-accounts-require-passwords-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Windows Server - Local User Account Passwords from Enabled Users must be configured to expire.",
+        "collect": {
+          "module_id": null,
+          "module_name": "CimCmdlets",
+          "module_version": null,
+          "noun": "CimInstance",
+          "parameters": {
+            "fields": {
+              "class": {
+                "equals": "Win32_Useraccount",
+                "selection_match": "all"
+              },
+              "filter": {
+                "equals": "PasswordExpires=False and LocalAccount=True and Disabled=False",
+                "selection_match": "all"
+              }
+            }
+          },
+          "select": {
+            "fields": {
+              "first": {
+                "equals": "100",
+                "selection_match": "all"
+              }
+            }
+          },
+          "verb": "Get"
+        },
+        "inspect": "windows.cmdlet",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278005.automated.yaml",
+      "test": "windows-server-local-user-account-passwords-from-enabled-users-configured-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Windows Domain Controller - Active Directory User Account Passwords for Enabled Users must be configured to expire.",
+        "collect": {
+          "module_id": null,
+          "module_name": "ActiveDirectory",
+          "module_version": null,
+          "noun": "ADUser",
+          "parameters": {
+            "fields": {
+              "filter": {
+                "equals": "Enabled -eq $true -and PasswordNeverExpires -eq $true",
+                "selection_match": "all"
+              },
+              "properties": {
+                "equals": "PasswordNeverExpires",
+                "selection_match": "all"
+              }
+            }
+          },
+          "select": {
+            "fields": {
+              "first": {
+                "equals": "100",
+                "selection_match": "all"
+              }
+            }
+          },
+          "verb": "Get"
+        },
+        "inspect": "windows.cmdlet",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278005.automated.yaml",
+      "test": "windows-domain-controller-active-directory-user-account-passwords-enabled-users-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Check to make sure the FTP server role is not present.",
+        "collect": {
+          "namespace": "root\\cimv2",
+          "query": "SELECT startmode FROM Win32_Service WHERE name='ftpsvc'"
+        },
+        "inspect": "windows.wmi.query",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278016.automated.yaml",
+      "test": "check-make-sure-ftp-server-role-not-present-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Verify a PKI cerificate is being used",
+        "collect": {
+          "module_id": null,
+          "module_name": "Microsoft.Powershell.Management",
+          "module_version": null,
+          "noun": "ChildItem",
+          "parameters": {
+            "fields": {
+              "path": {
+                "equals": "Cert:\\LocalMachine\\my",
+                "selection_match": "all"
+              }
+            }
+          },
+          "select": {
+            "fields": {
+              "property": {
+                "equals": "issuer,thumbprint",
+                "selection_match": "all"
+              }
+            }
+          },
+          "verb": "Get"
+        },
+        "inspect": "windows.cmdlet",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "at_least_one"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278159.automated.yaml",
+      "test": "verify-pki-cerificate-being-used-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "All Active Directory users must have the 'Smart card is required for interactive logon' option enabled'",
+        "collect": {
+          "module_id": null,
+          "module_name": "ActiveDirectory",
+          "module_version": null,
+          "noun": "ADUser",
+          "parameters": {
+            "fields": {
+              "filter": {
+                "equals": "(Enabled -eq $True) -and (SmartcardLogonRequired -eq $False)",
+                "selection_match": "all"
+              }
+            }
+          },
+          "select": {
+            "fields": {
+              "first": {
+                "equals": "100",
+                "selection_match": "all"
+              }
+            }
+          },
+          "verb": "Get"
+        },
+        "inspect": "windows.cmdlet",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "none"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278162.automated.yaml",
+      "test": "all-active-directory-users-have-smart-card-required-interactive-logon-test"
+    },
+    {
+      "collection": [
+        "collect"
+      ],
+      "readable": {
+        "check": "Hyper-V Role is installed",
+        "collect": {
+          "namespace": "root\\cimv2",
+          "query": "SELECT ID FROM Win32_ServerFeature"
+        },
+        "inspect": "windows.wmi.query",
+        "report": {
+          "elements": "all"
+        },
+        "require": {
+          "collected_items": "at_least_one"
+        }
+      },
+      "source": "authoring/ms_windows_server_2025/assessments/automated/SV-278249.automated.yaml",
+      "test": "hyper-v-role-installed-test"
+    }
+  ],
+  "negative_guards": 126,
+  "source_archive_sha256": "03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d",
+  "status": "STATE-FREE TEST STRUCTURE INVERSION; NO SCANNER SEMANTIC PROOF"
+}
