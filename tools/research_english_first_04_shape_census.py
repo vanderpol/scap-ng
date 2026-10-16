@@ -256,6 +256,7 @@ def main():
         "field_requirements_top": list(report["field_requirements"].items())[:12],
         "comparator_top": list(report["comparators"].items())[:20],
         "capability_top": list(report["capability"].items())[:20],
+        "source_examples": {k: v[:2] for k, v in report["sample_sources"].items()},
     }, indent=2, sort_keys=True))
 
 
