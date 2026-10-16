@@ -36,7 +36,9 @@ def run(zip_path):
         try:
             actual=reference(flag,existence="none_exist",check="all",
                              has_state=True,item_results=observed,exists=n)
-        except AssertionError:
+        except (AssertionError, ValueError) as exc:
+            if not (isinstance(exc, ValueError) and "requires at least one input" in str(exc)) and not isinstance(exc, AssertionError):
+                raise
             actual="REFERENCE_UNDEFINED_EMPTY_STATE_AGGREGATION"
         if actual!=expected:
             raise AssertionError("source-boundary outcome unexpectedly differs: "+repr((flag,n,actual,expected)))
