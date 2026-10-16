@@ -173,6 +173,32 @@ expect:
 
 **Ranking proposal:** test A (fused enum), B (generic pairs), D (separate scope nouns) and E (English-first vocabulary) with blind novices and experienced OVAL authors. If E cannot express outliers without a second grammar, prefer D or improve the one compositional grammar rather than standardizing E prematurely.
 
+## F. Wording refinement: existence of Items vs evaluation of each collected Item
+
+A reviewer found the concrete `check / inspect / where / require` example easier to understand, and asked two important questions:
+- Does `all_found` really mean "**for each collected Item**"? **Yes for the Item result aggregation**, but `for_each` is *already* a distinct SCAP-NG collection-expansion operation. Prefer **`every_collected_item`** as an author-facing phrase over a misleading `for_each` in the Test.
+- Is `at_least_one_item_exists: true` clearer than `at_least_one_found: true`? It appears clearer in a simple read-aloud test; it names the population instead of an ambiguous `found` value.
+
+```yaml
+# Leading wording to test; NOT valid current SCAP-NG v0.4 grammar
+check: /home filesystems must use nosuid
+inspect: linux.partition
+where:
+  mount_point:
+    matches_regex: '.*\\/home'
+require:
+  at_least_one_item_exists: true
+  every_collected_item:
+    mount_options:
+      includes_value: nosuid
+```
+
+**Do not confuse universal evaluation with a runtime loop:** `every_collected_item` is equivalent in intent to applying the original Test `match=all` over the already collected partition Item population. It must **not** cause repeated collector execution, new target queries or per-Item Assessment result creation. This is fundamentally different from an Object's `for_each` projection, which may expand collected source Items into another combined target Item population.
+
+**Review question that this short example does not answer:** how does the same grammar express `one`, `none`, and `one_or_more` collected-Item match aggregation, versus independent existence modes `none`, `one`, `one_or_more`, `all`, `optional`? A separate Boolean key for every combination (`exactly_one_item_exists`, `no_items_exist`, `items_may_be_absent`, etc.) may make the language larger and harder to validate. Test this against a structured alternative like `items_exist: at_least_one` *without* prematurely picking either option. `true` must not imply that unknown/error/incomplete collection becomes ordinary `false`.
+
+**Next experiments:** preserve source `collected_items_require` (existence and match independently) and State-field/record comparisons on Linux initialized files (one branch may have no matching Items), Windows WMI role branches, DNS command outputs, and Apache optional fields. Disallow any silent two-valued short-circuit or derived-field alias without exhaustive proof.
+
 ## Apply the same idea to harder real content
 
 | Real example | Existing label | Candidate structured form | Important scope |
