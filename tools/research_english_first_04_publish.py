@@ -24,6 +24,13 @@ REPORTS = {
     "english-first-04-objectless.json": "Built-in Objectless collectors",
     "english-first-04-generic-scalar.json": "Typed common scalar checks",
 }
+EXAMPLES_DIR = "research/assessment-simplification/english-first-04/comparisons"
+EXAMPLE_LABELS = {
+    "linux-initialization": "RHEL9 initialization-file Set and foreach",
+    "win11-role-rights": "Windows 11 domain-role and Remote Desktop rights",
+    "dns-zone-signing": "Windows Server DNS zone-signing commands",
+    "apache-keepalive": "Apache include-file and directive discovery",
+}
 # GitHub's online file viewer works best for smaller files.
 MAX_JSON_BYTES = 700000
 
@@ -118,6 +125,19 @@ def publish():
         else:
             json_link = "Over online size threshold; summary available"
         rows.append((title, md_name, json_link))
+    # Publish the four COMPLETE, source-exact experimental Assessments directly
+    # to github.com. A full-source round-trip is proved in the earlier CI step;
+    # these are not a new normative 0.4 dialect or a runtime parity claim.
+    for label in EXAMPLE_LABELS:
+        source = Path("english-first-04-compact-layout-examples") / (label + ".research.yaml")
+        if not source.is_file():
+            raise FileNotFoundError("Missing generated full comparison: " + str(source))
+        value = source.read_text(encoding="utf-8")
+        if not value.startswith("# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly."):
+            raise ValueError("Unexpected generated sample format: " + str(source))
+        git_api(repo, EXAMPLES_DIR + "/" + label + ".research.yaml", value, run)
+    print("Published four full proposed versions on github.com")
+
     index = [
         "# Six-STIG research reports (accessible through github.com)",
         "",
