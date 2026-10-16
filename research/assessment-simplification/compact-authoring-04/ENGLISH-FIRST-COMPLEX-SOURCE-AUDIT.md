@@ -36,21 +36,13 @@ checks:
             domainrole:
               one_of: ['1', '3']  # UNPROVEN: original has two distinct State alternatives
   guests_denied:
-    check: Guests are assigned the deny-Remote-Desktop user right
+    check: Deny Remote Desktop logon must include Guests
     inspect: windows.userright
     where:
-      userright:
-        equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
-    expect:
-      trustee_name:
-        case_insensitive_equals: Guests
-        observed_values:
-          exist: at_least_one
-          matching: all
+      userright: {equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
     require:
-      collected_items:
-        exist: at_least_one
-        satisfying: at_least_one
+      trustee_name:
+        includes_value_ignoring_case: Guests  # INTENT ONLY; unproven shortcut
 # Additional named checks: standalone, local_account, domain_admins,
 # enterprise_admins, everyone; their full source must be preserved.
 evaluate:
@@ -60,9 +52,11 @@ evaluate:
     - everyone
 ```
 
-**Readability correction:** The first draft mixed `at_least_one_item_exists: true` (Boolean) and `at_least_one_collected_item: {trustee_name: ...}` (a predicate map). That looked like a missing `true` value and concealed the original field-value requirement. This corrected **research-only** sketch gives each part one job: `expect` describes which fields match; `require.collected_items.exist` counts collected user-right Items; `require.collected_items.satisfying` counts how many Items satisfy `expect`; `observed_values` separately requires at least one `trustee_name` value and all observed values to equal Guests ignoring case. It corresponds structurally to original `collected_items_require: at_least_one_exists_and_some_match` and field `require: at_least_one_exists_and_all_match`. All six-state behavior still requires independent proof. **No Boolean is missing**, and no new normative schema has been adopted.
+**Readability correction — this example is not yet a proved translation:** The previous draft omitted useful collection context in the standalone excerpt and repeated `exist: at_least_one` / `matching: all`, which is essentially OVAL terminology in new wrappers. That failed the stated author-comprehension goal. The replacement above is only a **plain-English intent sketch**: `inspect: windows.userright` specifies the typed native collector and `where.userright` identifies **exactly which right to retrieve**. A capability-specific `includes_value_ignoring_case` would be easy for a security administrator to read, **but it is not implemented or proven faithful**.
 
-**Works for people:** typed data source, purpose, alternatives, and referenced checks are in one reading flow. **New challenges:** `one_of: ['1','3']` must not casually collapse two record State alternatives or alter `value_match`/six-state semantics. The user-right collection may contain many principals; `at_least_one_collected_item` is essential and must not become `every_collected_item`. Need separate record and nested-field cardinality and a clear way to define/reuse a named Object once.
+The exact real [SV-253495 Test](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) currently requires **at least one collected user-right Item, some collected Items matching the State, and for each qualifying Item at least one `trustee_name` field value with all its observed field values equal to `Guests` ignoring case**. Simple “includes Guests somewhere” can give a different answer if a collected Item has multiple `trustee_name` values. Error/unknown/incomplete outcomes can also differ. The concise shorthand **must not be promoted to standard syntax** until the Windows capability's Item/value cardinality and six-state behavior are proven equivalent. If it cannot be proven, this case is a real counterexample to unlimited English-first compaction.
+
+**Readability only:** the typed data source, selection and policy intent are visible, but the illustrative shorthand does **not** preserve all original cardinality semantics. **New challenges:** `one_of: ['1','3']` must not casually collapse two record State alternatives or alter `value_match`/six-state semantics. The user-right collection may contain many principals; `at_least_one_collected_item` is essential and must not become `every_collected_item`. Need separate record and nested-field cardinality and a clear way to define/reuse a named Object once.
 
 ## 2. RHEL 9 — account-derived initialization-file collection
 
