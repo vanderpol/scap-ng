@@ -4,6 +4,7 @@ on:
     paths:
       - .github/workflows/research-english-first-census-04.yml
       - tools/research_english_first_04_census.py
+      - tools/research_english_first_04_shape_census.py
       - tools/research_english_first_04.py
   workflow_dispatch:
 
@@ -39,10 +40,18 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --output english-first-04-six-stig-census.json
 
+      - name: Census collection, State, cardinality and dynamic-dependency shapes
+        run: |
+          python tools/research_english_first_04_shape_census.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-shape-census.json
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: english-first-v04-six-stig-source-census
-          path: english-first-04-six-stig-census.json
+          path: |
+            english-first-04-six-stig-census.json
+            english-first-04-shape-census.json
           if-no-files-found: warn
