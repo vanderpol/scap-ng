@@ -2,7 +2,9 @@
 
 **Pre-alpha specification draft in progress — not approved, not a release.** The existing 0.3 specification, scanner bundle format and Board Discussion #213 remain unchanged.
 
-## Joval showcase — best starting point (October 15, 2026)
+## Joval showcase — best starting point (October 16, 2026)
+
+**For advance sharing:** [20-minute Joval meeting overview with three embedded, source-backed NG examples](JOVAL-MEETING-2026-10-16.md). For evaluator implementers, the [focused technical notes](JOVAL-TECHNICAL-PREVIEW.md) include additional Windows, DNS and Apache examples and explicit proof boundaries.
 
 **[Original OVAL single → modern SCAP-NG 0.4 showcase](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)** gives ten source-backed examples as original OVAL XML, 0.4 YAML and corresponding JSON with provenance. [Joval meeting guide](JOVAL-TECHNICAL-PREVIEW.md) includes the real versus optional/proposed transformation distinction and the [conditional semantic questions](../conditional-10/JOVAL-IF-ELSE-QUESTIONS.md). The showcase's optional if/else illustration is **not** a proven automatic six-state OVAL normalization; tested collection `for_each` examples are separately identified.
 
