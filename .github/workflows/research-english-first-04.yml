@@ -4,6 +4,7 @@ on:
     paths:
       - .github/workflows/research-english-first-04.yml
       - tools/research_english_first_04.py
+      - tools/research_english_first_04_evaluate.py
   workflow_dispatch:
 
 permissions:
@@ -11,7 +12,7 @@ permissions:
 
 jobs:
   narrow-source-inversion:
-    name: Pinned two-case Test inversion and OVAL six-state charts
+    name: Pinned source Test inversion, OVAL charts and complex evaluation trees
     runs-on: ubuntu-latest
     steps:
       - name: Checkout SCAP-NG (trunk only)
@@ -36,10 +37,18 @@ jobs:
             --fixture-root sample-data \
             --report english-first-04-research-report.json
 
+      - name: Prove exact named-Test composition of four complex STIG Assessments
+        run: |
+          python tools/research_english_first_04_evaluate.py \
+            --fixture-root sample-data \
+            --report english-first-04-evaluate-graph-report.json
+
       - name: Upload source-backed report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: english-first-v04-two-case-research
-          path: english-first-04-research-report.json
+          path: |
+            english-first-04-research-report.json
+            english-first-04-evaluate-graph-report.json
           if-no-files-found: warn
