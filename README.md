@@ -23,6 +23,7 @@ See the [full objectives](specification/objectives.md) and
 - **Specification:** [specification/README.md](specification/README.md)
 - **Real-world examples:** [Benchmark and Rule policy](specification/examples/README.md) · [technical Assessments](specification/examples/assessments.md) · [result fixtures](specification/examples/0.3.0/results/README.md)
 - **0.4 pre-alpha preview:** [Example-led technical overview](research/assessment-simplification/compact-authoring-04/ASSESSMENT-REVIEW-OVERVIEW.md) · [deeper authoring/semantics review](research/assessment-simplification/compact-authoring-04/ASSESSMENT-REVIEW-TECHNICAL.md)
+- **0.4 complex examples:** [Three larger source-backed Assessment walkthroughs](research/assessment-simplification/compact-authoring-04/COMPLEX-REAL-WORLD-EXAMPLES.md) — Windows user rights, DNS, and Apache.
 - **Current review:** [review/current/README.md](review/current/README.md)
 - **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
 - **Six complete STIGs:** [One native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [six compiled scanning bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
