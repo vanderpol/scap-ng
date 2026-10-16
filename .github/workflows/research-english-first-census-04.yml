@@ -10,6 +10,8 @@ on:
       - tools/research_english_first_04_scalar.py
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
+      - tools/research_english_first_04_six_state.py
+      - tools/oval_result_truth_tables.py
       - tools/research_english_first_04_complex.py
       - tools/research_english_first_04_evaluate.py
       - tools/research_english_first_04.py
@@ -84,6 +86,11 @@ jobs:
             --output english-first-04-compact-layout-report.json \
             --examples-dir english-first-04-compact-layout-examples
 
+      - name: Cross-check six-state Item cardinalities with independent evaluator
+        run: |
+          python tools/research_english_first_04_six_state.py \
+            --output english-first-04-six-state-cardinality.json
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -97,5 +104,6 @@ jobs:
             english-first-04-generic-scalar.json
             english-first-04-full-assessment-census.json
             english-first-04-compact-layout-report.json
+            english-first-04-six-state-cardinality.json
             english-first-04-compact-layout-examples/
           if-no-files-found: warn
