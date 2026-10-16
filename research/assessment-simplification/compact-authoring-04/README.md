@@ -2,15 +2,13 @@
 
 **Pre-alpha specification draft in progress — not approved, not a release.** The existing 0.3 specification, scanner bundle format and Board Discussion #213 remain unchanged.
 
-## Joval showcase — best starting point (October 16, 2026)
+## Start here — technical review for any audience
 
-**For advance sharing:** [20-minute Joval meeting overview with three embedded, source-backed NG examples](JOVAL-MEETING-2026-10-16.md). For evaluator implementers, the [focused technical notes](JOVAL-TECHNICAL-PREVIEW.md) include additional Windows, DNS and Apache examples and explicit proof boundaries.
+- **[Short 0.4 overview](ASSESSMENT-REVIEW-OVERVIEW.md)** — three embedded real NG Test examples: Linux mount selection, Windows registry alternatives, and user-right cardinality. Suitable as the main pre-read.
+- **[Detailed technical examples](ASSESSMENT-REVIEW-TECHNICAL.md)** — Windows WMI record scoping, DNS exact-one checks, Apache Variables, proof boundaries, and guidance on Test versus private/shared Object titles.
+- **[Conditional semantics questions](../conditional-10/CONDITIONAL-REVIEW-QUESTIONS.md)** — six-state behavior, `if/else` versus faithful OVAL Boolean graphs, and evidence collection.
 
-**[Original OVAL single → modern SCAP-NG 0.4 showcase](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)** gives ten source-backed examples as original OVAL XML, 0.4 YAML and corresponding JSON with provenance. [Joval meeting guide](JOVAL-TECHNICAL-PREVIEW.md) includes the real versus optional/proposed transformation distinction and the [conditional semantic questions](../conditional-10/JOVAL-IF-ELSE-QUESTIONS.md). The showcase's optional if/else illustration is **not** a proven automatic six-state OVAL normalization; tested collection `for_each` examples are separately identified.
-
-## Current six-STIG YAML + JSON authoring review packet
-
-**[Permanent pre-alpha discussion prerelease](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3)** contains all six STIG authoring conversions in **both formats**, with all 2,958 Rule choice links resolved and all 12 previously omitted shared manual Assessments included ([issue #230](https://github.com/vanderpol/scap-ng/issues/230)), including the scoped field-requirement candidate (Test/group/field) and human `and`/`or` logic. [Joval meeting reading guide](JOVAL-TECHNICAL-PREVIEW.md). All 1,396 converted Assessments and 2,144 native Tests passed the candidate overlay, explicit scope inverse, full 0.4 base and native schema checks; JSON values mirror YAML. **Pre-alpha, not Board-approved or scanner-compiled.** The revised Test-level name is `collected_items_require`; native field/record-level `require` remains distinct. The separate earlier RHEL9 preview remains historical.
+**Optional full content:** [ten original OVAL → NG YAML/JSON comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015) and [six-STIG r3 authoring preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) (YAML + JSON). The release tags are historical immutable identifiers, not audience restrictions. r3 contains all six representative STIGs, repairs 12 shared manual Assessment files, and resolves all 2,958 Rule Assessment-choice links. Both are **pre-alpha research**, not scanner-conformant 0.4 binaries.
 
 **Start with [0.4 scope and release gates](0.4-SCOPE-AND-RELEASE-GATES.md).** It explicitly includes actual field names in State predicates, a human-readable `require` vocabulary, operator-as-key comparisons, native typed arrays, and Windows record fields. One **authoring** grammar is the goal, not a second optional set of hidden YAML shortcuts.
 
