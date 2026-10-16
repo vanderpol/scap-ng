@@ -74,7 +74,7 @@ def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
     if errors:
         raise ValueError("Unresolved JSON authoring references: "+repr(errors[:15]))
     total["documents"]=len(parsed)
-    total.update({k:references[k] for k in
+    total.update({k:references.get(k,0) for k in
                   ("rule_choice_links","evaluate_test_leaves","variable_references",
                    "shared_object_references","unresolved")})
     if pinned_r3:
