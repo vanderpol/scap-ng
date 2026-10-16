@@ -1,109 +1,123 @@
-# SCAP-NG 0.4 — Joval technical discussion preview
+# SCAP-NG 0.4 — Joval technical notes
 
-**For technical discussion on October 16, 2026.** This is a **pre-alpha authoring-language candidate**, not a final standard, OVAL Board decision, or executable scanner bundle. The current 0.3 release is not changed.
+**Pre-alpha Assessment authoring research for October 16, 2026.** Please start with the [20-minute meeting overview and three NG examples](JOVAL-MEETING-2026-10-16.md). We are asking for **counterexamples and implementation feedback**, not approval of a finished standard.
 
-**For the October 16 technical review, [start with the one-page meeting card](JOVAL-MEETING-2026-10-16.md).** The detailed discussion and source excerpts remain below.
+**Downloads:** [10 original OVAL XML ↔ NG YAML/JSON comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015) · [complete corrected six-STIG r3 authoring source](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3). Review the former first; the latter is available for exhaustive inspection.
 
-## Start with the original OVAL → NG 0.4 feature showcase
+## The proposal in plain terms
 
-**[Download the ten real OVAL-single/NG side-by-side comparisons](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-oval-to-ng-showcase-20261015)**. The 86 KB ZIP is a better starting point for the Joval meeting than the multi-megabyte six-STIG bundles. It contains actual archived OVAL single XML, the **correct** linked 0.4 authoring Assessment in **YAML and JSON**, and its Rule, grouped together by SV-ID. **[Open the concise showcase guide](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-oval-to-ng-showcase-20261015/SHOWCASE-START-HERE.md)** for real side-by-side static Variable and Set/filter examples and the validated, separately labeled conditional illustration.
+One readable Assessment grammar uses observed **field names as keys** and meaningful operations (`equals`, `matches_regex`, `greater_than_or_equal`) instead of repeatedly spelling out an intermediate State wrapper. We still distinguish separate evaluation populations:
 
-Feature highlights: **SV-257889** (OVAL ObjectComponent → separately proved opt-in collection `for_each`), **SV-278028** (filters), **SV-278001** (multi-valued constant Variable → literal arrays; role-sensitive `evaluate` and a separately labeled `if/then/else` native authoring illustration), **SV-278138** (exclude filters), **SV-258179** (shared Assessment and OVAL extend-definition), **SV-259345** (DNS runtime Variables), **SV-214228** (Apache regex capture). The current six-STIG converter intentionally leaves some source graphs faithful rather than enabling a potentially unsafe automatic modernization.
+- **`collected_items_require`** — how collected Items must exist and match the Test; **not** a default for fields.
+- **`state_fields_require`** — shared requirement for ordinary State fields at a Test or State-group scope, with explicit field-level overrides.
+- **Field `require`** — the cardinality of a specific value/field, including a field that may be absent or must have exactly one matching value.
+- **`result.record.require` versus `result.record.fields.<name>.require`** — independent nested-record and member quantifiers, without hidden inheritance from scalar fields.
+- **`states_match` and `and`/`or`** — alternative States versus logical predicates inside a State; `value_match` remains independent for multiple expected operands.
 
-**Evidence classification:** The full OVAL/NG pairs are source-backed and copied verbatim; the extra `for_each` fixture is an accepted 0.3 authoring/proof example rather than emitted by 0.4 r2; the `if/else` fragment is valid 0.4 grammar but **not** claimed to be six-state-equivalent to the archived OVAL Boolean expression. The result fixture is synthetic. These are essential distinctions for an evaluator-implementation discussion.
+All authoring keys above describe the **Joval research candidate**, not ratified 0.4. Missing required semantics must fail validation rather than silently choose a default.
 
-## Suggested 20-minute meeting flow
+## Three deeper NG examples — directly from r3 source
 
-- **3 minutes — motivation:** one Assessment grammar, inline native fields and verbs, explicit cardinality with less repetition. Existing SCAP 1.4 is a forward-conversion source, not an authoring dependency.
-- **7 minutes — examine three Windows 11 files:** `SV-253254` (two matching State alternatives and one shared field requirement), `SV-253274` (shell-command `stderr_line` absence override), `SV-253495` (five user-right single-field Tests plus two WMI nested-record Tests). Include one RHEL 9 file for contrast.
-- **7 minutes — request semantic criticism:** user-right `some_match`, nested record/field quantifiers, absent versus error/unknown/incomplete collection, and preservation of evaluation semantics.
-- **3 minutes — capture next actions:** which semantics require normative tests, counterexamples or source-backed migration proof? No request to approve 0.4 or attest scanner equivalence at this meeting.
+The short examples on the [meeting overview](JOVAL-MEETING-2026-10-16.md) show Linux mount selection, Windows State alternatives, and user-right assignment. These additional clips are **unchanged excerpts from actual linked Assessments**, not complete, standalone Assessments.
 
-**Status to say aloud:** The corrected **revision 3** packet is a verified *pre-alpha technical proposal*, not an approved 0.4 grammar. Its six Benchmark-specific totals count **1,396 Assessment / 2,144 Test occurrences** across shared reuse, while the deduplicated archive has **872 unique automated Assessment documents / 1,375 native Test nodes**. The research overlay has not been accepted into the base 0.4 schema. The [independent JSON-only validation gate](https://github.com/vanderpol/scap-ng/actions/runs/38830995691) passes for all 872 distinct automated documents and checks all 2,958 Rule choices; the JSON input contains logical Assessment IDs, **not unresolved literal YAML file paths**. **Actual 0.4 YAML/JSON compilation remains unproven** ([#232](https://github.com/vanderpol/scap-ng/issues/232)); no scanner exists and no runtime equivalence is claimed. The [current-main 0.3 converter's six representative conversions and compilation passed](https://github.com/vanderpol/scap-ng/actions/runs/38829943744); the full 65-package release checkpoint is still open under #226.
+### 1. Windows WMI: a record is not its field
 
-## What to review first (about five minutes)
+Windows 11 [SV-253495](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) has five `windows.userright` and two `windows.wmi.query` Tests. This WMI State has *two* requirements: one for the record and one for its `domainrole` member. The next State permits another `domainrole`.
 
-The shareable [six-STIG YAML/JSON preview release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) contains two complete corresponding authoring ZIPs, now **4,001 authored documents each** (including the 12 previously omitted shared manual Assessments). All **2,958 Rule Assessment-choice links resolve**, as verified by the [new closure gate](https://github.com/vanderpol/scap-ng/issues/230): one YAML and one JSON. Each contains all six real benchmark structures, Rules, manual fallbacks, relevant shared Assessments and automated/applicability Assessments. Open the internal `MEETING-START-HERE.md`, then a few converted files.
+```yaml
+      states:
+      - result:
+          record:
+            fields:
+              domainrole:
+                require: at_least_one_exists_and_all_match
+                equals: '1'
+            require: at_least_one_exists_and_all_match
+      - result:
+          record:
+            fields:
+              domainrole:
+                require: at_least_one_exists_and_all_match
+                equals: '3'
+            require: at_least_one_exists_and_all_match
+```
 
-### Representative content
+A separate user-right Test in the same Assessment shows why the two cardinalities cannot collapse:
 
-| STIG | Reason to inspect |
+```yaml
+    deny-log-on-through-remote-desktop-services-guests-test:
+      test_title: Deny log on through Remote Desktop Services - Guests
+      capability: windows.userright
+      object: windows-userright-object
+      states:
+      - trustee_name:
+          require: at_least_one_exists_and_all_match
+          case_insensitive_equals: Guests
+      reported_elements: all
+      collected_items_require: at_least_one_exists_and_some_match
+```
+
+`at_least_one_exists_and_some_match` governs **Items** in the user-right Test; `at_least_one_exists_and_all_match` governs the **trustee-name field**. This is a semantic difference, not just word choice.
+
+### 2. DNS: “only one and it matches”
+
+Windows Server DNS [SV-259345](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_server_dns/assessments/automated/SV-259345.automated.yaml) retains a precise field-level `only_one_exists_and_matches` rule:
+
+```yaml
+      states:
+      - stdout_line:
+          require: only_one_exists_and_matches
+          equals: 'True'
+```
+
+The Test also declares `collected_items_require: at_least_one_exists_and_all_match` for collected Items. “Exactly one field value matches” and “all collected Items match” are **different scopes**, even when the author sees only one `stdout_line` in practice.
+
+### 3. Apache: preserve actual runtime dataflow
+
+Apache [SV-214228](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml) still needs dynamic Variables because a config path is assembled from detected paths. The converter **does not** replace this with an invented literal or claim a general lossless `for_each` rewrite.
+
+```yaml
+    filepath-http-conf-file-variable:
+      title: Filepath to http conf file
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - variable: filepath-httpd-root-variable
+        - literal:
+            value: /
+            datatype: string
+        - variable: relative-server-config-file-variable
+```
+
+Another Test in this Assessment permits a missing optional directive while requiring matching values if present:
+
+```yaml
+      states:
+      - stdout_line:
+          require: may_be_absent_and_all_match
+          matches_regex: \s*KeepAlive On
+```
+
+The full file contains more collection and Variable dependencies; these excerpts are for comprehension, not a replacement for the authoring archive.
+
+## The semantic questions we need answered
+
+1. **Absent versus incomplete:** Does the proposed combination of collected-Item, ordinary field and record requirements retain OVAL `true`, `false`, `unknown`, `error`, `not_evaluated` and `not_applicable` outcomes when Items are missing, partial or failed? [Boundary review](INCOMPLETE-ITEM-SEMANTICS-REVIEW.md).
+2. **Conditional expressions:** Source OVAL `OR(AND(G,P),AND(NOT G,Q))` and procedural `if G then P else Q` disagree in **81/216** generic six-state cases. We must preserve source-faithful `evaluate` trees unless a particular rewrite is proven, including skipped-branch evidence. [Detailed questions](../conditional-10/JOVAL-IF-ELSE-QUESTIONS.md).
+3. **Iteration and Variables:** A source-backed `for_each` illustration can be authored and tested, but that does **not** prove universal automatic rewriting of dynamic ObjectComponent graphs. Preserve Sets, Filters and runtime provenance until equivalence is established.
+4. **Evidence:** Should a source→NG correspondence table include exact Item counts, missing/error markers, Object/Variable provenance, and decisive reason codes for scanner auditability?
+
+## Evidence and remaining gates
+
+| Independently supported | What it does **not** establish |
 | --- | --- |
-| RHEL 9 | Unix/Linux native file, process, account and policy checks; native field expressions |
-| Oracle Linux 9 | Cross-Linux readability and potential reuse without flattening assessment semantics |
-| Windows 11 | Registry `SV-253254` (AND/OR matching) and shellcommand `SV-253274` (stderr may have to be absent) |
-| Windows Server 2025 | Native Windows records, security policy and registry checks |
-| Windows Server DNS | Domain-specific Windows DNS assessment patterns |
-| Apache 2.4 UNIX | Variables, multi-step configuration discovery and remaining complex native checks |
+| [Six real STIGs converted/validated/compiled with 0.3](https://github.com/vanderpol/scap-ng/actions/runs/38829943744) | That 0.4 research files compile or that two scanners agree |
+| [r3 YAML/JSON source proof](https://github.com/vanderpol/scap-ng/issues/228) + [4,001 JSON documents statically validated](https://github.com/vanderpol/scap-ng/actions/runs/38830995691) | Native 0.4 JSON-to-signed-bundle compilation |
+| **872 unique automated Assessments / 1,375 native Tests** in the deduplicated r3 archive | **1,396 Assessment / 2,144 Test appearances** counted across six Benchmarks are not unique files |
+| **2,958/2,958 Rule choice links resolved**, no duplicate Assessment IDs | Semantic runtime parity of referenced Assessments |
+| **1,106 fewer explicit field requirement declarations out of 2,550 (43.4%)** in the scope research | Fewer runtime tests or less collected data |
 
-## Windows 11 SV-253495 — why some requirements remain on individual States
+Schema/source/identity checks are promising, but **no SCAP-NG 0.4 scanner is yet validated**. Independent native YAML and JSON compilation is tracked in [#232](https://github.com/vanderpol/scap-ng/issues/232); evaluator conformance in [#229](https://github.com/vanderpol/scap-ng/issues/229). The separate [0.3 source-converter release gate #226](https://github.com/vanderpol/scap-ng/issues/226) covers the broader input corpus. Published 0.3 and immutable preview releases are unchanged.
 
-This source-backed example deserves special review. It contains seven Tests: **five** single-field `windows.userright` Tests and **two** `windows.wmi.query` record Tests. On the user-right Tests, `collected_items_require: at_least_one_exists_and_some_match` means at least one assigned trustee must match, while `trustee_name.require: at_least_one_exists_and_all_match` constrains each field's cardinality. The two scopes **cannot be merged**. For a single-field Test, the automatic minimum-declaration authoring form keeps `require` on the field, because moving it to `state_fields_require` saves no declarations.
-
-A **semantically identical alternative**, useful if explicit scope separation reads better, is:
-
-```yaml
-collected_items_require: at_least_one_exists_and_some_match
-state_fields_require: at_least_one_exists_and_all_match
-states:
-  - trustee_name: {case_insensitive_equals: Guests}
-```
-
-The real WMI Tests contain `result.record.require` and `result.record.fields.domainrole.require`. Although their phrases happen to match, they quantify **different populations** (records and record members); the scalar State-field scope is deliberately not inherited into records. Whether to favor Test-level field scopes for every single-field Test is **an authoring style decision**, not a missing semantic feature. No extra inheritance level across unrelated Tests is proposed for 0.4.
-
-## Proposal: one human-readable Assessment grammar
-
-The value of the redesign is straightforward: authors name actual observed fields and comparison operations, rather than having to follow indirect Object/Test/State entities or repeat `field`, `operation`, `value`, `existence`, `match` at every node.
-
-The important distinctions remain explicit:
-1. Test `collected_items_require` concerns collected Items and State matching. It is never a hidden field default. Individual field/record `require` remains scoped locally.
-2. The **proposed** `state_fields_require` declares common requirements for ordinary State fields at the Test or logical State group level. A particular field can override it using its own `require`. Missing effective requirements are errors, not defaults.
-3. `and`/`or` represent logical State expressions; `states_match: any` combines alternative State entries, and `value_match` independently governs multiple expected operands from arrays/Variables.
-4. Native records retain record and record-field semantics, including absent/error/unknown behavior; scalar field inheritance does not silently enter record members.
-5. Object selectors and dynamic Variables retain native source/reference behavior; no inferred value matching or flattened arrays.
-
-Example (selected State lines from Windows 11 `SV-253254`, not a complete Assessment):
-
-```yaml
-collected_items_require: at_least_one_exists_and_all_match
-state_fields_require: at_least_one_exists_and_all_match
-states_match: any
-states:
-  - and:
-      - type: {equals: string}
-      - value: {equals: Enterprise}
-  - and:
-      - type: {equals: string}
-      - value: {equals: EnterpriseS}
-```
-
-A shellcommand State can keep an absence exception, for example `stderr_line: {require: none_exist, equals: ''}`, independently from the common scope applied to successful output fields.
-
-## Why this is more than presentation-only research
-
-The scope-language prototype has proven reversible across the six representative published authoring benchmarks: **1,396 automated/applicability Assessments, 2,144 Tests**. The 2,550 leaf-level field requirement declarations become 1,444 explicit declarations after Test/group/field factoring (**43.4% fewer**), without dropping the original independent distinctions. Source-exact versus separately proved State-free normalizations is reported rather than concealed.
-
-The new Joval preview output separately validates **each complete candidate Assessment**, expands explicit scopes to the present 0.4 draft baseline, validates the full native capability-specific Test schema, and asserts that the JSON mirror equals the parsed YAML authoring document. A passed CI proves authoring/schema/source reconstruction, **not execution-time scanner agreement**.
-
-**Known open issues:** unusual human-readable `require` names, approval of Test/group/field scoping, reference six-valued missing/error/unknown behavior, provenance of multi-valued Variables, future compiler packaging/signing, and live scanner conformance. Current published 0.3 converter regressions are separately tracked in [issue #226](https://github.com/vanderpol/scap-ng/issues/226).
-
-## Open question: native `if/else` versus lossless OVAL `AND/OR`
-
-**[Joval conditional review questions](../conditional-10/JOVAL-IF-ELSE-QUESTIONS.md)** detail the decision we need before normalizing any OVAL branch tree. The real **SV-278001** and **SV-258004** examples read well as `if/else`, but ordinary OVAL `OR(AND(G,P),AND(NOT G,Q))` and procedural `if` differ for **81 of 216** generic six-state input combinations. We must distinguish author-authored procedural branching from lossless source conversion; `error`, `unknown`, `not_evaluated`, `not_applicable`, skipped-branch evidence and applicability are not mere syntax questions. Bring the question sheet to Joval. **The actual source-faithful Assessment remains unchanged in the showcase.**
-
-## Questions for the Joval authors
-
-- Are the Test/item, logical group, and individual field requirement scopes a clean evaluation model, including six-valued OVAL semantics and potentially incomplete collection?
-- Are there native Windows registry, shellcommand, WMI/cmdlet or nested record cases that still require a more explicit syntax?
-- Where would you expect meaningful regression differences when translating OVAL 5.12.3 sources into this authoring grammar?
-- Does this preserve adequate source provenance and evidence lineage for enterprise scanners and audit?
-- Which semantics should be settled in the specification before independent scanner implementations begin?
-
-## References
-
-- [0.4 single-grammar candidate and Board vocabulary discussion](https://github.com/vanderpol/scap-ng/issues/227)
-- [Full six-anchor validation and release gate](https://github.com/vanderpol/scap-ng/issues/228)
-- [Scoped requirement before/after and formal caveats](SCOPED-FIELD-REQUIRE-REVIEW.md)
-- [Versioned 0.4 draft schema](../../../schema/v0.4.0/README.md)
-
-**Distribution note:** The two preview ZIPs are *independently readable representations* of the same Assessment content. Path references copied from the original YAML remain YAML-looking inside JSON for fidelity; the JSON mirror is not presently guaranteed to be buildable without a JSON-aware reference resolver.
+**Please send feedback as a concrete source node → observed Item/field population → expected six-state result → candidate NG expression.** That gives us a reusable conformance test, not just a vocabulary preference. [Assessment grammar decisions #227](https://github.com/vanderpol/scap-ng/issues/227) · [semantics #229](https://github.com/vanderpol/scap-ng/issues/229) · [capability schemas #228](https://github.com/vanderpol/scap-ng/issues/228).
