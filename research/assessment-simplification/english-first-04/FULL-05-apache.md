@@ -12,12 +12,14 @@
 
 **Authoring question:** Would you prefer an explicit reusable `discover Apache configuration` source, and can you tell exactly how it would preserve the existing command/collection behavior?
 
-## Before — complete existing 0.4 Assessment
+## Complete assessments — side by side
 
-Full source including metadata, Tests, shared Objects, Variables (where used), source selectors and evaluate tree. Nothing omitted.
+Both columns include the **complete** original and proposed YAML; no checks, sources, Variables, or evaluation branches have been omitted. The view is intended for a wide desktop browser. If the table is wider than the viewport, scroll horizontally inside the rendered table. Standalone YAML links remain above.
 
-```yaml
-assessment:
+<table>
+<thead><tr><th align="left" width="50%">BEFORE — Current 0.4</th><th align="left" width="50%">AFTER — English-first research</th></tr></thead>
+<tbody><tr>
+<td valign="top" width="50%"><pre><code>assessment:
   id: SV-214228.automated
   version: 2
   assessment_title: The Apache web server must limit the number of allowed simultaneous session requests.
@@ -356,15 +358,8 @@ assessment:
         command: ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
         pattern: ^\/\S+(\/httpd|\/apache2)\s*
         error_if_exit_status_not_0: false
-        error_if_stderr_exists: false
-```
-
-## After — complete generated English-first research Assessment
-
-Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
-
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+        error_if_stderr_exists: false</code></pre></td>
+<td valign="top" width="50%"><pre><code># EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-214228.automated
@@ -700,8 +695,10 @@ evaluate:
   - test: verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test
   - test: if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test
   - test: verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test
-  - test: if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test
-```
+  - test: if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test</code></pre></td>
+</tr></tbody>
+</table>
+
 
 ## What to tell us
 
