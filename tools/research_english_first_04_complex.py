@@ -307,6 +307,20 @@ def native_source(src):
   out["set"]={"operator":op,"operands":operands}
  return out
 
+# The author reads the source/collection before the expected condition.
+# This is only YAML mapping order, never scan sequencing or Test semantics.
+READING_ORDER=(
+ "check","inspect","gather","input_from",
+ "all_state_fields_exist","all_state_fields_when_present",
+ "require","report_elements",
+)
+
+def order_human_check(check):
+ unknown=set(check)-set(READING_ORDER)
+ if unknown:raise ValueError("unrecognized human Test display attributes "+repr(unknown))
+ return {k:check[k] for k in READING_ORDER if k in check}
+
+
 def human_test(test):
  supported={"test_title","capability","object","states","reported_elements",
             "collected_items_require","states_match","state_fields_require","variable"}
@@ -325,7 +339,7 @@ def human_test(test):
   if "variable" in test:
    if not isinstance(test["variable"],str) or not test["variable"]:raise ValueError("invalid direct Test Variable")
    result["input_from"]={"variable":test["variable"]}
-  return result
+  return order_human_check(result)
  if item_mode not in ITEM_REQS:
   raise ValueError("unproven output or Item scope")
  states=test["states"]
@@ -353,7 +367,7 @@ def human_test(test):
  if "variable" in test:
   if not isinstance(test["variable"],str) or not test["variable"]:raise ValueError("invalid direct Test Variable")
   readable["input_from"]={"variable":test["variable"]}
- return readable
+ return order_human_check(readable)
 
 def native_test(src):
  mandatory={"check","inspect","require","report_elements"}
