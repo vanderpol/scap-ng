@@ -15,7 +15,11 @@ from research_04_scoped_schema import validate
 from test_v04_review_reference_graph import scan
 
 EXPECTED_DOCUMENTS = 4001
-EXPECTED_AUTO_ASSESSMENTS = 1396
+# Pinned six-STIG preview sums 1,396 per-Benchmark *occurrences*.
+# Its shared Assessment deduplication yields only 872 distinct authored
+# automated documents. Do not confuse these counts or weaken the gate.
+EXPECTED_AUTO_ASSESSMENTS = 872
+EXPECTED_NATIVE_TEST_NODES = 1375
 EXPECTED_RULES = 1567
 EXPECTED_ASSESSMENT_IDS = 2422
 EXPECTED_RULE_CHOICE_LINKS = 2958
@@ -61,6 +65,7 @@ def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
                 raise ValueError(f"{path}: invalid Assessment")
             if assessment.get("mode") == "automated":
                 total["automated_assessments"]+=1
+                total["native_test_nodes"]+=len(assessment.get("tests") or {})
                 if validate_native:
                     try:
                         validate(doc,cache)
@@ -84,6 +89,7 @@ def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
             ("rule",EXPECTED_RULES),
             ("rule_choice_links",EXPECTED_RULE_CHOICE_LINKS),
             ("automated_assessments",EXPECTED_AUTO_ASSESSMENTS),
+            ("native_test_nodes",EXPECTED_NATIVE_TEST_NODES),
             ("unresolved",0),
         ):
             if total[key] != expected:
