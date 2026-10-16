@@ -94,6 +94,10 @@ In 0.4, `mount_options` and `equals` are directly readable, and the two `require
 
 That same [SV-253495 file](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) also contains nested WMI records with separate **record and record-field requirements**. See the [technical examples](ASSESSMENT-REVIEW-TECHNICAL.md) for that excerpt.
 
+## Need more than single-Test examples?
+
+The [three complex source-backed Assessments](COMPLEX-REAL-WORLD-EXAMPLES.md) show the **full multi-Test logic** for Windows role-dependent user rights, DNS zone/Variable processing and Apache configuration discovery. This is where the Slang-inspired readability goals meet actual OVAL complexity. The short samples above are deliberately the entry point, not the completeness argument.
+
 ## Suggested review flow (20 minutes)
 
 | Time | Focus | Question for reviewers |
