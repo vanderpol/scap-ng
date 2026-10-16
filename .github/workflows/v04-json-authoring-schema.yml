@@ -1,0 +1,53 @@
+name: 0.4 independent JSON authoring schema and reference gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/test_v04_json_authoring_readiness.py'
+      - 'tools/test_v04_review_reference_graph.py'
+      - 'tools/research_04_scoped_schema.py'
+      - '.github/workflows/v04-json-authoring-schema.yml'
+  pull_request:
+    paths:
+      - 'tools/test_v04_json_authoring_readiness.py'
+      - 'tools/test_v04_review_reference_graph.py'
+      - 'tools/research_04_scoped_schema.py'
+      - '.github/workflows/v04-json-authoring-schema.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  json-candidate:
+    name: Validate direct JSON 0.4 candidate source
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install JSON Schema / research dependencies
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Retrieve immutable r3 JSON authoring ZIP (no YAML input)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --pattern scap-ng-v0.4-joval-six-stig-json.zip --dir work
+      - name: Check negative references and validate 1,396 native JSON Assessments
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_json_authoring_readiness.py \
+            --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --report work/json-source-schema-report.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: independent-v04-json-source-schema-report
+          path: work/json-source-schema-report.json
+          if-no-files-found: error
