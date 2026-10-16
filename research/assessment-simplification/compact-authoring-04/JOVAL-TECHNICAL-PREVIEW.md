@@ -42,22 +42,7 @@ Windows 11 [SV-253495](https://github.com/vanderpol/scap-ng-editor-sample-data/b
             require: at_least_one_exists_and_all_match
 ```
 
-A separate user-right Test in the same Assessment shows why the two cardinalities cannot collapse:
-
-```yaml
-    deny-log-on-through-remote-desktop-services-guests-test:
-      test_title: Deny log on through Remote Desktop Services - Guests
-      capability: windows.userright
-      object: windows-userright-object
-      states:
-      - trustee_name:
-          require: at_least_one_exists_and_all_match
-          case_insensitive_equals: Guests
-      reported_elements: all
-      collected_items_require: at_least_one_exists_and_some_match
-```
-
-`at_least_one_exists_and_some_match` governs **Items** in the user-right Test; `at_least_one_exists_and_all_match` governs the **trustee-name field**. This is a semantic difference, not just word choice.
+The [Guests user-right Test in the meeting overview](JOVAL-MEETING-2026-10-16.md#three-ng-examples-from-the-actual-six-stig-r3-content) makes the contrast: `at_least_one_exists_and_some_match` applies to collected **Items**; its `trustee_name.require: at_least_one_exists_and_all_match` applies to the **field's values**. They cannot be merged.
 
 ### 2. DNS: “only one and it matches”
 
@@ -74,7 +59,7 @@ The Test also declares `collected_items_require: at_least_one_exists_and_all_mat
 
 ### 3. Apache: preserve actual runtime dataflow
 
-Apache [SV-214228](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml) still needs dynamic Variables because a config path is assembled from detected paths. The converter **does not** replace this with an invented literal or claim a general lossless `for_each` rewrite.
+Apache [SV-214228](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml) still needs dynamic Variables because a config path is assembled from detected paths. The converter **does not** replace this with an invented literal or claim a universal lossless `for_each` rewrite. Typed literal components in this particular dynamic expression are still present in the r3 source; datatype simplification is not universal.
 
 ```yaml
     filepath-http-conf-file-variable:
