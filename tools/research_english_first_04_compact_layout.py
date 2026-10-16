@@ -6,6 +6,9 @@ inline gathered data, lifts ordinary collector fields alongside inspect, and
 uses 'from' for a named shared source. The inverse is deterministic.
 Reconstruct whole original source for every admitted Assessment.
 
+The direct union/difference/intersection/complement spelling is a reversible
+experiment: it never drops a one-operand Set or alters filter order.
+
 Not a normative grammar, scanner, or readability-user study.
 """
 import argparse
@@ -30,6 +33,77 @@ READABLE_MATCH_KEYS = {
     "no_collected_item": "no_item_may_match",
 }
 NATIVE_MATCH_KEYS = {v: k for k, v in READABLE_MATCH_KEYS.items()}
+SET_OPERATIONS = {"union", "difference", "intersection", "complement"}
+
+
+def compact_source(original):
+    """Remove the redundant 'combine' wrapper, retaining every Set operand."""
+    source = deepcopy(original)
+    if not isinstance(source, dict):
+        raise ValueError("collection source must be a mapping")
+    if "combine" not in source:
+        return source
+    spec = source.pop("combine")
+    if not isinstance(spec, dict) or len(spec) != 1:
+        raise ValueError("Set must have exactly one operation")
+    op, operands = next(iter(spec.items()))
+    if op not in SET_OPERATIONS or any(x in source for x in SET_OPERATIONS):
+        raise ValueError("invalid or duplicate Set operation")
+    if not isinstance(operands, list) or not operands:
+        raise ValueError("Set operands must be a nonempty list")
+    converted = []
+    for operand in operands:
+        if not isinstance(operand, dict) or "from" not in operand:
+            raise ValueError("Set operand lacks source")
+        part = deepcopy(operand)
+        reference = part["from"]
+        if isinstance(reference, dict) and set(reference) == {"source"}:
+            if not isinstance(reference["source"], str) or not reference["source"]:
+                raise ValueError("invalid referenced collection")
+            part["from"] = reference["source"]
+        elif isinstance(reference, dict):
+            part["from"] = compact_source(reference)
+        else:
+            raise ValueError("unsupported Set operand reference")
+        converted.append(part)
+    source[op] = converted
+    return source
+
+
+def expand_source(compacted, names):
+    """Restore the exact original Set tree; reject ambiguous sources."""
+    source = deepcopy(compacted)
+    if not isinstance(source, dict):
+        raise ValueError("collection source must be a mapping")
+    if "combine" in source:
+        raise ValueError("noncanonical combine wrapper")
+    operators = SET_OPERATIONS & set(source)
+    if len(operators) > 1:
+        raise ValueError("multiple Set operations")
+    if not operators:
+        return source
+    op = next(iter(operators))
+    operands = source.pop(op)
+    if not isinstance(operands, list) or not operands:
+        raise ValueError("Set operands must be a nonempty list")
+    restored = []
+    for operand in operands:
+        if not isinstance(operand, dict) or "from" not in operand:
+            raise ValueError("Set operand lacks source")
+        part = deepcopy(operand)
+        reference = part["from"]
+        if isinstance(reference, str):
+            if not reference or reference not in names:
+                raise ValueError("undefined named Set source " + reference)
+            part["from"] = {"source": reference}
+        elif isinstance(reference, dict):
+            part["from"] = expand_source(reference, names)
+        else:
+            raise ValueError("invalid Set operand reference")
+        restored.append(part)
+    source["combine"] = {op: restored}
+    return source
+
 
 
 def compact(original):
@@ -37,6 +111,7 @@ def compact(original):
     doc = deepcopy(original)
     if set(doc) != {"metadata", "sources", "checks", "evaluate"}:
         raise ValueError("unrecognized source grammar")
+    doc["sources"] = {name: compact_source(src) for name, src in doc["sources"].items()}
     for name, check in doc["checks"].items():
         if set(check) - BASE_CHECK - {"gather"}:
             raise ValueError("unrecognized input check keys: " + name)
@@ -50,7 +125,8 @@ def compact(original):
                 requirement[readable] = requirement.pop(source)
         if "gather" not in check:
             continue
-        gather = check["gather"]
+        gather = compact_source(check["gather"])
+        check["gather"] = gather
         if not isinstance(gather, dict):
             raise ValueError("gather not mapping")
         if set(gather) == {"source"}:
@@ -80,6 +156,7 @@ def expand(compact_doc):
     doc = deepcopy(compact_doc)
     if set(doc) != {"metadata", "sources", "checks", "evaluate"}:
         raise ValueError("unexpected document keys")
+    source_names = set(doc["sources"])
     for name, check in doc["checks"].items():
         if set(check) - BASE_CHECK - EXTENDED:
             raise ValueError("unexpected check property " + name)
@@ -113,10 +190,14 @@ def expand(compact_doc):
             gather = check["gather"]
             if not isinstance(gather, dict):
                 raise ValueError("invalid gather map")
+            gather = expand_source(gather, source_names)
             if "inspect" not in gather:
                 gather["inspect"] = check["inspect"]
             if set(gather) == {"source", "inspect"}:
                 raise ValueError("ambiguous reference collector")
+            check["gather"] = gather
+    doc["sources"] = {name: expand_source(src, source_names)
+                      for name, src in doc["sources"].items()}
     return doc
 
 
@@ -170,6 +251,11 @@ def inspect(archive, examples_dir=None):
                     "inspect" not in item["gather"]
                 ):
                     saved_by_category["deduplicated_nested_inspect"] += 1
+                if "gather" in item and any(op in item["gather"] for op in SET_OPERATIONS):
+                    saved_by_category["direct_check_set_ops"] += 1
+            for src in compacted["sources"].values():
+                if any(op in src for op in SET_OPERATIONS):
+                    saved_by_category["direct_shared_set_ops"] += 1
             if len(exact) < 8:
                 exact.append({"path": path, "tests": len(ass["tests"])})
             if examples_dir:
@@ -196,6 +282,11 @@ def inspect(archive, examples_dir=None):
         {"where": {}, "from": "shared"},
         {"collect": {}, "gather": {}},
         {"from": "missing-source"},
+        {"gather": {"union": [], "difference": []}},
+        {"gather": {"union": []}},
+        {"gather": {"union": [{"from": "missing-source"}]}},
+        {"gather": {"union": [{"from": 123}]}},
+        {"gather": {"combine": {"union": [{"from": "x"}]}}},
     ]:
         obj = {"metadata": {}, "sources": {}, "evaluate": {"test": "dummy"},
                "checks": {"dummy": {"check": "dummy", "inspect": "unix.file",
