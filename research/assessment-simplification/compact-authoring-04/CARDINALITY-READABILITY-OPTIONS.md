@@ -199,6 +199,65 @@ require:
 
 **Next experiments:** preserve source `collected_items_require` (existence and match independently) and State-field/record comparisons on Linux initialized files (one branch may have no matching Items), Windows WMI role branches, DNS command outputs, and Apache optional fields. Disallow any silent two-valued short-circuit or derived-field alias without exhaustive proof.
 
+## G. A one-line requirement without JSON-looking YAML?
+
+**Feedback:** the short `require: {trustee_name: {includes_ignoring_case: Guests}}` looked like mixing YAML with JSON. The author found its meaning promising but wants to continue research rather than freeze the punctuation. Distinguish **YAML display style** from **Assessment grammar semantics**.
+
+### Four spellings, only two equivalent today
+
+**Block YAML — ordinary hierarchy, no braces:**
+
+```yaml
+require:
+  trustee_name:
+    includes_ignoring_case: Guests
+```
+
+**Flow YAML — compact single line, visually JSON-like:**
+
+```yaml
+require: {trustee_name: {includes_ignoring_case: Guests}}
+```
+
+Both are **standard YAML** and parse to the exact same nested mapping. They are **not** two SCAP-NG languages. A style guide/editor can render the same AST differently at different screen widths, without a different schema or operator.
+
+**Dotted-key alternative — short but not the same YAML structure:**
+
+```yaml
+require:
+  trustee_name.includes_ignoring_case: Guests
+```
+
+This is legal YAML but creates a single *literal key* `trustee_name.includes_ignoring_case`. A compiler would need to parse the dot as a special SCAP-NG rule. It can collide with field names containing dots, becomes complicated for record members and authors unfamiliar with property-path notation, and is not simply a whitespace shortcut for the nested map. **Not recommended** without a proven field-path escaping and conformance model.
+
+**Sentence-like scalar alternative — terse but a second mini-language:**
+
+```yaml
+require: trustee_name includes_ignoring_case Guests
+```
+
+Valid YAML **string**, but the scanner/compiler would have to parse an invented expression grammar inside it. Quoting, escaping, complex values, arrays, regexes and records would require a second language. **Reject** as a general normative form.
+
+The first two forms were locally parsed with `yaml.safe_load`: they produced **identical nested mappings**; the dotted-key alternative produced a different literal key, and the sentence produced an unstructured string. This is a structural check, **not OVAL-equivalence validation**.
+
+### Keep the full data source in view
+
+```yaml
+# English-first authoring sketch, not valid 0.4 and not yet proven lossless
+check: Guests must be denied Remote Desktop logon
+inspect: windows.userright
+where:
+  userright:
+    equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+require:
+  trustee_name:
+    includes_ignoring_case: Guests
+```
+
+**Critical semantic caveat:** Original [SV-253495](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/main/focused-fixtures/source-backed/authoring/ms_windows_11/assessments/automated/SV-253495.automated.yaml) has a **Test-level** existence one-or-more + match one-or-more **and a distinct field-level** `trustee_name` existence one-or-more + match all. The pleasant-looking one-line `includes_ignoring_case` may not preserve this for multi-valued field Items, records, errors or partial collection. Treat as an *intent sketch*, never a converted fixture or a complete valid Test.
+
+**Research recommendation:** keep **one structured YAML-native grammar** (field → comparator → expected value) and treat block/flow as rendering choices, not two syntaxes. Prefer block style in public example pages where braces become visually dense; permit an editor to display or toggle one-line maps when they remain legible. Do not settle the operator `includes_ignoring_case` until its semantics are fully defined. Challenge every candidate with real multi-valued Windows/OVAL cases, regex and array operands, nested records, and counterexamples before promoting 0.4.
+
 ## Apply the same idea to harder real content
 
 | Real example | Existing label | Candidate structured form | Important scope |
