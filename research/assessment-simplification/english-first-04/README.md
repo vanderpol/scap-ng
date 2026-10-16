@@ -7,15 +7,11 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **[Authoring consistency working draft](AUTHORING-CONSISTENCY-WORKING-DRAFT.md)** — one proposed location for each collection operation, set-composition vocabulary, named-source resolution, and acceptance gates. This is research guidance, **not an approved schema**. The [source-backed examples](FOUR-REAL-WORLD-RESEARCH-EXAMPLES.md) now show the Linux referenced collection in the same English-first style rather than switching back to the 0.4 source vocabulary.
 
-## Direct links — six-STIG reference and validation reports
+## Six-STIG reports you can read on github.com
 
-- **[Six-STIG research workflow: latest runs](https://github.com/vanderpol/scap-ng/actions/workflows/research-english-first-census-04.yml)** — select a successful run, then its **Artifacts** section.
-- **[Last previously verified six-STIG research run (October 16)](https://github.com/vanderpol/scap-ng/actions/runs/38922336217)** — earlier structural and six-state results. This run **predates the new reference graph report**; it should not be cited as proving that new check.
-- **Reference graph report:** `english-first-04-reference-graph-report.json`, inside the run artifact `english-first-v04-six-stig-source-census`. It reports missing or malformed references, cycles, and longest source/variable dependency chains. **The new report's successful run and permanent artifact URL have not yet been verified**, so the workflow link above is the authoritative entry point; no guessed artifact URL is provided.
-- **[Reference graph audit implementation](https://github.com/vanderpol/scap-ng/blob/main/tools/research_english_first_04_references.py)** and **[workflow/report artifact configuration](https://github.com/vanderpol/scap-ng/blob/main/.github/workflows/research-english-first-census-04.yml)**.
-- **[Authoring consistency and verification criteria](https://github.com/vanderpol/scap-ng/blob/main/research/assessment-simplification/english-first-04/AUTHORING-CONSISTENCY-WORKING-DRAFT.md)**.
+**[Open the GitHub-hosted six-STIG research reports](reports/README.md)** — the preferred entry point on restricted networks and phones. This folder contains a readable summary of the last independently verified results and is configured to receive each new report as ordinary Markdown and, where practical, JSON files in the repository. **No Actions artifact download is required to read this page.**
 
-The Actions artifact is a ZIP containing the JSON report, not a separately hosted JSON page. Artifacts can expire; a stable direct link to the report itself requires publishing the verified JSON into the repository or an enduring release asset.
+The [six-STIG workflow](https://github.com/vanderpol/scap-ng/actions/workflows/research-english-first-census-04.yml) still creates optional ZIP artifacts, but those may use non-github.com download domains and are not a viable primary distribution method. New reports must be confirmed as successfully published before being described as verified. The [reference graph audit source](https://github.com/vanderpol/scap-ng/blob/main/tools/research_english_first_04_references.py) and [GitHub publication source](https://github.com/vanderpol/scap-ng/blob/main/tools/research_english_first_04_publish.py) are also available directly.
 
 ## Six-state research checkpoint — 125,268 matched generic cases
 
