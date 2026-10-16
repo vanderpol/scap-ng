@@ -117,6 +117,12 @@ The final snippet **illustrates placement and reference resolution**, not an exa
 
 **Evidence boundary:** The previously reported **871/872** full-Assessment structural reconstructions apply to the earlier English-first research. The direct-Set presentation change has been committed to [the research compact-layout script](../../../tools/research_english_first_04_compact_layout.py) with new guard cases. Do **not** quote 871/872 as newly rerun proof for that change until the pinned six-STIG workflow finishes successfully. Nothing here changes released 0.3 content, the pinned 0.4 review artifacts, or the scanner specification.
 
+## Named-reference validation now in CI
+
+The new [source/variable dependency auditor](../../../tools/research_english_first_04_references.py) is wired into the [pinned six-STIG workflow](../../../.github/workflows/research-english-first-census-04.yml). It resolves direct check `from` declarations, Set operands, `for_each_source.in`, local command/Variable references, and source references embedded in Variable expressions. It deliberately does **not** interpret `user.home_dir` as a named Object.
+
+The report separates missing targets, malformed references and cycles, and records the longest prerequisite chain for investigating difficult Apache/DNS cases. Local positive and negative graph fixtures passed. **The full new census result is pending confirmation**; unresolved references found there will be reported, not silently rewritten or assumed to be external imports. Structural lookup does not prove capability typing, execution order, collected-Item counts, or six-state evidence parity.
+
 ## Next decisions
 
 1. Decide whether a one-operand union is retained as a direct unary Set operation in authoring or removed only when formally proven result/evidence equivalent. Source-structure inversion currently retains it.
