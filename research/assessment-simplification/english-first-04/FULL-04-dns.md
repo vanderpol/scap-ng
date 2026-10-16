@@ -12,12 +12,14 @@
 
 **Authoring question:** Could you write a fourth DNS command check from scratch using these definitions, or is the variable graph too opaque?
 
-## Before — complete existing 0.4 Assessment
+## Complete assessments — side by side
 
-Full source including metadata, Tests, shared Objects, Variables (where used), source selectors and evaluate tree. Nothing omitted.
+Both columns include the **complete** original and proposed YAML; no checks, sources, Variables, or evaluation branches have been omitted. The view is intended for a wide desktop browser. If the table is wider than the viewport, scroll horizontally inside the rendered table. Standalone YAML links remain above.
 
-```yaml
-assessment:
+<table>
+<thead><tr><th align="left" width="50%">BEFORE — Current 0.4</th><th align="left" width="50%">AFTER — English-first research</th></tr></thead>
+<tbody><tr>
+<td valign="top" width="50%"><pre><code>assessment:
   id: SV-259345.automated
   version: 8
   assessment_title: The validity period for the Resource Record Signatures (RRSIGs) covering a zone's DNSKEY RRSet
@@ -193,15 +195,8 @@ assessment:
         command: Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors')
           -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}
         error_if_exit_status_not_0: false
-        error_if_stderr_exists: false
-```
-
-## After — complete generated English-first research Assessment
-
-Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
-
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+        error_if_stderr_exists: false</code></pre></td>
+<td valign="top" width="50%"><pre><code># EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-259345.automated
@@ -386,8 +381,10 @@ evaluate:
   - all_of:
     - test: all-forward-lookup-zones-dnssec-signed-test
     - test: all-forward-lookup-zones-have-dns-key-signature-validity-periods-test
-    - test: all-forward-lookup-zones-have-dns-key-signature-validity-periods-2-test
-```
+    - test: all-forward-lookup-zones-have-dns-key-signature-validity-periods-2-test</code></pre></td>
+</tr></tbody>
+</table>
+
 
 ## What to tell us
 
