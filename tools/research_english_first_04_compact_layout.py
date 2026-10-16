@@ -201,7 +201,82 @@ def expand(compact_doc):
     return doc
 
 
+
+def verify_self_test():
+    """Source-shaped fixtures catch lossy Set and named-source rewrites."""
+    linux_operand = {
+        "from": {
+            "inspect": "unix.file",
+            "for_each_source": {"item": "user", "in": "non-system-users"},
+            "where": {"directory": {"from": "user.home_dir"}},
+            "filesystem": "all",
+            "traversal": {"max_depth": 1, "recurse": "symlinks"},
+        },
+        "exclude_if": [{"type": {"is": "directory"}}],
+    }
+    one_operand_union = {
+        "inspect": "unix.file",
+        "combine": {"union": [linux_operand]},
+    }
+    named_difference = {
+        "inspect": "unix.password",
+        "combine": {"difference": [{
+            "from": {"source": "users"},
+            "exclude_if": [
+                {"user_id": {"less_than": 1000}},
+                {"home_dir": {"equals": "/"}},
+            ],
+        }]},
+    }
+    sources = {"users": {"inspect": "unix.password"},
+               "non-system-users": named_difference}
+    checks = {
+        "file-check": {
+            "check": "Check initialization file permissions",
+            "inspect": "unix.file",
+            "gather": one_operand_union,
+            "require": {"items_may_be_absent": True,
+                        "every_collected_item": {"setuid": {"is": False}}},
+            "report_elements": "all",
+        },
+        "named-check": {
+            "check": "Check collected user accounts",
+            "inspect": "unix.password",
+            "gather": {"source": "non-system-users"},
+            "require": {"every_collected_item": {"user_id": {"at_least": 1000}}},
+            "report_elements": "all",
+        },
+    }
+    doc = {"metadata": {}, "sources": sources, "checks": checks,
+           "evaluate": {"test": "file-check"}}
+    compacted = compact(doc)
+    if expand(compacted) != doc:
+        raise AssertionError("complex Set and references did not round trip")
+    if "combine" in compacted["checks"]["file-check"]["gather"]:
+        raise AssertionError("redundant Set wrapper still present")
+    if "union" not in compacted["checks"]["file-check"]["gather"]:
+        raise AssertionError("one-operand Set was erased")
+    if "difference" not in compacted["sources"]["non-system-users"]:
+        raise AssertionError("shared-source Set was erased")
+    if compacted["checks"]["named-check"].get("from") != "non-system-users":
+        raise AssertionError("named check source not normalized")
+    for illegal in [
+        {"union": [], "difference": [linux_operand]},
+        {"union": []},
+        {"union": [{"from": "unknown"}]},
+        {"union": [{"from": {"inspect": "unix.file", "combine": {"union": []}}}]},
+    ]:
+        try:
+            expand_source(illegal, set(sources))
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("noncanonical/undefined Set accepted")
+    return True
+
+
 def inspect(archive, examples_dir=None):
+    verify_self_test()
     digest = hashlib.sha256(Path(archive).read_bytes()).hexdigest()
     if digest != PINNED:
         raise ValueError("unexpected source archive")
