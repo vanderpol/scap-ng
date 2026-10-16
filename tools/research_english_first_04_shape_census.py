@@ -180,6 +180,9 @@ def inspect(archive):
                             "object_type": type(test.get("object")).__name__,
                             "object_sample": repr(test.get("object"))[:250],
                             "test_keys": sorted(test),
+                            "capability": cap,
+                            "item_require": test.get("collected_items_require"),
+                            "states_sample": repr(test.get("states"))[:700],
                         })
                 if not isinstance(test.get("test_title"), str) or not test.get("test_title"):
                     counts["missing_title"] += 1
