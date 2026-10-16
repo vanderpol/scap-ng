@@ -21,6 +21,8 @@ The six-STIG reports are *engineering evidence*, not evidence that a person can 
 
 Source: [current six-STIG reports, run 38932589417](reports/README.md). This is pinned-source research, not a claim of equivalence to the original SCAP 1.4 XML in execution.
 
+**[Before/after review with complete source links](BEFORE-AFTER-REVIEW.md)** — use this page when deciding whether a real author would prefer the proposed form.
+
 ## The four examples we should actually review
 
 | Real assessment | What the reader should judge | Current limitation |
