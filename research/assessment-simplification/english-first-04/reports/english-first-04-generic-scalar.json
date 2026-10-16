@@ -1,0 +1,557 @@
+{
+  "capabilities": {
+    "independent.shellcommand": 30,
+    "independent.textfilecontent54": 75,
+    "linux.partition": 2,
+    "linux.selinuxsecuritycontext": 1,
+    "linux.systemdunitproperty": 13,
+    "unix.file": 35,
+    "unix.password": 1,
+    "unix.symlink": 12,
+    "unix.sysctl": 7,
+    "windows.appcmdlistconfig": 1,
+    "windows.registry": 9,
+    "windows.service": 2,
+    "windows.user_sid55": 1
+  },
+  "counts": {
+    "all_named_tests": 1375,
+    "exact_generic_scalar_tests": 189,
+    "rejected_complex_object_or_set": 150,
+    "rejected_extra_test_state_scope_or_properties": 96,
+    "rejected_field_cardinality_or_operation_not_covered": 144,
+    "rejected_grouped_or_multi_field_state": 152,
+    "rejected_item_cardinality_or_evidence_not_covered": 519,
+    "rejected_no_typed_object": 114,
+    "rejected_nonliteral_comparison": 8,
+    "rejected_unrecognized_field": 3
+  },
+  "examples": [
+    {
+      "candidate": {
+        "check": "Gather all installation directories from running apache httpd processes",
+        "collect": {
+          "command": "ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": "^\\/\\S+(\\/httpd|\\/apache2)\\s*",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "^/"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/applicability/platform.cpe-apache-http-server-2-4.yaml",
+      "test": "gather-all-installation-directories-from-running-apache-httpd-processes-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-keepalive-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "\\s*KeepAlive On"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml",
+      "test": "verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that MaxKeepAliveRequests is defined and is configured to 100 or greater httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-maxkeepaliverequests-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": "MaxKeepAliveRequests (\\d+)",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "subexpression": {
+              "has_only_values_at_least": 100
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml",
+      "test": "verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that SSLProtocol directrive is defined, and is configured to -SSLv2 -SSLv3 -TLSv1 +TLSv1.2 +TLSv1.3 in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-sslprotocol-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "\\s*SSLProtocol -SSLv2 -SSLv3 -TLSv1 \\+TLSv1\\.2 \\+TLSv1\\.3"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214230.automated.yaml",
+      "test": "verify-that-sslprotocol-directrive-defined-configured-sslv2-sslv3-tlsv1-tlsv1-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that CustomLog directive is defined in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-customlog-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "\\s*CustomLog\\s+.+\\s+.+"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214231.automated.yaml",
+      "test": "verify-that-customlog-directive-defined-in-httpd-conf-apache2-conf-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that LogFormat directive is defined and configured correctly for all httpd.conf/apache2.conf and included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-logformat-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "\\s*LogFormat \"%a %A %h %H %l %m %s %t %u %U \\\\\"%\\{Referer\\}i\\\\\" \" common"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214232.automated.yaml",
+      "test": "verify-that-logformat-directive-defined-configured-correctly-all-httpd-conf-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that Listen directive is defined and configured to ip and port for all httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-listen-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "Listen ((?:(?:\\d{1,3}\\.){3}(?:\\d{1,3}))|(?:(?:::)?(?:[\\dA-Fa-f]{1,4}:{1,2}){1,7}(?:[\\d\\%A-Fa-z\\.]+)?(?:::)?)|(?:::[\\dA-Fa-f\\.]{1,15})|(?:::)):\\d+"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214246.automated.yaml",
+      "test": "verify-that-listen-directive-defined-configured-ip-port-all-httpd-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that SessionMaxAge is defined and configured to 600 or less for all httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-sessionmaxage-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": "SessionMaxAge (\\d+)",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "subexpression": {
+              "has_only_values_at_most": 600
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214250.automated.yaml",
+      "test": "verify-that-sessionmaxage-defined-configured-600-or-less-all-httpd-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that SessionCryptoCipher is defined and configured to aes256 for all httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-sessioncryptocipher-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "\\s*SessionCryptoCipher aes256"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214252.automated.yaml",
+      "test": "verify-that-sessioncryptocipher-defined-configured-aes256-all-httpd-conf-apache2-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that Timeout directive is deinfed, and is configured to 60 or less in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-timeout-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": "Timeout (\\d+)",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "subexpression": {
+              "has_only_values_at_most": 60
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214255.automated.yaml",
+      "test": "verify-that-timeout-directive-deinfed-configured-60-or-less-in-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that ErrorDocument directive exists and is configured to 4xx codes in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-errordocument-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": "ErrorDocument\\s+4\\d{2}",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "ErrorDocument\\s+4\\d{2} .+"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214256.automated.yaml",
+      "test": "verify-that-errordocument-directive-exists-configured-4xx-codes-in-httpd-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that ErrorDocument directive exists and is configured to 5xx codes in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-errordocument-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": "ErrorDocument\\s+5\\d{2}",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "ErrorDocument\\s+5\\d{2} .+"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214256.automated.yaml",
+      "test": "verify-that-errordocument-directive-exists-configured-5xx-codes-in-httpd-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that TraceEnable directive is defined and is Off in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-traceenable-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "(?i)TraceEnable Off"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214257.automated.yaml",
+      "test": "verify-that-traceenable-directive-defined-off-in-httpd-conf-apache2-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that LogLevel is defined and configured to disable debug and trace in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-loglevel-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "(?i)LogLevel\\s+(info|notice|warn|error|crit|alert|emerg)"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214257.automated.yaml",
+      "test": "verify-that-loglevel-defined-configured-disable-debug-trace-in-httpd-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify the RequestReadTimeout directive exists in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-requestreadtimeout-in-all-loaded-conf-files-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "(?i)RequestReadTimeout .+"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214258.automated.yaml",
+      "test": "verify-requestreadtimeout-directive-exists-in-httpd-conf-apache2-conf-or-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that LogFormat directive exists and is configured to include %t for all httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-logformat-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "%t"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214265.automated.yaml",
+      "test": "verify-that-logformat-directive-exists-configured-include-t-all-httpd-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify the Session directive exists and is configured to On for all httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-session-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "(?i)Session On"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214268.automated.yaml",
+      "test": "verify-session-directive-exists-configured-on-all-httpd-conf-apache2-test"
+    },
+    {
+      "candidate": {
+        "check": "Verify that SSLCipherSuite is defined and configured to include !EXPORT or !EXP in httpd.conf/apache2.conf or included conf files",
+        "collect": {
+          "command": {
+            "variable": "shell-command-check-sslciphersuite-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "inspect": "independent.shellcommand",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "stdout_line": {
+              "has_only_values_matching_regex": "\\s*SSLCipherSuite.*\\!EXP"
+            }
+          }
+        }
+      },
+      "source": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214269.automated.yaml",
+      "test": "verify-that-sslciphersuite-defined-configured-include-export-or-exp-in-test"
+    },
+    {
+      "candidate": {
+        "check": "The installed operating system is Windows 10 or 11",
+        "inspect": "windows.registry",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "value": {
+              "has_only_values_matching_regex": "^[Ww][Ii][Nn][Dd][Oo][Ww][Ss] 1[01].*$"
+            }
+          }
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+          },
+          "name": {
+            "equals": "ProductName"
+          }
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/applicability/platform.cpe-o-microsoft-windows-11.yaml",
+      "test": "installed-operating-system-windows-10-or-11-test"
+    },
+    {
+      "candidate": {
+        "check": "The current build number is 22000 or greater.",
+        "inspect": "windows.registry",
+        "report_elements": "all",
+        "require": {
+          "at_least_one_item_exists": true,
+          "every_collected_item": {
+            "value": {
+              "has_only_values_at_least": 22000
+            }
+          }
+        },
+        "where": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+          },
+          "name": {
+            "equals": "CurrentBuildNumber"
+          }
+        }
+      },
+      "source": "authoring/ms_windows_11/assessments/applicability/platform.cpe-o-microsoft-windows-11.yaml",
+      "test": "current-build-number-22000-or-greater-test"
+    }
+  ],
+  "negative_guards": 567,
+  "semantic_scope": "requires both source Test Item and field value one_or_more/all; all reported elements",
+  "source_sha256": "03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d",
+  "status": "EXACT COMMON SCALAR NODE STRUCTURE; NO RUNTIME OR READABILITY VALIDATION"
+}
