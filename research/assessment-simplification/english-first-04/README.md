@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[NEW INDEPENDENT RESTART — requirements-first auditor authoring](../../requirements-first-language/README.md)** — reconsidered the August/October Claude proposals and deliberately omitted Object/Test/State from native authoring; ten new complete native sketches (Windows, Linux, Apache, DNS, nested user/file, manual, conditional), strict structural validator and adversarial tests. **Not the same syntax as the English-first OVAL-aligned experiments, not lossless SCAP 1.4 conversion proof, no native providers implemented.** This new research track should be evaluated on provider contracts and cold authorability, not line count.
+
+
 **[New — five permanent generated auditor previews on github.com](field-presence-iteration/generated-previews/INDEX.md)** explain the full source/Variables, exact predicates and complete AND/OR trees from parsed Assessment YAML; Windows has 7 named checks and 8 leaf uses. **[Generic six-state truth ledger](field-presence-iteration/generated-previews/SEMANTIC-BOUNDARY-LEDGER.md)** is separately marked reference-only. [CI run 39052675482](https://github.com/vanderpol/scap-ng/actions/runs/39052675482) passed source inverse, negative-reference tests, reference truth tables and publication. [Answer-free raw-versus-auditor-view external review packet](field-presence-iteration/AUDITOR-PREVIEW-BLIND-COMPARISON.md). Still no scanner-semantic parity or normative 0.4 language adoption.
 
 
