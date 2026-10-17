@@ -10,7 +10,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parent))
 import yaml
 from research_linux_init_permissions import (
     ALLOWED_MODE,FLAG_BITS,mode_complies,eight_flag_comparisons,
-    evaluate,per_user_required_root_files
+    evaluate,per_user_required_root_files,only_these_bits
 )
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -36,6 +36,14 @@ class LinuxInitializationSourceConstraintTests(unittest.TestCase):
         for mode in range(0o10000):
             with self.subTest(mode=oct(mode)):
                 self.assertEqual(mode_complies(mode),all(eight_flag_comparisons(mode).values()))
+
+    def test_typed_octal_operator_refuses_numeric_and_non_octal_literals(self):
+        self.assertTrue(only_these_bits(0o600,"0740"))
+        self.assertFalse(only_these_bits(0o644,"0740"))
+        for value in (740,"740","0780","0o740",True,None):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ValueError,"four-digit octal STRING"):
+                    only_these_bits(0o600,value)
 
     def test_numeric_less_than_0740_is_NOT_permission_subsetting(self):
         self.assertLessEqual(0o644,0o740)
