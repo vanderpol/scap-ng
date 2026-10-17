@@ -122,6 +122,72 @@ class CandidateBContractTests(unittest.TestCase):
             item("registry",name="AlwaysInstallElevated",value=0),using=using)}).result,TRUE)
         self.assertEqual(run_case(REG,{"windows.registry_value":pop(using=using)}).result,FALSE)
 
+    def test_two_registry_settings_have_separate_evidence_acquisitions(self):
+        first=read(EXAMPLES/"03-named-registry.yaml")["ast"]
+        second=copy.deepcopy(first)
+        second["using"]=dict(first["using"],name="AnotherSetting")
+        tree={"kind":"logic","operator":"all","children":[first,second]}
+        def observation(using,value):
+            return {"using":using,"status":"complete",
+                    "items":[item(using["name"],value=value)]}
+        source={"windows.registry_value":{"acquisitions":[
+            observation(first["using"],0),observation(second["using"],0)]}}
+        self.assertEqual(evaluate(tree,source).result,TRUE)
+        source["windows.registry_value"]["acquisitions"][1]["items"][0]["fields"]["value"]=1
+        self.assertEqual(evaluate(tree,source).result,FALSE)
+
+    def test_missing_second_acquisition_cannot_reuse_first_registry_value(self):
+        first=read(EXAMPLES/"03-named-registry.yaml")["ast"]
+        second=copy.deepcopy(first)
+        second["using"]=dict(first["using"],name="DifferentSetting")
+        tree={"kind":"logic","operator":"all","children":[first,second]}
+        only_first={"using":first["using"],"status":"complete",
+                    "items":[item("first",value=0)]}
+        fixtures={"windows.registry_value":{"acquisitions":[only_first]}}
+        self.assertEqual(evaluate(tree,fixtures).result,UNKNOWN)
+
+    def test_duplicate_acquisition_parameters_fail_as_provider_error(self):
+        ast=read(EXAMPLES/"03-named-registry.yaml")["ast"]
+        q={"using":ast["using"],"status":"complete",
+           "items":[item("ok",value=0)]}
+        fixtures={"windows.registry_value":{"acquisitions":[q,copy.deepcopy(q)]}}
+        self.assertEqual(evaluate(ast,fixtures).result,ERROR)
+
+    def test_missing_items_field_is_error_not_verified_empty_optional_pass(self):
+        ast=read(EXAMPLES/"02-optional-guest.yaml")["ast"]
+        fixtures={"windows.accounts":{"status":"complete"}}
+        self.assertEqual(evaluate(ast,fixtures).result,ERROR)
+
+    def test_invalid_field_type_never_satisfies_not_equals(self):
+        from research_native_contract_evaluator import compare
+        self.assertEqual(compare(item("bad",enabled="false"),
+                                 "enabled","not_equals",False),ERROR)
+        self.assertEqual(compare(item("bad",value="0"),
+                                 "value","equals",0),ERROR)
+        self.assertEqual(compare(item("bad",mount_options=[7,"nosuid"]),
+                                 "mount_options","contains","nosuid"),ERROR)
+
+    def test_catalog_refuses_boolean_numeric_predicates(self):
+        doc={"id":"x","title":"x","require":{"each":"windows.accounts",
+             "must":{"enabled":{"at_least":0}}}}
+        with self.assertRaisesRegex(ValueError,"incompatible with typed field boolean"):
+            compile_doc(doc)
+
+    def test_catalog_refuses_bitmask_on_unrelated_text_field(self):
+        doc={"id":"x","title":"x","require":{"each":"linux.mounts",
+             "must":{"mount_point":{"only_these_bits":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"incompatible with typed field string"):
+            compile_doc(doc)
+
+    def test_nested_field_group_is_type_checked(self):
+        doc={"id":"x","title":"x","require":{"each":"windows.dns.zones",
+             "as":"zone","must":{"all":[
+                {"fields":{"signed":{"at_least":1}}},
+                {"each":"$zone.zone_signing_keys","minimum_resources":1,
+                 "must":{"validity_hours":{"between":[48,168]}}}]}}}
+        with self.assertRaisesRegex(ValueError,"incompatible with typed field boolean"):
+            compile_doc(doc)
+
     def test_named_registry_duplicate_provider_identity_is_error(self):
         using=sample(REG)["using"]
         evidence=pop(item("v1",name="AlwaysInstallElevated",value=0),
