@@ -140,7 +140,9 @@ def census(path):
                                   "counterpart_examples":[{"source":m["source"],"test":m["test"],"mode":m["mode"]} for m in exact[:3]]})
     def short(row):
         return {k:row[k] for k in ("source","test","check","capability","state_bearing","source_origin","source_shape")}
-    potential={key:[short(r) for r in records if r["source_shape"]["potential_expected_population"]==key]
+    potential={key:[{**short(r),
+                     "object_selector_excerpt":json.dumps(r["object"],sort_keys=True,default=str)[:2400]}
+                     for r in records if r["source_shape"]["potential_expected_population"]==key][:12]
                for key in sorted(bypopulation)}
     return {
        "status":"FORENSIC SOURCE-CHOICE CENSUS: intent not proven; no content rewrites",
