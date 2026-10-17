@@ -96,6 +96,11 @@ def census(path):
                 else:counts['mixed_field_policies']+=1
                 if unique=={item_mode}:
                     counts['item_policy_equals_all_scalar_policies']+=1
+                    if len(fields)>1:
+                        counts['same_as_items_multi_scalar_fields']+=1
+                        classifications['candidate_both_multi']=True
+                    else:
+                        counts['same_as_items_single_scalar_field']+=1
                     classifications['same_as_items']=True
                     if record_count==0:
                         counts['possible_combined_item_field_alias_no_records']+=1
@@ -139,6 +144,7 @@ def markdown(r):
       f"- Ordinary scalar field requirements with one common mode: **{c['same_policy_all_scalar_fields']} Tests**, including **{c.get('same_policy_multiple_fields',0)}** with multiple scalar fields.",
       f"- Field requirements differ from their Item Test requirement in at least one scalar field: **{c['item_policy_differs_from_some_fields']} Tests**.",
       f"- Entire scalar field set uses the *same named requirement mode* as the Item Test: **{c['item_policy_equals_all_scalar_policies']} Tests**; no record wrapper: **{c['possible_combined_item_field_alias_no_records']} Tests**.",
+      f"- Of those potential combined-scope cases, **{c.get('same_as_items_single_scalar_field',0)}** have only one scalar field (new scope likely adds syntax); **{c.get('same_as_items_multi_scalar_fields',0)}** have multiple fields (more promising for a shared default).",
       f"- Tests containing records: **{c['tests_containing_record']}**; record wrappers found: **{c['record_leaf_wrappers']}**.",
       f"- Shared Test-level scalar field policies: **{c.get('tests_with_shared_scalar_policy',0)} Tests**; grouped ones: **{c.get('group_field_policies',0)}**.",
       f"- Missing effective scalar field requirements: **{c.get('missing_ordinary_field_policy',0)}** (expected 0).",
