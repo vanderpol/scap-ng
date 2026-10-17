@@ -30,11 +30,26 @@ The native B named registry provider instead requires **one logical resource** a
 
 Thus merely converting the original Test into B's short native expression can silently change compliance results. A correct importer must either prove source equivalence for a specific class or retain an inspectable, versioned compatibility operation.
 
+## First source-shaped execution over *observed* Items
+
+The [state-free textfile source lowerer](../../../tools/research_b_source_textfile_lowering.py) accepts only the exact converted 0.3 source Test shape of [the shared Chrony `cmdport 0` Assessment](corpus/source-specimens/independent-textfilecontent54-0-4c14428014be.source.yaml). It rejects source States, different Item checks, additional collection options, nontrivial instance selectors and composite evaluation instead of guessing. The lowerer emits a **compiler-owned** `compat_oval_provider_existence` operation, not authored B syntax.
+
+The existing [read-only textfile collector](../../../tools/research_provider_textfile_matches.py) supplies **actual typed, identified match Items**, not precomputed OVAL Test outcomes. The common B fixture dispatcher evaluates the source Test's existence using the pinned OVAL reference table. The [regression suite](../../../tools/test_research_b_source_textfile_lowering.py) creates real temporary files and proves the following intentionally divergent case:
+
+| Observed source | Native B `exists` | Imported source Test (OVAL reference) |
+| --- | --- | --- |
+| Complete, one or more matches | true | true |
+| Complete, zero matches | false | false |
+| **Incomplete, one observed matching Item** | **true** (witness is decisive) | **unknown** (incomplete source Test) |
+| Incomplete, zero matches | unknown | unknown |
+
+**This is not a scanner parity claim.** Python regex, UTF-8 decoding, `filesystem: all`, `item_creation`, OVAL Item flags and full original SCAP 1.4 source XML remain unverified. The table demonstrates why one native B shorthand cannot be substituted for a seemingly equivalent imported source Test without checking the exact outcome domain and completeness contract. The source compatibility node runs with the **same typed collection result** and evaluator dispatcher, avoiding a second authored language.
+
 ## Proven and missing
 
-**Implemented in research:** deterministic JSON encoding/decoding, contract/version/corruption checks, AST structural validation, mixed native and pre-evaluated compatibility aggregation, tests against pinned source Assessment structures, and explicit separation of native vs compiler-only input.
+**Implemented in research:** deterministic JSON encoding/decoding, contract/version/corruption checks, AST structural validation, mixed native and pre-evaluated compatibility aggregation plus a bounded source-state-free Test consuming observed Items, tests against pinned source Assessment structures, and explicit separation of native vs compiler-only input.
 
-**NOT implemented:** signed scanner bundle integration, independent JSON Schema conformance, real OVAL XML-to-B lowering, executable legacy Object collection, State and Variable evaluation, per-record/field cardinality, six-state full B runtime, actual Windows registry scanning, full source-equivalent evidence acquisition, reusable cross-host cache, results packaging, or parity on the six STIGs. The SHA-256 field is a **corruption check, not an authenticity signature**. The compatibility Test values here are *pre-evaluated*, not collected from a host.
+**NOT implemented:** complete generic source lowering or scanner parity; signed scanner bundle integration, independent JSON Schema conformance, real OVAL XML-to-B lowering, executable legacy Object collection, State and Variable evaluation, per-record/field cardinality, six-state full B runtime, actual Windows registry scanning, full source-equivalent evidence acquisition, reusable cross-host cache, results packaging, or parity on the six STIGs. The SHA-256 field is a **corruption check, not an authenticity signature**. The compatibility Test values here are *pre-evaluated*, not collected from a host.
 
 ## Next B development gate
 
