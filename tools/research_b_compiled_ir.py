@@ -37,6 +37,14 @@ def _ensure(condition, reason):
         raise ValueError("B compiled fixture IR: " + reason)
 
 
+def _unique_pairs(pairs):
+    result = {}
+    for key, value in pairs:
+        _ensure(key not in result, "duplicate JSON property " + key)
+        result[key] = value
+    return result
+
+
 def _predicates(values):
     _ensure(isinstance(values, list), "predicates must be array")
     for entry in values:
@@ -44,7 +52,8 @@ def _predicates(values):
                 "predicate must have field/operator/value only")
         _ensure(isinstance(entry["field"], str) and bool(entry["field"]),
                 "predicate field must be named")
-        _ensure(entry["operator"] in OPS, "unknown predicate operation")
+        _ensure(isinstance(entry["operator"], str) and entry["operator"] in OPS,
+                "unknown predicate operation")
         # Authoring compilation validates typed fields. This research decode
         # only validates JSON/tree shape, NOT a production provider contract.
 
@@ -68,9 +77,11 @@ def _node(node, source_kind, depth=0):
         _ensure(isinstance(t["flag"], str) and
                 t["flag"] in {"complete", "incomplete", "error", "not collected",
                               "not applicable", "does not exist"}, "invalid source collection flag")
-        _ensure(t["existence"] in {"all_exist", "any_exist", "at_least_one_exists",
+        _ensure(isinstance(t["existence"], str) and
+                t["existence"] in {"all_exist", "any_exist", "at_least_one_exists",
                                    "none_exist", "only_one_exists"}, "invalid existence operation")
-        _ensure(t["check"] in {"all", "at least one", "only one", "none satisfy"},
+        _ensure(isinstance(t["check"], str) and
+                t["check"] in {"all", "at least one", "only one", "none satisfy"},
                 "invalid OVAL Item check")
         for key in ("exists", "does_not_exist", "error", "not_collected"):
             if key in t:
@@ -87,7 +98,8 @@ def _node(node, source_kind, depth=0):
     if kind == "logic":
         _ensure(set(node) == {"kind", "operator", "children"},
                 "logic node has unexpected keys")
-        _ensure(node["operator"] in {"all", "any"},
+        _ensure(isinstance(node["operator"], str) and
+                node["operator"] in {"all", "any"},
                 "only current B AND/OR logic is supported")
         _ensure(isinstance(node["children"], list) and len(node["children"]) >= 2,
                 "logic node needs two or more children")
@@ -109,7 +121,8 @@ def _node(node, source_kind, depth=0):
     _ensure(isinstance(p, str) and bool(p) and
             (p in PROVIDERS or p.startswith("$")),
             "unknown typed resource")
-    _ensure(node["mode"] in {"each", "some", "none", "exactly_one"},
+    _ensure(isinstance(node["mode"], str) and
+            node["mode"] in {"each", "some", "none", "exactly_one"},
             "unknown collection quantifier")
     _ensure(type(node["min_count"]) is int and node["min_count"] >= 0,
             "invalid minimum-resource cardinality")
@@ -128,18 +141,20 @@ def _node(node, source_kind, depth=0):
                 "invalid nested parent identity")
 
 
-def _classify(node):
+def _classify(node, depth=0):
     """Make compiler-owned source compatibility impossible to conceal."""
+    _ensure(depth <= 64 and isinstance(node, dict) and
+            isinstance(node.get("kind"), str), "invalid or excessive requirement tree")
     kind = node["kind"]
     if kind == "compat_oval_test":
         return { "compiler-compatibility" }
     if kind == "logic":
         result = set()
         for child in node["children"]:
-            result.update(_classify(child))
+            result.update(_classify(child, depth + 1))
         return result
     if kind == "collection" and isinstance(node.get("nested"), dict):
-        return {"native"} | _classify(node["nested"])
+        return {"native"} | _classify(node["nested"], depth + 1)
     return {"native"}
 
 
@@ -184,7 +199,8 @@ def decode(raw):
     _ensure(isinstance(raw, bytes) and len(raw) <= 2_000_000,
             "missing or oversized JSON")
     try:
-        obj = json.loads(raw, parse_constant=lambda value:
+        obj = json.loads(raw, object_pairs_hook=_unique_pairs,
+                         parse_constant=lambda value:
                          (_ for _ in ()).throw(ValueError("non-finite number: " + value)))
     except (ValueError, UnicodeError) as exc:
         raise ValueError("B compiled fixture IR: invalid JSON") from exc
