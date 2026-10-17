@@ -9,6 +9,8 @@ This is **requirement-choice enum coverage**, not whole language coverage or sca
 | --- | ---: | ---: |
 | basic | 1093/1375 (79.49%) | 685/872 (78.56%) |
 | practical | 1319/1375 (95.93%) | 833/872 (95.53%) |
+| practical_plus_two | 1358/1375 (98.76%) | 859/872 (98.51%) |
+| practical_plus_three | 1368/1375 (99.49%) | 866/872 (99.31%) |
 | exhaustive_vocabulary | 1374/1375 (99.93%) | 871/872 (99.89%) |
 
 ## Coverage by source folder
@@ -57,30 +59,25 @@ Folder 'shared' is not a seventh STIG. Its Assessments may be used in several st
 | `may_be_absent_and_none_match` | 7 |
 | `at_least_one_exists_and_only_one_matches` | 2 |
 
-## Practical-vocabulary residual examples
+## Residual examples after adding two scoped choices
 
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214241.automated.yaml` — `verify-that-proxyrequests-directive-exists-not-configured-on-in-all-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214241.automated.yaml` — `if-proxyrequests-directive-exists-in-other-loaded-configuration-files-verify-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214243.automated.yaml` — `verify-that-addhandler-directive-exists-configured-stig-httpd-conf-apache2-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214243.automated.yaml` — `if-addhandler-directive-exists-in-any-loaded-configuration-verify-that-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
-- `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214245.automated.yaml` — `apache-dav-module-not-enabled-test`: Item `at_least_one_exists_and_all_match`, field modes `at_least_one_exists_and_none_match`; anomaly=False
-- `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214245.automated.yaml` — `apache-dav-fs-module-not-enabled-test`: Item `at_least_one_exists_and_all_match`, field modes `at_least_one_exists_and_none_match`; anomaly=False
-- `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214245.automated.yaml` — `apache-dav-fs-module-not-enabled-2-test`: Item `at_least_one_exists_and_all_match`, field modes `at_least_one_exists_and_none_match`; anomaly=False
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214246.automated.yaml` — `verify-listen-directive-not-configured-listen-on-0-0-0-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214251.automated.yaml` — `verify-that-sessioncookiename-directive-exists-configured-httponly-secure-not-domain-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
 - `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214251.automated.yaml` — `if-sessioncookiename-exists-in-other-loaded-configurations-files-verify-it-test`: Item `at_least_one_exists_and_all_match`, field modes `may_be_absent_and_none_match`; anomaly=False
 - `authoring/ms_windows_11/assessments/automated/SV-253266.automated.yaml` — `review-installed-os-via-powershell-test`: Item `only_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253274.automated.yaml` — `network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
 - `authoring/ms_windows_11/assessments/automated/SV-253289.automated.yaml` — `secondary-logon-service-startup-type-disabled-or-service-uninstalled-test`: Item `may_be_absent_and_some_match`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253291.automated.yaml` — `bluetooth-radio-turned-off-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
 - `authoring/ms_windows_11/assessments/automated/SV-253296.automated.yaml` — `review-windows-time-service-configuration-via-powershell-test`: Item `only_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253350.automated.yaml` — `camera-access-from-lock-screen-disabled-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253363.automated.yaml` — `prioritize-ecc-curves-longer-key-lengths-first-nistp384-requirement-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253370.automated.yaml` — `credential-guard-running-on-windows-11-domain-joined-systems-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253446.automated.yaml` — `windows-dialog-box-title-legal-banner-configured-title-option-1-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253446.automated.yaml` — `windows-dialog-box-title-legal-banner-configured-title-option-2-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253446.automated.yaml` — `windows-dialog-box-title-legal-banner-configured-title-option-3-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
-- `authoring/ms_windows_11/assessments/automated/SV-253446.automated.yaml` — `windows-dialog-box-title-legal-banner-configured-title-option-4-test`: Item `at_least_one_exists_and_only_one_matches`, field modes ``; anomaly=False
+- `authoring/ms_windows_server_2025/assessments/automated/SV-278090.automated.yaml` — `windows-server-virtualization-based-security-enabled-platform-security-level-configured-test`: Item `at_least_one_exists_and_only_one_matches`, field modes `at_least_one_exists_and_only_one_matches`; anomaly=False
+- `authoring/ms_windows_server_2025/assessments/automated/SV-278090.automated.yaml` — `windows-server-virtualization-based-security-enabled-platform-security-level-configured-2-test`: Item `at_least_one_exists_and_only_one_matches`, field modes `at_least_one_exists_and_only_one_matches`; anomaly=False
+- `authoring/rhel_9/assessments/automated/SV-258146.automated.yaml` — `streamdriverauthmode-not-set-in-module-block-advanced-syntax-test`: Item `may_be_absent_and_none_match`, field modes ``; anomaly=False
+- `authoring/rhel_9/assessments/automated/SV-258147.automated.yaml` — `streamdrivermode-not-set-in-module-block-advanced-syntax-test`: Item `may_be_absent_and_none_match`, field modes ``; anomaly=False
+- `authoring/rhel_9/assessments/automated/SV-258148.automated.yaml` — `streamdriver-not-set-in-module-block-advanced-syntax-test`: Item `may_be_absent_and_none_match`, field modes ``; anomaly=False
+- `authoring/shared/assessments/linux/files/gpg-signature-enabled-software-repo.assessment.yaml` — `no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set-test`: Item `all_exist_and_none_match`, field modes ``; anomaly=False
+- `authoring/shared/assessments/linux/files/verify-boot-loader-root-admin-adminstrator.assessment.yaml` — `verify-boot-loader-password-not-set-root-admin-or-adminstrator-test`: Item `none_exist`, field modes ``; anomaly=True
 
 ## Limits and decision rule
 
