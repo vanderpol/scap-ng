@@ -11,7 +11,7 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **[Apache 18-variable dependency map](APACHE-DEPENDENCY-REDESIGN.md)** — six human-understandable stages, two distinct file-discovery branches, four preserved checks, and the contract needed before a native collector can replace shell commands.
 
-**[Review the auditor-first candidate](AUDITOR-FIRST-CANDIDATE.md)** — a complete, source-reversible language proposal emphasizing security-auditor reading order and explicit Item existence versus matching. Research only; original OVAL runtime/evidence parity remains unproven.
+**[Read the check-level existence audit](TEST-ITEM-EXISTENCE-REVIEW.md)** — 1,375 source Tests, including why `none` needs no State and why `all_exist` is still unsettled in OVAL's own documentation.\n\n**[Review the auditor-first candidate](AUDITOR-FIRST-CANDIDATE.md)** — a complete, source-reversible language proposal emphasizing security-auditor reading order and explicit Item existence versus matching. Research only; original OVAL runtime/evidence parity remains unproven.
 
 **[Review the before-and-after examples](BEFORE-AFTER-REVIEW.md)** — five complete real 0.4 vs experimental English-first Assessments, each with a short excerpt, direct GitHub links and focused questions for author feedback. **This is the practical decision review.**
 
