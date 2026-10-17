@@ -110,6 +110,26 @@ def raw_checks(archive):
                             for beh in o.iter():
                                 if local(beh.tag)=="behaviors" and beh.get("item_creation"):
                                     options.append(beh.get("item_creation"))
+                        selectors=[]
+                        if exists=="only_one_exists":
+                            for oid in objs:
+                                o=object_by_id.get(oid)
+                                if o is None:
+                                    selectors.append({"object_id":oid,"resolved":False})
+                                    continue
+                                fields=[]
+                                for child in list(o)[:14]:
+                                    if not isinstance(child.tag,str):continue
+                                    value=(child.text or "").strip()
+                                    fields.append({
+                                        "field":local(child.tag),
+                                        "operation":child.get("operation"),
+                                        "var_ref":child.get("var_ref"),
+                                        "text":value[:450],
+                                        "child_elements":[local(x.tag) for x in child][:15],
+                                    })
+                                selectors.append({"object_id":oid,"object_type":local(o.tag),
+                                                  "fields":fields})
                         evidence={
                             "stig":stig,"id":tid,"author":owner,"source_xml":member,
                             "capability":tag.removesuffix("_test"),
@@ -120,6 +140,7 @@ def raw_checks(archive):
                             "state_refs":len(states),"item_creation":sorted(set(options)),
                             "object_ref_authors":sorted({original_author(x) for x in objs if x}),
                             "state_ref_authors":sorted({original_author(x) for x in states if x}),
+                            "source_objects_if_exact_one":selectors if exists=="only_one_exists" else [],
                         }
                         # Distinct Test ID across sources is a single author identity,
                         # but may have other source revisions. Do not suppress conflicts.
@@ -231,6 +252,7 @@ def build(args):
             "candidate_authors":sorted({m["author"] for m in matches}),
             "original_checks":sorted({str(m["check"]) for m in matches}),
             "original_item_creation":sorted({o for m in matches for o in m["item_creation"]}),
+            "source_object_details":[{"source_test_id":m["id"],"stig":m["stig"],"objects":m["source_objects_if_exact_one"]} for m in matches[:4]],
         })
     if len(exact_one_candidates)!=7:
         raise AssertionError("Unexpected native exactly-one Test count")
