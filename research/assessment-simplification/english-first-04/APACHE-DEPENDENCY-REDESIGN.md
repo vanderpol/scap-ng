@@ -16,7 +16,7 @@ The source Assessment has **18 command-building/local Variables and four Tests**
 | 6. Test \`MaxKeepAliveRequests\` | Build two separate directive searches, one per file-discovery path | 2 |
 | **Total** | **Six understandable stages, still 18 exact source Variables** | **18** |
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     A["Discover Apache installation paths"] --> B["apachectl -V: main configuration path"]
     A --> C["Apache executable: DUMP_INCLUDES"]
@@ -26,7 +26,7 @@ flowchart TD
     E --> G["Additional loaded-file KeepAlive / MaxKeepAliveRequests checks"]
     F --> H["All four checks required"]
     G --> H
-\`\`\`
+```
 
 The two branches are **not interchangeable**. A source with a configured \`IncludeOptional\` or conditional include can have different *declared* paths from *actually loaded* paths. Collapsing them into "read the Apache config" could erase source intent, especially on failure and partial collection.
 
@@ -49,7 +49,7 @@ A reusable native Apache collector could produce two explicitly named sets of fi
 
 **Conceptual typed-source shape (not executable; new capabilities and modes require specification):**
 
-\`\`\`yaml
+```yaml
 sources:
   apache-installations:
     inspect: apache.installations
@@ -76,7 +76,7 @@ checks:
   additional-keepalive:
     from: loaded-directives
     require: ... # original when-present semantics
-\`\`\`
+```
 
 This follows the *same* \`sources → checks → evaluate\` grammar being investigated elsewhere. The two other \`MaxKeepAliveRequests\` checks, collection failure flags and full metadata are deliberately not invented in this conceptual sketch. \`installations_from\`, \`file_scope\` and \`view\` are **potential capability parameters**, not approved 0.4 vocabulary.
 
