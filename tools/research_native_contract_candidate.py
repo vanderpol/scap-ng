@@ -113,7 +113,7 @@ def check_using(raw,allowed,path,provider,scope):
         fail(path,"unregistered typed acquisition parameter contract for "+provider)
     return raw
 
-def compile_check(node,path="require",scope=None,current_fields=None):
+def compile_check(node,path="require",scope=None,current_fields=None,current_types=None):
     scope=scope or {}
     if not isinstance(node,dict) or not node:fail(path,"requirement must be mapping")
     # Field assertions inside an Item-scope composite are not separate
@@ -121,7 +121,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
     if set(node)=={"fields"}:
         if current_fields is None:fail(path,"fields requires current selected Item scope")
         return {"kind":"fields","predicates":check_predicates(
-            node["fields"],current_fields,path+".fields",scope)}
+            node["fields"],current_fields,path+".fields",scope,current_types)}
     groups=set(node)&GROUPS
     modes=set(node)&QUANTIFIERS
     named="resource" in node
@@ -134,7 +134,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
         if not isinstance(items,list) or len(items)<2:
             fail(path,"Boolean group requires at least two requirements")
         return {"kind":"logic","operator":mode,"children":[
-            compile_check(c,path+"."+mode+"["+str(i)+"]",scope,current_fields) for i,c in enumerate(items)]}
+            compile_check(c,path+"."+mode+"["+str(i)+"]",scope,current_fields,current_types) for i,c in enumerate(items)]}
     if named:
         if set(node)-{"resource","using","must"}:
             fail(path,"named resources support only resource, using, must")
@@ -198,7 +198,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
         raw_must=node.get("must")
         if isinstance(raw_must,dict) and (
            set(raw_must)&(GROUPS|QUANTIFIERS|{"resource","fields"})):
-            nested=compile_check(raw_must,path+".must",local_scope,fields)
+            nested=compile_check(raw_must,path+".must",local_scope,fields,field_types)
             compare=[]
         else:
             compare=check_predicates(raw_must,fields,path+".must",local_scope,field_types)
