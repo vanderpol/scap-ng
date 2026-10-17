@@ -24,7 +24,7 @@ from research_english_first_04_complex import ITEM_REQS,STATELESS_PRESENCE
 EXIST={
     "at_least_one_item_exists":"at_least_one",
     "items_may_be_absent":"may_be_absent",
-    "all_collected_items_exist":"all_collected",
+    "all_collected_items_exist":"all_must_exist",
     "exactly_one_item_exists":"exactly_one",
 }
 MATCH={
@@ -37,7 +37,7 @@ PRESENCE={
     "at_least_one":"at_least_one",
     "exactly_one":"exactly_one",
     "none":"none",
-    "all_exist":"all_collected",
+    "all_exist":"all_must_exist",
     "may_be_absent":"may_be_absent",
 }
 REV_EXIST={v:k for k,v in EXIST.items()}
