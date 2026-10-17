@@ -9,6 +9,7 @@ The question is whether one cardinality declaration can apply to both **collecte
 - Ordinary scalar field requirements with one common mode: **906 Tests**, including **295** with multiple scalar fields.
 - Field requirements differ from their Item Test requirement in at least one scalar field: **355 Tests**.
 - Entire scalar field set uses the *same named requirement mode* as the Item Test: **567 Tests**; no record wrapper: **567 Tests**.
+- Of those potential combined-scope cases, **323** have only one scalar field (new scope likely adds syntax); **244** have multiple fields (more promising for a shared default).
 - Tests containing records: **66**; record wrappers found: **86**.
 - Shared Test-level scalar field policies: **108 Tests**; grouped ones: **200**.
 - Missing effective scalar field requirements: **0** (expected 0).
@@ -38,6 +39,7 @@ Prefer a **shared field policy at the nearest existing `fields` group or Test sc
 - **same_as_items:** `authoring/apache_server_2-4_unix_server/assessments/applicability/platform.cpe-apache-http-server-2-4.yaml` / `gather-all-installation-directories-from-running-apache-httpd-processes-test`; Item mode `at_least_one_exists_and_all_match`; scalar field modes `['at_least_one_exists_and_all_match']`; record wrappers 0.
 - **candidate_both:** `authoring/apache_server_2-4_unix_server/assessments/applicability/platform.cpe-apache-http-server-2-4.yaml` / `gather-all-installation-directories-from-running-apache-httpd-processes-test`; Item mode `at_least_one_exists_and_all_match`; scalar field modes `['at_least_one_exists_and_all_match']`; record wrappers 0.
 - **differs:** `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml` / `if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test`; Item mode `at_least_one_exists_and_all_match`; scalar field modes `['may_be_absent_and_all_match']`; record wrappers 0.
+- **candidate_both_multi:** `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214268.automated.yaml` / `verify-that-sessioncookiename-directive-exists-configured-httponly-secure-in-httpd-test`; Item mode `at_least_one_exists_and_all_match`; scalar field modes `['at_least_one_exists_and_all_match']`; record wrappers 0.
 
 ## Evidence boundary
 
