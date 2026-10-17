@@ -5,9 +5,11 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
 
+**[Browse six graded auditor-friendly examples](AUDITOR-SAMPLE-GALLERY.md)** — simple Linux/Windows checks through Windows WMI records, DNS, Apache, and dependent Linux file collection; each links to complete YAML on GitHub.com.
+
 **[Review the auditor-first candidate](AUDITOR-FIRST-CANDIDATE.md)** — a complete, source-reversible language proposal emphasizing security-auditor reading order and explicit Item existence versus matching. Research only; original OVAL runtime/evidence parity remains unproven.
 
-**[Review the before-and-after examples](BEFORE-AFTER-REVIEW.md)** — four complete real 0.4 vs experimental English-first Assessments, each with a short excerpt, direct GitHub links and focused questions for author feedback. **This is the practical decision review.**
+**[Review the before-and-after examples](BEFORE-AFTER-REVIEW.md)** — five complete real 0.4 vs experimental English-first Assessments, each with a short excerpt, direct GitHub links and focused questions for author feedback. **This is the practical decision review.**
 
 **[Start here: decision brief](DECISION-BRIEF.md)** — what is proved, what remains unproved, and what evidence would justify adopting (or rejecting) the English-first grammar. The detailed report statistics below are supporting evidence, not the adoption decision.
 
