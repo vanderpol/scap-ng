@@ -209,6 +209,31 @@ def build(args):
             key=row["author"]+":"+row["check_existence"]
             if len(owner_rare_examples[key])<12:
                 owner_rare_examples[key].append(row)
+    # Native seven only_one_exists Tests: preserve real per-Test content,
+    # and label comment+mode source-ID candidates as *unverified* joins.
+    exact_one_candidates = []
+    raw_by_title_mode = defaultdict(list)
+    for row in raw:
+        if row["comment"].strip():
+            raw_by_title_mode[(normalized_comment(row["comment"]),row["check_existence"])].append(row)
+    for row in native:
+        if row["existence"]!="only_one_exists":
+            continue
+        matches=raw_by_title_mode.get((normalized_comment(row["title"]),row["existence"]),[])
+        matches_by_identity={(m["id"],m["author"]) for m in matches}
+        exact_one_candidates.append({
+            "native_source":row["source"],"native_test":row["native_test"],
+            "native_title":row["title"],"native_mode":row["mode"],
+            "has_state":row["has_state"],
+            "match_quality":("single_source_ID_candidate" if len(matches_by_identity)==1
+                              else "unmatched" if not matches else "ambiguous"),
+            "source_test_candidates":sorted({m["id"] for m in matches}),
+            "candidate_authors":sorted({m["author"] for m in matches}),
+            "original_checks":sorted({str(m["check"]) for m in matches}),
+            "original_item_creation":sorted({o for m in matches for o in m["item_creation"]}),
+        })
+    if len(exact_one_candidates)!=7:
+        raise AssertionError("Unexpected native exactly-one Test count")
     exists_source=Counter()
     for t in raw:exists_source[t["check_existence"]]+=1
     exists_native=Counter()
@@ -233,6 +258,7 @@ def build(args):
       "native_source_ID_join_candidate_quality":candidates,
       "all_201_native_all_exist_candidate_matches":all_exist_join,
       "all_201_native_all_exist_single_ID_candidate_author_counts":dict(candidate_201),
+      "seven_native_exact_one_existence_tests":exact_one_candidates,
       "rare_original_tests_by_author_and_mode":dict(owner_rare_examples),
       "original_oval_element_distribution":element_counts,
       "source_members":source_members,
@@ -286,6 +312,19 @@ def md(v):
               "| --- | ---: |"]
     lines += [f"| {author} | {count} |"
               for author,count in sorted(v["all_201_native_all_exist_single_ID_candidate_author_counts"].items())]
+    lines+=["", "## Seven native Test-level only_one_exists cases", "",
+           "Exactly one **existing Item** is distinct from exactly one **matching Item**.",
+           "Unverified joins use source Test comment and existence mode, not a converter ID.",
+           "", "| Native Assessment | Has State | Original Test ID candidate | Original check |",
+           "| --- | --- | --- | --- |"]
+    for case in v["seven_native_exact_one_existence_tests"]:
+        orig=", ".join(case["source_test_candidates"]) or "not found"
+        origcheck=", ".join(case["original_checks"]) or "unknown"
+        lines.append(f"| \`{case['native_source']}\` | {case['has_state']} "
+                     f"| \`{orig}\` | \`{origcheck}\` |")
+    lines+=["", "These seven should be reviewed for *actual resource duplication intent*;",
+            "replacing exact-one with at-least-one is not a lossless simplification.",
+            ""]
     lines+=["", "## Source attribution for 201 native all_exist cases", "",
             "The JSON contains each native Test with **source-ID candidates**, not proven",
             "lineage. Cases where several original IDs share a comment, or none match,",
