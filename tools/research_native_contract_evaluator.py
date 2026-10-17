@@ -45,19 +45,21 @@ def compare(item,field,operation,desired):
         # evidence prevents determination and is NOT silently filtered out.
         return FALSE if status=="absent" else (ERROR if status=="error" else UNKNOWN)
     if operation=="equals":
-        return TRUE if type(value)==type(desired) and value==desired else FALSE
+        if type(value)!=type(desired):return ERROR
+        return TRUE if value==desired else FALSE
     if operation=="not_equals":
-        return TRUE if type(value)!=type(desired) or value!=desired else FALSE
+        if type(value)!=type(desired):return ERROR
+        return TRUE if value!=desired else FALSE
     if operation=="contains":
-        if not isinstance(value,(list,tuple)):
+        if not isinstance(value,(list,tuple)) or any(type(x)!=str for x in value):
             return ERROR
         return TRUE if desired in value else FALSE
     if operation=="at_least":
-        if type(value) not in (int,float) or type(desired) not in (int,float):
+        if type(value)!=int or type(desired)!=int:
             return ERROR
         return TRUE if value>=desired else FALSE
     if operation=="between":
-        if type(value) not in (int,float):
+        if type(value)!=int:
             return ERROR
         return TRUE if desired[0]<=value<=desired[1] else FALSE
     if operation=="only_these_bits":
@@ -83,7 +85,9 @@ def evaluate_collection(node,evidence,fixtures,scope=None):
         return Decision(ERROR,"missing or mismatched typed acquisition parameters",node["provider"])
     if "using" in evidence and evidence["using"]!=node["using"]:
         return Decision(ERROR,"acquisition parameters do not match evidence",node["provider"])
-    records=evidence.get("items",[])
+    if "items" not in evidence:
+        return Decision(ERROR,"provider omitted mandatory Items field",node["provider"])
+    records=evidence["items"]
     if not isinstance(records,list):
         raise ValueError("items must be list")
     if flag=="error":
