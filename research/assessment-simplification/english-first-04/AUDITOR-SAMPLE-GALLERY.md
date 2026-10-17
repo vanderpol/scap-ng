@@ -1,158 +1,102 @@
-# Auditor-first SCAP-NG: six real patterns
+# Auditor-first SCAP-NG: six real source-backed patterns
 
-**Experimental 0.4 grammar — not normative.** Each block below is an **excerpt**, not a standalone executable Assessment. Read the linked full YAML on `github.com`; every full Assessment linked here is among the 871 complete dictionaries reconstructed exactly from the pinned six-STIG source. This is not independent OVAL scanner/evidence proof.
+**Latest experimental authoring presentation; NOT approved v0.4 syntax or scanner-equivalence evidence.** These are excerpts from complete, **source-structurally reversible** six-STIG Assessments. [Read the full proof, limitations and the one rejected source](consistent-quantifiers/report.md). Original source acquisition, collection flags, missing-field rules and final evaluate trees remain in the linked complete files; omission from an excerpt does not make them optional.
 
-## 1. RHEL — mount the home filesystem with nosuid
+**One consistent rule:** `items` counts collected Items; `match` says how many must satisfy the predicate. Records use `records` and the same `match` choices (`all`, `at_least_one`, `exactly_one`, `none`). A `states.and/or` groups **whole States**; `fields.and/or` groups **fields inside a State**. No `scope:` or `condition:` wrapper, and no `some` synonym.
+
+## 1. RHEL 9 — `/home` must use nosuid
 
 ```yaml
-check: /home is mounted with the nosuid option.
 inspect: linux.partition
 where:
-  mount_point:
-    matches_regex: .*\/home
+  mount_point: {matches_regex: '.*\/home'}
 require:
   items: at_least_one
-  every_item:
-    mount_options:
-      at_least_one_value_is: nosuid
+  match: all
+  mount_options: {at_least_one_value_is: nosuid}
 ```
 
-**Meaning:** find the partitions matching the original `/home` regex; at least one must exist and every selected partition must have `nosuid` among its option values. The source regex is wider than an exact mount-point comparison, so an importer must not silently replace it.
+At least one selected partition exists; every selected partition has `nosuid` among its mount options. The source regex is preserved instead of silently tightening it to `/home` equality. [Complete RHEL Assessment](consistent-quantifiers/linux-home.consistent.research.yaml).
 
-[Full RHEL mount YAML](auditor-candidate/linux-home.auditor.research.yaml)
-
-## 2. Windows 11 — deny Remote Desktop logon to Guests
+## 2. Windows 11 — Guests must have a deny-logon right
 
 ```yaml
-sources:
-  windows-userright-object:
-    inspect: windows.userright
-    where:
-      userright:
-        equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
-checks:
-  deny-log-on-through-remote-desktop-services-guests-test:
-    check: Deny log on through Remote Desktop Services - Guests
-    inspect: windows.userright
-    from: windows-userright-object
-    require:
-      items: at_least_one
-      at_least_one_item:
-        trustee_name:
-          equals_ignoring_case: Guests
+from: windows-userright-object
+require:
+  items: at_least_one
+  match: at_least_one
+  trustee_name: {equals_ignoring_case: Guests}
 ```
 
-**Meaning:** inspect that specific user right, and require at least one Item identifying Guests. *At least one matching* is not the same as *every Item matching*.
+At least one Item must exist and at least one must match the Guests identity; **not every trustee Item must be Guests**. The named source restricts which user right is collected. [Complete seven-Test Windows Assessment](consistent-quantifiers/windows-wmi-rights.consistent.research.yaml).
 
-[Full Windows YAML — includes seven Tests and WMI role alternatives](auditor-candidate/windows-wmi-rights.auditor.research.yaml)
-
-## 3. Windows — records with whole-State alternatives
+## 3. Windows 11 — WMI DomainRole, two whole-State alternatives
 
 ```yaml
-check: The system is a non-DC domain-joined Windows server or workstation
-inspect: windows.wmi.query
 from: windows-wmi57-object
 require:
   items: at_least_one
-  every_item:
-    any_of:
+  match: all
+  states:
+    or:
       - result:
-          at_least_one_record_exists: true
-          every_record:
-            domainrole: {is: '1'}
+          records: at_least_one
+          match: all
+          domainrole: {is: '1'}
       - result:
-          at_least_one_record_exists: true
-          every_record:
-            domainrole: {is: '3'}
+          records: at_least_one
+          match: all
+          domainrole: {is: '3'}
 ```
 
-**Meaning:** use the declared WMI query, retain two **whole-record** alternatives. Replacing them with a simple membership comparison is not generally equivalent when multiple records exist.
+The outer `states.or` means **either entire record-comparison alternative** must hold for an Item; it does *not* change the record-level rules or mean that each record may freely have role `1` or `3`. For records `[1,3]`, neither `match: all` branch succeeds. [Complete Windows Assessment](consistent-quantifiers/windows-wmi-rights.consistent.research.yaml).
 
-[Full Windows WMI YAML](auditor-candidate/windows-wmi-rights.auditor.research.yaml)
-
-## 4. Windows DNS — collect command results, enforce both bounds
+## 4. Windows DNS — signature-validity lower and upper bounds
 
 ```yaml
-inspect: independent.shellcommand
-collect:
-  shell: powershell
-  command:
-    variable: command-get-list-dns-key-signature-validity-periods-zone-signing-variable
-  error_if_exit_status_not_0: false
-  error_if_stderr_exists: false
-all_state_fields_exist: true
 require:
   items: at_least_one
-  every_item:
-    all_states:
+  match: all
+  states:
+    and:
       - stdout_line: {at_least: 48}
       - stdout_line: {at_most: 168}
 ```
 
-**Meaning:** the named Variable constructs the source command. Every Item must meet both 48-hour and 168-hour limits. The full Assessment retains three command Variables and five Tests.
+The original Assessment contains two bound States and constructs PowerShell commands from collected zone names. This excerpt omits the actual collector, command Variable and **an inherited field-presence rule**, all retained in the complete source. [Complete DNS Assessment](consistent-quantifiers/dns.consistent.research.yaml).
 
-[Full DNS YAML](auditor-candidate/dns.auditor.research.yaml)
-
-## 5. Apache — required Item, optional field comparison
+## 5. Apache — required Item with an optional field comparison
 
 ```yaml
-inspect: independent.shellcommand
-collect:
-  shell: bash
-  command:
-    variable: shell-command-check-keepalive-in-all-loaded-conf-files-variable
-  pattern: .+
-  error_if_exit_status_not_0: false
-  error_if_stderr_exists: false
 require:
   items: at_least_one
-  every_item:
-    stdout_line:
-      when_present_matches_regex: \s*KeepAlive On
+  match: all
+  stdout_line:
+    when_present_matches_regex: '\s*KeepAlive On'
 ```
 
-**Meaning:** Item existence and the *when-present* field comparison are different requirements. The full Assessment retains the original Apache configuration discovery graph of 18 Variables.
+The Item must exist; the `stdout_line` comparison applies **when that field is present**. These are distinct requirements. Apache's actual multi-file command/Variable discovery graph is still needed. [Complete Apache Assessment](consistent-quantifiers/apache.consistent.research.yaml).
 
-[Full Apache YAML](auditor-candidate/apache.auditor.research.yaml)
-
-## 6. Linux — collect initialization files derived from each account
+## 6. Linux — account-dependent initialization files
 
 ```yaml
-inspect: unix.file
-gather:
-  union:
-    - from:
-        inspect: unix.file
-        where:
-          directory:
-            from: user.home_dir
-          name:
-            matches_regex: ^\.[^\s\.]+
-        filesystem: all
-        traversal:
-          max_depth: 1
-          recurse: symlinks
-        for_each_source:
-          item: user
-          in: only-non-system-users-uid-999-home-dirs-excluding-root-object
-      exclude_if:
-        - type: {is: directory}
 require:
-  items: may_be_absent
-  every_item:
-    all_of:
+  items: if_present
+  match: all
+  fields:
+    and:
       - setuid: {is: false}
       - setgid: {is: false}
-      # Six more permissions are required in the complete Assessment.
-    all_fields_must_exist: true
+      # Six other permission fields in the source
+    presence: all
 ```
 
-**Meaning:** for each qualifying account, collect matching files under that user's home directory; omit directory Items; evaluate eight permissions on every remaining Item. Missing files are allowed in this branch, but the separate root-user branch has a different existence requirement. The `union` is preserved from the real source, not added for decoration.
+The non-system-user branch permits no matching files, but when files exist every Item must satisfy eight required field comparisons. The separate root-account branch instead requires `items: at_least_one`. The complete file retains user-derived collection, Set operations, directory exclusion and source references. [Complete Linux Assessment](consistent-quantifiers/linux-files.consistent.research.yaml).
 
-[Full Linux derived-file YAML](auditor-candidate/linux-files.auditor.research.yaml)
+## Proof boundary and remaining authoring cleanup
 
-## Security-auditor acceptance criteria
+The latest conversion structurally reconstructs **871/872 complete automated Assessments (1,374/1,375 Tests)**. It is not independently proved to reproduce original OVAL six-state runtime and evidence behavior. It deliberately preserves legacy `all_exist` source distinctions, and rejects the contradictory bootloader Test with an attached State.
 
-A reviewer must be able to identify **which data is collected, how Items are selected, what happens when no Items are returned, which Items/field values must match, and how multiple Tests combine**. If any distinction requires guesswork, more language work is needed. Do not rewrite a `none_exist` violation-query + filter as an ordinary `every_item` test without preserving the original error behavior: [counterexample research](https://github.com/vanderpol/scap-ng/blob/main/research/assessment-simplification/violation-query-14/README.md).
+Some **other** old field-presence controls remain in the generated complete files, notably a top-level `all_state_fields_exist: true` in DNS and field-level `no_values_exist: true` elsewhere. These are *semantically meaningful legacy requirements*, not proof they should remain Boolean flags in the final authoring language. They require their own reversible rewrite rather than being silently deleted.
 
-**Candidate and verification:** [auditor-first language and proof](AUDITOR-FIRST-CANDIDATE.md); [five complete before/after comparison pages](BEFORE-AFTER-REVIEW.md). No vocabulary is fixed until semantics and auditor usability are satisfactory.
+**Review standard:** an auditor should understand acquisition, Item and record cardinality, missing data, field value matching, and complete `and`/`or` group semantics without memorizing special inheritance rules. [Research task #235](https://github.com/vanderpol/scap-ng/issues/235).
