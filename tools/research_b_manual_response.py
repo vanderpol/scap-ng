@@ -35,7 +35,7 @@ def complete_manual_response(compiled_ir, response):
     if not isinstance(who,dict) or set(who)!={"scheme","value"} or not all(
             isinstance(v,str) and v.strip() for v in who.values()):
         raise ValueError("authenticated stable evaluator scheme/value required")
-    if response["response_source"] not in {"direct","authorized_import"}:
+    if not isinstance(response["response_source"],str) or response["response_source"] not in {"direct","authorized_import"}:
         raise ValueError("unsupported manual response source")
     timestamp=response["completed_at"]
     if not isinstance(timestamp,str):
