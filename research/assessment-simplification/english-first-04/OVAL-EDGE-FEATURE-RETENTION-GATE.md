@@ -76,6 +76,8 @@ The [direct original-source logical/State/Set/Variable inventory](reports/source
 
 **Shortlist for genuine reduction of native keyword count:** old Test `all_exist` (if proven source-equivalent in a native real-Item + collection-status model); the duplicate composed exact-one labels; legacy Object `COMPLEMENT` spelling where a transparent set-subtraction/selection exclusion is equivalent; obscure scalar Variable-function keywords such as `substring` if direct typed expressions already cover them. None is approved for removal today.
 
+**Exactly-one review checkpoint:** [Seven real Test selectors, complete/incomplete truth table, and exhaustively proved positive-match-quantifier collapse](EXACTLY-ONE-EXISTS-TRUTH-TABLE.md). The shared NIWC DoD banner source selects literal `/etc/issue` and `instance=1`, making extra Test-level uniqueness potentially redundant—unlike the real multi-line and command-result selectors. Don't remove the uniqueness capability itself; reduce its redundant combined shorthand forms.
+
 ## Proof obligations before pruning
 
 1. **Source provenance:** Join the original XCCDF Rule → OVAL Definition → Test/Object/State/Variable IDs, noting mixed DISA/NIWC closures. A source-comment match is not proof of identity.
