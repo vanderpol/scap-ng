@@ -164,6 +164,28 @@ class ApacheConfigProviderTests(unittest.TestCase):
         self.assertIn("multiline_directive_unsupported",
                       {x["reason"] for x in result["diagnostics"]})
 
+    def test_file_byte_limit_prevents_unbounded_read(self):
+        self.write("httpd.conf","KeepAlive On\n" * 100)
+        result=self.read(max_bytes_per_file=40)
+        self.assertEqual(result["status"],"incomplete")
+        self.assertEqual(result["items"],[])
+        self.assertIn("file_byte_limit",
+                      {x["reason"] for x in result["diagnostics"]})
+
+    def test_versioned_manifest_matches_emitted_fields_and_status(self):
+        import yaml
+        manifest_path=(Path(__file__).resolve().parents[1]/
+             "research/requirements-first-language/providers/apache.config_directives.v0.1.yaml")
+        manifest=yaml.safe_load(manifest_path.read_text())
+        self.write("httpd.conf","KeepAlive On\n")
+        observed=self.read()
+        self.assertEqual((observed["provider"],observed["version"]),
+                         (manifest["provider"],manifest["version"]))
+        self.assertEqual(set(observed["items"][0]["fields"]),
+                         set(manifest["collection"]["exposed_fields"]))
+        self.assertEqual(observed["effective_values_supported"],False)
+        self.assertEqual(manifest["scope"]["no_effective_values"],True)
+
     def test_maxkeepalive_raw_value_not_automatically_typed(self):
         self.write("httpd.conf","MaxKeepAliveRequests 100garbage\n")
         result=self.read()
