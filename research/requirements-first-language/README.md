@@ -1,6 +1,9 @@
 # Requirements-first SCAP-NG — fresh-start auditor language
 
-**17 October 2026. Research only. Not an adopted 0.4 standard, scanner, or lossless conversion proof.** Tracked in [#235](https://github.com/vanderpol/scap-ng/issues/235). Existing 0.3/0.4 schemas, compiled content and releases remain unchanged.
+**17 October 2026. Research only. Not an adopted 0.4 standard, scanner, or lossless conversion proof.**
+
+**[Answer-free naive ChatGPT review packet](NAIVE-REVIEW-PACKET.md)** asks an unfamiliar first-time reader to infer meaning from the samples, particularly contradictory empty-population interpretations, without an answer key. A separate **[internal counterexample and alternatives review](INTERNAL-EMPTY-POPULATION-REVIEW.md)** must be withheld until blind responses are saved. The current `if_empty` requirement is **not** promoted or removed pending evidence; this is a deliberate fresh attempt to avoid agreeing too quickly with the latest suggestion.
+ Tracked in [#235](https://github.com/vanderpol/scap-ng/issues/235). Existing 0.3/0.4 schemas, compiled content and releases remain unchanged.
 
 I revisited the August and October Claude redesign documents. Their strongest idea was **typed security-resource checks, composable requirements and lexically scoped iteration**, combined with evidence caps and clear organizational inputs. I had previously dismissed them as too simple. Simplicity is exactly what an authoring interface needs; the technical challenge is defining provider behavior without concealing mistakes.
 
