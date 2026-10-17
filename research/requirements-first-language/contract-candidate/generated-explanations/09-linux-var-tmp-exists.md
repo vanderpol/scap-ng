@@ -5,7 +5,7 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- At least one selected Linux mount whose mount point equals /var/tmp
+- At least one Linux mount whose mount point equals /var/tmp must exist.
 
 ## Evidence and status rules
 
