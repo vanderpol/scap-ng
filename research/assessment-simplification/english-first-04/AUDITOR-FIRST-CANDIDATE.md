@@ -77,7 +77,7 @@ checks:
         all_fields_must_exist: true
 ```
 
-**Windows 11 WMI / deny-rights (SV-253495).** A role query and shared user-right collection are named data sources. The following State alternatives must apply to the **whole record comparison**, not become one `domainrole in [1,3]` field predicate. Other deny-right checks use `at_least_one_item`, not `every_item`.
+**Windows 11 WMI / deny-rights (SV-253495).** A role query and shared user-right collection are named data sources. The following State alternatives must apply to the **whole record comparison**, not become one `domainrole in [1,3]` field predicate. The Guests/user-right checks naturally say `at_least_one_item_matches`; that phrase explicitly requires an existing, matching Item, so no separate `items: at_least_one` line is needed. WMI whole-record comparisons still use different semantics.
 
 ```yaml
 checks:
@@ -98,6 +98,23 @@ checks:
               every_record:
                 domainrole: {is: '3'}
 ```
+
+For example, the actual **Guests** Test now reads:
+
+```yaml
+checks:
+  deny-log-on-through-remote-desktop-services-guests-test:
+    check: Deny log on through Remote Desktop Services - Guests
+    inspect: windows.userright
+    from: windows-userright-object
+    require:
+      at_least_one_item_matches:
+        trustee_name:
+          equals_ignoring_case: Guests
+    report_elements: all
+```
+
+This one operator has **two explicit meanings in its name**: at least one Item exists, and at least one Item matches. Its compiler lowering is exactly the original `at_least_one_exists_and_some_match` Test requirement. The old spelling with both `items: at_least_one` and `at_least_one_item` is deliberately rejected as noncanonical. For checks requiring **at least one existing Item AND every Item matches**, keep both clauses because they express different cardinalities. This is not a general permission to omit Item existence.
 
 **Windows DNS (SV-259345).** First explain how source zone discovery feeds the three command-building Variables; only then evaluate the five command-based Tests. The signatures' 48-hour and 168-hour bounds are **two** separate States, with a final `any_of` three-branch decision. A compact signature check is:
 
@@ -150,8 +167,9 @@ These are illustrations of one candidate grammar, **not complete executable Asse
 | `gather` | Explicit composition of complex collection sources, Sets, dependent iteration | A redundant wrapper for every simple Object |
 | `include_if`, `exclude_if` | Filter already collected Set Items | Pre-collection Object selection |
 | Field comparators such as `at_least_one_value_is` | How many **values within one field** must meet a condition; separate from the Item count | `require.items` / `require.every_item` |
+| `require.at_least_one_item_matches` | An Item exists **and** at least one matches the condition; precise shorthand for the observed paired mode | A separately written duplicate `items: at_least_one` plus `at_least_one_item` |
 | `require.items` | Explicit Item existence rule: `at_least_one`, `exactly_one`, `none`, `may_be_absent`, or `all_must_exist` | Item matching or field matching |
-| `require.every_item` / `at_least_one_item` / `exactly_one_item` / `no_item` | Scope over the selected Items, separate from their existence requirement | How many values of a field must match |
+| `require.every_item` / `exactly_one_item` / `no_item` | Scope over the selected Items, separate from their existence requirement | How many values of a field must match |
 | `evaluate` | Combines named checks using explicit Boolean alternatives, conjunctions and conditions | An invented implicit AND/OR default |
 | `report_elements` | Evidence disclosure behavior | A compliance test |
 
