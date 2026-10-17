@@ -2,8 +2,8 @@
 
 **Research only, not adopted SCAP-NG syntax or scanner validation.**
 
-Published from workflow run 38990168310:
-https://github.com/vanderpol/scap-ng/actions/runs/38990168310
+Published from workflow run 38990423138:
+https://github.com/vanderpol/scap-ng/actions/runs/38990423138
 
 Read these pages directly in GitHub; no Actions artifact ZIP is needed.
 
