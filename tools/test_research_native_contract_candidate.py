@@ -35,13 +35,43 @@ WIN="06-windows-privilege-or.yaml"
 LINUX="07-linux-permission-bits.yaml"
 
 class CandidateBContractTests(unittest.TestCase):
-    def test_all_eight_examples_compile_to_single_recursive_ast(self):
+    def test_all_nine_examples_compile_to_single_recursive_ast(self):
         files=sorted(EXAMPLES.glob("*.yaml"))
-        self.assertEqual(len(files),8)
+        self.assertEqual(len(files),9)
         for f in files:
             with self.subTest(file=f.name):
                 tree=read(f)
                 self.assertIn(tree["ast"]["kind"],{"logic","collection"})
+
+    def test_existence_only_src_linux_partition_validates_and_decides(self):
+        source=read(EXAMPLES/"09-linux-var-tmp-exists.yaml")["ast"]
+        self.assertEqual(source["mode"],"some")
+        self.assertTrue(source["exists_only"])
+        self.assertEqual(source["predicates"],[])
+        self.assertEqual(source["where"],[
+            {"field":"mount_point","operator":"equals","value":"/var/tmp"}])
+        yes={"linux.mounts":pop(item("m",mount_point="/var/tmp"))}
+        no={"linux.mounts":pop(item("m",mount_point="/var"))}
+        absent={"linux.mounts":pop()}
+        partial={"linux.mounts":pop(status="incomplete")}
+        observed_partial={"linux.mounts":pop(item("m",mount_point="/var/tmp"),
+                                             status="incomplete")}
+        self.assertEqual(evaluate(source,yes).result,TRUE)
+        self.assertEqual(evaluate(source,no).result,FALSE)
+        self.assertEqual(evaluate(source,absent).result,FALSE)
+        self.assertEqual(evaluate(source,partial).result,UNKNOWN)
+        self.assertEqual(evaluate(source,observed_partial).result,TRUE)
+        self.assertEqual(evaluate(source,{"linux.mounts":pop(item("m",filesystem="x"))}).result,UNKNOWN)
+
+    def test_exists_only_rejects_redundant_or_conflicting_assertions(self):
+        for extra in ({"must":{"mount_point":{"equals":"/var/tmp"}}},
+                      {"minimum_resources":1},{"as":"mount"}):
+            doc={"id":"x","title":"x","require":{
+                "exists":"linux.mounts","where":{"mount_point":{"equals":"/var/tmp"}},
+                **extra}}
+            with self.subTest(extra=extra):
+                with self.assertRaisesRegex(ValueError,"exists means selected-resource existence only"):
+                    compile_doc(doc)
 
     def test_required_vs_optional_verified_zero(self):
         self.assertEqual(run_case(MOUNT,{"linux.mounts":pop()}).result,FALSE)
