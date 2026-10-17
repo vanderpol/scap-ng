@@ -69,6 +69,32 @@ Also, an incomplete Object population may produce different Test decisions depen
 
 **Provisional direction:** For new, fully observed native Items, `items: at_least_one` may subsume the ordinary Test `all_exist` case; retain an importer-only legacy distinction and any proven stronger semantics until error, incomplete and multi-value/Set/record cases are validated. Never collapse **State-field** `all_exist`, where a different scope is involved.
 
+## Source-backed results of the 201-Test follow-up (17 October 2026)
+
+The pinned [201-Test existing-Item result-model audit](reports/all-exist-native-equivalence.md) passed in [GitHub Actions](https://github.com/vanderpol/scap-ng/actions/runs/39029016539):
+
+| Distinct Test category | Count | What was proved |
+| --- | ---: | --- |
+| State-free Test `all_exist` | **127** | Under the research profile where **all returned root Items have status `exists`**, the local generic reference also agrees with `at_least_one_exists` for incomplete collection flags, as well as complete |
+| State-bearing `all_exist` | **74** | Equivalent on complete real-Item-only collections; **not** necessarily equivalent on incomplete collections because the at-least-one form may return decisive false while the generic all-exist form remains unknown |
+| Total | **201** | All equivalent on complete real-Item-only population; **not** unconditional OVAL migration equivalence |
+
+The reference tested 3,132 bounded results combinations, with 206 observed differences all confined to incomplete, State-bearing cases in that restricted population. Root Item statuses `error` and `not_collected`, currently valid in existing results schemas, are separately relevant: a mixed existing/error population can still distinguish the two OVAL existence options. **Merely banning fabricated missing Items is insufficient** to prove every inherited result equal.
+
+The [source `item_creation` census](reports/all-exist-item-creation.md) found all **132** `independent.textfilecontent54` Tests among the 201 use `all_object_elements_fullfilled`, and all **3** `windows.ntuser` Tests use `key_and_name_exist`. None use `filepath_exists` or `every_ntuser` respectively. These are **matching-dependent collection modes, not necessarily phantom Item creation**: they may emit no Item when a property does not match. Converting an Object to file/hive-level Items is a change to the Item population and must preserve original tests and evidence under a proven mapping.
+
+An [experimental JSON Schema profile](native-existing-item.profile.schema.json), plus [validation cases](https://github.com/vanderpol/scap-ng/blob/main/tools/test_research_04_native_existing_item_profile.py), [passed in CI](https://github.com/vanderpol/scap-ng/actions/runs/39029351309). It demonstrates the **stronger** possible invariant: for *new native results*, an Item has a confirmed identity and root `status: exists`; missing fields retain their own `does_not_exist`/error/not-collected statuses, while missing/failed/incomplete collections retain collection-level status. That profile is **separate research**, not an approved replacement for the existing 0.4 Item/report contracts, which currently allow other root statuses.
+
+This suggests an eventual single author-facing existence choice `at_least_one` for ordinary collected Item presence, **but no source Test is normalized automatically**. The importer must retain or explicitly lower the 74 legacy incomplete-State cases and all mixed-status meaning, and must separately represent each mandatory *expected identity* where policy requires all named resources to exist.
+
+### What a prohibition must actually say
+
+- **Forbidden:** invented absent root Item solely because an Object partially matched or a requested field was not found.
+- **Required for new native Items:** the capability states its real Item identity, and the collector confirms that resource exists before reporting it as an Item.
+- **Allowed and necessary:** missing property on a real Item; collection-level absence; error/incomplete/not-collected evidence; redaction without fabricating absence.
+- **Not automatically forbidden:** legacy `item_creation` choices that simply restrict selection to fully matching existing resources. These are not themselves fictitious Items. Their correct native lowering still needs proof.
+- **Not inferred:** all explicitly specified file names must exist. That remains a separate author requirement from all returned Items matching a State.
+
 ## Verification gate before a 0.4 normative decision
 
 1. Confirm a capability-level identity for every Item type; `ntuser.dat` and text-file path semantics must be explicit.
