@@ -30,7 +30,7 @@ def normalize(snapshot, *, hive, key, name, view):
     missing-key or type coercion is inferred here.
     """
     using = {"hive": hive, "key": key, "name": name, "view": view}
-    if hive != "HKLM" or not all(isinstance(x, str) and x for x in (key, name)) or view not in VIEWS:
+    if hive != "HKLM" or not all(isinstance(x, str) and x for x in (key, name)) or not isinstance(view, str) or view not in VIEWS:
         raise ValueError("registry query requires HKLM, nonempty key/name and an explicit WOW64 view")
     if not isinstance(snapshot, dict):
         return _bad(using, "snapshot_not_a_mapping")
@@ -38,7 +38,7 @@ def normalize(snapshot, *, hive, key, name, view):
         return _bad(using, "missing_or_unexpected_snapshot_fields")
     if snapshot["query"] != using:
         return _bad(using, "wrong_registry_acquisition_identity")
-    if snapshot["status"] not in STATUSES or not isinstance(snapshot["records"], list):
+    if not isinstance(snapshot["status"], str) or snapshot["status"] not in STATUSES or not isinstance(snapshot["records"], list):
         return _bad(using, "unknown_collection_status_or_record_shape")
     status = snapshot["status"]
     if status in {"error", "not collected", "not applicable"}:
