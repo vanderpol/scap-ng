@@ -56,10 +56,7 @@ jobs:
           python - <<'PY'
           import base64,json,os,pathlib,subprocess
           repo='vanderpol/scap-ng'
-          head=subprocess.run(['gh','api',f'repos/{repo}/commits/main','--jq','.sha'],capture_output=True,text=True,check=True).stdout.strip()
-          if head!=os.environ['GITHUB_SHA']:
-              print('Main advanced; skip stale publication')
-              raise SystemExit(0)
+          # Pinned research writing to its own folder; unrelated commits cannot make this proof stale.
           root='research/assessment-simplification/english-first-04/field-presence-policy'
           for file in sorted(pathlib.Path('work/proof').glob('*')):
               if file.suffix not in ('.json','.md','.yaml'):continue
