@@ -5,7 +5,7 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- At least one linux.textfile_matches must exist. (provider inputs: ignore_case=false, multiline=true, path=/etc/chrony.conf, pattern=^[ \t]*cmdport[ \t]+0[ \t]*$, singleline=false)
+- At least one matching passage must exist in /etc/chrony.conf (provider inputs: ignore_case=false, multiline=true, path=/etc/chrony.conf, pattern=^[ \t]*cmdport[ \t]+0[ \t]*$, singleline=false)
 
 ## Evidence and status rules
 
