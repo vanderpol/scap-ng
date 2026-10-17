@@ -1,0 +1,9 @@
+id: linux-home-nosuid
+title: Home filesystems must disable setuid execution
+require:
+  every: linux.mounts
+  where:
+    mount_point: {matches_regex: '.*\/home'}
+  must:
+    mount_options: {contains: nosuid}
+  if_empty: fail
