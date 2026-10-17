@@ -189,7 +189,8 @@ class ApacheConfigProviderTests(unittest.TestCase):
     def test_maxkeepalive_raw_value_not_automatically_typed(self):
         self.write("httpd.conf","MaxKeepAliveRequests 100garbage\n")
         result=self.read()
-        self.assertEqual(result["status"],"complete")
+        self.assertEqual(result["status"],"incomplete")
         self.assertEqual(result["items"][0]["fields"]["raw_value"],"100garbage")
+        self.assertEqual(result["items"][0]["fields"]["integer_value"],{"field_status":"error"})
 
 if __name__=="__main__":unittest.main()
