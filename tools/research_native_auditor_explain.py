@@ -11,16 +11,16 @@ from pathlib import Path
 from research_native_contract_candidate import EXAMPLES,read
 
 NAMES={
-  "linux.mounts":"Linux mounts",
-  "windows.accounts":"Windows accounts",
+  "linux.mounts":"Linux mount",
+  "windows.accounts":"Windows account",
   "windows.registry_value":"Windows registry value",
   "windows.computer_role":"Windows computer role",
-  "windows.user_rights":"Windows user-right assignments",
-  "apache.config_directives":"Apache configuration directive observations",
-  "windows.dns.zones":"Windows DNS zones",
-  "linux.files_from_account_homes":"Linux files collected from selected account homes",
-  "$zone.zone_signing_keys":"zone-signing keys belonging to that zone",
-  "$zone.key_signing_keys":"key-signing keys belonging to that zone"
+  "windows.user_rights":"Windows user-right assignment",
+  "apache.config_directives":"Apache configuration directive observation",
+  "windows.dns.zones":"Windows DNS zone",
+  "linux.files_from_account_homes":"Linux file collected from selected account homes",
+  "$zone.zone_signing_keys":"zone-signing key belonging to the same DNS zone",
+  "$zone.key_signing_keys":"key-signing key belonging to the same DNS zone"
 }
 PRETTY={
   "mount_point":"mount point",
@@ -70,17 +70,20 @@ def explain(ast,indent=0):
     if ast["mode"]=="exactly_one" and not ast["singleton"]:
         who="Exactly one selected "+name
     if ast["where"]:
-        who+=" WHERE "+", and ".join(map(pred,ast["where"]))
+        who+=" whose "+", and ".join(map(pred,ast["where"]))
     if ast["using"]:
         using=", ".join(str(k)+"="+value(v) for k,v in sorted(ast["using"].items()))
         who+=" (provider inputs: "+using+")"
     lines=[prefix+"- "+who]
     if ast["mode"]=="each":
         if ast["min_count"]:
-            lines.append(prefix+"  At least "+str(ast["min_count"])+
-                         " selected resources must exist across THIS population.")
+            minimum="one" if ast["min_count"]==1 else str(ast["min_count"])
+            lines.append(prefix+"  At least "+minimum+
+                         " matching resource must exist in this selected population." if ast["min_count"]==1
+                         else prefix+"  At least "+minimum+
+                         " matching resources must exist in this selected population.")
         else:
-            lines.append(prefix+"  If this population is confirmed empty, this condition passes.")
+            lines.append(prefix+"  No matching resource is required to exist if selection is confirmed complete.")
     if ast.get("nested") is not None:
         lines.extend(explain(ast["nested"],indent+1))
     elif ast["predicates"]:
