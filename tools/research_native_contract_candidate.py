@@ -38,7 +38,7 @@ PROVIDERS={
                                     set(["name","mode","directory","account_id"]),False,
                                     set(["account_filter","filename","max_depth","follow_symlinks"])),
 }
-OPS={"equals","contains","at_least","between","only_these_bits","matches_regex"}
+OPS={"equals","not_equals","contains","at_least","between","only_these_bits","matches_regex"}
 # Strict, known parent-child links: no invisible join, no implicit completeness.
 RELATIONS={
   "windows.dns.zones":{
