@@ -20,6 +20,7 @@ import zipfile
 from research_b_full_corpus_import import read_source, import_corpus
 from research_b_source_textfile_lowering import lower_state_free_textfile_assessment
 from research_b_source_partition_lowering import lower_state_free_partition_assessment
+from research_b_manual_lowering import lower_manual_assessment
 from research_b_compiled_ir import encode, decode
 
 FORMAT = "scap-ng-b-six-stream-research-coverage/0.1"
@@ -39,7 +40,16 @@ def _lower_assessment(capsule):
         return "unsupported_source_assessment", "missing Assessment envelope", None
     mode = a.get("mode")
     if mode == "manual":
-        return "manual_contract_unimplemented", "Manual Assessment must have its own runtime contract", None
+        try:
+            ast=lower_manual_assessment(doc)
+            encoded=encode(capsule["id"],ast)
+            if decode(encoded)["source_kind"]!="manual":
+                raise ValueError("unexpected nonmanual compiled source kind")
+            return ("manual_procedure_ir_compiled",
+                    "publisher procedure preserved; human attestation required",encoded)
+        except (ValueError,KeyError,TypeError) as exc:
+            return ("manual_contract_unimplemented",
+                    "unsupported manual contract: "+str(exc)[:440],None)
     if mode != "automated":
         return "unsupported_source_assessment", "unrecognized Assessment mode", None
     rejections=[]
@@ -129,6 +139,8 @@ def build_six_stream_report(corpus, capsules):
         "assessment_choice_bindings": corpus["summary"]["assessment_choice_bindings"],
         "referenced_assessments": len(entries),
         "fixture_ir_compiled": len(compiled),
+        "manual_procedure_ir_compiled": global_status.get("manual_procedure_ir_compiled",0),
+        "automated_fixture_ir_compiled": global_status.get(READY_STATUS,0),
         "fully_executable_assessments": 0,
         "source_parity_verified_assessments": 0,
         "scanner_verified_assessments": 0,
@@ -169,18 +181,20 @@ def render_markdown(report):
         f"| Rules | {summary['rules']} |",
         f"| Assessment-choice links | {summary['assessment_choice_bindings']} |",
         f"| Distinct referenced Assessments | {summary['referenced_assessments']} |",
-        f"| Strictly lowered fixture-IR Assessments (not scanner-verified) | {summary['fixture_ir_compiled']} |",
+        f"| Strictly lowered automated fixture IR (not scanner-verified) | {summary['automated_fixture_ir_compiled']} |",
+        f"| Manual procedures compiled (human result still required) | {summary['manual_procedure_ir_compiled']} |",
         f"| **Verified executable source-equivalent Assessments** | **{summary['source_parity_verified_assessments']}** |",
         "",
         "## Per-stream conversion status",
         "",
-        "| Stream | References | Fixture IR (unverified) | Remaining/unimplemented |",
-        "| --- | ---: | ---: | ---: |",
+        "| Stream | References | Automated fixture IR | Manual procedure IR | Remaining |",
+        "| --- | ---: | ---: | ---: | ---: |",
     ]
     for name, counts in sorted(report["by_stream"].items()):
         total = counts["referenced_assessments"]
         compiled = counts.get(READY_STATUS,0)
-        lines.append(f"| {name} | {total} | {compiled} | {total-compiled} |")
+        manual = counts.get("manual_procedure_ir_compiled",0)
+        lines.append(f"| {name} | {total} | {compiled} | {manual} | {total-compiled-manual} |")
     lines += ["", "## Classification", "",
               "| Status | Distinct Assessments |",
               "| --- | ---: |"]
@@ -188,9 +202,9 @@ def render_markdown(report):
         lines.append(f"| {status} | {count} |")
     lines += ["",
               "Every referenced Assessment is in [the machine-readable conversion ledger](conversion-progress.json).",
-              "The research ZIP contains **only** validated fixture IR and metadata; it is",
-              "**not** a partial scanner content release. Unsupported/manual content",
-              "is never copied into executable IR or silently discarded from the ledger.",
+              "The research ZIP contains **only** validated fixture IR, manual procedures and metadata; it is",
+              "**not** a partial scanner content release. Unsupported content",
+              "is never copied into executable IR or silently discarded. Manual procedures remain unevaluated until a human responds.",
               "",
               "Remaining release gates: complete original SCAP 1.4 import; implement",
               "OVAL Object/State/Variable/Set and source-specific collection behavior;",
