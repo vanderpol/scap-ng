@@ -20,6 +20,7 @@ import zipfile
 from research_b_full_corpus_import import read_source, import_corpus
 from research_b_source_textfile_lowering import lower_state_free_textfile_assessment
 from research_b_source_partition_lowering import lower_state_free_partition_assessment
+from research_b_source_textfile_state_lowering import lower_single_capture_textfile_assessment
 from research_b_manual_lowering import lower_manual_assessment
 from research_b_compiled_ir import encode, decode
 
@@ -56,6 +57,7 @@ def _lower_assessment(capsule):
     families=[
         ("independent.textfilecontent54/state_free_existence",lower_state_free_textfile_assessment),
         ("linux.partition/state_free_existence",lower_state_free_partition_assessment),
+        ("independent.textfilecontent54/single_capture_state",lower_single_capture_textfile_assessment),
     ]
     for family,lowerer in families:
         try:
