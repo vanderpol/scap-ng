@@ -6,6 +6,8 @@ on:
       - 'research/assessment-simplification/english-first-04/field-presence-iteration/**'
       - 'research/assessment-simplification/english-first-04/canonical-operators/**'
       - 'tools/research_04_field_presence_iteration.py'
+      - 'tools/research_04_auditor_preview.py'
+      - 'tools/test_research_04_auditor_preview.py'
       - '.github/workflows/research-04-field-presence-iteration.yml'
   workflow_dispatch:
 
@@ -28,3 +30,15 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_oval_result_truth_tables.py
+      - name: Test generated auditor-preview source graph completeness and negative refs
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_04_auditor_preview.py
+      - name: Generate read-only auditor previews from the five parsed Assessments
+        env:
+          PYTHONPATH: tools
+        run: python tools/research_04_auditor_preview.py
+      - name: Check generated preview output is stable
+        env:
+          PYTHONPATH: tools
+        run: python tools/research_04_auditor_preview.py --check
