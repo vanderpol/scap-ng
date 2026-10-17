@@ -2,6 +2,37 @@
 
 **October 17, 2026 — radical design exploration / NO ADOPTION.** Issue [#235](https://github.com/vanderpol/scap-ng/issues/235). This is neither an approved 0.4 authoring grammar nor a source-reversible whole-corpus conversion, and it does not supersede the pinned source evidence. **The purpose is to decide whether a different mental model is more understandable**, not to invent more aliases.
 
+## Review disposition — reject the YAML redesign, retain the explanation concept
+
+The owner identified unnecessary nesting, particularly `claims.<id>.valid.all`, on October 17, 2026. **Disposition: do not pursue `observe/claims/pass_if` as a replacement 0.4 YAML language in its current form.** It renames existing concepts and introduces wrappers without a corresponding new semantic distinction. The illustrations below are a retained historical thought experiment, **not the recommended authoring syntax**.
+
+Every author-facing wrapper must supply a distinct, necessary semantic boundary. In this experiment:
+
+- `valid` does not define one; its child quantifier already expresses the required matching scope. **Remove.**
+- `observed` describes Item existence ambiguously; `items` expresses it more precisely. **Do not rename.**
+- `on` merely renames `from`; `using` merely renames `inspect`. **Do not rename without proven benefit.**
+- `claims` is substantially a rename for named `checks`; `observe` renames typed `sources`; `pass_if` renames `evaluate`, and could falsely imply only Boolean pass/fail rather than the six-state technical result model. **Do not change the normative vocabulary for aesthetic reasons.**
+- **Keep** the useful *reader model*—facts collected, requirements checked, and acceptable decision paths—as a generated auditor preview of the **single existing Assessment**. Named passing routes may be editor/presentation labels that preserve the original `evaluate` expression.
+
+The following is the shorter, source-backed **current research candidate**, not newly approved normative 0.4:
+
+```yaml
+checks:
+  home_uses_nosuid:
+    from: home_mounts
+    require:
+      items: at_least_one
+      match: all
+      mount_options:
+        at_least_one_value_equals: nosuid
+```
+
+Do not silently omit `require`: it currently distinguishes the predicate's technical requirements from acquisition and descriptive metadata. Its removal needs a separate reserved-name and compiler proof. Do not redefine `all` as both Item matching and field-value matching; the latter may be `at_least_one_value_equals` (e.g., the `rw,nosuid` case).
+
+**Design check before proposing new nesting:** if deleting a key changes neither scope, cardinality, acquisition, evaluation order, reference identity nor error propagation, the key is a strong removal candidate. Field absence and legacy `all_exist` semantics still require independent work, not hidden defaults.
+
+---
+
 ## The underlying diagnosis
 
 People do not think in OVAL Tests/Objects/States and their implementation-scoped check/existence operators. They think: **what facts did we observe → what assertions can we make about those facts → which complete combination constitutes compliance?** Changing `require` vocabulary does not simplify the Apache 18-Variable dependency chain, a seven-Test Windows Boolean tree, or a Linux account-dependent file search.
