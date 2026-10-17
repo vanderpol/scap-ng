@@ -101,6 +101,18 @@ class LinuxAccountHomeFilesTests(unittest.TestCase):
             self.get([{"id":"bad","username":"bad","home_dir":"relative"}])
         with self.assertRaises(ValueError):
             self.get([{"id":"bad","username":"bad","home_dir":"/"}],follow_symlinks="yes")
+    def test_manifest_matches_real_emitted_schema(self):
+        import yaml
+        manifest=yaml.safe_load((Path(__file__).resolve().parents[1]/
+            "research/requirements-first-language/providers/linux.files_from_account_homes.v0.1.yaml").read_text())
+        self.write(self.one,".profile",0o600)
+        observed=self.get()
+        self.assertEqual(manifest["provider"],observed["provider"])
+        self.assertEqual(manifest["version"],observed["version"])
+        self.assertEqual(set(manifest["collection"]["exposed_fields"]),set(observed["items"][0]))
+        self.assertEqual(manifest["collection"]["max_items_reached"],"incomplete")
+        self.assertEqual(manifest["scope"]["directory"],"immediate_children_only")
+
     def test_non_system_absent_files_known_complete(self):
         users=[{"id":"u","username":"jane","uid":1001,"home_dir":str(self.one)}]
         result=self.get(users)
