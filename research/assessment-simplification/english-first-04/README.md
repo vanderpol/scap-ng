@@ -3,6 +3,8 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[Exactly-one existence: official truth tables, seven source selectors, and elimination of redundant combined quantifiers](EXACTLY-ONE-EXISTS-TRUTH-TABLE.md)** — source and 12,432-case regression evidence. Proposes one clearly scoped `items: exactly_one` choice rather than several special labels; **no normative changes**. [Passing test CI](https://github.com/vanderpol/scap-ng/actions/runs/39031176661).
+
 **[OVAL exceptional-feature retention gate](OVAL-EDGE-FEATURE-RETENTION-GATE.md)** — source-backed criteria for core, advanced, importer-only compatibility and potential deprecation. Rare usage triggers semantic review; no unsupported source behavior is silently removed. [Rare operator guards passed](https://github.com/vanderpol/scap-ng/actions/runs/39030549202).
 
 **[Original OVAL Test author/source census](reports/source-oval-author-edge-census.md)** — 2,140 original six-STIG OVAL Tests (1,818 DISA, 322 NIWC/NAVWAR), stratified by original Test IDs and contrasted with 1,375 native Tests; 201 native all-exist cases have 198 DISA and three NIWC *comment+mode source-ID candidates*, not confirmed converter lineage. [Passing CI](https://github.com/vanderpol/scap-ng/actions/runs/39030379635).
