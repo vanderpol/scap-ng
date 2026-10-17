@@ -28,12 +28,13 @@ def yaml_under_heading(md, heading):
         raise AssertionError("Missing " + heading)
     other = md.find("\n## ", start + 3)
     section = md[start:other] if other >= 0 else md[start:]
-    fence = chr(96) * 3
-    pattern = "(?m)^" + fence + "yaml" + chr(10) + "(.*?)" + chr(10) + fence
-    match = re.search(pattern, section, re.DOTALL)
-    if match is None:
-        raise AssertionError("No complete YAML in " + heading)
-    return yaml.safe_load(match.group(1))
+    marker = chr(96) * 3 + "yaml" + chr(10)
+    if marker not in section:
+        raise AssertionError("No complete YAML after " + heading)
+    rendered = section.split(marker, 1)[1].split(chr(10) + chr(96) * 3, 1)
+    if len(rendered) != 2:
+        raise AssertionError("Unclosed YAML fence after " + heading)
+    return yaml.safe_load(rendered[0])
 
 def test_page(name):
     content = (ROOT / name).read_text(encoding="utf-8")
