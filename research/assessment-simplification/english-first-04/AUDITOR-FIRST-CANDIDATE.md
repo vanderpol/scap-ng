@@ -26,14 +26,14 @@ checks:
       items: at_least_one
       every_item:
         mount_options:
-          some_values_is: nosuid
+          at_least_one_value_is: nosuid
     report_elements: all
 
 evaluate:
   test: home-mounted-nosuid-option-test
 ```
 
-**Read it:** Inspect mounted Linux partitions; choose those whose mount point matches the **original source pattern**; at least one partition must exist; **every** selected partition must contain a `nosuid` option among its reported values. The source pattern is deliberately not silently rewritten to `equals: /home`, since that would be a semantic change. The original field comparator `some_values_is` is not yet polished into final auditor-friendly wording.
+**Read it:** Inspect mounted Linux partitions; choose those whose mount point matches the **original source pattern**; at least one partition must exist; **every** selected partition must contain a `nosuid` option among its reported values. The source pattern is deliberately not silently rewritten to `equals: /home`, since that would be a semantic change. The field comparator now reads `at_least_one_value_is`, which describes **field-value** matching rather than Item matching. This is a reversible alias, not a new default or changed comparison.
 
 The complete candidate retains Assessment metadata and any other required source structures, omitted **only from this editorial excerpt**. See [the full original and current English-first RHEL comparison](FULL-01-linux-home.md).
 
@@ -149,6 +149,7 @@ These are illustrations of one candidate grammar, **not complete executable Asse
 | `from` | Reference to a previously defined source | An undeclared or guessed identifier |
 | `gather` | Explicit composition of complex collection sources, Sets, dependent iteration | A redundant wrapper for every simple Object |
 | `include_if`, `exclude_if` | Filter already collected Set Items | Pre-collection Object selection |
+| Field comparators such as `at_least_one_value_is` | How many **values within one field** must meet a condition; separate from the Item count | `require.items` / `require.every_item` |
 | `require.items` | Explicit Item existence rule: `at_least_one`, `exactly_one`, `none`, `may_be_absent`, or `all_must_exist` | Item matching or field matching |
 | `require.every_item` / `at_least_one_item` / `exactly_one_item` / `no_item` | Scope over the selected Items, separate from their existence requirement | How many values of a field must match |
 | `evaluate` | Combines named checks using explicit Boolean alternatives, conjunctions and conditions | An invented implicit AND/OR default |
