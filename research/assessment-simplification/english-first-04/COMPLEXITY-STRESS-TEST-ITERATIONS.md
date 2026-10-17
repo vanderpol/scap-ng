@@ -30,6 +30,8 @@ This is an actual structural improvement over the present research format, where
 
 **Small source-backed proof:** In the full [Windows 11 seven-Test experiment](experiments/windows-wmi-rights-typed-source.research.yaml), all **seven** referring checks inherited their capability from **two** named sources. The seven repeated `check.inspect` lines (217 YAML characters) were removed; source-type agreement was checked for each reference and reinserting those exact seven fields reconstructed the [original auditor-first YAML](auditor-candidate/windows-wmi-rights.auditor.research.yaml) **byte-for-byte**. This proves this narrow presentation change for *that file only*. Of the other four complete gallery files, none has a direct check-level named `from` to simplify. Do not extrapolate this into a major corpus-wide gain or scanner parity.
 
+**Second improvement to that experiment:** [The fail-closed typed-source probe](../../../tools/research_english_first_04_inherited_capability.py) now resolves a **homogeneous Set source** by deriving its capability from each operand, including a one-operand `union`. It rejects missing names, mixed capability operands and cyclic references. [Nine targeted unit cases](../../../tools/test_research_english_first_04_inherited_capability.py) passed locally and the five complete gallery files are included as a repeatable GitHub Actions check. This is a *type-inference proof for the supported shapes*, not a verified full-corpus conversion, collection semantics or a license to drop Set operators.
+
 ### Linux: source graph, then two distinctly quantified checks
 
 The following is a **design fragment** grounded in [SV-257889's complete source](FULL-02-linux-files.md); it is not an executable whole Assessment. The non-system account source below retains the real *separate exclusions* and the one-operand Set union. In the real Assessment the root-account source is another `difference` of the same accounts, excluding IDs **greater than 0** and home directory `/`.
@@ -118,18 +120,18 @@ The largest opportunity is **not** shorter field names: it is changing the primi
 ```yaml
 # CONCEPTUAL DESIGN ONLY. NOT a lossless conversion of SV-214228.
 sources:
-  loaded-apache-directives:
+  keepalive-occurrences:
     inspect: apache.configuration
     collect:
       discovery: installed_servers
       include_files: true
       representation: raw_occurrences
-
-checks:
-  included-keepalive:
-    from: loaded-apache-directives
     where:
       directive: {equals_ignoring_case: KeepAlive}
+
+checks:
+  keepalive-across-loaded-files:
+    from: keepalive-occurrences
     require:
       items: at_least_one
       every_item:
@@ -150,7 +152,7 @@ A proposed per-zone foreach is **not equivalent by assertion**: empty zone sets,
 
 A new native capability is only better if it moves real, **well-specified** complexity into a reusable audited implementation. The collection implementation must expose what was discovered, where it came from, why it was skipped, and partial/error flags. A short authoring file with an opaque collector is not a success.
 
-**Proposed winning direction for further prototyping:**
+**Proposed winning direction for further prototyping:** In particular, a named `from` check must not introduce a competing `where` or `collect`; any selection belongs in the defining source, where its collection stage and type can be checked. This fixes an ambiguity caught while reviewing the initial Apache sketch.
 
 1. **One grammar:** `sources` define typed acquisition (native, selected, Set-composed or dependent); `checks` reference sources or inspect inline; `require` declares explicit cardinality; `evaluate` joins named checks in six-state logic. No duplicated `inspect` at a `from` call site and no redundant `combine → union` wrapper.
 2. **One dependency model:** named sources are lexical, cycle-checked and type-checked. Dependencies appear *before* consumers in canonical authoring order. Names are identifiers, **never executable descriptions**. Use precise original Test/Item/provenance mappings during import.
