@@ -10,7 +10,9 @@ only: this does NOT copy legacy item/existence behavior.
 from __future__ import annotations
 from dataclasses import dataclass
 import re
-from oval_result_truth_tables import aggregate_operator, TRUE, FALSE, ERROR, UNKNOWN, NOT_APPLICABLE
+from oval_result_truth_tables import (
+    aggregate_operator, evaluate_collected_object_test,
+    TRUE, FALSE, ERROR, UNKNOWN, NOT_APPLICABLE)
 from research_linux_init_permissions import only_these_bits
 
 STATUSES={"complete","incomplete","error","not collected","not applicable"}
@@ -160,6 +162,20 @@ def evaluate(ast,fixtures,scope=None):
     rather than assuming cached results apply.
     """
     scope=scope or {}
+    # INTERNAL COMPILER-OWNED compatibility IR, not authored YAML. This
+    # delegates source OVAL Test existence/item truth tables to the PINNED
+    # reference combiner. This one node is a bounded bridge demo: it does
+    # not execute original command collections, Records, Variables or States.
+    if ast["kind"]=="compat_oval_test":
+        if "source_test_id" not in ast or not isinstance(ast.get("test"),dict):
+            raise ValueError("compatibility IR requires source_test_id and Test inputs")
+        source=ast["test"]
+        permitted={"flag","existence","check","item_results","has_state",
+                   "exists","does_not_exist","error","not_collected"}
+        if not {"flag","existence","check","exists"}<=set(source) or set(source)-permitted:
+            raise ValueError("compatibility Test has missing or unexpected input fields")
+        result=evaluate_collected_object_test(**source)
+        return Decision(result,"source-compatible OVAL Test "+ast["source_test_id"])
     if ast["kind"]=="fields":
         selected=scope.get("__current__")
         if selected is None:raise ValueError("fields assertion requires selected Item scope")
