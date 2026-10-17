@@ -45,8 +45,12 @@ def one_whole_state(root, expected_role):
         if not isinstance(record,dict):raise ValueError("invalid record")
         if record.get("status")=="error":
             results.append(ERROR)
-        elif record.get("status")=="unknown" or "domainrole" not in record:
+        elif record.get("status")=="unknown":
             results.append(UNKNOWN)
+        elif "domainrole" not in record:
+            # Original record-state expected field is absent: the pinned
+            # OVAL EntityStateFieldType reference reports Error.
+            results.append(ERROR)
         else:
             role=record["domainrole"]
             if not isinstance(role,str):
