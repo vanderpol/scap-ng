@@ -1,0 +1,80 @@
+name: Compare merged vs split requirements (#235)
+on:
+  push:
+    paths:
+      - .github/workflows/research-require-presentations-04.yml
+      - tools/research_04_require_presentation_comparison.py
+      - tools/test_research_04_require_presentation_comparison.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  six-stig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned parser and validator
+        run: python -m pip install 'PyYAML==6.0.3' 'jsonschema==4.25.1'
+      - name: Unit-test 15 semantic mode mappings and invalid expressions
+        run: python tools/test_research_04_require_presentation_comparison.py -v
+      - name: Download pinned six-STIG r3 source archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --dir work
+      - name: Source-exact six-STIG comparison, with both independent inverse paths
+        run: |
+          python tools/research_04_require_presentation_comparison.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --base-schema research/assessment-simplification/english-first-04/fixed-require.editor.schema.json \
+            --out work/proof
+      - name: Enforce six-STIG baseline and one explicit reject
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('work/proof/report.json'))
+          c=p['counts']
+          assert (c['assessments'],c['tests'])==(872,1375),c
+          for s in ('split','merged'):
+              assert (c[s+'_exact_assessments'],c[s+'_exact_tests'])==(871,1374),c
+          assert p['legacy_all_exist_tests']==201,p
+          assert len(p['failures'])==1,p['failures']
+          assert 'verify-boot-loader' in p['failures'][0]['path'],p
+          print('PASS: both grammars reconstruct 871/872 source Assessments; 201 legacy cases retained')
+          PY
+      - name: Publish human-readable report and both full example sets on github.com
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64,json,os,pathlib,subprocess
+          repo='vanderpol/scap-ng'
+          head=subprocess.run(['gh','api',f'repos/{repo}/commits/main','--jq','.sha'],capture_output=True,text=True,check=True).stdout.strip()
+          if head!=os.environ['GITHUB_SHA']:
+              print('Newer main advanced; avoid stale publication')
+              raise SystemExit(0)
+          root='research/assessment-simplification/english-first-04/require-presentation-comparison'
+          for path in sorted(pathlib.Path('work/proof').glob('*')):
+              if path.suffix not in ('.json','.md','.yaml'):continue
+              target=root+'/'+path.name
+              read=subprocess.run(['gh','api',f'repos/{repo}/contents/{target}','--jq','.sha'],capture_output=True,text=True)
+              if read.returncode not in (0,1):raise RuntimeError('Remote read failed '+target)
+              payload={'branch':'main','message':'research(#235): publish merged-vs-split requirement proof',
+                       'content':base64.b64encode(path.read_bytes()).decode('ascii')}
+              if read.returncode==0:payload['sha']=read.stdout.strip()
+              subprocess.run(['gh','api','--method','PUT',f'repos/{repo}/contents/{target}','--input','-'],
+                             input=json.dumps(payload),text=True,check=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: merged-vs-split-requirement-research
+          path: work/proof/
+          if-no-files-found: warn
