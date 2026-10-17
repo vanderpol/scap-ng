@@ -381,6 +381,98 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "linux.partition"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__linux_partition"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.registry"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__windows_registry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.userright"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__windows_userright"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.wmi.query"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__windows_wmi_query"
+                  }
+                }
+              }
+            }
+          }
         }
       ]
     },
@@ -611,6 +703,565 @@
             }
           },
           "description": "AND/OR of complete alternative States. Each child evaluates all its own record/field requirements first."
+        }
+      ]
+    },
+    "capStateNode__linux_partition": {
+      "description": "A linux.partition State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "mount_point": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'mount_point'; operator/value semantics validated separately"
+            },
+            "device": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'device'; operator/value semantics validated separately"
+            },
+            "uuid": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'uuid'; operator/value semantics validated separately"
+            },
+            "fs_type": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'fs_type'; operator/value semantics validated separately"
+            },
+            "mount_options": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'mount_options'; operator/value semantics validated separately"
+            },
+            "total_space": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'total_space'; operator/value semantics validated separately"
+            },
+            "space_used": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'space_used'; operator/value semantics validated separately"
+            },
+            "space_left": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'space_left'; operator/value semantics validated separately"
+            },
+            "space_left_for_unprivileged_users": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'space_left_for_unprivileged_users'; operator/value semantics validated separately"
+            },
+            "block_size": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'block_size'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__linux_partition": {
+      "description": "Condition on linux.partition, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__linux_partition"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capStateNode__windows_registry": {
+      "description": "A windows.registry State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "hive": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'hive'; operator/value semantics validated separately"
+            },
+            "key": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'key'; operator/value semantics validated separately"
+            },
+            "name": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'name'; operator/value semantics validated separately"
+            },
+            "last_write_time": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'last_write_time'; operator/value semantics validated separately"
+            },
+            "type": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'type'; operator/value semantics validated separately"
+            },
+            "value": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'value'; operator/value semantics validated separately"
+            },
+            "expanded_value": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'expanded_value'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__windows_registry": {
+      "description": "Condition on windows.registry, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__windows_registry"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capStateNode__windows_userright": {
+      "description": "A windows.userright State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "userright": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.userright observed field 'userright'; operator/value semantics validated separately"
+            },
+            "trustee_name": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.userright observed field 'trustee_name'; operator/value semantics validated separately"
+            },
+            "trustee_sid": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.userright observed field 'trustee_sid'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__windows_userright": {
+      "description": "Condition on windows.userright, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__windows_userright"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capStateNode__windows_wmi_query": {
+      "description": "A windows.wmi.query State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "namespace": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.wmi.query observed field 'namespace'; operator/value semantics validated separately"
+            },
+            "wql": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.wmi.query observed field 'wql'; operator/value semantics validated separately"
+            },
+            "result": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.wmi.query observed field 'result'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__windows_wmi_query": {
+      "description": "Condition on windows.wmi.query, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__windows_wmi_query"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            }
+          }
         }
       ]
     }
