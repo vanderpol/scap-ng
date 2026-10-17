@@ -1,0 +1,29 @@
+# RESEARCH ONLY — not normative 0.4, runtime/evidence parity not proven
+metadata:
+  id: ng.shared.home-is-mounted-with-the-nosuid-option
+  version: 1
+  assessment_title: Linux must prevent files with the setuid and setgid bit set from being executed on file systems
+    that contain user home directories.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+sources: {}
+checks:
+  home-mounted-nosuid-option-test:
+    check: /home is mounted with the nosuid option.
+    inspect: linux.partition
+    description: null
+    where:
+      mount_point:
+        matches_regex: .*\/home
+    require:
+      items: at_least_one
+      match: all
+      mount_options:
+        at_least_one_value_equals: nosuid
+    report_elements: all
+evaluate:
+  test: home-mounted-nosuid-option-test
