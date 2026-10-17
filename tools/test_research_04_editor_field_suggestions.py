@@ -9,7 +9,7 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import unittest
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 
 ROOT=Path(__file__).resolve().parents[1]
 SCHEMA=ROOT/"research/assessment-simplification/english-first-04/fixed-require.editor.schema.json"
@@ -36,7 +36,7 @@ class CapabilityCompletionResearch(unittest.TestCase):
         self.validator.validate(check(cap,condition))
 
     def invalid(self,cap,condition):
-        with self.assertRaises(Exception):
+        with self.assertRaises(ValidationError):
             self.validator.validate(check(cap,condition))
 
     def test_field_autocomplete_matches_capability_mapping(self):
