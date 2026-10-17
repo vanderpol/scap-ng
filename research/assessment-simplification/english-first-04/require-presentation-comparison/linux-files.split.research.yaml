@@ -1,0 +1,139 @@
+# RESEARCH ONLY: source structural equality, NOT scanner parity
+metadata:
+  id: ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive
+  version: 1
+  assessment_title: Linux local initialization files must have mode 0740 or less permissive.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+sources:
+  users-username-object:
+    inspect: unix.password
+    description: Users with an username
+    where:
+      username:
+        matches_regex: '[\w]+'
+  only-non-system-users-uid-999-home-dirs-excluding-root-object:
+    inspect: unix.password
+    description: only non-system users (uid>999) home-dirs excluding root directory
+    difference:
+    - from: users-username-object
+      exclude_if:
+      - user_id:
+          less_than: 1000
+      - home_dir:
+          is: /
+  only-root-users-uid-0-home-dirs-excluding-root-directory-object:
+    inspect: unix.password
+    description: only root users (uid=0) home-dirs excluding root directory
+    difference:
+    - from: users-username-object
+      exclude_if:
+      - user_id:
+          greater_than: 0
+      - home_dir:
+          is: /
+checks:
+  local-initialization-files-non-system-users-have-mode-0740-or-test:
+    check: Local initialization files for non-system users have mode 0740 or less permissive.
+    inspect: unix.file
+    gather:
+      description: local initialization files of non-system users.
+      union:
+      - from:
+          inspect: unix.file
+          description: local initialization files of non-system users.
+          where:
+            directory:
+              from: user.home_dir
+            name:
+              matches_regex: ^\.[^\s\.]+
+          filesystem: all
+          traversal:
+            max_depth: 1
+            recurse: symlinks
+          for_each_source:
+            item: user
+            in: only-non-system-users-uid-999-home-dirs-excluding-root-object
+        exclude_if:
+        - type:
+            is: directory
+    require:
+      items: if_present
+      match: all
+      condition:
+        scope: fields
+        and:
+        - setuid:
+            is: false
+        - setgid:
+            is: false
+        - sticky:
+            is: false
+        - group_write:
+            is: false
+        - group_execute:
+            is: false
+        - other_read:
+            is: false
+        - other_write:
+            is: false
+        - other_execute:
+            is: false
+        all_fields_must_exist: true
+    report_elements: all
+  local-initialization-files-root-have-mode-0740-or-less-permissive-test:
+    check: Local initialization files for root have mode 0740 or less permissive.
+    inspect: unix.file
+    gather:
+      description: local initialization files of root user.
+      union:
+      - from:
+          inspect: unix.file
+          description: local initialization files of root user.
+          where:
+            directory:
+              from: user.home_dir
+            name:
+              matches_regex: ^\.[^\s\.]+
+          filesystem: all
+          traversal:
+            max_depth: 1
+            recurse: symlinks
+          for_each_source:
+            item: user
+            in: only-root-users-uid-0-home-dirs-excluding-root-directory-object
+        exclude_if:
+        - type:
+            is: directory
+    require:
+      items: at_least_one
+      match: all
+      condition:
+        scope: fields
+        and:
+        - setuid:
+            is: false
+        - setgid:
+            is: false
+        - sticky:
+            is: false
+        - group_write:
+            is: false
+        - group_execute:
+            is: false
+        - other_read:
+            is: false
+        - other_write:
+            is: false
+        - other_execute:
+            is: false
+        all_fields_must_exist: true
+    report_elements: all
+evaluate:
+  and:
+  - test: local-initialization-files-non-system-users-have-mode-0740-or-test
+  - test: local-initialization-files-root-have-mode-0740-or-less-permissive-test
