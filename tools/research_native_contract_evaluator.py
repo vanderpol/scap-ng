@@ -12,7 +12,7 @@ from dataclasses import dataclass
 import re
 from oval_result_truth_tables import (
     aggregate_operator, evaluate_collected_object_test,
-    TRUE, FALSE, ERROR, UNKNOWN, NOT_APPLICABLE)
+    TRUE, FALSE, ERROR, UNKNOWN, NOT_APPLICABLE, NOT_EVALUATED)
 from research_linux_init_permissions import only_these_bits
 
 STATUSES={"complete","incomplete","error","not collected","not applicable"}
@@ -168,6 +168,8 @@ def evaluate(ast,fixtures,scope=None):
     rather than assuming cached results apply.
     """
     scope=scope or {}
+    if ast["kind"]=="manual_procedure":
+        return Decision(NOT_EVALUATED,"manual procedure requires authenticated human determination")
     # RESEARCH source-shape compatibility: unlike compat_oval_test below this
     # node consumes RAW typed collector Items, not pre-evaluated Item results.
     # It only supports an independently pinned state-free textfile existence
