@@ -3,6 +3,8 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[Working scoped `and` / `or` authoring + editor proof](SCOPED-AND-OR-EDITOR-PILOT.md)** — real Windows WMI, Linux permissions and six-STIG source-exact examples. Sibling `scope: states|fields` with `and|or`, validated autocomplete for four native capabilities; 871/872 source-exact Assessments, 3,484 malformed-input guards, and original NIWC bootloader violation identified. [CI proof](https://github.com/vanderpol/scap-ng/actions/runs/39034513658).
+
 **[Exactly-one existence: official truth tables, seven source selectors, and elimination of redundant combined quantifiers](EXACTLY-ONE-EXISTS-TRUTH-TABLE.md)** — source and 12,432-case regression evidence. Proposes one clearly scoped `items: exactly_one` choice rather than several special labels; **no normative changes**. [Passing test CI](https://github.com/vanderpol/scap-ng/actions/runs/39031176661).
 
 **[OVAL exceptional-feature retention gate](OVAL-EDGE-FEATURE-RETENTION-GATE.md)** — source-backed criteria for core, advanced, importer-only compatibility and potential deprecation. Rare usage triggers semantic review; no unsupported source behavior is silently removed. [Rare operator guards passed](https://github.com/vanderpol/scap-ng/actions/runs/39030549202).
