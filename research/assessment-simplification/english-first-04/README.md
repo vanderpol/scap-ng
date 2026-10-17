@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[NEW — field-presence revision, five complete source-backed candidates and repeated internal reviews](field-presence-iteration/README.md)** — item/record matching labels, required fields moved inside `require`, Apache optional fields split from comparison, unchanged original collection and evaluation graphs; independent exact byte-for-byte inverse to five original research YAML files. [Fail-closed verifier](../../../tools/research_04_field_presence_iteration.py) and [CI workflow](../../../.github/workflows/research-04-field-presence-iteration.yml) have been added but the workflow run has **not been confirmed**. **[Send the fresh, answer-free Gemini packet](field-presence-iteration/GEMINI-NEXT-BLIND-REVIEW.md)** for external feedback. **Research only, not 0.4 adoption or six-state scanner parity.**
+
+
 **[Second Gemini review — source-backed rejection of the proposed 0.4.1 rewrite (17 October)](GEMINI-SECOND-REVIEW-SOURCE-AUDIT-2026-10-17.md)** — independent-model feedback is useful for field presence and named passing paths, but its proposed YAML **does not parse** and changes the original RHEL regex, Windows deny-right selector, WMI whole-State record behavior and source/Variable dependency graphs. Detailed counterexamples, limits of Gemini's six-state predictions, and next semantic gates recorded. **No normative syntax, bundles or version were changed.**
 
 
