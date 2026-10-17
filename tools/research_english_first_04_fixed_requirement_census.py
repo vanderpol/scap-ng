@@ -41,11 +41,21 @@ BASIC = {"at_least_one_exists_and_all_match",
          "at_least_one_exists_and_some_match",
          "may_be_absent_and_all_match"}
 PRACTICAL = BASIC | {"all_exist_and_all_match", "only_one_exists_and_matches"}
+# Add a *specific scope meaning*, not a synonym: exactly one collected Item
+# can match, and a field may have no matching observed values.
+PLUS_TWO_ITEMS = PRACTICAL | {"at_least_one_exists_and_only_one_matches"}
+PLUS_TWO_FIELDS = PRACTICAL | {"none_exist", "at_least_one_exists_and_none_match"}
+PLUS_THREE_ITEMS = PLUS_TWO_ITEMS | {"may_be_absent_and_none_match"}
+PLUS_THREE_FIELDS = PLUS_TWO_FIELDS | {"may_be_absent_and_none_match"}
 STAGES = {
     "basic": {"items": BASIC, "field": BASIC | {"none_exist"},
               "statefree": {"at_least_one_exists", "none_exist"}},
     "practical": {"items": PRACTICAL, "field": PRACTICAL | {"none_exist"},
                   "statefree": STATE_FREE_ALL},
+    "practical_plus_two": {"items": PLUS_TWO_ITEMS,
+                           "field": PLUS_TWO_FIELDS, "statefree": STATE_FREE_ALL},
+    "practical_plus_three": {"items": PLUS_THREE_ITEMS,
+                             "field": PLUS_THREE_FIELDS, "statefree": STATE_FREE_ALL},
     "exhaustive_vocabulary": {"items": ITEM_ALL, "field": FIELD_ALL,
                                "statefree": STATE_FREE_ALL},
 }
@@ -253,8 +263,8 @@ def markdown(result):
                   "| Source requirement | Occurrences |", "| --- | ---: |"])
     for mode, count in result["source_explicit_field_mode_frequency"].items():
         lines.append(f"| `{mode}` | {count} |")
-    lines.extend(["", "## Practical-vocabulary residual examples", ""])
-    for record in result["limited_residual_samples"]["practical"][:22]:
+    lines.extend(["", "## Residual examples after adding two scoped choices", ""])
+    for record in result["limited_residual_samples"]["practical_plus_two"][:22]:
         lines.append(f'- `{record["source"]}` — `{record["test"]}`: '
                      f'Item `{record["item_mode"]}`, field modes '
                      f'`{", ".join(record["unrecognized_field_modes"])}`; '
