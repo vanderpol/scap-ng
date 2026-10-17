@@ -106,6 +106,16 @@ def check_using(raw,allowed,path,provider,scope):
                 fail(path+"."+name,"must be a nonempty string")
         if raw["view"] not in {"32bit","64bit"}:
             fail(path+".view","registry view must be 32bit or 64bit")
+    elif provider=="linux.textfile_matches":
+        if not isinstance(raw["path"],str) or not raw["path"].startswith("/"):
+            fail(path+".path","text file path must be absolute")
+        if not isinstance(raw["pattern"],str) or not raw["pattern"] or len(raw["pattern"])>4096:
+            fail(path+".pattern","text pattern must be a nonempty bounded regex")
+        try:re.compile(raw["pattern"])
+        except re.error:fail(path+".pattern","textfile pattern is invalid")
+        for setting in ("ignore_case","multiline","singleline"):
+            if type(raw[setting])!=bool:
+                fail(path+"."+setting,"regex options must be Boolean")
     elif provider=="windows.user_rights":
         if not isinstance(raw["right"],str) or not raw["right"]:
             fail(path+".right","Windows privilege name must be nonempty")
