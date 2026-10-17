@@ -163,11 +163,20 @@ def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
                 note("directive_limit",limit=max_directives)
                 limits_hit=True
                 break
+            integer_value={"field_status":"absent"}
+            if low=="maxkeepaliverequests":
+                if re.fullmatch(r"[0-9]+",value):
+                    integer_value=int(value)
+                else:
+                    note("numeric_directive_not_canonical",
+                         path=str(normalized),line=line_number,value=value)
+                    integer_value={"field_status":"error"}
             directives.append({
                 "id":str(normalized)+":"+str(line_number),
                 "fields":{
                     "name":DIRECTIVES[low],
                     "raw_value":value,
+                    "integer_value":integer_value,
                     "source_file":str(normalized),
                     "source_line":line_number,
                     "source_text":raw,
