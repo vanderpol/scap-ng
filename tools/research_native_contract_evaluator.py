@@ -168,6 +168,50 @@ def evaluate(ast,fixtures,scope=None):
     rather than assuming cached results apply.
     """
     scope=scope or {}
+    # RESEARCH source-shape compatibility: unlike compat_oval_test below this
+    # node consumes RAW typed collector Items, not pre-evaluated Item results.
+    # It only supports an independently pinned state-free textfile existence
+    # Test shape. No claim of OVAL regex/item_creation/source parity.
+    if ast["kind"]=="compat_oval_provider_existence":
+        required={"kind","source_assessment_id","source_test_id",
+                  "provider","using","existence"}
+        if set(ast)!=required or ast["provider"]!="linux.textfile_matches" or (
+                ast["existence"]!="at_least_one_exists"):
+            raise ValueError("unsupported source-compatible provider Test contract")
+        ev=fixtures.get(ast["provider"])
+        if ev is None:
+            return Decision(UNKNOWN,"no source-compatible provider acquisition supplied",
+                            ast["provider"])
+        if not isinstance(ev,dict) or ev.get("using")!=ast["using"]:
+            return Decision(ERROR,"source-compatible acquisition identity differs",ast["provider"])
+        flag=ev.get("status")
+        statuses={"complete":"complete","incomplete":"incomplete",
+                  "error":"error","not collected":"not collected",
+                  "not applicable":"not applicable"}
+        if flag not in statuses or not isinstance(ev.get("items"),list):
+            return Decision(ERROR,"invalid source-compatible collection envelope",ast["provider"])
+        items=ev["items"]
+        if flag not in {"complete","incomplete"} and items:
+            return Decision(ERROR,"terminal source collection has unverifiable Items",ast["provider"])
+        ids=set()
+        for item in items:
+            if not isinstance(item,dict) or not isinstance(item.get("fields"),dict):
+                return Decision(ERROR,"malformed source-compatible Item",ast["provider"])
+            fields=item["fields"]
+            ident=item.get("id")
+            if not isinstance(ident,str) or not ident or ident in ids:
+                return Decision(ERROR,"missing or duplicate source Item identity",ast["provider"])
+            ids.add(ident)
+            if (fields.get("full_path")!=ast["using"]["path"] or
+                    type(fields.get("instance")) is not int or fields["instance"]<1 or
+                    not isinstance(fields.get("match_text"),str)):
+                return Decision(ERROR,"source Item violates typed selector contract",ast["provider"])
+        result=evaluate_collected_object_test(
+            flag=statuses[flag],existence=ast["existence"],
+            check="all",has_state=False,exists=len(items))
+        return Decision(result,
+                        "source Test existence over observed textfile Items (source parity unverified)",
+                        ast["provider"],observed=len(items),selected=len(items))
     # INTERNAL COMPILER-OWNED compatibility IR, not authored YAML. This
     # delegates source OVAL Test existence/item truth tables to the PINNED
     # reference combiner. This one node is a bounded bridge demo: it does
