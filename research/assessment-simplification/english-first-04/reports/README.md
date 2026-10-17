@@ -2,8 +2,8 @@
 
 **Research only, not adopted SCAP-NG syntax or scanner validation.**
 
-Published from workflow run 38989751683:
-https://github.com/vanderpol/scap-ng/actions/runs/38989751683
+Published from workflow run 38990168310:
+https://github.com/vanderpol/scap-ng/actions/runs/38990168310
 
 Read these pages directly in GitHub; no Actions artifact ZIP is needed.
 
@@ -14,6 +14,8 @@ Read these pages directly in GitHub; no Actions artifact ZIP is needed.
 | --- | --- | --- |
 | Named source and variable reference graph | [Read online](english-first-04-reference-graph-report.md) | [Read JSON](english-first-04-reference-graph-report.json) |
 | Compact authoring layout | [Read online](english-first-04-compact-layout-report.md) | [Read JSON](english-first-04-compact-layout-report.json) |
+| Auditor-first requirement language candidate | [Read online](english-first-04-auditor-candidate.md) | [Read JSON](english-first-04-auditor-candidate.json) |
+| Pinned OVAL 5.12.3 source-pattern restriction | [Read online](english-first-04-oval-schema-boundary.md) | [Read JSON](english-first-04-oval-schema-boundary.json) |
 | Full Assessment source inversion | [Read online](english-first-04-full-assessment-census.md) | [Read JSON](english-first-04-full-assessment-census.json) |
 | Six-state cardinality comparison | [Read online](english-first-04-six-state-cardinality.md) | [Read JSON](english-first-04-six-state-cardinality.json) |
 | Unresolved none_exist State boundary | [Read online](english-first-04-none-exist-state-boundary.md) | [Read JSON](english-first-04-none-exist-state-boundary.json) |
