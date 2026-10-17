@@ -1,0 +1,78 @@
+# Research-only provider manifest. Not a validated Apache configuration parser
+# and NOT equivalent to original SCAP 1.4 shellcommand/OVAL tests.
+provider: apache.config_directives
+version: 0.1.0
+status: fixture_tested_partial_config_evidence
+implementation: tools/research_provider_apache_directives.py
+inputs:
+  root_config:
+    type: absolute_path_to_primary_configuration
+    required: true
+  server_root:
+    type: absolute_directory_path
+    required: true
+  max_files:
+    type: bounded_positive_integer
+    default: 500
+  max_directives:
+    type: bounded_positive_integer
+    default: 10000
+  max_depth:
+    type: bounded_positive_integer
+    default: 24
+scope:
+  supports:
+    - static Include
+    - static IncludeOptional
+    - nonrecursive wildcard globs
+    - nested static Include files
+    - observed KeepAlive directives
+    - observed MaxKeepAliveRequests directives
+  no_effective_values: true
+  no_apache_runtime_or_version_introspection: true
+  does_not_evaluate:
+    - conditional IfModule or IfDefine
+    - Directory or VirtualHost or other directive scopes
+    - dynamic macros or expressions
+    - Apache command-line flags or environment substitutions
+    - active vs inactive directives
+    - Apache DUMP_INCLUDES runtime output
+    - directives inherited or overridden at runtime
+collection:
+  identity: absolute_config_file_path_plus_source_line
+  file_order: depth_first_with_sorted_bounded_glob_expansions
+  supported_directive_names: [KeepAlive, MaxKeepAliveRequests]
+  exposed_fields: [name, raw_value, source_file, source_line, source_text]
+  all_duplicate_directives_retained: true
+  source_evidence_includes_exact_line: true
+  incomplete_for:
+    - required_include_unmatched
+    - included_directory_unsupported
+    - file_unreadable
+    - path_outside_server_root
+    - unsupported_include_syntax
+    - dynamic_include_unresolved
+    - dynamic_directive_value_unresolved
+    - unparsed_config_line
+    - multiline_directive_unsupported
+    - conditional_or_container_context_unsupported
+    - include_cycle
+    - duplicate_include_ambiguous
+    - file_limit
+    - directive_limit
+    - glob_match_limit
+  missing_optional_include: allowed_known_absence
+safety:
+  filesystem_read_only: true
+  path_scope: under_server_root_only_including_symlink_resolution
+  no_shell_execution: true
+  bounded_file_count_and_directive_count: true
+source_parity_limits:
+  - Source original has four distinct command Tests with at_least_one Items
+  - Original includes a separate direct Include source and Apache DUMP_INCLUDES source
+  - Original includes 18 derived Variables, regex capture and merge sort
+  - Source grep KeepAlive pattern can select KeepAliveTimeout; this provider matches exact name
+  - Source permits nonzero command exit and stderr without automatic error
+  - Source when_present entity semantics differ from required root Item existence
+  - This collector cannot prove effective Apache settings
+  - No actual Apache binary, host collector, complete parse or normative schema
