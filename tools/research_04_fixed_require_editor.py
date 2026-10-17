@@ -204,8 +204,8 @@ def census(archive, schema, examples=None):
         root.mkdir(parents=True,exist_ok=True)
         for label,doc in sample_data.items():
             (root/(label+".research.yaml")).write_text(
+                "# yaml-language-server: $schema=../fixed-require.editor.schema.json\n"
                 "# EXPERIMENTAL 0.4: not normative SCAP-NG; source exact if admitted.\n"
-                "# Editor JSON Schema: fixed-require.editor.schema.json\n"
                 +yaml.safe_dump(doc,sort_keys=False,allow_unicode=True,width=104))
     return {
        "source_sha256": digest,
