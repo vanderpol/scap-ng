@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[Gemini first-feedback triage (17 October)](GEMINI-FIRST-FEEDBACK-TRIAGE-2026-10-17.md)** — checks its four architectural concerns against actual selection rules, inherited OVAL six-state truth tables, DNS field-presence inheritance and Windows whole-State/record semantics. Finds field-presence readability debt, but *no completed independent A1–G blind review or Part 2 source comparison yet*. Keep the original [answer-free Gemini packet](GEMINI-INDEPENDENT-REVIEW-PACKET.md) for the missing scenario-based external gate; no 0.4 schema promotion.
+
+
 **[NEW — iterated readability revision and repeated reviews (17 October)](ITERATED-READABILITY-REVIEW-2026-10-17.md)** — four critical passes on the same original Linux, Windows, Apache and DNS examples. Trials `matching_items` / `matching_records` and explicit population naming, records remaining field-inheritance/six-state issues, and distinguishes a same-assistant lexical stopping point from independent proof. **[Send the answer-free Gemini blind/technical review packet](GEMINI-INDEPENDENT-REVIEW-PACKET.md) in a fresh conversation**, without linking this review's rationale or expected interpretations. Neither is approved v0.4 syntax; original source-backed examples remain unchanged.
 
 
