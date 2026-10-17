@@ -8,13 +8,20 @@ from research_native_contract_candidate import EXAMPLES,read
 from research_native_auditor_explain import render
 
 class NativeAuditorExplanationTests(unittest.TestCase):
-    def test_all_nine_have_nonempty_explanation(self):
+    def test_all_ten_have_nonempty_explanation(self):
         for file in sorted(EXAMPLES.glob("*.yaml")):
             with self.subTest(file=file.name):
                 text=render(read(file))
                 self.assertIn("What must be true",text)
                 self.assertIn("Source-conversion boundary",text)
                 self.assertIn("Evidence and status rules",text)
+
+    def test_chrony_regex_existence_is_human_readable(self):
+        text=render(read(EXAMPLES/"10-linux-chrony-cmdport.yaml"))
+        self.assertIn("At least one",text)
+        self.assertIn("linux.textfile_matches",text)
+        self.assertIn("path=/etc/chrony.conf",text)
+        self.assertIn("must exist.",text)
 
     def test_filesystem_existence_only_has_no_redundant_property(self):
         explanation=render(read(EXAMPLES/"09-linux-var-tmp-exists.yaml"))
