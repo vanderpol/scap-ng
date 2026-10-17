@@ -30,8 +30,8 @@ def lower_single_capture_textfile_assessment(source):
         raise ValueError("unexpected source Test or State contract")
     if test["capability"]!="independent.textfilecontent54":
         raise ValueError("wrong collection capability")
-    existence={"one_or_more":"at_least_one_exists",
-               "none":"none_exist","one":"only_one_exists"}
+    # Other Test existence scopes need separate zero-Item State proofs.
+    existence={"one_or_more":"at_least_one_exists"}
     checks={"all":"all","one":"only one","one_or_more":"at least one","none":"none satisfy"}
     if test["existence"] not in existence or test["match"] not in checks:
         raise ValueError("unsupported source Test existence/matching")
