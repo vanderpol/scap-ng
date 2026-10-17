@@ -10,6 +10,10 @@
 
 **New validated Linux proof (17 October):** [source-backed initialization-file audit](LINUX-INIT-FILES-AUDIT-2026-10-17.md) found a global-root-file count regression in the earlier nested example and confirmed across all 4,096 POSIX modes that the original eight flag constraints mean **allowed-bit subset of octal 0740**, not numeric mode <=0740. A [revised native sketch](experiments/linux-init-global-population.yaml) and read-only [streaming files-from-account-homes provider](../../tools/research_provider_linux_account_files.py) with its [contract](providers/linux.files_from_account_homes.v0.1.yaml) were added; this provider is test-fixture-backed and not old OVAL source-compatible. The existing WMI grouping test suite is also now run in CI. These are material semantic findings, not another vocabulary vote.
 
+**Compiler bridge proof:** [mixed native/OVAL Test IR fixture tests](../../tools/test_research_common_ir_bridge.py) now pass using one evaluator dispatcher and the existing pinned OVAL truth-table reference. One original Apache required shell Item can be absent even when the short native two-directive policy passes. Internal compatibility nodes preserve that difference and are rejected as human authoring syntax. Full source conversion and OVAL Object/State/Variable evaluation are still unimplemented.
+
+**[Full go/no-go and fallback recommendation](GO-NO-GO-ARCHITECTURE-2026-10-17.md).**
+
 **Direction:** typed-resource-first for ordinary auditor checks, with one explicit collection form for genuinely multi-resource policies. This is no longer an author-facing OVAL Object/Test/State grammar. Leave OVAL-like structural compatibility to the converter/evaluator when source semantics require it.
 
 **Why:** independently provided Gemini blind-read and context-aware ChatGPT first-read both identified good comprehension of simple selection/expectation checks but ambiguity about required versus optional resource existence, missing evidence, and nested provider identity. We caught a further source-fidelity failure in WMI: raw [1,3] is not the same as membership in either 1 or 3. We must not use English-like fields to hide that difference.
