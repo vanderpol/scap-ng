@@ -35,9 +35,9 @@ WIN="06-windows-privilege-or.yaml"
 LINUX="07-linux-permission-bits.yaml"
 
 class CandidateBContractTests(unittest.TestCase):
-    def test_all_seven_examples_compile_to_single_recursive_ast(self):
+    def test_all_eight_examples_compile_to_single_recursive_ast(self):
         files=sorted(EXAMPLES.glob("*.yaml"))
-        self.assertEqual(len(files),7)
+        self.assertEqual(len(files),8)
         for f in files:
             with self.subTest(file=f.name):
                 tree=read(f)
@@ -241,11 +241,69 @@ class CandidateBContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"duplicate YAML key"):
             yaml.load("id: one\nid: two\n",Loader=StrictLoader)
 
-    def test_experimental_nested_alias_is_not_silently_accepted(self):
+    def test_unregistered_child_relation_rejected(self):
         doc={"id":"x","title":"x","require":{
             "each":"windows.dns.zones","as":"zone",
-            "must":{"signed":{"equals":True}}}}
-        with self.assertRaisesRegex(ValueError,"nested population lowering not yet proven"):
+            "must":{"each":"$zone.unknown_children",
+                    "minimum_resources":1,
+                    "must":{"validity_hours":{"between":[48,168]}}}}}
+        with self.assertRaisesRegex(ValueError,"undeclared typed child relation"):
             compile_doc(doc)
+
+    def test_signed_zone_has_two_explicit_and_complete_key_populations(self):
+        tree=sample("08-dns-signing-nested.yaml")
+        self.assertEqual(tree["as"],"zone")
+        self.assertEqual(tree["nested"]["kind"],"logic")
+        self.assertEqual(len(tree["nested"]["children"]),3)
+        self.assertEqual(tree["nested"]["children"][1]["parent_ref"],
+                         {"alias":"zone","relation":"zone_signing_keys"})
+
+        def signing_child(ident,kind,value,zone_id="zone"):
+            return item(ident,zone_id=zone_id,kind=kind,validity_hours=value)
+        good_zone=item("zone",direction="forward",signed=True,
+            zone_signing_keys=pop(signing_child("z","ZoneSigningKey",72)),
+            key_signing_keys=pop(signing_child("k","KeySigningKey",168)))
+        fixtures={"windows.dns.zones":pop(good_zone)}
+        self.assertEqual(evaluate(tree,fixtures).result,TRUE)
+        bad_key=copy.deepcopy(good_zone)
+        bad_key["fields"]["zone_signing_keys"]["items"][0]["fields"]["validity_hours"]=169
+        self.assertEqual(evaluate(tree,{"windows.dns.zones":pop(bad_key)}).result,FALSE)
+
+    def test_nested_mismatched_zone_key_fails_closed(self):
+        zone=item("zone",direction="forward",signed=True,
+             zone_signing_keys=pop(item("z",zone_id="other",kind="ZoneSigningKey",validity_hours=72)),
+             key_signing_keys=pop(item("k",zone_id="zone",kind="KeySigningKey",validity_hours=72)))
+        self.assertEqual(evaluate(sample("08-dns-signing-nested.yaml"),
+                                  {"windows.dns.zones":pop(zone)}).result,ERROR)
+
+    def test_nested_child_without_explicit_status_cannot_pass(self):
+        zone=item("zone",direction="forward",signed=True,
+             zone_signing_keys=[item("z",zone_id="zone",validity_hours=72)],
+             key_signing_keys=pop(item("k",zone_id="zone",validity_hours=72)))
+        self.assertEqual(evaluate(sample("08-dns-signing-nested.yaml"),
+                                  {"windows.dns.zones":pop(zone)}).result,UNKNOWN)
+
+    def test_nested_child_partial_evidence_cannot_pass(self):
+        zone=item("zone",direction="forward",signed=True,
+             zone_signing_keys=pop(item("z",zone_id="zone",validity_hours=72),status="incomplete"),
+             key_signing_keys=pop(item("k",zone_id="zone",validity_hours=72)))
+        self.assertEqual(evaluate(sample("08-dns-signing-nested.yaml"),
+                                  {"windows.dns.zones":pop(zone)}).result,UNKNOWN)
+
+    def test_each_outer_zone_has_own_key_populations(self):
+        z1=item("one",direction="forward",signed=True,
+             zone_signing_keys=pop(item("z1",zone_id="one",validity_hours=72)),
+             key_signing_keys=pop(item("k1",zone_id="one",validity_hours=72)))
+        z2=item("two",direction="forward",signed=True,
+             zone_signing_keys=pop(item("z2",zone_id="two",validity_hours=72)),
+             key_signing_keys=pop())
+        self.assertEqual(evaluate(sample("08-dns-signing-nested.yaml"),
+                                  {"windows.dns.zones":pop(z1,z2)}).result,FALSE)
+        # A compliant key found for zone one cannot satisfy zone two.
+
+    def test_nested_no_forward_zone_is_not_a_required_signing_population(self):
+        self.assertEqual(evaluate(sample("08-dns-signing-nested.yaml"),
+                                  {"windows.dns.zones":pop()}).result,FALSE)
+        # Distinct from optional DNS Active Directory integration rule.
 
 if __name__=="__main__":unittest.main()
