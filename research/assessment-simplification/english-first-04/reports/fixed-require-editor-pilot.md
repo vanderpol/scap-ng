@@ -17,6 +17,10 @@ require:
 The `items` field is a **documented editor-dropdown enum**, `condition` is mandatory
 when the chosen Item mode evaluates a State, and absent for State-free checks.
 
+The nested evaluate tree uses OVAL-aligned `and` / `or` (not `all_of` / `any_of`).
+This rename is **strictly scoped to evaluate**: State alternatives and nested State-field groups are
+not indiscriminately renamed, because conflating distinct grouping scopes can change results.
+
 ## Per source folder
 
 | Folder | Exact Assessments | Rejected |
