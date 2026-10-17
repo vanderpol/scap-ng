@@ -2,6 +2,8 @@
 
 **Research working draft — October 16, 2026.** No vocabulary approved. No replacement 0.4 schema. The five cases below use original pinned Assessments, not invented examples. Read this before the [five complete before/after YAML comparisons](BEFORE-AFTER-REVIEW.md). We seek a *single executable, lossless human-authorable language*, not a pretty display layer.
 
+**Vocabulary clarification:** Neither `where` nor `inspect` is disfavored or earmarked for deletion. They remain reasonable candidates if they clearly express distinct behaviors across real Assessments. We will not optimize for eliminating keywords, invent a new nesting scheme merely to replace familiar words, or select terminology before the full source-backed translation makes the need apparent.
+
 ## Describe what the Assessment does, without designing YAML
 
 ### 1. RHEL 9 — `/home` filesystem must have `nosuid` (SV-257851)
