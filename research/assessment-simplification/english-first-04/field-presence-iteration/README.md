@@ -95,7 +95,7 @@ python -m pip install "PyYAML>=6,<7"
 python tools/research_04_field_presence_iteration.py --require-yaml
 ~~~
 
-[GitHub Actions workflow](../../../../.github/workflows/research-04-field-presence-iteration.yml) is configured to run the same research-only checks for changes to this directory. **Do not call CI passing until the actual run is inspected.** Even if it passes, source inversion and YAML parsing **do not** prove original OVAL six-state scanner/evidence parity, parser/schema acceptance of this new dialect, correctness outside five hand-selected complete files, or human comprehension.
+[GitHub Actions workflow](../../../../.github/workflows/research-04-field-presence-iteration.yml) has a **[verified successful run (39050496910)](https://github.com/vanderpol/scap-ng/actions/runs/39050496910)** for the revised five-source candidate. The `research-inverse` job passed YAML parsing, source-identity/evaluate checks and exact textual source inverses. This is structural research evidence only. Even if it passes, source inversion and YAML parsing **do not** prove original OVAL six-state scanner/evidence parity, parser/schema acceptance of this new dialect, correctness outside five hand-selected complete files, or human comprehension.
 
 ## Internal adversarial review: revision log
 
@@ -121,6 +121,6 @@ Those are **human editorial labels applied here to the existing AST for review**
 
 ## Unresolved issues / external test handoff
 
-**Gating concerns:** (1) source-specific exact six-state truth table for `required` and `may_be_absent` aliases, including missing/errors and inherited field scope; (2) run and inspect read-only verifier CI; (3) broaden beyond five pinned files before proposing canonical 0.4; (4) genuinely unfamiliar auditor predictions for zero/mixed/duplicate/unknown; (5) generated not hand-authored proof view and authoring-editor tests.
+**Gating concerns:** (1) source-specific exact six-state truth table for `required` and `may_be_absent` aliases, including missing/errors and inherited field scope; (2) keep the read-only verifier CI green as candidate revisions expand; (3) broaden beyond five pinned files before proposing canonical 0.4; (4) genuinely unfamiliar auditor predictions for zero/mixed/duplicate/unknown; (5) generated not hand-authored proof view and authoring-editor tests.
 
 **Next external gate:** [New answer-free Gemini review packet](GEMINI-NEXT-BLIND-REVIEW.md). Provide that document *alone* in a new conversation. Do not provide this README or the source-exact expected results before Gemini completes its blind phase.
