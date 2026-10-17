@@ -202,7 +202,7 @@ def decode(raw):
         obj = json.loads(raw, object_pairs_hook=_unique_pairs,
                          parse_constant=lambda value:
                          (_ for _ in ()).throw(ValueError("non-finite number: " + value)))
-    except (ValueError, UnicodeError) as exc:
+    except (json.JSONDecodeError, UnicodeError) as exc:
         raise ValueError("B compiled fixture IR: invalid JSON") from exc
     _ensure(isinstance(obj, dict), "envelope must be a JSON object")
     expected = {"format", "scope", "assessment_id", "source_kind",
