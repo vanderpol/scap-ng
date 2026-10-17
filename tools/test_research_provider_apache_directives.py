@@ -141,6 +141,29 @@ class ApacheConfigProviderTests(unittest.TestCase):
         self.assertIn("unparsed_config_line",
                       {x["reason"] for x in result["diagnostics"]})
 
+    def test_glob_expansion_is_bounded_and_reports_partial(self):
+        self.write("httpd.conf","Include conf.d/*.conf\n")
+        for i in range(5):
+            self.write(f"conf.d/{i}.conf","KeepAlive On\n")
+        result=self.read(max_files=2)
+        self.assertEqual(result["status"],"incomplete")
+        self.assertIn("glob_match_limit",{x["reason"] for x in result["diagnostics"]})
+
+    def test_dynamic_value_reports_unresolved_instead_of_effective(self):
+        self.write("httpd.conf","KeepAlive $"+"{TURN_ON}\n")
+        result=self.read()
+        self.assertEqual(result["status"],"incomplete")
+        self.assertEqual(result["items"],[])
+        self.assertIn("dynamic_directive_value_unresolved",
+                      {x["reason"] for x in result["diagnostics"]})
+
+    def test_multiline_config_does_not_masquerade_as_complete(self):
+        self.write("httpd.conf","KeepAlive On "+chr(92)+"\n")
+        result=self.read()
+        self.assertEqual(result["status"],"incomplete")
+        self.assertIn("multiline_directive_unsupported",
+                      {x["reason"] for x in result["diagnostics"]})
+
     def test_maxkeepalive_raw_value_not_automatically_typed(self):
         self.write("httpd.conf","MaxKeepAliveRequests 100garbage\n")
         result=self.read()
