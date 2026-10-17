@@ -1,0 +1,28 @@
+name: English-first full Markdown comparison consistency
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test-english-first-comparisons.yml'
+      - 'tools/test_english_first_full_markdown_examples.py'
+      - 'tools/research_english_first_04_compact_layout.py'
+      - 'tools/research_english_first_04_complex.py'
+      - 'tools/research_english_first_04_evaluate.py'
+      - 'research/assessment-simplification/english-first-04/FULL-*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  full-comparison-pages:
+    name: Verify all five full before/after Assessment pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned YAML parser
+        run: python -m pip install 'PyYAML==6.0.3'
+      - name: Verify collection-first reading order and exact source round trips
+        run: python tools/test_english_first_full_markdown_examples.py
