@@ -1,0 +1,79 @@
+name: Compare State field presence and scope (#235)
+on:
+  push:
+    paths:
+      - .github/workflows/research-field-presence-policy-04.yml
+      - tools/research_04_field_presence_policy.py
+      - tools/test_research_04_field_presence_policy.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  six-stig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install pinned parser and schema tools
+        run: python -m pip install 'PyYAML==6.0.3' 'jsonschema==4.25.1'
+      - name: Regression test inherited State field policy vs group-local fields and records
+        run: python tools/test_research_04_field_presence_policy.py -v
+      - name: Download pinned six-STIG authoring baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --dir work
+      - name: Prove complete source structural inversion
+        run: |
+          python tools/research_04_field_presence_policy.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --base-schema research/assessment-simplification/english-first-04/fixed-require.editor.schema.json \
+            --out work/proof
+      - name: Guard corpus, source exception, and inherited policy coverage
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('work/proof/report.json'))
+          c=p['counts']
+          assert (c['assessments'],c['tests'])==(872,1375),c
+          assert (c['exact_assessments'],c['exact_tests'])==(871,1374),p
+          assert len(p['errors'])==1 and 'verify-boot-loader' in p['errors'][0]['path'],p['errors']
+          assert c['inherited_all']>0 and c['inherited_if_present']>0,c
+          assert c['local_field_group_presence_all']>0,c
+          assert c['invalid_bool_rejected']==871,c
+          print('PASS: field policy is a source-exact presentation, no new exceptions')
+          PY
+      - name: Publish report and full six-STIG examples directly on github.com
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64,json,os,pathlib,subprocess
+          repo='vanderpol/scap-ng'
+          head=subprocess.run(['gh','api',f'repos/{repo}/commits/main','--jq','.sha'],capture_output=True,text=True,check=True).stdout.strip()
+          if head!=os.environ['GITHUB_SHA']:
+              print('Main advanced; skip stale publication')
+              raise SystemExit(0)
+          root='research/assessment-simplification/english-first-04/field-presence-policy'
+          for file in sorted(pathlib.Path('work/proof').glob('*')):
+              if file.suffix not in ('.json','.md','.yaml'):continue
+              target=root+'/'+file.name
+              exists=subprocess.run(['gh','api',f'repos/{repo}/contents/{target}','--jq','.sha'],capture_output=True,text=True)
+              if exists.returncode not in (0,1):raise RuntimeError('Could not read '+target)
+              payload={'branch':'main','message':'research(#235): publish State field presence policy proof',
+                       'content':base64.b64encode(file.read_bytes()).decode()}
+              if exists.returncode==0:payload['sha']=exists.stdout.strip()
+              subprocess.run(['gh','api','--method','PUT',f'repos/{repo}/contents/{target}','--input','-'],input=json.dumps(payload),check=True,text=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: state-field-presence-policy-proof
+          path: work/proof/
+          if-no-files-found: warn
