@@ -19,17 +19,17 @@ class NativeAuditorExplanationTests(unittest.TestCase):
     def test_required_home_and_optional_guest_explicit(self):
         required=render(read(EXAMPLES/"01-required-home.yaml"))
         optional=render(read(EXAMPLES/"02-optional-guest.yaml"))
-        self.assertIn("At least 1 selected resources must exist",required)
-        self.assertIn("If this population is confirmed empty, this condition passes.",optional)
+        self.assertIn("At least one matching resource must exist",required)
+        self.assertIn("No matching resource is required to exist if selection is confirmed complete.",optional)
         self.assertNotIn("if_empty",required)
         self.assertNotIn("if_empty",optional)
 
     def test_nested_dns_completeness_and_both_key_types_visible(self):
         text=render(read(EXAMPLES/"08-dns-signing-nested.yaml"))
-        for word in ("zone-signing keys belonging to that zone",
-                     "key-signing keys belonging to that zone",
+        for word in ("zone-signing key belonging to the same DNS zone",
+                     "key-signing key belonging to the same DNS zone",
                      "between 48 and 168","signed equals true",
-                     "At least 1 selected resources must exist"):
+                     "At least one matching resource must exist"):
             with self.subTest(word=word):
                 self.assertIn(word,text)
 
@@ -43,7 +43,7 @@ class NativeAuditorExplanationTests(unittest.TestCase):
         text=render(read(EXAMPLES/"04-apache-two-settings.yaml"))
         self.assertIn("ALL of these conditions must hold",text)
         self.assertIn("raw directive value equals 150",text)
-        self.assertIn("Apache configuration directive observations",text)
+        self.assertIn("Apache configuration directive observation",text)
         self.assertNotIn("effective Apache setting",text)
 
     def test_permission_bitmask_means_bit_subset(self):
