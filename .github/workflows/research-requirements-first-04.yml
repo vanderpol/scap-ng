@@ -22,6 +22,9 @@ on:
       - 'tools/test_research_dns_source_contract.py'
       - 'tools/research_dns_zone_key_evidence.py'
       - 'tools/test_research_dns_zone_key_evidence.py'
+      - 'tools/research_native_contract_candidate.py'
+      - 'tools/research_native_contract_evaluator.py'
+      - 'tools/test_research_native_contract_candidate.py'
       - '.github/workflows/research-requirements-first-04.yml'
   workflow_dispatch:
 
@@ -80,3 +83,11 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_dns_zone_key_evidence.py
+      - name: Compile seven native auditor examples to one AST
+        env:
+          PYTHONPATH: tools
+        run: python tools/research_native_contract_candidate.py
+      - name: Test native one-AST singleton/population and evidence semantic fixtures
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_native_contract_candidate.py
