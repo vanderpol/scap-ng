@@ -10,6 +10,7 @@ on:
       - tools/research_english_first_04_scalar.py
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
+      - tools/research_english_first_04_auditor_candidate.py
       - tools/research_english_first_04_vocabulary_variants.py
       - tools/research_english_first_04_references.py
       - tools/research_english_first_04_publish.py
@@ -127,6 +128,13 @@ jobs:
             --output english-first-04-vocabulary-variants.json \
             --examples-dir english-first-04-vocabulary-examples
 
+      - name: Validate auditor-first requirement grammar against complete pinned source
+        run: |
+          python tools/research_english_first_04_auditor_candidate.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-auditor-candidate.json \
+            --examples-dir english-first-04-auditor-examples
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -141,6 +149,8 @@ jobs:
             english-first-04-full-assessment-census.json
             english-first-04-compact-layout-report.json
             english-first-04-vocabulary-variants.json
+            english-first-04-auditor-candidate.json
+            english-first-04-auditor-examples/
             english-first-04-vocabulary-examples/
             english-first-04-reference-graph-report.json
             english-first-04-six-state-cardinality.json
