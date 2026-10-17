@@ -3,6 +3,8 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[DISA SCAP 1.3 versus NIWC SCAP 1.4 OVAL source provenance](OVAL-SOURCE-PROVENANCE-BOUNDARY.md)** — original Definition/Test/Object/State/Variable IDs verified for both source organizations; inherited DISA checks are not a valid sample for interpreting use of new NIWC OVAL 5.12.3 authoring options. The mixed 201-Test Item-creation census must be joined back to original OVAL IDs before reporting author-specific behavior. [Passing source-ID CI](https://github.com/vanderpol/scap-ng/actions/runs/39029699446).
+
 **[201-Test all-exist equivalence](reports/all-exist-native-equivalence.md)** — source-Test classification: 127 State-free and 74 State-bearing. All agree with at-least-one on complete, existing-only Item populations; incomplete State-bearing and mixed Item-status differences remain explicit. [CI proof](https://github.com/vanderpol/scap-ng/actions/runs/39029016539).
 
 **[Item creation settings in all 201 cases](reports/all-exist-item-creation.md)** — 132 textfilecontent54 Tests use `all_object_elements_fullfilled`; three NTUSER use `key_and_name_exist`. [CI census](https://github.com/vanderpol/scap-ng/actions/runs/39029190471).
