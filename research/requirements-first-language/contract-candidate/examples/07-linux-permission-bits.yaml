@@ -1,0 +1,15 @@
+id: native-linux-root-initialization-files
+title: At least one initialization file across root accounts, all with safe mode bits
+require:
+  each: linux.files_from_account_homes
+  using:
+    account_filter:
+      username: {matches_regex: '[\w]+'}
+      uid: {equals: 0}
+      home_dir: {not_equals: /}
+    filename: '^\.[^\s\.]+'
+    max_depth: 1
+    follow_symlinks: true
+  minimum_resources: 1
+  must:
+    mode: {only_these_bits: '0740'}
