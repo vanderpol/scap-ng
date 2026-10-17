@@ -17,7 +17,7 @@ import zipfile
 import yaml
 from research_english_first_04_complex import to_human,to_native
 from research_english_first_04_compact_layout import compact,expand,PINNED
-from research_english_first_04_complex import ITEM_REQS,STATELESS_PRESENCE
+from research_english_first_04_complex import ITEM_REQS,STATELESS_PRESENCE,FIELD_OPS
 
 # The enumerated 10 Item pairs and 5 State-free cases are the admitted source
 # semantics. We must not invent defaults, infer regex semantics, or merge axes.
@@ -95,11 +95,45 @@ def from_auditor_requirement(require):
         raise ValueError("nonempty State predicate required")
     return {REV_EXIST[exists]:True,REV_MATCH[matcher]:deepcopy(require[matcher])}
 
+# Prefer natural per-field quantifiers without changing their *values*.
+# This is separate from top-level Item existence and matching cardinality.
+FIELD_NAMES={
+    ("some_values_"+operation):("at_least_one_value_"+operation)
+    for operation in FIELD_OPS.values()
+}
+FIELD_NAMES.update({
+    ("when_present_some_values_"+operation):("when_present_at_least_one_value_"+operation)
+    for operation in FIELD_OPS.values()
+})
+REV_FIELD_NAMES={v:k for k,v in FIELD_NAMES.items()}
+if len(REV_FIELD_NAMES)!=len(FIELD_NAMES):
+    raise AssertionError("Ambiguous field quantifier aliases")
+
+def rename_field_predicates(node, reverse=False):
+    aliases=REV_FIELD_NAMES if reverse else FIELD_NAMES
+    incompatible=FIELD_NAMES if reverse else REV_FIELD_NAMES
+    if isinstance(node,list):
+        return [rename_field_predicates(x,reverse=reverse) for x in node]
+    if not isinstance(node,dict):return deepcopy(node)
+    result={}
+    for key,value in node.items():
+        if key in incompatible:
+            raise ValueError("noncanonical field requirement alias "+key)
+        normalized=aliases.get(key,key)
+        if normalized in result:
+            raise ValueError("colliding field comparator aliases "+normalized)
+        result[normalized]=rename_field_predicates(value,reverse=reverse)
+    return result
+
 def to_auditor(doc):
     if not isinstance(doc,dict) or set(doc)!={"metadata","sources","checks","evaluate"}:
         raise ValueError("invalid whole Assessment")
     out=deepcopy(doc)
+    out["sources"]={k:rename_field_predicates(v) for k,v in out["sources"].items()}
     for check in out["checks"].values():
+        for k in list(check):
+            if k!="check" and k!="inspect":
+                check[k]=rename_field_predicates(check[k])
         check["require"]=to_auditor_requirement(check["require"])
     return out
 
@@ -107,8 +141,12 @@ def from_auditor(doc):
     if not isinstance(doc,dict) or set(doc)!={"metadata","sources","checks","evaluate"}:
         raise ValueError("invalid candidate Assessment")
     out=deepcopy(doc)
+    out["sources"]={k:rename_field_predicates(v,reverse=True) for k,v in out["sources"].items()}
     for check in out["checks"].values():
         check["require"]=from_auditor_requirement(check["require"])
+        for k in list(check):
+            if k!="check" and k!="inspect":
+                check[k]=rename_field_predicates(check[k],reverse=True)
     return out
 
 SAMPLES={
@@ -196,6 +234,7 @@ def inspect(archive,examples_dir=None,output=None):
       "chars":dict(chars),
       "change_pct":round(100*(chars["candidate"]-chars["before"])/chars["before"],2),
       "negative_requirement_guards":negatives,
+      "field_alias_contract":"some_values_* → at_least_one_value_*, when_present_some_values_* → when_present_at_least_one_value_*; no default semantics",
       "examples":samples,
       "exceptions":failures,
       "limitations":[
