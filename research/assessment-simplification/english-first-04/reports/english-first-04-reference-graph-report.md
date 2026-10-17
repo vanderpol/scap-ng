@@ -2,8 +2,8 @@
 
 **Experimental research. Not an approved SCAP-NG syntax or scanner proof.**
 
-Generated in GitHub Actions run 38991739232:
-https://github.com/vanderpol/scap-ng/actions/runs/38991739232
+Generated in GitHub Actions run 38992079463:
+https://github.com/vanderpol/scap-ng/actions/runs/38992079463
 
 This page is a stable GitHub-hosted rendering of the result.
 Structural source inversion does not establish original OVAL runtime/evidence parity.
