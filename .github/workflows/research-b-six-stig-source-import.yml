@@ -8,6 +8,8 @@ on:
       - 'tools/test_research_b_full_corpus_import.py'
       - 'tools/research_b_full_corpus_features.py'
       - 'tools/test_research_b_full_corpus_features.py'
+      - 'tools/research_b_source_specimens.py'
+      - 'tools/test_research_b_source_specimens.py'
       - '.github/workflows/research-b-six-stig-source-import.yml'
   workflow_dispatch:
 
@@ -33,6 +35,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_full_corpus_features.py
+      - name: Validate source-backed specimen selection and nonconversion guards
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_source_specimens.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -58,6 +64,13 @@ jobs:
             --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
             --output research/requirements-first-language/contract-candidate/corpus/feature-inventory.json \
             --markdown research/requirements-first-language/contract-candidate/corpus/feature-inventory.md
+      - name: Publish bounded source-backed cases for next B compiler implementation
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_source_specimens.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output-dir research/requirements-first-language/contract-candidate/corpus/source-specimens
       - name: Preserve full source capsules as temporary CI artifact, not scanner bundles
         uses: actions/upload-artifact@v4
         with:
@@ -71,6 +84,7 @@ jobs:
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.md
+          git add research/requirements-first-language/contract-candidate/corpus/source-specimens/
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
