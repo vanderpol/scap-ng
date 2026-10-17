@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[Gemini blind-prediction audit after limited third response](GEMINI-PHASE1-PREDICTION-AUDIT-2026-10-17.md)** — corrects unjustified assumptions that incomplete acquisition always yields Error, AND(False,Error) yields Error, and repeated DNS field values are multiple Items. Gemini explicitly could not fetch the source YAML; Phase 2 was **not** completed. **[Offline source pack with all ten full original/revised YAML documents](field-presence-iteration/GEMINI-PHASE2-OFFLINE-SOURCE-PACK.md)** enables a real follow-up without internet access. [CI run 39051291180](https://github.com/vanderpol/scap-ng/actions/runs/39051291180) passed both source-structure/YAML checks and inherited OVAL truth-table unit tests; these do not prove scanner parity for new aliases.
+
+
 **[NEW — field-presence revision, five complete source-backed candidates and repeated internal reviews](field-presence-iteration/README.md)** — item/record matching labels, required fields moved inside `require`, Apache optional fields split from comparison, unchanged original collection and evaluation graphs; independent exact byte-for-byte inverse to five original research YAML files. [Fail-closed verifier](../../../tools/research_04_field_presence_iteration.py) and **[successful GitHub CI run 39050496910](https://github.com/vanderpol/scap-ng/actions/runs/39050496910)** verify five pinned source inverses, YAML parsing and the check/source/evaluate identities. **[Send the fresh, answer-free Gemini packet](field-presence-iteration/GEMINI-NEXT-BLIND-REVIEW.md)** for external feedback. **Research only, not 0.4 adoption or six-state scanner parity.**
 
 
