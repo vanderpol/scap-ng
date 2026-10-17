@@ -307,7 +307,7 @@ class CandidateBContractTests(unittest.TestCase):
 
     def test_unapproved_bitmask_non_octal_rejected(self):
         doc={"id":"x","title":"x","require":{"each":"linux.files_from_account_homes",
-            "using":{"account_filter":{},"filename":"x","max_depth":1,"follow_symlinks":False},
+            "using":{"account_filter":{"uid":{"equals":0}},"filename":"x","max_depth":1,"follow_symlinks":False},
             "must":{"mode":{"only_these_bits":740}}}}
         with self.assertRaisesRegex(ValueError,"four-digit octal"):
             compile_doc(doc)
