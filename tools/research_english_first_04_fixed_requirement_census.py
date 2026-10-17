@@ -269,6 +269,39 @@ def markdown(result):
                      f'Item `{record["item_mode"]}`, field modes '
                      f'`{", ".join(record["unrecognized_field_modes"])}`; '
                      f'anomaly={record["state_attached_to_none_exist"]}')
+    lines.extend(["", "## Six-STIG source-folder coverage after third choice", "",
+                  "The six STIGs share additional Assessments; the shared folder is not a seventh benchmark.",
+                  "", "| Source folder | Tests covered | Assessments covered |",
+                  "| --- | ---: | ---: |"])
+    for folder, stages in result["per_source_folder"].items():
+        vals = stages["practical_plus_three"]
+        tests = vals.get("tests_covered",0)
+        ttotal = vals.get("tests_total",0)
+        docs = vals.get("assessments_covered",0)
+        dtotal = docs + vals.get("assessments_rejected",0)
+        lines.append(f"| {folder} | {tests}/{ttotal} ({100*tests/ttotal:.1f}%) | "
+                     f"{docs}/{dtotal} ({100*docs/dtotal:.1f}%) |")
+    lines.extend(["", "## Remaining individual Tests after three choices", "",
+                  "These are not reasons to rewrite a STIG merely to inflate a percentage.", ""])
+    reasons = {
+        "only_one_exists_and_only_one_matches": "Requires exactly one existing Item and exactly one matching Item; preserve unless collector cardinality is proven.",
+        "may_be_absent_and_some_match": "Optional population with some-match semantics; not equivalent to optional all-match if multiple Items exist.",
+        "at_least_one_exists_and_only_one_matches": "Requires at least one Item and exactly one matching Item; this source also needs distinct nested field cardinality.",
+        "all_exist_and_none_match": "Requires all-exist semantics plus zero matching Items; not a no-Items Test.",
+        "none_exist": "Contradictory source: none_exist Test with attached State; trace OVAL XML and converter before altering.",
+    }
+    for record in result["limited_residual_samples"]["practical_plus_three"]:
+        title = record["test"]
+        mode = record["item_mode"]
+        lines.append(f"- `{record['source']}` — `{title}`: "
+                     f"`{mode}`. {reasons.get(mode, 'Source-specific semantics require proof.')}")
+    lines.extend(["", "## Recommendation", "",
+                  "The 98% overall mode-coverage target can be met with just two extra scoped choices,",
+                  "but Windows 11 remains below 98% of its own source-folder Assessments after the third addition.",
+                  "Keep rare valid semantics available through the SAME item/condition grammar, not a second source dialect.",
+                  "Do not equate full enum coverage with proof of a shallow condition syntax for records,",
+                  "Set filters, Variables, State alternatives, or six-state collection/evidence behavior.",
+                  "Assess the five semantic residual classes above before standardizing labels.", ""])
     lines.extend(["", "## Limits and decision rule", ""])
     lines.extend("- " + x for x in result["scope_limits"])
     lines.extend(["", "**98% is a review trigger, not permission to change valid results.**",
