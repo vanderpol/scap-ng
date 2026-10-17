@@ -133,7 +133,8 @@ def write(picks,manifest,out_dir):
      "This B-only specimen set enables implementation research; it is",
      "not an A/B bake-off or a claim of any native conversion rate.",
      ""])
-    if warnings:parts+=["Missing bounded families: "+", ".join(warnings)]
+    if manifest["warnings"]:
+        parts+=["Missing bounded families: "+", ".join(manifest["warnings"])]
     (out_dir/"README.md").write_text("\n".join(parts)+"\n")
     return manifest
 
