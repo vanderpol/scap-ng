@@ -66,12 +66,14 @@ def explain(ast,indent=0):
     if kind!="collection":raise ValueError("unknown AST")
     name=NAMES.get(ast["provider"],ast["provider"])
     who="The uniquely identified "+name if ast["singleton"] else "Every selected "+name
-    if ast["mode"]=="some":who="At least one selected "+name
+    if ast.get("exists_only"):who="At least one "+name
+    elif ast["mode"]=="some":who="At least one selected "+name
     if ast["mode"]=="none":who="No selected "+name+" may exist"
     if ast["mode"]=="exactly_one" and not ast["singleton"]:
         who="Exactly one selected "+name
     if ast["where"]:
         who+=" whose "+", and ".join(map(pred,ast["where"]))
+    if ast.get("exists_only"):who+=" must exist."
     if ast["using"]:
         using=", ".join(str(k)+"="+value(v) for k,v in sorted(ast["using"].items()))
         who+=" (provider inputs: "+using+")"
