@@ -40,15 +40,24 @@ class Result:
     accounts_selected: int
     files_selected: int
 
+def only_these_bits(mode, allowed_bits):
+    """Typed POSIX bit-set comparator; textual allowed mask must be octal.
+
+    A plain numeric <= comparator (even after octal parse) is incorrect.
+    """
+    if not isinstance(mode,int) or isinstance(mode,bool) or not 0<=mode<=0o7777:
+        raise ValueError("file mode must be a numeric POSIX 12-bit mask")
+    if not isinstance(allowed_bits,str) or not re.fullmatch(r"[0-7]{4}",allowed_bits):
+        raise ValueError("allowed permission bits must be a four-digit octal STRING")
+    return (mode & ~int(allowed_bits,8))==0
+
 def mode_complies(mode):
     """Boolean iff all EIGHT OVAL-derived boolean flag constraints are false.
 
     "no more permissive than 0740" must mean allowed-bit *subset*, never
     ordinary numeric <=, lexical <= or a numeric threshold comparator.
     """
-    if not isinstance(mode,int) or isinstance(mode,bool) or not 0<=mode<=0o7777:
-        raise ValueError("file permission mode must be a numeric POSIX 12-bit mask")
-    return (mode & ~ALLOWED_MODE)==0
+    return only_these_bits(mode,"0740")
 
 def eight_flag_comparisons(mode):
     if not isinstance(mode,int) or isinstance(mode,bool) or not 0<=mode<=0o7777:
