@@ -230,6 +230,69 @@ class CandidateBContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"typed numeric"):
             compile_doc(doc)
 
+    def test_gemini_acquisition_options_unknown_key_rejected(self):
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes",
+            "acquisition_options":{"account_filter":{"uid":{"equals":0}}},
+            "minimum_resources":1,
+            "must":{"mode":{"only_these_bits":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"unsupported population properties"):
+            compile_doc(doc)
+
+    def test_gemini_misspelled_account_home_field_rejected(self):
+        using={"account_filter":{"uid":{"equals":0},
+                "home_directory":{"not_equals":"/root"}},
+               "filename":r"^\.[^\s\.]+","max_depth":1,
+               "follow_symlinks":False}
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes","using":using,
+            "minimum_resources":1,"must":{"mode":{"only_these_bits":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"unrecognized account field"):
+            compile_doc(doc)
+
+    def test_gemini_filename_dictionary_not_a_regex_rejected(self):
+        using={"account_filter":{"uid":{"equals":0},
+                "home_dir":{"not_equals":"/"}},
+               "filename":{".bashrc":None,".profile":None},"max_depth":1,
+               "follow_symlinks":False}
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes","using":using,
+            "minimum_resources":1,"must":{"mode":{"only_these_bits":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"filename regular expression string"):
+            compile_doc(doc)
+
+    def test_gemini_unimplemented_depth_two_rejected_not_silent(self):
+        using={"account_filter":{"uid":{"equals":0},
+                "home_dir":{"not_equals":"/"}},
+               "filename":r"^\.[^\s\.]+","max_depth":2,
+               "follow_symlinks":False}
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes","using":using,
+            "minimum_resources":1,"must":{"mode":{"only_these_bits":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"only depth 1"):
+            compile_doc(doc)
+
+    def test_gemini_wrong_octal_operator_rejected(self):
+        using={"account_filter":{"uid":{"equals":0},
+                "home_dir":{"not_equals":"/"}},
+               "filename":r"^\.[^\s\.]+","max_depth":1,
+               "follow_symlinks":False}
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes","using":using,
+            "minimum_resources":1,"must":{"permissions":{"octal_equals":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"does not expose field"):
+            compile_doc(doc)
+
+    def test_bad_symlink_parameter_type_rejected(self):
+        using={"account_filter":{"uid":{"equals":0}},
+               "filename":r"^\.[^\s\.]+","max_depth":1,
+               "follow_symlinks":"false"}
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes","using":using,
+            "minimum_resources":1,"must":{"mode":{"only_these_bits":"0740"}}}}
+        with self.assertRaisesRegex(ValueError,"must be a Boolean"):
+            compile_doc(doc)
+
     def test_unapproved_bitmask_non_octal_rejected(self):
         doc={"id":"x","title":"x","require":{"each":"linux.files_from_account_homes",
             "using":{"account_filter":{},"filename":"x","max_depth":1,"follow_symlinks":False},
