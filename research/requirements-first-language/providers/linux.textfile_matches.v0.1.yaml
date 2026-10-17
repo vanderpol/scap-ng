@@ -1,0 +1,36 @@
+# Research-only, bounded native text file regex evidence collector.
+# It is NOT equivalent to OVAL independent.textfilecontent54 source,
+# even when the author-visible regex and selected pathname are identical.
+provider: linux.textfile_matches
+version: 0.1.0
+implementation: tools/research_provider_textfile_matches.py
+status: fixture_tested_read_only
+inputs:
+  path: required_absolute_path
+  pattern: required_regex_string_max_4096_characters
+  ignore_case: boolean
+  multiline: boolean
+  singleline: boolean
+  max_bytes: bounded_positive_integer_implementation_limit
+  max_matches: bounded_positive_integer_implementation_limit
+collection:
+  identity: absolute_path_plus_match_instance
+  item_fields: [full_path, instance, match_text, start_offset, end_offset]
+  complete: observed_entire_file_within_byte_limit_and_all_matches_within_count_limit
+  absent_file: verified_empty_population
+  symbolic_link: incomplete_not_followed
+  unreadable_file: error
+  unsupported_encoding: incomplete
+  truncated_file: incomplete
+  truncated_match_count: incomplete
+  regex_engine: Python_re
+  decoding: UTF_8_strict
+  no_unbounded_file_read: true
+source_parity_limits:
+  - Regex engine and pattern_match operations not proven compatible with OVAL
+  - Original textfilecontent54 object item_creation and instance semantics not all modeled
+  - Original select.full_path and filesystem all status not proven equivalent
+  - OVAL entity flag/cardinality/version/masking unsupported
+  - Multiline/singleline defined as Python re flags, not verified OVAL equivalent
+  - Native provider currently only supports read-only standalone UTF-8 fixture files
+  - No real SCAP 1.4 source Test-State-Object parity or scanner execution
