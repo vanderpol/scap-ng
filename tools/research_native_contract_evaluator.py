@@ -174,6 +174,11 @@ def evaluate(ast,fixtures,scope=None):
     # node consumes RAW typed collector Items, not pre-evaluated Item results.
     # It only supports an independently pinned state-free textfile existence
     # Test shape. No claim of OVAL regex/item_creation/source parity.
+    if ast["kind"]=="compat_oval_provider_state":
+        from research_b_source_state_evaluator import evaluate_source_textfile_state
+        result,reason,observed,selected=evaluate_source_textfile_state(
+            ast,fixtures.get(ast["provider"]))
+        return Decision(result,reason,ast["provider"],observed,selected)
     if ast["kind"]=="compat_oval_provider_existence":
         provider=ast.get("provider")
         common={"kind","source_assessment_id","source_test_id",
