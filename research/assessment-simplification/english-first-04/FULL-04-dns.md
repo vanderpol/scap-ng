@@ -200,8 +200,7 @@ assessment:
 
 Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
 
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+```yaml# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-259345.automated
@@ -282,14 +281,6 @@ checks:
   dns-server-caching-only-there-no-forward-or-reverse-lookup-test:
     check: DNS server is caching only (there are no forward or reverse lookup zones)
     inspect: independent.shellcommand
-    require:
-      at_least_one_item_exists: true
-      every_item_must_match:
-        stdout_line:
-          no_values_exist: true
-          source_comparison:
-            is: ''
-    report_elements: all
     description: The list of all forward and reverse lookup zones
     collect:
       shell: powershell
@@ -298,9 +289,6 @@ checks:
         ForEach-Object {$_.ZoneName}
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
-  all-forward-lookup-zones-if-any-integrated-active-directory-test:
-    check: All forward lookup zones (if any) are integrated with Active Directory
-    inspect: independent.shellcommand
     require:
       at_least_one_item_exists: true
       every_item_must_match:
@@ -309,6 +297,9 @@ checks:
           source_comparison:
             is: ''
     report_elements: all
+  all-forward-lookup-zones-if-any-integrated-active-directory-test:
+    check: All forward lookup zones (if any) are integrated with Active Directory
+    inspect: independent.shellcommand
     description: The list of all forward lookup zones that are not integrated with
       Active Directory
     collect:
@@ -319,15 +310,17 @@ checks:
         {$_.ZoneName}
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
-  all-forward-lookup-zones-dnssec-signed-test:
-    check: All forward lookup zones are DNSSEC signed
-    inspect: independent.shellcommand
     require:
       at_least_one_item_exists: true
       every_item_must_match:
         stdout_line:
-          exactly_one_is: 'True'
+          no_values_exist: true
+          source_comparison:
+            is: ''
     report_elements: all
+  all-forward-lookup-zones-dnssec-signed-test:
+    check: All forward lookup zones are DNSSEC signed
+    inspect: independent.shellcommand
     description: The 'IsSigned' setting for each forward lookup zone
     collect:
       shell: powershell
@@ -335,20 +328,16 @@ checks:
         variable: command-get-issigned-setting-each-forward-lookup-zone-variable
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    require:
+      at_least_one_item_exists: true
+      every_item_must_match:
+        stdout_line:
+          exactly_one_is: 'True'
+    report_elements: all
   all-forward-lookup-zones-have-dns-key-signature-validity-periods-test:
     check: All forward lookup zones have DNS key signature validity periods between
       two days and a week for their zone signing keys
     inspect: independent.shellcommand
-    require:
-      at_least_one_item_exists: true
-      every_item_must_match:
-        all_states:
-        - stdout_line:
-            at_least: 48
-        - stdout_line:
-            at_most: 168
-    report_elements: all
-    all_state_fields_exist: true
     description: The list of DNS key signature validity periods for the zone signing
       keys
     collect:
@@ -357,10 +346,7 @@ checks:
         variable: command-get-list-dns-key-signature-validity-periods-zone-signing-variable
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
-  all-forward-lookup-zones-have-dns-key-signature-validity-periods-2-test:
-    check: All forward lookup zones have DNS key signature validity periods between
-      two days and a week for their key signing keys
-    inspect: independent.shellcommand
+    all_state_fields_exist: true
     require:
       at_least_one_item_exists: true
       every_item_must_match:
@@ -370,7 +356,10 @@ checks:
         - stdout_line:
             at_most: 168
     report_elements: all
-    all_state_fields_exist: true
+  all-forward-lookup-zones-have-dns-key-signature-validity-periods-2-test:
+    check: All forward lookup zones have DNS key signature validity periods between
+      two days and a week for their key signing keys
+    inspect: independent.shellcommand
     description: The list of DNS key signature validity periods for the key signing
       keys
     collect:
@@ -379,6 +368,16 @@ checks:
         variable: command-get-list-dns-key-signature-validity-periods-key-signing-variable
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    all_state_fields_exist: true
+    require:
+      at_least_one_item_exists: true
+      every_item_must_match:
+        all_states:
+        - stdout_line:
+            at_least: 48
+        - stdout_line:
+            at_most: 168
+    report_elements: all
 evaluate:
   any_of:
   - test: dns-server-caching-only-there-no-forward-or-reverse-lookup-test
