@@ -1,0 +1,36 @@
+id: SV-253495.automated
+title: Deny Remote Desktop logon to unauthorized account categories
+require:
+  any:
+    - all:
+        - exactly_one: windows.computer
+          must:
+            role: {one_of: [member_workstation, member_server]}
+        - some: windows.user_right_assignments
+          using: {right: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
+          must:
+            principal: {matches_regex: '(?i)^(NT Authority\\)?Local account$'}
+        - some: windows.user_right_assignments
+          using: {right: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
+          must:
+            principal: {equals_ignore_case: Guests}
+        - some: windows.user_right_assignments
+          using: {right: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
+          must:
+            principal: {matches_regex: '(?i)^(.+\\)?Domain Admins$'}
+        - some: windows.user_right_assignments
+          using: {right: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
+          must:
+            principal: {matches_regex: '(?i)^(.+\\)?Enterprise Admins$'}
+    - all:
+        - exactly_one: windows.computer
+          must:
+            role: {one_of: [standalone_server, standalone_workstation]}
+        - some: windows.user_right_assignments
+          using: {right: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
+          must:
+            principal: {equals_ignore_case: Guests}
+    - some: windows.user_right_assignments
+      using: {right: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME}
+      must:
+        principal: {equals_ignore_case: Everyone}
