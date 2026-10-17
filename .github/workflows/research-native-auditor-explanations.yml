@@ -1,0 +1,50 @@
+name: Publish native auditor explanations
+
+on:
+  push:
+    paths:
+      - 'research/requirements-first-language/contract-candidate/examples/**'
+      - 'tools/research_native_contract_candidate.py'
+      - 'tools/research_native_auditor_explain.py'
+      - 'tools/test_research_native_auditor_explain.py'
+      - '.github/workflows/research-native-auditor-explanations.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deterministic-explanations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PyYAML
+        run: python -m pip install 'PyYAML>=6,<7'
+      - name: Validate native AST and deterministic explanations
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_native_contract_candidate.py
+          python -m unittest -v tools/test_research_native_auditor_explain.py
+      - name: Generate readable pages from the exact validated AST
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_native_auditor_explain.py --output-dir research/requirements-first-language/contract-candidate/generated-explanations
+      - name: Publish markdown to GitHub main instead of inaccessible Actions artifacts
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: bash
+        run: |
+          git add research/requirements-first-language/contract-candidate/generated-explanations/
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'docs(#235): publish compiler-derived auditor explanations'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            echo 'Generated pages already current.'
+          fi
