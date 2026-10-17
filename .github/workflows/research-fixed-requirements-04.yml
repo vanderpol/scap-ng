@@ -5,6 +5,7 @@ on:
       - .github/workflows/research-fixed-requirements-04.yml
       - tools/research_english_first_04_fixed_requirement_census.py
       - tools/research_04_all_exist_intent_census.py
+      - tools/research_04_all_exist_native_semantics.py
   workflow_dispatch:
 
 permissions:
@@ -40,6 +41,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --json all-exist-source-forensics.json \
             --markdown all-exist-source-forensics.md
+      - name: Prove 201 Test-level all_exist native Item semantic boundaries
+        run: |
+          python tools/research_04_all_exist_native_semantics.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --json all-exist-native-equivalence.json \
+            --markdown all-exist-native-equivalence.md
       - name: Publish stable GitHub.com results on main
         if: github.ref == 'refs/heads/main'
         env:
@@ -58,7 +65,8 @@ jobs:
               raise SystemExit(0)
           folder = "research/assessment-simplification/english-first-04/reports"
           for name in ("fixed-requirements-six-stig.json", "fixed-requirements-six-stig.md",
-                       "all-exist-source-forensics.json", "all-exist-source-forensics.md"):
+                       "all-exist-source-forensics.json", "all-exist-source-forensics.md",
+                       "all-exist-native-equivalence.json", "all-exist-native-equivalence.md"):
               target = folder + "/" + name
               read = subprocess.run(["gh","api",f"repos/{repo}/contents/{target}",
                                      "--jq",".sha"],capture_output=True,text=True)
@@ -84,4 +92,6 @@ jobs:
             fixed-requirements-six-stig.md
             all-exist-source-forensics.json
             all-exist-source-forensics.md
+            all-exist-native-equivalence.json
+            all-exist-native-equivalence.md
           if-no-files-found: warn
