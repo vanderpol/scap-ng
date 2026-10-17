@@ -96,7 +96,7 @@ def check_predicates(raw,known,path,scope):
         result.append({"field":field,"operator":op,"value":expected})
     return result
 
-def check_using(raw,allowed,path):
+def check_using(raw,allowed,path,provider,scope):
     if not allowed:
         if raw:fail(path,"provider has no authoring acquisition parameters")
         return {}
@@ -104,8 +104,40 @@ def check_using(raw,allowed,path):
         fail(path,"typed provider requires explicit using parameters")
     if set(raw)!=allowed:
         fail(path,"provider using parameters must exactly match "+repr(sorted(allowed)))
-    # Deep input contract deliberately not implemented; reject nested strings
-    # claiming interpolated source expressions outside lexical bound captures.
+    # Fail closed for the small explicitly supported research provider inputs.
+    # The previous prototype only checked top-level parameter names; that
+    # would accept Gemini's incorrect home_directory selector in a typed
+    # account_filter and could change the collection silently.
+    if provider=="linux.files_from_account_homes":
+        account=raw["account_filter"]
+        if not isinstance(account,dict) or not account:
+            fail(path+".account_filter","must provide nonempty account predicates")
+        permitted={"uid","username","home_dir"}
+        if set(account)-permitted:
+            fail(path+".account_filter","unrecognized account field "+
+                 repr(sorted(set(account)-permitted)))
+        check_predicates(account,permitted,path+".account_filter",scope)
+        regex=raw["filename"]
+        if not isinstance(regex,str) or not regex:
+            fail(path+".filename","must be a filename regular expression string")
+        try:re.compile(regex)
+        except re.error:
+            fail(path+".filename","invalid filename regular expression")
+        if type(raw["max_depth"]) is not int or raw["max_depth"]!=1:
+            fail(path+".max_depth","only depth 1 has fixture-tested provider support")
+        if type(raw["follow_symlinks"]) is not bool:
+            fail(path+".follow_symlinks","must be a Boolean")
+    elif provider=="windows.registry_value":
+        for name in ("hive","key","name","view"):
+            if not isinstance(raw[name],str) or not raw[name]:
+                fail(path+"."+name,"must be a nonempty string")
+        if raw["view"] not in {"32bit","64bit"}:
+            fail(path+".view","registry view must be 32bit or 64bit")
+    elif provider=="windows.user_rights":
+        if not isinstance(raw["right"],str) or not raw["right"]:
+            fail(path+".right","Windows privilege name must be nonempty")
+    else:
+        fail(path,"unregistered typed acquisition parameter contract for "+provider)
     return raw
 
 def compile_check(node,path="require",scope=None,current_fields=None):
@@ -137,7 +169,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
         if provider not in PROVIDERS:fail(path,"unknown provider "+str(provider))
         select,fields,unique,parameters=PROVIDERS[provider]
         if not unique:fail(path,"provider does not promise singleton identity")
-        using=check_using(node.get("using",{}),parameters,path+".using")
+        using=check_using(node.get("using",{}),parameters,path+".using",provider,scope)
         conditions=check_predicates(node.get("must"),fields,path+".must",scope)
         return {"kind":"collection","provider":provider,"mode":"exactly_one",
                 "min_count":1,"singleton":True,"using":using,
@@ -166,7 +198,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
         if provider not in PROVIDERS:fail(path,"unknown population resource "+str(provider))
         selectable,fields,unique,parameters=PROVIDERS[provider]
         if unique:fail(path,"singleton provider requires named resource form")
-    using=check_using(node.get("using",{}),parameters,path+".using")
+    using=check_using(node.get("using",{}),parameters,path+".using",provider,scope)
     raw_where=node.get("where")
     selection=check_predicates(raw_where,selectable,path+".where",scope) if raw_where else []
     minimum=node.get("minimum_resources",0)
