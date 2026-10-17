@@ -53,6 +53,29 @@ The 98% goal is a **review gate**: the earlier fixed-dropdown experiment reached
 - `oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103` — optional collected crypto-policy configuration with a State (NIWC `any_exist`). “May be absent” must not silently imply that a present violation is allowed.
 - `oval:navy.navwar.niwcatlantic.scc.windows:tst:25329301` — Bluetooth notification `all_exist`, illustrating a NIWC use of a legacy Test existence option. Modern authors can still use legacy vocabulary without proving it is necessary.
 
+## Original OVAL broader feature audit (author-stratified)
+
+The [direct original-source logical/State/Set/Variable inventory](reports/source-oval-semantic-edges.md) is a different denominator from the curated native Test-mode statistics above, and its [machine ledger](reports/source-oval-semantic-edges.json) provides original OVAL IDs and a few real examples. The audit passed in [CI](https://github.com/vanderpol/scap-ng/actions/runs/39030633098).
+
+| Source feature | DISA-origin | NIWC/NAVWAR-origin | Relevance to simplification |
+| --- | ---: | ---: | --- |
+| Test `check="only one"` | 0 | **32** | Not equivalent to the rarer Test `only_one_exists`: exactly one **matching** Item is a meaningful modern pattern |
+| Test `check="at least one"` | 79 | 21 | Core, not an edge |
+| Test `check="none satisfy"` | 5 | 0 | A negative Item comparison; different from zero existing Items |
+| State field `check_existence="only_one_exists"` | 0 | **20** | Field/value cardinality remains important even if Test-level existence syntax simplifies |
+| State field `check_existence="none_exist"` | 0 | 42 | Strong real use of absent field, separate from absent parent Item |
+| State entity `entity_check="only one"` | 0 | 2 | Rare but meaningful observed-value cardinality; candidate for the **same** advanced quantifier, not its own keyword |
+| Object Sets with `COMPLEMENT` | 8 | 0 | A source expression for set difference; explore direct scoped `exclude`, but prove collection/incomplete behavior |
+| Object Sets with `UNION` or omitted default | 157 | 3 | Real shared selection semantics; not an argument for two redundant combine/union keywords |
+| Local Variables | 91 | **367** | NIWC uses extensive dynamic derived values; replacing them requires typed nested/foreach/dataflow proof |
+| Variable `regex_capture` components | 14 | **113** | Common enough to demand a readable typed extraction mechanism or advanced primitive |
+| Variable `substring` components | 0 | **2** | A plausible low-use **authoring primitive** candidate for indirect lowering, not a reason to lose source meaning |
+| Definition `ONE` or `XOR` operator | 0 | 0 | No observed source occurrences in six packages, but OVAL language-conformance content may still need it; zero STIG sightings is not deprecation proof |
+
+**Important correction:** The 32 NIWC `check="only one"` Tests cannot be explained away by the four NIWC `only_one_exists` Tests. Exact cardinality applies at different scopes (collected Items, matching Items, observed field values, expected values). Removing the distinction would cause different results, including false compliant outcomes. [Regression guards](https://github.com/vanderpol/scap-ng/blob/main/tools/test_research_04_rare_oval_removal_guards.py) passed in [CI](https://github.com/vanderpol/scap-ng/actions/runs/39030549202).
+
+**Shortlist for genuine reduction of native keyword count:** old Test `all_exist` (if proven source-equivalent in a native real-Item + collection-status model); the duplicate composed exact-one labels; legacy Object `COMPLEMENT` spelling where a transparent set-subtraction/selection exclusion is equivalent; obscure scalar Variable-function keywords such as `substring` if direct typed expressions already cover them. None is approved for removal today.
+
 ## Proof obligations before pruning
 
 1. **Source provenance:** Join the original XCCDF Rule → OVAL Definition → Test/Object/State/Variable IDs, noting mixed DISA/NIWC closures. A source-comment match is not proof of identity.
