@@ -2,6 +2,8 @@
 
 **17 October 2026. Research only. Not an adopted 0.4 standard, scanner, or lossless conversion proof.**
 
+**[User-supplied Gemini/ChatGPT first-read comparison](REVIEW-TRIAGE-GEMINI-CHATGPT-2026-10-17.md)** — both flagged missing existence and provider contracts; ChatGPT disclosed prior context, and Gemini Part 3 is not yet received. [Affirmative existence experiment](experiments/affirmative-presence-candidate.md) compares optional `each` with a positive `minimum_resources` constraint against a named-singleton alternative. None of these variants is adopted. The research grammar now rejects ambiguous `none` combined with `must`.
+
 **[Answer-free naive ChatGPT review packet](NAIVE-REVIEW-PACKET.md)** asks an unfamiliar first-time reader to infer meaning from the samples, particularly contradictory empty-population interpretations, without an answer key. A separate **[internal counterexample and alternatives review](INTERNAL-EMPTY-POPULATION-REVIEW.md)** must be withheld until blind responses are saved. The current `if_empty` requirement is **not** promoted or removed pending evidence; this is a deliberate fresh attempt to avoid agreeing too quickly with the latest suggestion.
  Tracked in [#235](https://github.com/vanderpol/scap-ng/issues/235). Existing 0.3/0.4 schemas, compiled content and releases remain unchanged.
 
@@ -31,8 +33,8 @@ This is a **new native policy** that selects exact /home, not a lossless rewrite
 | --- | --- |
 | every: resource | Every selected resource must satisfy its nested requirement |
 | some: resource | At least one selected resource satisfies its nested requirement |
-| none: resource | No selected resource exists or satisfies the declared predicate |
-| exactly_one: resource | Exactly one selected resource exists and satisfies the requirement |
+| none: resource | **Zero selected resources after where**; must is prohibited to avoid two conflicting meanings |
+| exactly_one: resource | **Exactly one selected resource**, which also satisfies must; counts selected Items, not only compliant Items |
 | where | Restrict the resources examined; distinct from acquisition |
 | using | Inputs to the named typed evidence provider |
 | must | Required properties or more nested security requirements |
