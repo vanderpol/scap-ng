@@ -68,6 +68,23 @@ class RequirementsFirstAuthorabilityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'on_unknown'):
             grammar.validate(doc)
 
+    def test_none_can_only_count_selected_resources(self):
+        doc={'id':'x','title':'x','require':{
+            'none':'windows.user_right_assignments',
+            'where':{'principal':{'equals_ignore_case':'Unknown'}},
+            'must':{'enabled':{'equals':True}}}}
+        with self.assertRaisesRegex(ValueError,'none means zero resources selected'):
+            grammar.validate(doc)
+
+    def test_exactly_one_counts_selected_even_if_property_fails(self):
+        doc={'id':'x','title':'x','require':{
+            'exactly_one':'windows.registry_values',
+            'must':{'value':{'equals':0}}}}
+        self.assertTrue(grammar.validate(doc))
+        # Structural validator has no evaluator: do not claim it proves the
+        # 2-selected/1-compliant case. The research contract must say
+        # exactly_one counts selected resources, not compliant ones.
+
     def test_duplicate_yaml_mapping_rejected(self):
         with self.assertRaisesRegex(ValueError,'duplicate key'):
             grammar.yaml.load('id: x\nid: y\n',Loader=grammar.Loader)
