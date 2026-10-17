@@ -173,45 +173,68 @@ def evaluate(ast,fixtures,scope=None):
     # It only supports an independently pinned state-free textfile existence
     # Test shape. No claim of OVAL regex/item_creation/source parity.
     if ast["kind"]=="compat_oval_provider_existence":
-        required={"kind","source_assessment_id","source_test_id",
-                  "provider","using","existence"}
-        if set(ast)!=required or ast["provider"]!="linux.textfile_matches" or (
-                ast["existence"]!="at_least_one_exists"):
+        provider=ast.get("provider")
+        common={"kind","source_assessment_id","source_test_id",
+                "provider","using","existence"}
+        required=common|({"where"} if provider=="linux.mounts" else set())
+        if (set(ast)!=required or provider not in {"linux.textfile_matches","linux.mounts"}
+                or ast["existence"]!="at_least_one_exists"):
             raise ValueError("unsupported source-compatible provider Test contract")
-        ev=fixtures.get(ast["provider"])
+        ev=fixtures.get(provider)
         if ev is None:
-            return Decision(UNKNOWN,"no source-compatible provider acquisition supplied",
-                            ast["provider"])
-        if not isinstance(ev,dict) or ev.get("using")!=ast["using"]:
-            return Decision(ERROR,"source-compatible acquisition identity differs",ast["provider"])
+            return Decision(UNKNOWN,"no source-compatible provider acquisition supplied",provider)
+        if not isinstance(ev,dict):
+            return Decision(ERROR,"source-compatible collection is not a mapping",provider)
+        if provider=="linux.textfile_matches" and ev.get("using")!=ast["using"]:
+            return Decision(ERROR,"source-compatible acquisition identity differs",provider)
+        if provider=="linux.mounts" and (
+                ast["using"]!={} or not isinstance(ev.get("namespace"),str) or
+                not ev["namespace"]):
+            return Decision(ERROR,"source-compatible mount namespace identity absent",provider)
         flag=ev.get("status")
         statuses={"complete":"complete","incomplete":"incomplete",
                   "error":"error","not collected":"not collected",
                   "not applicable":"not applicable"}
         if not isinstance(flag,str) or flag not in statuses or not isinstance(ev.get("items"),list):
-            return Decision(ERROR,"invalid source-compatible collection envelope",ast["provider"])
+            return Decision(ERROR,"invalid source-compatible collection envelope",provider)
         items=ev["items"]
         if flag not in {"complete","incomplete"} and items:
-            return Decision(ERROR,"terminal source collection has unverifiable Items",ast["provider"])
+            return Decision(ERROR,"terminal source collection has unverifiable Items",provider)
         ids=set()
+        selected=0
+        unresolved=False
         for item in items:
             if not isinstance(item,dict) or not isinstance(item.get("fields"),dict):
-                return Decision(ERROR,"malformed source-compatible Item",ast["provider"])
+                return Decision(ERROR,"malformed source-compatible Item",provider)
             fields=item["fields"]
             ident=item.get("id")
             if not isinstance(ident,str) or not ident or ident in ids:
-                return Decision(ERROR,"missing or duplicate source Item identity",ast["provider"])
+                return Decision(ERROR,"missing or duplicate source Item identity",provider)
             ids.add(ident)
-            if (fields.get("full_path")!=ast["using"]["path"] or
-                    type(fields.get("instance")) is not int or fields["instance"]<1 or
-                    not isinstance(fields.get("match_text"),str)):
-                return Decision(ERROR,"source Item violates typed selector contract",ast["provider"])
+            if provider=="linux.textfile_matches":
+                if (fields.get("full_path")!=ast["using"]["path"] or
+                        type(fields.get("instance")) is not int or fields["instance"]<1 or
+                        not isinstance(fields.get("match_text"),str)):
+                    return Decision(ERROR,"source Item violates typed selector contract",provider)
+                selected+=1
+            else:
+                point=fields.get("mount_point")
+                if point is None or (isinstance(point,dict) and
+                                    point.get("field_status") in {"unknown","absent"}):
+                    unresolved=True
+                elif not isinstance(point,str):
+                    return Decision(ERROR,"invalid mount_point evidence type",provider)
+                elif point==ast["where"]["equals"]:
+                    selected+=1
+        if unresolved:
+            return Decision(UNKNOWN,"mount selector field absence leaves Item population unresolved",
+                            provider,observed=len(items),selected=selected)
         result=evaluate_collected_object_test(
             flag=statuses[flag],existence=ast["existence"],
-            check="all",has_state=False,exists=len(items))
+            check="all",has_state=False,exists=selected)
         return Decision(result,
-                        "source Test existence over observed textfile Items (source parity unverified)",
-                        ast["provider"],observed=len(items),selected=len(items))
+                        "source Test existence over typed collected Items (source parity unverified)",
+                        provider,observed=len(items),selected=selected)
     # INTERNAL COMPILER-OWNED compatibility IR, not authored YAML. This
     # delegates source OVAL Test existence/item truth tables to the PINNED
     # reference combiner. This one node is a bounded bridge demo: it does
