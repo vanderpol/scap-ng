@@ -14,6 +14,8 @@ No weighted authorability/readability scoring or selecting a winner before the g
 
 **First executable native source-shape pilots (not parity):** [Linux /var/tmp must exist and Chrony cmdport 0](contract-candidate/FIRST-SOURCE-BACKED-NATIVE-PILOT.md) now use native requirements backed by exact source Assessment specimens from the six-stream 0.3 authoring cohort. A bounded read-only textfile regex collector is tested with actual temporary files, explicit observed Items and incomplete/error status. These remain examples of B-native *policy shapes*, not verified OVAL Test/State/Object conversion. Structural coverage is six streams; executable source-equivalence coverage remains unproved.
 
+**Additional bounded Windows registry pilot:** An [offline typed registry snapshot normalizer and Win11 SV-253291 source-boundary test](contract-candidate/REGISTRY-SOURCE-BOUNDARY-PILOT.md) now retain WOW64 query identity, numeric value kind, explicit complete/incomplete/error statuses and duplicate singleton evidence. This is **not a Windows host collector or parity proof**: original source `match: one`, textual `'0'`, and unspecified registry view are still unresolved for native B lowering.
+
 ## Capability criteria for B
 
 | Area | Comparable-capability readiness criterion | Current B evidence / gap |
