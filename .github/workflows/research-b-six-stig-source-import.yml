@@ -6,6 +6,8 @@ on:
     paths:
       - 'tools/research_b_full_corpus_import.py'
       - 'tools/test_research_b_full_corpus_import.py'
+      - 'tools/research_b_full_corpus_features.py'
+      - 'tools/test_research_b_full_corpus_features.py'
       - '.github/workflows/research-b-six-stig-source-import.yml'
   workflow_dispatch:
 
@@ -27,6 +29,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_full_corpus_import.py
+      - name: Validate B-only feature inventory and shared-reference counts
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_full_corpus_features.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -44,6 +50,14 @@ jobs:
             --output research/requirements-first-language/contract-candidate/corpus/source-accounting.json \
             --markdown research/requirements-first-language/contract-candidate/corpus/source-accounting.md \
             --capsules-output work/b-corpus/nonexecutable-source-capsules.json
+      - name: Build B-only source capability and operation inventory for all six streams
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_full_corpus_features.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output research/requirements-first-language/contract-candidate/corpus/feature-inventory.json \
+            --markdown research/requirements-first-language/contract-candidate/corpus/feature-inventory.md
       - name: Preserve full source capsules as temporary CI artifact, not scanner bundles
         uses: actions/upload-artifact@v4
         with:
@@ -55,6 +69,8 @@ jobs:
         run: |
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.json
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
+          git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
+          git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.md
           if ! git diff --cached --quiet; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
