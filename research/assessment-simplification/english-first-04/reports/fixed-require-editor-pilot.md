@@ -34,6 +34,13 @@ not indiscriminately renamed, because conflating distinct grouping scopes can ch
 | rhel_9 | 57 | 0 |
 | shared | 526 | 1 |
 
+## How often the extra scope field is necessary
+
+- Groups over whole States: **128**
+- Groups within one State: **247**
+- Tests with any grouped condition: **331** of 1374
+Single-field conditions require no scope marker.
+
 ## Remaining blockers
 
 - `authoring/shared/assessments/linux/files/verify-boot-loader-root-admin-adminstrator.assessment.yaml` — unproven output or Item scope
