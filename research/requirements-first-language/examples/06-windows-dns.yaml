@@ -1,0 +1,34 @@
+id: SV-259345.automated.native
+title: DNS signatures must have approved validity periods
+require:
+  any:
+    - all:
+        - none: windows.dns.zones
+          where:
+            direction: {equals: forward}
+        - none: windows.dns.zones
+          where:
+            direction: {equals: reverse}
+    - every: windows.dns.zones
+      where:
+        direction: {equals: forward}
+      must:
+        directory_integration: {equals: active_directory}
+      if_empty: fail
+    - every: windows.dns.zones
+      as: zone
+      where:
+        direction: {equals: forward}
+      must:
+        all:
+          - fields:
+              signed: {equals: true}
+          - every: '$zone.zone_signing_keys'
+            must:
+              validity_hours: {between: [48, 168]}
+            if_empty: fail
+          - every: '$zone.key_signing_keys'
+            must:
+              validity_hours: {between: [48, 168]}
+            if_empty: fail
+      if_empty: fail
