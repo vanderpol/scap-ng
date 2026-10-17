@@ -3,6 +3,8 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[New: fixed `items` + `condition` requirement-choice coverage, six-STIG audit](reports/fixed-requirements-six-stig.md)** — counts precisely which existing Item/field existence-and-matching modes a small dropdown vocabulary covers and links individual residual Tests. Two focused scoped choices raise source-annotated requirement coverage above 98% of unique automated Assessments; three choices raise it above 99%. This is **not complete grammar, Rule coverage, usability, or scanner semantic parity**. Remaining source cases are reviewed individually before any rewrite or language extension.
+
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
 
 **[Browse six graded auditor-friendly examples](AUDITOR-SAMPLE-GALLERY.md)** — simple Linux/Windows checks through Windows WMI records, DNS, Apache, and dependent Linux file collection; each links to complete YAML on GitHub.com.
