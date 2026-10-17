@@ -5,8 +5,8 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- Every selected Windows accounts WHERE category equals guest
-  If this population is confirmed empty, this condition passes.
+- Every selected Windows account whose category equals guest
+  No matching resource is required to exist if selection is confirmed complete.
   Required: enabled equals false
 
 ## Evidence and status rules

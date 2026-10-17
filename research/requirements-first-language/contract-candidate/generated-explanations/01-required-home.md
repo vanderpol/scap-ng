@@ -5,8 +5,8 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- Every selected Linux mounts WHERE mount point equals /home
-  At least 1 selected resources must exist across THIS population.
+- Every selected Linux mount whose mount point equals /home
+  At least one matching resource must exist in this selected population.
   Required: mount options contains nosuid
 
 ## Evidence and status rules

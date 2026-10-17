@@ -5,15 +5,15 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- Every selected Windows DNS zones WHERE direction equals forward
-  At least 1 selected resources must exist across THIS population.
+- Every selected Windows DNS zone whose direction equals forward
+  At least one matching resource must exist in this selected population.
   ALL of these conditions must hold:
     - signed equals true
-    - Every selected zone-signing keys belonging to that zone
-      At least 1 selected resources must exist across THIS population.
+    - Every selected zone-signing key belonging to the same DNS zone
+      At least one matching resource must exist in this selected population.
       Required: validity (hours) is between 48 and 168
-    - Every selected key-signing keys belonging to that zone
-      At least 1 selected resources must exist across THIS population.
+    - Every selected key-signing key belonging to the same DNS zone
+      At least one matching resource must exist in this selected population.
       Required: validity (hours) is between 48 and 168
 
 ## Evidence and status rules

@@ -6,11 +6,11 @@ of the same AST used by fixture tests, not separate executable prose.
 ## What must be true
 
 ALL of these conditions must hold:
-  - Every selected Apache configuration directive observations WHERE name equals KeepAlive
-    At least 1 selected resources must exist across THIS population.
+  - Every selected Apache configuration directive observation whose name equals KeepAlive
+    At least one matching resource must exist in this selected population.
     Required: raw directive value equals On
-  - Every selected Apache configuration directive observations WHERE name equals MaxKeepAliveRequests
-    At least 1 selected resources must exist across THIS population.
+  - Every selected Apache configuration directive observation whose name equals MaxKeepAliveRequests
+    At least one matching resource must exist in this selected population.
     Required: raw directive value equals 150
 
 ## Evidence and status rules

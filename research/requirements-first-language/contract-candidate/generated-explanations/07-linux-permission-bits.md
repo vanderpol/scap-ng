@@ -5,8 +5,8 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- Every selected Linux files collected from selected account homes (provider inputs: account_filter={'username': {'matches_regex': '[\\w]+'}, 'uid': {'equals': 0}, 'home_dir': {'not_equals': '/'}}, filename=^\.[^\s\.]+, follow_symlinks=true, max_depth=1)
-  At least 1 selected resources must exist across THIS population.
+- Every selected Linux file collected from selected account homes (provider inputs: account_filter={'username': {'matches_regex': '[\\w]+'}, 'uid': {'equals': 0}, 'home_dir': {'not_equals': '/'}}, filename=^\.[^\s\.]+, follow_symlinks=true, max_depth=1)
+  At least one matching resource must exist in this selected population.
   Required: POSIX mode bits contains only bits allowed by octal 0740
 
 ## Evidence and status rules

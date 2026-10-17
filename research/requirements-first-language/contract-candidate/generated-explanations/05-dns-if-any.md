@@ -5,8 +5,8 @@ of the same AST used by fixture tests, not separate executable prose.
 
 ## What must be true
 
-- Every selected Windows DNS zones WHERE direction equals forward
-  If this population is confirmed empty, this condition passes.
+- Every selected Windows DNS zone whose direction equals forward
+  No matching resource is required to exist if selection is confirmed complete.
   Required: directory integration equals true
 
 ## Evidence and status rules

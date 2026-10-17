@@ -9,11 +9,11 @@ AT LEAST ONE of these alternatives must hold:
   ALL of these conditions must hold:
     - The uniquely identified Windows computer role
       Required: role equals domain_member
-    - At least one selected Windows user-right assignments (provider inputs: right=SeDenyRemoteInteractiveLogonRight)
+    - At least one selected Windows user-right assignment (provider inputs: right=SeDenyRemoteInteractiveLogonRight)
       Required: principal equals Guests
-    - At least one selected Windows user-right assignments (provider inputs: right=SeDenyRemoteInteractiveLogonRight)
+    - At least one selected Windows user-right assignment (provider inputs: right=SeDenyRemoteInteractiveLogonRight)
       Required: principal equals LocalAccount
-  - At least one selected Windows user-right assignments (provider inputs: right=SeDenyRemoteInteractiveLogonRight)
+  - At least one selected Windows user-right assignment (provider inputs: right=SeDenyRemoteInteractiveLogonRight)
     Required: principal equals Everyone
 
 ## Evidence and status rules
