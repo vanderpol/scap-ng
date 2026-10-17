@@ -65,7 +65,8 @@ def _node(node, source_kind, depth=0):
     kind = node["kind"]
 
     if kind == "manual_procedure":
-        _ensure(source_kind=="manual", "manual procedures cannot be embedded in automated tests")
+        _ensure(source_kind=="manual" and depth==0,
+                "manual procedures cannot be embedded in automated tests")
         keys={"kind","source_assessment_id","version","title",
               "class","purpose","procedure","response","evidence_guidance"}
         _ensure(set(node)==keys,"unexpected manual procedure fields")
