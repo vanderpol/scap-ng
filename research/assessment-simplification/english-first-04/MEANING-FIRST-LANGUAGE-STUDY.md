@@ -72,6 +72,12 @@ Judge a whole Assessment, not isolated snippets:
 4. **Consistency:** one role should have one construction across objectless collectors, nested Linux iteration, Windows records, derived Variables and reusable Sets.
 5. **Simplicity:** measure nesting and optional special cases before counting or renaming keywords. Never treat a shorter file as proof of an easier language.
 
+### What the structural word-removal experiment actually showed
+
+The [passing six-STIG exploratory comparison](https://github.com/vanderpol/scap-ng/actions/runs/38988669776) reversibly represented **871 of 872** complete source Assessments with a trial structure that folds ordinary `inspect` + `where` into a polymorphic `capability` field. The only rejection remained the original Linux bootloader source exception.
+
+This is **not** a recommendation for the word `capability` and **not** a recommendation to eliminate `where`. In fact, the trial **increased rendered YAML character count by 0.79%** (1,593,224 → 1,605,776), even before accounting for authors learning a string-or-mapping field. **Six complete Assessments retained other nested `where` usage**, demonstrating that not every occurrence means the same sort of top-level native Object selection. Literal word removal and semantic simplification are different goals. The experiment showed that a systematic rename/re-nest is feasible for admitted source structures, **not** that it makes them clearer or easier to author.
+
 ### Current evidence (not a final choice)
 
 The [six-STIG structural census](reports/README.md) has exact reconstructed source structures for **871 of 872** automated Assessments. The bootloader Test combining `none_exist` and an attached State remains a fail-closed exception. The four complex full comparisons pass a source inversion, and the [Markdown consistency test](../../../tools/test_english_first_full_markdown_examples.py) checks all five inline “after” examples. These are **not** independent SCAP 1.4 runtime/evidence conformance or author usability results.
