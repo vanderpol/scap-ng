@@ -6,6 +6,7 @@ on:
       - .github/workflows/research-source-author-edge-04.yml
       - tools/research_04_source_author_edge_census.py
       - tools/research_04_source_semantic_edges.py
+      - tools/research_04_none_exist_original_oval.py
   workflow_dispatch:
 
 permissions:
@@ -58,6 +59,12 @@ jobs:
             --sources niwc/Current \
             --json source-oval-semantic-edges.json \
             --markdown source-oval-semantic-edges.md
+      - name: Trace bootloader none-exist State anomaly to original OVAL
+        run: |
+          python scap-ng/tools/research_04_none_exist_original_oval.py \
+            --sources niwc/Current \
+            --json source-bootloader-none-exist.json \
+            --markdown source-bootloader-none-exist.md
       - name: Publish human-readable report and machine evidence to GitHub.com
         if: github.ref == 'refs/heads/main'
         env:
@@ -76,7 +83,9 @@ jobs:
           for name in ("source-oval-author-edge-census.md",
                        "source-oval-author-edge-census.json",
                        "source-oval-semantic-edges.md",
-                       "source-oval-semantic-edges.json"):
+                       "source-oval-semantic-edges.json",
+                       "source-bootloader-none-exist.json",
+                       "source-bootloader-none-exist.md"):
               path = "research/assessment-simplification/english-first-04/reports/"+name
               read = subprocess.run(["gh","api",f"repos/{repo}/contents/{path}",
                                      "--jq",".sha"],capture_output=True,text=True)
@@ -101,4 +110,6 @@ jobs:
             source-oval-author-edge-census.json
             source-oval-semantic-edges.md
             source-oval-semantic-edges.json
+            source-bootloader-none-exist.json
+            source-bootloader-none-exist.md
           if-no-files-found: warn
