@@ -13,6 +13,10 @@ def lower_state_free_partition_assessment(source):
     a=source["assessment"]
     if not isinstance(a,dict) or a.get("mode")!="automated":
         raise ValueError("partition lowering requires automated Assessment")
+    allowed={"assessment_title","class","evaluate","id","mode","purpose",
+             "specification","tests","version"}
+    if set(a)-allowed:
+        raise ValueError("unsupported Assessment-level Variables, shared Objects or inputs")
     tests=a.get("tests")
     if not isinstance(tests,dict) or len(tests)!=1:
         raise ValueError("partition lowering requires exactly one Test")
