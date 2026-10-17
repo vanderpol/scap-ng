@@ -63,7 +63,7 @@ def read_source(archive):
             if info.is_dir() or not name.endswith((".yaml",".yml")):
                 continue  # Release README/metadata are not Assessment documents.
             if not _safe_zip_name(name):
-                raise ValueError("unsafe source archive YAML path: "+name)
+                raise ValueError("unsafe source archive path: "+name)
             if name in documents:raise ValueError("duplicate archive path: "+name)
             if info.file_size>MAX_DOCUMENT_BYTES:
                 raise ValueError("oversized source document: "+name)
