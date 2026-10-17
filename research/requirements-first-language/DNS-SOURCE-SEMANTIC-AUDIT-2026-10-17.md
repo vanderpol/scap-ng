@@ -39,4 +39,6 @@ Retain typed, reusable zones and signing-key providers as the leading **native a
 
 The [source test](../../tools/test_research_dns_source_contract.py) verifies five checks, three alternatives, five Item-existence obligations, two no-output predicates, typed/State structure, original zone exclusions and separate key commands. No production DNS service or scanner has been invoked.
 
+**New fixture evidence contract:** [typed DNS zone/key normalizer](../../tools/research_dns_zone_key_evidence.py), [versioned schema sketch](providers/windows.dns.zone_signing_evidence.v0.1.yaml), and [negative tests](../../tools/test_research_dns_zone_key_evidence.py) preserve forward vs reverse, ZoneSigningKey vs KeySigningKey, source days/hours, duplicate identities, per-zone correlation, missing fields and incomplete/error collection. This is STRUCTURED SYNTHETIC input, **not** Get-DnsServerZone or DNSKEY PowerShell collection, and cannot establish source conversion parity. It intentionally does not mimic the original catch-output-zero, shell Item/value separation or OVAL record/State evaluation.
+
 **Next step:** source-aware synthetic provider fixtures and a formal native evidence/status contract; independent Gemini review will be useful only with those explicit counterexamples rather than another keyword poll.
