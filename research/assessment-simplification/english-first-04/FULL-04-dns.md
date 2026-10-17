@@ -200,7 +200,8 @@ assessment:
 
 Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
 
-```yaml# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+```yaml
+# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-259345.automated
