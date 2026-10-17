@@ -2,6 +2,8 @@
 
 **17 October 2026. Research, not a Board vote, approved schema or scanner release.** [Track #235](https://github.com/vanderpol/scap-ng/issues/235).
 
+**New DNS prototype evidence:** [versioned structured fixture normalizer](providers/windows.dns.zone_signing_evidence.v0.1.yaml) and [tests](../../tools/test_research_dns_zone_key_evidence.py) distinguish forward/reverse zones, both signing-key classes, typed days/hours, duplicate identities and incomplete data. This is **not** a Windows DNS collector or parity proof.
+
 **New DNS source finding (17 October):** [DNS source audit](DNS-SOURCE-SEMANTIC-AUDIT-2026-10-17.md) caught a wrong minimum-existence assumption in the native AD-integration branch. The original permits zero forward zones **when the corresponding required shellcommand Item exists but reports no violating zone values**; a reverse-only server exposes the mismatch. [Source contract tests](../../tools/test_research_dns_source_contract.py) pin all five Tests and three alternative routes. No actual Windows DNS collection or source parity is claimed.
 
 **New Apache proof (17 October):** [full source audit](APACHE-SOURCE-PROVIDER-AUDIT-2026-10-17.md) establishes four at-least-one shellcommand Tests, 18 Variables, separate primary Include versus loaded-file discovery, and different optional field conditions. [Read-only static Apache provider](../../tools/research_provider_apache_directives.py) now preserves individual raw directive sources and reports incomplete unsupported contexts, macros, glob limits, cycles, and missing required Includes. **Do not conflate this with Apache effective configuration or proven conversion.**
