@@ -18,7 +18,7 @@ from research_native_provider_catalog import CATALOG
 
 FORMAT = "scap-ng-b-fixture-ir/0.1"
 SCOPE = "research-fixture-evaluator-only"
-SOURCE_KINDS = {"native", "compiler-compatibility", "mixed"}
+SOURCE_KINDS = {"native", "compiler-compatibility", "mixed", "manual"}
 COMPAT_INPUTS = {"flag", "existence", "check", "item_results", "has_state",
                  "exists", "does_not_exist", "error", "not_collected"}
 COLLECTION_KEYS = {"kind", "provider", "mode", "exists_only", "min_count",
@@ -63,6 +63,34 @@ def _node(node, source_kind, depth=0):
     _ensure(isinstance(node, dict) and isinstance(node.get("kind"), str),
             "every node needs a kind")
     kind = node["kind"]
+
+    if kind == "manual_procedure":
+        _ensure(source_kind=="manual", "manual procedures cannot be embedded in automated tests")
+        keys={"kind","source_assessment_id","version","title",
+              "class","purpose","procedure","response","evidence_guidance"}
+        _ensure(set(node)==keys,"unexpected manual procedure fields")
+        _ensure(isinstance(node["source_assessment_id"],str) and
+                bool(node["source_assessment_id"]) and
+                isinstance(node["procedure"],str) and bool(node["procedure"]),
+                "manual Assessment requires immutable id/procedure")
+        _ensure((type(node["version"]) in {int,str}) and
+                bool(str(node["version"])), "manual version invalid")
+        _ensure(node["title"] is None or isinstance(node["title"],str),
+                "manual title invalid")
+        _ensure(node["purpose"] in {"assessment","applicability"} and
+                node["class"] in {"compliance","vulnerability","patch",
+                                   "inventory","miscellaneous"}, "manual purpose/class invalid")
+        _ensure(node["evidence_guidance"] is None or
+                isinstance(node["evidence_guidance"],str), "manual evidence guidance invalid")
+        from research_b_manual_lowering import lower_manual_assessment
+        raw={"id":node["source_assessment_id"],
+             "version":node["version"],"assessment_title":node["title"],
+             "mode":"manual","class":node["class"],"purpose":node["purpose"],
+             "procedure":node["procedure"],"response":node["response"],
+             "evidence_guidance":node["evidence_guidance"]}
+        _ensure(lower_manual_assessment({"assessment":raw})==node,
+                "manual procedure is not semantically canonical")
+        return
 
     if kind == "compat_oval_test":
         _ensure(source_kind != "native",
@@ -180,6 +208,8 @@ def _classify(node, depth=0):
     _ensure(depth <= 64 and isinstance(node, dict) and
             isinstance(node.get("kind"), str), "invalid or excessive requirement tree")
     kind = node["kind"]
+    if kind == "manual_procedure":
+        return {"manual"}
     if kind in {"compat_oval_test","compat_oval_provider_existence"}:
         return {"compiler-compatibility"}
     if kind == "logic":
@@ -196,7 +226,9 @@ def _semantic_payload(assessment_id, root):
     _ensure(isinstance(assessment_id, str) and bool(assessment_id),
             "assessment identity is required")
     kinds = _classify(root)
-    if kinds == {"native"}:
+    if kinds == {"manual"}:
+        source_kind = "manual"
+    elif kinds == {"native"}:
         source_kind = "native"
     elif kinds == {"compiler-compatibility"}:
         source_kind = "compiler-compatibility"
