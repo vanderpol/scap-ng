@@ -46,6 +46,8 @@ def compare(item,field,operation,desired):
         return FALSE if status=="absent" else (ERROR if status=="error" else UNKNOWN)
     if operation=="equals":
         return TRUE if type(value)==type(desired) and value==desired else FALSE
+    if operation=="not_equals":
+        return TRUE if type(value)!=type(desired) or value!=desired else FALSE
     if operation=="contains":
         if not isinstance(value,(list,tuple)):
             return ERROR
