@@ -195,6 +195,20 @@ def build(args):
     raw,owners,by_stig,dupes,element_counts,source_members=raw_checks(Path(args.sources))
     native,doc_count=native_checks(Path(args.native))
     candidates,all_exist_join=classify_candidate(native,raw)
+    # Candidate original source ID counts for all 201 native all_exist Tests.
+    # Title+mode is not an authoritative converter-supplied provenance join.
+    candidate_201=Counter()
+    for row in all_exist_join:
+        if row["quality"]=="single_original_test_id_candidate" and len(row["candidate_authors"])==1:
+            candidate_201[row["candidate_authors"][0]]+=1
+        else:
+            candidate_201["ambiguous_or_unmatched"]+=1
+    owner_rare_examples=defaultdict(list)
+    for row in raw:
+        if row["check_existence"] in {"all_exist","only_one_exists","any_exist"}:
+            key=row["author"]+":"+row["check_existence"]
+            if len(owner_rare_examples[key])<12:
+                owner_rare_examples[key].append(row)
     exists_source=Counter()
     for t in raw:exists_source[t["check_existence"]]+=1
     exists_native=Counter()
@@ -218,6 +232,8 @@ def build(args):
       "native_combined_item_requirement_distribution":dict(native_source),
       "native_source_ID_join_candidate_quality":candidates,
       "all_201_native_all_exist_candidate_matches":all_exist_join,
+      "all_201_native_all_exist_single_ID_candidate_author_counts":dict(candidate_201),
+      "rare_original_tests_by_author_and_mode":dict(owner_rare_examples),
       "original_oval_element_distribution":element_counts,
       "source_members":source_members,
       "duplicate_test_id_observations":dupes,
@@ -257,6 +273,19 @@ def md(v):
               "candidate matches, **not verified source identities**.",
               "| Candidate quality | Native Test count |","| --- | ---: |"]
     lines += [f"| `{status}` | {qty} |" for status,qty in sorted(v["native_source_ID_join_candidate_quality"].items())]
+    lines+=["", "## Original rare Test examples by original author", ""]
+    for key,examples in sorted(v["rare_original_tests_by_author_and_mode"].items()):
+        lines.extend(["",f"### {key}", ""])
+        for row in examples[:5]:
+            lines.append(f"- \`{row['id']}\`: {row['comment'] or '(no comment)'}; "
+                         f"State refs={row['state_refs']}, check={row['check']}")
+    lines += ["", "## Candidate origin of the 201 selected native all_exist Tests", "",
+              "The test title + existence mode yields exactly one original source Test ID",
+              "for the cases below, but **that is not an explicit converter lineage ID**.",
+              "", "| Candidate original author | Native Tests |",
+              "| --- | ---: |"]
+    lines += [f"| {author} | {count} |"
+              for author,count in sorted(v["all_201_native_all_exist_single_ID_candidate_author_counts"].items())]
     lines+=["", "## Source attribution for 201 native all_exist cases", "",
             "The JSON contains each native Test with **source-ID candidates**, not proven",
             "lineage. Cases where several original IDs share a comment, or none match,",
