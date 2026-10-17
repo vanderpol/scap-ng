@@ -19,7 +19,7 @@ EXAMPLES=ROOT/"research/requirements-first-language/contract-candidate/examples"
 from research_native_provider_catalog import (PROVIDERS, FIELD_TYPES, RELATIONS,
                                                RELATION_TYPES,operator_accepts)
 OPS={"equals","not_equals","contains","at_least","between","only_these_bits","matches_regex"}
-QUANTIFIERS={"each","some","none","exactly_one"}
+QUANTIFIERS={"each","some","none","exactly_one","exists"}
 GROUPS={"all","any"}
 REGEX=re.compile(r"^\$([a-z][a-z0-9_]*)\.([a-z_][a-z0-9_]*)$")
 NAME=re.compile(r"^[a-z][a-z0-9_]*$")
@@ -181,6 +181,8 @@ def compile_check(node,path="require",scope=None,current_fields=None,current_typ
         fail(path,"minimum_resources must be a nonnegative integer")
     if mode!="each" and "minimum_resources" in node:
         fail(path,"minimum_resources belongs only to each")
+    if mode=="exists" and (set(node)&{"must","minimum_resources","as"}):
+        fail(path,"exists means selected-resource existence only; no must/minimum_resources/as allowed")
     alias=node.get("as")
     if alias is not None and (mode=="none" or not isinstance(alias,str) or
                             not NAME.fullmatch(alias) or alias in scope):
@@ -191,8 +193,8 @@ def compile_check(node,path="require",scope=None,current_fields=None,current_typ
             fail(path,"a child Item alias requires a declared provider relation contract")
         local_scope[alias]={"provider":provider,"fields":fields}
     nested=None
-    if mode=="none":
-        if "must" in node:fail(path,"none counts selected resources; where is the prohibited predicate")
+    if mode in {"none","exists"}:
+        if "must" in node:fail(path,"none/exists may not include a property requirement")
         compare=[]
     else:
         raw_must=node.get("must")
@@ -202,8 +204,11 @@ def compile_check(node,path="require",scope=None,current_fields=None,current_typ
             compare=[]
         else:
             compare=check_predicates(raw_must,fields,path+".must",local_scope,field_types)
-    return {"kind":"collection","provider":provider,"mode":mode,
-            "min_count":minimum,"singleton":False,"using":using,
+    return {"kind":"collection","provider":provider,
+            "mode":"some" if mode=="exists" else mode,
+            "exists_only":mode=="exists",
+            "min_count":1 if mode=="exists" else minimum,
+            "singleton":False,"using":using,
             "where":selection,"predicates":compare,"as":alias,
             "nested":nested,"parent_ref":parent_ref,"owner_field":owner_field}
 
