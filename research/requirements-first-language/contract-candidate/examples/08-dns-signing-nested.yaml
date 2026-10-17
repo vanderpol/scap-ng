@@ -1,0 +1,20 @@
+id: native-dns-zone-and-key-signing
+title: Every forward DNS zone must be signed with both key kinds in validity range
+require:
+  each: windows.dns.zones
+  as: zone
+  where:
+    direction: {equals: forward}
+  minimum_resources: 1
+  must:
+    all:
+      - fields:
+          signed: {equals: true}
+      - each: '$zone.zone_signing_keys'
+        minimum_resources: 1
+        must:
+          validity_hours: {between: [48, 168]}
+      - each: '$zone.key_signing_keys'
+        minimum_resources: 1
+        must:
+          validity_hours: {between: [48, 168]}
