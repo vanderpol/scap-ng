@@ -23,7 +23,8 @@ LINE=re.compile(r"^\s*([A-Za-z][A-Za-z0-9]*)\b(?:\s+(.*?))?\s*$")
 
 
 def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
-            max_directives=10000, max_depth=MAX_INCLUDE_DEPTH):
+            max_directives=10000, max_depth=MAX_INCLUDE_DEPTH,
+            max_bytes_per_file=2000000):
     """Return exact directive lines with file/line and explicit coverage status.
 
     File include order is retained (no sorting except deterministic glob
@@ -31,7 +32,7 @@ def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
     decide inherited scopes, precedence, effective values or active contexts.
     """
     if any(not isinstance(x,int) or isinstance(x,bool) or x<1
-           for x in (max_files,max_directives,max_depth)):
+           for x in (max_files,max_directives,max_depth,max_bytes_per_file)):
         raise ValueError("all collection limits must be positive integers")
     server_root=Path(server_root).resolve(strict=True)
     if not server_root.is_dir(): raise ValueError("server_root must be a directory")
@@ -76,7 +77,12 @@ def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
             limits_hit=True
             return
         try:
-            text=normalized.read_text(encoding="utf-8")
+            with normalized.open("rb") as reader:
+                raw_file=reader.read(max_bytes_per_file+1)
+            if len(raw_file)>max_bytes_per_file:
+                note("file_byte_limit",path=str(normalized),limit=max_bytes_per_file)
+                return
+            text=raw_file.decode("utf-8")
         except (OSError,UnicodeError) as exc:
             note("file_unreadable",path=str(normalized),detail=str(exc))
             return
