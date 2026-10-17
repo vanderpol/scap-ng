@@ -23,7 +23,7 @@ For each case answer in plain English: (1) what type of data is being selected o
 
 ### A. Linux filesystem partitions
 
-\`\`\`yaml
+```yaml
 inspect: linux.partition
 where:
   mount_point: {matches_regex: '.*\/home'}
@@ -31,13 +31,13 @@ require:
   items: at_least_one
   matching_items: all
   mount_options: {at_least_one_value_equals: nosuid}
-\`\`\`
+```
 
-Evaluate separately: **A1** no partitions are selected, with complete successful collection; **A2** one selected partition reports two options \`rw\` and \`nosuid\`; **A3** two partitions are selected, of which only one has \`nosuid\`; **A4** one partition exists, but its mount option field is unreadable; **A5** acquisition is incomplete.
+Evaluate separately: **A1** no partitions are selected, with complete successful collection; **A2** one selected partition reports two options `rw` and `nosuid`; **A3** two partitions are selected, of which only one has `nosuid`; **A4** one partition exists, but its mount option field is unreadable; **A5** acquisition is incomplete.
 
 ### B. Windows WMI record alternatives
 
-\`\`\`yaml
+```yaml
 from: windows-wmi57-object
 require:
   items: at_least_one
@@ -52,25 +52,25 @@ require:
           records: at_least_one
           matching_records: all
           domainrole: {equals: '3'}
-\`\`\`
+```
 
-Evaluate separately for **one collected root Item** with records: **B1** \`['1']\`, **B2** \`['3']\`, **B3** \`['1','3']\`, **B4** \`['1','1']\`, **B5** no records, **B6** one record with a missing DomainRole, **B7** an incomplete WMI response. Explain specifically which unit the \`or\` combines: *record values, whole record tests, or entire root Items*, or say you cannot determine.
+Evaluate separately for **one collected root Item** with records: **B1** `['1']`, **B2** `['3']`, **B3** `['1','3']`, **B4** `['1','1']`, **B5** no records, **B6** one record with a missing DomainRole, **B7** an incomplete WMI response. Explain specifically which unit the `or` combines: *record values, whole record tests, or entire root Items*, or say you cannot determine.
 
 ### C. Windows Guests user right
 
-\`\`\`yaml
+```yaml
 from: windows-userright-object
 require:
   items: at_least_one
   matching_items: at_least_one
   trustee_name: {case_insensitive_equals: Guests}
-\`\`\`
+```
 
-Evaluate: **C1** no trustee Items, **C2** two Items (\`Guests\` and \`Administrators\`), **C3** two \`Administrators\` Items, **C4** one Item with missing trustee_name, **C5** two identical \`Guests\` Items. What is and is not implied by duplicates?
+Evaluate: **C1** no trustee Items, **C2** two Items (`Guests` and `Administrators`), **C3** two `Administrators` Items, **C4** one Item with missing trustee_name, **C5** two identical `Guests` Items. What is and is not implied by duplicates?
 
 ### D. Linux account-derived file permissions
 
-\`\`\`yaml
+```yaml
 require:
   items: may_be_absent
   matching_items: all
@@ -85,25 +85,25 @@ require:
       - other_write: {equals: false}
       - other_execute: {equals: false}
     listed_fields_must_exist: true
-\`\`\`
+```
 
-Evaluate: **D1** no files, all collection successful; **D2** one file with all eight fields set to false; **D3** one file with seven fields false, one true; **D4** one file lacks \`setuid\`; **D5** one file has unreadable \`setuid\`; **D6** one file passes and one fails. Which exact population is optional, and what does \`listed_fields_must_exist\` refer to? Identify anything that cannot be determined because acquisition is absent from this excerpt.
+Evaluate: **D1** no files, all collection successful; **D2** one file with all eight fields set to false; **D3** one file with seven fields false, one true; **D4** one file lacks `setuid`; **D5** one file has unreadable `setuid`; **D6** one file passes and one fails. Which exact population is optional, and what does `listed_fields_must_exist` refer to? Identify anything that cannot be determined because acquisition is absent from this excerpt.
 
 ### E. Apache configuration command output
 
-\`\`\`yaml
+```yaml
 require:
   items: at_least_one
   matching_items: all
   stdout_line:
     when_present_matches_regex: '\s*KeepAlive On'
-\`\`\`
+```
 
-Evaluate: **E1** no command Items; **E2** one command Item with no stdout_line field; **E3** one with \`KeepAlive On\`; **E4** one with \`KeepAlive Off\`; **E5** a command execution error. Is \`when_present\` about the whole Item, the stdout field, or an expected source configuration file? Does the snippet prove anything about the other Apache checks?
+Evaluate: **E1** no command Items; **E2** one command Item with no stdout_line field; **E3** one with `KeepAlive On`; **E4** one with `KeepAlive Off`; **E5** a command execution error. Is `when_present` about the whole Item, the stdout field, or an expected source configuration file? Does the snippet prove anything about the other Apache checks?
 
 ### F. Windows DNS signature-validity bounds
 
-\`\`\`yaml
+```yaml
 all_state_fields_exist: true
 require:
   items: at_least_one
@@ -112,13 +112,13 @@ require:
     and:
       - stdout_line: {greater_than_or_equal: 48}
       - stdout_line: {less_than_or_equal: 168}
-\`\`\`
+```
 
-Evaluate: **F1** \`stdout_line: 24\`; **F2** \`stdout_line: 72\`; **F3** \`stdout_line: 200\`; **F4** absent \`stdout_line\`; **F5** unreadable or incomplete field; **F6** duplicate stdout values \`72\` and \`200\`. Can you infer what the inherited top-level \`all_state_fields_exist\` means and why it sits outside \`require\`? Is a comparison to numeric-looking text fully specified?
+Evaluate: **F1** `stdout_line: 24`; **F2** `stdout_line: 72`; **F3** `stdout_line: 200`; **F4** absent `stdout_line`; **F5** unreadable or incomplete field; **F6** duplicate stdout values `72` and `200`. Can you infer what the inherited top-level `all_state_fields_exist` means and why it sits outside `require`? Is a comparison to numeric-looking text fully specified?
 
 ### G. Final logic for seven named Windows checks
 
-\`\`\`yaml
+```yaml
 evaluate:
   or:
     - and:
@@ -131,7 +131,7 @@ evaluate:
         - test: standalone_computer
         - test: deny_guests
     - test: deny_everyone
-\`\`\`
+```
 
 These are abbreviated *display IDs*, not authoritative source IDs. How many top-level OR alternatives are written? Can more than one alternative be satisfied at the same time? Is this a set of independent alternatives or an ordered if/else? What happens when one leaf is unknown, error, not-applicable, or not collected? Which questions are impossible to answer from the expression alone?
 
@@ -139,7 +139,7 @@ These are abbreviated *display IDs*, not authoritative source IDs. How many top-
 
 # Part 1B — Authorability and deletion test
 
-Without reading outside docs, try to **write one original new Assessment fragment** in the same style: inspect a Windows password policy, require at least one collected Item, require every collected Item's \`min_passwd_len\` field to be at least 14, and identify any field-presence assumption you cannot justify. If you need more structural rules, explicitly say so; do not invent them silently.
+Without reading outside docs, try to **write one original new Assessment fragment** in the same style: inspect a Windows password policy, require at least one collected Item, require every collected Item's `min_passwd_len` field to be at least 14, and identify any field-presence assumption you cannot justify. If you need more structural rules, explicitly say so; do not invent them silently.
 
 Then try to express a more complex new requirement: collect filesystem Items and require **exactly one existing Item** with a specified path, independently of the Item's owner comparison. If the current syntax is insufficient or ambiguous, explain precisely why.
 
@@ -159,13 +159,13 @@ Now—and only now—compare your blind predictions with these **five complete, 
 4. [Apache KeepAlive and MaxKeepAliveRequests](https://github.com/vanderpol/scap-ng/blob/main/research/assessment-simplification/english-first-04/canonical-operators/apache.canonical.research.yaml)
 5. [Windows DNS signatures](https://github.com/vanderpol/scap-ng/blob/main/research/assessment-simplification/english-first-04/canonical-operators/dns.canonical.research.yaml)
 
-These source files use some **different, older research keys**. Do *not* assume a key with a newer English name is semantically equivalent just because the names seem related. Treat \`matching_items\`, \`matching_records\`, \`may_be_absent\`, and \`listed_fields_must_exist\` in the blind excerpts as **unverified proposed rewrites**. Source structural reversibility of older representations is **not** scanner-result parity.
+These source files use some **different, older research keys**. Do *not* assume a key with a newer English name is semantically equivalent just because the names seem related. Treat `matching_items`, `matching_records`, `may_be_absent`, and `listed_fields_must_exist` in the blind excerpts as **unverified proposed rewrites**. Source structural reversibility of older representations is **not** scanner-result parity.
 
 **Technical challenge:**
 
 1. For each proposed rewrite, say whether the original source makes equivalence **proved**, **plausible but unproved**, or **false**. Quote the exact structural path/reference (not large excerpts). Say which six-state or missing-field case would distinguish non-equivalent spellings.
 2. Check whether any excerpt omitted a behavior that would materially mislead an auditor about the **complete** Assessment: collection dependencies/Variables, filter/source type, root-vs-field-vs-record existence, original complete AND/OR tree, inherited presence rules, or error flags.
-3. Check the Windows \`['1','3']\` nested record case against its **whole State grouping**, the root/non-system Linux population distinction, Apache optional stdout versus required Item, and DNS inherited field existence. Do not flatten record States or "simplify" source regex patterns without proving equivalence.
+3. Check the Windows `['1','3']` nested record case against its **whole State grouping**, the root/non-system Linux population distinction, Apache optional stdout versus required Item, and DNS inherited field existence. Do not flatten record States or "simplify" source regex patterns without proving equivalence.
 4. Identify the smallest sufficient counterexample for any rule you think is unsafe, including zero/duplicate Items, missing/absent fields, collection error, unknown, not-applicable, and incomplete data.
 5. Evaluate whether a guided editor could permit **every proposed authoring control to map to exactly one compiler contract**. If not, identify the ambiguous control and what data the editor needs. Distinguish an editor *display label* from the one authoritative YAML schema.
 
