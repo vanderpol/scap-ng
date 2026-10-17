@@ -34,6 +34,66 @@ candidate matches, **not verified source identities**.
 | `multiple_same_author_candidates` | 112 |
 | `single_original_test_id_candidate` | 1249 |
 
+## Original rare Test examples by original author
+
+
+### DISA:all_exist
+
+- \`oval:mil.disa.stig.ind:tst:230345\`: check /etc/security/faillock.conf for the even_deny_root setting; State refs=0, check=all
+- \`oval:mil.disa.stig.ind:tst:23026400\`: Every /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 1.; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23026401\`: No /etc/yum.repos.d/*.repo:[{reponame}] has a gpgcheck set to 0.; State refs=1, check=none satisfy
+- \`oval:mil.disa.stig.ind:tst:23029201\`: There is a separate file system configured for /var.; State refs=0, check=all
+- \`oval:mil.disa.stig.ind:tst:23029401\`: There is a separate file system configured for audit data directory.; State refs=0, check=all
+
+### DISA:any_exist
+
+- \`oval:mil.disa.stig.ind:tst:23030001\`: If /boot is configured in /etc/fstab, it is configured with the nosuid option; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23030101\`: Device files are configured in /etc/fstab to use the nodev option.  Mounts on '/' are ignored.; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23030600\`: all nfs entries in /etc/fstab have noexec; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23031301\`: If core is set for any specific domains, it is set to 0.; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23034601\`: limits.conf and limits.d/*.conf:maxlogins is set to 10 or less for non-default domains; State refs=1, check=all
+
+### DISA:only_one_exists
+
+- \`oval:mil.disa.stig.ind:tst:23023700\`: /etc/pam.d/password-auth:password includes pam_unix.so sha512; State refs=0, check=all
+- \`oval:mil.disa.stig.ind:tst:23024000\`: selinux is enforcing; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23024001\`: /etc/selinux/config:SELINUX=enforcing; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:27401400\`: Defaults timestamp_timeout is configured to 0 in /etc/sudoers or /etc/sudoers.d.; State refs=1, check=all
+- \`oval:mil.disa.stig.ind:tst:23023700\`: /etc/pam.d/password-auth:password includes pam_unix.so sha512; State refs=0, check=all
+
+### NIWC/NAVWAR:all_exist
+
+- \`oval:navy.navwar.niwcatlantic.scc.almalinux9:tst:301\`: The os-release file has CPE_NAME of almalinux:almalinux:9; State refs=1, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.rocky9:tst:201\`: The os-release file has CPE_NAME of rocky:rocky:9; State refs=1, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.linux:tst:102\`: The gnome-session package is installed. (DEB); State refs=0, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.linux:tst:102\`: The gnome-session package is installed. (DEB); State refs=0, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.windows:tst:25329301\`: The system must notify the user when a Bluetooth device attempts to connect.; State refs=1, check=all
+
+### NIWC/NAVWAR:any_exist
+
+- \`oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824103\`: Verify no SHA1 algorithms are employed.; State refs=1, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.rhel9os:tst:25824104\`: Verify minimum hash values of 224.; State refs=1, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401\`: Confirm interactive user's home directories exist.; State refs=1, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.windows:tst:25347601\`: Password Age Check: Verify all enabled local Administrator accounts passwords are less than 60 days old; State refs=1, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.windows:tst:27800403\`: Windows Domain Controller - Accounts must require passwords.; State refs=1, check=all
+
+### NIWC/NAVWAR:only_one_exists
+
+- \`oval:navy.navwar.niwcatlantic.scc.linux:tst:25777901\`: The system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon.; State refs=0, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.linux:tst:27145501\`: The system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon.; State refs=0, check=all
+- \`oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601\`: Review Installed OS via PowerShell; State refs=1, check=only one
+- \`oval:navy.navwar.niwcatlantic.scc.windows:tst:25329601\`: Review the Windows time service configuration via PowerShell; State refs=1, check=only one
+
+## Candidate origin of the 201 selected native all_exist Tests
+
+The test title + existence mode yields exactly one original source Test ID
+for the cases below, but **that is not an explicit converter lineage ID**.
+
+| Candidate original author | Native Tests |
+| --- | ---: |
+| DISA | 198 |
+| NIWC/NAVWAR | 3 |
+
 ## Source attribution for 201 native all_exist cases
 
 The JSON contains each native Test with **source-ID candidates**, not proven
