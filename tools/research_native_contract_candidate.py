@@ -179,10 +179,10 @@ def compile_check(node,path="require",scope=None,current_fields=None,current_typ
     minimum=node.get("minimum_resources",0)
     if type(minimum)!=int or minimum<0:
         fail(path,"minimum_resources must be a nonnegative integer")
-    if mode!="each" and "minimum_resources" in node:
-        fail(path,"minimum_resources belongs only to each")
     if mode=="exists" and (set(node)&{"must","minimum_resources","as"}):
         fail(path,"exists means selected-resource existence only; no must/minimum_resources/as allowed")
+    if mode!="each" and "minimum_resources" in node:
+        fail(path,"minimum_resources belongs only to each")
     alias=node.get("as")
     if alias is not None and (mode=="none" or not isinstance(alias,str) or
                             not NAME.fullmatch(alias) or alias in scope):
