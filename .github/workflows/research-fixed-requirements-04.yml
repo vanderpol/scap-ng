@@ -6,6 +6,7 @@ on:
       - tools/research_english_first_04_fixed_requirement_census.py
       - tools/research_04_all_exist_intent_census.py
       - tools/research_04_all_exist_native_semantics.py
+      - tools/research_04_item_creation_census.py
   workflow_dispatch:
 
 permissions:
@@ -47,6 +48,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --json all-exist-native-equivalence.json \
             --markdown all-exist-native-equivalence.md
+      - name: Identify actual Item-creation modes in all 201 source Tests
+        run: |
+          python tools/research_04_item_creation_census.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --json all-exist-item-creation.json \
+            --markdown all-exist-item-creation.md
       - name: Publish stable GitHub.com results on main
         if: github.ref == 'refs/heads/main'
         env:
@@ -66,7 +73,8 @@ jobs:
           folder = "research/assessment-simplification/english-first-04/reports"
           for name in ("fixed-requirements-six-stig.json", "fixed-requirements-six-stig.md",
                        "all-exist-source-forensics.json", "all-exist-source-forensics.md",
-                       "all-exist-native-equivalence.json", "all-exist-native-equivalence.md"):
+                       "all-exist-native-equivalence.json", "all-exist-native-equivalence.md",
+                       "all-exist-item-creation.json", "all-exist-item-creation.md"):
               target = folder + "/" + name
               read = subprocess.run(["gh","api",f"repos/{repo}/contents/{target}",
                                      "--jq",".sha"],capture_output=True,text=True)
@@ -94,4 +102,6 @@ jobs:
             all-exist-source-forensics.md
             all-exist-native-equivalence.json
             all-exist-native-equivalence.md
+            all-exist-item-creation.json
+            all-exist-item-creation.md
           if-no-files-found: warn
