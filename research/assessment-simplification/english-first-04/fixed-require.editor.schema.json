@@ -36,7 +36,7 @@
   },
   "$defs": {
     "condition": {
-      "description": "A State predicate or explicit complete-State alternatives. Use and/or rather than aliases any_of/all_of.",
+      "description": "Single field predicate, or an explicit scope: fields/states plus and/or. Prevents implicit scope changes.",
       "oneOf": [
         {
           "$ref": "#/$defs/stateNode"
@@ -484,49 +484,59 @@
       ]
     },
     "stateNode": {
-      "description": "One State predicate: a single capability field, or logical AND/OR of predicates sharing this State scope.",
+      "description": "One State: single field/record comparison or a field-scope logical group.",
       "oneOf": [
         {
           "type": "object",
           "required": [
+            "scope",
             "and"
           ],
           "additionalProperties": false,
           "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "Interpret logical predicates at fields scope, not as a different scope."
+            },
             "and": {
               "type": "array",
               "minItems": 1,
               "items": {
                 "$ref": "#/$defs/stateNode"
-              },
-              "description": "AND combines predicates *within the same State*; it does not combine independent whole States."
+              }
             },
             "all_fields_must_exist": {
               "const": true,
-              "description": "A present explicit State-field existence requirement, never a hidden default."
+              "description": "Explicit field-existence policy; may not be omitted during source conversion."
             }
-          }
+          },
+          "description": "AND/OR of predicates inside one State."
         },
         {
           "type": "object",
           "required": [
+            "scope",
             "or"
           ],
           "additionalProperties": false,
           "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "Interpret logical predicates at fields scope, not as a different scope."
+            },
             "or": {
               "type": "array",
               "minItems": 1,
               "items": {
                 "$ref": "#/$defs/stateNode"
-              },
-              "description": "OR combines predicates *within the same State*; it does not combine independent whole States."
+              }
             },
             "all_fields_must_exist": {
               "const": true,
-              "description": "A present explicit State-field existence requirement, never a hidden default."
+              "description": "Explicit field-existence policy; may not be omitted during source conversion."
             }
-          }
+          },
+          "description": "AND/OR of predicates inside one State."
         },
         {
           "type": "object",
@@ -535,12 +545,13 @@
           "propertyNames": {
             "not": {
               "enum": [
+                "scope",
                 "and",
                 "or",
                 "states",
+                "all_of",
                 "any_of",
                 "all_states",
-                "all_of",
                 "any_of_fields",
                 "all_fields_must_exist"
               ]
@@ -550,57 +561,58 @@
             "type": "object",
             "minProperties": 1
           },
-          "description": "One named Item field (or record), with a nonempty typed comparison."
+          "description": "Single named field or record predicate; no scope keyword needed."
         }
       ]
     },
     "wholeStateAlternatives": {
-      "description": "Use states only when combining alternative complete States; this prevents accidental per-record merges.",
-      "type": "object",
-      "required": [
-        "states"
-      ],
-      "additionalProperties": false,
-      "properties": {
-        "states": {
-          "oneOf": [
-            {
-              "type": "object",
-              "required": [
-                "and"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "and": {
-                  "type": "array",
-                  "minItems": 2,
-                  "items": {
-                    "$ref": "#/$defs/stateNode"
-                  },
-                  "description": "Use OVAL-compatible AND to combine complete States"
-                }
-              }
+      "description": "Combines complete States, NEVER per-record membership; scope is mandatory.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "Interpret logical predicates at states scope, not as a different scope."
             },
-            {
-              "type": "object",
-              "required": [
-                "or"
-              ],
-              "additionalProperties": false,
-              "properties": {
-                "or": {
-                  "type": "array",
-                  "minItems": 2,
-                  "items": {
-                    "$ref": "#/$defs/stateNode"
-                  },
-                  "description": "Use OVAL-compatible OR to combine complete States"
-                }
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/stateNode"
               }
             }
-          ]
+          },
+          "description": "AND/OR of complete alternative States. Each child evaluates all its own record/field requirements first."
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "Interpret logical predicates at states scope, not as a different scope."
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              }
+            }
+          },
+          "description": "AND/OR of complete alternative States. Each child evaluates all its own record/field requirements first."
         }
-      }
+      ]
     }
   }
 }
