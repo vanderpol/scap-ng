@@ -1,0 +1,77 @@
+name: Fixed requirement vocabulary census (#235)
+on:
+  push:
+    paths:
+      - .github/workflows/research-fixed-requirements-04.yml
+      - tools/research_english_first_04_fixed_requirement_census.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  six-stig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install parser
+        run: python -m pip install 'PyYAML==6.0.3'
+      - name: Fetch pinned r3 content archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --dir work
+      - name: Classify every Test and explicitly annotated State/record requirement
+        run: |
+          python tools/research_english_first_04_fixed_requirement_census.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --json fixed-requirements-six-stig.json \
+            --markdown fixed-requirements-six-stig.md
+      - name: Publish stable GitHub.com results on main
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64, json, os, subprocess
+          repo = os.environ["GITHUB_REPOSITORY"]
+          if repo != "vanderpol/scap-ng":
+              raise RuntimeError("Unexpected repository")
+          current = subprocess.run(
+              ["gh", "api", f"repos/{repo}/commits/main", "--jq", ".sha"],
+              text=True, capture_output=True, check=True).stdout.strip()
+          if current != os.environ["GITHUB_SHA"]:
+              print("Newer main revision detected: skip stale publication")
+              raise SystemExit(0)
+          folder = "research/assessment-simplification/english-first-04/reports"
+          for name in ("fixed-requirements-six-stig.json", "fixed-requirements-six-stig.md"):
+              target = folder + "/" + name
+              read = subprocess.run(["gh","api",f"repos/{repo}/contents/{target}",
+                                     "--jq",".sha"],capture_output=True,text=True)
+              if read.returncode not in (0, 1):
+                  raise RuntimeError("Cannot read remote destination "+target)
+              content = open(name, "rb").read()
+              doc = {"branch":"main",
+                     "message":"research(#235): publish fixed-requirement six-STIG coverage",
+                     "content":base64.b64encode(content).decode("ascii")}
+              if read.returncode == 0:
+                  doc["sha"] = read.stdout.strip()
+              subprocess.run(["gh","api","--method","PUT",
+                              f"repos/{repo}/contents/{target}","--input","-"],
+                             input=json.dumps(doc),text=True,check=True)
+          PY
+      - name: Preserve complete machine-readable evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fixed-requirements-six-stig-research
+          path: |
+            fixed-requirements-six-stig.json
+            fixed-requirements-six-stig.md
+          if-no-files-found: warn
