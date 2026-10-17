@@ -15,6 +15,24 @@ import yaml
 
 from oval_result_truth_tables import aggregate_existence
 from research_english_first_04_compact_layout import PINNED
+from research_english_first_04_complex import ITEM_REQS,STATELESS_PRESENCE
+
+PAIRED_EXIST={
+    "at_least_one_item_exists":"at_least_one_exists",
+    "items_may_be_absent":"any_exist",
+    "all_collected_items_exist":"all_exist",
+    "exactly_one_item_exists":"only_one_exists",
+}
+SOURCE_MODE={
+    **{original:PAIRED_EXIST[pair[0]] for original,pair in ITEM_REQS.items()},
+    **{original:({
+        "at_least_one":"at_least_one_exists",
+        "exactly_one":"only_one_exists",
+        "none":"none_exist",
+        "all_exist":"all_exist",
+        "may_be_absent":"any_exist",
+    }[name]) for original,name in STATELESS_PRESENCE.items()},
+}
 
 MODES=("at_least_one_exists","none_exist","all_exist","any_exist","only_one_exists")
 EXAMPLES_PER_MODE=7
@@ -64,9 +82,10 @@ def audit(archive):
             if ass.get("mode")!="automated" or not ass.get("tests"):continue
             unique_assessments+=1
             for name,test in ass["tests"].items():
-                mode=test.get("collected_items_require")
+                native_mode=test.get("collected_items_require")
+                mode=SOURCE_MODE.get(native_mode)
                 if mode not in MODES:
-                    raise ValueError("unrecognized Test existence mode "+repr((path,name,mode)))
+                    raise ValueError("unrecognized Test existence mode "+repr((path,name,native_mode)))
                 cap=test.get("capability","(missing capability)")
                 test_has_state=bool(test.get("states"))
                 modes[mode]+=1
