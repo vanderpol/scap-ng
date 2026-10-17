@@ -69,8 +69,8 @@ def from_minimal(node):
         return [from_minimal(item) for item in node]
     if not isinstance(node,dict):
         return deepcopy(node)
-    if "inspect" in node or "where" in node:
-        raise ValueError("hybrid cannot contain inspect or where")
+    if "inspect" in node or ("where" in node and "capability" in node):
+        raise ValueError("hybrid cannot combine capability with unconverted where or inspect")
     out={}
     for key,value in node.items():
         if key!="capability":
