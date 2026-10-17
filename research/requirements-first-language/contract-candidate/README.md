@@ -2,6 +2,8 @@
 
 **17 October 2026 · experimental · issue #235.** [Go/no-go and fallback decision](../GO-NO-GO-ARCHITECTURE-2026-10-17.md).
 
+**[First source-backed native pilot report](FIRST-SOURCE-BACKED-NATIVE-PILOT.md):** Two real six-stream source Assessment **shapes** now have actual B native fixtures: /var/tmp filesystem existence and Chrony cmdport 0 text-file regex evidence. [The text-file collector](../../../tools/research_provider_textfile_matches.py) uses bounded read-only UTF-8 Python regex and retains statuses/instances, but original OVAL `textfilecontent54` parity remains unverified. The full six-stream corpus is NOT converted or executable B content.
+
 **Six-stream B engineering now has a [complete source-accounting ledger](corpus/source-accounting.md), [per-capability feature inventory](corpus/feature-inventory.md), and [12 bounded source-backed specimens](corpus/source-specimens/README.md)** spanning high-volume file-text, Windows registry/user rights/WMI, shellcommand and Linux partition cases. These specimens come from the published 0.3 converted authoring ZIP and are *not* original SCAP 1.4 XML or executable native B. The ninth native rule (`exists: linux.mounts`) comes directly from the /var/tmp linux.partition source structure; it is a native policy candidate, not proven OVAL collection parity.
 
 This is NOT normative SCAP-NG 0.4. It is a small runnable demonstration that a human-readable typed resource plus collection language can compile to ONE internal requirement AST. The [compiler](../../../tools/research_native_contract_candidate.py), [fixture evaluator](../../../tools/research_native_contract_evaluator.py), and [deterministic auditor explanation generator](../../../tools/research_native_auditor_explain.py) all consume the same authored structure. The real provider set remains incomplete, and no source SCAP 1.4 parity has been verified.
@@ -17,6 +19,7 @@ This is NOT normative SCAP-NG 0.4. It is a small runnable demonstration that a h
 | Root-derived Linux init files: combined set and permitted octal bits | [YAML](examples/07-linux-permission-bits.yaml) | [Explanation](generated-explanations/07-linux-permission-bits.md) |
 | Per-zone DNSSEC signature validity with two required key kinds | [YAML](examples/08-dns-signing-nested.yaml) | [Explanation](generated-explanations/08-dns-signing-nested.md) |
 | Filesystem must exist at /var/tmp — pure existence from a real source specimen | [YAML](examples/09-linux-var-tmp-exists.yaml) | [Explanation](generated-explanations/09-linux-var-tmp-exists.md) |
+| Chrony configuration must contain an explicit cmdport 0 line — native file-regex evidence | [YAML](examples/10-linux-chrony-cmdport.yaml) | [Explanation](generated-explanations/10-linux-chrony-cmdport.md) |
 
 A narrow [compiler-owned source compatibility IR bridge](../../../tools/test_research_common_ir_bridge.py) also runs through the same evaluator dispatcher. It specifically retains four independent Apache OVAL Test existence checks as separate internal nodes and demonstrates that a fluent native two-setting check can Pass when one source compatibility Test necessarily Fails. **This is only a Test-level truth-table bridge, not source conversion, State/Variable execution or an actual scanner.**
 
