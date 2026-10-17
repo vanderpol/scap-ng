@@ -133,7 +133,7 @@ evaluate:
     - test: deny_everyone
 \`\`\`
 
-These are abbreviated *display IDs*, not authoritative source IDs. How many distinct combinations can satisfy the overall expression? Is this a set of independent alternatives or an ordered if/else? What happens when one leaf is unknown, error, not-applicable, or not collected? Which questions are impossible to answer from the expression alone?
+These are abbreviated *display IDs*, not authoritative source IDs. How many top-level OR alternatives are written? Can more than one alternative be satisfied at the same time? Is this a set of independent alternatives or an ordered if/else? What happens when one leaf is unknown, error, not-applicable, or not collected? Which questions are impossible to answer from the expression alone?
 
 ---
 
