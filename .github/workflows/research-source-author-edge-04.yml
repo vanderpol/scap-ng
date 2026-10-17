@@ -1,0 +1,93 @@
+name: Original DISA-NAVWAR edge provenance census (#235)
+
+on:
+  push:
+    paths:
+      - .github/workflows/research-source-author-edge-04.yml
+      - tools/research_04_source_author_edge_census.py
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  source-six:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current SCAP-NG
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+          persist-credentials: false
+      - name: Checkout exactly six pinned NIWC source ZIPs
+        uses: actions/checkout@v4
+        with:
+          repository: niwc-atlantic/scap-content-library
+          ref: 8c8e5dff860af6b1290ee9273a282db24278f8d5
+          path: niwc
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+            Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip
+            Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip
+            Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip
+            Current/U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip
+            Current/U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip
+      - name: Install YAML parser
+        run: python -m pip install 'PyYAML==6.0.3'
+      - name: Fetch pinned six-STIG authoring release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern scap-ng-v0.4-joval-six-stig-yaml.zip --dir work
+      - name: Original ID source census and candidate provenance linkage
+        run: |
+          python scap-ng/tools/research_04_source_author_edge_census.py \
+            --sources niwc/Current \
+            --native work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --json source-oval-author-edge-census.json \
+            --markdown source-oval-author-edge-census.md
+      - name: Publish human-readable report and machine evidence to GitHub.com
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64, json, os, subprocess
+          repo = os.environ["GITHUB_REPOSITORY"]
+          if repo != "vanderpol/scap-ng":
+              raise RuntimeError("Unexpected repo for research publish")
+          current = subprocess.run(["gh","api",f"repos/{repo}/commits/main","--jq",".sha"],
+                                    capture_output=True,text=True,check=True).stdout.strip()
+          if current != os.environ["GITHUB_SHA"]:
+              print("Main advanced during research, skip stale publication.")
+              raise SystemExit(0)
+          for name in ("source-oval-author-edge-census.md",
+                       "source-oval-author-edge-census.json"):
+              path = "research/assessment-simplification/english-first-04/reports/"+name
+              read = subprocess.run(["gh","api",f"repos/{repo}/contents/{path}",
+                                     "--jq",".sha"],capture_output=True,text=True)
+              if read.returncode not in (0,1):
+                  raise RuntimeError("Remote content read failed")
+              doc = {
+                  "branch":"main",
+                  "message":"research(#235): publish original OVAL author rare-feature six-STIG census",
+                  "content":base64.b64encode(open(name,"rb").read()).decode("ascii"),
+              }
+              if read.returncode == 0:doc["sha"]=read.stdout.strip()
+              subprocess.run(["gh","api","--method","PUT",f"repos/{repo}/contents/{path}",
+                              "--input","-"],input=json.dumps(doc),text=True,check=True)
+          PY
+      - name: Preserve reproducible result evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-oval-author-edges
+          path: |
+            source-oval-author-edge-census.md
+            source-oval-author-edge-census.json
+          if-no-files-found: warn
