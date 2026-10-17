@@ -1,0 +1,128 @@
+# EXPERIMENTAL 0.4: not normative SCAP-NG; source exact if admitted.
+# Editor JSON Schema: fixed-require.editor.schema.json
+metadata:
+  id: SV-253495.automated
+  version: 2
+  assessment_title: WN11-UR-000090 - The "Deny log on through Remote Desktop Services" user right on Windows
+    11 workstations must be configured to prevent access from highly privileged domain accounts and local
+    accounts on domain systems and unauthenticated access on all systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+sources:
+  windows-wmi57-object:
+    inspect: windows.wmi.query
+    description: null
+    collect:
+      namespace: root\cimv2
+      query: SELECT DomainRole FROM win32_computersystem
+  windows-userright-object:
+    inspect: windows.userright
+    description: null
+    where:
+      userright:
+        equals: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+checks:
+  system-non-dc-domain-joined-windows-server-or-workstation-test:
+    check: The system is a non-DC domain-joined Windows server or workstation
+    inspect: windows.wmi.query
+    from: windows-wmi57-object
+    require:
+      items: at_least_one_all_match
+      condition:
+        any_of:
+        - result:
+            at_least_one_record_exists: true
+            every_record:
+              domainrole:
+                is: '1'
+        - result:
+            at_least_one_record_exists: true
+            every_record:
+              domainrole:
+                is: '3'
+    report_elements: all
+  deny-log-on-through-remote-desktop-services-local-account-test:
+    check: Deny log on through Remote Desktop Services - Local account
+    inspect: windows.userright
+    from: windows-userright-object
+    require:
+      items: at_least_one_some_match
+      condition:
+        trustee_name:
+          matches_regex: ^(?i)(NT Authority\\)?Local account$
+    report_elements: all
+  deny-log-on-through-remote-desktop-services-guests-test:
+    check: Deny log on through Remote Desktop Services - Guests
+    inspect: windows.userright
+    from: windows-userright-object
+    require:
+      items: at_least_one_some_match
+      condition:
+        trustee_name:
+          equals_ignoring_case: Guests
+    report_elements: all
+  deny-log-on-through-remote-desktop-services-domain-admins-test:
+    check: Deny log on through Remote Desktop Services - Domain Admins
+    inspect: windows.userright
+    from: windows-userright-object
+    require:
+      items: at_least_one_some_match
+      condition:
+        trustee_name:
+          matches_regex: ^(?i)(.+\\)?Domain Admins$
+    report_elements: all
+  deny-log-on-through-remote-desktop-services-enterprise-admins-test:
+    check: Deny log on through Remote Desktop Services - Enterprise Admins
+    inspect: windows.userright
+    from: windows-userright-object
+    require:
+      items: at_least_one_some_match
+      condition:
+        trustee_name:
+          matches_regex: ^(?i)(.+\\)?Enterprise Admins$
+    report_elements: all
+  system-standalone-windows-server-or-workstation-test:
+    check: The system is a standalone Windows server or workstation
+    inspect: windows.wmi.query
+    from: windows-wmi57-object
+    require:
+      items: at_least_one_all_match
+      condition:
+        any_of:
+        - result:
+            at_least_one_record_exists: true
+            every_record:
+              domainrole:
+                is: '0'
+        - result:
+            at_least_one_record_exists: true
+            every_record:
+              domainrole:
+                is: '2'
+    report_elements: all
+  deny-log-on-through-remote-desktop-services-everyone-test:
+    check: Deny log on through Remote Desktop Services - Everyone
+    inspect: windows.userright
+    from: windows-userright-object
+    require:
+      items: at_least_one_some_match
+      condition:
+        trustee_name:
+          equals_ignoring_case: Everyone
+    report_elements: all
+evaluate:
+  any_of:
+  - all_of:
+    - test: system-non-dc-domain-joined-windows-server-or-workstation-test
+    - test: deny-log-on-through-remote-desktop-services-local-account-test
+    - test: deny-log-on-through-remote-desktop-services-guests-test
+    - test: deny-log-on-through-remote-desktop-services-domain-admins-test
+    - test: deny-log-on-through-remote-desktop-services-enterprise-admins-test
+  - all_of:
+    - test: system-standalone-windows-server-or-workstation-test
+    - test: deny-log-on-through-remote-desktop-services-guests-test
+  - test: deny-log-on-through-remote-desktop-services-everyone-test
