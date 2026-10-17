@@ -14,6 +14,7 @@ BASE = "research/assessment-simplification/english-first-04/reports"
 REPORTS = {
     "english-first-04-reference-graph-report.json": "Named source and variable reference graph",
     "english-first-04-compact-layout-report.json": "Compact authoring layout",
+    "english-first-04-auditor-candidate.json": "Auditor-first requirement language candidate",
     "english-first-04-full-assessment-census.json": "Full Assessment source inversion",
     "english-first-04-six-state-cardinality.json": "Six-state cardinality comparison",
     "english-first-04-none-exist-state-boundary.json": "Unresolved none_exist State boundary",
@@ -137,6 +138,23 @@ def publish():
             raise ValueError("Unexpected generated sample format: " + str(source))
         git_api(repo, EXAMPLES_DIR + "/" + label + ".research.yaml", value, run)
     print("Published four full proposed versions on github.com")
+    # Publish FIVE complete full source Assessments in the verified
+    # auditor-first candidate. This is the same executable research grammar,
+    # not a prose facade or a claimed scanner-conformance result.
+    candidate_examples = Path("english-first-04-auditor-examples")
+    candidate_folder = "research/assessment-simplification/english-first-04/auditor-candidate"
+    for label in ("linux-home", "linux-files", "windows-wmi-rights", "dns", "apache"):
+        source = candidate_examples / (label + ".auditor.research.yaml")
+        if not source.is_file():
+            raise FileNotFoundError("Missing auditor candidate " + str(source))
+        candidate = source.read_text(encoding="utf-8")
+        if not candidate.startswith("# Research-only candidate:"):
+            raise ValueError("Incorrectly labeled auditor file " + label)
+        git_api(repo, candidate_folder + "/" + label + ".auditor.research.yaml",
+                candidate, run)
+    print("Published five complete auditor-first candidate Assessments on github.com")
+
+
 
     index = [
         "# Six-STIG research reports (accessible through github.com)",
