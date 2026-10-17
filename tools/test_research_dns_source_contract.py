@@ -99,6 +99,30 @@ class DnsSourceContractTests(unittest.TestCase):
         # This is only a structural counterexample, NOT evidence real
         # PowerShell invokes a zero-Item status in the particular scenario.
 
+    def test_reverse_zones_but_zero_forward_zones_exposes_new_minimum_bug(self):
+        # Hypothetical *complete* shell Item evidence. The original source
+        # caching-only path returns nonempty because reverse zone exists.
+        # But "forward zones NOT AD integrated" command returns no stdout
+        # values; the original second Test accepts that field state when its
+        # required command Item exists. Old native sample required one forward
+        # zone, despite source calling the branch "if any".
+        original_cache_only=False
+        original_bad_forward_output=[]  # one command Item, zero stdout values
+        original_ad_branch=(len(original_bad_forward_output)==0)
+        self.assertFalse(original_cache_only)
+        self.assertTrue(original_ad_branch)
+        native=yaml.safe_load((ROOT/
+           "research/requirements-first-language/examples/06-windows-dns.yaml").read_text())
+        ad_branch=native["require"]["any"][1]
+        self.assertEqual(ad_branch["every"],"windows.dns.zones")
+        self.assertEqual(ad_branch["if_empty"],"fail")
+        self.assertEqual(ad_branch["where"]["direction"],{"equals":"forward"})
+        self.assertEqual(ad_branch["must"]["directory_integration"],
+                         {"equals":"active_directory"})
+        # Thus zero forward selected Items -> Fail under this old native
+        # candidate even when the source's positive Item exists with no
+        # violating forward-zone name. Not a full OVAL runtime proof.
+
     def test_one_of_48_to_168_cannot_assume_numeric_coercion_or_field_cardinality(self):
         # A scalar between shorthand drops the source two distinct
         # whole-State comparisons and repeated stdout entity semantics.
