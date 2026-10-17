@@ -45,6 +45,14 @@ class LinuxInitializationSourceConstraintTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,"four-digit octal STRING"):
                     only_these_bits(0o600,value)
 
+    def test_gemini_ssh_mode_0400_is_subset_of_0600(self):
+        from research_linux_init_permissions import only_these_bits
+        self.assertTrue(only_these_bits(0o400,"0600"))
+        self.assertTrue(only_these_bits(0o600,"0600"))
+        self.assertFalse(only_these_bits(0o640,"0600"))
+        self.assertFalse(only_these_bits(0o644,"0600"))
+        # Owner UID and other SSH config policies remain independent.
+
     def test_numeric_less_than_0740_is_NOT_permission_subsetting(self):
         self.assertLessEqual(0o644,0o740)
         self.assertFalse(mode_complies(0o644)) # other_read is prohibited
