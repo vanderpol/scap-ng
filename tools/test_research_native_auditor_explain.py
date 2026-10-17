@@ -19,9 +19,9 @@ class NativeAuditorExplanationTests(unittest.TestCase):
     def test_chrony_regex_existence_is_human_readable(self):
         text=render(read(EXAMPLES/"10-linux-chrony-cmdport.yaml"))
         self.assertIn("At least one",text)
-        self.assertIn("linux.textfile_matches",text)
+        self.assertIn("matching passage must exist in /etc/chrony.conf",text)
         self.assertIn("path=/etc/chrony.conf",text)
-        self.assertIn("must exist.",text)
+        self.assertIn("pattern=^[",text)
 
     def test_filesystem_existence_only_has_no_redundant_property(self):
         explanation=render(read(EXAMPLES/"09-linux-var-tmp-exists.yaml"))
