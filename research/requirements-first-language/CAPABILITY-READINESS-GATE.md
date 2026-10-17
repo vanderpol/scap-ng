@@ -12,6 +12,8 @@ No weighted authorability/readability scoring or selecting a winner before the g
 
 **First verified corpus engineering milestone:** The [six-STIG source-accounting CI](https://github.com/vanderpol/scap-ng/actions/workflows/research-b-six-stig-source-import.yml) has already processed the published 0.3 six-stream authoring ZIP. The B-only [feature census](contract-candidate/corpus/feature-inventory.md) confirms which Test capability families actually dominate each platform, rather than assuming sample Assessments are representative. No native conversion/evaluation parity is claimed. Raw SCAP 1.4 XML import still needs its own gate.
 
+**First executable native source-shape pilots (not parity):** [Linux /var/tmp must exist and Chrony cmdport 0](contract-candidate/FIRST-SOURCE-BACKED-NATIVE-PILOT.md) now use native requirements backed by exact source Assessment specimens from the six-stream 0.3 authoring cohort. A bounded read-only textfile regex collector is tested with actual temporary files, explicit observed Items and incomplete/error status. These remain examples of B-native *policy shapes*, not verified OVAL Test/State/Object conversion. Structural coverage is six streams; executable source-equivalence coverage remains unproved.
+
 ## Capability criteria for B
 
 | Area | Comparable-capability readiness criterion | Current B evidence / gap |
