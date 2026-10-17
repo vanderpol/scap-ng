@@ -39,6 +39,15 @@ PROVIDERS={
                                     set(["account_filter","filename","max_depth","follow_symlinks"])),
 }
 OPS={"equals","contains","at_least","between","only_these_bits","matches_regex"}
+# Strict, known parent-child links: no invisible join, no implicit completeness.
+RELATIONS={
+  "windows.dns.zones":{
+    "zone_signing_keys":{"owner":"zone_id",
+                         "fields":{"zone_id","validity_hours","kind"}},
+    "key_signing_keys":{"owner":"zone_id",
+                        "fields":{"zone_id","validity_hours","kind"}},
+  }
+}
 QUANTIFIERS={"each","some","none","exactly_one"}
 GROUPS={"all","any"}
 REGEX=re.compile(r"^\$([a-z][a-z0-9_]*)\.([a-z_][a-z0-9_]*)$")
@@ -82,7 +91,7 @@ def check_predicates(raw,known,path,scope):
             found=REGEX.fullmatch(expected)
             if not found:fail(path+"."+field,"references must be whole lexical path")
             alias,ref=found.groups()
-            if alias not in scope or ref not in scope[alias]:
+            if alias not in scope or ref not in scope[alias]["fields"]:
                 fail(path+"."+field,"unbound/unknown parent field reference")
         result.append({"field":field,"operator":op,"value":expected})
     return result
@@ -99,9 +108,15 @@ def check_using(raw,allowed,path):
     # claiming interpolated source expressions outside lexical bound captures.
     return raw
 
-def compile_check(node,path="require",scope=None):
+def compile_check(node,path="require",scope=None,current_fields=None):
     scope=scope or {}
     if not isinstance(node,dict) or not node:fail(path,"requirement must be mapping")
+    # Field assertions inside an Item-scope composite are not separate
+    # Objects or States; they use the current typed resource fields.
+    if set(node)=={"fields"}:
+        if current_fields is None:fail(path,"fields requires current selected Item scope")
+        return {"kind":"fields","predicates":check_predicates(
+            node["fields"],current_fields,path+".fields",scope)}
     groups=set(node)&GROUPS
     modes=set(node)&QUANTIFIERS
     named="resource" in node
@@ -114,7 +129,7 @@ def compile_check(node,path="require",scope=None):
         if not isinstance(items,list) or len(items)<2:
             fail(path,"Boolean group requires at least two requirements")
         return {"kind":"logic","operator":mode,"children":[
-            compile_check(c,path+"."+mode+"["+str(i)+"]",scope) for i,c in enumerate(items)]}
+            compile_check(c,path+"."+mode+"["+str(i)+"]",scope,current_fields) for i,c in enumerate(items)]}
     if named:
         if set(node)-{"resource","using","must"}:
             fail(path,"named resources support only resource, using, must")
@@ -131,9 +146,26 @@ def compile_check(node,path="require",scope=None):
     if set(node)-{mode,"where","must","minimum_resources","using","as"}:
         fail(path,"unsupported population properties")
     provider=node[mode]
-    if provider not in PROVIDERS:fail(path,"unknown population resource "+str(provider))
-    selectable,fields,unique,parameters=PROVIDERS[provider]
-    if unique:fail(path,"singleton provider requires named resource form")
+    parent_ref=None
+    owner_field=None
+    if isinstance(provider,str) and provider.startswith("$"):
+        found=REGEX.fullmatch(provider)
+        if not found:fail(path,"nested resource must be whole lexical parent.field reference")
+        alias,relation=found.groups()
+        if alias not in scope:fail(path,"unbound parent alias "+alias)
+        parent_provider=scope[alias]["provider"]
+        contract=RELATIONS.get(parent_provider,{}).get(relation)
+        if contract is None:fail(path,"undeclared typed child relation "+provider)
+        selectable=contract["fields"]
+        fields=selectable
+        unique=False
+        parameters=set()
+        parent_ref={"alias":alias,"relation":relation}
+        owner_field=contract["owner"]
+    else:
+        if provider not in PROVIDERS:fail(path,"unknown population resource "+str(provider))
+        selectable,fields,unique,parameters=PROVIDERS[provider]
+        if unique:fail(path,"singleton provider requires named resource form")
     using=check_using(node.get("using",{}),parameters,path+".using")
     raw_where=node.get("where")
     selection=check_predicates(raw_where,selectable,path+".where",scope) if raw_where else []
@@ -142,21 +174,31 @@ def compile_check(node,path="require",scope=None):
         fail(path,"minimum_resources must be a nonnegative integer")
     if mode!="each" and "minimum_resources" in node:
         fail(path,"minimum_resources belongs only to each")
+    alias=node.get("as")
+    if alias is not None and (mode=="none" or not isinstance(alias,str) or
+                            not NAME.fullmatch(alias) or alias in scope):
+        fail(path,"invalid lexical alias")
+    local_scope=dict(scope)
+    if alias is not None:
+        if parent_ref is not None:
+            fail(path,"a child Item alias requires a declared provider relation contract")
+        local_scope[alias]={"provider":provider,"fields":fields}
+    nested=None
     if mode=="none":
         if "must" in node:fail(path,"none counts selected resources; where is the prohibited predicate")
         compare=[]
     else:
-        compare=check_predicates(node.get("must"),fields,path+".must",scope)
-    alias=node.get("as")
-    if alias is not None:
-        if mode=="none" or not isinstance(alias,str) or not NAME.fullmatch(alias) or alias in scope:
-            fail(path,"invalid lexical alias")
-        # In v0 we refuse nested resource queries under a field predicate.
-        # The next compiler pass must test actual parent-child correlation.
-        fail(path,"as is reserved; nested population lowering not yet proven")
+        raw_must=node.get("must")
+        if isinstance(raw_must,dict) and (
+           set(raw_must)&(GROUPS|QUANTIFIERS|{"resource","fields"})):
+            nested=compile_check(raw_must,path+".must",local_scope,fields)
+            compare=[]
+        else:
+            compare=check_predicates(raw_must,fields,path+".must",local_scope)
     return {"kind":"collection","provider":provider,"mode":mode,
             "min_count":minimum,"singleton":False,"using":using,
-            "where":selection,"predicates":compare,"as":None}
+            "where":selection,"predicates":compare,"as":alias,
+            "nested":nested,"parent_ref":parent_ref,"owner_field":owner_field}
 
 def compile_doc(doc):
     if not isinstance(doc,dict) or set(doc)!={"id","title","require"}:
