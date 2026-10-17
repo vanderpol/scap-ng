@@ -1,0 +1,22 @@
+id: dns-nested-equivalence
+title: Compare scoped child relationships
+target: windows.dns.zones
+filter:
+  direction: {equals: forward}
+constraints:
+  min_count: 1
+  fields:
+    signed: {equals: true}
+sub_resources:
+  - target: zone_signing_keys
+    relationship: zone_id
+    constraints:
+      min_count: 1
+      all:
+        validity_hours: {between: [48, 168]}
+  - target: key_signing_keys
+    relationship: zone_id
+    constraints:
+      min_count: 1
+      all:
+        validity_hours: {between: [48, 168]}
