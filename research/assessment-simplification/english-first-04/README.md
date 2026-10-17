@@ -3,6 +3,12 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[OVAL exceptional-feature retention gate](OVAL-EDGE-FEATURE-RETENTION-GATE.md)** — source-backed criteria for core, advanced, importer-only compatibility and potential deprecation. Rare usage triggers semantic review; no unsupported source behavior is silently removed. [Rare operator guards passed](https://github.com/vanderpol/scap-ng/actions/runs/39030549202).
+
+**[Original OVAL Test author/source census](reports/source-oval-author-edge-census.md)** — 2,140 original six-STIG OVAL Tests (1,818 DISA, 322 NIWC/NAVWAR), stratified by original Test IDs and contrasted with 1,375 native Tests; 201 native all-exist cases have 198 DISA and three NIWC *comment+mode source-ID candidates*, not confirmed converter lineage. [Passing CI](https://github.com/vanderpol/scap-ng/actions/runs/39030379635).
+
+**[Original OVAL State/Set/Variable/operator edge census](reports/source-oval-semantic-edges.md)** — exact-one Test matching, State-field cardinality, Object Set difference, nested Variable functions and logical operations separately inventoried by source author. [Passing CI](https://github.com/vanderpol/scap-ng/actions/runs/39030633098).
+
 **[DISA SCAP 1.3 versus NIWC SCAP 1.4 OVAL source provenance](OVAL-SOURCE-PROVENANCE-BOUNDARY.md)** — original Definition/Test/Object/State/Variable IDs verified for both source organizations; inherited DISA checks are not a valid sample for interpreting use of new NIWC OVAL 5.12.3 authoring options. The mixed 201-Test Item-creation census must be joined back to original OVAL IDs before reporting author-specific behavior. [Passing source-ID CI](https://github.com/vanderpol/scap-ng/actions/runs/39029699446).
 
 **[201-Test all-exist equivalence](reports/all-exist-native-equivalence.md)** — source-Test classification: 127 State-free and 74 State-bearing. All agree with at-least-one on complete, existing-only Item populations; incomplete State-bearing and mixed Item-status differences remain explicit. [CI proof](https://github.com/vanderpol/scap-ng/actions/runs/39029016539).
