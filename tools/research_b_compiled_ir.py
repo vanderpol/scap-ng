@@ -98,16 +98,26 @@ def _node(node, source_kind, depth=0):
     if kind == "compat_oval_provider_existence":
         _ensure(source_kind != "native",
                 "source provider compatibility operation cannot be native authored")
-        _ensure(set(node) == {"kind","source_assessment_id","source_test_id",
-                              "provider","using","existence"},
-                "source provider compatibility node has unexpected keys")
-        _ensure(node["provider"] == "linux.textfile_matches" and
-                node["existence"] == "at_least_one_exists",
+        provider=node.get("provider")
+        base={"kind","source_assessment_id","source_test_id",
+              "provider","using","existence"}
+        expected=base|({"where"} if provider=="linux.mounts" else set())
+        _ensure(set(node)==expected,"source provider compatibility node has unexpected keys")
+        _ensure(provider in {"linux.textfile_matches","linux.mounts"} and
+                node["existence"]=="at_least_one_exists",
                 "unsupported source provider existence contract")
         _ensure(all(isinstance(node[k],str) and bool(node[k])
                     for k in ("source_assessment_id","source_test_id")),
                 "missing source provenance identity")
         using=node["using"]
+        if provider=="linux.mounts":
+            _ensure(using=={}, "mount provider uses no acquisition inputs")
+            where=node["where"]
+            _ensure(isinstance(where,dict) and set(where)=={"field","equals"} and
+                    where["field"]=="mount_point" and
+                    isinstance(where["equals"],str) and where["equals"].startswith("/"),
+                    "mount point requires an explicit absolute path")
+            return
         required={"path","pattern","ignore_case","multiline","singleline"}
         _ensure(isinstance(using,dict) and set(using)==required,
                 "source acquisition parameter contract mismatch")
