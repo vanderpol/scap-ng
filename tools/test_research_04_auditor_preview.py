@@ -19,8 +19,8 @@ class SourceDerivedPreviewTests(unittest.TestCase):
 
     def test_five_full_assessments_render_from_parsed_source(self):
         previews=report.build()
-        self.assertEqual(set(previews),set(report.CASES)|{'INDEX.md','SEMANTIC-BOUNDARY-LEDGER.md'}-
-                         set(report.CASES)+{x+'.md' for x in report.CASES})
+        self.assertEqual(set(previews),{'INDEX.md','SEMANTIC-BOUNDARY-LEDGER.md'} |
+                         {x+'.md' for x in report.CASES})
         for name in report.CASES:
             self.assertIn(self.d[name]['metadata']['id'],previews[name+'.md'])
             self.assertIn('What remains unverified?',previews[name+'.md'])
