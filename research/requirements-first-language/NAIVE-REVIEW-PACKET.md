@@ -2,6 +2,8 @@
 
 **Blind review packet. No answer key.** Designed for a **new ChatGPT conversation with no SCAP-NG/OVAL history**, or for a human auditor unfamiliar with this language. The candidate examples below are experimental, not an accepted specification. Do not send the adjacent research README or prior critique into the new chat until this first pass is frozen.
 
+**Note:** samples A, B, D and E deliberately omit the current prototype's mandatory `if_empty`, and D uses a deliberately unapproved alternative `require_at_least_one`. They are readability test variants, **not valid authored Assessment files under the current research validator**. The reviewer should not be told which variant is accepted until after the blind read.
+
 ## Paste the following entire section into a brand-new ChatGPT conversation
 
 --- BEGIN REVIEW INPUT ---
