@@ -75,6 +75,8 @@ def evaluate_collection(node,evidence):
     flag=evidence.get("status")
     if flag not in STATUSES:
         raise ValueError("provider must declare status")
+    if node["using"] and evidence.get("using")!=node["using"]:
+        return Decision(ERROR,"missing or mismatched typed acquisition parameters",node["provider"])
     if "using" in evidence and evidence["using"]!=node["using"]:
         return Decision(ERROR,"acquisition parameters do not match evidence",node["provider"])
     records=evidence.get("items",[])
