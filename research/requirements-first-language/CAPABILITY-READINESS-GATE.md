@@ -18,6 +18,8 @@ No weighted authorability/readability scoring or selecting a winner before the g
 
 **Scanner-facing JSON research milestone:** A [versioned B compiled fixture IR](contract-candidate/SCANNER-FACING-JSON-PILOT.md) now serializes native B assessments and compiler-owned *pre-evaluated* OVAL Test compatibility nodes through the same evaluator. It distinguishes OVAL `only one matching Item` from native singleton resource identity, and tests all six OVAL outcomes. **This is not a signed bundle, working Object/State/Variable lowerer, production scanner or full source parity.**
 
+**First B source-shaped Test consuming collected Items:** The [compiled JSON pilot](contract-candidate/SCANNER-FACING-JSON-PILOT.md) now includes a bounded source-lowered, State-free Chrony `independent.textfilecontent54` Test over **actual typed textfile collector Items**, rather than pre-evaluated OVAL Item statuses. Fixture tests pin a meaningful result difference: one observed matching Item with an **incomplete** collection yields native B `exists: true` but source generic OVAL Test `unknown`. No raw SCAP 1.4 XML equivalence, source regex/item semantics, or six-stream execution is claimed; source compatibility remains a first-class B engineering requirement.
+
 ## Capability criteria for B
 
 | Area | Comparable-capability readiness criterion | Current B evidence / gap |
