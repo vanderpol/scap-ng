@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+"""#235: frozen research JSON boundary for the single B fixture evaluator.
+
+NOT a normative SCAP-NG bundle, scanner, signature, source converter or
+production validation API. Compatibility Test nodes consume ALREADY evaluated
+item_results supplied by a trusted fixture; source Objects/States/Variables
+are NOT executable through this payload. Scanner implementation feasibility
+is the research question, not a claim of end-to-end SCAP 1.4 parity.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+
+from oval_result_truth_tables import RESULTS
+from research_native_contract_candidate import OPS, PROVIDERS
+from research_native_provider_catalog import CATALOG
+
+FORMAT = "scap-ng-b-fixture-ir/0.1"
+SCOPE = "research-fixture-evaluator-only"
+SOURCE_KINDS = {"native", "compiler-compatibility", "mixed"}
+COMPAT_INPUTS = {"flag", "existence", "check", "item_results", "has_state",
+                 "exists", "does_not_exist", "error", "not_collected"}
+COLLECTION_KEYS = {"kind", "provider", "mode", "exists_only", "min_count",
+                   "singleton", "using", "where", "predicates", "as",
+                   "nested", "parent_ref", "owner_field"}
+
+
+def _canonical(value):
+    """Stable JSON bytes; rejects NaN and other non-JSON Python values."""
+    return json.dumps(value, ensure_ascii=False, sort_keys=True,
+                      separators=(",", ":"), allow_nan=False).encode("utf-8")
+
+
+def _ensure(condition, reason):
+    if not condition:
+        raise ValueError("B compiled fixture IR: " + reason)
+
+
+def _predicates(values):
+    _ensure(isinstance(values, list), "predicates must be array")
+    for entry in values:
+        _ensure(isinstance(entry, dict) and set(entry) == {"field", "operator", "value"},
+                "predicate must have field/operator/value only")
+        _ensure(isinstance(entry["field"], str) and bool(entry["field"]),
+                "predicate field must be named")
+        _ensure(entry["operator"] in OPS, "unknown predicate operation")
+        # Authoring compilation validates typed fields. This research decode
+        # only validates JSON/tree shape, NOT a production provider contract.
+
+
+def _node(node, source_kind, depth=0):
+    _ensure(depth <= 64, "excessive requirement depth")
+    _ensure(isinstance(node, dict) and isinstance(node.get("kind"), str),
+            "every node needs a kind")
+    kind = node["kind"]
+
+    if kind == "compat_oval_test":
+        _ensure(source_kind != "native",
+                "compiler-only OVAL compatibility node cannot be native authored")
+        _ensure(set(node) == {"kind", "source_test_id", "test"},
+                "invalid compatibility Test node keys")
+        _ensure(isinstance(node["source_test_id"], str) and bool(node["source_test_id"]),
+                "compatibility source Test requires identity")
+        t = node["test"]
+        _ensure(isinstance(t, dict) and {"flag", "existence", "check", "exists"} <= set(t)
+                and not (set(t) - COMPAT_INPUTS), "invalid source Test inputs")
+        _ensure(isinstance(t["flag"], str) and
+                t["flag"] in {"complete", "incomplete", "error", "not collected",
+                              "not applicable", "does not exist"}, "invalid source collection flag")
+        _ensure(t["existence"] in {"all_exist", "any_exist", "at_least_one_exists",
+                                   "none_exist", "only_one_exists"}, "invalid existence operation")
+        _ensure(t["check"] in {"all", "at least one", "only one", "none satisfy"},
+                "invalid OVAL Item check")
+        for key in ("exists", "does_not_exist", "error", "not_collected"):
+            if key in t:
+                _ensure(type(t[key]) is int and t[key] >= 0,
+                        "invalid OVAL Item-status count")
+        if "has_state" in t:
+            _ensure(type(t["has_state"]) is bool, "has_state requires Boolean")
+        if "item_results" in t:
+            _ensure(isinstance(t["item_results"], list) and
+                    all(isinstance(v, str) and v in RESULTS for v in t["item_results"]),
+                    "invalid pre-evaluated OVAL Item results")
+        return
+
+    if kind == "logic":
+        _ensure(set(node) == {"kind", "operator", "children"},
+                "logic node has unexpected keys")
+        _ensure(node["operator"] in {"all", "any"},
+                "only current B AND/OR logic is supported")
+        _ensure(isinstance(node["children"], list) and len(node["children"]) >= 2,
+                "logic node needs two or more children")
+        for child in node["children"]:
+            _node(child, source_kind, depth + 1)
+        return
+
+    if kind == "fields":
+        _ensure(set(node) == {"kind", "predicates"}, "field node shape invalid")
+        _predicates(node["predicates"])
+        _ensure(bool(node["predicates"]), "empty scoped field checks")
+        return
+
+    _ensure(kind == "collection", "unknown executable node kind")
+    _ensure(not (set(node) - COLLECTION_KEYS), "unknown collection keys")
+    required = {"provider", "mode", "min_count", "singleton", "using", "where", "predicates"}
+    _ensure(required <= set(node), "collection missing required contract keys")
+    p = node["provider"]
+    _ensure(isinstance(p, str) and bool(p) and
+            (p in PROVIDERS or p.startswith("$")),
+            "unknown typed resource")
+    _ensure(node["mode"] in {"each", "some", "none", "exactly_one"},
+            "unknown collection quantifier")
+    _ensure(type(node["min_count"]) is int and node["min_count"] >= 0,
+            "invalid minimum-resource cardinality")
+    _ensure(type(node["singleton"]) is bool and isinstance(node["using"], dict),
+            "invalid resource identity or acquisition parameters")
+    _predicates(node["where"])
+    _predicates(node["predicates"])
+    if "exists_only" in node:
+        _ensure(type(node["exists_only"]) is bool, "exists_only must be Boolean")
+    if "nested" in node and node["nested"] is not None:
+        _node(node["nested"], source_kind, depth + 1)
+    if "parent_ref" in node and node["parent_ref"] is not None:
+        ref = node["parent_ref"]
+        _ensure(isinstance(ref, dict) and set(ref) == {"alias", "relation"} and
+                all(isinstance(v, str) and bool(v) for v in ref.values()),
+                "invalid nested parent identity")
+
+
+def _classify(node):
+    """Make compiler-owned source compatibility impossible to conceal."""
+    kind = node["kind"]
+    if kind == "compat_oval_test":
+        return { "compiler-compatibility" }
+    if kind == "logic":
+        result = set()
+        for child in node["children"]:
+            result.update(_classify(child))
+        return result
+    if kind == "collection" and isinstance(node.get("nested"), dict):
+        return {"native"} | _classify(node["nested"])
+    return {"native"}
+
+
+def _semantic_payload(assessment_id, root):
+    _ensure(isinstance(assessment_id, str) and bool(assessment_id),
+            "assessment identity is required")
+    kinds = _classify(root)
+    if kinds == {"native"}:
+        source_kind = "native"
+    elif kinds == {"compiler-compatibility"}:
+        source_kind = "compiler-compatibility"
+    else:
+        source_kind = "mixed"
+    _node(root, source_kind)
+    return {
+        "format": FORMAT,
+        "scope": SCOPE,
+        "assessment_id": assessment_id,
+        "source_kind": source_kind,
+        "catalog_version": CATALOG["catalog_version"],
+        "evidence_contract": CATALOG["evidence_contract"],
+        "root": root,
+    }
+
+
+def encode(assessment_id, root):
+    """Compile-side deterministic bytes for one fixture-only Assessment.
+
+    An actual scanner must independently verify an outer signed bundle
+    and must implement the full source lowering/evidence provenance model.
+    This digest is a corruption check, NOT an authenticity signature.
+    """
+    obj = _semantic_payload(assessment_id, root)
+    obj["payload_sha256"] = hashlib.sha256(_canonical(obj)).hexdigest()
+    return _canonical(obj) + b"\n"
+
+
+def decode(raw):
+    """Scanner-side strict version/shape/corruption gate for this experiment."""
+    if isinstance(raw, str):
+        raw = raw.encode("utf-8")
+    _ensure(isinstance(raw, bytes) and len(raw) <= 2_000_000,
+            "missing or oversized JSON")
+    try:
+        obj = json.loads(raw, parse_constant=lambda value:
+                         (_ for _ in ()).throw(ValueError("non-finite number: " + value)))
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError("B compiled fixture IR: invalid JSON") from exc
+    _ensure(isinstance(obj, dict), "envelope must be a JSON object")
+    expected = {"format", "scope", "assessment_id", "source_kind",
+                "catalog_version", "evidence_contract", "root", "payload_sha256"}
+    _ensure(set(obj) == expected, "invalid envelope properties")
+    _ensure(obj["format"] == FORMAT and obj["scope"] == SCOPE,
+            "unsupported compiled IR version or scope")
+    _ensure(obj["catalog_version"] == CATALOG["catalog_version"] and
+            obj["evidence_contract"] == CATALOG["evidence_contract"],
+            "wrong typed provider or fixture evidence contract")
+    proof = obj.pop("payload_sha256")
+    _ensure(isinstance(proof, str) and len(proof) == 64 and
+            hashlib.sha256(_canonical(obj)).hexdigest() == proof,
+            "content digest mismatch")
+    reconstructed = _semantic_payload(obj["assessment_id"], obj["root"])
+    _ensure(obj == reconstructed, "declared provenance and actual IR differ")
+    return reconstructed
+
+
+def evaluate_json(raw, fixtures):
+    from research_native_contract_evaluator import evaluate
+    return evaluate(decode(raw)["root"], fixtures)
