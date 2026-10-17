@@ -90,6 +90,12 @@ def require(node,path='require',scope=frozenset(),inputs=None):
     if not isinstance(node,dict) or not node:fail(path,'require mapping cannot be empty')
     for k in node:
         if k in PROHIBITED: fail(path,'OVAL-like operation not permitted: '+k)
+    # When a collection item must satisfy a mixture of scalar field predicates
+    # and nested resource requirements, a fields leaf is one sibling in all/any.
+    # It is NOT an OVAL State or a second evaluation engine.
+    if set(node)=={'fields'}:
+        predicates(node['fields'],path+'.fields',scope,inputs)
+        return
     modes=set(node)&(QUANTIFIERS|GROUPS|SPECIAL)
     if len(modes)!=1:fail(path,'exactly one requirement operator required; found '+repr(sorted(modes)))
     mode=next(iter(modes))
