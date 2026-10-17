@@ -151,13 +151,12 @@ def require(node,path='require',scope=frozenset(),inputs=None):
         if not isinstance(node['using'],dict) or not node['using']:
             fail(path,'using requires explicit provider input mapping')
         links(node['using'],scope,inputs,path+'.using')
+    if mode=='none' and 'must' in node:
+        fail(path,'none means zero resources selected after where; express prohibited properties in where, not must')
     if 'must' in node:
         assertion(node['must'],path+'.must',inner_scope,inputs)
     elif mode in {'every','some','exactly_one','one_matching'}:
         fail(path,'this quantifier requires a must assertion')
-    if mode=='none' and 'must' in node:
-        # no matching item satisfies the must predicate, not no selected Items
-        pass
 
 def validate(doc,path='<Assessment>'):
     if not isinstance(doc,dict):fail(path,'expected mapping')
