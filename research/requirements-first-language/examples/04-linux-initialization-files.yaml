@@ -1,0 +1,46 @@
+id: linux-initialization-file-permissions
+title: Initialization files must not have prohibited permission bits
+require:
+  all:
+    - every: linux.accounts
+      as: user
+      where:
+        username: {matches_regex: '[\w]+'}
+        uid: {at_least: 1000}
+        home_dir: {not_equals: /}
+      must:
+        every: linux.files
+        using:
+          directory: '$user.home_dir'
+          filename_regex: '^\.[^\s\.]+'
+          max_depth: 1
+          follow_symlinks: true
+          filesystem: all
+          exclude_directories: true
+        must:
+          mode:
+            has_none_of: [setuid, setgid, sticky, group_write, group_execute,
+                          other_read, other_write, other_execute]
+        if_empty: pass
+      if_empty: pass
+    - every: linux.accounts
+      as: user
+      where:
+        username: {matches_regex: '[\w]+'}
+        uid: {equals: 0}
+        home_dir: {not_equals: /}
+      must:
+        every: linux.files
+        using:
+          directory: '$user.home_dir'
+          filename_regex: '^\.[^\s\.]+'
+          max_depth: 1
+          follow_symlinks: true
+          filesystem: all
+          exclude_directories: true
+        must:
+          mode:
+            has_none_of: [setuid, setgid, sticky, group_write, group_execute,
+                          other_read, other_write, other_execute]
+        if_empty: fail
+      if_empty: pass
