@@ -18,7 +18,7 @@ The `items` field is a **documented editor-dropdown enum**, `condition` is manda
 when the chosen Item mode evaluates a State, and absent for State-free checks.
 
 The nested evaluate tree uses OVAL-aligned `and` / `or` (not `all_of` / `any_of`).
-Conditions use `and` / `or` too. Whole-State alternatives are explicitly headed `states`.
+Grouped conditions use sibling `scope: fields|states` and `and` / `or` keys.
 This rename is **strictly scoped to evaluate**: State alternatives and nested State-field groups are
 not indiscriminately renamed, because conflating distinct grouping scopes can change results.
 
