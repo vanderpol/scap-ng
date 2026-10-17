@@ -177,8 +177,7 @@ assessment:
 
 The following is the **complete generated** research YAML that reconstructs the original source structure. It is not yet an approved standard.
 
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+```yaml# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive
@@ -222,6 +221,27 @@ checks:
     check: Local initialization files for non-system users have mode 0740 or less
       permissive.
     inspect: unix.file
+    gather:
+      description: local initialization files of non-system users.
+      union:
+      - from:
+          inspect: unix.file
+          description: local initialization files of non-system users.
+          where:
+            directory:
+              from: user.home_dir
+            name:
+              matches_regex: ^\.[^\s\.]+
+          filesystem: all
+          traversal:
+            max_depth: 1
+            recurse: symlinks
+          for_each_source:
+            item: user
+            in: only-non-system-users-uid-999-home-dirs-excluding-root-object
+        exclude_if:
+        - type:
+            is: directory
     require:
       items_may_be_absent: true
       every_item_must_match:
@@ -244,12 +264,15 @@ checks:
             is: false
         all_fields_must_exist: true
     report_elements: all
+  local-initialization-files-root-have-mode-0740-or-less-permissive-test:
+    check: Local initialization files for root have mode 0740 or less permissive.
+    inspect: unix.file
     gather:
-      description: local initialization files of non-system users.
+      description: local initialization files of root user.
       union:
       - from:
           inspect: unix.file
-          description: local initialization files of non-system users.
+          description: local initialization files of root user.
           where:
             directory:
               from: user.home_dir
@@ -261,13 +284,10 @@ checks:
             recurse: symlinks
           for_each_source:
             item: user
-            in: only-non-system-users-uid-999-home-dirs-excluding-root-object
+            in: only-root-users-uid-0-home-dirs-excluding-root-directory-object
         exclude_if:
         - type:
             is: directory
-  local-initialization-files-root-have-mode-0740-or-less-permissive-test:
-    check: Local initialization files for root have mode 0740 or less permissive.
-    inspect: unix.file
     require:
       at_least_one_item_exists: true
       every_item_must_match:
@@ -290,27 +310,6 @@ checks:
             is: false
         all_fields_must_exist: true
     report_elements: all
-    gather:
-      description: local initialization files of root user.
-      union:
-      - from:
-          inspect: unix.file
-          description: local initialization files of root user.
-          where:
-            directory:
-              from: user.home_dir
-            name:
-              matches_regex: ^\.[^\s\.]+
-          filesystem: all
-          traversal:
-            max_depth: 1
-            recurse: symlinks
-          for_each_source:
-            item: user
-            in: only-root-users-uid-0-home-dirs-excluding-root-directory-object
-        exclude_if:
-        - type:
-            is: directory
 evaluate:
   all_of:
   - test: local-initialization-files-non-system-users-have-mode-0740-or-test
