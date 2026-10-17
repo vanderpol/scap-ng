@@ -11,7 +11,7 @@ ALL of these conditions must hold:
     Required: raw directive value equals On
   - Every selected Apache configuration directive observation whose name equals MaxKeepAliveRequests
     At least one matching resource must exist in this selected population.
-    Required: raw directive value equals 150
+    Required: integer value is at least 100
 
 ## Evidence and status rules
 
