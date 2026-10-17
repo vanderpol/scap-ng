@@ -188,7 +188,7 @@ def evaluate(ast,fixtures,scope=None):
         statuses={"complete":"complete","incomplete":"incomplete",
                   "error":"error","not collected":"not collected",
                   "not applicable":"not applicable"}
-        if flag not in statuses or not isinstance(ev.get("items"),list):
+        if not isinstance(flag,str) or flag not in statuses or not isinstance(ev.get("items"),list):
             return Decision(ERROR,"invalid source-compatible collection envelope",ast["provider"])
         items=ev["items"]
         if flag not in {"complete","incomplete"} and items:
