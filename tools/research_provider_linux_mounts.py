@@ -22,10 +22,12 @@ def decode_mountinfo_path(text):
         if sequence not in OCTAL_ESCAPES:
             raise ValueError("unrecognized mountinfo escape: "+sequence)
         return OCTAL_ESCAPES[sequence]
-    value=ESCAPE.sub(replace,text)
-    if "\\" in value and "\\" not in text.replace(r"\134",""):
-        # Kernel strings should use only documented octal sequences.
+    # A literal backslash is encoded as \134 in mountinfo. Reject raw,
+    # malformed and unrecognized escape sequences, but allow decoded \134.
+    stripped=re.sub(r"\\(?:040|011|012|134)","",text)
+    if "\\" in stripped:
         raise ValueError("unrecognized mountinfo path escape")
+    value=ESCAPE.sub(replace,text)
     if not value.startswith("/"):
         raise ValueError("mountinfo path must be absolute")
     return value
