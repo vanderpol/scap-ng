@@ -2,6 +2,8 @@
 
 **17 October 2026. Research, not a Board vote, approved schema or scanner release.** [Track #235](https://github.com/vanderpol/scap-ng/issues/235).
 
+**Phase 2 review:** [verified findings](REVIEW-TWO-NOTES.md) preserve Phase 1's unaided-authoring NO-GO. Seven supposed first-round quotations were never stated in Phase 1. A complete [explicit DNS relationship alternative](contract-candidate/explicit-dns-relations.yaml) now compiles to the same typed AST as the lexical DNS rule, allowing a controlled readability comparison without dropping key-signing keys.
+
 **External authoring test (Gemini Phase 1):** [unchanged NO-GO review](GEMINI-NATIVE-PHASE1-RESPONSE-2026-10-17.md) and [separate audit](GEMINI-NATIVE-PHASE1-AUDIT-2026-10-17.md) now expose a genuine unaided authoring failure. Correct native engineering fixtures remain conditional GO; novice authorability and source parity remain NO-GO. The review produced new tests for wrong Linux home filtering, mode equality and Apache existential wording. The compiler now validates nested acquisition fields and includes the previously omitted not_equals operator. [Phase 2 prompt](GEMINI-NATIVE-AUTHORING-PHASE2.md) is ready and should be sent unchanged.
 
 **New DNS prototype evidence:** [versioned structured fixture normalizer](providers/windows.dns.zone_signing_evidence.v0.1.yaml) and [tests](../../tools/test_research_dns_zone_key_evidence.py) distinguish forward/reverse zones, both signing-key classes, typed days/hours, duplicate identities and incomplete data. This is **not** a Windows DNS collector or parity proof.
