@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[Fresh-eyes second and third reviews](FRESH-EYES-SECOND-THIRD-REVIEW.md):** zero-context auditor interpretation and skeptical implementer deletion test of the current split candidate versus the rejected ground-up experiment. **Neither is a genuinely independent human/model review.** The proposal's `valid` wrapper and mostly synonymous `observe/claims/pass_if` labels are rejected; unresolved `match` scope, optional/missing fields, Windows whole-State records, and real complex source graphs remain. [Send the blind, answer-free review packet](FRESH-EYES-BLIND-REVIEW-PACKET.md) to an outside reader before sharing the critique. No v0.4 schema changes or scanner correctness claims.
+
+
 **[FINAL GROUND-UP ALTERNATIVE: evidence → atomic claims → passing cases](PROOF-FIRST-GROUND-UP-ALTERNATIVE.md).** Instead of further renaming `require`, this research reorganizes an Assessment around what is collected, what precisely must be true, and which named combinations establish compliance. Demonstrates original RHEL `nosuid`, complete Windows WMI record-State alternatives, dependent Linux files, DNS and Apache, including unresolved source-only cardinality/missing-field semantics. **The simple RHEL case is longer and the replacement has NOT been source-lowered or six-state verified. This is a product-design experiment, NOT the new leading approved YAML grammar.** The most promising idea is a source-derived auditor proof sheet with named passing routes and a guided editor, even if the current split-requirement grammar wins as the underlying standard.
 
 
