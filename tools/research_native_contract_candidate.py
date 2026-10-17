@@ -16,38 +16,9 @@ import yaml
 
 ROOT=Path(__file__).resolve().parents[1]
 EXAMPLES=ROOT/"research/requirements-first-language/contract-candidate/examples"
-# catalog entry: selectable fields, comparable fields, identity guarantee,
-# authoring acquisition parameter names, fixture-backed only unless noted.
-PROVIDERS={
-  "linux.mounts":(set(["mount_point","filesystem","mount_options"]),
-                  set(["mount_point","filesystem","mount_options"]),False,set()),
-  "windows.accounts":(set(["category","username","enabled"]),
-                      set(["category","username","enabled"]),False,set()),
-  "windows.registry_value":(set(["name","value"]),
-                           set(["name","value"]),True,set(["hive","key","name","view"])),
-  "windows.computer_role":(set(["role"]),
-                           set(["role"]),True,set()),
-  "windows.user_rights":(set(["right","principal"]),
-                         set(["right","principal"]),False,set(["right"])),
-  "apache.config_directives":(set(["name","raw_value","integer_value","source_file"]),
-                              set(["name","raw_value","integer_value","source_file"]),False,set()),
-  "windows.dns.zones":(set(["name","direction","directory_integration","signed",
-                            "zone_signing_keys","key_signing_keys"]),
-                       set(["name","direction","directory_integration","signed"]),False,set()),
-  "linux.files_from_account_homes":(set(["name","mode","directory","account_id"]),
-                                    set(["name","mode","directory","account_id"]),False,
-                                    set(["account_filter","filename","max_depth","follow_symlinks"])),
-}
+from research_native_provider_catalog import (PROVIDERS, FIELD_TYPES, RELATIONS,
+                                               RELATION_TYPES,operator_accepts)
 OPS={"equals","not_equals","contains","at_least","between","only_these_bits","matches_regex"}
-# Strict, known parent-child links: no invisible join, no implicit completeness.
-RELATIONS={
-  "windows.dns.zones":{
-    "zone_signing_keys":{"owner":"zone_id",
-                         "fields":{"zone_id","validity_hours","kind"}},
-    "key_signing_keys":{"owner":"zone_id",
-                        "fields":{"zone_id","validity_hours","kind"}},
-  }
-}
 QUANTIFIERS={"each","some","none","exactly_one"}
 GROUPS={"all","any"}
 REGEX=re.compile(r"^\$([a-z][a-z0-9_]*)\.([a-z_][a-z0-9_]*)$")
@@ -67,7 +38,7 @@ StrictLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,mapp
 def fail(path,reason):
     raise ValueError(path+": "+reason)
 
-def check_predicates(raw,known,path,scope):
+def check_predicates(raw,known,path,scope,field_types=None):
     if not isinstance(raw,dict) or not raw:fail(path,"require nonempty field predicates")
     result=[]
     for field,test in raw.items():
@@ -76,6 +47,8 @@ def check_predicates(raw,known,path,scope):
             fail(path+"."+field,"exactly one predicate operation required")
         op,expected=next(iter(test.items()))
         if op not in OPS:fail(path+"."+field,"unregistered operation "+str(op))
+        if field_types is not None and field in field_types and not operator_accepts(field_types[field],op,expected):
+            fail(path+"."+field,"operation "+op+" incompatible with typed field "+field_types[field])
         if op=="only_these_bits" and (not isinstance(expected,str) or not OCTAL.fullmatch(expected)):
             fail(path+"."+field,"only_these_bits requires four-digit octal string")
         if op=="between" and (not isinstance(expected,list) or len(expected)!=2 or
@@ -116,7 +89,7 @@ def check_using(raw,allowed,path,provider,scope):
         if set(account)-permitted:
             fail(path+".account_filter","unrecognized account field "+
                  repr(sorted(set(account)-permitted)))
-        check_predicates(account,permitted,path+".account_filter",scope)
+        check_predicates(account,permitted,path+".account_filter",scope,{"uid":"integer","username":"string","home_dir":"string"})
         regex=raw["filename"]
         if not isinstance(regex,str) or not regex:
             fail(path+".filename","must be a filename regular expression string")
@@ -170,7 +143,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
         select,fields,unique,parameters=PROVIDERS[provider]
         if not unique:fail(path,"provider does not promise singleton identity")
         using=check_using(node.get("using",{}),parameters,path+".using",provider,scope)
-        conditions=check_predicates(node.get("must"),fields,path+".must",scope)
+        conditions=check_predicates(node.get("must"),fields,path+".must",scope,FIELD_TYPES[provider])
         return {"kind":"collection","provider":provider,"mode":"exactly_one",
                 "min_count":1,"singleton":True,"using":using,
                 "where":[],"predicates":conditions,"as":None}
@@ -199,8 +172,10 @@ def compile_check(node,path="require",scope=None,current_fields=None):
         selectable,fields,unique,parameters=PROVIDERS[provider]
         if unique:fail(path,"singleton provider requires named resource form")
     using=check_using(node.get("using",{}),parameters,path+".using",provider,scope)
+    field_types=(RELATION_TYPES[scope[parent_ref["alias"]]["provider"]][parent_ref["relation"]]
+                 if parent_ref is not None else FIELD_TYPES[provider])
     raw_where=node.get("where")
-    selection=check_predicates(raw_where,selectable,path+".where",scope) if raw_where else []
+    selection=check_predicates(raw_where,selectable,path+".where",scope,field_types) if raw_where else []
     minimum=node.get("minimum_resources",0)
     if type(minimum)!=int or minimum<0:
         fail(path,"minimum_resources must be a nonnegative integer")
@@ -226,7 +201,7 @@ def compile_check(node,path="require",scope=None,current_fields=None):
             nested=compile_check(raw_must,path+".must",local_scope,fields)
             compare=[]
         else:
-            compare=check_predicates(raw_must,fields,path+".must",local_scope)
+            compare=check_predicates(raw_must,fields,path+".must",local_scope,field_types)
     return {"kind":"collection","provider":provider,"mode":mode,
             "min_count":minimum,"singleton":False,"using":using,
             "where":selection,"predicates":compare,"as":alias,
