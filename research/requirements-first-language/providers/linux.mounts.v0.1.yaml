@@ -1,0 +1,51 @@
+# Research-only typed evidence provider manifest, issue #235.
+# NOT normative, not a general schema, not SCAP 1.4 source parity.
+provider: linux.mounts
+version: 0.1.0
+status: prototype_read_only
+implementation: tools/research_provider_linux_mounts.py
+collector:
+  platform: linux
+  source: /proc/self/mountinfo
+  namespace_source: /proc/self/ns/mnt
+  scope: current_process_mount_namespace
+  privileged_operations: none
+resources:
+  identity: [namespace, mount_id]
+  duplicates: error_or_incomplete
+  field_types:
+    mount_id: integer
+    parent_id: integer
+    namespace: string
+    major_minor: string
+    root: string
+    mount_point: string
+    mount_options: list_of_strings
+    optional_fields: list_of_strings
+    filesystem: string
+    source: string
+    super_options: list_of_strings
+selection:
+  where: filtered_after_collection
+  missing_selector: unresolved
+  unreadable_selector: error
+  count_scope: selected_resource_items
+comparison:
+  mount_options_contains: list_membership
+  implicit_number_casts: forbidden
+collection_status:
+  complete: every_parsed_line_valid
+  incomplete: at_least_one_line_failed_parsing
+  error: mount_namespace_or_mountinfo_unreadable
+  not_collected: not_emitted_by_prototype
+  not_applicable: not_emitted_by_prototype
+provenance:
+  item_id: namespace_plus_mount_id
+  retained: [namespace, mount_id, parent_id, root, mount_point, filesystem, source]
+known_limits:
+  - Not a substitute for original OVAL linux.partition object tests
+  - Current process namespace only, not every mount namespace on host
+  - Multiple records at same path are kept distinct; uniqueness is not promised
+  - Root and mountpoint escapes are decoded; source is retained as raw mountinfo token
+  - No mounting changes or recursive traversal
+  - No live remote target or macOS or Windows support
