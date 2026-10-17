@@ -17,6 +17,10 @@ def lower_state_free_textfile_assessment(source):
     a = source["assessment"]
     if not isinstance(a,dict) or a.get("mode") != "automated":
         raise ValueError("source must be an automated Assessment")
+    allowed={"assessment_title","class","evaluate","id","mode","purpose",
+             "specification","tests","version"}
+    if set(a)-allowed:
+        raise ValueError("unsupported Assessment-level Variables, shared Objects or inputs")
     tests = a.get("tests")
     if not isinstance(tests,dict) or len(tests) != 1:
         raise ValueError("only one local state-free Test is supported")
