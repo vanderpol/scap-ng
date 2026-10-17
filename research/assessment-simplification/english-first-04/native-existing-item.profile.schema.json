@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/english-first-04/native-existing-item.profile.schema.json",
+  "title": "RESEARCH ONLY: native existing-resource Item contract",
+  "description": "Standalone experimental result fixture, NOT normative 0.4 schema. Root Items must be observed real resources; missing nested properties and collection failures remain distinguishable.",
+  "type": "object",
+  "required": [
+    "collection",
+    "items"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "collection": {
+      "type": "object",
+      "required": [
+        "status",
+        "population_complete"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "complete",
+            "incomplete",
+            "does_not_exist",
+            "error",
+            "not_collected",
+            "not_applicable"
+          ]
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "capability",
+          "identity",
+          "status",
+          "fields"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capability": {
+            "type": "string",
+            "minLength": 1
+          },
+          "identity": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            }
+          },
+          "status": {
+            "const": "exists"
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/$defs/observed_field"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "observed_field": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "exists",
+            "does_not_exist",
+            "error",
+            "not_collected"
+          ]
+        },
+        "value": {},
+        "redacted": {
+          "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "does_not_exist",
+                  "error",
+                  "not_collected"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "redacted": {
+                "const": true
+              }
+            },
+            "required": [
+              "redacted"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
