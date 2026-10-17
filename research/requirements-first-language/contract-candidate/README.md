@@ -15,6 +15,8 @@ This is NOT normative SCAP-NG 0.4. It is a small runnable demonstration that a h
 | Root-derived Linux init files: combined set and permitted octal bits | [YAML](examples/07-linux-permission-bits.yaml) | [Explanation](generated-explanations/07-linux-permission-bits.md) |
 | Per-zone DNSSEC signature validity with two required key kinds | [YAML](examples/08-dns-signing-nested.yaml) | [Explanation](generated-explanations/08-dns-signing-nested.md) |
 
+A narrow [compiler-owned source compatibility IR bridge](../../../tools/test_research_common_ir_bridge.py) also runs through the same evaluator dispatcher. It specifically retains four independent Apache OVAL Test existence checks as separate internal nodes and demonstrates that a fluent native two-setting check can Pass when one source compatibility Test necessarily Fails. **This is only a Test-level truth-table bridge, not source conversion, State/Variable execution or an actual scanner.**
+
 The native renderer's pages are **derived text, not a second language or manually-authored source**. GitHub Actions publishes them directly to the repository so work networks do not need to access temporary run artifacts. Do not infer that the explanations encode all future evidence/error rules; this is a deliberately bounded semantic prototype.
 
 ## What succeeded
