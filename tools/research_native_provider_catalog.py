@@ -14,8 +14,23 @@ CATALOG_PATH=(Path(__file__).resolve().parents[1]/
 ALLOWED_TYPES={"string","list_string","integer","boolean","posix_mode"}
 ALLOWED_USING={"string","boolean","registry_view","account_predicates","regex_string","one"}
 
+class CatalogLoader(yaml.SafeLoader):
+    pass
+
+def _strict_mapping(loader,node):
+    result={}
+    for kn,vn in node.value:
+        name=loader.construct_object(kn)
+        if name in result:
+            raise ValueError("duplicate catalog key "+str(name))
+        result[name]=loader.construct_object(vn)
+    return result
+
+CatalogLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                              _strict_mapping)
+
 def load_catalog(path=CATALOG_PATH):
-    doc=yaml.safe_load(Path(path).read_text())
+    doc=yaml.load(Path(path).read_text(),Loader=CatalogLoader)
     if not isinstance(doc,dict) or set(doc)!={"catalog_version","evidence_contract","providers"}:
         raise ValueError("unrecognized research provider catalog envelope")
     if doc["catalog_version"]!="0.1.0":
