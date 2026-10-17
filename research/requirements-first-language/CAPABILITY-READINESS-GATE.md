@@ -16,6 +16,8 @@ No weighted authorability/readability scoring or selecting a winner before the g
 
 **Additional bounded Windows registry pilot:** An [offline typed registry snapshot normalizer and Win11 SV-253291 source-boundary test](contract-candidate/REGISTRY-SOURCE-BOUNDARY-PILOT.md) now retain WOW64 query identity, numeric value kind, explicit complete/incomplete/error statuses and duplicate singleton evidence. This is **not a Windows host collector or parity proof**: original source `match: one`, textual `'0'`, and unspecified registry view are still unresolved for native B lowering.
 
+**Scanner-facing JSON research milestone:** A [versioned B compiled fixture IR](contract-candidate/SCANNER-FACING-JSON-PILOT.md) now serializes native B assessments and compiler-owned *pre-evaluated* OVAL Test compatibility nodes through the same evaluator. It distinguishes OVAL `only one matching Item` from native singleton resource identity, and tests all six OVAL outcomes. **This is not a signed bundle, working Object/State/Variable lowerer, production scanner or full source parity.**
+
 ## Capability criteria for B
 
 | Area | Comparable-capability readiness criterion | Current B evidence / gap |
