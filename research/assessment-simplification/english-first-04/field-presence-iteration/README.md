@@ -88,14 +88,14 @@ This research pair reverses **exactly** to the existing source `stdout_line.when
 
 The five complete candidates were independently re-inverted **byte-for-byte** to their five existing canonical research YAML files in the GitHub connector on 17 October 2026 (five of five). Full assessment names, collection code, source graphs, literal regexes, operator positions and `evaluate` trees were preserved.
 
-Reproduce and validate YAML parsing using [the fail-closed verifier](../../../tools/research_04_field_presence_iteration.py):
+Reproduce and validate YAML parsing using [the fail-closed verifier](../../../../tools/research_04_field_presence_iteration.py):
 
 ~~~shell
 python -m pip install "PyYAML>=6,<7"
 python tools/research_04_field_presence_iteration.py --require-yaml
 ~~~
 
-[GitHub Actions workflow](../../../.github/workflows/research-04-field-presence-iteration.yml) is configured to run the same research-only checks for changes to this directory. **Do not call CI passing until the actual run is inspected.** Even if it passes, source inversion and YAML parsing **do not** prove original OVAL six-state scanner/evidence parity, parser/schema acceptance of this new dialect, correctness outside five hand-selected complete files, or human comprehension.
+[GitHub Actions workflow](../../../../.github/workflows/research-04-field-presence-iteration.yml) is configured to run the same research-only checks for changes to this directory. **Do not call CI passing until the actual run is inspected.** Even if it passes, source inversion and YAML parsing **do not** prove original OVAL six-state scanner/evidence parity, parser/schema acceptance of this new dialect, correctness outside five hand-selected complete files, or human comprehension.
 
 ## Internal adversarial review: revision log
 
