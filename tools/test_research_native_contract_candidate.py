@@ -63,6 +63,25 @@ class CandidateBContractTests(unittest.TestCase):
         self.assertEqual(evaluate(source,observed_partial).result,TRUE)
         self.assertEqual(evaluate(source,{"linux.mounts":pop(item("m",filesystem="x"))}).result,UNKNOWN)
 
+    def test_exists_only_motivated_by_actual_six_stream_partition_source(self):
+        source_path=(EXAMPLES.parent/"corpus/source-specimens"/
+            "linux-partition-0-88d5c4811f61.source.yaml")
+        original=yaml.safe_load(source_path.read_text())["assessment"]
+        tests=list(original["tests"].values())
+        self.assertEqual(len(tests),1)
+        old=tests[0]
+        self.assertEqual(old["capability"],"linux.partition")
+        self.assertEqual(old["existence"],"one_or_more")
+        self.assertEqual(old["match"],"all")
+        self.assertNotIn("states",old)
+        self.assertEqual(old["object"]["select"]["mount_point"],
+                         {"operation":"equals","value":"/var/tmp"})
+        native=read(EXAMPLES/"09-linux-var-tmp-exists.yaml")["ast"]
+        self.assertEqual(native["where"],[
+            {"field":"mount_point","operator":"equals","value":"/var/tmp"}])
+        # This establishes SOURCE STRUCTURE ONLY: it does not prove that the
+        # mountinfo probe captures original OVAL linux.partition evidence.
+
     def test_exists_only_rejects_redundant_or_conflicting_assertions(self):
         for extra in ({"must":{"mount_point":{"equals":"/var/tmp"}}},
                       {"minimum_resources":1},{"as":"mount"}):
