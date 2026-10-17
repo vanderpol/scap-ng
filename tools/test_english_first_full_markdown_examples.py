@@ -29,7 +29,7 @@ def yaml_under_heading(md, heading):
     other = md.find("\n## ", start + 3)
     section = md[start:other] if other >= 0 else md[start:]
     fence = chr(96) * 3
-    pattern = "(?m)^" + fence + "yaml\\n(.*?)\\n" + fence
+    pattern = "(?m)^" + fence + "yaml" + chr(10) + "(.*?)" + chr(10) + fence
     match = re.search(pattern, section, re.DOTALL)
     if match is None:
         raise AssertionError("No complete YAML in " + heading)
