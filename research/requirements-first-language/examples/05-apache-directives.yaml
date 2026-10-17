@@ -1,0 +1,16 @@
+id: SV-214228.automated.native
+title: Apache must limit simultaneous session requests
+require:
+  all:
+    - every: apache.loaded_directives
+      where:
+        name: {equals: KeepAlive}
+      must:
+        value: {equals_ignore_case: 'On'}
+      if_empty: fail
+    - every: apache.loaded_directives
+      where:
+        name: {equals: MaxKeepAliveRequests}
+      must:
+        integer_value: {at_least: 100}
+      if_empty: fail
