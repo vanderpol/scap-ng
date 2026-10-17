@@ -155,8 +155,7 @@ assessment:
 
 Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
 
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+```yaml# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-253495.automated
@@ -188,6 +187,7 @@ checks:
   system-non-dc-domain-joined-windows-server-or-workstation-test:
     check: The system is a non-DC domain-joined Windows server or workstation
     inspect: windows.wmi.query
+    from: windows-wmi57-object
     require:
       at_least_one_item_exists: true
       every_item_must_match:
@@ -203,50 +203,50 @@ checks:
               domainrole:
                 is: '3'
     report_elements: all
-    from: windows-wmi57-object
   deny-log-on-through-remote-desktop-services-local-account-test:
     check: Deny log on through Remote Desktop Services - Local account
     inspect: windows.userright
+    from: windows-userright-object
     require:
       at_least_one_item_exists: true
       at_least_one_item_matches:
         trustee_name:
           matches_regex: ^(?i)(NT Authority\\)?Local account$
     report_elements: all
-    from: windows-userright-object
   deny-log-on-through-remote-desktop-services-guests-test:
     check: Deny log on through Remote Desktop Services - Guests
     inspect: windows.userright
+    from: windows-userright-object
     require:
       at_least_one_item_exists: true
       at_least_one_item_matches:
         trustee_name:
           equals_ignoring_case: Guests
     report_elements: all
-    from: windows-userright-object
   deny-log-on-through-remote-desktop-services-domain-admins-test:
     check: Deny log on through Remote Desktop Services - Domain Admins
     inspect: windows.userright
+    from: windows-userright-object
     require:
       at_least_one_item_exists: true
       at_least_one_item_matches:
         trustee_name:
           matches_regex: ^(?i)(.+\\)?Domain Admins$
     report_elements: all
-    from: windows-userright-object
   deny-log-on-through-remote-desktop-services-enterprise-admins-test:
     check: Deny log on through Remote Desktop Services - Enterprise Admins
     inspect: windows.userright
+    from: windows-userright-object
     require:
       at_least_one_item_exists: true
       at_least_one_item_matches:
         trustee_name:
           matches_regex: ^(?i)(.+\\)?Enterprise Admins$
     report_elements: all
-    from: windows-userright-object
   system-standalone-windows-server-or-workstation-test:
     check: The system is a standalone Windows server or workstation
     inspect: windows.wmi.query
+    from: windows-wmi57-object
     require:
       at_least_one_item_exists: true
       every_item_must_match:
@@ -262,17 +262,16 @@ checks:
               domainrole:
                 is: '2'
     report_elements: all
-    from: windows-wmi57-object
   deny-log-on-through-remote-desktop-services-everyone-test:
     check: Deny log on through Remote Desktop Services - Everyone
     inspect: windows.userright
+    from: windows-userright-object
     require:
       at_least_one_item_exists: true
       at_least_one_item_matches:
         trustee_name:
           equals_ignoring_case: Everyone
     report_elements: all
-    from: windows-userright-object
 evaluate:
   any_of:
   - all_of:
