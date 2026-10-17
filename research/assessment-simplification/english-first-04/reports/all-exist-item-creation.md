@@ -4,6 +4,9 @@
 
 The historical six-STIG Test existence choice and collection Item creation behavior are separate.
 
+**Source-authorship correction (17 October 2026):** The project owner clarified that the NIWC enhanced SCAP 1.4 packages carry DISA's SCAP 1.3-authored checks forward *without modification*; new OVAL 5.12.3 authoring features belong to NIWC-added checks in that lineage. Consequently, the frequencies below are **mixed-source mode counts, not author-choice evidence**. The curated native YAML has no complete source-OVAL ID mapping for this 201-Test population; until we join each source Test/Object/State/Variable to its original `oval:mil.disa.stig...` or `oval:navy.navwar.niwcatlantic...` ID, do **not** describe these mode distributions as modern authors choosing against `every_ntuser` or `filepath_exists`. Verified [source ID convention and provenance boundary](../OVAL-SOURCE-PROVENANCE-BOUNDARY.md).
+
+
 ## Observed capability/behavior combinations
 
 | Capability | Item creation behavior | Count |
@@ -39,5 +42,7 @@ The historical six-STIG Test existence choice and collection Item creation behav
 - OVAL source behavior is not necessarily native Item identity policy.
 - Many capabilities do not expose a named item_creation setting.
 - A collection option that preserves existing file Items can change the tested Item population; it is not a safe blind rewrite of all_object_elements_fullfilled.
+- Legacy DISA SCAP 1.3 authoring is inherited without modification in NIWC enhanced 1.4 packages; it is not a valid population for estimating adoption of post-1.3 `item_creation` features.
+- Without original source-OVAL ID attribution, NIWC additions and imported DISA checks cannot be tallied separately in this 201-Test report.
 - The number of returned Items is different from the number of explicitly enumerated expected resource identities.
 - Each absent/error/not_collected source outcome still requires six-state preservation.
