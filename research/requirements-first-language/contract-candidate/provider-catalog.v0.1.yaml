@@ -1,0 +1,108 @@
+# SCAP-NG requirements-first RESEARCH catalog. Not normative v0.4.
+# This catalog specifies the AUTHORED surface and its fixture evaluator.
+# A provider's supported status here is NOT a claim of collection parity.
+catalog_version: 0.1.0
+evidence_contract: native-fixture-v0.1
+providers:
+  linux.mounts:
+    identity: mount_namespace_and_mount_id
+    coverage: current_linux_mount_namespace
+    implementation: prototype_linux_proc_mountinfo
+    using: {}
+    fields:
+      mount_point: string
+      filesystem: string
+      mount_options: list_string
+    relations: {}
+  windows.accounts:
+    identity: source_account_identity
+    coverage: synthetic_only
+    implementation: unimplemented
+    using: {}
+    fields:
+      category: string
+      username: string
+      enabled: boolean
+    relations: {}
+  windows.registry_value:
+    identity: hive_key_name_and_view
+    coverage: synthetic_only
+    implementation: unimplemented
+    singleton: true
+    using:
+      hive: string
+      key: string
+      name: string
+      view: registry_view
+    fields:
+      name: string
+      value: integer
+    relations: {}
+  windows.computer_role:
+    identity: typed_local_computer
+    coverage: synthetic_only_not_source_WMI_State_parity
+    implementation: unimplemented
+    singleton: true
+    using: {}
+    fields:
+      role: string
+    relations: {}
+  windows.user_rights:
+    identity: right_and_principal
+    coverage: synthetic_only_not_source_rights_probe_parity
+    implementation: unimplemented
+    using:
+      right: string
+    fields:
+      right: string
+      principal: string
+    relations: {}
+  apache.config_directives:
+    identity: absolute_source_path_and_line
+    coverage: limited_static_Include_parser_not_effective_config
+    implementation: tools/research_provider_apache_directives.py
+    using: {}
+    fields:
+      name: string
+      raw_value: string
+      integer_value: integer
+      source_file: string
+    relations: {}
+  windows.dns.zones:
+    identity: normalized_zone_id
+    coverage: structured_synthetic_zone_key_fixtures_only
+    implementation: tools/research_dns_zone_key_evidence.py
+    using: {}
+    fields:
+      name: string
+      direction: string
+      directory_integration: boolean
+      signed: boolean
+    relations:
+      zone_signing_keys:
+        owner_field: zone_id
+        fields:
+          zone_id: string
+          kind: string
+          validity_hours: integer
+      key_signing_keys:
+        owner_field: zone_id
+        fields:
+          zone_id: string
+          kind: string
+          validity_hours: integer
+  linux.files_from_account_homes:
+    identity: account_id_and_absolute_file_path
+    coverage: supplied_selected_accounts_immediate_children_only
+    implementation: tools/research_provider_linux_account_files.py
+    using:
+      account_filter: account_predicates
+      filename: regex_string
+      max_depth: one
+      follow_symlinks: boolean
+    fields:
+      name: string
+      mode: posix_mode
+      directory: string
+      account_id: string
+    relations: {}
