@@ -16,6 +16,7 @@ REPORTS = {
     "english-first-04-compact-layout-report.json": "Compact authoring layout",
     "english-first-04-auditor-candidate.json": "Auditor-first requirement language candidate",
     "english-first-04-oval-schema-boundary.json": "Pinned OVAL 5.12.3 source-pattern restriction",
+    "english-first-04-existence-audit.json": "Item existence versus State field existence audit",
     "english-first-04-full-assessment-census.json": "Full Assessment source inversion",
     "english-first-04-six-state-cardinality.json": "Six-state cardinality comparison",
     "english-first-04-none-exist-state-boundary.json": "Unresolved none_exist State boundary",
