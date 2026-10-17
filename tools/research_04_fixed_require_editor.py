@@ -261,6 +261,20 @@ def check_negative_guards(doc, validator):
             raise AssertionError("converter admitted invalid requirement")
     return len(negatives)
 
+def count_logical_scopes(node, result):
+    """Count explicitly marked groups, not arbitrary names in record values."""
+    if isinstance(node, list):
+        for value in node:
+            count_logical_scopes(value, result)
+    elif isinstance(node, dict):
+        if "scope" in node:
+            if node["scope"] not in {"states", "fields"}:
+                raise AssertionError("unexpected condition scope")
+            result["condition_scope_" + node["scope"]] += 1
+            result["condition_operator_" + next(k for k in ("and", "or") if k in node)] += 1
+        for value in node.values():
+            count_logical_scopes(value, result)
+
 def census(archive, schema, examples=None):
     digest = hashlib.sha256(Path(archive).read_bytes()).hexdigest()
     if digest != PINNED:
@@ -302,6 +316,12 @@ def census(archive, schema, examples=None):
                 per_folder[folder]["exact"] += 1
                 for check in candidate["checks"].values():
                     modes[check["require"]["items"]] += 1
+                    if "condition" in check["require"]:
+                        prior = counts["condition_scope_states"] + counts["condition_scope_fields"]
+                        count_logical_scopes(check["require"]["condition"], counts)
+                        current = counts["condition_scope_states"] + counts["condition_scope_fields"]
+                        if current > prior:
+                            counts["checks_with_grouped_condition"] += 1
                 if path in sample_paths:
                     sample_data[sample_paths[path]] = candidate
             except (ValueError, AssertionError, KeyError, TypeError) as exc:
@@ -363,7 +383,12 @@ def markdown(report):
            "| --- | ---: | ---: |"]
     for folder,counts in report["per_source_folder"].items():
         lines.append(f"| {folder} | {counts.get('exact',0)} | {counts.get('rejected',0)} |")
-    lines+=["", "## Remaining blockers", ""]
+    lines+=["", "## How often the extra scope field is necessary", "",
+            f"- Groups over whole States: **{c.get('condition_scope_states',0)}**",
+            f"- Groups within one State: **{c.get('condition_scope_fields',0)}**",
+            f"- Tests with any grouped condition: **{c.get('checks_with_grouped_condition',0)}** of {c['exact_tests']}",
+            "Single-field conditions require no scope marker.", "",
+            "## Remaining blockers", ""]
     for failure in report["rejects"]:
         lines.append("- `"+failure["source"]+"` — "+failure["error"])
     lines+=["", "## Meaning of this result", ""]
