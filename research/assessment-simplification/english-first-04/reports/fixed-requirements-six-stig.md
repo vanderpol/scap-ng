@@ -79,6 +79,42 @@ Folder 'shared' is not a seventh STIG. Its Assessments may be used in several st
 - `authoring/shared/assessments/linux/files/gpg-signature-enabled-software-repo.assessment.yaml` — `no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set-test`: Item `all_exist_and_none_match`, field modes ``; anomaly=False
 - `authoring/shared/assessments/linux/files/verify-boot-loader-root-admin-adminstrator.assessment.yaml` — `verify-boot-loader-password-not-set-root-admin-or-adminstrator-test`: Item `none_exist`, field modes ``; anomaly=True
 
+## Six-STIG source-folder coverage after third choice
+
+The six STIGs share additional Assessments; the shared folder is not a seventh benchmark.
+
+| Source folder | Tests covered | Assessments covered |
+| --- | ---: | ---: |
+| apache_server_2-4_unix_server | 57/57 (100.0%) | 23/23 (100.0%) |
+| ms_windows_11 | 151/154 (98.1%) | 90/93 (96.8%) |
+| ms_windows_server_2025 | 173/175 (98.9%) | 109/110 (99.1%) |
+| ms_windows_server_dns | 53/53 (100.0%) | 21/21 (100.0%) |
+| oracle_linux_9 | 57/57 (100.0%) | 41/41 (100.0%) |
+| rhel_9 | 99/99 (100.0%) | 57/57 (100.0%) |
+| shared | 778/780 (99.7%) | 525/527 (99.6%) |
+
+## Remaining individual Tests after three choices
+
+These are not reasons to rewrite a STIG merely to inflate a percentage.
+
+- `authoring/ms_windows_11/assessments/automated/SV-253266.automated.yaml` — `review-installed-os-via-powershell-test`: `only_one_exists_and_only_one_matches`. Requires exactly one existing Item and exactly one matching Item; preserve unless collector cardinality is proven.
+- `authoring/ms_windows_11/assessments/automated/SV-253289.automated.yaml` — `secondary-logon-service-startup-type-disabled-or-service-uninstalled-test`: `may_be_absent_and_some_match`. Optional population with some-match semantics; not equivalent to optional all-match if multiple Items exist.
+- `authoring/ms_windows_11/assessments/automated/SV-253296.automated.yaml` — `review-windows-time-service-configuration-via-powershell-test`: `only_one_exists_and_only_one_matches`. Requires exactly one existing Item and exactly one matching Item; preserve unless collector cardinality is proven.
+- `authoring/ms_windows_server_2025/assessments/automated/SV-278090.automated.yaml` — `windows-server-virtualization-based-security-enabled-platform-security-level-configured-test`: `at_least_one_exists_and_only_one_matches`. Requires at least one Item and exactly one matching Item; this source also needs distinct nested field cardinality.
+- `authoring/ms_windows_server_2025/assessments/automated/SV-278090.automated.yaml` — `windows-server-virtualization-based-security-enabled-platform-security-level-configured-2-test`: `at_least_one_exists_and_only_one_matches`. Requires at least one Item and exactly one matching Item; this source also needs distinct nested field cardinality.
+- `authoring/shared/assessments/linux/files/gpg-signature-enabled-software-repo.assessment.yaml` — `no-etc-yum-repos-d-repo-reponame-has-gpgcheck-set-test`: `all_exist_and_none_match`. Requires all-exist semantics plus zero matching Items; not a no-Items Test.
+- `authoring/shared/assessments/linux/files/verify-boot-loader-root-admin-adminstrator.assessment.yaml` — `verify-boot-loader-password-not-set-root-admin-or-adminstrator-test`: `none_exist`. Contradictory source: none_exist Test with attached State; trace OVAL XML and converter before altering.
+
+## Recommendation
+
+The 98% overall mode-coverage target can be met with just two extra scoped choices,
+but Windows 11 remains below 98% of its own source-folder Assessments after the third addition.
+Keep rare valid semantics available through the SAME item/condition grammar, not a second source dialect.
+Do not equate full enum coverage with proof of a shallow condition syntax for records,
+Set filters, Variables, State alternatives, or six-state collection/evidence behavior.
+Assess the five semantic residual classes above before standardizing labels.
+
+
 ## Limits and decision rule
 
 - Folder 'shared' is reused across benchmarks; source-folder coverage is not Rule coverage.
