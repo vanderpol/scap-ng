@@ -189,14 +189,14 @@ class CandidateBContractTests(unittest.TestCase):
         tree=sample(APACHE)
         fixtures={"apache.config_directives":pop(
             item("a",name="KeepAlive",raw_value="Off"),
-            item("b",name="MaxKeepAliveRequests",raw_value={"field_status":"error"}))}
+            item("b",name="MaxKeepAliveRequests",integer_value={"field_status":"error"}))}
         self.assertEqual(evaluate(tree,fixtures).result,FALSE)
 
     def test_real_apache_can_have_both_directives_but_not_source_parity(self):
         tree=sample(APACHE)
         fixtures={"apache.config_directives":pop(
             item("a",name="KeepAlive",raw_value="On"),
-            item("b",name="MaxKeepAliveRequests",raw_value="150"))}
+            item("b",name="MaxKeepAliveRequests",integer_value=150))}
         self.assertEqual(evaluate(tree,fixtures).result,TRUE)
         # This does not prove any of four OVAL shellcommand Items exist.
 
