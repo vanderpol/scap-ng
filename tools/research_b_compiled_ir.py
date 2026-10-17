@@ -124,6 +124,53 @@ def _node(node, source_kind, depth=0):
                     "invalid pre-evaluated OVAL Item results")
         return
 
+    if kind == "compat_oval_provider_state":
+        _ensure(source_kind != "native",
+                "source State operations may only be compiler generated")
+        keys={"kind","source_assessment_id","source_test_id","provider",
+              "using","existence","check","state"}
+        _ensure(set(node)==keys, "unexpected State compatibility IR keys")
+        _ensure(node["provider"]=="linux.textfile_matches",
+                "State evaluation supported only for bounded textfile pilot")
+        _ensure(all(isinstance(node[k],str) and bool(node[k])
+                    for k in ("source_assessment_id","source_test_id")),
+                "source State provenance identity required")
+        _ensure(node["existence"] in {"at_least_one_exists","none_exist","only_one_exists"},
+                "unsupported source Test existence")
+        _ensure(node["check"] in {"all","at least one","only one","none satisfy"},
+                "unsupported source Item matching")
+        using=node["using"]
+        required={"path","pattern","ignore_case","multiline","singleline"}
+        _ensure(isinstance(using,dict) and set(using)==required,
+                "source State acquisition parameters invalid")
+        _ensure(isinstance(using["path"],str) and using["path"].startswith("/")
+                and isinstance(using["pattern"],str) and bool(using["pattern"]),
+                "source State path/regex must be explicit")
+        _ensure(all(type(using[k]) is bool
+                    for k in ("ignore_case","multiline","singleline")),
+                "source State regex flags must be Boolean")
+        import re
+        try:
+            expression=re.compile(using["pattern"],
+                    (re.IGNORECASE if using["ignore_case"] else 0) |
+                    (re.MULTILINE if using["multiline"] else 0) |
+                    (re.DOTALL if using["singleline"] else 0))
+        except re.error as exc:
+            raise ValueError("source State regex must compile for research provider") from exc
+        _ensure(expression.groups==1 and not expression.groupindex,
+                "source State comparison requires exactly one unnamed group")
+        state=node["state"]
+        _ensure(isinstance(state,dict) and set(state)=={
+            "field","operation","expected","entity_existence","entity_check"},
+            "invalid State entity IR")
+        _ensure(state["field"]=="subexpression" and
+                state["operation"] in {"equals","not_equals"} and
+                isinstance(state["expected"],str) and
+                state["entity_existence"]=="at_least_one_exists" and
+                state["entity_check"]=="all",
+                "unsupported source State entity operation/type/cardinality")
+        return
+
     if kind == "compat_oval_provider_existence":
         _ensure(source_kind != "native",
                 "source provider compatibility operation cannot be native authored")
@@ -211,7 +258,8 @@ def _classify(node, depth=0):
     kind = node["kind"]
     if kind == "manual_procedure":
         return {"manual"}
-    if kind in {"compat_oval_test","compat_oval_provider_existence"}:
+    if kind in {"compat_oval_test","compat_oval_provider_existence",
+                "compat_oval_provider_state"}:
         return {"compiler-compatibility"}
     if kind == "logic":
         result = set()
