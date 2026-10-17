@@ -1,6 +1,9 @@
 # English-first 0.4 Assessment authoring — source-compatibility research
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
+
+**[NEW — merged vs split requirement proof](require-presentation-comparison/report.md):** both presentations reconstruct 871/872 full automated Assessments (1,374/1,375 Tests) from the pinned six STIGs; 1,742 invalid-input mutations rejected. Compare [RHEL split](require-presentation-comparison/linux-home.split.research.yaml) / [merged](require-presentation-comparison/linux-home.merged.research.yaml), [Windows WMI split](require-presentation-comparison/windows-wmi-rights.split.research.yaml) / [merged](require-presentation-comparison/windows-wmi-rights.merged.research.yaml), and [Apache split](require-presentation-comparison/apache.split.research.yaml) / [merged](require-presentation-comparison/apache.merged.research.yaml). **Neither author-facing grammar is approved**, and the 201 `all_exist` source Test distinctions are preserved (not normalized) pending six-state runtime/evidence proof.
+
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
 **[Working scoped `and` / `or` authoring + editor proof](SCOPED-AND-OR-EDITOR-PILOT.md)** — real Windows WMI, Linux permissions and six-STIG source-exact examples. Sibling `scope: states|fields` with `and|or`, validated autocomplete for four native capabilities; 871/872 source-exact Assessments, 3,484 malformed-input guards, and original NIWC bootloader violation identified. [CI proof](https://github.com/vanderpol/scap-ng/actions/runs/39034513658).
