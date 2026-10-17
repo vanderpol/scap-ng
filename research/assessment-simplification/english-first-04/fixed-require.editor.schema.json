@@ -31,9 +31,7 @@
       }
     },
     "evaluate": {
-      "type": "object",
-      "minProperties": 1,
-      "description": "Explicit evaluation tree; not changed by this pilot."
+      "$ref": "#/$defs/evaluateNode"
     }
   },
   "$defs": {
@@ -378,6 +376,105 @@
               }
             }
           }
+        }
+      ]
+    },
+    "evaluateNode": {
+      "description": "One OVAL-compatible named-Test evaluation tree. Distinct from State matching and Item cardinality.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "test"
+          ],
+          "properties": {
+            "test": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Reference to a named Test under checks."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "All operand Test results must satisfy the OVAL six-state AND rule"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "OVAL six-state OR combination"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "exactly_one_of"
+          ],
+          "properties": {
+            "exactly_one_of": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "exactly_one_of six-state evaluation rule"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "odd_number_of"
+          ],
+          "properties": {
+            "odd_number_of": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "odd_number_of six-state evaluation rule"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/evaluateNode"
+            }
+          },
+          "additionalProperties": false
         }
       ]
     }
