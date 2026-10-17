@@ -10,6 +10,7 @@ on:
       - tools/research_english_first_04_scalar.py
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
+      - tools/research_english_first_04_vocabulary_variants.py
       - tools/research_english_first_04_references.py
       - tools/research_english_first_04_publish.py
       - research/assessment-simplification/english-first-04/BEFORE-AFTER-REVIEW.md
@@ -119,6 +120,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python tools/research_english_first_04_publish.py
 
+      - name: Verify vocabulary variants and source-exact minimal hybrid
+        run: |
+          python tools/research_english_first_04_vocabulary_variants.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-vocabulary-variants.json \
+            --examples-dir english-first-04-vocabulary-examples
+
       - name: Upload full evidence ledger
         if: always()
         uses: actions/upload-artifact@v4
@@ -132,6 +140,8 @@ jobs:
             english-first-04-generic-scalar.json
             english-first-04-full-assessment-census.json
             english-first-04-compact-layout-report.json
+            english-first-04-vocabulary-variants.json
+            english-first-04-vocabulary-examples/
             english-first-04-reference-graph-report.json
             english-first-04-six-state-cardinality.json
             english-first-04-none-exist-state-boundary.json
