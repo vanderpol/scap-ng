@@ -4,6 +4,7 @@ on:
     paths:
       - .github/workflows/research-fixed-requirements-04.yml
       - tools/research_english_first_04_fixed_requirement_census.py
+      - tools/research_04_all_exist_intent_census.py
   workflow_dispatch:
 
 permissions:
@@ -33,6 +34,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --json fixed-requirements-six-stig.json \
             --markdown fixed-requirements-six-stig.md
+      - name: Analyze all 201 OVAL Test all_exist uses and source patterns
+        run: |
+          python tools/research_04_all_exist_intent_census.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --json all-exist-source-forensics.json \
+            --markdown all-exist-source-forensics.md
       - name: Publish stable GitHub.com results on main
         if: github.ref == 'refs/heads/main'
         env:
@@ -50,7 +57,8 @@ jobs:
               print("Newer main revision detected: skip stale publication")
               raise SystemExit(0)
           folder = "research/assessment-simplification/english-first-04/reports"
-          for name in ("fixed-requirements-six-stig.json", "fixed-requirements-six-stig.md"):
+          for name in ("fixed-requirements-six-stig.json", "fixed-requirements-six-stig.md",
+                       "all-exist-source-forensics.json", "all-exist-source-forensics.md"):
               target = folder + "/" + name
               read = subprocess.run(["gh","api",f"repos/{repo}/contents/{target}",
                                      "--jq",".sha"],capture_output=True,text=True)
@@ -74,4 +82,6 @@ jobs:
           path: |
             fixed-requirements-six-stig.json
             fixed-requirements-six-stig.md
+            all-exist-source-forensics.json
+            all-exist-source-forensics.md
           if-no-files-found: warn
