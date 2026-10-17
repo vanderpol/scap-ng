@@ -35,13 +35,30 @@ WIN="06-windows-privilege-or.yaml"
 LINUX="07-linux-permission-bits.yaml"
 
 class CandidateBContractTests(unittest.TestCase):
-    def test_all_nine_examples_compile_to_single_recursive_ast(self):
+    def test_all_ten_examples_compile_to_single_recursive_ast(self):
         files=sorted(EXAMPLES.glob("*.yaml"))
-        self.assertEqual(len(files),9)
+        self.assertEqual(len(files),10)
         for f in files:
             with self.subTest(file=f.name):
                 tree=read(f)
                 self.assertIn(tree["ast"]["kind"],{"logic","collection"})
+
+    def test_textfile_regex_acquisition_is_typed(self):
+        native=read(EXAMPLES/"10-linux-chrony-cmdport.yaml")["ast"]
+        self.assertEqual(native["mode"],"some")
+        self.assertTrue(native["exists_only"])
+        self.assertEqual(native["provider"],"linux.textfile_matches")
+        using=native["using"]
+        self.assertEqual(using["path"],"/etc/chrony.conf")
+        self.assertTrue(using["multiline"])
+        for bad in (dict(using,path="relative/chrony.conf"),
+                    dict(using,ignore_case="false"),
+                    dict(using,pattern="[")):
+            doc={"id":"x","title":"x","require":{
+                "exists":"linux.textfile_matches","using":bad}}
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    compile_doc(doc)
 
     def test_existence_only_src_linux_partition_validates_and_decides(self):
         source=read(EXAMPLES/"09-linux-var-tmp-exists.yaml")["ast"]
