@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[NEW — iterated readability revision and repeated reviews (17 October)](ITERATED-READABILITY-REVIEW-2026-10-17.md)** — four critical passes on the same original Linux, Windows, Apache and DNS examples. Trials `matching_items` / `matching_records` and explicit population naming, records remaining field-inheritance/six-state issues, and distinguishes a same-assistant lexical stopping point from independent proof. **[Send the answer-free Gemini blind/technical review packet](GEMINI-INDEPENDENT-REVIEW-PACKET.md) in a fresh conversation**, without linking this review's rationale or expected interpretations. Neither is approved v0.4 syntax; original source-backed examples remain unchanged.
+
+
 **[NEXT CHECKPOINT — close field/scope semantics → generate an auditor preview → blind comprehension test](NEXT-READABILITY-DECISION-GATE.md).** One concise action plan with RHEL, Windows, Apache and DNS counterexamples, acceptance conditions, and existing issue ownership. The current split requirements remain an experimental baseline; no new YAML wrapper experiments, no approved 0.4 language or editor implementation implied.
 
 
