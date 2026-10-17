@@ -60,8 +60,10 @@ SAMPLES = {
     "apache": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.yaml",
 }
 
-# In OVAL, OR of complete States is NOT an OR across individual
-# fields/records. The 'states' header makes that evaluation scope explicit.
+# OVAL `states_match` combines complete States, while a logical node
+# INSIDE one State combines predicates with a different scope.  Put `scope`
+# alongside `and`/`or`, keeping indent depth/field order consistent and
+# letting schema-based editors require a selection instead of guessing it.
 WHOLE_STATE_TO_LOGIC = {"any_of": "or", "all_states": "and"}
 LOGIC_TO_WHOLE_STATE = {v:k for k,v in WHOLE_STATE_TO_LOGIC.items()}
 WITHIN_STATE_TO_LOGIC = {"all_of": "and", "any_of_fields": "or"}
@@ -70,7 +72,7 @@ LOGIC_TO_WITHIN_STATE = {v:k for k,v in WITHIN_STATE_TO_LOGIC.items()}
 def _state_condition_to_logic(node):
     if not isinstance(node,dict) or not node:
         raise ValueError("State predicate must be nonempty")
-    groups = set(node) & set(WITHIN_STATE_TO_LOGIC)
+    groups=set(node) & set(WITHIN_STATE_TO_LOGIC)
     if groups:
         if len(groups)!=1 or set(node)-groups-{"all_fields_must_exist"}:
             raise ValueError("ambiguous State-field logical group")
@@ -78,23 +80,25 @@ def _state_condition_to_logic(node):
         children=node[op]
         if not isinstance(children,list) or not children:
             raise ValueError("State-field logical group must have operands")
-        out={WITHIN_STATE_TO_LOGIC[op]:[
+        out={"scope":"fields", WITHIN_STATE_TO_LOGIC[op]:[
             _state_condition_to_logic(child) for child in children]}
         if "all_fields_must_exist" in node:
             if node["all_fields_must_exist"] is not True:
                 raise ValueError("State field requirement must be true")
             out["all_fields_must_exist"]=True
         return out
-    if len(node)!=1 or set(node)&({"and","or","states","any_of","all_states"}):
+    if len(node)!=1 or set(node)&({"scope","and","or","states","any_of","all_states"}):
         raise ValueError("invalid single State leaf")
     return deepcopy(node)
 
 def _logic_to_state_condition(node):
     if not isinstance(node,dict) or not node:
         raise ValueError("State condition must be nonempty")
-    groups=set(node) & set(LOGIC_TO_WITHIN_STATE)
-    if groups:
-        if len(groups)!=1 or set(node)-groups-{"all_fields_must_exist"}:
+    if "scope" in node:
+        if node["scope"]!="fields":
+            raise ValueError("nested State logical groups must scope to fields")
+        groups=set(node)&set(LOGIC_TO_WITHIN_STATE)
+        if len(groups)!=1 or set(node)-groups-{"all_fields_must_exist","scope"}:
             raise ValueError("State-field group has conflicting operators")
         op=next(iter(groups))
         children=node[op]
@@ -107,14 +111,14 @@ def _logic_to_state_condition(node):
                 raise ValueError("all_fields_must_exist must be true")
             out["all_fields_must_exist"]=True
         return out
-    if len(node)!=1 or set(node)&({"states","any_of","all_states","all_of","any_of_fields"}):
-        raise ValueError("invalid State field condition")
+    if len(node)!=1 or set(node)&({"states","and","or","any_of","all_states","all_of","any_of_fields"}):
+        raise ValueError("field-level logic requires scope: fields")
     return deepcopy(node)
 
 def state_condition_to_logic(node):
     if not isinstance(node,dict) or not node:
         raise ValueError("condition must be a nonempty mapping")
-    outer=set(node) & set(WHOLE_STATE_TO_LOGIC)
+    outer=set(node)&set(WHOLE_STATE_TO_LOGIC)
     if outer:
         if len(outer)!=1 or set(node)!=outer:
             raise ValueError("whole-State alternatives must have one operator")
@@ -122,22 +126,21 @@ def state_condition_to_logic(node):
         children=node[op]
         if not isinstance(children,list) or len(children)<2:
             raise ValueError("whole-State alternatives need at least two States")
-        return {"states":{WHOLE_STATE_TO_LOGIC[op]:[
-            _state_condition_to_logic(c) for c in children]}}
+        return {"scope":"states", WHOLE_STATE_TO_LOGIC[op]:[
+            _state_condition_to_logic(c) for c in children]}
     return _state_condition_to_logic(node)
 
 def logic_to_state_condition(node):
     if not isinstance(node,dict) or not node:
         raise ValueError("condition must be a nonempty mapping")
-    if "states" in node:
-        if set(node)!={"states"} or not isinstance(node["states"],dict):
-            raise ValueError("whole-State alternatives need a states header")
-        choices=node["states"]
-        if len(choices)!=1 or next(iter(choices)) not in LOGIC_TO_WHOLE_STATE:
-            raise ValueError("states must choose one and/or operator")
-        op,children=next(iter(choices.items()))
+    if node.get("scope")=="states":
+        groups=set(node)&set(LOGIC_TO_WHOLE_STATE)
+        if len(groups)!=1 or set(node)!={"scope",next(iter(groups))}:
+            raise ValueError("whole-State alternatives require scope and one operator")
+        op=next(iter(groups))
+        children=node[op]
         if not isinstance(children,list) or len(children)<2:
-            raise ValueError("states operator requires at least two entire States")
+            raise ValueError("whole-State alternatives need at least two complete States")
         return {LOGIC_TO_WHOLE_STATE[op]:[
             _logic_to_state_condition(c) for c in children]}
     return _logic_to_state_condition(node)
@@ -351,7 +354,7 @@ def markdown(report):
            "when the chosen Item mode evaluates a State, and absent for State-free checks.",
            "",
            "The nested evaluate tree uses OVAL-aligned `and` / `or` (not `all_of` / `any_of`).",
-           "Conditions use `and` / `or` too. Whole-State alternatives are explicitly headed `states`.",
+           "Grouped conditions use sibling `scope: fields|states` and `and` / `or` keys.",
            "This rename is **strictly scoped to evaluate**: State alternatives and nested State-field groups are",
            "not indiscriminately renamed, because conflating distinct grouping scopes can change results.",
            "",
