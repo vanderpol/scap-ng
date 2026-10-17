@@ -105,10 +105,35 @@ def from_fixed_requirement(node):
     existence, match = REVERSE_PAIRS[mode]
     return {"items": existence, match: deepcopy(condition)}
 
+# Logical composition is a different scope from Item/State/record cardinality.
+# Change only whole-Assessment evaluate operators here. Nested State-alternative
+# 'any_of' and within-State 'all_of' need independent scope-preserving mapping.
+EVAL_LOGIC_TO_OVAL = {"all_of":"and", "any_of":"or",
+                      "exactly_one_of":"exactly_one_of",
+                      "odd_number_of":"odd_number_of", "not":"not"}
+EVAL_LOGIC_FROM_OVAL = {v:k for k,v in EVAL_LOGIC_TO_OVAL.items()}
+
+def map_evaluate_operators(node, mapping):
+    if not isinstance(node,dict) or len(node)!=1:
+        raise ValueError("evaluate requires exactly one logical operator")
+    key,value=next(iter(node.items()))
+    if key=="test":
+        if not isinstance(value,str) or not value:
+            raise ValueError("evaluate test reference must be nonempty")
+        return {"test":value}
+    if key not in mapping:
+        raise ValueError("unrecognized evaluate operator "+repr(key))
+    if key=="not":
+        return {mapping[key]:map_evaluate_operators(value,mapping)}
+    if not isinstance(value,list) or not value:
+        raise ValueError("logical and/or requires a nonempty list of operands")
+    return {mapping[key]:[map_evaluate_operators(x,mapping) for x in value]}
+
 def to_fixed(source):
     doc = to_auditor(compact(to_human(source)))
     for check in doc["checks"].values():
         check["require"] = to_fixed_requirement(check["require"])
+    doc["evaluate"] = map_evaluate_operators(doc["evaluate"], EVAL_LOGIC_TO_OVAL)
     return doc
 
 def from_fixed(candidate):
@@ -121,6 +146,7 @@ def from_fixed(candidate):
         if "require" not in check:
             raise ValueError("a check must have require")
         check["require"] = from_fixed_requirement(check["require"])
+    out["evaluate"] = map_evaluate_operators(out["evaluate"], EVAL_LOGIC_FROM_OVAL)
     return to_native(expand(from_auditor(out)))
 
 def check_negative_guards(doc, validator):
@@ -241,6 +267,10 @@ def markdown(report):
            "",
            "The `items` field is a **documented editor-dropdown enum**, `condition` is mandatory",
            "when the chosen Item mode evaluates a State, and absent for State-free checks.",
+           "",
+           "The nested evaluate tree uses OVAL-aligned `and` / `or` (not `all_of` / `any_of`).",
+           "This rename is **strictly scoped to evaluate**: State alternatives and nested State-field groups are",
+           "not indiscriminately renamed, because conflating distinct grouping scopes can change results.",
            "",
            "## Per source folder", "",
            "| Folder | Exact Assessments | Rejected |",
