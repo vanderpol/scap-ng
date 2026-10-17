@@ -116,6 +116,23 @@ class LinuxInitializationSourceConstraintTests(unittest.TestCase):
             file("same","root-one","/root",mode=0o644)])
         self.assertEqual(evaluate(snapshot,"root").result,"error")
 
+    def test_source_conscious_authoring_form_counts_global_root_files(self):
+        research=(ROOT/"research/requirements-first-language/experiments/linux-init-global-population.yaml")
+        new=yaml.safe_load(research.read_text())
+        self.assertEqual(len(new["require"]["all"]),2)
+        other,root=new["require"]["all"]
+        self.assertEqual(other["each"],"linux.files")
+        self.assertEqual(root["each"],"linux.files")
+        self.assertNotIn("minimum_resources",other)
+        self.assertEqual(root["minimum_resources"],1)
+        for branch in (other,root):
+            # The minimum count is outside the account-source mapping.
+            # A per-account minimum would change the original union.
+            self.assertEqual(branch["must"]["mode"],{"only_these_bits":"0740"})
+            self.assertEqual(branch["using"]["from_account_homes"]["account_source"],"linux.accounts")
+        self.assertEqual(other["using"]["from_account_homes"]["where"]["uid"],{"at_least":1000})
+        self.assertEqual(root["using"]["from_account_homes"]["where"]["uid"],{"equals":0})
+
     def test_original_source_document_contract_is_pinned(self):
         doc=yaml.safe_load(SOURCE.read_text())
         self.assertEqual(doc["sources"]["users-username-object"]["where"]["username"]["matches_regex"],r"[\w]+")
