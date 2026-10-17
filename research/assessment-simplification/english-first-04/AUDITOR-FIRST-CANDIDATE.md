@@ -159,6 +159,20 @@ These are illustrations of one candidate grammar, **not complete executable Asse
 
 The grammar recognizes **only the ten proven paired Item modes and five State-free modes**. An unmodeled pair is rejected; it is not guessed or assigned a default. It preserves nested State-field cardinality, WMI record grouping, Set operand order, error statuses, and command/Variable references.
 
+## Boundaries before promoting this as the one 0.4 standard
+
+The **871/872 proof covers automated Assessments**, not every SCAP-NG content type. This is deliberate; [the 0.4 draft scope](../compact-authoring-04/0.4-SCOPE-AND-RELEASE-GATES.md) preserves several existing contracts without redesigning them. Completing these compatibility checks is part of judging this candidate, not a mandate for new keywords.
+
+| Concern | Required compatibility or separate proof |
+| --- | --- |
+| Manual checks | Keep first-class `mode: manual`, `procedure`, explicit human response choices, evidence/comment support and reviewer provenance. The existing [manual Assessment schema](../../../schema/v0.4.0/manual-assessment.schema.json) is not validated by the 871 automated round trips. |
+| Organizational Input | Preserve author-declared Input contracts, concrete value binding and provenance. Do not silently manufacture values or reinterpret those Inputs as system-observed State. |
+| Applicability and decision branches | Keep the original named-check `evaluate` AST and six-state behavior. The [conditional research](../conditional-10/README.md) shows **81 of 216** six-state cases differ if an OVAL `OR(AND(G,P),AND(NOT G,Q))` is casually rewritten as a procedural `if/else`. A natural wording alone is not authority to change execution semantics. |
+| Violation queries | The [violation-query research](../violation-query-14/README.md) proves `exclude compliant Items → none_exist` is **not always equivalent** to simply `every_item` matching the positive requirement. Non-Boolean filter State outcomes become collection errors. |
+| Reporting and diagnostic results | Preserve collection flags, source Item evidence, explicit field/record scopes and all original `report_elements` behavior. Do not hide cases behind a success-only narrative. |
+
+**Auditor acceptance standard:** a security auditor needs to read the simple cases comfortably *and* identify data provenance, Item count, field cardinality, missing data, error behavior and final decision logic for complicated cases. The remaining work is measuring this with real reviewers, resolving the original OVAL exception, and proving semantics independently. "Looks simpler" is not sufficient.
+
 ## Proof and decision gates
 
 - The pinned six-STIG archive contains **872 distinct automated Assessments**. Exact whole-Assessment source reconstruction is currently **871/872**, or **1,374 named Tests**, including the four large real-world examples. The proposed `require.items`/match structure is additionally tested by an independent reversible experimental transformer and nine intentional malformed-input guards.
