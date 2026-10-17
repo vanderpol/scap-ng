@@ -1,0 +1,16 @@
+id: native-apache-keepalive
+title: Observed Apache KeepAlive and MaxKeepAliveRequests directives must satisfy policy
+require:
+  all:
+    - each: apache.config_directives
+      where:
+        name: {equals: KeepAlive}
+      minimum_resources: 1
+      must:
+        raw_value: {equals: 'On'}
+    - each: apache.config_directives
+      where:
+        name: {equals: MaxKeepAliveRequests}
+      minimum_resources: 1
+      must:
+        raw_value: {equals: '150'}
