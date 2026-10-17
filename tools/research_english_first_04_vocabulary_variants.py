@@ -87,6 +87,30 @@ def from_minimal(node):
             raise ValueError("ambiguous capability value")
     return out
 
+def document_to_minimal(doc):
+    """Only transform the Assessment vocabulary, never source-native Variables."""
+    if set(doc)!={"metadata","sources","checks","evaluate"}:
+        raise ValueError("unexpected research Assessment")
+    return {
+        "metadata":deepcopy(doc["metadata"]),
+        "sources":{k:to_minimal(v) for k,v in doc["sources"].items()},
+        "checks":{k:to_minimal(v) for k,v in doc["checks"].items()},
+        "evaluate":deepcopy(doc["evaluate"]),
+    }
+
+
+def document_from_minimal(doc):
+    """Inverse of the vocabulary-only transformation."""
+    if set(doc)!={"metadata","sources","checks","evaluate"}:
+        raise ValueError("unexpected hybrid Assessment")
+    return {
+        "metadata":deepcopy(doc["metadata"]),
+        "sources":{k:from_minimal(v) for k,v in doc["sources"].items()},
+        "checks":{k:from_minimal(v) for k,v in doc["checks"].items()},
+        "evaluate":deepcopy(doc["evaluate"]),
+    }
+
+
 def first_structural_difference(a,b, path=""):
     if type(a) is not type(b):
         return path + ": type " + type(a).__name__ + " vs " + type(b).__name__
@@ -124,8 +148,8 @@ def examine(archive, examples_dir=None):
             counts["assessments_total"]+=1
             try:
                 english=compact(to_human(source))
-                hybrid=to_minimal(english)
-                returned=from_minimal(hybrid)
+                hybrid=document_to_minimal(english)
+                returned=document_from_minimal(hybrid)
                 if returned!=english:
                     raise AssertionError("hybrid inverse: "+first_structural_difference(english,returned))
                 reconstructed=to_native(expand(returned))
