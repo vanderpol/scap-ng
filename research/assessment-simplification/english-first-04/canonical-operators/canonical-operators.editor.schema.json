@@ -1,0 +1,2148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/english-first-04/canonical-operators.schema.json",
+  "title": "RESEARCH: existing 0.4 comparison operators and consistent quantifiers",
+  "description": "Editor/JSON Schema for prototype YAML. Source structural inversion only. Not normative or scanner-conformant.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "sources",
+    "checks",
+    "evaluate"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Assessment identity and metadata, no special authoring syntax adopted."
+    },
+    "sources": {
+      "type": "object",
+      "description": "Named shared collectors/sources.",
+      "additionalProperties": {
+        "type": "object"
+      }
+    },
+    "checks": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/check"
+      }
+    },
+    "evaluate": {
+      "$ref": "#/$defs/evaluateNode"
+    }
+  },
+  "$defs": {
+    "condition": {
+      "description": "Single field predicate, or an explicit scope: fields/states plus and/or. Prevents implicit scope changes.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/stateNode"
+        },
+        {
+          "$ref": "#/$defs/wholeStateAlternatives"
+        }
+      ]
+    },
+    "presenceRequirement": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "at_least_one",
+              "description": "At least one collected Item must exist; no State comparison",
+              "title": "at_least_one"
+            },
+            {
+              "const": "exactly_one",
+              "description": "Exactly one collected Item must exist; no State comparison",
+              "title": "exactly_one"
+            },
+            {
+              "const": "none",
+              "description": "No collected Item may exist",
+              "title": "none"
+            },
+            {
+              "const": "all_exist",
+              "description": "Legacy OVAL all_exist; retain for source compatibility, not preferred native authoring",
+              "title": "all_exist"
+            },
+            {
+              "const": "if_present",
+              "description": "Presence optional; no State comparison",
+              "title": "if_present"
+            }
+          ]
+        }
+      }
+    },
+    "conditionRequirement": {
+      "type": "object",
+      "required": [
+        "items",
+        "condition"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "items": {
+          "type": "string",
+          "oneOf": [
+            {
+              "const": "at_least_one_all_match",
+              "description": "At least one Item exists, and every collected Item satisfies the condition",
+              "title": "at_least_one_all_match"
+            },
+            {
+              "const": "at_least_one_some_match",
+              "description": "At least one Item exists, and at least one satisfies the condition",
+              "title": "at_least_one_some_match"
+            },
+            {
+              "const": "if_present_all_match",
+              "description": "If any Items exist, every collected Item must satisfy the condition",
+              "title": "if_present_all_match"
+            },
+            {
+              "const": "all_exist_all_match",
+              "description": "Legacy all_exist plus all match; distinct on incomplete/errored collections",
+              "title": "all_exist_all_match"
+            },
+            {
+              "const": "at_least_one_one_match",
+              "description": "At least one Item exists and exactly one Item satisfies the condition",
+              "title": "at_least_one_one_match"
+            },
+            {
+              "const": "exactly_one_one_match",
+              "description": "Exactly one Item exists, and exactly one satisfies the condition (legacy spelling)",
+              "title": "exactly_one_one_match"
+            },
+            {
+              "const": "exactly_one_all_match",
+              "description": "Exactly one Item exists, and all satisfy the condition (legacy spelling)",
+              "title": "exactly_one_all_match"
+            },
+            {
+              "const": "if_present_none_match",
+              "description": "If Items exist, none may satisfy the forbidden condition",
+              "title": "if_present_none_match"
+            },
+            {
+              "const": "if_present_some_match",
+              "description": "Optional Items plus some-match; subtle OVAL empty-collection semantics, review",
+              "title": "if_present_some_match"
+            },
+            {
+              "const": "all_exist_none_match",
+              "description": "Legacy all_exist plus no match; distinct on incomplete/errored collections",
+              "title": "all_exist_none_match"
+            }
+          ]
+        },
+        "condition": {
+          "$ref": "#/$defs/condition"
+        }
+      }
+    },
+    "requirement": {
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "items"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "items": {
+                  "enum": [
+                    "at_least_one",
+                    "exactly_one",
+                    "none",
+                    "if_present",
+                    "legacy_all_exist"
+                  ]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "all"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "exactly_one"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "exactly_one"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "exactly_one"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "at_least_one"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "at_least_one"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "at_least_one"
+                },
+                "match": {
+                  "const": "at_least_one"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "exactly_one"
+                },
+                "match": {
+                  "const": "all"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "exactly_one"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "exactly_one"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "exactly_one"
+                },
+                "match": {
+                  "const": "exactly_one"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "exactly_one"
+                },
+                "match": {
+                  "const": "exactly_one"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "exactly_one"
+                },
+                "match": {
+                  "const": "exactly_one"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "all"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "none"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "none"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "none"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "at_least_one"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "at_least_one"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "if_present"
+                },
+                "match": {
+                  "const": "at_least_one"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "legacy_all_exist"
+                },
+                "match": {
+                  "const": "all"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "legacy_all_exist"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "legacy_all_exist"
+                },
+                "match": {
+                  "const": "all"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match"
+              ],
+              "minProperties": 3,
+              "maxProperties": 3,
+              "properties": {
+                "items": {
+                  "const": "legacy_all_exist"
+                },
+                "match": {
+                  "const": "none"
+                }
+              },
+              "patternProperties": {
+                "^(?!(?:items|match|scope|states|fields|condition|all_fields_must_exist)$).+$": {
+                  "type": "object",
+                  "minProperties": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "states"
+              ],
+              "properties": {
+                "items": {
+                  "const": "legacy_all_exist"
+                },
+                "match": {
+                  "const": "none"
+                },
+                "states": {
+                  "$ref": "#/$defs/modernStatesGroup"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "items",
+                "match",
+                "fields"
+              ],
+              "properties": {
+                "items": {
+                  "const": "legacy_all_exist"
+                },
+                "match": {
+                  "const": "none"
+                },
+                "fields": {
+                  "$ref": "#/$defs/modernFieldsGroup"
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        {
+          "$ref": "#/$defs/noEnglishOperatorAliases"
+        }
+      ]
+    },
+    "check": {
+      "type": "object",
+      "required": [
+        "check",
+        "inspect",
+        "require",
+        "report_elements"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "check": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Short, plain-English objective of the Test."
+        },
+        "inspect": {
+          "type": "string",
+          "minLength": 1,
+          "description": "SCAP-NG capability (e.g. linux.partition, windows.registry)."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "from": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Named source; editor should validate reference against sources."
+        },
+        "gather": {
+          "type": "object",
+          "description": "Inline Object/collection source."
+        },
+        "where": {
+          "type": "object",
+          "description": "Source selector applied before evaluation."
+        },
+        "collect": {
+          "type": "object",
+          "description": "Collection arguments."
+        },
+        "filesystem": {
+          "oneOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "string",
+              "minLength": 1
+            }
+          ],
+          "description": "Filesystem traversal constraint; may be a documented value such as all or a scoped object."
+        },
+        "traversal": {
+          "type": "object"
+        },
+        "input_from": {
+          "type": "object"
+        },
+        "all_state_fields_exist": {
+          "type": "boolean"
+        },
+        "all_state_fields_when_present": {
+          "type": "boolean"
+        },
+        "require": {
+          "$ref": "#/$defs/requirement"
+        },
+        "report_elements": {
+          "const": "all"
+        }
+      },
+      "not": {
+        "required": [
+          "from",
+          "gather"
+        ]
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "linux.partition"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "properties": {
+                      "mount_options": {
+                        "type": "object",
+                        "description": "Multiple mount option values; specify value cardinality explicitly."
+                      },
+                      "mount_point": {
+                        "type": "object"
+                      },
+                      "fs_type": {
+                        "type": "object"
+                      },
+                      "device": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.registry"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "properties": {
+                      "value": {
+                        "type": "object"
+                      },
+                      "type": {
+                        "type": "object"
+                      },
+                      "hive": {
+                        "type": "object"
+                      },
+                      "name": {
+                        "type": "object"
+                      },
+                      "key": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.userright"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "properties": {
+                      "trustee_name": {
+                        "type": "object"
+                      },
+                      "trustee_sid": {
+                        "type": "object"
+                      },
+                      "userright": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.wmi.query"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "properties": {
+                      "result": {
+                        "type": "object",
+                        "description": "Typed record values; field availability depends on selected WQL query."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "linux.partition"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__linux_partition"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.registry"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__windows_registry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.userright"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__windows_userright"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "inspect": {
+                "const": "windows.wmi.query"
+              }
+            },
+            "required": [
+              "inspect"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "properties": {
+                  "condition": {
+                    "$ref": "#/$defs/capCondition__windows_wmi_query"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evaluateNode": {
+      "description": "One OVAL-compatible named-Test evaluation tree. Distinct from State matching and Item cardinality.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "test"
+          ],
+          "properties": {
+            "test": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Reference to a named Test under checks."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "All operand Test results must satisfy the OVAL six-state AND rule"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "OVAL six-state OR combination"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "exactly_one_of"
+          ],
+          "properties": {
+            "exactly_one_of": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "exactly_one_of six-state evaluation rule"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "odd_number_of"
+          ],
+          "properties": {
+            "odd_number_of": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/evaluateNode"
+              },
+              "description": "odd_number_of six-state evaluation rule"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/evaluateNode"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "stateNode": {
+      "description": "One State: single field/record comparison or a field-scope logical group.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "Interpret logical predicates at fields scope, not as a different scope."
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true,
+              "description": "Explicit field-existence policy; may not be omitted during source conversion."
+            }
+          },
+          "description": "AND/OR of predicates inside one State."
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "Interpret logical predicates at fields scope, not as a different scope."
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true,
+              "description": "Explicit field-existence policy; may not be omitted during source conversion."
+            }
+          },
+          "description": "AND/OR of predicates inside one State."
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "propertyNames": {
+            "not": {
+              "enum": [
+                "scope",
+                "and",
+                "or",
+                "states",
+                "all_of",
+                "any_of",
+                "all_states",
+                "any_of_fields",
+                "all_fields_must_exist"
+              ]
+            }
+          },
+          "additionalProperties": {
+            "type": "object",
+            "minProperties": 1
+          },
+          "description": "Single named field or record predicate; no scope keyword needed."
+        }
+      ]
+    },
+    "wholeStateAlternatives": {
+      "description": "Combines complete States, NEVER per-record membership; scope is mandatory.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "Interpret logical predicates at states scope, not as a different scope."
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              }
+            }
+          },
+          "description": "AND/OR of complete alternative States. Each child evaluates all its own record/field requirements first."
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "Interpret logical predicates at states scope, not as a different scope."
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              }
+            }
+          },
+          "description": "AND/OR of complete alternative States. Each child evaluates all its own record/field requirements first."
+        }
+      ]
+    },
+    "capStateNode__linux_partition": {
+      "description": "A linux.partition State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "mount_point": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'mount_point'; operator/value semantics validated separately"
+            },
+            "device": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'device'; operator/value semantics validated separately"
+            },
+            "uuid": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'uuid'; operator/value semantics validated separately"
+            },
+            "fs_type": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'fs_type'; operator/value semantics validated separately"
+            },
+            "mount_options": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'mount_options'; operator/value semantics validated separately"
+            },
+            "total_space": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'total_space'; operator/value semantics validated separately"
+            },
+            "space_used": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'space_used'; operator/value semantics validated separately"
+            },
+            "space_left": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'space_left'; operator/value semantics validated separately"
+            },
+            "space_left_for_unprivileged_users": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'space_left_for_unprivileged_users'; operator/value semantics validated separately"
+            },
+            "block_size": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "linux.partition observed field 'block_size'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__linux_partition": {
+      "description": "Condition on linux.partition, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__linux_partition"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__linux_partition"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capStateNode__windows_registry": {
+      "description": "A windows.registry State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "hive": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'hive'; operator/value semantics validated separately"
+            },
+            "key": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'key'; operator/value semantics validated separately"
+            },
+            "name": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'name'; operator/value semantics validated separately"
+            },
+            "last_write_time": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'last_write_time'; operator/value semantics validated separately"
+            },
+            "type": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'type'; operator/value semantics validated separately"
+            },
+            "value": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'value'; operator/value semantics validated separately"
+            },
+            "expanded_value": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.registry observed field 'expanded_value'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__windows_registry": {
+      "description": "Condition on windows.registry, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__windows_registry"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_registry"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capStateNode__windows_userright": {
+      "description": "A windows.userright State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "userright": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.userright observed field 'userright'; operator/value semantics validated separately"
+            },
+            "trustee_name": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.userright observed field 'trustee_name'; operator/value semantics validated separately"
+            },
+            "trustee_sid": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.userright observed field 'trustee_sid'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__windows_userright": {
+      "description": "Condition on windows.userright, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__windows_userright"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_userright"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "capStateNode__windows_wmi_query": {
+      "description": "A windows.wmi.query State with capability-constrained field completion",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "fields",
+              "description": "fields must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            },
+            "all_fields_must_exist": {
+              "const": true
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "properties": {
+            "namespace": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.wmi.query observed field 'namespace'; operator/value semantics validated separately"
+            },
+            "wql": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.wmi.query observed field 'wql'; operator/value semantics validated separately"
+            },
+            "result": {
+              "type": "object",
+              "minProperties": 1,
+              "description": "windows.wmi.query observed field 'result'; operator/value semantics validated separately"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "capCondition__windows_wmi_query": {
+      "description": "Condition on windows.wmi.query, with explicit grouped-scope requirements",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/capStateNode__windows_wmi_query"
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "scope",
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "scope": {
+              "const": "states",
+              "description": "states must be chosen explicitly to avoid changing which observations are combined"
+            },
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/capStateNode__windows_wmi_query"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "modernState": {
+      "oneOf": [
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "patternProperties": {
+            "^(?!(?:states|fields)$).+$": {
+              "type": "object",
+              "minProperties": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "states"
+          ],
+          "properties": {
+            "states": {
+              "$ref": "#/$defs/modernStatesGroup"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "fields"
+          ],
+          "properties": {
+            "fields": {
+              "$ref": "#/$defs/modernFieldsGroup"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "modernFieldsGroup": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/modernState"
+              }
+            },
+            "presence": {
+              "const": "all"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/modernState"
+              }
+            },
+            "presence": {
+              "const": "all"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "modernStatesGroup": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/modernState"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/modernState"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "noEnglishOperatorAliases": {
+      "if": {
+        "type": "object"
+      },
+      "then": {
+        "propertyNames": {
+          "not": {
+            "enum": [
+              "all_values_exist_and_at_least",
+              "all_values_exist_and_at_most",
+              "all_values_exist_and_equals_ignoring_case",
+              "all_values_exist_and_is",
+              "all_values_exist_and_is_not",
+              "all_values_exist_and_is_not_ignoring_case",
+              "all_values_exist_and_no_at_least",
+              "all_values_exist_and_no_at_most",
+              "all_values_exist_and_no_equals_ignoring_case",
+              "all_values_exist_and_no_is",
+              "all_values_exist_and_no_is_not",
+              "all_values_exist_and_no_is_not_ignoring_case",
+              "all_values_exist_and_no_version_at_least",
+              "all_values_exist_and_version_at_least",
+              "at_least",
+              "at_least_one_value_at_least",
+              "at_least_one_value_at_most",
+              "at_least_one_value_equals_ignoring_case",
+              "at_least_one_value_is",
+              "at_least_one_value_is_not",
+              "at_least_one_value_is_not_ignoring_case",
+              "at_least_one_value_version_at_least",
+              "at_most",
+              "equals_ignoring_case",
+              "exactly_one_at_least",
+              "exactly_one_at_most",
+              "exactly_one_equals_ignoring_case",
+              "exactly_one_is",
+              "exactly_one_is_not",
+              "exactly_one_is_not_ignoring_case",
+              "exactly_one_matching_value_at_least",
+              "exactly_one_matching_value_at_most",
+              "exactly_one_matching_value_equals_ignoring_case",
+              "exactly_one_matching_value_is",
+              "exactly_one_matching_value_is_not",
+              "exactly_one_matching_value_is_not_ignoring_case",
+              "exactly_one_matching_value_version_at_least",
+              "exactly_one_observed_value_at_least",
+              "exactly_one_observed_value_at_most",
+              "exactly_one_observed_value_equals_ignoring_case",
+              "exactly_one_observed_value_is",
+              "exactly_one_observed_value_is_not",
+              "exactly_one_observed_value_is_not_ignoring_case",
+              "exactly_one_observed_value_version_at_least",
+              "exactly_one_version_at_least",
+              "is",
+              "is_not",
+              "is_not_ignoring_case",
+              "no_values_at_least",
+              "no_values_at_most",
+              "no_values_equals_ignoring_case",
+              "no_values_is",
+              "no_values_is_not",
+              "no_values_is_not_ignoring_case",
+              "no_values_version_at_least",
+              "version_at_least",
+              "when_present_at_least",
+              "when_present_at_least_one_value_at_least",
+              "when_present_at_least_one_value_at_most",
+              "when_present_at_least_one_value_equals_ignoring_case",
+              "when_present_at_least_one_value_is",
+              "when_present_at_least_one_value_is_not",
+              "when_present_at_least_one_value_is_not_ignoring_case",
+              "when_present_at_least_one_value_version_at_least",
+              "when_present_at_most",
+              "when_present_equals_ignoring_case",
+              "when_present_is",
+              "when_present_is_not",
+              "when_present_is_not_ignoring_case",
+              "when_present_no_values_at_least",
+              "when_present_no_values_at_most",
+              "when_present_no_values_equals_ignoring_case",
+              "when_present_no_values_is",
+              "when_present_no_values_is_not",
+              "when_present_no_values_is_not_ignoring_case",
+              "when_present_no_values_version_at_least",
+              "when_present_version_at_least"
+            ]
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/noEnglishOperatorAliases"
+        }
+      },
+      "else": {
+        "if": {
+          "type": "array"
+        },
+        "then": {
+          "items": {
+            "$ref": "#/$defs/noEnglishOperatorAliases"
+          }
+        }
+      }
+    }
+  }
+}
