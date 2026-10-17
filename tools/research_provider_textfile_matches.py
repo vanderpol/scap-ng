@@ -61,12 +61,24 @@ def collect(*,path,pattern,ignore_case=False,multiline=True,singleline=False,
                             diagnostics.append({"reason":"match_limit","limit":max_matches})
                             break
                         index=len(items)+1
+                        # A bounded research projection of exactly ONE
+                        # Python capture group. Do NOT generalize it into
+                        # OVAL subexpression entity parity.
+                        if expression.groups==1:
+                            captured=match.group(1)
+                            subexpression=(captured if captured is not None
+                                           else {"field_status":"absent"})
+                        elif expression.groups==0:
+                            subexpression={"field_status":"absent"}
+                        else:
+                            subexpression={"field_status":"error"}
                         items.append({
                             "id":path+"#"+str(index),
                             "fields":{
                                 "full_path":path,
                                 "instance":index,
                                 "match_text":match.group(0),
+                                "subexpression":subexpression,
                                 "start_offset":match.start(),
                                 "end_offset":match.end(),
                             },
