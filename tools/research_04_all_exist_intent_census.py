@@ -113,7 +113,7 @@ def census(path):
                       "objecthash":objhash,"semhash":semhash}
                 objects[objhash].append(info)
                 semantic_twins[semhash].append(info)
-                if mode!="all_exist" and mode!="all_exist_and_all_match":continue
+                if not (mode=="all_exist" or mode.startswith("all_exist_and_")):continue
                 count["all_exist_tests"]+=1
                 if test.get("states"):count["all_exist_with_states"]+=1
                 else:count["all_exist_state_free"]+=1
