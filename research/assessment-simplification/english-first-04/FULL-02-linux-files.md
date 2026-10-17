@@ -177,7 +177,8 @@ assessment:
 
 The following is the **complete generated** research YAML that reconstructs the original source structure. It is not yet an approved standard.
 
-```yaml# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+```yaml
+# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive
