@@ -11,6 +11,7 @@ on:
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
       - tools/research_english_first_04_auditor_candidate.py
+      - tools/research_english_first_04_existence_audit.py
       - tools/research_english_first_04_inherited_capability.py
       - tools/test_research_english_first_04_inherited_capability.py
       - research/assessment-simplification/english-first-04/experiments/windows-wmi-rights-typed-source.research.yaml
@@ -160,6 +161,12 @@ jobs:
             --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
             --output english-first-04-oval-schema-boundary.json
 
+      - name: Audit Test existence modes versus State-field existence
+        run: |
+          python tools/research_english_first_04_existence_audit.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-existence-audit.json
+
       - name: Publish phone-friendly reports directly on github.com
         if: github.ref == 'refs/heads/main'
         env:
@@ -182,6 +189,7 @@ jobs:
             english-first-04-vocabulary-variants.json
             english-first-04-auditor-candidate.json
             english-first-04-oval-schema-boundary.json
+            english-first-04-existence-audit.json
             english-first-04-auditor-examples/
             english-first-04-vocabulary-examples/
             english-first-04-reference-graph-report.json
