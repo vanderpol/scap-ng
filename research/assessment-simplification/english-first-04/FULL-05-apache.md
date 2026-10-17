@@ -363,8 +363,7 @@ assessment:
 
 Full experimental version, including metadata, named sources, checks, local Variables, requirements and evaluate tree. Nothing omitted.
 
-```yaml
-# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
+```yaml# EXPERIMENT ONLY; reconstructs the pinned Assessment exactly.
 # Not normative SCAP-NG v0.4 or independently validated OVAL execution.
 metadata:
   id: SV-214228.automated
@@ -626,12 +625,6 @@ checks:
     check: Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf
       or included conf files
     inspect: independent.shellcommand
-    require:
-      at_least_one_item_exists: true
-      every_item_must_match:
-        stdout_line:
-          matches_regex: \s*KeepAlive On
-    report_elements: all
     description: Gather all KeepAlive data from httpd and all Include conf files
     collect:
       shell: bash
@@ -640,16 +633,16 @@ checks:
       pattern: .+
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
-  if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test:
-    check: If the KeepAlive directive is defined in other loaded configuration files,
-      verify it is configured to On
-    inspect: independent.shellcommand
     require:
       at_least_one_item_exists: true
       every_item_must_match:
         stdout_line:
-          when_present_matches_regex: \s*KeepAlive On
+          matches_regex: \s*KeepAlive On
     report_elements: all
+  if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test:
+    check: If the KeepAlive directive is defined in other loaded configuration files,
+      verify it is configured to On
+    inspect: independent.shellcommand
     description: Gather all KeepAlive data from all loaded conf files
     collect:
       shell: bash
@@ -658,16 +651,16 @@ checks:
       pattern: .+
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    require:
+      at_least_one_item_exists: true
+      every_item_must_match:
+        stdout_line:
+          when_present_matches_regex: \s*KeepAlive On
+    report_elements: all
   verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test:
     check: Verify that MaxKeepAliveRequests is defined and is configured to 100 or
       greater httpd.conf/apache2.conf or included conf files
     inspect: independent.shellcommand
-    require:
-      at_least_one_item_exists: true
-      every_item_must_match:
-        subexpression:
-          at_least: 100
-    report_elements: all
     description: Gather all MaxKeepAliveRequests data from httpd and all Include conf
       files
     collect:
@@ -677,16 +670,16 @@ checks:
       pattern: MaxKeepAliveRequests (\d+)
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
-  if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test:
-    check: If the MaxKeepAliveRequests directive is defined in other loaded configuration
-      files, verify it is configured to 100 or greater
-    inspect: independent.shellcommand
     require:
       at_least_one_item_exists: true
       every_item_must_match:
         subexpression:
-          when_present_at_least: 100
+          at_least: 100
     report_elements: all
+  if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test:
+    check: If the MaxKeepAliveRequests directive is defined in other loaded configuration
+      files, verify it is configured to 100 or greater
+    inspect: independent.shellcommand
     description: Gather all MaxKeepAliveRequests data from all loaded conf files
     collect:
       shell: bash
@@ -695,6 +688,12 @@ checks:
       pattern: MaxKeepAliveRequests (\d+)
       error_if_exit_status_not_0: false
       error_if_stderr_exists: false
+    require:
+      at_least_one_item_exists: true
+      every_item_must_match:
+        subexpression:
+          when_present_at_least: 100
+    report_elements: all
 evaluate:
   all_of:
   - test: verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test
