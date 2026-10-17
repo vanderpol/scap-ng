@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[Second Gemini review — source-backed rejection of the proposed 0.4.1 rewrite (17 October)](GEMINI-SECOND-REVIEW-SOURCE-AUDIT-2026-10-17.md)** — independent-model feedback is useful for field presence and named passing paths, but its proposed YAML **does not parse** and changes the original RHEL regex, Windows deny-right selector, WMI whole-State record behavior and source/Variable dependency graphs. Detailed counterexamples, limits of Gemini's six-state predictions, and next semantic gates recorded. **No normative syntax, bundles or version were changed.**
+
+
 **[Gemini first-feedback triage (17 October)](GEMINI-FIRST-FEEDBACK-TRIAGE-2026-10-17.md)** — checks its four architectural concerns against actual selection rules, inherited OVAL six-state truth tables, DNS field-presence inheritance and Windows whole-State/record semantics. Finds field-presence readability debt, but *no completed independent A1–G blind review or Part 2 source comparison yet*. Keep the original [answer-free Gemini packet](GEMINI-INDEPENDENT-REVIEW-PACKET.md) for the missing scenario-based external gate; no 0.4 schema promotion.
 
 
