@@ -1,0 +1,20 @@
+id: users-own-files-in-home
+title: Every applicable file in each interactive user's home directory must be owned by that user
+require:
+  every: linux.accounts
+  as: user
+  where:
+    uid: {at_least: 1000}
+    shell: {not_in: [/sbin/nologin, /usr/sbin/nologin, /bin/false]}
+  must:
+    every: linux.files
+    as: file
+    using:
+      under: '$user.home_dir'
+      recursive: true
+      max_depth: 5
+      max_items: 10000
+    must:
+      owner: {equals: '$user.username'}
+    if_empty: pass
+  if_empty: pass
