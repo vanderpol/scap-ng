@@ -28,6 +28,8 @@ Keep `inspect`, `where`, `collect`, `from`, `require`, `evaluate` and a reader-f
 
 This is an actual structural improvement over the present research format, where `inspect` is sometimes repeated at both the source and referring check. It is still **one** authoring grammar, not a pretty view over a second authoring language. It requires new schema/type-checking and lossless-lowering proof before adoption.
 
+**Small source-backed proof:** In the full [Windows 11 seven-Test experiment](experiments/windows-wmi-rights-typed-source.research.yaml), all **seven** referring checks inherited their capability from **two** named sources. The seven repeated `check.inspect` lines (217 YAML characters) were removed; source-type agreement was checked for each reference and reinserting those exact seven fields reconstructed the [original auditor-first YAML](auditor-candidate/windows-wmi-rights.auditor.research.yaml) **byte-for-byte**. This proves this narrow presentation change for *that file only*. Of the other four complete gallery files, none has a direct check-level named `from` to simplify. Do not extrapolate this into a major corpus-wide gain or scanner parity.
+
 ### Linux: source graph, then two distinctly quantified checks
 
 The following is a **design fragment** grounded in [SV-257889's complete source](FULL-02-linux-files.md); it is not an executable whole Assessment. The non-system account source below retains the real *separate exclusions* and the one-operand Set union. In the real Assessment the root-account source is another `difference` of the same accounts, excluding IDs **greater than 0** and home directory `/`.
