@@ -4,6 +4,14 @@
 
 [Source-backed Gemini review audit](../GEMINI-SECOND-REVIEW-SOURCE-AUDIT-2026-10-17.md) demonstrated that replacing source graphs with invented typed collectors, rewriting regexes, or collapsing whole WMI States is not a legitimate simplification. **This iteration changes only typed presentation of existing requirements, never what is collected or how check results combine.**
 
+## Machine-derived auditor preview — gate B research demonstration
+
+The [five generated read-only auditor pages](generated-previews/INDEX.md) are now published directly on github.com. The renderer [source](../../../../tools/research_04_auditor_preview.py) parses the **complete** revised Assessment, checks named source/Variable/foreach references and complete `evaluate` coverage, and displays the exact selection graph, distinct root Item and nested record requirements, explicit field presence, and the complete AND/OR Test tree. The Windows result retains **seven checks and eight leaf occurrences** because Guests is referenced twice.
+
+A separate [computed generic OVAL six-state ledger](generated-previews/SEMANTIC-BOUNDARY-LEDGER.md) documents decisive True/False versus Unknown outcomes. It is **not** source-specific field/entity execution. It explicitly lists missing-field, multi-value, nested-record and real scanner parity as unverified.
+
+**[CI run 39052675482](https://github.com/vanderpol/scap-ng/actions/runs/39052675482) succeeded:** five source inverses, OVAL reference truth tables, negative graph/YAML-reference validation, generated previews and stable regeneration. The workflow commits generated Markdown to main only after these checks pass; no authoring YAML or normative schema is generated or modified.
+
 ## The tested candidate — full Assessment links on github.com
 
 | Source-backed Assessment | Full revised research Assessment | Original complete research Assessment |
