@@ -2,6 +2,8 @@
 
 **17 October 2026. Research only. Not an adopted 0.4 standard, scanner, or lossless conversion proof.**
 
+**[Capability readiness gate before any A/B bake-off](CAPABILITY-READINESS-GATE.md)** — develop requirements-first B until it can address the same source cohort and major feature families as the OVAL-derived A research. **No comparative scoring or winner selection yet.** Work on B's full source importer, compiler/provider/results contracts, and compatibility operations; preserve A unchanged as the reference.
+
 **[Typed DNS zone/key fixture evidence](../../tools/research_dns_zone_key_evidence.py)** is now paired with a [versioned provider contract](providers/windows.dns.zone_signing_evidence.v0.1.yaml) and [negative tests](../../tools/test_research_dns_zone_key_evidence.py) for real distinctions between zone IDs, key kinds, partial evidence and Days*24+Hours typing. These use supplied structured fixtures, not Windows APIs; source semantics remain gated.
 
 **[New DNS source counterexample](DNS-SOURCE-SEMANTIC-AUDIT-2026-10-17.md)** — the original AD-integrated check allows **zero forward zones** when its required command Item has no violating stdout values. The earlier native sample incorrectly required a forward zone, which can change a reverse-only DNS server's outcome. [Pinned DNS source checks](../../tools/test_research_dns_source_contract.py) prove the five-command, three-OR-alternative, separate key-State structure. **Not** source-parity proof.
