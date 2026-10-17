@@ -43,6 +43,7 @@ def pred(p):
     op=p["operator"]
     wanted=value(p["value"])
     if op=="equals":return name+" equals "+wanted
+    if op=="not_equals":return name+" does not equal "+wanted
     if op=="contains":return name+" contains "+wanted
     if op=="between":return name+" is between "+wanted.replace(", "," and ")
     if op=="at_least":return name+" is at least "+wanted
