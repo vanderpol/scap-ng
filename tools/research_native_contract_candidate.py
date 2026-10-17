@@ -47,8 +47,6 @@ def check_predicates(raw,known,path,scope,field_types=None):
             fail(path+"."+field,"exactly one predicate operation required")
         op,expected=next(iter(test.items()))
         if op not in OPS:fail(path+"."+field,"unregistered operation "+str(op))
-        if field_types is not None and field in field_types and not operator_accepts(field_types[field],op,expected):
-            fail(path+"."+field,"operation "+op+" incompatible with typed field "+field_types[field])
         if op=="only_these_bits" and (not isinstance(expected,str) or not OCTAL.fullmatch(expected)):
             fail(path+"."+field,"only_these_bits requires four-digit octal string")
         if op=="between" and (not isinstance(expected,list) or len(expected)!=2 or
@@ -60,6 +58,8 @@ def check_predicates(raw,known,path,scope,field_types=None):
             if not isinstance(expected,str):fail(path+"."+field,"regex must be string")
             try:re.compile(expected)
             except re.error:fail(path+"."+field,"invalid regular expression")
+        if field_types is not None and field in field_types and not operator_accepts(field_types[field],op,expected):
+            fail(path+"."+field,"operation "+op+" incompatible with typed field "+field_types[field])
         if isinstance(expected,str) and expected.startswith("$"):
             found=REGEX.fullmatch(expected)
             if not found:fail(path+"."+field,"references must be whole lexical path")
