@@ -19,6 +19,7 @@ import zipfile
 
 from research_b_full_corpus_import import read_source, import_corpus
 from research_b_source_textfile_lowering import lower_state_free_textfile_assessment
+from research_b_source_partition_lowering import lower_state_free_partition_assessment
 from research_b_compiled_ir import encode, decode
 
 FORMAT = "scap-ng-b-six-stream-research-coverage/0.1"
@@ -41,18 +42,24 @@ def _lower_assessment(capsule):
         return "manual_contract_unimplemented", "Manual Assessment must have its own runtime contract", None
     if mode != "automated":
         return "unsupported_source_assessment", "unrecognized Assessment mode", None
-    try:
-        ast = lower_state_free_textfile_assessment(doc)
-        encoded = encode(capsule["id"], ast)
-        decoded = decode(encoded)
-        if decoded["source_kind"] != "compiler-compatibility":
-            raise ValueError("lowered source must retain compiler-only compatibility scope")
-        if decoded["root"]["source_assessment_id"] != capsule["id"]:
-            raise ValueError("source Assessment identity changed during lowering")
-        return READY_STATUS, "bounded state-free textfile Test; original XML/runtime parity OPEN", encoded
-    except (ValueError, KeyError, TypeError) as exc:
-        return "unsupported_source_semantics", str(exc)[:500], None
-
+    rejections=[]
+    families=[
+        ("independent.textfilecontent54/state_free_existence",lower_state_free_textfile_assessment),
+        ("linux.partition/state_free_existence",lower_state_free_partition_assessment),
+    ]
+    for family,lowerer in families:
+        try:
+            ast = lowerer(doc)
+            encoded = encode(capsule["id"], ast)
+            decoded = decode(encoded)
+            if decoded["source_kind"] != "compiler-compatibility":
+                raise ValueError("lowered source must retain compiler-only compatibility scope")
+            if decoded["root"]["source_assessment_id"] != capsule["id"]:
+                raise ValueError("source Assessment identity changed during lowering")
+            return READY_STATUS, family+"; original XML/runtime parity OPEN", encoded
+        except (ValueError, KeyError, TypeError) as exc:
+            rejections.append(family+": "+str(exc)[:220])
+    return "unsupported_source_semantics", "; ".join(rejections)[:500], None
 
 def build_six_stream_report(corpus, capsules):
     """Pure deterministic per-assessment/per-stream accounting.
