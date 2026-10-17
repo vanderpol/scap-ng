@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[New — five permanent generated auditor previews on github.com](field-presence-iteration/generated-previews/INDEX.md)** explain the full source/Variables, exact predicates and complete AND/OR trees from parsed Assessment YAML; Windows has 7 named checks and 8 leaf uses. **[Generic six-state truth ledger](field-presence-iteration/generated-previews/SEMANTIC-BOUNDARY-LEDGER.md)** is separately marked reference-only. [CI run 39052675482](https://github.com/vanderpol/scap-ng/actions/runs/39052675482) passed source inverse, negative-reference tests, reference truth tables and publication. [Answer-free raw-versus-auditor-view external review packet](field-presence-iteration/AUDITOR-PREVIEW-BLIND-COMPARISON.md). Still no scanner-semantic parity or normative 0.4 language adoption.
+
+
 **[Gemini blind-prediction audit after limited third response](GEMINI-PHASE1-PREDICTION-AUDIT-2026-10-17.md)** — corrects unjustified assumptions that incomplete acquisition always yields Error, AND(False,Error) yields Error, and repeated DNS field values are multiple Items. Gemini explicitly could not fetch the source YAML; Phase 2 was **not** completed. **[Offline source pack with all ten full original/revised YAML documents](field-presence-iteration/GEMINI-PHASE2-OFFLINE-SOURCE-PACK.md)** enables a real follow-up without internet access. [CI run 39051291180](https://github.com/vanderpol/scap-ng/actions/runs/39051291180) passed both source-structure/YAML checks and inherited OVAL truth-table unit tests; these do not prove scanner parity for new aliases.
 
 
