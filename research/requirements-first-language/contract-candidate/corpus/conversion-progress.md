@@ -10,32 +10,33 @@ not original SCAP 1.4 XML. A valid JSON fixture IR is not source parity.
 | Rules | 1567 |
 | Assessment-choice links | 2958 |
 | Distinct referenced Assessments | 2395 |
-| Strictly lowered fixture-IR Assessments (not scanner-verified) | 13 |
+| Strictly lowered automated fixture IR (not scanner-verified) | 13 |
+| Manual procedures compiled (human result still required) | 1550 |
 | **Verified executable source-equivalent Assessments** | **0** |
 
 ## Per-stream conversion status
 
-| Stream | References | Fixture IR (unverified) | Remaining/unimplemented |
-| --- | ---: | ---: | ---: |
-| apache_server_2-4_unix_server | 67 | 0 | 67 |
-| ms_windows_11 | 502 | 0 | 502 |
-| ms_windows_server_2025 | 550 | 0 | 550 |
-| ms_windows_server_dns | 94 | 0 | 94 |
-| oracle_linux_9 | 854 | 12 | 842 |
-| rhel_9 | 861 | 11 | 850 |
+| Stream | References | Automated fixture IR | Manual procedure IR | Remaining |
+| --- | ---: | ---: | ---: | ---: |
+| apache_server_2-4_unix_server | 67 | 0 | 45 | 22 |
+| ms_windows_11 | 502 | 0 | 257 | 245 |
+| ms_windows_server_2025 | 550 | 0 | 291 | 259 |
+| ms_windows_server_dns | 94 | 0 | 73 | 21 |
+| oracle_linux_9 | 854 | 12 | 448 | 394 |
+| rhel_9 | 861 | 11 | 445 | 405 |
 
 ## Classification
 
 | Status | Distinct Assessments |
 | --- | ---: |
 | fixture_ir_compiled_source_parity_unverified | 13 |
-| manual_contract_unimplemented | 1550 |
+| manual_procedure_ir_compiled | 1550 |
 | unsupported_source_semantics | 832 |
 
 Every referenced Assessment is in [the machine-readable conversion ledger](conversion-progress.json).
-The research ZIP contains **only** validated fixture IR and metadata; it is
-**not** a partial scanner content release. Unsupported/manual content
-is never copied into executable IR or silently discarded from the ledger.
+The research ZIP contains **only** validated fixture IR, manual procedures and metadata; it is
+**not** a partial scanner content release. Unsupported content
+is never copied into executable IR or silently discarded. Manual procedures remain unevaluated until a human responds.
 
 Remaining release gates: complete original SCAP 1.4 import; implement
 OVAL Object/State/Variable/Set and source-specific collection behavior;
