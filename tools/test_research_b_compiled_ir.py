@@ -151,6 +151,16 @@ class CompiledFixtureIRTests(unittest.TestCase):
             decode(b'{"format":NaN}')
         with self.assertRaises(ValueError):
             decode(b"not JSON")
+        # Same parsed object with duplicate keys must still be rejected:
+        # ambiguity must not be masked by re-canonicalized digest.
+        duplicate=raw.replace(b'"scope":', b'"scope":"'+SCOPE.encode()+b'","scope":',1)
+        with self.assertRaisesRegex(ValueError,"duplicate JSON property"):
+            decode(duplicate)
+        for bad in ({"kind":"logic","operator":[],"children":[native["ast"],native["ast"]]},
+                    {"kind":"collection",**dict(native["ast"],mode=[])}):
+            with self.subTest(bad=bad.get("kind")):
+                with self.assertRaises(ValueError):
+                    encode("malformed-ir",bad)
 
     def test_recomputed_hash_cannot_authorize_unrecognized_operation(self):
         native=read(EXAMPLES/"01-required-home.yaml")
