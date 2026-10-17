@@ -79,6 +79,19 @@ class MountProviderContractTests(unittest.TestCase):
         second=parse_mountinfo_line(NORMAL,"mnt:[second]")
         self.assertNotEqual(first["id"],second["id"])
 
+    def test_versioned_manifest_matches_real_parsed_record(self):
+        import yaml
+        contract=(Path(__file__).resolve().parents[1]/
+                  "research/requirements-first-language/providers/linux.mounts.v0.1.yaml")
+        manifest=yaml.safe_load(contract.read_text())
+        item=parse_mountinfo_line(NORMAL,NAMESPACE)
+        self.assertEqual(manifest["provider"],"linux.mounts")
+        self.assertEqual(manifest["version"],"0.1.0")
+        self.assertEqual(manifest["resources"]["identity"],["namespace","mount_id"])
+        self.assertEqual(set(manifest["resources"]["field_types"]),set(item["fields"]))
+        self.assertEqual(manifest["selection"]["missing_selector"],"unresolved")
+        self.assertEqual(manifest["collection_status"]["incomplete"],"at_least_one_line_failed_parsing")
+
     def test_ci_linux_runner_actual_mountinfo_smoke(self):
         path=Path("/proc/self/mountinfo")
         if not path.exists():
