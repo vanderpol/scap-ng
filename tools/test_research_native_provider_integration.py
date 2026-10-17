@@ -85,13 +85,12 @@ class RealProviderToASTTests(unittest.TestCase):
             x=evaluate(compiled("04-apache-two-settings.yaml"),
                        {"apache.config_directives":observed})
             self.assertEqual(x.result,TRUE)
-            site.write_text("MaxKeepAliveRequests 200\n")
+            site.write_text("MaxKeepAliveRequests 99\n")
             observed=apache_collect(root/"httpd.conf",server_root=root)
             self.assertEqual(evaluate(compiled("04-apache-two-settings.yaml"),
                                       {"apache.config_directives":observed}).result,FALSE)
-            # Source's original >=100 accepts 200; this candidate uses
-            # exact string '150' and is a deliberately non-equivalent
-            # *native* policy. It still proves provider+AST wiring works.
+            # This checks canonical integer values in the native provider;
+            # the four original shellcommand Tests are still not replaced.
 
     def test_apache_partial_source_does_not_pass_even_with_good_lines(self):
         with tempfile.TemporaryDirectory() as temp:
