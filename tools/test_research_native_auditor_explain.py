@@ -42,7 +42,7 @@ class NativeAuditorExplanationTests(unittest.TestCase):
     def test_apache_alternatives_all_visible_and_not_falsely_effective(self):
         text=render(read(EXAMPLES/"04-apache-two-settings.yaml"))
         self.assertIn("ALL of these conditions must hold",text)
-        self.assertIn("raw directive value equals 150",text)
+        self.assertIn("integer value is at least 100",text)
         self.assertIn("Apache configuration directive observation",text)
         self.assertNotIn("effective Apache setting",text)
 
