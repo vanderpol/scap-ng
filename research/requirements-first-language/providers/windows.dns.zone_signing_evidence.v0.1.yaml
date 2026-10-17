@@ -1,0 +1,52 @@
+# Research-only fixture normalizer; no Windows host collector or source parity.
+provider: windows.dns.zone_signing_evidence
+version: 0.1.0
+status: synthetic_structured_fixture_only
+implementation: tools/research_dns_zone_key_evidence.py
+sources:
+  zones:
+    original_family: Get-DnsServerZone
+    expected_fields:
+      - ZoneName
+      - ZoneType
+      - IsAutoCreated
+      - IsReverseLookupZone
+      - IsDsIntegrated
+      - IsSigned
+    complete_status_required_for_known_absence: true
+  signing_keys:
+    original_family: Get-DNSServerSigningKey
+    expected_fields: [KeyId, ZoneName, KeyType, Days, Hours]
+    complete_status_required_for_known_absence: true
+population:
+  excludes_zone_types: [Forwarder]
+  excludes_zone_names: [TrustAnchors]
+  excludes_autocreated: true
+  forward_zone_filter: IsReverseLookupZone_equals_false
+  zone_identity: ZoneName_unicode_casefold_in_prototype
+  duplicate_zone_identity: incomplete
+  per_zone_signing_key_identity: [zone_id, KeyId]
+  duplicate_key_identity: incomplete
+  unrelated_key_parent: incomplete
+  separate_signing_key_groups: [zone_signing_keys, key_signing_keys]
+typed_fields:
+  directory_integration: boolean
+  signed: boolean
+  key_validity_hours: integer
+  duration_from_fields: Days_times_24_plus_Hours
+  bounds: Days_nonnegative_Hours_0_through_23
+  missing_typed_fields: incomplete
+status:
+  complete: zones_and_keys_complete_and_no_diagnostics
+  incomplete: either_collection_partial_or_diagnostics
+  error: either_collection_error
+  raw_evidence_preserved: source_days_source_hours_key_id_zone_id
+source_parity_limits:
+  - No actual PowerShell commands or Windows Server DNS API invocation
+  - Does not emit shellcommand Items or represent missing stdout_line field exactly
+  - Does not reproduce catch Write-Output zero on exception
+  - Does not implement OVAL exactly_one_equals True string cardinality
+  - Does not implement the two whole-State and per-value OVAL aggregates
+  - Assumed structured KeyId may not match actual cmdlet's stable identity
+  - Does not cover every original zone exclusion and data representation
+  - No deployment, integration or scanner results
