@@ -14,7 +14,7 @@ import yaml
 
 ROOT=Path(__file__).resolve().parents[1]
 SAMPLES=ROOT/'research/requirements-first-language/examples'
-QUANTIFIERS={'every','some','none','exactly_one','one_matching'}
+QUANTIFIERS={'every','some','none','exactly_one'}
 GROUPS={'all','any'}
 OPS={'equals','not_equals','equals_ignore_case','matches_regex',
      'contains','one_of','not_in','at_least','at_most','between','has_none_of'}
@@ -155,7 +155,7 @@ def require(node,path='require',scope=frozenset(),inputs=None):
         fail(path,'none means zero resources selected after where; express prohibited properties in where, not must')
     if 'must' in node:
         assertion(node['must'],path+'.must',inner_scope,inputs)
-    elif mode in {'every','some','exactly_one','one_matching'}:
+    elif mode in {'every','some','exactly_one'}:
         fail(path,'this quantifier requires a must assertion')
 
 def validate(doc,path='<Assessment>'):
