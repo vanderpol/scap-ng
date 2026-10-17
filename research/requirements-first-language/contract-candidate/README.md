@@ -10,6 +10,8 @@
 
 **[New B scanner-facing JSON boundary](SCANNER-FACING-JSON-PILOT.md):** deterministic fixture IR and a strictly versioned decoder preserve typed native and compiler-owned source-Test nodes without presenting OVAL objects/states/tests as a second human authoring language. The compatibility bridge currently consumes pre-evaluated Items and is *not* an executable SCAP 1.4 converter or full scanner.
 
+**[Six-STIG B conversion coverage and remaining blockers](corpus/conversion-progress.md):** the pinned source cohort now has a reproducible per-Assessment lowering attempt, full Rule-reference closure, manually authored procedure preservation, and explicit unsupported automated semantics. A research fixture IR is **not** a scanner-ready B conversion, and source equivalence is not yet proven. Follow [issue #237](https://github.com/vanderpol/scap-ng/issues/237); the later [automated source-family blocker inventory](corpus/conversion-blockers.md) prioritizes implementations by actual frequency.
+
 This is NOT normative SCAP-NG 0.4. It is a small runnable demonstration that a human-readable typed resource plus collection language can compile to ONE internal requirement AST. The [compiler](../../../tools/research_native_contract_candidate.py), [fixture evaluator](../../../tools/research_native_contract_evaluator.py), and [deterministic auditor explanation generator](../../../tools/research_native_auditor_explain.py) all consume the same authored structure. The real provider set remains incomplete, and no source SCAP 1.4 parity has been verified.
 
 | Security requirement | Actual researched author YAML | Auditor text generated from its AST |
