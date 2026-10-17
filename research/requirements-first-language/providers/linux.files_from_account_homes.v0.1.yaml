@@ -1,0 +1,48 @@
+# Research-only typed provider manifest; no source-parity or scanner approval.
+provider: linux.files_from_account_homes
+version: 0.1.0
+status: experimental_read_only
+implementation: tools/research_provider_linux_account_files.py
+inputs:
+  account_rows:
+    type: preselected_account_records
+    required_fields: [id, username, home_dir]
+    selection_status: caller_must_prove_completeness
+  filename_pattern: regex
+  max_items: bounded_positive_integer
+  follow_symlinks: boolean
+scope:
+  directory: immediate_children_only
+  recursive_subdirectories: false
+  arbitrary_real_user_homes_in_ci: forbidden
+  account_collection: NOT_IMPLEMENTED
+  filesystem_crossing: no_extra_traversal
+collection:
+  enumeration: streamed_os_scandir_per_account
+  file_identity: account_id_plus_absolute_path
+  duplicate_account_rows: incomplete
+  same_physical_file_under_different_accounts: separately_reported
+  emitted_mode: numeric_posix_12bit_from_stat
+  ownership: associated_account_id
+  missing_home_directory: incomplete
+  per_entry_stat_error: incomplete
+  max_items_reached: incomplete
+  sample_order: unspecified
+  complete: all_supplied_home_directories_enumerated_without_error_or_truncation
+  exposed_fields:
+    - id
+    - account_id
+    - directory
+    - name
+    - kind
+    - mode
+    - path
+    - is_symlink
+    - follow_symlinks
+source_parity_limits:
+  - Does not enumerate unix.password accounts or implement source Sets
+  - Does not implement original unix.file traversal.max_depth or recurse symlinks
+  - Does not prove filesystem all or source path/namespace dedup semantics
+  - Does not preserve OVAL separately reported permission-field presence
+  - No proof of remote scanner deployment, security or host performance
+  - Temporary test directory is not a real user account home
