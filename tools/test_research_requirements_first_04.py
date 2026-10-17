@@ -85,6 +85,13 @@ class RequirementsFirstAuthorabilityTests(unittest.TestCase):
         # 2-selected/1-compliant case. The research contract must say
         # exactly_one counts selected resources, not compliant ones.
 
+    def test_untested_one_matching_quantifier_is_rejected(self):
+        doc={'id':'x','title':'x','require':{
+            'one_matching':'linux.mounts',
+            'must':{'mount_options':{'contains':'nosuid'}}}}
+        with self.assertRaisesRegex(ValueError,'exactly one requirement operator'):
+            grammar.validate(doc)
+
     def test_duplicate_yaml_mapping_rejected(self):
         with self.assertRaisesRegex(ValueError,'duplicate key'):
             grammar.yaml.load('id: x\nid: y\n',Loader=grammar.Loader)
