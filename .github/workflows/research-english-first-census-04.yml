@@ -11,6 +11,8 @@ on:
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
       - tools/research_english_first_04_auditor_candidate.py
+      - tools/research_english_first_04_oval_schema_boundary.py
+      - research/assessment-simplification/english-first-04/AUDITOR-FIRST-CANDIDATE.md
       - tools/research_english_first_04_vocabulary_variants.py
       - tools/research_english_first_04_references.py
       - tools/research_english_first_04_publish.py
@@ -129,6 +131,12 @@ jobs:
             --output english-first-04-auditor-candidate.json \
             --examples-dir english-first-04-auditor-examples
 
+      - name: Verify last abnormal Test against pinned OVAL 5.12.3 Schematron
+        run: |
+          python tools/research_english_first_04_oval_schema_boundary.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output english-first-04-oval-schema-boundary.json
+
       - name: Publish phone-friendly reports directly on github.com
         if: github.ref == 'refs/heads/main'
         env:
@@ -150,6 +158,7 @@ jobs:
             english-first-04-compact-layout-report.json
             english-first-04-vocabulary-variants.json
             english-first-04-auditor-candidate.json
+            english-first-04-oval-schema-boundary.json
             english-first-04-auditor-examples/
             english-first-04-vocabulary-examples/
             english-first-04-reference-graph-report.json
