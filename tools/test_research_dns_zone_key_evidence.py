@@ -15,6 +15,20 @@ def key(zone_name,ident,kind="ZoneSigningKey",days=2,hours=0):
             "Days":days,"Hours":hours}
 
 class DnsEvidenceTests(unittest.TestCase):
+    def test_versioned_contract_matches_normalizer_output(self):
+        import yaml
+        contract=(Path(__file__).resolve().parents[1]/
+             "research/requirements-first-language/providers/windows.dns.zone_signing_evidence.v0.1.yaml")
+        manifest=yaml.safe_load(contract.read_text())
+        observed=normalize([zone("corp.test")],
+                           [key("corp.test","one")])
+        self.assertEqual((observed["provider"],observed["version"]),
+                         (manifest["provider"],manifest["version"]))
+        self.assertEqual(manifest["population"]["separate_signing_key_groups"],
+                         ["zone_signing_keys","key_signing_keys"])
+        self.assertEqual(manifest["status"]["incomplete"],
+                         "either_collection_partial_or_diagnostics")
+
     def test_reverse_zone_without_forward_zones(self):
         result=normalize([zone("1.168.192.in-addr.arpa",reverse=True)],[])
         self.assertEqual(result["status"],"complete")
