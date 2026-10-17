@@ -60,10 +60,10 @@ def read_source(archive):
     with zipfile.ZipFile(archive) as z:
         for info in sorted(z.infolist(),key=lambda x:x.filename):
             name=info.filename
-            if info.is_dir():continue
+            if info.is_dir() or not name.endswith((".yaml",".yml")):
+                continue  # Release README/metadata are not Assessment documents.
             if not _safe_zip_name(name):
-                raise ValueError("unsafe source archive path: "+name)
-            if not name.endswith((".yaml",".yml")):continue
+                raise ValueError("unsafe source archive YAML path: "+name)
             if name in documents:raise ValueError("duplicate archive path: "+name)
             if info.file_size>MAX_DOCUMENT_BYTES:
                 raise ValueError("oversized source document: "+name)
