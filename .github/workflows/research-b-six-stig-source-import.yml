@@ -18,6 +18,8 @@ on:
       - 'tools/research_b_manual_lowering.py'
       - 'tools/research_b_manual_response.py'
       - 'tools/test_research_b_manual_lowering.py'
+      - 'tools/research_b_conversion_backlog.py'
+      - 'tools/test_research_b_conversion_backlog.py'
       - 'tools/research_b_compiled_ir.py'
       - 'tools/research_native_contract_evaluator.py'
       - '.github/workflows/research-b-six-stig-source-import.yml'
@@ -61,6 +63,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_manual_lowering.py
+      - name: Test B six-STIG blocker census accounting
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_conversion_backlog.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -102,6 +108,14 @@ jobs:
             --output research/requirements-first-language/contract-candidate/corpus/conversion-progress.json \
             --markdown research/requirements-first-language/contract-candidate/corpus/conversion-progress.md \
             --research-zip work/b-corpus/scap-ng-0.4-B-research-not-scanner.zip
+      - name: Classify unresolved automated Assessment capabilities and semantics
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_conversion_backlog.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output research/requirements-first-language/contract-candidate/corpus/conversion-blockers.json \
+            --markdown research/requirements-first-language/contract-candidate/corpus/conversion-blockers.md
       - name: Preserve partial B fixture IR separately from scanner content
         uses: actions/upload-artifact@v4
         with:
@@ -122,6 +136,8 @@ jobs:
         run: |
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.json
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.json
+          git add research/requirements-first-language/contract-candidate/corpus/conversion-blockers.json
+          git add research/requirements-first-language/contract-candidate/corpus/conversion-blockers.md
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.md
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
