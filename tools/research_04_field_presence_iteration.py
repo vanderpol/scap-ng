@@ -36,7 +36,7 @@ def forward(text: str, kind: str) -> str:
         exactly(out, "        presence: all\n", 2, "Linux source field policies")
         pat = (r"(    require:\n      items: (?:if_present|at_least_one)\n"
                r"      matching_items: all\n)(      fields:\n)")
-        out, replaced = re.subn(pat, r"\1      state_fields_presence: required\n\2", out)
+        out, replaced = re.subn(pat, r"\1      field_presence: required\n\2", out)
         if replaced != 2:
             raise AssertionError(f"Linux group scope count: {replaced}")
         out = out.replace("        presence: all\n", "")
@@ -45,7 +45,7 @@ def forward(text: str, kind: str) -> str:
         out = out.replace("    all_state_fields_exist: true\n", "")
         pat = (r"(    require:\n      items: at_least_one\n"
                r"      matching_items: all\n)(      states:\n)")
-        out, replaced = re.subn(pat, r"\1      state_fields_presence: required\n\2", out)
+        out, replaced = re.subn(pat, r"\1      field_presence: required\n\2", out)
         if replaced != 2:
             raise AssertionError(f"DNS State scope count: {replaced}")
     elif kind == "apache":
@@ -60,15 +60,15 @@ def forward(text: str, kind: str) -> str:
 def inverse(text: str, kind: str) -> str:
     out = text
     if kind == "linux":
-        exactly(out, "      state_fields_presence: required\n", 2, "Linux alias")
-        out = out.replace("      state_fields_presence: required\n", "")
+        exactly(out, "      field_presence: required\n", 2, "Linux alias")
+        out = out.replace("      field_presence: required\n", "")
         exactly(out, "    report_elements: all\n", 2, "Linux restored group anchors")
         out = out.replace("    report_elements: all\n",
                           "        presence: all\n    report_elements: all\n")
     elif kind == "dns":
-        exactly(out, "      state_fields_presence: required\n", 2, "DNS alias")
+        exactly(out, "      field_presence: required\n", 2, "DNS alias")
         pat = (r"(    require:\n      items: at_least_one\n"
-               r"      matching_items: all\n)      state_fields_presence: required\n"
+               r"      matching_items: all\n)      field_presence: required\n"
                r"(      states:\n)")
         out, replaced = re.subn(pat, r"    all_state_fields_exist: true\n\1\2", out)
         if replaced != 2:
