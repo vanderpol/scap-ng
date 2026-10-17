@@ -11,6 +11,9 @@ on:
       - tools/research_english_first_04_full_corpus.py
       - tools/research_english_first_04_compact_layout.py
       - tools/research_english_first_04_auditor_candidate.py
+      - tools/research_english_first_04_inherited_capability.py
+      - tools/test_research_english_first_04_inherited_capability.py
+      - research/assessment-simplification/english-first-04/experiments/windows-wmi-rights-typed-source.research.yaml
       - tools/research_violation_query_semantics.py
       - tools/test_research_violation_query_semantics.py
       - tools/measure_oval_conditional_patterns.py
@@ -45,6 +48,16 @@ jobs:
 
       - name: Install pinned parser
         run: python -m pip install 'PyYAML==6.0.3'
+
+      - name: Prove named-source capability inheritance is fail-closed
+        run: |
+          python tools/test_research_english_first_04_inherited_capability.py
+          python tools/research_english_first_04_inherited_capability.py \
+            research/assessment-simplification/english-first-04/auditor-candidate/linux-home.auditor.research.yaml \
+            research/assessment-simplification/english-first-04/auditor-candidate/linux-files.auditor.research.yaml \
+            research/assessment-simplification/english-first-04/auditor-candidate/windows-wmi-rights.auditor.research.yaml \
+            research/assessment-simplification/english-first-04/auditor-candidate/dns.auditor.research.yaml \
+            research/assessment-simplification/english-first-04/auditor-candidate/apache.auditor.research.yaml
 
       - name: Fetch published immutable r3 YAML authoring ZIP
         env:
