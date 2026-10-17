@@ -2,8 +2,8 @@
 
 **Experimental research. Not an approved SCAP-NG syntax or scanner proof.**
 
-Generated in GitHub Actions run 38992079463:
-https://github.com/vanderpol/scap-ng/actions/runs/38992079463
+Generated in GitHub Actions run 39022493530:
+https://github.com/vanderpol/scap-ng/actions/runs/39022493530
 
 This page is a stable GitHub-hosted rendering of the result.
 Structural source inversion does not establish original OVAL runtime/evidence parity.
@@ -13,6 +13,7 @@ Structural source inversion does not establish original OVAL runtime/evidence pa
 
 | Measure | Value |
 | --- | ---: |
+| combined_exists_and_matches | 67 |
 | exact | 871 |
 | presence_all_must_exist | 201 |
 | presence_at_least_one | 993 |
