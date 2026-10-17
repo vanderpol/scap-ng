@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import glob
+import itertools
 import re
 import shlex
 
@@ -87,7 +88,11 @@ def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
             stripped=raw.strip()
             if not stripped or stripped.startswith("#"):
                 continue
-            if stripped.startswith("<") or stripped.startswith("</"):
+            if stripped.endswith(chr(92)):
+                note("multiline_directive_unsupported",
+                     path=str(normalized),line=line_number,text=stripped)
+                continue
+            if stripped.startswith("<"):
                 note("conditional_or_container_context_unsupported",
                      path=str(normalized),line=line_number,text=stripped)
                 continue
@@ -121,7 +126,14 @@ def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
                     note("unsafe_include_pattern",
                          path=str(normalized),line=line_number,text=raw)
                     continue
-                matches=sorted(Path(x) for x in glob.glob(str(candidate)))
+                # Cap the glob expansion itself before sorting; a huge
+                # glob must not allocate an unbounded list then claim
+                # collection was complete under max_files.
+                expansion=list(itertools.islice(glob.iglob(str(candidate)),max_files+1))
+                if len(expansion)>max_files:
+                    note("glob_match_limit",limit=max_files,pattern=pattern)
+                    expansion=expansion[:max_files]
+                matches=sorted(Path(x) for x in expansion)
                 if not matches and low=="include":
                     note("required_include_unmatched",
                          path=str(normalized),line=line_number,pattern=pattern)
@@ -136,6 +148,10 @@ def collect(root_config: str|Path, *, server_root: str|Path, max_files=500,
             if not value:
                 note("directive_without_value",path=str(normalized),
                      line=line_number, name=name)
+                continue
+            if "$"+"{" in value:
+                note("dynamic_directive_value_unresolved",
+                     path=str(normalized),line=line_number,text=raw)
                 continue
             if len(directives)>=max_directives:
                 note("directive_limit",limit=max_directives)
