@@ -1,0 +1,23 @@
+id: windows-time-source-site-policy
+title: Windows time source must match the computer's role
+require:
+  if:
+    fact: windows.computer.is_domain_controller
+    equals: true
+    then:
+      exactly_one: windows.time_source
+      must:
+        configured_server: {equals: '$site.domain_controller_ntp'}
+    otherwise:
+      exactly_one: windows.time_source
+      must:
+        configured_server: {equals: '$site.member_ntp'}
+    on_unknown: unknown
+inputs:
+  site:
+    domain_controller_ntp:
+      type: hostname
+      provenance: required
+    member_ntp:
+      type: hostname
+      provenance: required
