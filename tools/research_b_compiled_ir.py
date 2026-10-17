@@ -95,6 +95,30 @@ def _node(node, source_kind, depth=0):
                     "invalid pre-evaluated OVAL Item results")
         return
 
+    if kind == "compat_oval_provider_existence":
+        _ensure(source_kind != "native",
+                "source provider compatibility operation cannot be native authored")
+        _ensure(set(node) == {"kind","source_assessment_id","source_test_id",
+                              "provider","using","existence"},
+                "source provider compatibility node has unexpected keys")
+        _ensure(node["provider"] == "linux.textfile_matches" and
+                node["existence"] == "at_least_one_exists",
+                "unsupported source provider existence contract")
+        _ensure(all(isinstance(node[k],str) and bool(node[k])
+                    for k in ("source_assessment_id","source_test_id")),
+                "missing source provenance identity")
+        using=node["using"]
+        required={"path","pattern","ignore_case","multiline","singleline"}
+        _ensure(isinstance(using,dict) and set(using)==required,
+                "source acquisition parameter contract mismatch")
+        _ensure(isinstance(using["path"],str) and using["path"].startswith("/")
+                and isinstance(using["pattern"],str) and bool(using["pattern"]),
+                "source path and regex must be specified")
+        _ensure(all(type(using[k]) is bool
+                    for k in ("ignore_case","multiline","singleline")),
+                "source regex flags must be typed booleans")
+        return
+
     if kind == "logic":
         _ensure(set(node) == {"kind", "operator", "children"},
                 "logic node has unexpected keys")
@@ -146,8 +170,8 @@ def _classify(node, depth=0):
     _ensure(depth <= 64 and isinstance(node, dict) and
             isinstance(node.get("kind"), str), "invalid or excessive requirement tree")
     kind = node["kind"]
-    if kind == "compat_oval_test":
-        return { "compiler-compatibility" }
+    if kind in {"compat_oval_test","compat_oval_provider_existence"}:
+        return {"compiler-compatibility"}
     if kind == "logic":
         result = set()
         for child in node["children"]:
