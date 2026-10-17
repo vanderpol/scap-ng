@@ -63,6 +63,37 @@ class SourceTypeInheritanceTests(unittest.TestCase):
         with self.assertRaises(Unsupported):
             transform(bad)
 
+    def test_composed_source_type_inferred(self):
+        sample = copy.deepcopy(BASE)
+        sample["sources"]["init-files"] = {
+            "union": [{"inspect": "unix.file", "where": {"name": {"matches_regex": ".*"}}}]
+        }
+        sample["checks"]["files"] = {
+            "inspect": "unix.file",
+            "from": "init-files",
+            "require": {"items": "may_be_absent"},
+        }
+        compact, changed = transform(sample)
+        self.assertEqual(changed, 2)
+        self.assertEqual(restore(compact), sample)
+
+    def test_mixed_capabilities_in_set_rejected(self):
+        sample = copy.deepcopy(BASE)
+        sample["sources"]["bad-union"] = {
+            "union": [{"inspect": "unix.file"}, {"inspect": "unix.password"}]
+        }
+        sample["checks"]["bad"] = {"inspect": "unix.file", "from": "bad-union"}
+        with self.assertRaises(Unsupported):
+            transform(sample)
+
+    def test_cyclic_source_references_rejected(self):
+        sample = copy.deepcopy(BASE)
+        sample["sources"]["first"] = {"from": "second"}
+        sample["sources"]["second"] = {"from": "first"}
+        sample["checks"]["cycle"] = {"inspect": "unix.file", "from": "first"}
+        with self.assertRaises(Unsupported):
+            transform(sample)
+
     def test_from_with_extra_collection_rejected(self):
         bad = copy.deepcopy(BASE)
         bad["checks"]["read-role"]["collect"] = {"query": "SELECT * FROM foo"}
