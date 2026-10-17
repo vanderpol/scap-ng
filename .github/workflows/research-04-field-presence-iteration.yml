@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   research-inverse:
@@ -42,3 +42,17 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/research_04_auditor_preview.py --check
+      - name: Publish generated research previews to GitHub main
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        shell: bash
+        run: |
+          git add research/assessment-simplification/english-first-04/field-presence-iteration/generated-previews/
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'docs(#235): publish source-derived auditor preview pages'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            echo 'Generated preview pages already current.'
+          fi
