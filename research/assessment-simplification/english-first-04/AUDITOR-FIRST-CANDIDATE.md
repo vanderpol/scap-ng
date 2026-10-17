@@ -191,6 +191,10 @@ The **871/872 proof covers automated Assessments**, not every SCAP-NG content ty
 
 **Auditor acceptance standard:** a security auditor needs to read the simple cases comfortably *and* identify data provenance, Item count, field cardinality, missing data, error behavior and final decision logic for complicated cases. The remaining work is measuring this with real reviewers, resolving the original OVAL exception, and proving semantics independently. "Looks simpler" is not sufficient.
 
+## Existence-policy decision is not final
+
+The [follow-up auditor-focused existence audit](TEST-ITEM-EXISTENCE-REVIEW.md) counted **993 at-least-one**, **103 none** (including one invalid State-bearing Test), **201 all**, **71 optional**, and **7 exactly-one** requirements in all 1,375 named source Tests. Our current `items: all_must_exist` is **not considered an agreed user-facing keyword**: the pinned OVAL 5.12.3 common-schema prose says Test `all_exist` is equivalent to `at_least_one_exists`, while its general existence status table distinguishes those cases for mixed Item statuses. Preserve the source representation and fail closed until this conflict is interpreted for Test scope. `items: none` must have **no State predicate at all**. State-field existence remains separate.
+
 ## Proof and decision gates
 
 - The pinned six-STIG archive contains **872 distinct automated Assessments**. Exact whole-Assessment source reconstruction is currently **871/872**, or **1,374 named Tests**, including the four large real-world examples. The proposed `require.items`/match structure is additionally tested by an independent reversible experimental transformer and nine intentional malformed-input guards.
