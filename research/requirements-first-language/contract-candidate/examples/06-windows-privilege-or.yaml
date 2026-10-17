@@ -1,0 +1,20 @@
+id: native-deny-remote-login
+title: Deny remote interactive logon to prohibited account categories
+require:
+  any:
+    - all:
+        - resource: windows.computer_role
+          must:
+            role: {equals: domain_member}
+        - some: windows.user_rights
+          using: {right: SeDenyRemoteInteractiveLogonRight}
+          must:
+            principal: {equals: Guests}
+        - some: windows.user_rights
+          using: {right: SeDenyRemoteInteractiveLogonRight}
+          must:
+            principal: {equals: LocalAccount}
+    - some: windows.user_rights
+      using: {right: SeDenyRemoteInteractiveLogonRight}
+      must:
+        principal: {equals: Everyone}
