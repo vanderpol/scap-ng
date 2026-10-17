@@ -1,0 +1,64 @@
+name: 0.4-B full six-STIG source-accounting gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/research_b_full_corpus_import.py'
+      - 'tools/test_research_b_full_corpus_import.py'
+      - '.github/workflows/research-b-six-stig-source-import.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-accounting:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned fixture parser
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Negative corpus integrity and shared-assessment reference tests
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_full_corpus_import.py
+      - name: Retrieve immutable published six-STIG authoring source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/b-corpus
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern scap-ng-0.3-six-stig-authoring.zip --dir work/b-corpus
+      - name: Account for every Benchmark Rule and all Assessment choice references
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_full_corpus_import.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output research/requirements-first-language/contract-candidate/corpus/source-accounting.json \
+            --markdown research/requirements-first-language/contract-candidate/corpus/source-accounting.md \
+            --capsules-output work/b-corpus/nonexecutable-source-capsules.json
+      - name: Preserve full source capsules as temporary CI artifact, not scanner bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: research-b-nonexecutable-source-capsules
+          path: work/b-corpus/nonexecutable-source-capsules.json
+          retention-days: 30
+      - name: Publish stable corpus accounting pages on GitHub main
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          git add research/requirements-first-language/contract-candidate/corpus/source-accounting.json
+          git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'docs(#235): publish six-STIG B structural source accounting'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
