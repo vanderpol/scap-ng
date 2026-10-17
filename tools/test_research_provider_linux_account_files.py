@@ -53,7 +53,6 @@ class LinuxAccountHomeFilesTests(unittest.TestCase):
         self.assertFalse(mode_complies(result["items"][0]["mode"]))
     def test_hidden_prefix_and_excluded_directories(self):
         self.write(self.one,"normal",0o777)
-        self.write(self.one,"..",0o777) if False else None
         self.write(self.one,".bashrc",0o600)
         (self.one/".config").mkdir()
         result=self.get()
