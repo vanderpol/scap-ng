@@ -97,6 +97,24 @@ These comparisons detect inconsistent or intentional vocabulary choices; neither
 - `authoring/oracle_linux_9/assessments/automated/SV-271530.automated.yaml` — `audit-modifications-etc-gshadow-test`: Audit modifications to /etc/gshadow
 - `authoring/oracle_linux_9/assessments/automated/SV-271531.automated.yaml` — `audit-modifications-etc-security-opasswd-test`: Audit modifications to /etc/security/opasswd
 
+## A particularly revealing real-content example: audit tool paths
+
+Two shared Linux Assessments — `audit-tools-mode-0755-less-permissive` and `audit-tools-owned-by-root` — 
+select `unix.file` Items using a literal `full_path.equals` list of **seven** names with `value_match: one_or_more`,
+while both Tests specify `all_exist`. The seven options are /sbin/auditctl, /sbin/aureport,
+/sbin/ausearch, /sbin/autrace, /sbin/auditd, /sbin/rsyslogd and /sbin/augenrules.
+
+**This does not automatically prove that all seven named files exist.** One existing selected file
+can satisfy Test Item existence if the other six are not represented as partially missing Items.
+A collection that optionally reports missing partial Items could yield a different result.
+Therefore do not promote `all_exist` to an English expression such as 'all specified paths must exist'
+without specifying whether the author meant discovered Items or an explicitly enumerated expected population.
+
+A genuine requirement that *each enumerated file must exist* needs obligations scoped to each expected identity,
+or an independently proven compiler lowering. Rewriting the published rule to that stronger form
+would be an intentional compliance-policy change, not a lossless syntax simplification.
+
+
 ## Technical distinction that remains open
 
 1. Under a complete collection of only existing Items, Test `all_exist` and `at_least_one_exists` agree: one or more exist.
