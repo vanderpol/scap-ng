@@ -69,6 +69,12 @@ Also, an incomplete Object population may produce different Test decisions depen
 
 **Provisional direction:** For new, fully observed native Items, `items: at_least_one` may subsume the ordinary Test `all_exist` case; retain an importer-only legacy distinction and any proven stronger semantics until error, incomplete and multi-value/Set/record cases are validated. Never collapse **State-field** `all_exist`, where a different scope is involved.
 
+## Attribution and inherited SCAP 1.3 source — correction
+
+The project owner confirmed that NIWC enhanced SCAP 1.4 packages import DISA SCAP 1.3 content without changes to DISA-authored checks. NIWC-authored additions are identified by their own OVAL namespace. The original `oval:mil.disa.stig...` versus `oval:navy.navwar.niwcatlantic...` Definition/Test/Object/State/Variable IDs have been [verified from original OVAL evidence](OVAL-SOURCE-PROVENANCE-BOUNDARY.md) and checked by [CI](https://github.com/vanderpol/scap-ng/actions/runs/39029699446).
+
+Therefore **the 132 textfilecontent54 and three ntuser legacy `item_creation` values in the mixed 201-Test census must not be interpreted as authors intentionally avoiding the new OVAL 5.12.3 options**. NIWC's modern additions must be analyzed separately from unchanged inherited DISA content, using original source OVAL element IDs rather than native Assessment filenames. The curated six-STIG native ZIP does not retain all ID attribution evidence. This source-origin split remains a research gate before publishing author-behavior statistics.
+
 ## Source-backed results of the 201-Test follow-up (17 October 2026)
 
 The pinned [201-Test existing-Item result-model audit](reports/all-exist-native-equivalence.md) passed in [GitHub Actions](https://github.com/vanderpol/scap-ng/actions/runs/39029016539):
