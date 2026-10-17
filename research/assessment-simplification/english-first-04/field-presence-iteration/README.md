@@ -119,6 +119,26 @@ For the original Windows `evaluate` expression, a read-only auditor view can lab
 
 Those are **human editorial labels applied here to the existing AST for review**. The reader-facing explanation should eventually be **machine derived**, with each check ID still traceable to the original source, correct six-state truth handling, and error/unknown visibility. The labels do not change evaluation order, introduce priority `if/else`, or add `case` to the executable grammar.
 
+## Independent-review finding: correct the auditor explanation, not the test result
+
+The next external Gemini response **successfully read most ordinary checks**, but confidently treated every incomplete collection as `Error`, guessed deduplication, confused two field values inside one Item with two Items, and claimed `Error AND False = Error`. Those statements are not the inherited OVAL result semantics. See the [source/spec-backed third-response audit](../GEMINI-PHASE1-PREDICTION-AUDIT-2026-10-17.md) for the complete distinctions and verified counterexamples.
+
+**Minimum generated read-only auditor display from this language** (not a second executable dialect):
+
+| Display concern | Explanation that a viewer needs |
+| --- | --- |
+| Selection | Show exact capability and original `where` expression; don't interpret an unanchored source regex as end-anchored. |
+| Item existence | State the required root Item population after selection; distinguish zero successfully observed from not-collected/incomplete. |
+| Per-Item matching | Show `matching_items` for collected root Items and `matching_records` for nested records; keep whole-State alternatives as alternatives. |
+| Per-value matching | Show the repeated field-value population and the inherited comparison/value cardinality, separately from Item count. |
+| Effective field presence | Show whether each field is required or may be absent, where the policy was declared, and whether a nested record overrides it. |
+| Acquisition result | Display collection flag, permitted command-exit/stderr policies, incomplete/unknown vs actual error. Never call a failed command inherently Error when flags suppress that trigger. |
+| Final six-state outcome | Use the authoritative aggregation table; for instance, ordinary AND of False and Error is False, while OR of True and Error is True. Include the decisive reason and withheld/unknown evidence. |
+
+The exact six-state reference tests are **[green in CI run 39051291180](https://github.com/vanderpol/scap-ng/actions/runs/39051291180)** together with five-file YAML syntax and exact source inversion. **That is a reference truth-table unit test + structural inverse, not runtime parity for the experimental field-presence aliases.**
+
+Gemini reported **no ability to fetch GitHub files**, so we created an **[offline Phase 2 pack containing all ten original/revised full YAML files](GEMINI-PHASE2-OFFLINE-SOURCE-PACK.md)** and the source aggregation contract. Give it to Gemini *after* its blind answers are frozen; do not send earlier internal conclusions before it compares source.
+
 ## Unresolved issues / external test handoff
 
 **Gating concerns:** (1) source-specific exact six-state truth table for `required` and `may_be_absent` aliases, including missing/errors and inherited field scope; (2) keep the read-only verifier CI green as candidate revisions expand; (3) broaden beyond five pinned files before proposing canonical 0.4; (4) genuinely unfamiliar auditor predictions for zero/mixed/duplicate/unknown; (5) generated not hand-authored proof view and authoring-editor tests.
