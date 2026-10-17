@@ -1,0 +1,161 @@
+assessment:
+  assessment_title: WN11-UR-000090 - The "Deny log on through Remote Desktop Services"
+    user right on Windows 11 workstations must be configured to prevent access from
+    highly privileged domain accounts and local accounts on domain systems and unauthenticated
+    access on all systems.
+  class: compliance
+  evaluate:
+    any:
+    - all:
+      - test: system-non-dc-domain-joined-windows-server-or-workstation-test
+      - test: deny-log-on-through-remote-desktop-services-local-account-test
+      - test: deny-log-on-through-remote-desktop-services-guests-test
+      - test: deny-log-on-through-remote-desktop-services-domain-admins-test
+      - test: deny-log-on-through-remote-desktop-services-enterprise-admins-test
+    - all:
+      - test: system-standalone-windows-server-or-workstation-test
+      - test: deny-log-on-through-remote-desktop-services-guests-test
+    - test: deny-log-on-through-remote-desktop-services-everyone-test
+  id: SV-253495.automated
+  mode: automated
+  purpose: assessment
+  shared_objects:
+    windows-userright-object:
+      capability: windows.userright
+      object_title: null
+      select:
+        userright: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+    windows-wmi57-object:
+      capability: windows.wmi.query
+      collect:
+        namespace: root\cimv2
+        query: SELECT DomainRole FROM win32_computersystem
+      object_title: null
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    deny-log-on-through-remote-desktop-services-domain-admins-test:
+      capability: windows.userright
+      existence: one_or_more
+      match: one_or_more
+      object: windows-userright-object
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: trustee_name
+        match: all
+        operation: pattern_match
+        value: ^(?i)(.+\\)?Domain Admins$
+      test_title: Deny log on through Remote Desktop Services - Domain Admins
+    deny-log-on-through-remote-desktop-services-enterprise-admins-test:
+      capability: windows.userright
+      existence: one_or_more
+      match: one_or_more
+      object: windows-userright-object
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: trustee_name
+        match: all
+        operation: pattern_match
+        value: ^(?i)(.+\\)?Enterprise Admins$
+      test_title: Deny log on through Remote Desktop Services - Enterprise Admins
+    deny-log-on-through-remote-desktop-services-everyone-test:
+      capability: windows.userright
+      existence: one_or_more
+      match: one_or_more
+      object: windows-userright-object
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: trustee_name
+        match: all
+        operation: case_insensitive_equals
+        value: Everyone
+      test_title: Deny log on through Remote Desktop Services - Everyone
+    deny-log-on-through-remote-desktop-services-guests-test:
+      capability: windows.userright
+      existence: one_or_more
+      match: one_or_more
+      object: windows-userright-object
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: trustee_name
+        match: all
+        operation: case_insensitive_equals
+        value: Guests
+      test_title: Deny log on through Remote Desktop Services - Guests
+    deny-log-on-through-remote-desktop-services-local-account-test:
+      capability: windows.userright
+      existence: one_or_more
+      match: one_or_more
+      object: windows-userright-object
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: trustee_name
+        match: all
+        operation: pattern_match
+        value: ^(?i)(NT Authority\\)?Local account$
+      test_title: Deny log on through Remote Desktop Services - Local account
+    system-non-dc-domain-joined-windows-server-or-workstation-test:
+      capability: windows.wmi.query
+      existence: one_or_more
+      match: all
+      object: windows-wmi57-object
+      reported_elements: all
+      states:
+      - field: result
+        record:
+          existence: one_or_more
+          fields:
+            domainrole:
+              existence: one_or_more
+              match: all
+              operation: equals
+              value: '1'
+          match: all
+      - field: result
+        record:
+          existence: one_or_more
+          fields:
+            domainrole:
+              existence: one_or_more
+              match: all
+              operation: equals
+              value: '3'
+          match: all
+      states_match: any
+      test_title: The system is a non-DC domain-joined Windows server or workstation
+    system-standalone-windows-server-or-workstation-test:
+      capability: windows.wmi.query
+      existence: one_or_more
+      match: all
+      object: windows-wmi57-object
+      reported_elements: all
+      states:
+      - field: result
+        record:
+          existence: one_or_more
+          fields:
+            domainrole:
+              existence: one_or_more
+              match: all
+              operation: equals
+              value: '0'
+          match: all
+      - field: result
+        record:
+          existence: one_or_more
+          fields:
+            domainrole:
+              existence: one_or_more
+              match: all
+              operation: equals
+              value: '2'
+          match: all
+      states_match: any
+      test_title: The system is a standalone Windows server or workstation
+  version: 2

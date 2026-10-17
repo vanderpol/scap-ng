@@ -1,0 +1,31 @@
+assessment:
+  assessment_title: The "Lock pages in memory" user right must not be assigned to
+    any groups or accounts.
+  class: compliance
+  evaluate:
+    test: lock-pages-in-memory-none-test
+  id: ng.shared.lock-pages-in-memory-none
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    lock-pages-in-memory-none-test:
+      capability: windows.userright
+      existence: one_or_more
+      match: all
+      object:
+        capability: windows.userright
+        object_title: null
+        select:
+          userright: SE_LOCK_MEMORY_NAME
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: trustee_name
+        match: all
+        operation: equals
+        value: ''
+      test_title: Lock pages in memory - None
+  version: 1

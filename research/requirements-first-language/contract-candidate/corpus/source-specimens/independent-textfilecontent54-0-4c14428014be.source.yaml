@@ -1,0 +1,38 @@
+assessment:
+  assessment_title: Linux must disable network management of the chrony daemon.
+  class: compliance
+  evaluate:
+    test: etc-chrony-conf-cmdport-option-set-0-test
+  id: ng.shared.etc-chrony-conf-cmdport-option-is-set-to-0
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    etc-chrony-conf-cmdport-option-set-0-test:
+      capability: independent.textfilecontent54
+      existence: one_or_more
+      match: all
+      object:
+        capability: independent.textfilecontent54
+        collect:
+          ignore_case: false
+          item_creation: all_object_elements_fullfilled
+          multiline: true
+          singleline: false
+        filesystem: all
+        object_title: null
+        select:
+          full_path:
+            operation: equals
+            value: /etc/chrony.conf
+          instance:
+            operation: greater_than_or_equal
+            value: 1
+          pattern:
+            operation: pattern_match
+            value: ^[ \t]*cmdport[ \t]+0[ \t]*$
+      reported_elements: all
+      test_title: '/etc/chrony.conf: cmdport option is set to 0'
+  version: 1

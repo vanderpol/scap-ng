@@ -1,0 +1,213 @@
+assessment:
+  assessment_title: Windows Server 2025 default permissions for the HKEY_LOCAL_MACHINE
+    registry hive must be maintained.
+  class: compliance
+  evaluate:
+    all:
+    - test: default-permissions-hkey-local-machine-security-registry-key-maintained-test
+    - test: default-non-domain-controller-permissions-hkey-local-machine-software-registry-test
+    - any:
+      - all:
+        - test: system-windows-domain-controller-test
+        - test: default-domain-controller-permissions-hkey-local-machine-system-registry-key-test
+      - all:
+        - not:
+            test: system-windows-domain-controller-test
+        - test: default-non-domain-controller-permissions-hkey-local-machine-system-registry-test
+  id: SV-278001.automated
+  mode: automated
+  purpose: assessment
+  shared_objects:
+    gather-permissions-hkey-local-machine-software-registry-2-object:
+      capability: independent.shellcommand
+      collect:
+        command: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("System", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+          | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object
+          { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access:
+          $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags:
+          $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }'
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+        shell: powershell
+      object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    default-domain-controller-permissions-hkey-local-machine-system-registry-key-test:
+      capability: independent.shellcommand
+      existence: one_or_more
+      match: all
+      object: gather-permissions-hkey-local-machine-software-registry-2-object
+      reported_elements: all
+      states:
+      - datatype: string
+        existence: one_or_more
+        field: stdout_line
+        match: all
+        operation: pattern_match
+        value:
+        - '^Identity:NT AUTHORITY\\Authenticated Users, Rights: ReadKey, Access: Allow,
+          IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+          None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow,
+          IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+          None$'
+        - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$'
+        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights:
+          ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        - '^Identity:BUILTIN\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
+          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        - ''
+        value_match: one_or_more
+      test_title: Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM
+        registry key must be maintained.
+    default-non-domain-controller-permissions-hkey-local-machine-software-registry-test:
+      capability: independent.shellcommand
+      existence: one_or_more
+      match: all
+      object:
+        capability: independent.shellcommand
+        collect:
+          command: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Software",
+            [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+            | Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object
+            { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access:
+            $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags:
+            $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }'
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          shell: powershell
+        object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SOFTWARE registry
+      reported_elements: all
+      states:
+      - datatype: string
+        existence: one_or_more
+        field: stdout_line
+        match: all
+        operation: pattern_match
+        value:
+        - '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow,
+          IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+          None$'
+        - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$'
+        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights:
+          ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
+          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        value_match: one_or_more
+      test_title: Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SOFTWARE
+        registry key must be maintained.
+    default-non-domain-controller-permissions-hkey-local-machine-system-registry-test:
+      capability: independent.shellcommand
+      existence: one_or_more
+      match: all
+      object: gather-permissions-hkey-local-machine-software-registry-2-object
+      reported_elements: all
+      states:
+      - datatype: string
+        existence: one_or_more
+        field: stdout_line
+        match: all
+        operation: pattern_match
+        value:
+        - '^Identity:BUILTIN\\Users, Rights: ReadKey, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: FullControl, Access: Allow,
+          IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags:
+          None$'
+        - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$'
+        - '^Identity:APPLICATION PACKAGE AUTHORITY\\ALL APPLICATION PACKAGES, Rights:
+          ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        - '^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681,
+          Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        value_match: one_or_more
+      test_title: Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\SYSTEM
+        registry key must be maintained.
+    default-permissions-hkey-local-machine-security-registry-key-maintained-test:
+      capability: independent.shellcommand
+      existence: one_or_more
+      match: all
+      object:
+        capability: independent.shellcommand
+        collect:
+          command: '([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey("Security",
+            [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access
+            |  Where-Object { $_.RegistryRights -notmatch ''\d+'' } | ForEach-Object
+            { "Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access:
+            $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags:
+            $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)" }'
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          shell: powershell
+        object_title: Gather permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
+      reported_elements: all
+      states:
+      - datatype: string
+        existence: one_or_more
+        field: stdout_line
+        match: all
+        operation: pattern_match
+        value:
+        - '^Identity:NT AUTHORITY\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited:
+          False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$'
+        - '^Identity:BUILTIN\\Administrators, Rights: ReadPermissions, ChangePermissions,
+          Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None),
+          PropagationFlags: None$'
+        value_match: one_or_more
+      test_title: Default permissions for the HKEY_LOCAL_MACHINE\SECURITY registry
+        key must be maintained.
+    system-windows-domain-controller-test:
+      capability: windows.wmi.query
+      existence: one_or_more
+      match: all
+      object:
+        capability: windows.wmi.query
+        collect:
+          namespace: root\cimv2
+          query: SELECT DomainRole FROM win32_computersystem
+        object_title: null
+      reported_elements: all
+      states:
+      - field: result
+        record:
+          existence: one_or_more
+          fields:
+            domainrole:
+              existence: one_or_more
+              match: all
+              operation: equals
+              value: '4'
+          match: all
+      - field: result
+        record:
+          existence: one_or_more
+          fields:
+            domainrole:
+              existence: one_or_more
+              match: all
+              operation: equals
+              value: '5'
+          match: all
+      states_match: any
+      test_title: The system is a Windows Domain Controller
+  version: 1

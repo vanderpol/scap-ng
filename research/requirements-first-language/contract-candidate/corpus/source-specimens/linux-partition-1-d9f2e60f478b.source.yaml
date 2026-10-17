@@ -1,0 +1,95 @@
+assessment:
+  assessment_title: Linux must use a separate file system for the system audit data
+    path.
+  class: compliance
+  evaluate:
+    all:
+    - test: there-separate-file-system-audit-data-directory-test
+    - test: there-separate-file-system-configured-audit-data-directory-test
+  id: ng.shared.linux-must-use-a-separate-file-system-for-the-system-audit-data-path
+  mode: automated
+  purpose: assessment
+  shared_objects:
+    independent-textfilecontent54-object:
+      capability: independent.textfilecontent54
+      collect:
+        ignore_case: true
+        item_creation: all_object_elements_fullfilled
+        multiline: true
+        singleline: false
+      filesystem: all
+      object_title: null
+      select:
+        full_path:
+          operation: equals
+          value: /etc/audit/auditd.conf
+        instance:
+          operation: greater_than_or_equal
+          value: 1
+        pattern:
+          operation: pattern_match
+          value: ^\s*log_file\s*=\s*(\S+)/\S+\s*$
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    there-separate-file-system-audit-data-directory-test:
+      capability: linux.partition
+      existence: all
+      match: all
+      object:
+        capability: linux.partition
+        for_each:
+          in: independent-textfilecontent54-object
+          item: match
+        object_title: null
+        select:
+          mount_point:
+            from: match.subexpression
+      reported_elements: all
+      test_title: There is a separate file system for audit data directory.
+    there-separate-file-system-configured-audit-data-directory-test:
+      capability: independent.textfilecontent54
+      existence: all
+      match: all
+      object:
+        capability: independent.textfilecontent54
+        collect:
+          ignore_case: false
+          item_creation: all_object_elements_fullfilled
+          multiline: true
+          singleline: false
+        filesystem: all
+        object_title: null
+        select:
+          full_path:
+            operation: equals
+            value: /etc/fstab
+          instance:
+            operation: greater_than_or_equal
+            value: 1
+          pattern:
+            datatype: string
+            operation: pattern_match
+            value:
+              variable: regex-find-audit-data-partition-in-etc-fstab-variable
+            value_match: one_or_more
+      reported_elements: all
+      test_title: There is a separate file system configured for audit data directory.
+  variables:
+    regex-find-audit-data-partition-in-etc-fstab-variable:
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            datatype: string
+            value: ^[^# \t]+\s+
+        - values:
+            field: subexpression
+            object: independent-textfilecontent54-object
+        - literal:
+            datatype: string
+            value: \s+
+      kind: local
+      title: regex to find audit data partition in /etc/fstab
+  version: 1

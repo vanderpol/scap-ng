@@ -1,0 +1,36 @@
+assessment:
+  assessment_title: Bluetooth must be turned off unless approved by the organization.
+  class: compliance
+  evaluate:
+    test: bluetooth-radio-turned-off-test
+  id: SV-253291.automated
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    bluetooth-radio-turned-off-test:
+      capability: windows.registry
+      existence: one_or_more
+      match: one
+      object:
+        capability: windows.registry
+        object_title: Verify the Bluetooth radio is turned off
+        select:
+          hive: local_machine
+          key:
+            operation: equals
+            value: SOFTWARE\Microsoft\PolicyManager\current\device\Connectivity
+          name:
+            operation: equals
+            value: AllowBluetooth
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: value
+        match: all
+        operation: equals
+        value: '0'
+      test_title: Bluetooth radio must be turned off.
+  version: 18

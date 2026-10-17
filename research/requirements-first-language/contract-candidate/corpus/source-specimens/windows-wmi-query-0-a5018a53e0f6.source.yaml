@@ -1,0 +1,25 @@
+assessment:
+  assessment_title: WN11-00-000050 - Local volumes must be formatted using NTFS.
+  class: compliance
+  evaluate:
+    test: local-volumes-use-ntfs-test
+  id: SV-253265.automated
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    local-volumes-use-ntfs-test:
+      capability: windows.wmi.query
+      existence: none
+      match: all
+      object:
+        capability: windows.wmi.query
+        collect:
+          namespace: root\cimv2
+          query: SELECT deviceid FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!="NTFS"
+        object_title: All 'Local Disk' File systems not using NTFS
+      reported_elements: all
+      test_title: Local volumes use NTFS
+  version: 2
