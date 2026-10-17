@@ -3,6 +3,12 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[201-Test all-exist equivalence](reports/all-exist-native-equivalence.md)** — source-Test classification: 127 State-free and 74 State-bearing. All agree with at-least-one on complete, existing-only Item populations; incomplete State-bearing and mixed Item-status differences remain explicit. [CI proof](https://github.com/vanderpol/scap-ng/actions/runs/39029016539).
+
+**[Item creation settings in all 201 cases](reports/all-exist-item-creation.md)** — 132 textfilecontent54 Tests use `all_object_elements_fullfilled`; three NTUSER use `key_and_name_exist`. [CI census](https://github.com/vanderpol/scap-ng/actions/runs/39029190471).
+
+**[Experimental real-Item validation schema](native-existing-item.profile.schema.json)** — enforces root `exists` for confirmed real native Items and retains missing/error field/collection status; [nine research regression tests](https://github.com/vanderpol/scap-ng/blob/main/tools/test_research_04_native_existing_item_profile.py) [passed in CI](https://github.com/vanderpol/scap-ng/actions/runs/39029351309). This is **not** the normative 0.4 result schema.
+
 **[Existing-resource-only native Items — proposal](NATIVE-ITEM-EXISTENCE-POLICY.md)** — prohibits fabricated absent root Items in native results, preserves missing field/resource and failure evidence, and explains why Test `all_exist` still needs separate error/incomplete review. [Executable boundary guards](https://github.com/vanderpol/scap-ng/blob/main/tools/test_research_04_nonexistent_items_policy.py) passed in [GitHub CI](https://github.com/vanderpol/scap-ng/actions/runs/39028682792). Research only; the 0.4 normative schemas were not modified.
 
 **[All 201 `all_exist` Tests — source-selection and reuse forensics](reports/all-exist-source-forensics.md)** — examines open-ended pattern searches, fixed and multi-value selectors, dynamic discovery, State-free versus State-bearing checks, and reused Objects. Original OVAL 5.12.3 documentation conflicts on Test-level equivalence under mixed Item statuses, and partly missing Items may be reported optionally. Source choices remain unchanged pending semantic and provenance proof.
