@@ -1,0 +1,40 @@
+# Research #235: source-conscious new-auditor policy, NOT approved syntax or scanner parity.
+# Intent: file requirements apply to one COMBINED file population per user class.
+# No file is required per individual root user; at least one root file is required globally.
+id: linux-initialization-files-permissions
+title: Linux local initialization files must have safe permission bits
+require:
+  all:
+    - each: linux.files
+      using:
+        from_account_homes:
+          account_source: linux.accounts
+          where:
+            username: {matches_regex: '[\w]+'}
+            uid: {at_least: 1000}
+            home_dir: {not_equals: /}
+          home_field: home_dir
+        filename: {matches_regex: '^\.[^\s\.]+'}
+        max_depth: 1
+        traverse_symlinks: true
+        cross_filesystems: true
+        exclude_directories: true
+      must:
+        mode: {only_these_bits: '0740'}
+    - each: linux.files
+      using:
+        from_account_homes:
+          account_source: linux.accounts
+          where:
+            username: {matches_regex: '[\w]+'}
+            uid: {equals: 0}
+            home_dir: {not_equals: /}
+          home_field: home_dir
+        filename: {matches_regex: '^\.[^\s\.]+'}
+        max_depth: 1
+        traverse_symlinks: true
+        cross_filesystems: true
+        exclude_directories: true
+      minimum_resources: 1
+      must:
+        mode: {only_these_bits: '0740'}
