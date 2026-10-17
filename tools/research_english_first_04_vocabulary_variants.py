@@ -136,7 +136,7 @@ def examine(archive, examples_dir=None):
                         "# EXPERIMENT ONLY: native Assessment source-structure round-trip, NOT SCAP 1.4 runtime parity\n"+
                         hy,encoding="utf-8")
     if counts["assessments_total"] != 872 or counts["exact"] < 871:
-        raise AssertionError("source-exact grammar coverage regression")
+        raise AssertionError("source-exact grammar coverage regression "+repr(dict(counts))+" first rejections "+repr(rejections[:12]))
     if counts["exact"]+counts["rejected"]!=counts["assessments_total"]:
         raise AssertionError("unaccounted Assessment")
     # Adversarial invalid syntax: zero/2 capability names, empty selectors,
