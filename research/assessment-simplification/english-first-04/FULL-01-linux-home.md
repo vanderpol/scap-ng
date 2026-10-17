@@ -71,16 +71,16 @@ checks:
   home-mounted-nosuid-option-test:
     check: /home is mounted with the nosuid option.
     inspect: linux.partition
+    description: null
+    where:
+      mount_point:
+        matches_regex: .*\/home
     require:
       at_least_one_item_exists: true
       every_item_must_match:
         mount_options:
           some_values_is: nosuid
     report_elements: all
-    where:
-      mount_point:
-        matches_regex: .*\/home
-    description: null
 evaluate:
   test: home-mounted-nosuid-option-test
 ```
