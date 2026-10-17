@@ -3,6 +3,8 @@
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#227](https://github.com/vanderpol/scap-ng/issues/227) (vocabulary), [#229](https://github.com/vanderpol/scap-ng/issues/229) (semantics).
 
+**[All 201 `all_exist` Tests — source-selection and reuse forensics](reports/all-exist-source-forensics.md)** — examines open-ended pattern searches, fixed and multi-value selectors, dynamic discovery, State-free versus State-bearing checks, and reused Objects. Original OVAL 5.12.3 documentation conflicts on Test-level equivalence under mixed Item statuses, and partly missing Items may be reported optionally. Source choices remain unchanged pending semantic and provenance proof.
+
 **[New: fixed `items` + `condition` requirement-choice coverage, six-STIG audit](reports/fixed-requirements-six-stig.md)** — counts precisely which existing Item/field existence-and-matching modes a small dropdown vocabulary covers and links individual residual Tests. Two focused scoped choices raise source-annotated requirement coverage above 98% of unique automated Assessments; three choices raise it above 99%. This is **not complete grammar, Rule coverage, usability, or scanner semantic parity**. Remaining source cases are reviewed individually before any rewrite or language extension.
 
 **Goal:** A security administrator understands an Assessment without knowing OVAL; an implementer derives exact semantics without guessing.
