@@ -8,13 +8,18 @@ from research_native_contract_candidate import EXAMPLES,read
 from research_native_auditor_explain import render
 
 class NativeAuditorExplanationTests(unittest.TestCase):
-    def test_all_eight_have_nonempty_explanation(self):
+    def test_all_nine_have_nonempty_explanation(self):
         for file in sorted(EXAMPLES.glob("*.yaml")):
             with self.subTest(file=file.name):
                 text=render(read(file))
                 self.assertIn("What must be true",text)
                 self.assertIn("Source-conversion boundary",text)
                 self.assertIn("Evidence and status rules",text)
+
+    def test_filesystem_existence_only_has_no_redundant_property(self):
+        explanation=render(read(EXAMPLES/"09-linux-var-tmp-exists.yaml"))
+        self.assertIn("At least one Linux mount whose mount point equals /var/tmp must exist.",explanation)
+        self.assertNotIn("Required: ",explanation)
 
     def test_required_home_and_optional_guest_explicit(self):
         required=render(read(EXAMPLES/"01-required-home.yaml"))
