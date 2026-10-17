@@ -4,6 +4,8 @@
 
 [Source-backed Gemini review audit](../GEMINI-SECOND-REVIEW-SOURCE-AUDIT-2026-10-17.md) demonstrated that replacing source graphs with invented typed collectors, rewriting regexes, or collapsing whole WMI States is not a legitimate simplification. **This iteration changes only typed presentation of existing requirements, never what is collected or how check results combine.**
 
+[Answer-free next external reading comparison](AUDITOR-PREVIEW-BLIND-COMPARISON.md) tests the **same complete Assessments** as raw YAML vs machine-derived auditor previews, and later checks source fidelity with the full offline pack. Neither group is shown earlier findings or answer keys.
+
 ## Machine-derived auditor preview — gate B research demonstration
 
 The [five generated read-only auditor pages](generated-previews/INDEX.md) are now published directly on github.com. The renderer [source](../../../../tools/research_04_auditor_preview.py) parses the **complete** revised Assessment, checks named source/Variable/foreach references and complete `evaluate` coverage, and displays the exact selection graph, distinct root Item and nested record requirements, explicit field presence, and the complete AND/OR Test tree. The Windows result retains **seven checks and eight leaf occurrences** because Guests is referenced twice.
