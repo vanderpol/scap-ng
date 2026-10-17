@@ -325,6 +325,13 @@ class CandidateBContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"undeclared typed child relation"):
             compile_doc(doc)
 
+    def test_explicit_dns_relation_surface_lowers_identically(self):
+        from research_native_relation_alternative import read as relation_read
+        source=(EXAMPLES.parent/"explicit-dns-relations.yaml")
+        a=read(EXAMPLES/"08-dns-signing-nested.yaml")
+        b=relation_read(source)
+        self.assertEqual(a,b)
+
     def test_signed_zone_has_two_explicit_and_complete_key_populations(self):
         tree=sample("08-dns-signing-nested.yaml")
         self.assertEqual(tree["as"],"zone")
