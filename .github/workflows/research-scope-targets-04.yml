@@ -1,0 +1,73 @@
+name: Scope targets census (#235)
+on:
+  push:
+    paths:
+      - .github/workflows/research-scope-targets-04.yml
+      - tools/research_04_scope_target_audit.py
+      - tools/test_research_04_scope_target_audit.py
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  six-stig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install source parser dependencies
+        run: python -m pip install 'PyYAML==6.0.3' 'jsonschema==4.25.1'
+      - name: Unit-test disjoint Item, State-field and record populations
+        run: python tools/test_research_04_scope_target_audit.py -v
+      - name: Download pinned six-STIG authoring reference
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --dir work
+      - name: Census shared versus split Item/field rules
+        run: |
+          python tools/research_04_scope_target_audit.py \
+            --archive work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --output work/proof
+      - name: Verify pinned coverage and fail closed on unparsable modes
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open('work/proof/scope-target-audit.json'));c=p['counts']
+          assert (c['assessments'],c['tests'])==(872,1375),c
+          assert c['tests_with_states']+c['tests_no_states']==1375,c
+          assert c.get('missing_ordinary_field_policy',0)==0,c
+          assert not p['parse_exceptions'],p['parse_exceptions'][:10]
+          print('PASS: checked all six-STIG Test nodes without conflating Item/field/record rules')
+          PY
+      - name: Publish report and exact examples on github.com
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import base64,json,os,pathlib,subprocess
+          repo='vanderpol/scap-ng'
+          head=subprocess.run(['gh','api',f'repos/{repo}/commits/main','--jq','.sha'],capture_output=True,text=True,check=True).stdout.strip()
+          if head!=os.environ['GITHUB_SHA']:
+              print('Main advanced: do not publish stale run');raise SystemExit(0)
+          folder='research/assessment-simplification/english-first-04/scope-targets'
+          for path in sorted(pathlib.Path('work/proof').glob('*')):
+              remote=folder+'/'+path.name
+              read=subprocess.run(['gh','api',f'repos/{repo}/contents/{remote}','--jq','.sha'],capture_output=True,text=True)
+              if read.returncode not in (0,1):raise RuntimeError('Remote read failed '+remote)
+              payload={'branch':'main','message':'research(#235): publish Item vs field scope census',
+                       'content':base64.b64encode(path.read_bytes()).decode('ascii')}
+              if read.returncode==0:payload['sha']=read.stdout.strip()
+              subprocess.run(['gh','api','--method','PUT',f'repos/{repo}/contents/{remote}','--input','-'],input=json.dumps(payload),text=True,check=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scope-targets-six-stig-census
+          path: work/proof/
+          if-no-files-found: warn
