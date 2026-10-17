@@ -5,6 +5,7 @@ on:
       - .github/workflows/research-fixed-require-editor-04.yml
       - tools/research_04_fixed_require_editor.py
       - tools/test_research_04_scoped_condition_editor.py
+      - tools/test_research_04_editor_field_suggestions.py
       - research/assessment-simplification/english-first-04/fixed-require.editor.schema.json
   workflow_dispatch:
 
@@ -30,6 +31,8 @@ jobs:
             --repo vanderpol/scap-ng \
             --pattern scap-ng-v0.4-joval-six-stig-yaml.zip \
             --dir work
+      - name: Validate capability-specific condition-field suggestions and typo rejection
+        run: python tools/test_research_04_editor_field_suggestions.py -v
       - name: Reject wrong scopes and verify WMI mixed-record counterexample
         run: python tools/test_research_04_scoped_condition_editor.py -v
       - name: Complete fixed-grammar source reconstruction and autocomplete validation
