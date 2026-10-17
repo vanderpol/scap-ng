@@ -9,6 +9,8 @@ Tracking: [#235](https://github.com/vanderpol/scap-ng/issues/235) (research), [#
 
 **[Complexity stress test and redesign iterations](COMPLEXITY-STRESS-TEST-ITERATIONS.md)** — the difficult Linux, Windows, DNS and Apache cases; one grammar, typed source dependencies, explicit semantic hazards, and a seven-Test Windows proof of removing duplicate `inspect` at named `from` references. Native Apache/DNS redesign is still unproven research.
 
+**[Apache 18-variable dependency map](APACHE-DEPENDENCY-REDESIGN.md)** — six human-understandable stages, two distinct file-discovery branches, four preserved checks, and the contract needed before a native collector can replace shell commands.
+
 **[Review the auditor-first candidate](AUDITOR-FIRST-CANDIDATE.md)** — a complete, source-reversible language proposal emphasizing security-auditor reading order and explicit Item existence versus matching. Research only; original OVAL runtime/evidence parity remains unproven.
 
 **[Review the before-and-after examples](BEFORE-AFTER-REVIEW.md)** — five complete real 0.4 vs experimental English-first Assessments, each with a short excerpt, direct GitHub links and focused questions for author feedback. **This is the practical decision review.**
