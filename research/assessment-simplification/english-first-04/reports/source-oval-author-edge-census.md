@@ -94,6 +94,25 @@ for the cases below, but **that is not an explicit converter lineage ID**.
 | DISA | 198 |
 | NIWC/NAVWAR | 3 |
 
+## Seven native Test-level only_one_exists cases
+
+Exactly one **existing Item** is distinct from exactly one **matching Item**.
+Unverified joins use source Test comment and existence mode, not a converter ID.
+
+| Native Assessment | Has State | Original Test ID candidate | Original check |
+| --- | --- | --- | --- |
+| \`authoring/ms_windows_11/assessments/automated/SV-253266.automated.yaml\` | True | \`oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601\` | \`only one\` |
+| \`authoring/ms_windows_11/assessments/automated/SV-253296.automated.yaml\` | True | \`oval:navy.navwar.niwcatlantic.scc.windows:tst:25329601\` | \`only one\` |
+| \`authoring/shared/assessments/linux/files/defaults-timestamp-timeout-sudoers-etc-sudo.assessment.yaml\` | True | \`oval:mil.disa.stig.ind:tst:27401400\` | \`all\` |
+| \`authoring/shared/assessments/linux/files/etc-pam-d-unix-so-sha512.assessment.yaml\` | False | \`oval:mil.disa.stig.ind:tst:23023700\` | \`all\` |
+| \`authoring/shared/assessments/linux/files/system-display-standard-notice-consent-ba.assessment.yaml\` | False | \`oval:navy.navwar.niwcatlantic.scc.linux:tst:25777901, oval:navy.navwar.niwcatlantic.scc.linux:tst:27145501\` | \`all\` |
+| \`authoring/shared/assessments/linux/other/use-linux-limits-on-s.assessment.yaml\` | True | \`oval:mil.disa.stig.ind:tst:23024000\` | \`all\` |
+| \`authoring/shared/assessments/linux/other/use-linux-limits-on-s.assessment.yaml\` | True | \`oval:mil.disa.stig.ind:tst:23024001\` | \`all\` |
+
+These seven should be reviewed for *actual resource duplication intent*;
+replacing exact-one with at-least-one is not a lossless simplification.
+
+
 ## Source attribution for 201 native all_exist cases
 
 The JSON contains each native Test with **source-ID candidates**, not proven
