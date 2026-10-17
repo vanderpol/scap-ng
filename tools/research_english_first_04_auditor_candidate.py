@@ -73,10 +73,23 @@ def to_auditor_requirement(require):
     visible=(EXIST[exist[0]],MATCH[match[0]])
     if visible not in SUPPORTED_PAIRS:
         raise ValueError("source-unproven Item pair")
+    if visible == ("at_least_one", "at_least_one_item"):
+        # One phrase states BOTH requirements; not a hidden default.
+        return {"at_least_one_item_matches":deepcopy(require[match[0]])}
     return {"items":visible[0],visible[1]:deepcopy(require[match[0]])}
 
 def from_auditor_requirement(require):
-    if not isinstance(require,dict) or "items" not in require:
+    if not isinstance(require,dict):
+        raise ValueError("expected mapping of required Items")
+    # Canonical shorthand maps to the *specific* original Test requirement:
+    # at_least_one_exists_and_some_match. It cannot mean any_exist or all_exist.
+    if set(require)=={"at_least_one_item_matches"}:
+        predicate=require["at_least_one_item_matches"]
+        if not isinstance(predicate,dict) or not predicate:
+            raise ValueError("at_least_one_item_matches requires a State predicate")
+        return {"at_least_one_item_exists":True,
+                "at_least_one_item_matches":deepcopy(predicate)}
+    if "items" not in require:
         raise ValueError("explicit required Item existence missing")
     exists=require["items"]
     if exists not in REV_PRESENCE:
@@ -91,6 +104,8 @@ def from_auditor_requirement(require):
     matcher=next(iter(other))
     if matcher not in REV_MATCH or (exists,matcher) not in SUPPORTED_PAIRS:
         raise ValueError("unproven Item match combination")
+    if (exists,matcher)==("at_least_one","at_least_one_item"):
+        raise ValueError("use canonical at_least_one_item_matches without duplicate Item existence")
     if not isinstance(require[matcher],dict) or not require[matcher]:
         raise ValueError("nonempty State predicate required")
     return {REV_EXIST[exists]:True,REV_MATCH[matcher]:deepcopy(require[matcher])}
@@ -166,6 +181,9 @@ def test_invalid():
        {"items":"at_least_one","no_item":{"x":1}},
        {"items":"exactly_one","at_least_one_item":{"x":1}},
        {"items":"at_least_one","every_item":True},
+       {"items":"at_least_one","at_least_one_item":{"trustee_name":{"equals_ignoring_case":"Guests"}}},
+       {"at_least_one_item_matches":{}},
+       {"at_least_one_item_matches":{"trustee_name":{"is":"Guests"}},"items":"at_least_one"},
     ]
     for node in wrong:
         try:from_auditor_requirement(node)
@@ -205,9 +223,14 @@ def inspect(archive,examples_dir=None,output=None):
             counts["tests"]+=len(src["tests"])
             for chk in candidate["checks"].values():
                 req=chk["require"]
-                counts["presence_"+req["items"]]+=1
-                for matching in set(req)-{"items"}:
-                    counts["scope_"+matching]+=1
+                if "at_least_one_item_matches" in req:
+                    counts["combined_exists_and_matches"]+=1
+                    counts["presence_at_least_one"]+=1
+                    counts["scope_at_least_one_item"]+=1
+                else:
+                    counts["presence_"+req["items"]]+=1
+                    for matching in set(req)-{"items"}:
+                        counts["scope_"+matching]+=1
                 if list(chk).index("require")<list(chk).index("inspect"):
                     raise AssertionError("State before Object")
             before=yaml.safe_dump(previous,sort_keys=False,allow_unicode=True)
