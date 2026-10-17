@@ -38,7 +38,7 @@ require:
     singleline: false
 ~~~
 
-[Native YAML](examples/10-linux-chrony-cmdport.yaml), [typed provider](../../tools/research_provider_textfile_matches.py), [versioned scope contract](../providers/linux.textfile_matches.v0.1.yaml), and [tests using real temporary files](../../tools/test_research_provider_textfile_matches.py).
+[Native YAML](examples/10-linux-chrony-cmdport.yaml), [typed provider](../../../tools/research_provider_textfile_matches.py), [versioned scope contract](../providers/linux.textfile_matches.v0.1.yaml), and [tests using real temporary files](../../../tools/test_research_provider_textfile_matches.py).
 
 The provider returns matched texts, source offsets, 1-based match-instance IDs, explicit source-query identity, and complete/incomplete/error diagnostics for absent file, too-large input, too many matches, symlinks and unreadable encoding. Source matching is **Python `re` over strict UTF-8**, not verified OVAL regex `pattern_match` semantics, filesystem search behavior or source Item-creation rules. It is a new native provider, **not a certified compiler lowering**.
 
