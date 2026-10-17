@@ -230,6 +230,18 @@ class CandidateBContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"typed numeric"):
             compile_doc(doc)
 
+    def test_account_filter_not_equals_is_registered_and_type_checked(self):
+        doc={"id":"x","title":"x","require":{
+            "each":"linux.files_from_account_homes",
+            "using":{"account_filter":{"uid":{"equals":0},
+                 "home_dir":{"not_equals":"/"}},
+                 "filename":r"^\\.[^\\s\\.]+","max_depth":1,
+                 "follow_symlinks":True},
+            "minimum_resources":1,
+            "must":{"mode":{"only_these_bits":"0740"}}}}
+        ast=compile_doc(doc)["ast"]
+        self.assertEqual(ast["using"]["account_filter"]["home_dir"],{"not_equals":"/"})
+
     def test_gemini_acquisition_options_unknown_key_rejected(self):
         doc={"id":"x","title":"x","require":{
             "each":"linux.files_from_account_homes",
