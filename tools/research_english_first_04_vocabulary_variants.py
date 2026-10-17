@@ -87,6 +87,24 @@ def from_minimal(node):
             raise ValueError("ambiguous capability value")
     return out
 
+def first_structural_difference(a,b, path=""):
+    if type(a) is not type(b):
+        return path + ": type " + type(a).__name__ + " vs " + type(b).__name__
+    if isinstance(a,dict):
+        if set(a)!=set(b):
+            return path + ": keys " + repr(sorted(set(a)^set(b)))
+        for key in a:
+            if a[key]!=b[key]:
+                return first_structural_difference(a[key],b[key],path+"/"+str(key))
+    elif isinstance(a,list):
+        if len(a)!=len(b): return path+": list sizes "+repr((len(a),len(b)))
+        for i,(left,right) in enumerate(zip(a,b)):
+            if left!=right: return first_structural_difference(left,right,path+"/"+str(i))
+    elif a!=b:
+        return path+": values "+repr((a,b))[:220]
+    return path+": structural equality failed unexpectedly"
+
+
 def examine(archive, examples_dir=None):
     digest=hashlib.sha256(Path(archive).read_bytes()).hexdigest()
     if digest != PINNED:raise ValueError("unexpected immutable archive")
@@ -108,8 +126,11 @@ def examine(archive, examples_dir=None):
                 english=compact(to_human(source))
                 hybrid=to_minimal(english)
                 returned=from_minimal(hybrid)
-                if returned!=english or to_native(expand(returned))!=source:
-                    raise AssertionError("full Assessment source mismatch")
+                if returned!=english:
+                    raise AssertionError("hybrid inverse: "+first_structural_difference(english,returned))
+                reconstructed=to_native(expand(returned))
+                if reconstructed!=source:
+                    raise AssertionError("native inverse: "+first_structural_difference(source,reconstructed))
                 if "where" in yaml.safe_dump(hybrid,sort_keys=False):
                     # An explicit selector outside a capability would be invalid.
                     raise ValueError("a where keyword remains in minimal hybrid")
