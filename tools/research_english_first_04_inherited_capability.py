@@ -20,6 +20,47 @@ class Unsupported(ValueError):
     """A change cannot be justified by this narrow reversible experiment."""
 
 
+SET_OPS = ("union", "difference", "intersection", "complement")
+
+
+def infer_type(node: dict, sources: dict, active: tuple[str, ...] = ()) -> str:
+    """Resolve a typed source DAG, rejecting ambiguous or cyclic compositions."""
+    if not isinstance(node, dict):
+        raise Unsupported("Source node is not a mapping")
+    direct = node.get("inspect")
+    if direct is not None and (not isinstance(direct, str) or not direct):
+        raise Unsupported("Invalid source inspect capability")
+    composed = [op for op in SET_OPS if op in node]
+    if len(composed) > 1 or (composed and "from" in node):
+        raise Unsupported("Competing source composition forms")
+    derived = []
+    if "from" in node:
+        ref = node["from"]
+        if isinstance(ref, dict):
+            derived.append(infer_type(ref, sources, active))
+        elif isinstance(ref, str) and ref in sources:
+            if ref in active:
+                raise Unsupported("Source reference cycle: " + " -> ".join((*active, ref)))
+            derived.append(infer_type(sources[ref], sources, (*active, ref)))
+        else:
+            raise Unsupported(f"Source reference does not resolve: {ref!r}")
+    if composed:
+        operands = node[composed[0]]
+        if not isinstance(operands, list) or not operands:
+            raise Unsupported("Set operands must be a nonempty sequence")
+        derived.extend(infer_type(item, sources, active) for item in operands)
+    observed = {x for x in derived}
+    if len(observed) > 1:
+        raise Unsupported(f"Mixed-capability source composition: {sorted(observed)}")
+    if direct and observed and direct != next(iter(observed)):
+        raise Unsupported("Declared source capability differs from operand capabilities")
+    if direct:
+        return direct
+    if observed:
+        return next(iter(observed))
+    raise Unsupported("Source capability cannot be inferred")
+
+
 def transform(doc: dict) -> tuple[dict, int]:
     if not isinstance(doc, dict):
         raise Unsupported("Assessment must be a YAML mapping")
@@ -39,11 +80,8 @@ def transform(doc: dict) -> tuple[dict, int]:
         source_id = check["from"]
         if not isinstance(source_id, str) or source_id not in sources:
             raise Unsupported(f"{name}: source does not resolve: {source_id!r}")
-        source = sources[source_id]
-        if not isinstance(source, dict) or not isinstance(source.get("inspect"), str):
-            raise Unsupported(f"{name}: source capability cannot be proven")
         actual = check.get("inspect")
-        expected = source["inspect"]
+        expected = infer_type(sources[source_id], sources, (source_id,))
         if actual != expected:
             raise Unsupported(f"{name}: source capability mismatch {actual!r} != {expected!r}")
         del check["inspect"]
@@ -55,12 +93,12 @@ def restore(compact: dict) -> dict:
     out = copy.deepcopy(compact)
     for name, check in out["checks"].items():
         if "from" in check:
-            source = out["sources"].get(check["from"])
-            if not isinstance(source, dict) or not isinstance(source.get("inspect"), str):
+            source_id = check["from"]
+            if source_id not in out["sources"]:
                 raise Unsupported(f"{name}: source type cannot be restored")
             if "inspect" in check:
                 raise Unsupported(f"{name}: compact check repeats inspect")
-            check["inspect"] = source["inspect"]
+            check["inspect"] = infer_type(out["sources"][source_id], out["sources"], (source_id,))
     return out
 
 
