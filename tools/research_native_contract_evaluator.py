@@ -213,4 +213,19 @@ def evaluate(ast,fixtures,scope=None):
         evidence=fixtures.get(ast["provider"])
         if evidence is None:
             return Decision(UNKNOWN,"no fixture acquisition supplied",ast["provider"])
+        # Research fixture form for multiple acquisitions from one provider:
+        # {"acquisitions":[{"using":{...},"status":"complete","items":[...]},...]}
+        # Never let evidence for one registry path/view stand in for another.
+        if isinstance(evidence,dict) and "acquisitions" in evidence:
+            if set(evidence)!={"acquisitions"} or not isinstance(evidence["acquisitions"],list):
+                return Decision(ERROR,"invalid multi-acquisition evidence envelope",ast["provider"])
+            if any(not isinstance(x,dict) or "using" not in x
+                   for x in evidence["acquisitions"]):
+                return Decision(ERROR,"acquisition missing query identity",ast["provider"])
+            matches=[x for x in evidence["acquisitions"] if x["using"]==ast["using"]]
+            if len(matches)>1:
+                return Decision(ERROR,"duplicate acquisition identity",ast["provider"])
+            if not matches:
+                return Decision(UNKNOWN,"no evidence for requested acquisition identity",ast["provider"])
+            evidence=matches[0]
     return evaluate_collection(ast,evidence,fixtures,scope)
