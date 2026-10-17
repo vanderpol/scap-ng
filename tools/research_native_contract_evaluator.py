@@ -69,7 +69,7 @@ def compare(item,field,operation,desired):
 def predicates(item,compiled):
     return _and([compare(item,p["field"],p["operator"],p["value"]) for p in compiled])
 
-def evaluate_collection(node,evidence):
+def evaluate_collection(node,evidence,fixtures,scope=None):
     if not isinstance(evidence,dict):
         raise ValueError("explicit fixture evidence is required")
     flag=evidence.get("status")
@@ -105,45 +105,53 @@ def evaluate_collection(node,evidence):
         elif selection in {ERROR,UNKNOWN}:
             unresolved.append(selection)
     n=len(selected)
-    context=(node["provider"],len(records),n,len(unresolved))
+    info=(node["provider"],len(records),n,len(unresolved))
     mode=node["mode"]
-    tested=[predicates(item,node["predicates"]) for item in selected]
+    tested=[]
+    for item in selected:
+        if node.get("nested") is not None:
+            local=dict(scope or {})
+            local["__current__"]=item
+            if node.get("as") is not None:local[node["as"]]=item
+            tested.append(evaluate(node["nested"],fixtures,local).result)
+        else:
+            tested.append(predicates(item,node["predicates"]))
     uncertain=ERROR if ERROR in unresolved+tested else UNKNOWN
     if mode=="none":
-        if n:return Decision(FALSE,"selected prohibited Item found",*context)
+        if n:return Decision(FALSE,"selected prohibited Item found",*info)
         if flag=="complete" and not unresolved:
-            return Decision(TRUE,"proved no selected prohibited Items",*context)
-        return Decision(uncertain,"prohibition not proved from incomplete evidence",*context)
+            return Decision(TRUE,"proved no selected prohibited Items",*info)
+        return Decision(uncertain,"prohibition not proved from incomplete evidence",*info)
 
     if mode=="some":
         if TRUE in tested:
-            return Decision(TRUE,"compliant witness found",*context)
+            return Decision(TRUE,"compliant witness found",*info)
         if flag=="complete" and not unresolved and all(x==FALSE for x in tested):
-            return Decision(FALSE,"no compliant witness exists",*context)
-        return Decision(uncertain,"cannot prove witness or its absence",*context)
+            return Decision(FALSE,"no compliant witness exists",*info)
+        return Decision(uncertain,"cannot prove witness or its absence",*info)
 
     if mode=="exactly_one":
         if n>1:
             result=ERROR if node["singleton"] else FALSE
             why="singleton provider violated identity" if node["singleton"] else "more than one selected Item"
-            return Decision(result,why,*context)
+            return Decision(result,why,*info)
         if n==1 and tested==[FALSE]:
-            return Decision(FALSE,"only possible observed compliant singleton fails",*context)
+            return Decision(FALSE,"only possible observed compliant singleton fails",*info)
         if flag=="complete" and not unresolved:
-            if n==0:return Decision(FALSE,"required resource is absent",*context)
-            return Decision(tested[0],"one selected Item and property evaluated",*context)
-        return Decision(uncertain,"unique required resource not resolved",*context)
+            if n==0:return Decision(FALSE,"required resource is absent",*info)
+            return Decision(tested[0],"one selected Item and property evaluated",*info)
+        return Decision(uncertain,"unique required resource not resolved",*info)
 
     if mode!="each":raise ValueError("unknown AST quantifier")
     if FALSE in tested:
-        return Decision(FALSE,"a selected Item violates requirement",*context)
+        return Decision(FALSE,"a selected Item violates requirement",*info)
     if flag=="complete" and not unresolved and n<node["min_count"]:
-        return Decision(FALSE,"selected population is smaller than declared minimum",*context)
+        return Decision(FALSE,"selected population is smaller than declared minimum",*info)
     if flag=="complete" and not unresolved and all(x==TRUE for x in tested):
-        return Decision(TRUE,"all selected Items meet requirements",*context)
-    return Decision(uncertain,"cannot establish a complete compliant selected population",*context)
+        return Decision(TRUE,"all selected Items meet requirements",*info)
+    return Decision(uncertain,"cannot establish a complete compliant selected population",*info)
 
-def evaluate(ast,fixtures):
+def evaluate(ast,fixtures,scope=None):
     """Evaluate compiler AST over caller-provided typed evidence fixtures.
 
     Fixture keys are provider IDs. A real scanner must cache acquisitions by
@@ -151,14 +159,36 @@ def evaluate(ast,fixtures):
     This trial intentionally rejects incompatible acquisition parameters
     rather than assuming cached results apply.
     """
+    scope=scope or {}
+    if ast["kind"]=="fields":
+        selected=scope.get("__current__")
+        if selected is None:raise ValueError("fields assertion requires selected Item scope")
+        return Decision(predicates(selected,ast["predicates"]),"selected Item fields")
     if ast["kind"]=="logic":
-        subs=[evaluate(branch,fixtures) for branch in ast["children"]]
+        subs=[evaluate(branch,fixtures,scope) for branch in ast["children"]]
         result=aggregate_operator("AND" if ast["operator"]=="all" else "OR",
                                   [x.result for x in subs])
         return Decision(result,"Boolean "+ast["operator"]+" of "+str(len(subs))+" requirements")
     if ast["kind"]!="collection":
         raise ValueError("unknown compiler AST node")
-    evidence=fixtures.get(ast["provider"])
-    if evidence is None:
-        return Decision(UNKNOWN,"no fixture acquisition supplied",ast["provider"])
-    return evaluate_collection(ast,evidence)
+    if ast.get("parent_ref") is not None:
+        ref=ast["parent_ref"]
+        owner=scope.get(ref["alias"])
+        if owner is None:
+            return Decision(ERROR,"dependent source has no bound parent",ast["provider"])
+        evidence=owner.get("fields",{}).get(ref["relation"])
+        if not isinstance(evidence,dict) or not {"status","items"}<=set(evidence):
+            return Decision(UNKNOWN,"dependent resource lacks explicit complete/item evidence",
+                            ast["provider"])
+        if not isinstance(evidence["items"],list):
+            return Decision(ERROR,"dependent resource Items must be a list",ast["provider"])
+        for child in evidence["items"]:
+            if not isinstance(child,dict) or not isinstance(child.get("fields"),dict):
+                return Decision(ERROR,"dependent Item needs identity and typed fields",ast["provider"])
+            if child["fields"].get(ast["owner_field"])!=owner.get("id"):
+                return Decision(ERROR,"dependent Item attached to wrong parent",ast["provider"])
+    else:
+        evidence=fixtures.get(ast["provider"])
+        if evidence is None:
+            return Decision(UNKNOWN,"no fixture acquisition supplied",ast["provider"])
+    return evaluate_collection(ast,evidence,fixtures,scope)
