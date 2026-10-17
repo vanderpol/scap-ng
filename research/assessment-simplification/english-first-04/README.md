@@ -2,6 +2,9 @@
 
 **Pre-alpha experiment; NOT adopted grammar or scanner-conformance evidence.**
 
+**[NEXT CHECKPOINT — close field/scope semantics → generate an auditor preview → blind comprehension test](NEXT-READABILITY-DECISION-GATE.md).** One concise action plan with RHEL, Windows, Apache and DNS counterexamples, acceptance conditions, and existing issue ownership. The current split requirements remain an experimental baseline; no new YAML wrapper experiments, no approved 0.4 language or editor implementation implied.
+
+
 **[Fresh-eyes second and third reviews](FRESH-EYES-SECOND-THIRD-REVIEW.md):** zero-context auditor interpretation and skeptical implementer deletion test of the current split candidate versus the rejected ground-up experiment. **Neither is a genuinely independent human/model review.** The proposal's `valid` wrapper and mostly synonymous `observe/claims/pass_if` labels are rejected; unresolved `match` scope, optional/missing fields, Windows whole-State records, and real complex source graphs remain. [Send the blind, answer-free review packet](FRESH-EYES-BLIND-REVIEW-PACKET.md) to an outside reader before sharing the critique. No v0.4 schema changes or scanner correctness claims.
 
 
