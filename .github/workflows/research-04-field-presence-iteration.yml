@@ -1,0 +1,26 @@
+name: Research 0.4 field-presence source inverse
+
+on:
+  push:
+    paths:
+      - 'research/assessment-simplification/english-first-04/field-presence-iteration/**'
+      - 'research/assessment-simplification/english-first-04/canonical-operators/**'
+      - 'tools/research_04_field_presence_iteration.py'
+      - '.github/workflows/research-04-field-presence-iteration.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research-inverse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install YAML parser
+        run: python -m pip install 'PyYAML>=6,<7'
+      - name: Verify five pinned source inverses, YAML syntax, IDs and evaluation paths
+        run: python tools/research_04_field_presence_iteration.py --require-yaml
