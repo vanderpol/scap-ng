@@ -332,6 +332,40 @@ class CandidateBContractTests(unittest.TestCase):
         b=relation_read(source)
         self.assertEqual(a,b)
 
+    def test_flat_dns_one_key_draft_is_not_equivalent(self):
+        from research_native_relation_alternative import compile_relation_document
+        import yaml
+        alternate=yaml.safe_load((EXAMPLES.parent/"explicit-dns-relations.yaml").read_text())
+        one_branch=dict(alternate)
+        one_branch["sub_resources"]=alternate["sub_resources"][:1]
+        partial=compile_relation_document(one_branch)
+        full=read(EXAMPLES/"08-dns-signing-nested.yaml")
+        self.assertNotEqual(partial["ast"],full["ast"])
+        # A passing ZSK cannot compensate for a missing KSK in the full rule.
+        candidate=item("zone",direction="forward",signed=True,
+            zone_signing_keys=pop(item("z",zone_id="zone",
+                   kind="ZoneSigningKey",validity_hours=72)),
+            key_signing_keys=pop())
+        evidence={"windows.dns.zones":pop(candidate)}
+        self.assertEqual(evaluate(partial["ast"],evidence).result,TRUE)
+        self.assertEqual(evaluate(full["ast"],evidence).result,FALSE)
+
+    def test_flat_dns_unknown_join_is_rejected(self):
+        from research_native_relation_alternative import compile_relation_document
+        import yaml
+        doc=yaml.safe_load((EXAMPLES.parent/"explicit-dns-relations.yaml").read_text())
+        doc["sub_resources"][0]["relationship"]="unsupported_relation"
+        with self.assertRaisesRegex(ValueError,"trusted provider catalog"):
+            compile_relation_document(doc)
+
+    def test_flat_dns_duplicate_relation_is_rejected(self):
+        from research_native_relation_alternative import compile_relation_document
+        import yaml,copy
+        doc=yaml.safe_load((EXAMPLES.parent/"explicit-dns-relations.yaml").read_text())
+        doc["sub_resources"].append(copy.deepcopy(doc["sub_resources"][0]))
+        with self.assertRaisesRegex(ValueError,"duplicate child relation"):
+            compile_relation_document(doc)
+
     def test_signed_zone_has_two_explicit_and_complete_key_populations(self):
         tree=sample("08-dns-signing-nested.yaml")
         self.assertEqual(tree["as"],"zone")
