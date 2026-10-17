@@ -36,10 +36,15 @@
   },
   "$defs": {
     "condition": {
-      "type": "object",
-      "minProperties": 1,
-      "description": "Predicate on selected Items. Scalar field keys may be completed from inspect capability; nested OR/AND/record remain typed and separately validated.",
-      "additionalProperties": true
+      "description": "A State predicate or explicit complete-State alternatives. Use and/or rather than aliases any_of/all_of.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/stateNode"
+        },
+        {
+          "$ref": "#/$defs/wholeStateAlternatives"
+        }
+      ]
     },
     "presenceRequirement": {
       "type": "object",
@@ -477,6 +482,125 @@
           "additionalProperties": false
         }
       ]
+    },
+    "stateNode": {
+      "description": "One State predicate: a single capability field, or logical AND/OR of predicates sharing this State scope.",
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              },
+              "description": "AND combines predicates *within the same State*; it does not combine independent whole States."
+            },
+            "all_fields_must_exist": {
+              "const": true,
+              "description": "A present explicit State-field existence requirement, never a hidden default."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/stateNode"
+              },
+              "description": "OR combines predicates *within the same State*; it does not combine independent whole States."
+            },
+            "all_fields_must_exist": {
+              "const": true,
+              "description": "A present explicit State-field existence requirement, never a hidden default."
+            }
+          }
+        },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "propertyNames": {
+            "not": {
+              "enum": [
+                "and",
+                "or",
+                "states",
+                "any_of",
+                "all_states",
+                "all_of",
+                "any_of_fields",
+                "all_fields_must_exist"
+              ]
+            }
+          },
+          "additionalProperties": {
+            "type": "object",
+            "minProperties": 1
+          },
+          "description": "One named Item field (or record), with a nonempty typed comparison."
+        }
+      ]
+    },
+    "wholeStateAlternatives": {
+      "description": "Use states only when combining alternative complete States; this prevents accidental per-record merges.",
+      "type": "object",
+      "required": [
+        "states"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "states": {
+          "oneOf": [
+            {
+              "type": "object",
+              "required": [
+                "and"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "and": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/stateNode"
+                  },
+                  "description": "Use OVAL-compatible AND to combine complete States"
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "or"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "or": {
+                  "type": "array",
+                  "minItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/stateNode"
+                  },
+                  "description": "Use OVAL-compatible OR to combine complete States"
+                }
+              }
+            }
+          ]
+        }
+      }
     }
   }
 }
