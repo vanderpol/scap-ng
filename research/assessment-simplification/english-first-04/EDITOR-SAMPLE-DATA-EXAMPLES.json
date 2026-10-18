@@ -1,0 +1,216 @@
+{
+  "$comment": "RESEARCH-ONLY conceptual fixture input/expected contract. NOT valid current SCAP-NG authoring, scanner input, or implemented runner schema; no actual computation has run from this file. Expected results transcribed from pinned OVAL/reference boundary tests and source-specific pilot.",
+  "fixture_format": "scap-ng-editor-sample-data-research-0.1",
+  "source_release": "v0.4.0-joval-meeting-preview-20261015-r3",
+  "synthetic_data_only": true,
+  "scenarios": [
+    {
+      "id": "linux-home-nosuid-one-compliant",
+      "assessment_id": "ng.shared.home-is-mounted-with-the-nosuid-option",
+      "target_test": "home-mounted-nosuid-option-test",
+      "observation": {
+        "capability": "linux.partition",
+        "collection_flag": "complete",
+        "items": [
+          {
+            "id": "mount1",
+            "fields": {
+              "mount_point": "/home",
+              "mount_options": [
+                "rw",
+                "nosuid"
+              ]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "true",
+        "assessment_result": "true",
+        "reason": "one selected Item; an option is nosuid"
+      },
+      "oracle": "research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json"
+    },
+    {
+      "id": "linux-home-nosuid-one-noncompliant",
+      "assessment_id": "ng.shared.home-is-mounted-with-the-nosuid-option",
+      "target_test": "home-mounted-nosuid-option-test",
+      "observation": {
+        "capability": "linux.partition",
+        "collection_flag": "complete",
+        "items": [
+          {
+            "id": "mount1",
+            "fields": {
+              "mount_point": "/home",
+              "mount_options": [
+                "rw",
+                "nodev"
+              ]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "false",
+        "assessment_result": "false",
+        "reason": "a selected Item lacks the required nosuid option"
+      },
+      "oracle": "tools/test_v04_a_linux_mount_expression_bridge.py"
+    },
+    {
+      "id": "linux-home-nosuid-zero-items",
+      "assessment_id": "ng.shared.home-is-mounted-with-the-nosuid-option",
+      "target_test": "home-mounted-nosuid-option-test",
+      "observation": {
+        "capability": "linux.partition",
+        "collection_flag": "complete",
+        "items": []
+      },
+      "expected": {
+        "test_result": "false",
+        "assessment_result": "false",
+        "reason": "at least one collected /home Item required; none present"
+      },
+      "oracle": "tools/test_v04_a_linux_mount_expression_bridge.py"
+    },
+    {
+      "id": "linux-home-nosuid-incomplete-one-matching",
+      "assessment_id": "ng.shared.home-is-mounted-with-the-nosuid-option",
+      "target_test": "home-mounted-nosuid-option-test",
+      "observation": {
+        "capability": "linux.partition",
+        "collection_flag": "incomplete",
+        "items": [
+          {
+            "id": "mount1",
+            "fields": {
+              "mount_point": "/home",
+              "mount_options": [
+                "rw",
+                "nosuid"
+              ]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "unknown",
+        "assessment_result": "unknown",
+        "reason": "unseen selected Items may fail all-match requirement"
+      },
+      "oracle": "tests/v04-semantic-boundaries/cases.json"
+    },
+    {
+      "id": "linux-home-nosuid-incomplete-decisive-nonmatch",
+      "assessment_id": "ng.shared.home-is-mounted-with-the-nosuid-option",
+      "target_test": "home-mounted-nosuid-option-test",
+      "observation": {
+        "capability": "linux.partition",
+        "collection_flag": "incomplete",
+        "items": [
+          {
+            "id": "mount1",
+            "fields": {
+              "mount_point": "/home",
+              "mount_options": [
+                "rw",
+                "nodev"
+              ]
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "false",
+        "assessment_result": "false",
+        "reason": "observed nonmatching Item makes all-match impossible"
+      },
+      "oracle": "tools/test_v04_a_linux_mount_expression_bridge.py"
+    },
+    {
+      "id": "win11-role-domain-joined-3",
+      "assessment_id": "SV-253495.automated",
+      "target_test": "system-non-dc-domain-joined-windows-server-or-workstation-test",
+      "observation": {
+        "capability": "windows.wmi.query",
+        "collection_flag": "complete",
+        "items": [
+          {
+            "id": "wmi1",
+            "fields": {
+              "result": {
+                "record": {
+                  "domainrole": "3"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "true",
+        "reason": "source DomainRole alternative 1 or 3 matches"
+      },
+      "oracle": "tools/v04_a_wmi_domainrole_source_fixture.py",
+      "note": "Only the named role Test is expected. The full seven-Test Assessment result is intentionally NOT asserted without trustee Test inputs."
+    },
+    {
+      "id": "win11-role-domain-joined-4-does-not-match",
+      "assessment_id": "SV-253495.automated",
+      "target_test": "system-non-dc-domain-joined-windows-server-or-workstation-test",
+      "observation": {
+        "capability": "windows.wmi.query",
+        "collection_flag": "complete",
+        "items": [
+          {
+            "id": "wmi1",
+            "fields": {
+              "result": {
+                "record": {
+                  "domainrole": "4"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "false",
+        "reason": "4 is not a non-DC domain-joined role"
+      },
+      "oracle": "tools/v04_a_wmi_domainrole_source_fixture.py"
+    },
+    {
+      "id": "win11-role-missing-record-member",
+      "assessment_id": "SV-253495.automated",
+      "target_test": "system-non-dc-domain-joined-windows-server-or-workstation-test",
+      "observation": {
+        "capability": "windows.wmi.query",
+        "collection_flag": "complete",
+        "items": [
+          {
+            "id": "wmi1",
+            "fields": {
+              "result": {
+                "record": {}
+              }
+            }
+          }
+        ]
+      },
+      "expected": {
+        "test_result": "error",
+        "reason": "missing required DomainRole record member is not zero collected WMI Items"
+      },
+      "oracle": "tools/test_v04_a_wmi_domainrole_source_fixture.py"
+    }
+  ],
+  "limitations": [
+    "This JSON is a contract illustration; no schema/parser/evaluator exists for it.",
+    "Canonical system-collected Item/Entity structure and collection status vocabulary must be validated before implementation.",
+    "Expected six-state results are independent assertions, not outputs computed by running this JSON.",
+    "Real OVAL 5.12.3/SCAP-NG scanner parity is not established.",
+    "No host, shell, WMI, registry or other provider calls are made."
+  ]
+}
