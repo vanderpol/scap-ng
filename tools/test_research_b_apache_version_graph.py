@@ -73,6 +73,13 @@ class ApacheVariableGraphTests(unittest.TestCase):
         self.assertEqual(self.verdict(self.fixtures(discovery_flag="incomplete")),UNKNOWN)
         self.assertEqual(self.verdict(self.fixtures(version_flag="incomplete")),UNKNOWN)
 
+    def test_duplicate_source_paths_are_not_implicitly_unique(self):
+        duplicated=self.fixtures(paths=[
+            "/usr/sbin/httpd -DFOREGROUND",
+            "/usr/sbin/httpd -DFOREGROUND",
+        ])
+        self.assertEqual(self.verdict(duplicated),UNKNOWN)
+
     def test_multivalued_version_entity_aggregation_within_one_item(self):
         self.assertEqual(self.verdict(self.fixtures(versions=[
             "Server version: Apache/2.2.0 (Unix)",
