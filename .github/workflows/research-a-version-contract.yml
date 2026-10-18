@@ -1,0 +1,63 @@
+name: 0.4-A version contract mismatch gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-version-contract.yml'
+      - 'tools/v04_a_specification_version_gate.py'
+      - 'tools/test_v04_a_specification_version_gate.py'
+      - 'tools/v04_a_authoring_graph_index.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  block-implicit-migration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install YAML parser for independent format cross-check
+        run: python -m pip install PyYAML==6.0.3
+      - name: Run focused negative and positive tests
+        run: python -m unittest -v tools/test_v04_a_specification_version_gate.py
+      - name: Download pinned original six-STIG 0.4-A research source
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          mkdir -p work/a-version-gate
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern 'scap-ng-v0.4-joval-six-stig-json.zip' \
+            --pattern 'scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --dir work/a-version-gate
+      - name: Pin expected source incompatibility without waiving it
+        run: |
+          python tools/v04_a_specification_version_gate.py \
+            --json-archive work/a-version-gate/scap-ng-v0.4-joval-six-stig-json.zip \
+            --yaml-archive work/a-version-gate/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --expect-blocked \
+            --report-json "$RUNNER_TEMP/version-gate.json"
+          python - "$RUNNER_TEMP/version-gate.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["status"]=="BLOCKED_UNDECLARED_SPECIFICATION",d
+          assert d["allowed_to_compile"] is False,d
+          assert d["yaml_json_agree"] is True,d
+          assert len(d["benchmarks"])==6,d
+          assert len(d["unmatched_automated_specs"])==1,d
+          m=d["unmatched_automated_specs"][0]
+          assert m["specification"]["version"]=="0.4.0",m
+          assert m["automated_assessments"]==872,m
+          assert all(b["declared_specs"]==[
+              {"id":"scap-ng.pre-alpha.assessment","version":"0.3.0"}]
+              for b in d["benchmarks"]),d
+          print("PASS: 872 automated Assessments remain BLOCKED by explicit 0.3 Benchmark metadata")
+          PY
+      - name: Summarize actual gate result and limitation
+        if: always()
+        run: |
+          echo '## 0.4-A version contract — #232/#239' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Research regression passes because native 0.4 compilation remains **BLOCKED** until version authority is reviewed. No silent migration is performed.' >> "$GITHUB_STEP_SUMMARY"
