@@ -17,6 +17,7 @@ from v04_a_authoring_graph_index import canonical_json
 from v04_a_lossless_ir import decode_and_verify
 from v04_a_truth_plan import (STAGE, SIX, UnsupportedExpression,
                               compile_expression, execute_supplied_results)
+from v04_a_truth_plan_source_oracle import source_expected_outcome
 
 FIXED_SCENARIOS = ("true", "false", "error", "unknown",
                    "not_evaluated", "not_applicable")
@@ -70,8 +71,37 @@ def build_manifest(ir):
                 supplied_tests = dict.fromkeys(plan["requires"]["tests"], outcome)
                 supplied_deps = dict.fromkeys(plan["requires"]["dependencies"], outcome)
                 observed = execute_supplied_results(plan, supplied_tests, supplied_deps)
+                expected = source_expected_outcome(assessment[field],
+                                                   supplied_tests, supplied_deps)
+                if observed["outcome"] != expected:
+                    raise ValueError(f"{path}:{field}: source oracle disagrees for {outcome}")
                 checks[outcome] = observed["outcome"]
                 counted["synthetic_expression_executions"] += 1
+                counted["independent_oracle_topology_checks"] += 1
+            ids = [("test", key) for key in plan["requires"]["tests"]]
+            ids += [("assessment", key) for key in plan["requires"]["dependencies"]]
+            for scenario in ("ascending", "descending", "name_bytes"):
+                assigned = {}
+                for index, (kind, ident) in enumerate(ids):
+                    if scenario == "ascending":
+                        selected = index % len(FIXED_SCENARIOS)
+                    elif scenario == "descending":
+                        selected = (-index - 1) % len(FIXED_SCENARIOS)
+                    else:
+                        selected = sum(ident.encode("utf-8")) % len(FIXED_SCENARIOS)
+                    assigned[(kind, ident)] = FIXED_SCENARIOS[selected]
+                mixed_tests = {name: assigned[("test", name)]
+                               for name in plan["requires"]["tests"]}
+                mixed_deps = {name: assigned[("assessment", name)]
+                              for name in plan["requires"]["dependencies"]}
+                actual = execute_supplied_results(plan, mixed_tests, mixed_deps)["outcome"]
+                expected = source_expected_outcome(assessment[field],
+                                                   mixed_tests, mixed_deps)
+                if actual != expected:
+                    raise ValueError(f"{path}:{field}: mixed source oracle disagrees ({scenario})")
+                counted["synthetic_expression_executions"] += 1
+                counted["independent_oracle_topology_checks"] += 1
+                counted["mixed_leaf_oracle_checks"] += 1
             plans.append({
                 "assessment_id": assessment["id"],
                 "source_path": path,
