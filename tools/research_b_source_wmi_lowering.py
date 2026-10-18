@@ -10,6 +10,17 @@ from __future__ import annotations
 import re
 
 
+def validate_wmi_query(ns,query):
+    if (not isinstance(ns,str) or
+        not re.fullmatch(r"[A-Za-z][\\w]*(?:\\\\[\\w]+)*",ns) or len(ns)>256):
+        raise ValueError("WMI namespace must be an explicit bounded path")
+    if (not isinstance(query,str) or len(query)>4096 or
+        not re.match(r"^\\s*SELECT\\s+\\S+",query,re.IGNORECASE) or
+        not re.search(r"\\bFROM\\b",query,re.IGNORECASE) or
+        ";" in query or "\\x00" in query):
+        raise ValueError("only bounded read-only WMI SELECT fixture queries supported")
+
+
 def lower_state_free_wmi_assessment(source):
     if not isinstance(source, dict) or set(source) != {"assessment"}:
         raise ValueError("source WMI Assessment must be a single document")
