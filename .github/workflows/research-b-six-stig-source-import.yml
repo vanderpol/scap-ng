@@ -46,6 +46,9 @@ on:
       - 'tools/test_research_b_variable_plan_coverage.py'
       - 'tools/research_b_regex_capture_source_audit.py'
       - 'tools/test_research_b_regex_capture_source_audit.py'
+      - 'tools/research_b_apache_original_oval_crosswalk.py'
+      - 'tools/test_research_b_apache_original_oval_crosswalk.py'
+      - 'research/assessment-simplification/evidence/apache_server_2-4_unix_server/SV-214268/source-oval.xml'
       - 'tools/research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
@@ -252,6 +255,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_regex_capture_source_audit.py
+      - name: Validate Apache B source against original 5.12.3 OVAL merge and regex graph
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_apache_original_oval_crosswalk.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -348,6 +355,10 @@ jobs:
             --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
             --output research/requirements-first-language/contract-candidate/corpus/regex-capture-audit.json \
             --markdown research/requirements-first-language/contract-candidate/corpus/regex-capture-audit.md
+      - name: Publish Apache original SCAP 1.4 XML versus converted-source lexical crosswalk
+        env:
+          PYTHONPATH: tools
+        run: python tools/research_b_apache_original_oval_crosswalk.py
       - name: Preserve partial B fixture IR separately from scanner content
         uses: actions/upload-artifact@v4
         with:
@@ -381,6 +392,7 @@ jobs:
           git add research/requirements-first-language/contract-candidate/corpus/variable-plan-coverage.md
           git add research/requirements-first-language/contract-candidate/corpus/regex-capture-audit.json
           git add research/requirements-first-language/contract-candidate/corpus/regex-capture-audit.md
+          git add research/requirements-first-language/contract-candidate/corpus/apache-original-oval-crosswalk.json
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.md
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
