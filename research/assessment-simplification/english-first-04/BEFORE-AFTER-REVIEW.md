@@ -2,6 +2,10 @@
 
 **October 16, 2026 · Pre-alpha research · Not a specification adoption request**
 
+## Sample-data editor test bench — research opportunity
+
+**The editor can help decide whether split existence/matching fields or a merged requirement phrase is clearer.** The [six-state sample-data playground research](EDITOR-SAMPLE-DATA-PLAYGROUND.md) designs a regex101-style authoring pane with user-supplied synthetic system Items, completeness flags, expected-versus-actual regression cases, and source-linked explanations. [Eight representative sample scenarios](EDITOR-SAMPLE-DATA-EXAMPLES.json) cover RHEL9 `/home` and Windows11 WMI DomainRole evidence, including zero Items, incomplete streams and missing nested record members. **These are proposed input fixtures, not runnable editor tests.** Tracked in [#241](https://github.com/vanderpol/scap-ng/issues/241). This is **not** permission to change the compiler or ship fixtures in signed bundles.
+
 ## New readability candidates and first-read tests — 18 October 2026
 
 **Research only.** The complete paired baseline documents below remain unchanged. None of the new candidates has an accepted 0.4 grammar, standalone lossless lowering, complete scanner parity or independent novice-review scores.
