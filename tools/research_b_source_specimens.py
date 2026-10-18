@@ -88,6 +88,58 @@ def choose(report,capsules):
                 "file":filename,
                 "content":body,
             }
+    # The dominant source registry cohort is not the existing shortest/longest
+    # sample: 135 / 190 registry Tests use a nested all State. Publish one
+    # independently accounted, small, direct source Assessment of that form.
+    # It is NOT a compiled B conversion or a verified original XML mapping.
+    nested=[]
+    for aid,cap in sorted(capsules.items()):
+        if aid in selected:
+            continue
+        a=cap["source_document"].get("assessment",{})
+        tests=a.get("tests",{})
+        if a.get("mode")!="automated" or not isinstance(tests,dict) or len(tests)!=1:
+            continue
+        tid,t=next(iter(tests.items()))
+        if (not isinstance(t,dict) or t.get("capability")!="windows.registry" or
+            a.get("evaluate")!={"test":tid} or
+            bool(a.get("variables")) or bool(a.get("shared_objects"))):
+            continue
+        states=t.get("states")
+        if not isinstance(states,list) or len(states)!=1 or not isinstance(states[0],dict):
+            continue
+        conjunct=states[0].get("all")
+        if not isinstance(conjunct,list) or len(conjunct)<2:
+            continue
+        obj=t.get("object")
+        if not isinstance(obj,dict) or obj.get("capability")!="windows.registry":
+            continue
+        sel=obj.get("select")
+        if not isinstance(sel,dict) or set(sel)!={"hive","key","name"}:
+            continue
+        body=yaml.safe_dump(cap["source_document"],sort_keys=True,allow_unicode=True)
+        size=len(body.encode("utf-8"))
+        if size>MAX_BYTES:
+            continue
+        nested.append((size,aid,cap,body))
+    if nested:
+        size,aid,cap,body=min(nested,key=lambda row:(row[0],row[1]))
+        suffix=sha256(aid.encode()).hexdigest()[:12]
+        selected[aid]={
+            "id":aid,
+            "source_path":cap["source_path"],
+            "source_raw_sha256":cap["source_raw_sha256"],
+            "source_parsed_sha256":cap["source_parsed_sha256"],
+            "specimen_dump_sha256":sha256(body.encode()).hexdigest(),
+            "families":["windows.registry/nested_state_all"],
+            "benchmarks":sorted(binding[aid]),
+            "byte_count":size,
+            "test_count":1,
+            "file":"windows-registry-state-all-"+suffix+".source.yaml",
+            "content":body,
+        }
+    elif "No bounded nested registry State all source specimen" not in warnings:
+        warnings.append("No bounded nested registry State all source specimen")
     return selected,warnings
 
 def build_manifest(picks,warnings):
