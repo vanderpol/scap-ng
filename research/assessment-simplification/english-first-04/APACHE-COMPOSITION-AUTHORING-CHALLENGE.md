@@ -25,6 +25,10 @@
 
 **Evidence boundary:** Zero/many stdout values, missing source paths, failures and incomplete collection need the source's actual result/collection contract; the current snippets alone cannot prove those semantics. Any reviewer who confidently asserts all missing/failed commands become passing checks has guessed. The hypothetical `Timeout` exercise is **not** a proposal to alter the Apache STIG.
 
+## Optional follow-up after the frozen first answer
+
+The [second-pass Apache graph study](APACHE-SECOND-PASS-READABILITY.md) distinguishes five multiply reused Variables from thirteen single-use intermediates, measures the costs of *more* inlining, and supplies a **non-executable** five-stage source view for the loaded-config path. Show it **only after** the reviewer answers the original questions. Ask whether explicit source stages help the reviewer understand *where values and errors come from*, and whether the staged `from/transform` sketch falsely implies per-process loops or automatic error handling. Do not treat a prettier diagram as evidence of actual native authoring support.
+
 ## What to score
 
 Record reviewer background, document, time spent, incorrect source connections, named-variable lookups, missing-provenance claims, errors confusing Item vs field presence, and hypothetical authoring changes that alter source population. Mark each response as *correct / partially correct / unsupported guess* with source paths as evidence.
