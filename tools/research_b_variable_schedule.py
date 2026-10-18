@@ -23,12 +23,36 @@ MAX_VARS=512
 MAX_EDGES=8192
 
 
+def shared_object_references(value):
+    """Collect named shared Object references without resolving acquisitions."""
+    found=set()
+    def walk(node):
+        if isinstance(node,dict):
+            for key,value in node.items():
+                if key=="object" and type(value) is str:
+                    found.add(value)
+                walk(value)
+        elif isinstance(node,list):
+            for entry in node:walk(entry)
+    walk(value)
+    return found
+
+
 def plan_source_variables(assessment):
     if not isinstance(assessment,dict) or type(assessment.get("id")) is not str:
         raise ValueError("source Assessment id required for Variable DAG plan")
     source=assessment.get("variables")
     if not isinstance(source,dict) or not source or len(source)>MAX_VARS:
         raise ValueError("source Variable schedule requires bounded local graph")
+    shared=assessment.get("shared_objects",{})
+    if not isinstance(shared,dict) or len(shared)>MAX_VARS:
+        raise ValueError("source shared Object definitions must be bounded mapping")
+    raw_object_refs=shared_object_references({
+        "variables":source,"tests":assessment.get("tests",{})})
+    missing=raw_object_refs-set(shared)
+    if missing:
+        raise ValueError("source Variable/Test references unresolved shared Objects: "+
+                         repr(sorted(missing)))
     g=analyze_graph(assessment)
     if g["cycle_nodes"]:
         raise ValueError("cyclic source Variable references: "+repr(g["cycle_nodes"]))
@@ -77,6 +101,11 @@ def plan_source_variables(assessment):
         "execution_supported":False,
         "note":"structural Variable dependency plan, no acquisition or evaluation",
         "source_variables_sha256":fingerprint,
+        "referenced_shared_object_ids":sorted(raw_object_refs),
+        "source_shared_objects":copy.deepcopy(shared),
+        "source_shared_objects_sha256":sha256(
+            json.dumps(shared,sort_keys=True,separators=(",",":"),
+                       ensure_ascii=False).encode("utf-8")).hexdigest(),
         "test_variable_references":g["test_variables"],
         "max_variable_depth":g["max_variable_depth"],
         "nodes":result,
