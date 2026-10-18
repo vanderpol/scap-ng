@@ -39,6 +39,20 @@ All counters are derived from the *base-grammar staged* source AST and retain so
 
 Those paths are logical paths inside the immutable/research package, not guaranteed tracked paths on main. The CI step summary includes the exact audit report's representative source IDs and paths.
 
+## Audited foreach binding patterns
+
+The [latest exact-head CI run 39140113610](https://github.com/vanderpol/scap-ng/actions/runs/39140113610) also reconstructed all eight actual source bindings, including their exact source Object ID, item alias and projected selector:
+
+| Source binding | Target selector | Sites |
+| --- | --- | ---: |
+| `user.home_dir` | `directory` | 3 |
+| `item.directory` | `directory` | 2 |
+| `match.subexpression` | `mount_point` | 2 |
+| `match.subexpression` | `username` | 1 |
+| **Total** | | **8** |
+
+Examples include the shared Linux user-home and initialization-file mode Assessments, RHEL dconf database directories, and audit mount-point checks. All eight are **direct** for_each source bindings. The code additionally has positive/negative synthetic tests for inherited nested bindings, no-shadowing and current-alias requirements, but **no nested source-backed site was observed in this six-STIG set**. Therefore nested source-result conformance remains an explicit future gate, not a proven live scanner capability.
+
 ## What was implemented
 
 The [A source-dataflow index](../../../tools/v04_a_dataflow_index.py) preserves named Test/Object/Variable identities, source hashes, repeated reference edges, collection and foreach-source dependencies, and exact Set/Filter/selector lexical locations. It checks missing references and cycles in the combined named Object+Variable source graph, independently of Assessment truth-dependency graphs. The [research IR v0.2](../../../tools/v04_a_lossless_ir.py) embeds this index with every complete source AST, so the independent decoder can verify dataflow indexing was not forged or lost.
