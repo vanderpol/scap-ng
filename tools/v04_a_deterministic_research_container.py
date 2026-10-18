@@ -104,7 +104,24 @@ def verify_research_container(raw):
             raise ValueError("duplicate ZIP member names")
         if "manifest.json" not in names:
             raise ValueError("missing research manifest")
-        manifest = json.loads(archive.read("manifest.json"))
+        # Manifest flags, graph hashes, and provenance must be unambiguous.
+        # Reject duplicate keys at every nesting level and non-JSON constants.
+        manifest_bytes = archive.read("manifest.json")
+        def unique_manifest_pairs(pairs):
+            obj = {}
+            for key, value in pairs:
+                if key in obj:
+                    raise ValueError(f"duplicate research manifest key {key!r}")
+                obj[key] = value
+            return obj
+        manifest = json.loads(
+            manifest_bytes,
+            object_pairs_hook=unique_manifest_pairs,
+            parse_constant=lambda token: (_ for _ in ()).throw(
+                ValueError(f"invalid research manifest JSON constant {token}")),
+        )
+        if canonical_json(manifest) != manifest_bytes:
+            raise ValueError("noncanonical research manifest")
         if (manifest.get("stage") != STAGE or manifest.get("build_status") != MAGIC
                 or manifest.get("authoring_spec_approval") is not False
                 or manifest.get("migration_policy_approval") is not False):
