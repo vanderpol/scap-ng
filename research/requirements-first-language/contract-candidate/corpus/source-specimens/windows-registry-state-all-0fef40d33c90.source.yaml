@@ -1,0 +1,42 @@
+assessment:
+  assessment_title: WN11-CC-000038 - WDigest Authentication must be disabled.
+  class: compliance
+  evaluate:
+    test: wdigest-authentication-disabled-test
+  id: SV-253358.automated
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    wdigest-authentication-disabled-test:
+      capability: windows.registry
+      existence: one_or_more
+      match: all
+      object:
+        capability: windows.registry
+        object_title: null
+        select:
+          hive: local_machine
+          key:
+            operation: equals
+            value: SYSTEM\CurrentControlSet\Control\SecurityProviders\Wdigest
+          name:
+            operation: equals
+            value: UseLogonCredential
+      reported_elements: all
+      states:
+      - all:
+        - existence: one_or_more
+          field: type
+          match: all
+          operation: equals
+          value: dword
+        - existence: one_or_more
+          field: value
+          match: all
+          operation: equals
+          value: 0
+      test_title: WDigest Authentication is disabled
+  version: 2

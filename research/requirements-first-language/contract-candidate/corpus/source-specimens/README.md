@@ -13,6 +13,7 @@ small and larger documents exercise different conversion complexity.
 | windows.wmi.query | SV-253265.automated | ms_windows_11 | 1 | [windows-wmi-query-0-a5018a53e0f6.source.yaml](windows-wmi-query-0-a5018a53e0f6.source.yaml) |
 | windows.registry | SV-253274.automated | ms_windows_11 | 5 | [windows-registry-1-2db73c819346.source.yaml](windows-registry-1-2db73c819346.source.yaml) |
 | windows.registry | SV-253291.automated | ms_windows_11 | 1 | [windows-registry-0-de183f784659.source.yaml](windows-registry-0-de183f784659.source.yaml) |
+| windows.registry/nested_state_all | SV-253358.automated | ms_windows_11 | 1 | [windows-registry-state-all-0fef40d33c90.source.yaml](windows-registry-state-all-0fef40d33c90.source.yaml) |
 | windows.userright | SV-253495.automated | ms_windows_11 | 7 | [windows-userright-1-39dad4df5336.source.yaml](windows-userright-1-39dad4df5336.source.yaml) |
 | independent.shellcommand | SV-258038.automated | rhel_9 | 1 | [independent-shellcommand-0-365f46522e9e.source.yaml](independent-shellcommand-0-365f46522e9e.source.yaml) |
 | windows.wmi.query | SV-278001.automated | ms_windows_server_2025 | 5 | [windows-wmi-query-1-c3af977226de.source.yaml](windows-wmi-query-1-c3af977226de.source.yaml) |
