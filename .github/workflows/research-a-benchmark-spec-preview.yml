@@ -1,0 +1,74 @@
+name: 0.4-A Benchmark declaration migration research proof
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-benchmark-spec-preview.yml'
+      - 'tools/v04_a_benchmark_spec_migration_preview.py'
+      - 'tools/test_v04_a_benchmark_spec_migration_preview.py'
+      - 'tools/v04_a_benchmark_choice_version_closure.py'
+      - 'tools/v04_a_authoring_graph_index.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  staged-candidate-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent YAML loader
+        run: python -m pip install PyYAML==6.0.3
+      - name: Exercise preservation and negative cases
+        run: python -m unittest -v tools/test_v04_a_benchmark_spec_migration_preview.py
+      - name: Retrieve immutable source review packages without credentials
+        run: |
+          mkdir -p work/a-version-candidate
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-json.zip' \
+            --output work/a-version-candidate/scap-ng-v0.4-joval-six-stig-json.zip
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --output work/a-version-candidate/scap-ng-v0.4-joval-six-stig-yaml.zip
+      - name: Prove exact reachable candidate without authoring mutations
+        run: |
+          python tools/v04_a_benchmark_spec_migration_preview.py \
+            --json-archive work/a-version-candidate/scap-ng-v0.4-joval-six-stig-json.zip \
+            --yaml-archive work/a-version-candidate/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --assert-six-preview \
+            --report-json "$RUNNER_TEMP/version-research-preview.json" > "$RUNNER_TEMP/preview-output.json"
+          python - "$RUNNER_TEMP/version-research-preview.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["status"]=="RESEARCH_CANDIDATE_NOT_APPROVED"
+          assert r["normative_approval_required"] is True
+          assert r["allowed_to_compile"] is False
+          assert r["source_incompatible_edges"]==1391
+          assert r["candidate_incompatible_edges"]==0
+          assert r["yaml_json_agree"] is True
+          assert r["preservation_proved"] is True
+          assert all(x["existing_specs"]==[{"id":"scap-ng.pre-alpha.assessment","version":"0.3.0"}] for x in r["benchmark_changes"])
+          assert all(x["reachable_automated_specs"]==[{"id":"scap-ng.pre-alpha.assessment","version":"0.4.0"}] for x in r["benchmark_changes"])
+          print("PASS: six independent candidate Benchmark version patches; no Assessment, Rule or manual choice changed.")
+          print("SOURCE graph:",r["source_graph_sha256"])
+          print("CANDIDATE graph:",r["proposed_graph_sha256"])
+          PY
+      - name: Record exact research-only status
+        if: always()
+        run: |
+          {
+            echo '## Candidate 0.4-A Benchmark specification declarations'
+            echo 'NO files were rewritten in the pinned r3 release or repository, and no native .scapng bundle was produced. This proves reversible metadata-only research patches and preserved 2,958 Rule choices; owner promotion remains outstanding.'
+            if test -s "$RUNNER_TEMP/version-research-preview.json"; then
+              python - "$RUNNER_TEMP/version-research-preview.json" <<'PY'
+          import json,sys
+          x=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("Source blocked edges:",x["source_incompatible_edges"])
+          print("Hypothetical staged blocked edges:",x["candidate_incompatible_edges"])
+          print("Six STIGs:",len(x["benchmark_changes"]))
+          PY
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
