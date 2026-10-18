@@ -84,7 +84,8 @@ class LosslessIrTests(unittest.TestCase):
         auto = automated(self.docs)
         test = next(iter(auto["tests"].values()))
         test["research_unexecuted"] = {
-            "for_each": {"variable": "loop-variable", "over": ["users"]},
+            "for_each": {"item": "user", "in": "existing"},
+            "computed": {"variable": "loop-variable"},
             "records": [{"record": {"require": "only_one_exists",
                                    "fields": [{"sid": {"equals": "S-1-5-18",
                                                        "require": "all_exist_and_all_match"}}]}}],
@@ -93,15 +94,19 @@ class LosslessIrTests(unittest.TestCase):
                       "not_applicable": "not_applicable"},
         }
         auto["variables"] = {"loop-variable": {"value": [1, 2]}}
+        auto["shared_objects"] = {"existing": {"capability": "unix.file"}}
         ir = normalize_documents(self.docs)
         r = next(x for x in ir["documents"] if x["id"] == auto["id"])
         self.assertEqual(decode_and_verify(ir), self.docs)
         indexed = r["assessment_index"]["tests"][0]
         self.assertIn({"type": "variable",
-                       "path": ["research_unexecuted", "for_each", "variable"],
+                       "path": ["research_unexecuted", "computed", "variable"],
                        "target": "loop-variable"},
                       indexed["collection_reference_hints"])
         self.assertEqual(r["source_ast"]["assessment"]["tests"], auto["tests"])
+        dataflow = r["assessment_index"]["source_dataflow"]
+        self.assertTrue(any(e["role"] == "for_each_source" for e in dataflow["edges"]))
+        self.assertEqual(dataflow["status"], "SOURCE_DATAFLOW_ONLY_NOT_EXECUTABLE")
 
     def test_preserves_provenance_and_valid_unrecognized_test_subtrees(self):
         auto = automated(self.docs)

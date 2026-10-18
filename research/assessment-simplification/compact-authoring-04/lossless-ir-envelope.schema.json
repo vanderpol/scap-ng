@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://scap-ng.dev/research/0.4-a/lossless-ir-envelope-0.1.schema.json",
-  "title": "SCAP-NG 0.4-A lossless compiler source envelope (RESEARCH ONLY)",
+  "$id": "https://scap-ng.dev/research/0.4-a/lossless-ir-envelope-0.2.schema.json",
+  "title": "SCAP-NG 0.4-A lossless research compiler source envelope v0.2 (NOT EXECUTABLE)",
   "description": "Non-executable v0.1 transport/index over complete validated base-authoring ASTs; source_ast is losslessly preserved, not evaluated. This research JSON Schema is not a versioned normative SCAP-NG schema.",
   "type": "object",
   "additionalProperties": false,
@@ -19,7 +19,7 @@
   ],
   "properties": {
     "format": {
-      "const": "scap-ng-0.4-a-lossless-source-envelope/0.1"
+      "const": "scap-ng-0.4-a-lossless-source-envelope/0.2"
     },
     "status": {
       "const": "RESEARCH_NOT_EXECUTABLE"
@@ -271,6 +271,9 @@
               "minLength": 1
             }
           }
+        },
+        "source_dataflow": {
+          "$ref": "#/$defs/source_dataflow"
         }
       },
       "allOf": [
@@ -287,7 +290,8 @@
           },
           "then": {
             "required": [
-              "specification"
+              "specification",
+              "source_dataflow"
             ],
             "properties": {
               "tests": {
@@ -297,13 +301,201 @@
           },
           "else": {
             "not": {
-              "required": [
-                "specification"
+              "anyOf": [
+                {
+                  "required": [
+                    "specification"
+                  ]
+                },
+                {
+                  "required": [
+                    "source_dataflow"
+                  ]
+                }
               ]
             }
           }
         }
       ]
+    },
+    "source_dataflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "nodes",
+        "edges",
+        "sites",
+        "dependency_first_source_order",
+        "edge_count",
+        "unverified"
+      ],
+      "properties": {
+        "status": {
+          "const": "SOURCE_DATAFLOW_ONLY_NOT_EXECUTABLE"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_node"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_edge"
+          }
+        },
+        "sites": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source_site"
+          }
+        },
+        "dependency_first_source_order": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind",
+              "id"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "object",
+                  "variable"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "edge_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unverified": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "source_path": {
+      "type": "array",
+      "items": {
+        "type": [
+          "string",
+          "integer"
+        ]
+      }
+    },
+    "source_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "path",
+        "source_sha256"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "object",
+            "variable",
+            "test"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "$ref": "#/$defs/source_path"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "source_edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_kind",
+        "from_id",
+        "to_kind",
+        "to_id",
+        "role",
+        "path"
+      ],
+      "properties": {
+        "from_kind": {
+          "enum": [
+            "object",
+            "variable",
+            "test"
+          ]
+        },
+        "from_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to_kind": {
+          "enum": [
+            "object",
+            "variable"
+          ]
+        },
+        "to_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "role": {
+          "enum": [
+            "variable_value",
+            "object_acquisition",
+            "for_each_source"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/source_path"
+        }
+      }
+    },
+    "source_site": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path",
+        "source_sha256"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "for_each",
+            "set",
+            "filter",
+            "projection"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/source_path"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
     }
   }
 }

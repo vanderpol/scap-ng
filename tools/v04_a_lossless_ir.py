@@ -15,8 +15,9 @@ from pathlib import Path, PurePosixPath
 
 from v04_a_authoring_graph_index import canonical_json, graph_index
 from v04_a_benchmark_choice_version_closure import inspect_edges
+from v04_a_dataflow_index import index_assessment_dataflow
 
-IR_FORMAT = "scap-ng-0.4-a-lossless-source-envelope/0.1"
+IR_FORMAT = "scap-ng-0.4-a-lossless-source-envelope/0.2"
 IR_STATUS = "RESEARCH_NOT_EXECUTABLE"
 
 
@@ -187,6 +188,7 @@ def normalize_documents(documents):
                 if "evaluate" not in body:
                     raise ValueError(f"{path}: missing evaluate expression")
                 index["specification"] = spec
+                index["source_dataflow"] = index_assessment_dataflow(body)
                 for name, test in sorted(tests.items()):
                     if not isinstance(test, dict):
                         raise ValueError(f"{path}: invalid Test {name!r}")
@@ -315,6 +317,10 @@ def main(argv=None):
         "automated_tests": ir["automated_test_count"],
         "rule_choice_links": ir["rule_choice_link_count"],
         "roundtrip": "PASS",
+        "source_dataflow_edges": sum(r.get("assessment_index", {}).get(
+            "source_dataflow", {}).get("edge_count", 0) for r in ir["documents"]),
+        "source_dataflow_sites": sum(len(r.get("assessment_index", {}).get(
+            "source_dataflow", {}).get("sites", [])) for r in ir["documents"]),
         "assessment_truth_dependencies": sum(len(r.get("assessment_index", {}).get(
             "assessment_dependencies", [])) for r in ir["documents"]),
         "research_ir_schema": "PASS",

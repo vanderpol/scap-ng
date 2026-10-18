@@ -7,6 +7,8 @@ on:
       - '.github/workflows/research-a-integrated-base-authoring.yml'
       - 'tools/v04_a_end_to_end_base_authoring.py'
       - 'tools/v04_a_lossless_ir.py'
+      - 'tools/v04_a_dataflow_index.py'
+      - 'tools/test_v04_a_dataflow_index.py'
       - 'tools/test_v04_a_lossless_ir.py'
       - 'research/assessment-simplification/compact-authoring-04/lossless-ir-envelope.schema.json'
       - 'tools/test_v04_a_end_to_end_base_authoring.py'
@@ -29,6 +31,8 @@ jobs:
         run: python -m pip install PyYAML==6.0.3 jsonschema==4.25.1
       - name: Run adversarial integrated packaging tests
         run: python -m unittest -v tools/test_v04_a_end_to_end_base_authoring.py
+      - name: Verify collection/variable/set/filter graph regression cases
+        run: python -m unittest -v tools/test_v04_a_dataflow_index.py
       - name: Verify adversarial lossless typed-IR source envelopes
         run: python -m unittest -v tools/test_v04_a_lossless_ir.py
       - name: Fetch immutable 0.4-A r3 authoring sources
@@ -87,6 +91,8 @@ jobs:
           assert result["rule_choice_links"]==2958,result
           assert result["roundtrip"]=="PASS",result
           assert result["research_ir_schema"]=="PASS",result
+          assert result["source_dataflow_edges"]>=0,result
+          assert result["source_dataflow_sites"]>=0,result
           assert result["scanner_executable"] is False,result
           print("PASS: #240 lossless typed envelope + independent full decode")
           print("Canonical IR SHA-256:",result["ir_sha256"])
