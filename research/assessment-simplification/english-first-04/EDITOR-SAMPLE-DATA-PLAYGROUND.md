@@ -10,6 +10,12 @@ The existing Python OVAL result reference, supplied-Test expression executor, re
 
 This separation changes the phased product plan: the editor may ship a scenario authoring/prediction exercise and schema diagnostics first, then integrate a tested scanner for genuine Assessment outcomes. Neither AI reasoning nor a passing regression fixture substitutes for scanner validation.
 
+## Owner refinement: share the scanner's evaluation core, not its collectors
+
+The [evaluation-only scanner-core research](SCANNER-EVALUATION-CORE-FOR-EDITOR.md) clarifies the path to an authoritative **sample-data** result without developing live SSH/WMI/shell collection for the editor. An actual scanner's **same tested evaluation code** can consume synthetic Items/variable values at an explicit collected-data injection boundary. Once that execution mode meets independent source-backed six-state conformance requirements and coverage for a specific Assessment, the UI can legitimately report **SCANNER-VERIFIED ON SUPPLIED EVIDENCE**—not that an actual host was scanned. Until then, existing standalone Python truth tables and restricted fixtures still produce **NO AUTHORITATIVE ASSESSMENT RESULT**.
+
+The official OVAL 5.12.3 `independent:variable_test` is a useful supplied-value precedent, but a generic Assessment sample mode additionally needs Item/field existence, record correlation, Sets/Filters, `for_each` and complete/incomplete/error source flags where referenced. **No independent census has verified how prevalent `variable_test` is in the SCAP validation-content corpus.** This is a **design refinement** within the prior owner instruction that AI cannot assert assessment truth; it does not relax that instruction.
+
 ## The primary experience
 
 A content author edits a real Assessment while exercising it on **simulated collected system evidence**. The editor does **not** connect to a real host, execute shell commands, query WMI, or need production credentials for this workflow. Its feedback must make the distinction among these layers obvious:
