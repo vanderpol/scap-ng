@@ -1,0 +1,66 @@
+name: 0.4-A reversible research syntax to base-schema lowering
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-scoped-lowering.yml'
+      - 'tools/v04_a_lower_scoped_to_base.py'
+      - 'tools/test_v04_a_lower_scoped_to_base.py'
+      - 'tools/research_04_scoped_state_require.py'
+      - 'schema/v0.4.0/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  six-stig-strict-base-lowering:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent YAML and schema validation tools
+        run: python -m pip install PyYAML==6.0.3 jsonschema==4.25.1
+      - name: Test scoped research inverse, no hidden defaults
+        run: python -m unittest -v tools/test_v04_a_lower_scoped_to_base.py
+      - name: Retrieve pinned six-STIG research authoring formats
+        run: |
+          mkdir -p work/a-lowering
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-json.zip' \
+            --output work/a-lowering/json.zip
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --output work/a-lowering/yaml.zip
+      - name: Lower and validate all automated Assessments against current 0.4-A base schema
+        run: |
+          python tools/v04_a_lower_scoped_to_base.py \
+            --json-archive work/a-lowering/json.zip \
+            --yaml-archive work/a-lowering/yaml.zip \
+            --expect-six-stig \
+            --report-json "$RUNNER_TEMP/a-base-lowering.json" \
+            > "$RUNNER_TEMP/a-base-lowering.stdout"
+          python - "$RUNNER_TEMP/a-base-lowering.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1], encoding="utf-8"))
+          assert d["status"]=="REVERSIBLE_0.4_A_AUTHORING_LOWERING_NOT_COMPILATION",d
+          assert d["base_schema_validation"]=="PASS",d
+          assert d["yaml_json_agree"] is True,d
+          assert d["source_counts"]["rule_choice_links"]==2958,d
+          assert d["counters"]["lowered_automated_assessments"]==872,d
+          assert d["counters"]["lowered_tests"]==1375,d
+          assert d["native_bundle_compiled"] is False,d
+          print("PASS: 872 exact-reversible A Assessments, 1375 Tests, 2958 unchanged choice edges")
+          print("Canonical lowered A graph SHA256:",d["lowered_graph_sha256"])
+          PY
+      - name: Publish accurate semantic validation limitations
+        if: always()
+        run: |
+          {
+            echo '## 0.4-A scoped authoring to base schema — #232/#239'
+            echo 'Independent source formats, reversible syntax and base JSON schema only. No owner acceptance of research syntax, native bundle compilation, typed execution, or OVAL result parity.'
+            if test -s "$RUNNER_TEMP/a-base-lowering.json"; then
+              cat "$RUNNER_TEMP/a-base-lowering.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
