@@ -10,7 +10,7 @@ not original SCAP 1.4 XML. A valid JSON fixture IR is not source parity.
 | Rules | 1567 |
 | Assessment-choice links | 2958 |
 | Distinct referenced Assessments | 2395 |
-| Strictly lowered automated fixture IR (not scanner-verified) | 41 |
+| Strictly lowered automated fixture IR (not scanner-verified) | 44 |
 | Manual procedures compiled (human result still required) | 1550 |
 | **Verified executable source-equivalent Assessments** | **0** |
 
@@ -22,16 +22,16 @@ not original SCAP 1.4 XML. A valid JSON fixture IR is not source parity.
 | ms_windows_11 | 502 | 0 | 257 | 245 |
 | ms_windows_server_2025 | 550 | 0 | 291 | 259 |
 | ms_windows_server_dns | 94 | 0 | 73 | 21 |
-| oracle_linux_9 | 854 | 40 | 448 | 366 |
-| rhel_9 | 861 | 38 | 445 | 378 |
+| oracle_linux_9 | 854 | 43 | 448 | 363 |
+| rhel_9 | 861 | 41 | 445 | 375 |
 
 ## Classification
 
 | Status | Distinct Assessments |
 | --- | ---: |
-| fixture_ir_compiled_source_parity_unverified | 41 |
+| fixture_ir_compiled_source_parity_unverified | 44 |
 | manual_procedure_ir_compiled | 1550 |
-| unsupported_source_semantics | 804 |
+| unsupported_source_semantics | 801 |
 
 Every referenced Assessment is in [the machine-readable conversion ledger](conversion-progress.json).
 The research ZIP contains **only** validated fixture IR, manual procedures and metadata; it is
