@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/research/0.4-a/lossless-ir-envelope-0.1.schema.json",
+  "title": "SCAP-NG 0.4-A lossless compiler source envelope (RESEARCH ONLY)",
+  "description": "Non-executable v0.1 transport/index over complete validated base-authoring ASTs; source_ast is losslessly preserved, not evaluated. This research JSON Schema is not a versioned normative SCAP-NG schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "status",
+    "source_graph_sha256",
+    "version_inventory",
+    "document_count",
+    "automated_assessment_count",
+    "automated_test_count",
+    "rule_choice_link_count",
+    "documents",
+    "not_proven"
+  ],
+  "properties": {
+    "format": {
+      "const": "scap-ng-0.4-a-lossless-source-envelope/0.1"
+    },
+    "status": {
+      "const": "RESEARCH_NOT_EXECUTABLE"
+    },
+    "source_graph_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "version_inventory": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "document_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "automated_assessment_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "automated_test_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "rule_choice_link_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "documents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/document"
+      }
+    },
+    "not_proven": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "source_path",
+        "source_sha256",
+        "source_ast"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "assessment",
+            "rule",
+            "benchmark",
+            "applicability"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_path": {
+          "type": "string",
+          "pattern": "^authoring/.+\\.json$"
+        },
+        "source_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "source_ast": {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "description": "Complete canonical parsed source document, including every unrecognized-but-validated subtree and all provenance. Never discard a member."
+        },
+        "assessment_index": {
+          "$ref": "#/$defs/assessment_index"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "assessment"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "assessment_index"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "assessment_index"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "assessment_index": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "assessment_dependencies",
+        "tests"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "manual",
+            "automated"
+          ]
+        },
+        "assessment_dependencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "alias",
+              "target",
+              "expected_version",
+              "purpose"
+            ],
+            "properties": {
+              "alias": {
+                "type": "string"
+              },
+              "target": {
+                "type": "string",
+                "minLength": 1
+              },
+              "expected_version": {
+                "type": [
+                  "integer",
+                  "string",
+                  "null"
+                ]
+              },
+              "purpose": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "capability",
+              "item_requirement",
+              "source_sha256",
+              "collection_reference_hints"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "capability": {
+                "type": "string",
+                "minLength": 1
+              },
+              "item_requirement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "source_sha256": {
+                "$ref": "#/$defs/sha256"
+              },
+              "collection_reference_hints": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "type",
+                    "path",
+                    "target"
+                  ],
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "variable",
+                        "shared_object"
+                      ]
+                    },
+                    "path": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "integer",
+                          "string"
+                        ]
+                      }
+                    },
+                    "target": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "specification": {
+          "type": "object",
+          "additionalProperties": {
+            "description": "Full source declaration retained, with identity checked again by decoder."
+          },
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "automated"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "specification"
+            ],
+            "properties": {
+              "tests": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "not": {
+              "required": [
+                "specification"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
