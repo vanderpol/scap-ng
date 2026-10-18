@@ -2,6 +2,8 @@
 
 **Curated guidance · 18 October 2026 · [#242](https://github.com/vanderpol/scap-ng/issues/242).** Use this with [public knowledge entry](README.md) and [version/source contract](VERSION-AND-SOURCES.md). Applicable to a ChatGPT plugin, Claude/Gemini/Grok model adapter, offline VS Code editor or ordinary author.
 
+**Source authority:** [Publisher versus discovery-source policy](AUTHORITATIVE-STIG-SOURCES.md). The agent can follow third-party Rule lookup leads, but must not treat STIGViewer.com as the official publisher or assert a Rule revision without verified Cyber Exchange or verifiable local content.
+
 ## The fast-first authoring loop
 
 **When a user names a Rule or provides an Assessment, the first useful reply should show the actual source or draft.** Don't spend ten minutes retrieving entire benchmarks before showing anything. Do not invoke heavyweight autonomous research for ordinary edits.
