@@ -24,15 +24,16 @@ jobs:
       - name: Run focused negative and positive tests
         run: python -m unittest -v tools/test_v04_a_specification_version_gate.py
       - name: Download pinned original six-STIG 0.4-A research source
-        env:
-          GH_TOKEN: \${{ github.token }}
         run: |
           mkdir -p work/a-version-gate
-          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
-            --repo vanderpol/scap-ng \
-            --pattern 'scap-ng-v0.4-joval-six-stig-json.zip' \
-            --pattern 'scap-ng-v0.4-joval-six-stig-yaml.zip' \
-            --dir work/a-version-gate
+          base='https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3'
+          for source in json yaml; do
+            name="scap-ng-v0.4-joval-six-stig-${source}.zip"
+            curl --fail --location --silent --show-error \
+              --retry 5 --retry-all-errors --retry-delay 2 \
+              "${base}/${name}" --output "work/a-version-gate/${name}"
+            test -s "work/a-version-gate/${name}"
+          done
       - name: Pin expected source incompatibility without waiving it
         run: |
           python tools/v04_a_specification_version_gate.py \
