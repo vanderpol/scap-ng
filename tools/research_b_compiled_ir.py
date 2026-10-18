@@ -185,6 +185,12 @@ def _node(node, source_kind, depth=0):
                 raise ValueError("invalid source State regex for research provider") from exc
         return
 
+    if kind == "compat_oval_shellcommand_variable_version":
+        _ensure(source_kind!="native","dynamic source graph must be compiler owned")
+        from research_b_apache_version_graph import validate_apache_version_ir
+        validate_apache_version_ir(node)
+        return
+
     if kind == "compat_oval_shellcommand_state":
         _ensure(source_kind!="native",
                 "source shell compatibility cannot be native authored")
@@ -367,7 +373,7 @@ def _classify(node, depth=0):
         return {"manual"}
     if kind in {"compat_oval_test","compat_oval_provider_existence",
                 "compat_oval_provider_state","compat_oval_registry_view_invariant",
-                "compat_oval_shellcommand_state"}:
+                "compat_oval_shellcommand_state","compat_oval_shellcommand_variable_version"}:
         return {"compiler-compatibility"}
     if kind == "logic":
         result = set()
