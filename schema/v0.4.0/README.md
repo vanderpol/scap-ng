@@ -2,6 +2,8 @@
 
 **Pre-alpha draft, not accepted or Board approved.** The v0.3.0 schemas are unchanged.
 
+**Current 0.4-A stabilization:** [single-grammar decision and compiler gate ledger](../../research/assessment-simplification/compact-authoring-04/A-STABILIZATION-CHECKPOINT.md). The base `require` and r3 scoped `collected_items_require` research grammars remain distinct pending human approval; [focused CI](https://github.com/vanderpol/scap-ng/actions/runs/39128581887) prevents silent mixing. [Six-STIG parsed YAML/JSON logical graph CI](https://github.com/vanderpol/scap-ng/actions/runs/39128898638) is successful **but is not compilation, signature verification, or scanner execution**.
+
 This directory is a complete physically independent version-local copy-forward of the 0.3 schema and capability mapping surface. Versioned metadata, IDs and references identify v0.4.0; each unchanged file preserves its substantive modification date.
 
 ## Six-STIG YAML + JSON technical review packet
