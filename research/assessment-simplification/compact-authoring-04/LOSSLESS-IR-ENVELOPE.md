@@ -13,7 +13,15 @@ No branch was created. Commits reference relevant GitHub issues and do not modif
 
 ## Repeatable commands
 
-Focused test: python -m unittest -v tools/test_v04_a_lossless_ir.py
+Primary supported command (after fetching the two immutable r3 six-STIG source ZIPs from the pinned release):
+
+    python tools/v04_a_compile_verified_ir.py --json-archive /path/to/six-stig-json.zip --yaml-archive /path/to/six-stig-yaml.zip --out-ir /path/to/a-lossless-ir.json --assert-six --report-json /path/to/verified-ir-report.json
+
+This **one command** parses YAML and JSON independently, validates every base 0.4 Assessment and each generated 0.4 capability-specific Test, checks all Rule choices and version-declaration research staging, creates byte-identical unsigned research packages, independently derives matching typed IRs, decodes and verifies the full source, and checks the research IR Draft 2020-12 JSON Schema. There is no bypass switch for production CLI schema validation.
+
+Focused tests:
+
+    python -m unittest -v tools/test_v04_a_lossless_ir.py tools/test_v04_a_dataflow_index.py tools/test_v04_a_dataflow_census.py tools/test_v04_a_compile_verified_ir.py
 
 Compile independently checked IR from an existing verified unsigned research base-authoring ZIP:
 
@@ -33,7 +41,7 @@ The existing [end-to-end pipeline](../../../tools/v04_a_end_to_end_base_authorin
 
 ## Verified checkpoint
 
-The latest exact-head [six-STIG CI run 39139809628](https://github.com/vanderpol/scap-ng/actions/runs/39139809628) **passed**, with 19 lossless-IR tests, 14 Object/Variable/Set/Filter/for_each graph/lineage tests, three independently decoded source-census tests, and the 11 maintained integrated tests. The research Draft 2020-12 envelope schema, exact Assessment-dependency closure, 4,001 full source documents, 872 automated Assessments, 1,375 Tests and 2,958 Rule choices all passed. Canonical IR v0.2 digest: 9a9c418b3eaa2dc28831302af76f2911869fafe848f110167888f0b9a5a2dfab. [Full measured source graph counts and real source anchors](DATAFLOW-SIX-STIG-CENSUS.md).
+The latest exact-head [six-STIG CI run 39140548231](https://github.com/vanderpol/scap-ng/actions/runs/39140548231) **passed**, with 19 lossless-IR tests, 14 Object/Variable/Set/Filter/for_each graph/lineage tests, three source-census tests, **six single-command parity/negative tests**, and 11 maintained integrated tests. The research Draft 2020-12 envelope schema, exact Assessment-dependency closure, 4,001 full source documents, 872 automated Assessments, 1,375 Tests and 2,958 Rule choices all passed. Canonical IR v0.2 digest: 9a9c418b3eaa2dc28831302af76f2911869fafe848f110167888f0b9a5a2dfab. [Full measured source graph counts and real source anchors](DATAFLOW-SIX-STIG-CENSUS.md).
 
 All of these named checks passed on the cited exact-head run. This is still structural evidence only.
 

@@ -4,7 +4,7 @@
 
 ## Reproducible integrated gate
 
-[Latest exact-head CI run 39139809628 — PASS](https://github.com/vanderpol/scap-ng/actions/runs/39139809628) validated the integrated YAML/JSON → base 0.4-A research-authoring path, complete lossless source-envelope IR v0.2 roundtrip, its Draft 2020-12 research schema, **14** standalone dataflow and correlated for_each-alias cases, **three** independent census fixtures, and 19 complete IR adversarial cases.
+[Latest exact-head CI run 39140548231 — PASS](https://github.com/vanderpol/scap-ng/actions/runs/39140548231) validated the integrated YAML/JSON → base 0.4-A research-authoring path, complete lossless source-envelope IR v0.2 roundtrip, its Draft 2020-12 research schema, **14** standalone dataflow and correlated for_each-alias cases, **three** independent census fixtures, 19 complete IR adversarial cases, **six** independent YAML/JSON single-command compiler checks, and 11 maintained integration checks.
 
 Run the exact research-only census after generating the verified base archive and the IR:
 
