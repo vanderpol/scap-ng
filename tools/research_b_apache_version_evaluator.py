@@ -11,6 +11,7 @@ from oval_result_truth_tables import (
     evaluate_collected_object_test,aggregate_check,
 )
 from research_b_apache_version_graph import _regex
+from research_b_variable_value_ops import values as variable_values, capture as variable_capture, concat as variable_concat
 
 PROVIDER="independent.shellcommand"
 FLAGS={"complete","incomplete","error","not collected","not applicable"}
@@ -95,27 +96,38 @@ def evaluate_apache_version(ast,fixtures):
     if flag=="incomplete":
         return UNKNOWN,"incomplete process discovery cannot resolve executable identity",len(items)
     selector=_regex(ast["discovery_pattern"],"source collection filter")
-    capture=_regex(ast["capture_pattern"],"source executable capture")
-    paths=set()
+    extractor=_regex(ast["capture_pattern"],"source executable capture")
+    selected=[]
     for item in items:
         for line in item["fields"]["stdout_line"]:
             if len(line)>4096:
                 return ERROR,"oversized source process stdout line",len(items)
             if not selector.search(line):continue
-            match=capture.search(line)
+            match=extractor.search(line)
             if match is None or match.group(1) is None:
                 return UNKNOWN,"source filter matched but capture did not resolve",len(items)
-            path=match.group(1)
-            if not SAFE_EXE.fullmatch(path) or any(
-                    part in {".",".."} for part in path.split("/")):
-                return ERROR,"unsafe or unsupported executable path capture",len(items)
-            paths.add(path)
-    if not paths:return UNKNOWN,"no executable path derived from collected Items",len(items)
-    if len(paths)!=1:
-        return UNKNOWN,"multiple executable paths require unimplemented Variable fan-out",len(items)
-    command=next(iter(paths))+ast["command_suffix"]
-    if len(command)>4096:
-        return ERROR,"derived version command exceeds bounded length",len(items)
+            selected.append(line)
+    if not selected:
+        return UNKNOWN,"no executable path derived from collected Items",len(items)
+    try:
+        resolved=variable_capture(variable_values(selected),ast["capture_pattern"])
+    except ValueError as exc:
+        return ERROR,"source capture evidence exceeds bounds: "+str(exc),len(items)
+    if resolved["status"]!="values":
+        return (ERROR if resolved["status"]=="error" else UNKNOWN),"source capture unresolved",len(items)
+    for path in resolved["values"]:
+        if not SAFE_EXE.fullmatch(path) or any(
+                part in {".",".."} for part in path.split("/")):
+            return ERROR,"unsafe or unsupported executable path capture",len(items)
+    # Critically, a source regex_capture is not an implicit unique(). Two
+    # collected path values, even identical ones, cannot be arbitrarily
+    # collapsed into one OVAL Variable instance.
+    if len(resolved["values"])!=1:
+        return UNKNOWN,"multiple captured Variable values require source fan-out",len(items)
+    assembled=variable_concat([resolved,variable_values([ast["command_suffix"]])])
+    if assembled["status"]!="values" or len(assembled["values"])!=1:
+        return ERROR,"dynamic version query could not be safely constructed",len(items)
+    command=assembled["values"][0]
     using={**ast["version_using"],"command":command}
     try:
         target=_acquisition(fixtures,using)
