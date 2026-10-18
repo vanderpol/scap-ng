@@ -4,7 +4,7 @@
 Counts below are distinct *unsupported automated Assessments* referencing
 each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
-**Unsupported automated Assessments: 801**.
+**Unsupported automated Assessments: 799**.
 
 ## Highest-volume capability families
 
@@ -17,8 +17,8 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 | windows.auditeventpolicysubcategories | 53 |
 | windows.userright | 49 |
 | linux.rpminfo | 38 |
-| windows.wmi.query | 34 |
 | unix.sysctl | 33 |
+| windows.wmi.query | 32 |
 | linux.partition | 31 |
 | linux.systemdunitproperty | 15 |
 | windows.cmdlet | 15 |
@@ -66,7 +66,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 | windows.registry | 135 |
 | windows.auditeventpolicysubcategories | 43 |
 | windows.userright | 29 |
-| windows.wmi.query | 16 |
+| windows.wmi.query | 15 |
 | windows.cmdlet | 9 |
 | independent.shellcommand | 7 |
 | windows.passwordpolicy | 7 |
@@ -86,7 +86,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 | windows.registry | 111 |
 | windows.auditeventpolicysubcategories | 43 |
 | windows.userright | 39 |
-| windows.wmi.query | 25 |
+| windows.wmi.query | 24 |
 | independent.shellcommand | 22 |
 | windows.fileeffectiverights53 | 8 |
 | independent.textfilecontent54 | 7 |
