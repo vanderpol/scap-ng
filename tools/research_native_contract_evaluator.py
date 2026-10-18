@@ -213,13 +213,42 @@ def evaluate(ast,fixtures,scope=None):
         common={"kind","source_assessment_id","source_test_id",
                 "provider","using","existence"}
         required=common|({"where"} if provider=="linux.mounts" else set())
-        if (set(ast)!=required or provider not in {"linux.textfile_matches","linux.mounts"}
-                or ast["existence"]!="at_least_one_exists"):
+        if (set(ast)!=required or provider not in {
+                "linux.textfile_matches","linux.mounts","windows.wmi.query"} or
+                (provider!="windows.wmi.query" and
+                 ast["existence"]!="at_least_one_exists") or
+                (provider=="windows.wmi.query" and
+                 ast["existence"] not in {"none_exist","at_least_one_exists"})):
             raise ValueError("unsupported source-compatible provider Test contract")
         ev=_source_acquisition(ast,fixtures)
         if isinstance(ev,Decision):return ev
         if not isinstance(ev,dict):
             return Decision(ERROR,"source-compatible collection is not a mapping",provider)
+        if provider=="windows.wmi.query":
+            if ev.get("using")!=ast["using"]:
+                return Decision(ERROR,"WMI acquisition namespace/query identity mismatch",provider)
+            status=ev.get("status")
+            if not isinstance(status,str) or status not in {
+                    "complete","incomplete","error","not collected","not applicable"
+                    } or not isinstance(ev.get("items"),list):
+                return Decision(ERROR,"malformed WMI collection flag or Items",provider)
+            items=ev["items"]
+            if status not in {"complete","incomplete"} and items:
+                return Decision(ERROR,"untrusted WMI Items on terminal status",provider)
+            ids=set()
+            for item in items:
+                if not isinstance(item,dict) or not isinstance(item.get("fields"),dict):
+                    return Decision(ERROR,"malformed WMI Item evidence",provider)
+                identity=item.get("id")
+                if not isinstance(identity,str) or not identity or identity in ids:
+                    return Decision(ERROR,"missing or duplicate WMI Item identity",provider)
+                ids.add(identity)
+            result=evaluate_collected_object_test(
+                flag=status,existence=ast["existence"],check="all",
+                has_state=False,exists=len(items))
+            return Decision(result,
+                "WMI query returned typed Items; source WMI collection parity unverified",
+                provider,observed=len(items),selected=len(items))
         if provider=="linux.textfile_matches" and ev.get("using")!=ast["using"]:
             return Decision(ERROR,"source-compatible acquisition identity differs",provider)
         if provider=="linux.mounts" and (
