@@ -27,6 +27,10 @@ on:
       - 'tools/research_b_source_registry_evaluator.py'
       - 'tools/test_research_b_source_registry.py'
       - 'tools/test_research_b_source_registry_and.py'
+      - 'tools/research_b_source_shell_lowering.py'
+      - 'tools/research_b_source_shell_snapshot.py'
+      - 'tools/research_b_source_shell_evaluator.py'
+      - 'tools/test_research_b_source_shell.py'
       - 'tools/research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
@@ -128,6 +132,14 @@ jobs:
           mkdir -p work/b-corpus
           set -o pipefail
           python -m unittest -v tools/test_research_b_source_registry_and.py 2>&1 | tee work/b-corpus/registry-and-test.log
+      - name: Verify source shell command Items and Windows DNS RRL result checks
+        id: source-shell
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_source_shell.py 2>&1 | tee work/b-corpus/source-shell-test.log
       - name: Publish bounded State/Boolean CI outcomes directly on GitHub main
         if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
@@ -136,6 +148,7 @@ jobs:
           WMI_OUTCOME: ${{ steps.source-wmi.outcome }}
           REGISTRY_OUTCOME: ${{ steps.source-registry.outcome }}
           REGISTRY_AND_OUTCOME: ${{ steps.source-registry-and.outcome }}
+          SHELL_OUTCOME: ${{ steps.source-shell.outcome }}
         run: |
           mkdir -p research/requirements-first-language/contract-candidate/corpus
           target=research/requirements-first-language/contract-candidate/corpus/source-runtime-ci.md
@@ -148,9 +161,10 @@ jobs:
             printf '| Windows WMI source fixture tests | %s |\n' "$WMI_OUTCOME"
             printf '| Windows registry source fixture tests | %s |\n' "$REGISTRY_OUTCOME"
             printf '| Registry type/value AND same-Item tests | %s |\n' "$REGISTRY_AND_OUTCOME"
-            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ] || [ "$REGISTRY_OUTCOME" != success ] || [ "$REGISTRY_AND_OUTCOME" != success ]; then
+            printf '| Shell source command stdout Item tests | %s |\n' "$SHELL_OUTCOME"
+            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ] || [ "$REGISTRY_OUTCOME" != success ] || [ "$REGISTRY_AND_OUTCOME" != success ] || [ "$SHELL_OUTCOME" != success ]; then
               printf '\n## Failed/skipped test diagnostics\n\n'
-              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log work/b-corpus/registry-test.log work/b-corpus/registry-and-test.log; do
+              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log work/b-corpus/registry-test.log work/b-corpus/registry-and-test.log work/b-corpus/source-shell-test.log; do
                 printf '### %s\n\n' "$f"
                 printf '%s\n' '~~~text'
                 if [ -f "$f" ]; then tail -n 80 "$f"; else printf 'Step skipped; inspect Actions earlier steps.\n'; fi
