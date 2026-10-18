@@ -26,6 +26,19 @@ evaluate:
 
 The Linux Test evaluator observes mountinfo and returns an explicit six-state Test outcome. The result-only expression plan reads that named Test outcome without inventing another collection or another truth function. On an incomplete read the Test returns `unknown` unless a failure is already decisive, and that `unknown` flows into the Assessment expression rather than turning into a pass.
 
+## Real complex expression topology witnesses (frozen six-STIG source)
+
+The [source-backed expression census CI 39142006452](https://github.com/vanderpol/scap-ng/actions/runs/39142006452) recovered the original logical file paths inside the immutable r3 authoring ZIP. These are **actual 0.4-A authoring evaluate trees**, not illustrative syntax inventions:
+
+| Actual Assessment | Source path inside r3 | Expression instructions and topology |
+| --- | --- | --- |
+| Windows 11 `SV-253260.automated` | `authoring/ms_windows_11/assessments/automated/SV-253260.automated.json` | 14 instructions; 3 `all`, 3 `any`, 1 `not` |
+| Server 2025 `SV-278001.automated` | `authoring/ms_windows_server_2025/assessments/automated/SV-278001.automated.json` | 11 instructions; 3 `all`, 1 `any`, 1 `not` |
+| RHEL 9 `SV-258236.automated` | `authoring/rhel_9/assessments/automated/SV-258236.automated.json` | 13 instructions; 1 `all` |
+| Shared Linux audit syscall groups | `authoring/shared/assessments/linux/files/audit-uses-fsetxattr-lsetxattr-removexatt.assessment.json` | 30 instructions; 6 `all` |
+
+The complete six-STIG source contains **1,393 Test-leaf occurrences**, **246 `all`**, **100 `any`**, and **25 `not`** operations across 872 automated `evaluate` trees. All of these trees passed structural compilation without introducing an unapproved conditional operator. This helps select real, complex cases for later Test-result and evidence propagation. It **does not** mean their Test/State/collector implementations have been executed or found equivalent to source OVAL.
+
 ## Scope that remains unproved
 
 **No broad native executable 0.4 compiler, signed .scapng, arbitrary capability/Test evaluator or SCAP 1.4 parity is claimed.** Even though all six-STIG `evaluate` trees compile, the 872 Test/State implementations have not been executed. In particular:
