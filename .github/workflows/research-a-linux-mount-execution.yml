@@ -6,6 +6,9 @@ on:
     paths:
       - '.github/workflows/research-a-linux-mount-execution.yml'
       - 'tools/prototype_a_linux_mount_scan.py'
+      - 'tools/v04_a_linux_mount_expression_bridge.py'
+      - 'tools/test_v04_a_linux_mount_expression_bridge.py'
+      - 'tools/v04_a_truth_plan.py'
       - 'tools/test_prototype_a_linux_mount_scan.py'
       - 'tools/research_provider_linux_mounts.py'
       - 'research/assessment-simplification/compact-authoring-04/runtime-slice/**'
@@ -22,6 +25,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Test A assessment interpreter against real provider implementation
         run: python -m unittest -v tools/test_prototype_a_linux_mount_scan.py
+      - name: Test independent Test-to-expression boundary on complete incomplete and error observations
+        run: python -m unittest -v tools/test_v04_a_linux_mount_expression_bridge.py
       - name: Execute actual Linux host collection using the pinned 0.4-A Assessment
         run: |
           python tools/prototype_a_linux_mount_scan.py \
@@ -38,6 +43,22 @@ jobs:
           print("Real Linux collector + A pilot result:",d["result"],
                 "reason:",d["reason_code"],"observed:",d["counts"]["observed"])
           PY
+      - name: Execute actual Linux provider Test and feed its outcome into A expression
+        run: |
+          python tools/v04_a_linux_mount_expression_bridge.py \
+            --assessment research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json \
+            --live > "$RUNNER_TEMP/a-linux-expression-bridge.json"
+          python - "$RUNNER_TEMP/a-linux-expression-bridge.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["stage"]=="RESEARCH_PINNED_LINUX_TEST_TO_EXPRESSION_BRIDGE_NOT_SCANNER",d
+          assert d["test_result"]["fixture_mode"] is False,d
+          assert d["assessment_expression"]["collections_evaluated"] is False,d
+          assert d["result"]==d["test_result"]["result"],d
+          assert d["result"] in {"true","false"},d
+          assert d["scanner_executed"] is False,d
+          print("PASS: actual bounded Linux Test-to-expression result:",d["result"])
+          PY
       - name: Publish human-visible scoped research outcome
         if: always()
         run: |
@@ -45,6 +66,10 @@ jobs:
             echo '## 0.4-A read-only Linux Assessment pilot (issue #238)'
             echo 'This verifies running Linux mountinfo integration, not OVAL partition source semantics or full STIG/Benchmark scanning.'
             echo 'All claims remain research-only; source-equivalent scanner conversions are not established.'
+            if test -s "$RUNNER_TEMP/a-linux-expression-bridge.json"; then
+              echo '### #238/#232 actual Test outcome fed into A Boolean expression — source-pinned only'
+              cat "$RUNNER_TEMP/a-linux-expression-bridge.json"
+            fi
             if test -s "$RUNNER_TEMP/a-linux-mount-report.json"; then
               echo '### Linux runner evidence (bounded)'
               cat "$RUNNER_TEMP/a-linux-mount-report.json"
