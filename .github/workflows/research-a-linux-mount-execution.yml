@@ -1,0 +1,52 @@
+name: 0.4-A first live Linux assessment pilot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-linux-mount-execution.yml'
+      - 'tools/prototype_a_linux_mount_scan.py'
+      - 'tools/test_prototype_a_linux_mount_scan.py'
+      - 'tools/research_provider_linux_mounts.py'
+      - 'research/assessment-simplification/compact-authoring-04/runtime-slice/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-mount-a-execution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test A assessment interpreter against real provider implementation
+        run: python -m unittest -v tools/test_prototype_a_linux_mount_scan.py
+      - name: Execute actual Linux host collection using the pinned 0.4-A Assessment
+        run: |
+          python tools/prototype_a_linux_mount_scan.py \
+            --assessment research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json \
+            > "$RUNNER_TEMP/a-linux-mount-report.json"
+          python - "$RUNNER_TEMP/a-linux-mount-report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["assessment_id"]=="ng.shared.home-is-mounted-with-the-nosuid-option"
+          assert d["result"] in {"true","false"},d
+          assert d["counts"]["observed"]>0,d
+          assert d["fixture_mode"] is False,d
+          assert d["collector"]["namespace"].startswith("mnt:["),d
+          print("Real Linux collector + A pilot result:",d["result"],
+                "reason:",d["reason_code"],"observed:",d["counts"]["observed"])
+          PY
+      - name: Publish human-visible scoped research outcome
+        if: always()
+        run: |
+          {
+            echo '## 0.4-A read-only Linux Assessment pilot (issue #238)'
+            echo 'This verifies running Linux mountinfo integration, not OVAL partition source semantics or full STIG/Benchmark scanning.'
+            echo 'All claims remain research-only; source-equivalent scanner conversions are not established.'
+            if test -s "$RUNNER_TEMP/a-linux-mount-report.json"; then
+              echo '### Linux runner evidence (bounded)'
+              cat "$RUNNER_TEMP/a-linux-mount-report.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
