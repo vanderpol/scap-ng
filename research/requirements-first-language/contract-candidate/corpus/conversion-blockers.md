@@ -4,7 +4,7 @@
 Counts below are distinct *unsupported automated Assessments* referencing
 each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
-**Unsupported automated Assessments: 725**.
+**Unsupported automated Assessments: 724**.
 
 ## Highest-volume capability families
 
@@ -12,7 +12,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 | --- | ---: |
 | independent.textfilecontent54 | 220 |
 | windows.registry | 86 |
-| independent.shellcommand | 84 |
+| independent.shellcommand | 83 |
 | unix.file | 76 |
 | windows.auditeventpolicysubcategories | 53 |
 | windows.userright | 49 |
@@ -42,11 +42,11 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Feature | Unsupported Assessments containing it |
 | --- | ---: |
-| states | 553 |
+| states | 552 |
 | multiple_tests | 246 |
 | set_or_filter | 110 |
 | shared_objects | 77 |
-| variables | 77 |
+| variables | 76 |
 | value_match | 60 |
 | record | 39 |
 | for_each | 7 |
@@ -57,7 +57,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Capability | Referenced unsupported Assessments |
 | --- | ---: |
-| independent.shellcommand | 22 |
+| independent.shellcommand | 21 |
 
 ### ms_windows_11
 
