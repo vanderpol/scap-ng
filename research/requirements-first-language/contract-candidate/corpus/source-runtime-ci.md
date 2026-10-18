@@ -11,3 +11,4 @@
 | Registry type/value AND same-Item tests | success |
 | Shell source command stdout Item tests | success |
 | Apache Variable DAG source fixture tests | success |
+| Typed Variable value operator tests | success |
