@@ -13,6 +13,7 @@ from oval_result_truth_tables import TRUE,FALSE,UNKNOWN,ERROR
 from research_b_apache_version_graph import lower_apache_version_graph
 from research_b_compiled_ir import encode,decode,evaluate_json
 from research_b_source_shell_snapshot import normalize,PROVIDER
+from research_b_six_stream_compiler import _lower_assessment,READY_STATUS
 
 SOURCE=(Path(__file__).resolve().parents[1]/
         "research/requirements-first-language/contract-candidate/corpus/"
@@ -121,6 +122,42 @@ class ApacheVariableGraphTests(unittest.TestCase):
             with self.subTest(change=change):
                 with self.assertRaises((ValueError,TypeError)):
                     lower_apache_version_graph(doc)
+
+    def test_compiler_census_rebuilds_apache_source_leaf_and_rejects_tampering(self):
+        capsule={"id":self.doc["assessment"]["id"],
+                 "source_document":copy.deepcopy(self.doc)}
+        status,reason,data=_lower_assessment(capsule)
+        self.assertEqual(status,READY_STATUS,reason)
+        self.assertEqual(decode(data)["root"],self.ast)
+        altered=copy.deepcopy(capsule)
+        t=next(iter(altered["source_document"]["assessment"]["tests"].values()))
+        t["states"][0]["value"]="2.6"
+        state,reason,data=_lower_assessment(altered)
+        self.assertEqual(state,READY_STATUS,reason)
+        self.assertEqual(decode(data)["root"]["state"]["expected"],"2.6")
+
+    def test_renamed_variables_preserve_graph_semantics_without_magic_ids(self):
+        doc=copy.deepcopy(self.doc)
+        a=doc["assessment"]
+        variables=a["variables"]
+        first="apache-path-httpd-or-apache2-variable"
+        second="command-gather-apache-version-variable"
+        variables["detected-server-path"]=variables.pop(first)
+        variables["version-query"]=variables.pop(second)
+        variables["version-query"]["expression"]["concat"][0]["variable"]="detected-server-path"
+        test=next(iter(a["tests"].values()))
+        test["object"]["collect"]["command"]["variable"]="version-query"
+        ir=lower_apache_version_graph(doc)
+        self.assertEqual(ir["capture_variable"],"detected-server-path")
+        self.assertEqual(ir["command_variable"],"version-query")
+        self.assertEqual(ir["version_pattern"],self.ast["version_pattern"])
+        payload=encode(doc["assessment"]["id"],ir)
+        self.assertEqual(evaluate_json(payload,self.fixtures()).result,TRUE)
+
+    def test_provider_provenance_cannot_be_swapped_without_failure(self):
+        fixture=self.fixtures()
+        fixture[PROVIDER]["acquisitions"][1]["provider"]="another-command-provider"
+        self.assertEqual(self.verdict(fixture),ERROR)
 
     def test_compiled_graph_tampering_rejected(self):
         for key,value in [("command_suffix"," ; rm -rf /"),
