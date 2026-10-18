@@ -135,5 +135,65 @@ class DeterministicResearchContainerTests(unittest.TestCase):
         self.assertIn("Benchmark specification declaration policy", manifest["required_owner_decisions"])
 
 
+    def test_rejects_duplicate_manifest_approval_key(self):
+        source, _ = create_research_container(self.documents)
+
+        def tamper(items):
+            original = b'"authoring_spec_approval":false,'
+            self.assertIn(original, items["manifest.json"])
+            items["manifest.json"] = items["manifest.json"].replace(
+                original, original + original, 1)
+
+        with self.assertRaisesRegex(ValueError, "duplicate research manifest key"):
+            verify_research_container(rewrite(source, tamper))
+
+    def test_rejects_duplicate_manifest_source_provenance_key(self):
+        source, _ = create_research_container(self.documents)
+
+        def tamper(items):
+            original = b'"source_graph_sha256":'
+            self.assertIn(original, items["manifest.json"])
+            metadata = json.loads(items["manifest.json"])
+            digest = metadata["source_graph_sha256"].encode("ascii")
+            items["manifest.json"] = items["manifest.json"].replace(
+                original, original + b'"' + digest + b'",' + original, 1)
+
+        with self.assertRaisesRegex(ValueError, "duplicate research manifest key"):
+            verify_research_container(rewrite(source, tamper))
+
+    def test_rejects_duplicate_nested_document_provenance_key(self):
+        source, _ = create_research_container(self.documents)
+
+        def tamper(items):
+            original = b'"logical_source":'
+            self.assertIn(original, items["manifest.json"])
+            items["manifest.json"] = items["manifest.json"].replace(
+                original, b'"logical_source":"authoring/forged",' + original, 1)
+
+        with self.assertRaisesRegex(ValueError, "duplicate research manifest key"):
+            verify_research_container(rewrite(source, tamper))
+
+    def test_rejects_noncanonical_manifest_bytes(self):
+        source, _ = create_research_container(self.documents)
+
+        def tamper(items):
+            items["manifest.json"] = b" " + items["manifest.json"]
+
+        with self.assertRaisesRegex(ValueError, "noncanonical research manifest"):
+            verify_research_container(rewrite(source, tamper))
+
+    def test_rejects_nonfinite_manifest_metadata(self):
+        source, _ = create_research_container(self.documents)
+
+        def tamper(items):
+            original = b'"no_source_mutation":true'
+            self.assertIn(original, items["manifest.json"])
+            items["manifest.json"] = items["manifest.json"].replace(
+                original, b'"no_source_mutation":NaN', 1)
+
+        with self.assertRaisesRegex(ValueError, "invalid research manifest JSON constant"):
+            verify_research_container(rewrite(source, tamper))
+
+
 if __name__ == "__main__":
     unittest.main()
