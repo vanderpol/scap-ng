@@ -180,6 +180,46 @@ class CollectedStateTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"State pattern"):
             lower_single_capture_textfile_assessment(doc)
 
+    def test_typed_integer_bounds_and_canonical_capture_gates(self):
+        doc=source()
+        state=next(iter(doc["assessment"]["tests"].values()))["states"][0]
+        state["operation"]="greater_than_or_equal"
+        state["value"]=15
+        ast=lower_single_capture_textfile_assessment(doc)
+        ast["using"]["path"]=str(self.path)
+        compiled=encode(doc["assessment"]["id"],ast)
+        for captured,expected in [("15",TRUE),("100",TRUE),("14",FALSE),
+                                  ("-2",FALSE),("015",ERROR),("+15",ERROR),
+                                  ("-0",ERROR),("9223372036854775808",ERROR)]:
+            with self.subTest(captured=captured):
+                self.path.write_text("ProcessSizeMax="+captured+"\n")
+                self.assertEqual(evaluate_json(
+                    compiled,{PROVIDER:collect(**ast["using"])}).result,expected)
+
+    def test_less_than_and_less_than_or_equal_keep_exact_comparison(self):
+        for op,target,expected in [
+            ("less_than",15,FALSE),("less_than_or_equal",15,TRUE),
+            ("greater_than",15,FALSE),("greater_than_or_equal",15,TRUE)]:
+            with self.subTest(op=op):
+                doc=source()
+                state=next(iter(doc["assessment"]["tests"].values()))["states"][0]
+                state["operation"]=op
+                state["value"]=target
+                ast=lower_single_capture_textfile_assessment(doc)
+                ast["using"]["path"]=str(self.path)
+                self.path.write_text("ProcessSizeMax=15\n")
+                compiled=encode(doc["assessment"]["id"],ast)
+                self.assertEqual(evaluate_json(
+                    compiled,{PROVIDER:collect(**ast["using"])}).result,expected)
+
+    def test_boolean_is_not_a_source_integer_literal(self):
+        doc=source()
+        state=next(iter(doc["assessment"]["tests"].values()))["states"][0]
+        state["operation"]="greater_than"
+        state["value"]=True
+        with self.assertRaisesRegex(ValueError,"signed int64"):
+            lower_single_capture_textfile_assessment(doc)
+
     def test_nonmatching_multiple_capture_groups_are_field_error(self):
         p=str(self.path)
         self.path.write_text("x=123\n")
