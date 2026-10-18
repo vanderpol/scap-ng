@@ -105,10 +105,9 @@ def main(argv=None):
     if args.assert_six:
         if c["automated_assessments_seen"] != 872:
             raise ValueError("six-STIG automated Assessment count has changed")
-        if (c.get("assessments_with_compiled_evaluate", 0) +
-                len([x for x in manifest["unapproved_expression_blockers"]
-                     if x["field"] == "evaluate"]) != 872):
-            raise ValueError("unclassified 0.4-A evaluate source trees")
+        if (c.get("assessments_with_compiled_evaluate", 0) != 872
+                or manifest["unapproved_expression_blockers"]):
+            raise ValueError("six-STIG evaluate source plan coverage is incomplete or blocked")
     encoded = canonical_json(manifest) + b"\n"
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_bytes(encoded)

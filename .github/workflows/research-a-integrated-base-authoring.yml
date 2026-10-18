@@ -133,16 +133,16 @@ jobs:
           c=d["counts"]
           assert d["verified"] is True,d
           assert c["automated_assessments_seen"]==872,c
-          assert (c.get("assessments_with_compiled_evaluate",0)
-              + sum(x["field"]=="evaluate" for x in d["blocked_sources"])
-              == 872) or d["blocked_expression_count"]>len(d["blocked_sources"]),d
+          assert c["assessments_with_compiled_evaluate"]==872,c
+          assert d["blocked_expression_count"]==0,d
           assert d["scanner_executed"] is False,d
           assert d["native_executable_compiler_complete"] is False,d
           assert d["synthetic_result_execution_only"] is True,d
           print("PASS: #229 / #232 full source expression census (supplied outcomes only)")
           print("Compiled evaluate roots:",c.get("assessments_with_compiled_evaluate",0))
           print("Unapproved expression blockers:",d["blocked_expression_count"])
-          print("Boolean operator nodes:",sum(n for k,n in c.items() if k.startswith("opcode_")))
+          print("Expression plan instructions including leaf references:",sum(n for k,n in c.items() if k.startswith("opcode_")))
+          print("Operator counts:",{k:v for k,v in c.items() if k.startswith("opcode_")})
           print("Synthetic leaf-status simulations:",c["synthetic_expression_executions"])
           print("Source plan SHA-256:",d["manifest_sha256"])
           PY
