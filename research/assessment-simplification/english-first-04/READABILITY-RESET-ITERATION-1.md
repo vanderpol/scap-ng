@@ -16,6 +16,22 @@ After rereading [all five complete before/after examples](BEFORE-AFTER-REVIEW.md
 
 **The first-read threshold:** The reviewer must be able to answer (a) *what was collected and from where*, (b) *what population or fields must exist*, (c) *which predicates are enforced and for how many Items/values*, and (d) *how errors/incomplete results affect the conclusion* **without guessing a keyword default**.
 
+## Measured source sizes — sanity check, *not* usability scores
+
+Measured **nonblank, non-comment YAML lines** in the five full documents from the [existing complete-comparison page](BEFORE-AFTER-REVIEW.md). No generated artifacts or compiler execution were used.
+
+| Real complete example | Current 0.4 | Prior English-first | Difference | What matters more |
+| --- | ---: | ---: | ---: | --- |
+| Simple Linux /home | 29 | 28 | -1 (-3.4%) | Replaces one explicit rule with multiple English Boolean keys |
+| Complex Linux dotfiles | 154 | 135 | -19 (-12.3%) | Still requires Set/foreach source tracing and two different Item-existence policies |
+| Windows 11 Remote Desktop | 132 | 127 | -5 (-3.8%) | Duplicates `inspect` in seven Tests despite only two native source definitions |
+| Windows Server DNS | 177 | 184 | **+7 (+4.0%)** | Three command-building Variables remain hard to author |
+| Apache UNIX | 340 | 335 | -5 (-1.5%) | 18 Variables and long acquisition/command dependencies remain |
+
+The new [complete lean Windows third candidate](FULL-03-win11-LEAN-THIRD-CANDIDATE.md) is **123** nonblank/non-comment YAML lines versus 132 original and 127 English-first. More importantly, it declares native `inspect` in **two reusable sources** rather than repeating it across the seven checks. It is **not validated/approved**, and the original null metadata has not yet been reversibly reconstructed. **Line counts and repeating-key counts are authoring-cost indicators, not readability or semantic-equivalence proof.**
+
+**Working implication:** Improving DNS/Apache requires collection/Variable composition and discoverability, not merely more synonyms. Improving Windows requires fewer duplicated declarations *without* hiding cardinality or the three OR alternatives.
+
 ## A tighter third candidate for the complete simple check
 
 Below is **illustrative authoring research, neither current valid 0.4 nor a runnable compiler input**. It tests one design direction: keep the source's exact field predicates and distinct quantifiers; reduce wrappers instead of inventing longer paraphrases. This is deliberately presented against the [complete unchanged current 0.4 and generated English-first documents](FULL-01-linux-home.md) rather than silently replacing either.
