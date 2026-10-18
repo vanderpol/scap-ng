@@ -25,6 +25,8 @@ For each Assessment creation/edit session, record:
 
 A pinned reference may be a local verified offline pack. The editor and offline VS Code workflow must not require fetching GitHub after the pack is installed.
 
+**STIG trust note:** [Authoritative DISA source policy and third-party discovery limits](AUTHORITATIVE-STIG-SOURCES.md). STIGViewer.com may help locate a Rule but does **not** establish official Check text/revision; distinguish it from DISA's separate STIG Viewer application. When official provenance cannot be verified, label the draft's source uncertainty and offer an uploaded, verifiable publisher package rather than silently substituting a mirror.
+
 ## Reuse trusted logic, modernize safely
 
 Preferred source order for initial drafting:
