@@ -4,7 +4,7 @@
 
 ## Reproducible integrated gate
 
-[Exact-head CI run 39139469580 — PASS](https://github.com/vanderpol/scap-ng/actions/runs/39139469580) validated the integrated YAML/JSON → base 0.4-A research-authoring path, complete lossless source-envelope IR v0.2 roundtrip, its Draft 2020-12 research schema, **ten** standalone dataflow graph cases, **three** independent census fixtures, and 19 complete IR adversarial cases.
+[Latest exact-head CI run 39139809628 — PASS](https://github.com/vanderpol/scap-ng/actions/runs/39139809628) validated the integrated YAML/JSON → base 0.4-A research-authoring path, complete lossless source-envelope IR v0.2 roundtrip, its Draft 2020-12 research schema, **14** standalone dataflow and correlated for_each-alias cases, **three** independent census fixtures, and 19 complete IR adversarial cases.
 
 Run the exact research-only census after generating the verified base archive and the IR:
 
@@ -43,11 +43,11 @@ Those paths are logical paths inside the immutable/research package, not guarant
 
 The [A source-dataflow index](../../../tools/v04_a_dataflow_index.py) preserves named Test/Object/Variable identities, source hashes, repeated reference edges, collection and foreach-source dependencies, and exact Set/Filter/selector lexical locations. It checks missing references and cycles in the combined named Object+Variable source graph, independently of Assessment truth-dependency graphs. The [research IR v0.2](../../../tools/v04_a_lossless_ir.py) embeds this index with every complete source AST, so the independent decoder can verify dataflow indexing was not forged or lost.
 
-The graph's deterministic dependency-first ordering is **not** a scanner schedule. It does not evaluate Variable operators, create repeated Test outcomes for foreach loops, reorder Sets, push filters to collection, or infer completeness/error/unknown/not_applicable behavior.
+The index now rejects a foreach alias that shadows an inherited alias, a selector that references an out-of-scope alias, and a foreach level with no projection from its current alias; these source-contract checks passed on all eight observed real source sites. The graph's deterministic dependency-first ordering is **not** a scanner schedule. It does not evaluate Variable operators, create repeated Test outcomes for foreach loops, reorder Sets, push filters to collection, or infer completeness/error/unknown/not_applicable behavior.
 
 ## Next engineering boundaries
 
-1. Verify correlated for_each alias scope and source Item lineage (including inherited aliases) without changing Assessment truth; keep actual field type and status conformance a separate gate.
+1. Extend the verified static correlated for_each source-alias and inherited-selector scope checks with runtime source Item lineage and independent field-type/status conformance (currently unexecuted).
 2. Produce independent six-valued tests for variable/collection dependency errors, partial Items, Set include/exclude and nested for_each; no expected results from the implementation under test.
 3. Only after explicit grammar and version policy acceptance in #227/#232, promote compiler instructions into a separate native executable packaging gate. Never rename this research ZIP or IR as a signed/scannable bundle.
 
