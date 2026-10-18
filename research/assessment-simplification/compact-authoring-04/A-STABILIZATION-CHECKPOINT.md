@@ -2,6 +2,8 @@
 
 **Working proposal, not a normative release.** Tracking: [#239](https://github.com/vanderpol/scap-ng/issues/239), [#227](https://github.com/vanderpol/scap-ng/issues/227), [#229](https://github.com/vanderpol/scap-ng/issues/229), [#232](https://github.com/vanderpol/scap-ng/issues/232).
 
+**Direct implementation checkpoint (#240; 18 Oct):** [Research-only, lossless typed Assessment IR envelope and exact limitations](LOSSLESS-IR-ENVELOPE.md) now exist on main without Codex/Work. [Exact-head six-STIG CI 39138218901](https://github.com/vanderpol/scap-ng/actions/runs/39138218901) PASSED: all 4,001 source documents roundtrip, 872 automated Assessments, 1,375 named Tests, 2,958 Rule choice links; 19 focused adversarial IR tests; research Draft 2020-12 schema and fail-closed Assessment-dependency target/version/purpose/scope/cycle checks. Canonical IR SHA-256: b8683d48428024dbbd579567ff5b68efcb23e8946cbe99a4ef24528e7a9fdc10. This is source preservation and structural closure, **not** a native executable compiler, owner-approved migration, signed bundle or scanner-result equivalence.
+
 ## One authoring language, one authoritative next gate
 
 Focus on the existing **0.4-A authoring grammar** and complete its review/compilation path. Do **not** revive the 0.4-B six-stream development or invent a third grammar. Do not silently change the released 0.3 specification, the versioned 0.4 base draft, or the immutable Joval r3 preview. Structural evidence, source/result parity, native compiler success, signed bundles and scanner execution are different gates.

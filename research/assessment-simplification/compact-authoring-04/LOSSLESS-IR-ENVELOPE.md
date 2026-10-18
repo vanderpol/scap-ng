@@ -26,20 +26,20 @@ The existing [end-to-end pipeline](../../../tools/v04_a_end_to_end_base_authorin
 - The full source_ast subtree is lossless, including accepted capability extension fields; the typed index **does not execute** those expressions. The upstream version-local 0.4 capability schema validator rejects unsupported capabilities.
 - The assessment_index separates manual/automated mode, named Test identities/capabilities/explicit Item requirement and hashes, Assessment truth dependencies, and Test-local Variable/shared Object source hints. It does not silently convert a collection dependency into Assessment truth.
 - The independent decoder recomputes every envelope, source digest, Test index, ordering, version inventory, and graph closure from embedded complete source trees; any discrepancy fails closed.
-- Existing static graph validation checks Rule choices, evaluate aliases, Test/Variable/shared-Object references; per-Benchmark checks reject mismatched specification declarations. **Full cross-Assessment target/version/scope closure and executable collector/Variable/Set/for_each scheduling remain missing.**
+- Existing static graph validation checks Rule choices, evaluate aliases, Test/Variable/shared-Object references; per-Benchmark checks reject mismatched specification declarations. **Static Assessment-to-Assessment target ID, exact version, purpose, authoring namespace, and acyclic dependency closure now fail closed.** Dynamic collector/Variable/Set/for_each scheduling and runtime truth evaluation remain missing.
 - Candidate 0.3-to-0.4 Benchmark declaration staging and scoped shorthand lowering remain **research only**, unapproved. No source release is mutated.
 - Source expressions involving unknown, error, incomplete and not_applicable are retained in source_ast but **not interpreted or proven result-equivalent**.
 - Nothing is signed, scanner executable, OVAL-parity verified, or accepted as a native release.
 
 ## Verified checkpoint
 
-The first exact-head [six-STIG CI run 39137508758](https://github.com/vanderpol/scap-ng/actions/runs/39137508758) **passed**, covering 4,001 documents, 872 automated Assessments, 1,375 Tests, 2,958 Rule choice links and independently decoded full authoring ASTs. Canonical IR digest for that run: b8683d48428024dbbd579567ff5b68efcb23e8946cbe99a4ef24528e7a9fdc10.
+The latest exact-head [six-STIG CI run 39138218901](https://github.com/vanderpol/scap-ng/actions/runs/39138218901) **passed**, including 19 focused lossless-IR adversarial tests, research Draft 2020-12 envelope schema validation, exact Assessment dependency closure, 4,001 documents, 872 automated Assessments, 1,375 Tests, 2,958 Rule choice links, and independently decoded full authoring ASTs. Canonical IR digest for that run: b8683d48428024dbbd579567ff5b68efcb23e8946cbe99a4ef24528e7a9fdc10.
 
-A follow-up exact-head CI run must pass before the additional research JSON Schema check is considered verified.
+All of these named checks passed on the cited exact-head run. This is still structural evidence only.
 
 ## Next engineering gates
 
-1. Add source-backed Assessment-to-Assessment dependency target/version/purpose/scope closure with adversarial cases.
+1. Extend the now-implemented static target/version/purpose/scope/cycle closure with source-backed runtime scheduling, dependency-completeness propagation and independent result semantics tests.
 2. Index typed Variable, Set/Filter, Windows record and for_each dependency subtrees against representative original content, retaining the lossless AST as an always-available fallback.
 3. Only after semantic and version decisions, build native executable IR instructions, truth/completeness/provenance propagation, signed packaging and scanner conformance. Structural AST equivalence is not runtime parity.
 
