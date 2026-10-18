@@ -13,7 +13,7 @@
 | DNS signing | [Complete inline-command candidate](FULL-04-dns-INLINE-COMMAND-CANDIDATE.md) | [Unprimed full DNS A/B](DNS-COMPOSITION-BLIND-REVIEW.md) ([facilitator-only key](DNS-COMPOSITION-REVIEW-KEY.md)) |
 | Apache configuration | [Complete inline-command candidate](FULL-05-apache-INLINE-COMMAND-CANDIDATE.md) · [Second-pass inlining limits and staged-source sketch](APACHE-SECOND-PASS-READABILITY.md) | [Full Apache authorability exercise](APACHE-COMPOSITION-AUTHORING-CHALLENGE.md) |
 
-Supporting analysis: [Original Apache/DNS Variable chains](APACHE-DNS-COMPOSITION-RESEARCH.md) · [Command composition/typing/provenance contract](COMMAND-COMPOSITION-CONTRACT.md).
+Supporting analysis: [Original Apache/DNS Variable chains](APACHE-DNS-COMPOSITION-RESEARCH.md) · [OVAL 5.12.3 concat vs merge values](OVAL-5123-CONCAT-MERGE-READABILITY.md) · [Command composition/typing/provenance contract](COMMAND-COMPOSITION-CONTRACT.md).
 
 **Your feedback question:** Which format makes it easier to understand **and author a complete check**—existing 0.4 or proposed English-first—without needing to guess what a referenced collection or Variable means?
 
