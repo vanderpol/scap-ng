@@ -1,0 +1,36 @@
+# B source Apache Variable dependency DAG pilot
+
+**Issue #237 · research-only · October 2026.** First Apache source Assessment lowered into compiler-owned B fixture IR. **Not an operating-system scanner, an original SCAP 1.4/OVAL equivalence proof, a normative authoring language, or a production compiled bundle.**
+
+The actual converted 0.3 Apache UNIX [SV-214273](contract-candidate/corpus/source-specimens/independent-shellcommand-apache-small-575d1e0ee9d2.source.yaml) requires a dependency chain that cannot be replaced by a static command without changing the check:
+
+1. Collect process-list output with the source `independent.shellcommand` Object.
+2. Use the author's original regular expressions to identify and capture the Apache executable path.
+3. Resolve a local `regex_capture` Variable; use a second `concat` Variable to append the original ` -V` suffix.
+4. Request *separate* evidence for that **exact derived command**. Match the original source version regex and apply `version_greater_than_or_equal: '2.4'` across captured `subexpression` entities and source Test Items.
+
+The [strict source graph lowerer](../../tools/research_b_apache_version_graph.py) parses the original local Variable references and records command identity, collector flags, extraction expressions, and State/Test cardinality in `compat_oval_shellcommand_variable_version`. It no longer assumes specific Variable IDs. Cycles, unreferenced extra Variables, unsupported shell/State operation, unbounded expression shapes and malformed captures are rejected. The graph remains a **compiler-owned** compatibility operation; auditor-facing B YAML does not acquire layers of Variable machinery.
+
+The [fixture evaluator](../../tools/research_b_apache_version_evaluator.py) accepts **only externally supplied, query-identified command results**. It does not call a shell, spawn a process or execute the derived command. The process collection must be complete; an unresolved, ambiguous, missing or multiply derived executable returns `unknown` (invalid/untrusted evidence is `error`). The example's executable path is constrained to a safe absolute path ending in `httpd` or `apache2`; traversal and shell metacharacters are rejected rather than executed. The version query must match the derived path and original flags exactly. The version comparison uses a *strictly bounded numeric-dot fixture rule* (for example, 2.4.0 equals 2.4); nonnumeric or suffix-bearing versions produce `error`, **not a claimed OVAL-equivalent verdict**.
+
+| Source evidence (offline fixture) | Research result |
+| --- | --- |
+| One complete httpd process discovery, matching version 2.4.66 | true |
+| Version reported as 2.3.99 | false |
+| Incomplete process discovery, even with one observed path | unknown |
+| Several different executable paths | unknown, pending source Variable fan-out semantics |
+| Derived version query missing | unknown |
+| Version collection incomplete and no decisive failure | unknown |
+| Duplicate command query identity / invalid output type | error |
+| Version not representable as bounded numeric-dot version | error |
+
+The [regressions](../../tools/test_research_b_apache_version_graph.py) cover actual source graph identities, renamed Variables, source-leaf reconstruction, partial evidence, multiple paths, version boundaries, non-execution, and bad provenance. [GitHub CI](contract-candidate/corpus/source-runtime-ci.md) now includes the Apache DAG fixture suite. The [live six-STIG conversion ledger](contract-candidate/corpus/conversion-progress.md) first credited **1 Apache automated fixture-IR lowering and 121 total automated fixture lowerings**. Original SCAP 1.4 verified executable conversions remain **zero**.
+
+## Next semantic and engineering gates
+
+- Prove original OVAL 5.12.3 `local_variable` regex capture / concat cardinality and source Item-creation behavior using **raw SCAP 1.4 XML**, including zero/multiple source values, errors, and a version string with vendor suffix.
+- Replace fixture-only command evidence with a legitimate, explicitly authorized scanner command collector; constrain command execution and cache shared process/configuration discovery across Assessments.
+- Extend **compiler-owned** typed Variable DAG operations to deeper chains, multi-valued fan-out, and source `unique`, `merge`, nested Object values, and shared-collection references. Never guess a default command or silently choose an arbitrary path.
+- Continue the 21 remaining Apache automated Assessments. The corpus-wide [Variable DAG inventory](contract-candidate/corpus/variable-dags.md) (when published by CI) will prioritize operators and depth.
+
+Candidate A is unchanged; no A/B bake-off until the complete six-STIG executable, source-equivalent capability gate is reached.
