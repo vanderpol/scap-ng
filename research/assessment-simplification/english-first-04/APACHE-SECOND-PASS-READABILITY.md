@@ -74,6 +74,66 @@ A winning *single authoring language* should allow:
 
 The **next high-value comparison** is not a fourth enormous YAML dialect. Compare a *typed, explicitly labeled reusable collection stage* with the existing named Variable+Object graph and an editor showing an expanded source chain. Use the existing full Apache content as the truth source and score new auditors on predicting source populations and failure outcomes. If a clearer source view cannot be represented without hiding semantics, retain the existing graph and simplify authoring through guided composition.
 
+## Scoped authoring syntax experiment: a *visible stage* instead of four separate Variables
+
+This is an **incomplete, non-executable sketch of only the actually-loaded config path**; the [complete Apache Assessment](FULL-05-apache.md) still defines every source command and all four checks. The intent is to test whether a *source is either collected or transformed* is a better organizing principle than naked Variable definitions. **It does not authorize the words `from`, `transform` or `inspect`; they are candidates to test for clarity.**
+
+```yaml
+# RESEARCH SKETCH ONLY. Not accepted 0.4 syntax.
+sources:
+  apache-process-commands:
+    inspect: independent.shellcommand
+    collect:
+      shell: bash
+      command: ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
+      pattern: ^\/\S+(\/httpd|\/apache2)\s*
+      error_if_exit_status_not_0: false
+      error_if_stderr_exists: false
+
+  apache-executable-paths:
+    from:
+      source: apache-process-commands
+      field: stdout_line
+    transform:
+      regex_capture:
+        pattern: '(^\/.+\/httpd|^\/.+\/apache2) '
+
+  loaded-configuration-dump:
+    inspect: independent.shellcommand
+    collect:
+      shell: bash
+      command:
+        concat:
+          - from: apache-executable-paths
+          - literal: ' -t -D DUMP_INCLUDES'
+      pattern: ' \('
+      error_if_exit_status_not_0: false
+      error_if_stderr_exists: false
+
+  loaded-configuration-paths:
+    from:
+      source: loaded-configuration-dump
+      field: stdout_line
+    transform:
+      unique:
+        regex_capture:
+          pattern: \(.*\) (/.*)
+
+  loaded-configuration-paths-for-command:
+    from: loaded-configuration-paths
+    transform:
+      merge:
+        delimiter: ' '
+        sort: document
+        order: ascending
+```
+
+**Source fidelity of the sketch:** It keeps the exact originally shown `ps` command, process regex, Apache `-t -D DUMP_INCLUDES` fragment, `pattern: ' \\('` collection filter, loaded-file regex, `unique`, and `merge` delimiter/order, with explicit shell error flags. It **does not demonstrate the base config/Include path**. All of those still exist in the full source and must remain.
+
+**Critical gaps to explain before any full candidate:** The original captured value is a Variable, and `concat` consumes it; what does `from: apache-executable-paths` mean for multiple processes? Does the `unique` operate before or after record-to-field projection? Does `transform` inherit full source-item identity, completeness flags and evidence? Does a failed `loaded-configuration-dump` prevent downstream command execution? These cannot be decided by pretty indentation. The literal `from` values need a typed name-resolution/namespace contract; this sketch has no such compiler.
+
+A candidate would be *materially better* if an auditor can trace collection → extraction → loaded-file output in five visibly ordered steps **without having to invent those missing rules**. A viable canonical syntax must then be tested on **both** Apache paths and a full Assessment, not accepted from this one scoped diagram.
+
 ## Decision status
 
 - **Survives as a research candidate:** Four leaf command expressions inlined into the checks (14 Variables), pending standalone metadata, type and result preservation; reviewer comprehension is untested.
