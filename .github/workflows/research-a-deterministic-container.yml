@@ -1,0 +1,65 @@
+name: 0.4-A deterministic research graph package (NOT scapng)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-deterministic-container.yml'
+      - 'tools/v04_a_deterministic_research_container.py'
+      - 'tools/test_v04_a_deterministic_research_container.py'
+      - 'tools/v04_a_benchmark_spec_migration_preview.py'
+      - 'tools/v04_a_benchmark_choice_version_closure.py'
+      - 'tools/v04_a_authoring_graph_index.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic-graph-package-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install separate source YAML parser
+        run: python -m pip install PyYAML==6.0.3
+      - name: Exercise deterministic and adversarial package tests
+        run: python -m unittest -v tools/test_v04_a_deterministic_research_container.py
+      - name: Download immutable r3 authoring sources
+        run: |
+          mkdir -p work/a-graph-package
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-json.zip' \
+            --output work/a-graph-package/source-json.zip
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --output work/a-graph-package/source-yaml.zip
+      - name: Build identical unsigned graph container from both formats
+        run: |
+          python tools/v04_a_deterministic_research_container.py \
+            --json-archive work/a-graph-package/source-json.zip \
+            --yaml-archive work/a-graph-package/source-yaml.zip \
+            --out "$RUNNER_TEMP/a-research-graph.zip" > "$RUNNER_TEMP/a-research-summary.json"
+          python - "$RUNNER_TEMP/a-research-summary.json" <<'PY'
+          import json,sys
+          x=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert x["status"]=="UNSIGNED_RESEARCH_CONTAINER_VERIFIED_NOT_EXECUTABLE",x
+          assert x["member_count"]==4001,x
+          assert x["choice_links"]==2958,x
+          assert x["format_parity"]=="PASS",x
+          assert x["native_compiler_completed"] is False,x
+          assert x["signatures_verified"] is False,x
+          print("Independent JSON/YAML output bytes: identical")
+          print("Unsigned research ZIP SHA-256:",x["archive_sha256"])
+          print("Staged canonical graph SHA-256:",x["graph_sha256"])
+          PY
+      - name: Display honest output status, not a compiler pass
+        if: always()
+        run: |
+          {
+            echo '## 0.4-A source-to-unsigned research graph package — issues #232/#239'
+            echo 'Only deterministic, independently parsed and hashed canonical JSON graph members were produced. **Not** the normative signed .scapng, not owner-approved syntax, not scanner executable.'
+            if test -s "$RUNNER_TEMP/a-research-summary.json"; then
+              cat "$RUNNER_TEMP/a-research-summary.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
