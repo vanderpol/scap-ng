@@ -48,6 +48,8 @@ on:
       - 'tools/test_research_b_regex_capture_source_audit.py'
       - 'tools/research_b_apache_original_oval_crosswalk.py'
       - 'tools/test_research_b_apache_original_oval_crosswalk.py'
+      - 'tools/research_b_windows_registry_original_crosswalk.py'
+      - 'tools/test_research_b_windows_registry_original_crosswalk.py'
       - 'research/assessment-simplification/evidence/apache_server_2-4_unix_server/SV-214268/source-oval.xml'
       - 'tools/research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_registry_shape_inventory.py'
@@ -259,6 +261,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_apache_original_oval_crosswalk.py
+      - name: Check original Windows Server registry source case-insensitive selectors
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_windows_registry_original_crosswalk.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -359,6 +365,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/research_b_apache_original_oval_crosswalk.py
+      - name: Publish actual original Windows registry selector parity baseline
+        env:
+          PYTHONPATH: tools
+        run: python tools/research_b_windows_registry_original_crosswalk.py
       - name: Preserve partial B fixture IR separately from scanner content
         uses: actions/upload-artifact@v4
         with:
@@ -393,6 +403,7 @@ jobs:
           git add research/requirements-first-language/contract-candidate/corpus/regex-capture-audit.json
           git add research/requirements-first-language/contract-candidate/corpus/regex-capture-audit.md
           git add research/requirements-first-language/contract-candidate/corpus/apache-original-oval-crosswalk.json
+          git add research/requirements-first-language/contract-candidate/corpus/windows-registry-original-crosswalk.json
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.md
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
