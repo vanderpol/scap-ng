@@ -34,6 +34,8 @@ on:
       - 'tools/research_b_apache_version_graph.py'
       - 'tools/research_b_apache_version_evaluator.py'
       - 'tools/test_research_b_apache_version_graph.py'
+      - 'tools/research_b_variable_dag_inventory.py'
+      - 'tools/test_research_b_variable_dag_inventory.py'
       - 'tools/research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
@@ -197,6 +199,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_registry_shape_inventory.py
+      - name: Test source Variable graph cycles and dependency census
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_variable_dag_inventory.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -262,6 +268,14 @@ jobs:
             --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
             --output research/requirements-first-language/contract-candidate/corpus/registry-shapes.json \
             --markdown research/requirements-first-language/contract-candidate/corpus/registry-shapes.md
+      - name: Inventory bounded source Variable graph operations across six STIGs
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_variable_dag_inventory.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output research/requirements-first-language/contract-candidate/corpus/variable-dags.json \
+            --markdown research/requirements-first-language/contract-candidate/corpus/variable-dags.md
       - name: Preserve partial B fixture IR separately from scanner content
         uses: actions/upload-artifact@v4
         with:
@@ -288,6 +302,8 @@ jobs:
           git add research/requirements-first-language/contract-candidate/corpus/textfile-shapes.md
           git add research/requirements-first-language/contract-candidate/corpus/registry-shapes.json
           git add research/requirements-first-language/contract-candidate/corpus/registry-shapes.md
+          git add research/requirements-first-language/contract-candidate/corpus/variable-dags.json
+          git add research/requirements-first-language/contract-candidate/corpus/variable-dags.md
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.md
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
