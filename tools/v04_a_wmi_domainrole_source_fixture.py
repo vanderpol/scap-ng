@@ -102,7 +102,7 @@ def oracle_observed_record_test(compiled, observation):
         flag, existence=compiled["item_existence"],
         check=compiled["test_check"], has_state=True, exists=len(items),
         item_results=results,
-    )
+    ).replace(" ", "_")
     return {
         "stage": STAGE, "test_id": compiled["test_id"],
         "result": result, "collection_flag": flag,
