@@ -1,0 +1,33 @@
+assessment:
+  assessment_title: Windows DNS response rate limiting (RRL) must be enabled.
+  class: compliance
+  evaluate:
+    test: windows-dns-response-rate-limiting-rrl-enabled-test
+  id: SV-259417.automated
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    windows-dns-response-rate-limiting-rrl-enabled-test:
+      capability: independent.shellcommand
+      existence: one_or_more
+      match: all
+      object:
+        capability: independent.shellcommand
+        collect:
+          command: (Get-DnsServerResponseRateLimiting -ComputerName $env:COMPUTERNAME).Mode
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          shell: powershell
+        object_title: The 'response rate limiting' (RRL) setting
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: stdout_line
+        match: all
+        operation: equals
+        value: Enable
+      test_title: Windows DNS response rate limiting (RRL) is enabled
+  version: 8

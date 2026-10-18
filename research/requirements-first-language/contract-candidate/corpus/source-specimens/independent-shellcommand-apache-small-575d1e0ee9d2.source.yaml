@@ -1,0 +1,66 @@
+assessment:
+  assessment_title: The Apache web server software must be a vendor-supported version.
+  class: compliance
+  evaluate:
+    test: apache-usertrack-module-enabled-test
+  id: SV-214273.automated
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.3.0
+  tests:
+    apache-usertrack-module-enabled-test:
+      capability: independent.shellcommand
+      existence: one_or_more
+      match: all
+      object:
+        capability: independent.shellcommand
+        collect:
+          command:
+            variable: command-gather-apache-version-variable
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: '^Server version: Apache\/(.+) \('
+          shell: bash
+        object_title: List version of apache
+      reported_elements: all
+      states:
+      - existence: one_or_more
+        field: subexpression
+        match: one_or_more
+        operation: version_greater_than_or_equal
+        value: '2.4'
+      test_title: Apache usertrack_module must be enabled
+  variables:
+    apache-path-httpd-or-apache2-variable:
+      datatype: string
+      expression:
+        regex_capture:
+          pattern: '(^\/.+\/httpd|^\/.+\/apache2) '
+          value:
+            values:
+              field: stdout_line
+              object:
+                capability: independent.shellcommand
+                collect:
+                  command: ps -e -o command --no-headers | grep -e httpd -e apache2
+                    | sort | uniq
+                  error_if_exit_status_not_0: false
+                  error_if_stderr_exists: false
+                  pattern: ^\/\S+(\/httpd|\/apache2)\s*
+                  shell: bash
+                object_title: Gather unique apache http installation paths
+      kind: local
+      title: Apache path to httpd or apache2
+    command-gather-apache-version-variable:
+      datatype: string
+      expression:
+        concat:
+        - variable: apache-path-httpd-or-apache2-variable
+        - literal:
+            datatype: string
+            value: ' -V'
+      kind: local
+      title: command to gather apache version
+  version: 2

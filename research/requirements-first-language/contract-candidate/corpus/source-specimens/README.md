@@ -10,12 +10,14 @@ small and larger documents exercise different conversion complexity.
 | Family | Source Assessment | Referencing streams | Tests | Source specimen |
 | --- | --- | --- | ---: | --- |
 | independent.shellcommand | SV-214268.automated | apache_server_2-4_unix_server | 5 | [independent-shellcommand-1-3d964d126ca8.source.yaml](independent-shellcommand-1-3d964d126ca8.source.yaml) |
+| independent.shellcommand/apache_small | SV-214273.automated | apache_server_2-4_unix_server | 1 | [independent-shellcommand-apache-small-575d1e0ee9d2.source.yaml](independent-shellcommand-apache-small-575d1e0ee9d2.source.yaml) |
 | windows.wmi.query | SV-253265.automated | ms_windows_11 | 1 | [windows-wmi-query-0-a5018a53e0f6.source.yaml](windows-wmi-query-0-a5018a53e0f6.source.yaml) |
 | windows.registry | SV-253274.automated | ms_windows_11 | 5 | [windows-registry-1-2db73c819346.source.yaml](windows-registry-1-2db73c819346.source.yaml) |
 | windows.registry | SV-253291.automated | ms_windows_11 | 1 | [windows-registry-0-de183f784659.source.yaml](windows-registry-0-de183f784659.source.yaml) |
 | windows.registry/nested_state_all | SV-253358.automated | ms_windows_11 | 1 | [windows-registry-state-all-0fef40d33c90.source.yaml](windows-registry-state-all-0fef40d33c90.source.yaml) |
 | windows.userright | SV-253495.automated | ms_windows_11 | 7 | [windows-userright-1-39dad4df5336.source.yaml](windows-userright-1-39dad4df5336.source.yaml) |
 | independent.shellcommand | SV-258038.automated | rhel_9 | 1 | [independent-shellcommand-0-365f46522e9e.source.yaml](independent-shellcommand-0-365f46522e9e.source.yaml) |
+| independent.shellcommand/dns_small | SV-259417.automated | ms_windows_server_dns | 1 | [independent-shellcommand-dns-small-db533570bbca.source.yaml](independent-shellcommand-dns-small-db533570bbca.source.yaml) |
 | windows.wmi.query | SV-278001.automated | ms_windows_server_2025 | 5 | [windows-wmi-query-1-c3af977226de.source.yaml](windows-wmi-query-1-c3af977226de.source.yaml) |
 | independent.textfilecontent54 | ng.shared.etc-chrony-conf-cmdport-option-is-set-to-0 | oracle_linux_9, rhel_9 | 1 | [independent-textfilecontent54-0-4c14428014be.source.yaml](independent-textfilecontent54-0-4c14428014be.source.yaml) |
 | independent.textfilecontent54 | ng.shared.linux-must-audit-all-uses-of-the-setxattr-fsetxattr-lsetxattr-removexatt | oracle_linux_9, rhel_9 | 24 | [independent-textfilecontent54-1-48fa5787cc44.source.yaml](independent-textfilecontent54-1-48fa5787cc44.source.yaml) |
