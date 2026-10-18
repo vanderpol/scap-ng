@@ -26,36 +26,60 @@ test_source_capture_match_pass_and_fail (tools.test_research_b_source_textfile_s
 test_source_state_pattern_match_keeps_typed_regex_field_semantics (tools.test_research_b_source_textfile_state.CollectedStateTests.test_source_state_pattern_match_keeps_typed_regex_field_semantics) ... ok
 test_terminal_flags_and_missing_source (tools.test_research_b_source_textfile_state.CollectedStateTests.test_terminal_flags_and_missing_source) ... ok
 test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) ... 
-  test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='+15') ... FAIL
-  test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='-0') ... FAIL
+  test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='15') ... FAIL
+  test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='100') ... FAIL
+  test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='14') ... FAIL
+  test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='-2') ... FAIL
 test_unsupported_source_shapes_rejected (tools.test_research_b_source_textfile_state.CollectedStateTests.test_unsupported_source_shapes_rejected) ... ok
 
 ======================================================================
-FAIL: test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='+15')
+FAIL: test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='15')
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_source_textfile_state.py", line 196, in test_typed_integer_bounds_and_canonical_capture_gates
+  File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_source_textfile_state.py", line 201, in test_typed_integer_bounds_and_canonical_capture_gates
     self.assertEqual(evaluate_json(
-AssertionError: 'false' != 'error'
-- false
-+ error
+AssertionError: 'error' != 'true'
+- error
++ true
 
 
 ======================================================================
-FAIL: test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='-0')
+FAIL: test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='100')
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_source_textfile_state.py", line 196, in test_typed_integer_bounds_and_canonical_capture_gates
+  File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_source_textfile_state.py", line 201, in test_typed_integer_bounds_and_canonical_capture_gates
     self.assertEqual(evaluate_json(
-AssertionError: 'false' != 'error'
-- false
-+ error
+AssertionError: 'error' != 'true'
+- error
++ true
+
+
+======================================================================
+FAIL: test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='14')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_source_textfile_state.py", line 201, in test_typed_integer_bounds_and_canonical_capture_gates
+    self.assertEqual(evaluate_json(
+AssertionError: 'error' != 'false'
+- error
++ false
+
+
+======================================================================
+FAIL: test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_source_textfile_state.CollectedStateTests.test_typed_integer_bounds_and_canonical_capture_gates) (captured='-2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_source_textfile_state.py", line 201, in test_typed_integer_bounds_and_canonical_capture_gates
+    self.assertEqual(evaluate_json(
+AssertionError: 'error' != 'false'
+- error
++ false
 
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.022s
+Ran 15 tests in 0.023s
 
-FAILED (failures=2)
+FAILED (failures=4)
 ~~~
 ### work/b-corpus/boolean-test.log
 
