@@ -185,6 +185,11 @@ class CollectedStateTests(unittest.TestCase):
         state=next(iter(doc["assessment"]["tests"].values()))["states"][0]
         state["operation"]="greater_than_or_equal"
         state["value"]=15
+        # Include signs in the *collected* raw field, so invalid integer
+        # strings reach the State evaluator rather than disappearing under
+        # the collection regex and masquerading as absent Items.
+        test=next(iter(doc["assessment"]["tests"].values()))
+        test["object"]["select"]["pattern"]["value"]=r"^[ \t]*ProcessSizeMax[ \t]*=[ \t]*([^ \t#]+)"
         ast=lower_single_capture_textfile_assessment(doc)
         ast["using"]["path"]=str(self.path)
         compiled=encode(doc["assessment"]["id"],ast)
