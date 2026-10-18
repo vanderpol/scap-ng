@@ -10,12 +10,14 @@ from __future__ import annotations
 from research_b_source_textfile_lowering import lower_state_free_textfile_assessment
 from research_b_source_partition_lowering import lower_state_free_partition_assessment
 from research_b_source_textfile_state_lowering import lower_single_capture_textfile_assessment
+from research_b_source_wmi_lowering import lower_state_free_wmi_assessment
 
 
 LEAF_LOWERERS=(
     lower_state_free_textfile_assessment,
     lower_single_capture_textfile_assessment,
     lower_state_free_partition_assessment,
+    lower_state_free_wmi_assessment,
 )
 METADATA={"id","version","assessment_title","mode","class","purpose",
           "specification","tests","evaluate"}
