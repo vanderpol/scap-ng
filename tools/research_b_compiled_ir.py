@@ -163,12 +163,19 @@ def _node(node, source_kind, depth=0):
         _ensure(isinstance(state,dict) and set(state)=={
             "field","operation","expected","entity_existence","entity_check"},
             "invalid State entity IR")
+        numeric={"greater_than_or_equal","greater_than","less_than","less_than_or_equal"}
         _ensure(state["field"]=="subexpression" and
-                state["operation"] in {"equals","not_equals","pattern_match"} and
-                isinstance(state["expected"],str) and
+                state["operation"] in {"equals","not_equals","pattern_match"}|numeric and
                 state["entity_existence"]=="at_least_one_exists" and
                 state["entity_check"]=="all",
-                "unsupported source State entity operation/type/cardinality")
+                "unsupported source State entity operation/cardinality")
+        if state["operation"] in numeric:
+            _ensure(type(state["expected"]) is int and
+                    -(2**63)<=state["expected"]<2**63,
+                    "numeric source State requires signed int64 literal")
+        else:
+            _ensure(isinstance(state["expected"],str),
+                    "text source State requires string literal")
         if state["operation"]=="pattern_match":
             _ensure(len(state["expected"])<=2048,
                     "source State regex exceeds bounded research length")
