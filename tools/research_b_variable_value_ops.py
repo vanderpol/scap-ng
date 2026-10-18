@@ -2,9 +2,10 @@
 """#237: bounded typed Variable value operators for compiler-owned B fixtures.
 
 Pure value transforms, NEVER execute shell commands or acquire evidence.
-The first-capture and nonmatch-empty-string conventions follow the OVAL
-Definition Schema; Python regex lexical equivalence and source 0.3 merge
-ordering are NOT verified. Do not count as converted Assessments.
+The first-capture/nonmatch conventions and merge document-order rule are
+verified against pinned OVAL v5.12.3 Definitions Schema. Python regex
+dialect and whether collected Item order equals source document order are
+NOT proven. Do not count as source-equivalent executable Assessments.
 """
 from __future__ import annotations
 from itertools import product
@@ -66,22 +67,20 @@ def capture(variable,pattern):
 
 
 def merge(variable,*,delimiter,sort,order):
-    """Conservative converted-0.3 merge; never invent sorting semantics.
+    """OVAL 5.12.3 merge with sort=document: preserve caller's Item order.
 
-    The canonical OVAL 5.x Definition Schema does not define an equivalent
-    merge function, so ordering from converted source is a parity blocker.
-    For one value, or repeated identical values, output is order-invariant.
-    For distinct multiple values, refuse to guess an ordering.
+    The pinned OVAL Definitions Schema defines document sorting as no sort:
+    values retain the order of referenced System Characteristics XML.
+    OrderEnumeration has no effect for document mode. This function
+    preserves the supplied sequence; provenance of the sequence from a
+    real OVAL collector remains a separate source-parity requirement.
     """
     source=_checked(variable)
     if source["status"]!="values":return source
     if (type(delimiter) is not str or len(delimiter)>256 or
-            sort!="document" or order!="ascending"):
+            sort!="document" or order not in {"ascending","descending"}):
         return values(status="error")
-    observed=source["values"]
-    if len(set(observed))>1:
-        return values(status="unknown")
-    result=delimiter.join(observed)
+    result=delimiter.join(source["values"])
     if len(result)>MAX_VALUE_LENGTH:
         return values(status="error")
     return values([result])
