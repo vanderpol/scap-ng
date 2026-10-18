@@ -49,7 +49,7 @@ class ExpressionTruthTests(unittest.TestCase):
         self.assertEqual(result["outcome"], "true")
         self.assertEqual(result["stage"], STAGE)
         self.assertFalse(result["scanner_executed"])
-        self.assertEqual(result["trace"][2]["path"],
+        self.assertEqual(result["trace"][1]["path"],
                          ["evaluate", "all", 1, "any", 0])
         self.assertEqual(result["trace"][-1]["path"], ["evaluate"])
 
