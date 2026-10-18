@@ -1,0 +1,78 @@
+name: 0.4-A Rule choice per-Benchmark version closure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-benchmark-choice-closure.yml'
+      - 'tools/v04_a_benchmark_choice_version_closure.py'
+      - 'tools/test_v04_a_benchmark_choice_version_closure.py'
+      - 'tools/v04_a_specification_version_gate.py'
+      - 'tools/v04_a_authoring_graph_index.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  six-stig-reference-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install separate YAML parser
+        run: python -m pip install PyYAML==6.0.3
+      - name: Run per-Benchmark negative and positive tests
+        run: python -m unittest -v tools/test_v04_a_benchmark_choice_version_closure.py
+      - name: Retrieve original immutable r3 source archives publicly
+        run: |
+          mkdir -p work/a-benchmark-closure
+          base='https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3'
+          for source in json yaml; do
+            name="scap-ng-v0.4-joval-six-stig-\${source}.zip"
+            curl --fail --location --silent --show-error \
+              --retry 5 --retry-all-errors --retry-delay 2 \
+              "\${base}/\${name}" --output "work/a-benchmark-closure/\${name}"
+            test -s "work/a-benchmark-closure/\${name}"
+          done
+      - name: Inspect all Rule choices under the correct Benchmark version
+        run: |
+          python tools/v04_a_benchmark_choice_version_closure.py \
+            --json-archive work/a-benchmark-closure/scap-ng-v0.4-joval-six-stig-json.zip \
+            --yaml-archive work/a-benchmark-closure/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --expect-blocked \
+            --report-json "$RUNNER_TEMP/a-edge-closure.json" > "$RUNNER_TEMP/a-edge-closure.stdout"
+          python - "$RUNNER_TEMP/a-edge-closure.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["status"]=="BLOCKED_PER_BENCHMARK_SPECIFICATION",d
+          assert d["allowed_to_compile"] is False,d
+          assert d["yaml_json_agree"] is True,d
+          assert len(d["benchmarks"])==6,d
+          assert d["counts"]["rules"]==1567,d
+          assert d["counts"]["choice_links"]==2958,d
+          assert d["incompatible_edge_count"]>0,d
+          assert d["counts"]["incompatible_automated_choice_links"]==d["incompatible_edge_count"],d
+          assert d["counts"]["manual_choice_links"]>0,d
+          assert d["counts"]["automated_choice_links"]>0,d
+          print("BLOCKED by explicit source versions; Rule choice links:",
+                d["counts"]["choice_links"],"incompatible edges:",d["incompatible_edge_count"])
+          for row in d["benchmarks"]:
+              print(row["folder"],row["counts"])
+          PY
+      - name: Display source-verification stage accurately
+        if: always()
+        run: |
+          {
+            echo '## 0.4-A per-Benchmark Rule choice gate — #232/#239'
+            echo 'This validates input references and specification declaration edges only. The native 0.4 compiler remains BLOCKED on mismatched source metadata and unapproved grammar; no versions were rewritten and no scanner semantics are claimed.'
+            if test -s "$RUNNER_TEMP/a-edge-closure.json"; then
+              python - "$RUNNER_TEMP/a-edge-closure.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("Gate:",d["status"],"Rule links:",d["counts"]["choice_links"],"incompatible:",d["incompatible_edge_count"])
+          for row in d["benchmarks"]:
+              print(row["folder"],row["counts"])
+          PY
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
