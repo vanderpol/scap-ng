@@ -21,6 +21,28 @@ STAGE = "research-only-0.4-a-deterministic-authoring-container/0.1"
 MAGIC = "UNSIGNED_NOT_EXECUTABLE_NOT_APPROVED"
 TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 
+# These disclosures are part of the fixed *research-only* format. A verifier
+# must not accept an archive that suppresses its outstanding approval gates.
+REQUIRED_OWNER_DECISIONS = (
+    "final 0.4-A grammar scope and vocabulary",
+    "Benchmark specification declaration policy",
+)
+NOT_VERIFIED = (
+    "native executable 0.4 compiler semantics",
+    "manifest signature",
+    "OVAL/scanner evaluation parity",
+    "publisher trust",
+)
+MANIFEST_KEYS = frozenset({
+    "stage", "build_status", "authoring_spec_approval",
+    "migration_policy_approval", "source_graph_sha256",
+    "staged_graph_sha256", "documents", "counts",
+    "required_owner_decisions", "no_source_mutation", "not_verified",
+})
+DOCUMENT_RECORD_KEYS = frozenset({
+    "kind", "id", "member", "logical_source", "sha256", "size",
+})
+
 
 def _logical_source(path):
     name = str(PurePosixPath(path))
@@ -75,15 +97,9 @@ def create_research_container(documents):
         "staged_graph_sha256": graph["graph_sha256"],
         "documents": items,
         "counts": graph["counts"],
-        "required_owner_decisions": [
-            "final 0.4-A grammar scope and vocabulary",
-            "Benchmark specification declaration policy",
-        ],
+        "required_owner_decisions": list(REQUIRED_OWNER_DECISIONS),
         "no_source_mutation": True,
-        "not_verified": [
-            "native executable 0.4 compiler semantics", "manifest signature",
-            "OVAL/scanner evaluation parity", "publisher trust",
-        ],
+        "not_verified": list(NOT_VERIFIED),
     }
     contents = {"manifest.json": canonical_json(manifest)}
     contents.update(payloads)
@@ -122,6 +138,13 @@ def verify_research_container(raw):
         )
         if canonical_json(manifest) != manifest_bytes:
             raise ValueError("noncanonical research manifest")
+        if not isinstance(manifest, dict) or set(manifest) != MANIFEST_KEYS:
+            raise ValueError("unexpected research manifest fields")
+        if (manifest.get("required_owner_decisions") != list(REQUIRED_OWNER_DECISIONS)
+                or manifest.get("not_verified") != list(NOT_VERIFIED)):
+            raise ValueError("research-only approval/verification disclosures altered")
+        if not isinstance(manifest["documents"], list):
+            raise ValueError("invalid research manifest documents")
         if (manifest.get("stage") != STAGE or manifest.get("build_status") != MAGIC
                 or manifest.get("authoring_spec_approval") is not False
                 or manifest.get("migration_policy_approval") is not False):
@@ -129,6 +152,8 @@ def verify_research_container(raw):
         docs = {}
         expected_names = {"manifest.json"}
         for record in manifest["documents"]:
+            if not isinstance(record, dict) or set(record) != DOCUMENT_RECORD_KEYS:
+                raise ValueError("unexpected research document metadata fields")
             kind, ident, member = record["kind"], record["id"], record["member"]
             if member != _artifact_name(kind, ident) or member in expected_names:
                 raise ValueError("untrusted member name / identity collision")
