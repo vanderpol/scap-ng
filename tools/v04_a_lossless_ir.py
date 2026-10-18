@@ -223,6 +223,13 @@ def main(argv=None):
     args = parser.parse_args(argv)
     ir = normalize_documents(_validated_from_base_archive(args.base_zip))
     decoded = decode_and_verify(ir)
+    from jsonschema import Draft202012Validator
+    schema_path = (Path(__file__).resolve().parents[1] /
+                   "research/assessment-simplification/compact-authoring-04/"
+                   "lossless-ir-envelope.schema.json")
+    research_schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    Draft202012Validator.check_schema(research_schema)
+    Draft202012Validator(research_schema).validate(ir)
     if args.assert_six and (
         ir["document_count"] != 4001 or
         ir["automated_assessment_count"] != 872 or
@@ -242,6 +249,7 @@ def main(argv=None):
         "automated_tests": ir["automated_test_count"],
         "rule_choice_links": ir["rule_choice_link_count"],
         "roundtrip": "PASS",
+        "research_ir_schema": "PASS",
         "scanner_executable": False,
     }, sort_keys=True, indent=2))
 
