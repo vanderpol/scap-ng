@@ -131,11 +131,11 @@ def evaluate_source_variable_plan(plan,fixtures):
                 return _fail()
             if command["status"]!="values":return command
             if len(command["values"])!=1:return _pending()
-            if not command["values"][0] or len(command["values"][0])>MAX_LINE or (
-                c["shell"] not in {"bash","powershell"}) or
+            if (not command["values"][0] or len(command["values"][0])>MAX_LINE or
+                c["shell"] not in {"bash","powershell"} or
                 type(c["pattern"]) is not str or len(c["pattern"])>1024 or any(
                 type(c[k]) is not bool for k in (
-                  "error_if_exit_status_not_0","error_if_stderr_exists")):
+                  "error_if_exit_status_not_0","error_if_stderr_exists"))):
                 return _fail()
             using={k:c[k] for k in ("shell","error_if_exit_status_not_0",
                                     "error_if_stderr_exists")}
