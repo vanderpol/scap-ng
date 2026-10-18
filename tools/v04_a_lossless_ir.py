@@ -1,0 +1,250 @@
+#!/usr/bin/env python3
+"""#240 / #232: lossless, non-executable 0.4-A research compiler envelope.
+
+A typed *index* over full canonical base-authoring ASTs, not a replacement
+language or an interpreter. No Test result, OVAL six-state truth, collection,
+or signed .scapng semantics are inferred. A validator-accepted extension is
+retained in the complete AST; a broken identity/reference fails closed.
+"""
+from __future__ import annotations
+
+import argparse
+from hashlib import sha256
+import json
+from pathlib import Path, PurePosixPath
+
+from v04_a_authoring_graph_index import canonical_json, graph_index
+from v04_a_benchmark_choice_version_closure import inspect_edges
+
+IR_FORMAT = "scap-ng-0.4-a-lossless-source-envelope/0.1"
+IR_STATUS = "RESEARCH_NOT_EXECUTABLE"
+
+
+def _source_name(name):
+    """Normalize source-format spelling, without discarding its logical path."""
+    if not isinstance(name, str) or not name.startswith("authoring/"):
+        raise ValueError(f"unsafe or unsupported authoring path: {name!r}")
+    parts = PurePosixPath(name).parts
+    if any(part in (".", "..", "") for part in parts) or len(parts) < 3:
+        raise ValueError(f"unsafe authoring path: {name!r}")
+    for suffix in (".json", ".yaml", ".yml"):
+        if name.endswith(suffix):
+            return name[:-len(suffix)] + ".json"
+    raise ValueError(f"unsupported authoring filename: {name!r}")
+
+
+def _collection_ref_hints(test):
+    """Index source references only; these are NOT executable dependencies.
+
+    In particular a Test-level Variable reference cannot be silently
+    promoted to an Assessment-level truth dependency.
+    """
+    found = []
+
+    def walk(value, path):
+        if isinstance(value, dict):
+            for key, child in sorted(value.items()):
+                current = path + [key]
+                if key == "variable" and isinstance(child, str):
+                    found.append({"type": "variable", "path": current, "target": child})
+                walk(child, current)
+        elif isinstance(value, list):
+            for i, child in enumerate(value):
+                walk(child, path + [i])
+
+    if isinstance(test.get("object"), str):
+        found.append({"type": "shared_object", "path": ["object"],
+                      "target": test["object"]})
+    walk(test, [])
+    return found
+
+
+def normalize_documents(documents):
+    """Build deterministic lossless envelopes from validated *base* documents.
+
+    This operation checks the complete reference graph and per-Benchmark
+    Rule choice closure. Strict 0.4 base/capability schema validation is done
+    by the independently maintained pipeline, and again by the CLI's archive
+    entrypoint. Do not pass unvalidated authoring to claim semantic validity.
+    """
+    if not isinstance(documents, dict) or not documents:
+        raise ValueError("no base-authoring documents")
+    canonical = {}
+    for original, document in documents.items():
+        path = _source_name(original)
+        if path in canonical:
+            raise ValueError(f"duplicate normalized authoring path: {path}")
+        canonical[path] = document
+    graph = graph_index(canonical)
+    edges = inspect_edges(canonical)
+    if edges["incompatible_edge_count"]:
+        raise ValueError("mixed Benchmark/Assessment specification versions")
+
+    entries = []
+    tests_total = 0
+    automated = 0
+    for path, document in sorted(canonical.items()):
+        kind, body = next(iter(document.items()))
+        entry = {
+            "kind": kind,
+            "id": body["id"],
+            "source_path": path,
+            "source_sha256": sha256(canonical_json(document)).hexdigest(),
+            "source_ast": document,
+        }
+        if kind == "assessment":
+            mode = body.get("mode")
+            if mode not in ("manual", "automated"):
+                raise ValueError(f"{path}: unknown Assessment mode")
+            index = {"mode": mode, "assessment_dependencies": [],
+                     "tests": []}
+            deps = body.get("dependencies") or {}
+            if not isinstance(deps, dict):
+                raise ValueError(f"{path}: dependencies must be a mapping")
+            for alias, dep in sorted(deps.items()):
+                if not isinstance(dep, dict) or not isinstance(dep.get("assessment"), str):
+                    raise ValueError(f"{path}: invalid Assessment dependency {alias!r}")
+                index["assessment_dependencies"].append({
+                    "alias": alias, "target": dep["assessment"],
+                    "expected_version": dep.get("expected_version"),
+                    "purpose": dep.get("purpose"),
+                })
+            if mode == "automated":
+                automated += 1
+                spec = body.get("specification")
+                if (not isinstance(spec, dict) or not isinstance(spec.get("id"), str)
+                        or not isinstance(spec.get("version"), str)):
+                    raise ValueError(f"{path}: missing explicit specification id/version")
+                tests = body.get("tests")
+                if not isinstance(tests, dict) or not tests:
+                    raise ValueError(f"{path}: no named automated Tests")
+                if "evaluate" not in body:
+                    raise ValueError(f"{path}: missing evaluate expression")
+                index["specification"] = spec
+                for name, test in sorted(tests.items()):
+                    if not isinstance(test, dict):
+                        raise ValueError(f"{path}: invalid Test {name!r}")
+                    capability = test.get("capability")
+                    requirement = test.get("require")
+                    if not isinstance(capability, str) or not capability:
+                        raise ValueError(f"{path}: Test {name} lacks capability")
+                    if not isinstance(requirement, str) or not requirement:
+                        raise ValueError(f"{path}: Test {name} lacks explicit Item require")
+                    if ("collected_items_require" in test
+                            or "state_fields_require" in test):
+                        raise ValueError(f"{path}: Test {name} retains scoped-only grammar")
+                    index["tests"].append({
+                        "id": name, "capability": capability,
+                        "item_requirement": requirement,
+                        "source_sha256": sha256(canonical_json(test)).hexdigest(),
+                        "collection_reference_hints": _collection_ref_hints(test),
+                    })
+                    tests_total += 1
+            entry["assessment_index"] = index
+        entries.append(entry)
+    return {
+        "format": IR_FORMAT,
+        "status": IR_STATUS,
+        "source_graph_sha256": graph["graph_sha256"],
+        "version_inventory": graph["version_inventory"],
+        "document_count": len(entries),
+        "automated_assessment_count": automated,
+        "automated_test_count": tests_total,
+        "rule_choice_link_count": edges["counts"]["choice_links"],
+        "documents": entries,
+        "not_proven": [
+            "runtime Test/State/Variable or collection evaluation",
+            "unknown/error/not_applicable six-state equivalence",
+            "scanner execution, signatures or executable bundle packaging",
+            "owner approval of scoped shorthand and version migration",
+        ],
+    }
+
+
+def decode_and_verify(ir):
+    """Independently rederive every index and hash; no lossy reverse mapping."""
+    if not isinstance(ir, dict) or ir.get("format") != IR_FORMAT or ir.get("status") != IR_STATUS:
+        raise ValueError("unexpected or executable-looking research IR")
+    entries = ir.get("documents")
+    if not isinstance(entries, list) or not entries:
+        raise ValueError("missing IR documents")
+    docs = {}
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ValueError("invalid IR envelope")
+        path = entry.get("source_path")
+        if not isinstance(path, str) or _source_name(path) != path or path in docs:
+            raise ValueError("duplicate or uncanonical IR source path")
+        doc = entry.get("source_ast")
+        if not isinstance(doc, dict):
+            raise ValueError(f"{path}: missing full source AST")
+        if sha256(canonical_json(doc)).hexdigest() != entry.get("source_sha256"):
+            raise ValueError(f"{path}: source AST digest mismatch")
+        docs[path] = doc
+    expected = normalize_documents(docs)
+    if canonical_json(ir) != canonical_json(expected):
+        raise ValueError("IR typed index, order, identity, or version checksum mismatch")
+    return docs
+
+
+def _validated_from_base_archive(path):
+    """Import only independently verified research ZIPs, never a signed bundle."""
+    from v04_a_deterministic_research_container import verify_research_container
+    from v04_a_end_to_end_base_authoring import (
+        _extract_docs, validate_native_capability_tests,
+    )
+    from validate_native_json_schemas import build_validators
+    raw = Path(path).read_bytes()
+    verified = verify_research_container(raw)
+    docs, _ = _extract_docs(raw)
+    if verified["member_count"] != len(docs):
+        raise ValueError("verified archive document count differs")
+    root = Path(__file__).resolve().parents[1]
+    schema = build_validators(root / "schema/v0.4.0")["assessment.schema.json"]
+    for source, doc in sorted(docs.items()):
+        assessment = doc.get("assessment")
+        if isinstance(assessment, dict) and assessment.get("mode") == "automated":
+            errors = list(schema.iter_errors(doc))
+            if errors:
+                err = sorted(errors, key=lambda e: (list(map(str, e.absolute_path)),
+                                                    e.message))[0]
+                raise ValueError(f"{source}: invalid base Assessment: {err.message}")
+    validate_native_capability_tests(docs)
+    return docs
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--base-zip", type=Path, required=True,
+                        help="independently verified 0.4-A unsigned base authoring research ZIP")
+    parser.add_argument("--out", type=Path, required=True,
+                        help="canonical lossless typed research envelope JSON")
+    parser.add_argument("--assert-six", action="store_true")
+    args = parser.parse_args(argv)
+    ir = normalize_documents(_validated_from_base_archive(args.base_zip))
+    decoded = decode_and_verify(ir)
+    if args.assert_six and (
+        ir["document_count"] != 4001 or
+        ir["automated_assessment_count"] != 872 or
+        ir["automated_test_count"] != 1375 or
+        ir["rule_choice_link_count"] != 2958
+    ):
+        raise ValueError("pinned six-STIG IR totals differ")
+    data = canonical_json(ir) + b"\n"
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_bytes(data)
+    print(json.dumps({
+        "status": ir["status"], "format": ir["format"],
+        "source_graph_sha256": ir["source_graph_sha256"],
+        "ir_sha256": sha256(data).hexdigest(),
+        "document_count": len(decoded),
+        "automated_assessments": ir["automated_assessment_count"],
+        "automated_tests": ir["automated_test_count"],
+        "rule_choice_links": ir["rule_choice_link_count"],
+        "roundtrip": "PASS",
+        "scanner_executable": False,
+    }, sort_keys=True, indent=2))
+
+
+if __name__ == "__main__":
+    main()
