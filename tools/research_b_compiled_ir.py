@@ -193,13 +193,21 @@ def _node(node, source_kind, depth=0):
               "provider","using","existence"}
         expected=base|({"where"} if provider=="linux.mounts" else set())
         _ensure(set(node)==expected,"source provider compatibility node has unexpected keys")
-        _ensure(provider in {"linux.textfile_matches","linux.mounts"} and
-                node["existence"]=="at_least_one_exists",
+        _ensure((provider in {"linux.textfile_matches","linux.mounts"} and
+                 node["existence"]=="at_least_one_exists") or
+                (provider=="windows.wmi.query" and
+                 node["existence"] in {"none_exist","at_least_one_exists"}),
                 "unsupported source provider existence contract")
         _ensure(all(isinstance(node[k],str) and bool(node[k])
                     for k in ("source_assessment_id","source_test_id")),
                 "missing source provenance identity")
         using=node["using"]
+        if provider=="windows.wmi.query":
+            _ensure(isinstance(using,dict) and set(using)=={"namespace","query"},
+                    "WMI fixture acquisition must name namespace and query")
+            from research_b_source_wmi_lowering import validate_wmi_query
+            validate_wmi_query(using["namespace"],using["query"])
+            return
         if provider=="linux.mounts":
             _ensure(using=={}, "mount provider uses no acquisition inputs")
             where=node["where"]
