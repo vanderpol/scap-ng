@@ -30,7 +30,7 @@
 
 [Read the two complete Assessment documents](FULL-02-linux-files.md). [Pinned source](https://github.com/vanderpol/scap-ng-editor-sample-data/blob/99cbceae8d594c44cb509df95975ac1676a2b44a/focused-fixtures/source-backed/authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.yaml).
 
-<text>Note: The following is an **explanation of the exact sources**, not a claim that every name is a hard-coded system fact. The Object selectors and Set filters determine the membership.</text>
+> The following explains the exact source structure; membership is determined by the authored Object selectors and Set filters, not the natural-language names.
 
 | Phase | Source or Test | Reader's required inference |
 | --- | --- | --- |
