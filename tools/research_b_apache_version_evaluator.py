@@ -38,6 +38,9 @@ def _acquisition(fixtures,using):
 def _verified_items(acquisition,using):
     if acquisition is None:return None,None,"required source query not acquired"
     if acquisition.get("using")!=using:return None,None,"query identity was changed"
+    if acquisition.get("provider")!=PROVIDER or (
+            acquisition.get("version")!="offline-source-shell-result-v0.1"):
+        return None,None,"source query missing typed provider/version identity"
     flag=acquisition.get("status");items=acquisition.get("items")
     if type(flag) is not str or flag not in FLAGS or not isinstance(items,list):
         return None,None,"invalid source command collection flag/Items"
@@ -103,7 +106,8 @@ def evaluate_apache_version(ast,fixtures):
             if match is None or match.group(1) is None:
                 return UNKNOWN,"source filter matched but capture did not resolve",len(items)
             path=match.group(1)
-            if not SAFE_EXE.fullmatch(path):
+            if not SAFE_EXE.fullmatch(path) or any(
+                    part in {".",".."} for part in path.split("/")):
                 return ERROR,"unsafe or unsupported executable path capture",len(items)
             paths.add(path)
     if not paths:return UNKNOWN,"no executable path derived from collected Items",len(items)
