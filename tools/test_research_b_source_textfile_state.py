@@ -154,6 +154,32 @@ class CollectedStateTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     lower_single_capture_textfile_assessment(doc)
 
+    def test_source_state_pattern_match_keeps_typed_regex_field_semantics(self):
+        doc=source()
+        state=next(iter(doc["assessment"]["tests"].values()))["states"][0]
+        state["operation"]="pattern_match"
+        state["value"]=r"^(?:0|disabled)$"
+        ast=lower_single_capture_textfile_assessment(doc)
+        ast["using"]["path"]=str(self.path)
+        compiled=encode(doc["assessment"]["id"],ast)
+        self.path.write_text("ProcessSizeMax=disabled\n")
+        self.assertEqual(evaluate_json(
+            compiled,{PROVIDER:collect(**ast["using"])}).result,TRUE)
+        self.path.write_text("ProcessSizeMax=1000\n")
+        self.assertEqual(evaluate_json(
+            compiled,{PROVIDER:collect(**ast["using"])}).result,FALSE)
+        self.path.write_text("ProcessSizeMax=0\n")
+        self.assertEqual(evaluate_json(
+            compiled,{PROVIDER:collect(**ast["using"])}).result,TRUE)
+
+    def test_invalid_state_regex_rejected_at_compile_and_ir_decode(self):
+        doc=source()
+        state=next(iter(doc["assessment"]["tests"].values()))["states"][0]
+        state["operation"]="pattern_match"
+        state["value"]="["
+        with self.assertRaisesRegex(ValueError,"State pattern"):
+            lower_single_capture_textfile_assessment(doc)
+
     def test_nonmatching_multiple_capture_groups_are_field_error(self):
         p=str(self.path)
         self.path.write_text("x=123\n")
