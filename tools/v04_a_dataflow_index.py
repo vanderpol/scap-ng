@@ -53,6 +53,75 @@ def _graph_order(dependency_map):
     return [{"kind": kind, "id": identity} for kind, identity in result]
 
 
+
+def _verify_foreach_lineage(assessment, sites):
+    """Check source alias scoping without projecting or collecting any Items.
+
+    A source Object inherits aliases from its own source Object chain. The
+    current alias must be new, and at least one selector consumes it.
+    Collected field types/completeness remain runtime/validator work.
+    """
+    shared = assessment.get("shared_objects") or {}
+    cache, visiting = {}, set()
+
+    def check_object(obj, inherited, where):
+        loop = obj.get("for_each")
+        if loop is None:
+            return tuple(inherited)
+        alias = loop["item"]
+        if alias in inherited:
+            raise ValueError(f"{where}: for_each alias shadows inherited {alias!r}")
+        visible = set(inherited) | {alias}
+        selectors = obj.get("select") or {}
+        if not isinstance(selectors, dict):
+            raise ValueError(f"{where}: for_each select must be a mapping")
+        binding_aliases = []
+        for field, selector in sorted(selectors.items()):
+            if isinstance(selector, dict) and "from" in selector:
+                ref = selector["from"]
+                if not isinstance(ref, str) or "." not in ref:
+                    raise ValueError(f"{where}: malformed projected source at {field}")
+                source_alias, source_field = ref.split(".", 1)
+                if not source_field or source_alias not in visible:
+                    raise ValueError(f"{where}: out-of-scope projected alias {ref!r}")
+                binding_aliases.append(source_alias)
+        if alias not in binding_aliases:
+            raise ValueError(f"{where}: for_each must project from current alias {alias!r}")
+        return tuple(inherited) + (alias,)
+
+    def lineage(ident):
+        if ident in cache:
+            return cache[ident]
+        if ident in visiting:
+            raise ValueError(f"cyclic source Object foreach lineage through {ident}")
+        visiting.add(ident)
+        obj = shared[ident]
+        loop = obj.get("for_each")
+        inherited = lineage(loop["in"]) if loop else ()
+        result = check_object(obj, inherited, f"shared_objects.{ident}")
+        visiting.remove(ident)
+        cache[ident] = result
+        return result
+
+    for ident in sorted(shared):
+        lineage(ident)
+    for site in sites:
+        if site["kind"] != "for_each":
+            continue
+        path = site["path"]
+        if len(path) == 3 and path[0] == "shared_objects":
+            continue  # Already checked by named Object lineage above.
+        node = assessment
+        for segment in path[:-1]:
+            node = node[segment]
+        # Inline source sites retain their path and the inherited alias
+        # lineage from the explicitly named acquisition source.
+        loop = node["for_each"]
+        inherited = lineage(loop["in"])
+        check_object(node, inherited, ".".join(map(str, path[:-1])))
+
+
+
 def index_assessment_dataflow(assessment):
     """Preserve named source nodes, explicit dependency edges and lexical sites.
 
@@ -139,6 +208,7 @@ def index_assessment_dataflow(assessment):
     # Only named Objects and Variables participate in the source-dataflow DAG;
     # a Test consumes data but never becomes an acquisition/Variable provider.
     order = _graph_order(dependency_map)
+    _verify_foreach_lineage(assessment, sites)
     edges.sort(key=lambda e: (e["from_kind"], e["from_id"],
                               canonical_json(e["path"]), e["role"], e["to_id"]))
     sites.sort(key=lambda s: (canonical_json(s["path"]), s["kind"]))
