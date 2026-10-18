@@ -8,3 +8,4 @@
 | Source Boolean fixture tests | success |
 | Windows WMI source fixture tests | success |
 | Windows registry source fixture tests | success |
+| Registry type/value AND same-Item tests | success |
