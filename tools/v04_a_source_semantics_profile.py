@@ -70,6 +70,8 @@ def source_profile(documents, ids=KNOWN_TARGETS):
                 "filters_nodes": observed_keys["filters"],
                 "foreach_nodes": observed_keys["for_each"],
                 "variable_references": observed_keys["variable"],
+                "wmi_record_state_source": test.get("states") if test.get("capability") == "windows.wmi.query" else None,
+                "wmi_object_source": test.get("object") if test.get("capability") == "windows.wmi.query" else None,
                 "test_source_sha256": sha256(canonical_json(test)).hexdigest(),
             })
         counts = Counter()
