@@ -53,7 +53,7 @@ class ExpressionManifestTests(unittest.TestCase):
         a["evaluate"] = {
             "if": {"test": name},
             "then": {"test": name},
-            "else": {"not_applicable": {"reason": "not applicable"}},
+            "else": {"test": name},
         }
         source = normalize_documents(self.docs)
         manifest = build_manifest(source)
