@@ -45,6 +45,10 @@ The Apache source has **two independent discovery paths**: reading the root conf
 
 Four final command-expression Variables can be inlined safely as a **source edit** only because each has one check use; that does **not** justify collapsing those two upstream sources.
 
+## Vocabulary choices now grounded in the two real source operations
+
+The [operator language comparison](VALUE-OPERATOR-AUTHORING-BAKEOFF.md) sets a **V1** control (the existing `concat` / `merge` function meanings) against **V2** (`build_each_combination` / `join_values`) and rejects **V3** (a raw string-template interpolation layer) for now. The [neutral micro-comprehension packet](VALUE-OPERATOR-BLIND-PACKET.md) must be completed before reviewers read the expected answers. Neither changing terms nor inline placement is approved; collection and result-status rules stay separate from the OVAL value-function output.
+
 ## Decision hypothesis to test with authors
 
 - **H1 (minimum intervention):** Permit an *explicitly typed* inline command expression at a check's collection boundary for a **single-use** derived command. Keep reused named sources and Variables when they genuinely serve more than one consumer. Requires a canonical typed expression contract, explicit provenance/metadata handling and no hidden defaults.
