@@ -123,9 +123,11 @@ def evaluate(compiled, observation, fixture_mode=False):
                       "status": status, "namespace": observation.get("namespace")},
         "counts": {"observed": len(items), "selected": len(selected),
                    "violating": len(violations)},
-        "evidence": [{"id": item["id"], "mount_point": item["fields"]["mount_point"],
-                      "mount_options": item["fields"]["mount_options"]}
-                     for item in selected[:10]],
+        "evidence": [{"id": item.get("id"),
+                      "mount_point": item.get("fields", {}).get("mount_point"),
+                      "mount_options": item.get("fields", {}).get("mount_options")}
+                     for item in selected[:10]
+                     if isinstance(item, dict) and isinstance(item.get("fields"), dict)],
         "evidence_truncated": len(selected) > 10,
         "diagnostics": diagnostics[:10] if isinstance(diagnostics, list)
                        else [{"reason": "invalid diagnostics"}],
