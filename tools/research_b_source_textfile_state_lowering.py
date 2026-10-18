@@ -44,10 +44,16 @@ def lower_single_capture_textfile_assessment(source):
     if not isinstance(state,dict) or set(state)!={"field","operation","value",
                                                 "existence","match"}:
         raise ValueError("unrecognized source State fields/cardinality")
-    if (state["field"]!="subexpression" or state["operation"] not in {"equals","not_equals","pattern_match"}
-        or state["existence"]!="one_or_more" or state["match"]!="all"
-        or not isinstance(state["value"],str)):
-        raise ValueError("State operation, entity quantifier or type unsupported")
+    numeric={"greater_than_or_equal","greater_than","less_than","less_than_or_equal"}
+    if (state["field"]!="subexpression" or
+        state["operation"] not in numeric|{"equals","not_equals","pattern_match"} or
+        state["existence"]!="one_or_more" or state["match"]!="all"):
+        raise ValueError("State operation or entity quantifier unsupported")
+    if state["operation"] in numeric:
+        if type(state["value"]) is not int or not -(2**63)<=state["value"]<2**63:
+            raise ValueError("numeric State comparison requires signed int64 literal")
+    elif not isinstance(state["value"],str):
+        raise ValueError("string State comparison requires literal text")
     if state["operation"]=="pattern_match":
         if len(state["value"])>2048:
             raise ValueError("source State regex exceeds bounded research length")
