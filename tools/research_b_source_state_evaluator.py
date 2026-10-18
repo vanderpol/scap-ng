@@ -70,7 +70,23 @@ def evaluate_source_textfile_state(ast, evidence):
         else:
             op=ast["state"]["operation"]
             expected=ast["state"]["expected"]
-            if op=="pattern_match":
+            numeric={"greater_than_or_equal","greater_than","less_than","less_than_or_equal"}
+            if op in numeric:
+                # Research-only canonical int64 normalization. Original OVAL
+                # numeric lexical rules must be verified independently.
+                if (len(value)>20 or not re.fullmatch(r"-?(?:0|[1-9][0-9]*)",value)
+                    or value=="-0"):
+                    item_results.append(ERROR)
+                    continue
+                found=int(value)
+                if not -(2**63)<=found<2**63:
+                    item_results.append(ERROR)
+                    continue
+                if op=="greater_than_or_equal": matches=found>=expected
+                elif op=="greater_than": matches=found>expected
+                elif op=="less_than": matches=found<expected
+                else:matches=found<=expected
+            elif op=="pattern_match":
                 # Research only. Python re does NOT establish OVAL regex
                 # compatibility; the bounded fixture is not a production
                 # resource-safe regex engine.
