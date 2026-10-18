@@ -4,15 +4,15 @@
 Counts below are distinct *unsupported automated Assessments* referencing
 each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
-**Unsupported automated Assessments: 729**.
+**Unsupported automated Assessments: 725**.
 
 ## Highest-volume capability families
 
 | Source Test capability | Unsupported Assessments containing it |
 | --- | ---: |
 | independent.textfilecontent54 | 220 |
-| independent.shellcommand | 88 |
 | windows.registry | 86 |
+| independent.shellcommand | 84 |
 | unix.file | 76 |
 | windows.auditeventpolicysubcategories | 53 |
 | windows.userright | 49 |
@@ -42,7 +42,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Feature | Unsupported Assessments containing it |
 | --- | ---: |
-| states | 557 |
+| states | 553 |
 | multiple_tests | 246 |
 | set_or_filter | 110 |
 | shared_objects | 77 |
@@ -102,7 +102,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Capability | Referenced unsupported Assessments |
 | --- | ---: |
-| independent.shellcommand | 16 |
+| independent.shellcommand | 14 |
 | variable.value | 2 |
 | windows.fileeffectiverights53 | 2 |
 | windows.userright | 2 |
@@ -136,7 +136,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 | linux.rpminfo | 35 |
 | unix.sysctl | 33 |
 | linux.partition | 31 |
-| independent.shellcommand | 21 |
+| independent.shellcommand | 19 |
 | linux.systemdunitproperty | 14 |
 | variable.value | 9 |
 | unix.password | 4 |
