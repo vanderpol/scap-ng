@@ -2,6 +2,14 @@
 
 **18 October 2026 · [Issue #241](https://github.com/vanderpol/scap-ng/issues/241) · NON-NORMATIVE UX/authoring research.** Owner request: a regex101-style space where a content author supplies system evidence and immediately sees true/false, explanation and test cases. **Not a request to implement a compiler, scanner or alternate 0.4 authoring grammar.** See current language issues [#227](https://github.com/vanderpol/scap-ng/issues/227) and [#235](https://github.com/vanderpol/scap-ng/issues/235), and independent semantics [#229](https://github.com/vanderpol/scap-ng/issues/229).
 
+## Binding owner decision (18 October 2026): tested scanner is the result authority
+
+**This supersedes earlier exploratory language about Python reference helpers calculating results for the editor.** AI may suggest Assessment content, configuration text and sample cases, but **cannot declare content semantically valid or determine Assessment outcomes**. Versioned deterministic tooling can report YAML/schema/reference validity. **Only a tested and validated SCAP-NG scanner** may issue authoritative Assessment true/false/error/unknown/not-evaluated/not-applicable results against sample or real evidence.
+
+The existing Python OVAL result reference, supplied-Test expression executor, restricted mountinfo Test and WMI record pilot are **research/oracle components, not a qualified general-purpose SCAP-NG scanner**. Until the scanner supports the requested case, the UI should say **NOT SCANNER-VERIFIED — RESULT UNAVAILABLE**. Saved sample inputs and independently reviewed expected results remain useful for later scanner conformance, but shall not be presented as an actually executed Assessment. Earlier mock displays of result TRUE/FALSE/UNKNOWN in this document are illustrative expected states, **not current editor verification**.
+
+This separation changes the phased product plan: the editor may ship a scenario authoring/prediction exercise and schema diagnostics first, then integrate a tested scanner for genuine Assessment outcomes. Neither AI reasoning nor a passing regression fixture substitutes for scanner validation.
+
 ## The primary experience
 
 A content author edits a real Assessment while exercising it on **simulated collected system evidence**. The editor does **not** connect to a real host, execute shell commands, query WMI, or need production credentials for this workflow. Its feedback must make the distinction among these layers obvious:
