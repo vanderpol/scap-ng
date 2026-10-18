@@ -25,6 +25,7 @@ from research_b_source_boolean_lowering import lower_source_boolean_assessment
 from research_b_source_wmi_lowering import lower_state_free_wmi_assessment
 from research_b_source_registry_lowering import lower_source_registry_assessment
 from research_b_source_shell_lowering import lower_source_shell_assessment
+from research_b_apache_version_graph import lower_apache_version_graph
 from research_b_manual_lowering import lower_manual_assessment
 from research_b_compiled_ir import encode, decode
 
@@ -45,6 +46,7 @@ _SOURCE_LEAF_LOWERERS=(
     lower_state_free_wmi_assessment,
     lower_source_registry_assessment,
     lower_source_shell_assessment,
+    lower_apache_version_graph,
 )
 
 
@@ -101,7 +103,7 @@ def _assert_complete_source_provenance(root, capsule):
             return
         if node.get("kind") not in {
             "compat_oval_provider_existence", "compat_oval_provider_state",
-            "compat_oval_registry_view_invariant", "compat_oval_shellcommand_state"
+            "compat_oval_registry_view_invariant", "compat_oval_shellcommand_state", "compat_oval_shellcommand_variable_version"
         }:
             raise ValueError("unsupported or native-authored source Test leaf")
         if node.get("source_assessment_id") != capsule["id"]:
@@ -147,6 +149,7 @@ def _lower_assessment(capsule):
         ("windows.wmi.query/state_free_existence",lower_state_free_wmi_assessment),
         ("windows.registry/single_literal_state_unresolved_view",lower_source_registry_assessment),
         ("independent.shellcommand/static_stdout_equality",lower_source_shell_assessment),
+        ("independent.shellcommand/var_capture_concat_version",lower_apache_version_graph),
         ("supported_Test_Boolean_AND_OR",lower_source_boolean_assessment),
     ]
     for family,lowerer in families:
