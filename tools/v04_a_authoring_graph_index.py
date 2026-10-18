@@ -86,6 +86,32 @@ def read_authoring_archive(path, fmt):
     return docs
 
 
+def version_inventory(documents):
+    """Observe version declarations only; never migrate or infer compatibility."""
+    observations = {}
+    for doc in documents.values():
+        kind, data = next(iter(doc.items()))
+        if kind == "assessment":
+            spec = data.get("specification")
+            if isinstance(spec, dict):
+                label = str(spec.get("id")) + "@" + str(spec.get("version"))
+                key = "assessment_specification:" + label
+                observations[key] = observations.get(key, 0) + 1
+        elif kind == "benchmark":
+            requirements = data.get("assessment_specifications")
+            if isinstance(requirements, list):
+                for entry in requirements:
+                    if isinstance(entry, dict):
+                        label = str(entry.get("id")) + "@" + str(entry.get("version"))
+                        key = "benchmark_required_specification:" + label
+                        observations[key] = observations.get(key, 0) + 1
+            elif isinstance(requirements, dict):
+                for name, entry in requirements.items():
+                    key = "benchmark_required_specification:" + str(name) + "=" + str(entry)
+                    observations[key] = observations.get(key, 0) + 1
+    return dict(sorted(observations.items()))
+
+
 def graph_index(documents):
     """Fingerprint logical identities and parsed source, independent of filename."""
     if not isinstance(documents, dict) or not documents:
@@ -122,6 +148,8 @@ def graph_index(documents):
         "graph_sha256": graph_digest,
         "nodes": records,
         "counts": counts,
+        "version_inventory": version_inventory(documents),
+        "version_contract_status": "NOT_ACCEPTED_FOR_NATIVE_0.4_BUNDLE",
         "limitations": [
             "static Rule/Assessment references only",
             "source assessment specifications and schema versions are not rewritten",
@@ -143,6 +171,8 @@ def main():
         "json_sha256": json_graph["graph_sha256"],
         "counts": json_graph["counts"],
         "nodes": len(json_graph["nodes"]),
+        "version_inventory": json_graph["version_inventory"],
+        "version_contract_status": json_graph["version_contract_status"],
     }
     if args.yaml_archive:
         yaml_graph = graph_index(read_authoring_archive(args.yaml_archive, "yaml"))
