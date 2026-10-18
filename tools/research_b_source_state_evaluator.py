@@ -6,6 +6,7 @@ research. Actual OVAL regex capture, Item flags, source XML semantics and
 missing-entity aggregation remain research boundaries.
 """
 from __future__ import annotations
+import re
 
 from oval_result_truth_tables import (
     TRUE, FALSE, ERROR, UNKNOWN, NOT_APPLICABLE, evaluate_collected_object_test,
@@ -68,8 +69,22 @@ def evaluate_source_textfile_state(ast, evidence):
             item_results.append(ERROR)
         else:
             op=ast["state"]["operation"]
-            matches=value==ast["state"]["expected"]
-            if op=="not_equals":matches=not matches
+            expected=ast["state"]["expected"]
+            if op=="pattern_match":
+                # Research only. Python re does NOT establish OVAL regex
+                # compatibility; the bounded fixture is not a production
+                # resource-safe regex engine.
+                if len(value)>8192 or len(expected)>2048:
+                    item_results.append(ERROR)
+                    continue
+                try:
+                    matches=bool(re.search(expected,value))
+                except re.error:
+                    item_results.append(ERROR)
+                    continue
+            else:
+                matches=value==expected
+                if op=="not_equals":matches=not matches
             item_results.append(TRUE if matches else FALSE)
     result=evaluate_collected_object_test(
         flag=FLAGS[flag],existence=ast["existence"],check=ast["check"],
