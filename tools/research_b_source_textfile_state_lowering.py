@@ -44,10 +44,17 @@ def lower_single_capture_textfile_assessment(source):
     if not isinstance(state,dict) or set(state)!={"field","operation","value",
                                                 "existence","match"}:
         raise ValueError("unrecognized source State fields/cardinality")
-    if (state["field"]!="subexpression" or state["operation"] not in {"equals","not_equals"}
+    if (state["field"]!="subexpression" or state["operation"] not in {"equals","not_equals","pattern_match"}
         or state["existence"]!="one_or_more" or state["match"]!="all"
         or not isinstance(state["value"],str)):
         raise ValueError("State operation, entity quantifier or type unsupported")
+    if state["operation"]=="pattern_match":
+        if len(state["value"])>2048:
+            raise ValueError("source State regex exceeds bounded research length")
+        try:
+            re.compile(state["value"])
+        except re.error as exc:
+            raise ValueError("source State pattern is not supported by Python fixture") from exc
     obj=test["object"]
     if not isinstance(obj,dict) or set(obj)!={"capability","collect","filesystem",
                                             "object_title","select"}:
