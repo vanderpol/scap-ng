@@ -97,6 +97,14 @@ jobs:
           mkdir -p work/b-corpus
           set -o pipefail
           python -m unittest -v tools/test_research_b_source_boolean_lowering.py 2>&1 | tee work/b-corpus/boolean-test.log
+      - name: Test B Windows WMI query state-free source and incomplete evidence
+        id: source-wmi
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_source_wmi.py 2>&1 | tee work/b-corpus/wmi-test.log
       - name: Publish bounded State/Boolean CI outcomes directly on GitHub main
         if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
@@ -107,7 +115,7 @@ jobs:
           mkdir -p research/requirements-first-language/contract-candidate/corpus
           target=research/requirements-first-language/contract-candidate/corpus/source-runtime-ci.md
           {
-            printf '# 0.4-B source State and Boolean fixture test gate\n\n'
+            printf '# 0.4-B source State, Boolean, and Windows WMI fixture test gate\n\n'
             printf '**GitHub Actions research only; not a SCAP 1.4 parity certification.**\n\n'
             printf '| Stage | Most recent push gate outcome |\n| --- | --- |\n'
             printf '| Source State fixture tests | %s |\n' "$STATE_OUTCOME"
@@ -131,14 +139,6 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
-      - name: Test B Windows WMI query state-free source and incomplete evidence
-        id: source-wmi
-        env:
-          PYTHONPATH: tools
-        run: |
-          mkdir -p work/b-corpus
-          set -o pipefail
-          python -m unittest -v tools/test_research_b_source_wmi.py 2>&1 | tee work/b-corpus/wmi-test.log
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
