@@ -13,6 +13,10 @@ Both experiments eliminate **single-use command-expression *names***, not collec
 
 **Important:** These are line counts from the *prior research after* YAML, **not** the source 0.4 normative schema. Reversibility of a text edit *with an edit recipe* is not proof that an author can produce a complete self-describing native 0.4 Assessment or recover omitted source metadata.
 
+## Official OVAL 5.12.3 clarification: vector `concat` versus scalar `merge`
+
+The [5.12.3 Core Definition](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html#concatfunctiontype) explicitly says a multi-valued concat component yields **a collection of constructed strings**, using a Cartesian product when several components are multi-valued; [merge](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html#mergefunctiontype) yields **one string** from a collection. See the [source-backed DNS/Apache distinction](OVAL-5123-CONCAT-MERGE-READABILITY.md). **This settles the original OVAL function-level meaning, NOT the native 0.4 Value→Object→collection instance correspondence, upstream failure behavior, or scanner parity.** Do not replace one by the other for authoring convenience.
+
 ## Semantic contract a viable *single authoring language* must expose
 
 Before choosing `collect.command: concat`, `derive`, `pipeline` or any other syntax, an implementer should be able to answer every cell without an undocumented default.
