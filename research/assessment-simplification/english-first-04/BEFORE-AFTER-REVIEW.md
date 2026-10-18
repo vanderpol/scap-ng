@@ -2,6 +2,8 @@
 
 **October 16, 2026 · Pre-alpha research · Not a specification adoption request**
 
+**Owner trust-boundary update (18 October 2026):** AI may generate drafts and sample data; deterministic schema tools provide structural diagnostics, and **only a tested SCAP-NG scanner** is permitted to supply verified Assessment results. Python OVAL/reference fixtures are development oracles, not authoritative editor results. The [sample-data editor research](EDITOR-SAMPLE-DATA-PLAYGROUND.md) has been amended to say so. Until scanner support exists, cases are expected-result proposals labeled **NOT SCANNER-VERIFIED**.
+
 ## Sample-data editor test bench — research opportunity
 
 **The editor can help decide whether split existence/matching fields or a merged requirement phrase is clearer.** The [six-state sample-data playground research](EDITOR-SAMPLE-DATA-PLAYGROUND.md) designs a regex101-style authoring pane with user-supplied synthetic system Items, completeness flags, expected-versus-actual regression cases, and source-linked explanations. [Eight representative sample scenarios](EDITOR-SAMPLE-DATA-EXAMPLES.json) cover RHEL9 `/home` and Windows11 WMI DomainRole evidence, including zero Items, incomplete streams and missing nested record members. **These are proposed input fixtures, not runnable editor tests.** Tracked in [#241](https://github.com/vanderpol/scap-ng/issues/241). This is **not** permission to change the compiler or ship fixtures in signed bundles.
