@@ -37,6 +37,41 @@ def _ir_filename(assessment_id):
     return "fixture-ir/" + sha256(assessment_id.encode("utf-8")).hexdigest() + ".json"
 
 
+_SOURCE_LEAF_LOWERERS=(
+    lower_state_free_textfile_assessment,
+    lower_state_free_partition_assessment,
+    lower_single_capture_textfile_assessment,
+    lower_state_free_wmi_assessment,
+    lower_source_registry_assessment,
+)
+
+
+def _recompile_source_leaf(capsule, test_id):
+    """Regenerate a Test leaf independently from its pinned source mapping.
+
+    The compiler uses this only to verify that the final source-provenance
+    contract matches the actual converted 0.3 Test, not an invented leaf
+    sharing the same ID. This still does not verify original SCAP 1.4 XML.
+    """
+    a=capsule["source_document"]["assessment"]
+    tests=a["tests"]
+    single={k:v for k,v in a.items() if k not in ("tests","evaluate")}
+    single["tests"]={test_id:tests[test_id]}
+    single["evaluate"]={"test":test_id}
+    document={"assessment":single}
+    candidates=[]
+    for lowerer in _SOURCE_LEAF_LOWERERS:
+        try:
+            candidates.append(lowerer(document))
+        except (ValueError,KeyError,TypeError):
+            pass
+    if not candidates:
+        raise ValueError("no independent verified lowering for source Test "+test_id)
+    if len(candidates)>1 and any(candidate != candidates[0] for candidate in candidates[1:]):
+        raise ValueError("ambiguous source Test lowerings "+test_id)
+    return candidates[0]
+
+
 def _assert_complete_source_provenance(root, capsule):
     """Require every referenced source Test to survive nested Boolean IR.
 
@@ -72,6 +107,9 @@ def _assert_complete_source_provenance(root, capsule):
         tid = node.get("source_test_id")
         if not isinstance(tid, str) or tid not in declared:
             raise ValueError("compiled source Test reference is not declared")
+        expected=_recompile_source_leaf(capsule, tid)
+        if node != expected:
+            raise ValueError("compiled source Test semantics/selection diverge: "+tid)
         seen.add(tid)
 
     visit(root)
