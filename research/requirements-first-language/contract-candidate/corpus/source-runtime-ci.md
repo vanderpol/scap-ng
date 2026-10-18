@@ -36,7 +36,7 @@ test_typed_integer_bounds_and_canonical_capture_gates (tools.test_research_b_sou
 test_unsupported_source_shapes_rejected (tools.test_research_b_source_textfile_state.CollectedStateTests.test_unsupported_source_shapes_rejected) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.028s
+Ran 15 tests in 1.030s
 
 OK
 ~~~
@@ -52,7 +52,7 @@ test_typed_distinct_acquisitions_are_both_required (tools.test_research_b_source
 test_unreachable_or_unsupported_check_cannot_be_dropped (tools.test_research_b_source_boolean_lowering.MultiTestTests.test_unreachable_or_unsupported_check_cannot_be_dropped) ... ok
 
 ----------------------------------------------------------------------
-Ran 7 tests in 0.052s
+Ran 7 tests in 0.079s
 
 OK
 ~~~
@@ -69,7 +69,7 @@ test_unsafe_or_unsupported_source_shapes_rejected (tools.test_research_b_source_
 test_wrong_query_cannot_prove_absence (tools.test_research_b_source_wmi.WmiSourceTests.test_wrong_query_cannot_prove_absence) ... ok
 
 ----------------------------------------------------------------------
-Ran 8 tests in 0.021s
+Ran 8 tests in 0.014s
 
 OK
 ~~~
@@ -87,7 +87,7 @@ test_terminal_statuses_and_missing_snapshot_are_not_equivalent_to_absence (tools
 test_wrong_view_identity_untrusted_types_and_duplicates_fail_closed (tools.test_research_b_source_registry.RegistrySourceTests.test_wrong_view_identity_untrusted_types_and_duplicates_fail_closed) ... ok
 
 ----------------------------------------------------------------------
-Ran 9 tests in 0.034s
+Ran 9 tests in 0.023s
 
 OK
 ~~~
@@ -101,7 +101,7 @@ test_real_wdigest_source_and_same_item_field_identity (tools.test_research_b_sou
 test_type_and_value_must_both_match_on_each_collected_item (tools.test_research_b_source_registry_and.RegistryAndSourceTests.test_type_and_value_must_both_match_on_each_collected_item) ... ok
 
 ----------------------------------------------------------------------
-Ran 5 tests in 0.022s
+Ran 5 tests in 0.014s
 
 OK
 ~~~
@@ -119,7 +119,7 @@ test_source_literal_stdout_empty_is_not_absence_of_stdout (tools.test_research_b
 test_wrong_command_or_malformed_line_array_is_not_accepted (tools.test_research_b_source_shell.SourceShellTests.test_wrong_command_or_malformed_line_array_is_not_accepted) ... ok
 
 ----------------------------------------------------------------------
-Ran 9 tests in 0.037s
+Ran 9 tests in 0.027s
 
 OK
 ~~~
@@ -140,7 +140,7 @@ test_unresolved_dependency_not_blind_true_or_false (tools.test_research_b_apache
 test_unverified_version_suffix_and_bad_evidence_are_errors (tools.test_research_b_apache_version_graph.ApacheVariableGraphTests.test_unverified_version_suffix_and_bad_evidence_are_errors) ... ok
 
 ----------------------------------------------------------------------
-Ran 12 tests in 0.074s
+Ran 12 tests in 0.049s
 
 OK
 ~~~
@@ -159,7 +159,7 @@ test_unique_explicitly_reduces_duplicates_only_when_requested (tools.test_resear
 test_unknown_and_error_do_not_become_empty_or_success (tools.test_research_b_variable_value_ops.VariableValueOpsTests.test_unknown_and_error_do_not_become_empty_or_success) ... ok
 
 ----------------------------------------------------------------------
-Ran 10 tests in 0.090s
+Ran 10 tests in 0.049s
 
 OK
 ~~~
@@ -186,8 +186,8 @@ Traceback (most recent call last):
              ^^^^^^^^^^^^^^^^^^^^^^^
   File "/home/runner/work/scap-ng/scap-ng/tools/test_research_b_variable_plan_evaluator.py", line 12, in <module>
     from research_b_variable_plan_evaluator import evaluate_source_variable_plan
-  File "/home/runner/work/scap-ng/scap-ng/tools/research_b_variable_plan_evaluator.py", line 138
-    "error_if_exit_status_not_0","error_if_stderr_exists"))):
-                                                           ^
-SyntaxError: unmatched ')'
+  File "/home/runner/work/scap-ng/scap-ng/tools/research_b_variable_plan_evaluator.py", line 135
+    c["shell"] not in {"bash","powershell"}) or
+                                               ^
+SyntaxError: invalid syntax
 ~~~
