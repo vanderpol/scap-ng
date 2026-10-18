@@ -40,6 +40,8 @@ on:
       - 'tools/test_research_b_variable_schedule.py'
       - 'tools/research_b_variable_value_ops.py'
       - 'tools/test_research_b_variable_value_ops.py'
+      - 'tools/research_b_variable_plan_evaluator.py'
+      - 'tools/test_research_b_variable_plan_evaluator.py'
       - 'tools/research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
@@ -165,6 +167,14 @@ jobs:
           mkdir -p work/b-corpus
           set -o pipefail
           python -m unittest -v tools/test_research_b_variable_value_ops.py 2>&1 | tee work/b-corpus/variable-ops-test.log
+      - name: Verify source Variable DAG partial Item-backed fixture evaluator
+        id: source-variable-plan
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_variable_plan_evaluator.py 2>&1 | tee work/b-corpus/variable-plan-test.log
       - name: Publish bounded State/Boolean CI outcomes directly on GitHub main
         if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
@@ -176,6 +186,7 @@ jobs:
           SHELL_OUTCOME: ${{ steps.source-shell.outcome }}
           APACHE_OUTCOME: ${{ steps.source-apache.outcome }}
           VAROPS_OUTCOME: ${{ steps.source-variable-ops.outcome }}
+          PLAN_OUTCOME: ${{ steps.source-variable-plan.outcome }}
         run: |
           mkdir -p research/requirements-first-language/contract-candidate/corpus
           target=research/requirements-first-language/contract-candidate/corpus/source-runtime-ci.md
@@ -191,9 +202,10 @@ jobs:
             printf '| Shell source command stdout Item tests | %s |\n' "$SHELL_OUTCOME"
             printf '| Apache Variable DAG source fixture tests | %s |\n' "$APACHE_OUTCOME"
             printf '| Typed Variable value operator tests | %s |\n' "$VAROPS_OUTCOME"
-            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ] || [ "$REGISTRY_OUTCOME" != success ] || [ "$REGISTRY_AND_OUTCOME" != success ] || [ "$SHELL_OUTCOME" != success ] || [ "$APACHE_OUTCOME" != success ] || [ "$VAROPS_OUTCOME" != success ]; then
+            printf '| Variable DAG partial fixture evaluator tests | %s |\n' "$PLAN_OUTCOME"
+            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ] || [ "$REGISTRY_OUTCOME" != success ] || [ "$REGISTRY_AND_OUTCOME" != success ] || [ "$SHELL_OUTCOME" != success ] || [ "$APACHE_OUTCOME" != success ] || [ "$VAROPS_OUTCOME" != success ] || [ "$PLAN_OUTCOME" != success ]; then
               printf '\n## Failed/skipped test diagnostics\n\n'
-              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log work/b-corpus/registry-test.log work/b-corpus/registry-and-test.log work/b-corpus/source-shell-test.log work/b-corpus/source-apache-test.log work/b-corpus/variable-ops-test.log; do
+              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log work/b-corpus/registry-test.log work/b-corpus/registry-and-test.log work/b-corpus/source-shell-test.log work/b-corpus/source-apache-test.log work/b-corpus/variable-ops-test.log work/b-corpus/variable-plan-test.log; do
                 printf '### %s\n\n' "$f"
                 printf '%s\n' '~~~text'
                 if [ -f "$f" ]; then tail -n 80 "$f"; else printf 'Step skipped; inspect Actions earlier steps.\n'; fi
