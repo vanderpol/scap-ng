@@ -1,0 +1,38 @@
+name: 0.4-A grammar stabilization guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-grammar-stabilization.yml'
+      - 'tools/v04_a_grammar_boundary.py'
+      - 'tools/test_v04_a_grammar_boundary.py'
+      - 'schema/v0.4.0/assessment.schema.json'
+      - 'schema/v0.4.0/assessment-language.schema.json'
+      - 'research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  guard-draft-vs-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test one-grammar draft-versus-candidate boundary
+        run: python -m unittest -v tools/test_v04_a_grammar_boundary.py
+      - name: Emit exact baseline schema boundary and pinned A sample audit
+        run: |
+          python tools/v04_a_grammar_boundary.py             --assessment-json research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json             | tee "$RUNNER_TEMP/a-grammar-boundary.json"
+      - name: Make limitations visible in job summary
+        if: always()
+        run: |
+          {
+            echo '## 0.4-A draft grammar stabilization — issue #239'
+            echo 'This is a draft-versus-research boundary guard, not a 0.4 promotion, six-STIG compiler proof or scanner conformance.'
+            if test -f "$RUNNER_TEMP/a-grammar-boundary.json"; then
+              cat "$RUNNER_TEMP/a-grammar-boundary.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
