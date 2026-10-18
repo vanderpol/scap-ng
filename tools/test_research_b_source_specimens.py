@@ -94,6 +94,31 @@ class BSpecimensTests(unittest.TestCase):
         self.assertIn("windows.registry/nested_state_all",selected["families"])
         self.assertIn("states:",selected["content"])
 
+    def test_platform_specific_apache_and_dns_command_source_samples(self):
+        docs={
+            "authoring/apache_server_2-4_unix_server/rules/apache.yaml":
+                rule("SV-701","apache-command"),
+            "authoring/ms_windows_server_dns/rules/dns.yaml":
+                rule("SV-702","dns-command"),
+            "authoring/apache_server_2-4_unix_server/assessments/apache.yaml":
+                assessment("apache-command","independent.shellcommand"),
+            "authoring/ms_windows_server_dns/assessments/dns.yaml":
+                assessment("dns-command","independent.shellcommand"),
+        }
+        report,capsules=import_corpus(docs,{k:digest(v) for k,v in docs.items()},
+                                       expected_benchmarks=2)
+        picks,_=choose(report,capsules)
+        self.assertIn("apache-command",picks)
+        self.assertIn("dns-command",picks)
+        self.assertIn("independent.shellcommand/apache_small",
+                      picks["apache-command"]["families"])
+        self.assertIn("independent.shellcommand/dns_small",
+                      picks["dns-command"]["families"])
+        self.assertEqual(picks["apache-command"]["benchmarks"],
+                         ["apache_server_2-4_unix_server"])
+        self.assertEqual(picks["dns-command"]["benchmarks"],
+                         ["ms_windows_server_dns"])
+
     def test_output_filenames_do_not_use_ids_as_unsafe_paths(self):
         report,capsules=self.fixtures()
         picks,_=choose(report,capsules)
