@@ -11,13 +11,13 @@ import re
 
 
 def validate_wmi_query(ns,query):
-    if (not isinstance(ns,str) or
-        not re.fullmatch(r"[A-Za-z][\\w]*(?:\\\\[\\w]+)*",ns) or len(ns)>256):
+    if (not isinstance(ns,str) or not re.fullmatch(r"[A-Za-z][\w]*(?:\\[\w]+)*",ns)
+        or len(ns)>256):
         raise ValueError("WMI namespace must be an explicit bounded path")
     if (not isinstance(query,str) or len(query)>4096 or
-        not re.match(r"^\\s*SELECT\\s+\\S+",query,re.IGNORECASE) or
-        not re.search(r"\\bFROM\\b",query,re.IGNORECASE) or
-        ";" in query or "\\x00" in query):
+        not re.match(r"^\s*SELECT\s+\S+",query,re.IGNORECASE) or
+        not re.search(r"\bFROM\b",query,re.IGNORECASE) or
+        ";" in query or "\x00" in query):
         raise ValueError("only bounded read-only WMI SELECT fixture queries supported")
 
 
@@ -54,14 +54,7 @@ def lower_state_free_wmi_assessment(source):
     if not isinstance(collected,dict) or set(collected)!={"namespace","query"}:
         raise ValueError("unsupported WMI query acquisition fields")
     ns=collected["namespace"]; query=collected["query"]
-    if (not isinstance(ns,str) or not re.fullmatch(r"[A-Za-z][\w]*(?:\\[\w]+)*",ns)
-        or len(ns)>256):
-        raise ValueError("WMI namespace must be an explicit bounded path")
-    if (not isinstance(query,str) or len(query)>4096 or
-        not re.match(r"^\s*SELECT\s+\S+",query,re.IGNORECASE) or
-        not re.search(r"\bFROM\b",query,re.IGNORECASE) or
-        ";" in query or "\x00" in query):
-        raise ValueError("only bounded read-only WMI SELECT fixture queries supported")
+    validate_wmi_query(ns,query)
     return {
         "kind":"compat_oval_provider_existence",
         "source_assessment_id":a["id"],
