@@ -22,6 +22,10 @@ on:
       - 'tools/research_b_source_wmi_lowering.py'
       - 'tools/research_b_wmi_query_snapshot.py'
       - 'tools/test_research_b_source_wmi.py'
+      - 'tools/research_b_source_registry_lowering.py'
+      - 'tools/research_b_source_registry_snapshot.py'
+      - 'tools/research_b_source_registry_evaluator.py'
+      - 'tools/test_research_b_source_registry.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
       - 'tools/research_b_manual_lowering.py'
       - 'tools/research_b_manual_response.py'
@@ -105,25 +109,35 @@ jobs:
           mkdir -p work/b-corpus
           set -o pipefail
           python -m unittest -v tools/test_research_b_source_wmi.py 2>&1 | tee work/b-corpus/wmi-test.log
+      - name: Verify source registry dual-view and typed Item semantics
+        id: source-registry
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_source_registry.py 2>&1 | tee work/b-corpus/registry-test.log
       - name: Publish bounded State/Boolean CI outcomes directly on GitHub main
         if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
         env:
           STATE_OUTCOME: ${{ steps.source-state.outcome }}
           BOOLEAN_OUTCOME: ${{ steps.source-boolean.outcome }}
           WMI_OUTCOME: ${{ steps.source-wmi.outcome }}
+          REGISTRY_OUTCOME: ${{ steps.source-registry.outcome }}
         run: |
           mkdir -p research/requirements-first-language/contract-candidate/corpus
           target=research/requirements-first-language/contract-candidate/corpus/source-runtime-ci.md
           {
-            printf '# 0.4-B source State, Boolean, and Windows WMI fixture test gate\n\n'
+            printf '# 0.4-B source State, Boolean, WMI and registry fixture test gate\n\n'
             printf '**GitHub Actions research only; not a SCAP 1.4 parity certification.**\n\n'
             printf '| Stage | Most recent push gate outcome |\n| --- | --- |\n'
             printf '| Source State fixture tests | %s |\n' "$STATE_OUTCOME"
             printf '| Source Boolean fixture tests | %s |\n' "$BOOLEAN_OUTCOME"
             printf '| Windows WMI source fixture tests | %s |\n' "$WMI_OUTCOME"
-            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ]; then
+            printf '| Windows registry source fixture tests | %s |\n' "$REGISTRY_OUTCOME"
+            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ] || [ "$REGISTRY_OUTCOME" != success ]; then
               printf '\n## Failed/skipped test diagnostics\n\n'
-              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log; do
+              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log work/b-corpus/registry-test.log; do
                 printf '### %s\n\n' "$f"
                 printf '%s\n' '~~~text'
                 if [ -f "$f" ]; then tail -n 80 "$f"; else printf 'Step skipped; inspect Actions earlier steps.\n'; fi
