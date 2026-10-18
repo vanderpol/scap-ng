@@ -154,6 +154,38 @@ class SixStreamConversionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"not declared"):
             _assert_complete_source_provenance(forged,cap)
 
+    def test_recompiled_source_leaf_rejects_changed_path_or_cardinality(self):
+        cap=copy.deepcopy(self.capsules[self.aid])
+        status,why,blob=_lower_assessment(cap)
+        self.assertEqual(status,READY_STATUS,why)
+        root=decode(blob)["root"]
+        for modification in ("path","existence","source_test_id"):
+            with self.subTest(modification=modification):
+                changed=copy.deepcopy(root)
+                if modification=="path":
+                    changed["using"]["path"]="/etc/attacker-controlled.conf"
+                elif modification=="existence":
+                    changed["existence"]="none_exist"
+                else:
+                    changed["source_test_id"]="unknown-test"
+                with self.assertRaises(ValueError):
+                    _assert_complete_source_provenance(changed,cap)
+
+    def test_recompiled_source_boolean_leaf_rejects_changed_selector(self):
+        cap=copy.deepcopy(self.capsules[self.aid])
+        assessment=cap["source_document"]["assessment"]
+        original_id,original=next(iter(assessment["tests"].items()))
+        clone=copy.deepcopy(original)
+        clone["object"]["select"]["pattern"]["value"]=r"^\\s*maxpoll\\s+10\\s*$"
+        assessment["tests"]["second-check"]=clone
+        assessment["evaluate"]={"all":[{"test":original_id},{"test":"second-check"}]}
+        status,why,blob=_lower_assessment(cap)
+        self.assertEqual(status,READY_STATUS,why)
+        compiled=decode(blob)["root"]
+        compiled["children"][1]["using"]["pattern"]=r"^\\s*maxpoll\\s+11\\s*$"
+        with self.assertRaisesRegex(ValueError,"diverge"):
+            _assert_complete_source_provenance(compiled,cap)
+
     def test_manual_never_silently_lowered_to_automated(self):
         status,reason,payload=_lower_assessment(self.capsules["manual-check"])
         self.assertEqual(status,"manual_contract_unimplemented")
