@@ -39,6 +39,9 @@ def lower_one(doc):
             raise ValueError(f"{test_id}: invalid Test")
         if "require" in test or "collected_items_require" not in test:
             raise ValueError(f"{test_id}: mixed or missing Test requirement grammar")
+        requirement = test["collected_items_require"]
+        if not isinstance(requirement, str) or not requirement:
+            raise ValueError(f"{test_id}: invalid collected_items_require")
         test["require"] = test.pop("collected_items_require")
     # Expand the experimentally scoped scalar State fields into the already
     # versioned 0.4-A base State grammar. Independent Test Item requirements
