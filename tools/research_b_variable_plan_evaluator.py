@@ -2,8 +2,8 @@
 """#237 partial source Variable DAG evaluation over precollected command Items.
 
 Research fixture only: never executes commands, never returns source parity
-or scanner execution. Unverified merge ordering and source regex dialect
-prevent any claim of original SCAP 1.4 equivalence.
+or scanner execution. OVAL v5.12.3 merge document-order semantics are known;
+actual collector System Characteristics Item order and regex dialect remain unverified.
 """
 from __future__ import annotations
 import json
