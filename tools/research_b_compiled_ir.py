@@ -185,6 +185,38 @@ def _node(node, source_kind, depth=0):
                 raise ValueError("invalid source State regex for research provider") from exc
         return
 
+    if kind == "compat_oval_shellcommand_state":
+        _ensure(source_kind!="native",
+                "source shell compatibility cannot be native authored")
+        keys={"kind","source_assessment_id","source_test_id","provider",
+              "using","existence","check","state"}
+        _ensure(set(node)==keys,"source shell IR fields invalid")
+        _ensure(node["provider"]=="independent.shellcommand" and
+                node["existence"]=="at_least_one_exists" and node["check"]=="all",
+                "source shell Test aggregation unsupported")
+        _ensure(all(isinstance(node[k],str) and bool(node[k])
+                    for k in ("source_assessment_id","source_test_id")),
+                "source shell Test provenance identity required")
+        using=node["using"]
+        expected={"command","shell","error_if_exit_status_not_0",
+                  "error_if_stderr_exists"}
+        _ensure(isinstance(using,dict) and set(using)==expected and
+                type(using["command"]) is str and bool(using["command"]) and
+                len(using["command"])<=4096 and
+                using["shell"] in {"bash","powershell"} and
+                all(type(using[k]) is bool for k in
+                    ("error_if_exit_status_not_0","error_if_stderr_exists")),
+                "source shell acquisition identity invalid")
+        state=node["state"]
+        _ensure(isinstance(state,dict) and set(state)=={
+            "field","operation","expected","entity_existence","entity_check"} and
+            state["field"]=="stdout_line" and state["operation"]=="equals" and
+            type(state["expected"]) is str and
+            state["entity_existence"]=="at_least_one_exists" and
+            state["entity_check"]=="all",
+            "source shell State field/cardinality invalid")
+        return
+
     if kind == "compat_oval_registry_view_invariant":
         _ensure(source_kind != "native",
                 "source registry compatibility IR cannot be native authored")
@@ -334,7 +366,8 @@ def _classify(node, depth=0):
     if kind == "manual_procedure":
         return {"manual"}
     if kind in {"compat_oval_test","compat_oval_provider_existence",
-                "compat_oval_provider_state","compat_oval_registry_view_invariant"}:
+                "compat_oval_provider_state","compat_oval_registry_view_invariant",
+                "compat_oval_shellcommand_state"}:
         return {"compiler-compatibility"}
     if kind == "logic":
         result = set()
