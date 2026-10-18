@@ -2,8 +2,18 @@
 
 **October 16, 2026 · Pre-alpha research · Not a specification adoption request**
 
-**October 18 readability iteration (current research):** [Five-case friction audit + lean complete simple candidate](READABILITY-RESET-ITERATION-1.md) · [Three-way *unprimed* first-read packet](AUDITOR-FIRST-READ-PACKET.md) · [Facilitator answer key (do not show first)](AUDITOR-FIRST-READ-SCORING.md) · [Complex Windows/Linux review maps](COMPLEX-FIRST-READ-MAPS.md). **Also:** [Complete seven-Test Windows 11 lean third candidate](FULL-03-win11-LEAN-THIRD-CANDIDATE.md) (keeps all record and OR semantics, removes redundant per-check capability declarations) · [Measured Apache/DNS acquisition/Variable chain problems](APACHE-DNS-COMPOSITION-RESEARCH.md) · [Complete DNS inline-command candidate](FULL-04-dns-INLINE-COMMAND-CANDIDATE.md) · [Complete Apache inline-command candidate](FULL-05-apache-INLINE-COMMAND-CANDIDATE.md) · [Command composition semantics checklist](COMMAND-COMPOSITION-CONTRACT.md) · [Unprimed DNS A/B review](DNS-COMPOSITION-BLIND-REVIEW.md) (facilitator: [separate answer key](DNS-COMPOSITION-REVIEW-KEY.md)) · [Apache complete-file authorability drill](APACHE-COMPOSITION-AUTHORING-CHALLENGE.md) · [Apache second-pass: why aggressive inlining fails, plus explicit source-stage sketch](APACHE-SECOND-PASS-READABILITY.md) (potential real authoring simplification beyond syntax renaming). **None changes the 0.4 grammar.** Neither lean candidate has an independently verified compiler mapping or human-review scores; do not treat conversion/CI success as usability evidence.
+## New readability candidates and first-read tests — 18 October 2026
 
+**Research only.** The complete paired baseline documents below remain unchanged. None of the new candidates has an accepted 0.4 grammar, standalone lossless lowering, complete scanner parity or independent novice-review scores.
+
+| Topic | Complete candidate or evidence | Reader test |
+| --- | --- | --- |
+| Simple Linux /home | [Five-case friction audit + lean third candidate](READABILITY-RESET-ITERATION-1.md) | [Unprimed three-way full YAML review](AUDITOR-FIRST-READ-PACKET.md) ([facilitator-only key](AUDITOR-FIRST-READ-SCORING.md)) |
+| Windows 11 deny-RDP | [Complete seven-Test lean candidate](FULL-03-win11-LEAN-THIRD-CANDIDATE.md) | [Complex Windows/Linux meaning maps](COMPLEX-FIRST-READ-MAPS.md) |
+| DNS signing | [Complete inline-command candidate](FULL-04-dns-INLINE-COMMAND-CANDIDATE.md) | [Unprimed full DNS A/B](DNS-COMPOSITION-BLIND-REVIEW.md) ([facilitator-only key](DNS-COMPOSITION-REVIEW-KEY.md)) |
+| Apache configuration | [Complete inline-command candidate](FULL-05-apache-INLINE-COMMAND-CANDIDATE.md) · [Second-pass inlining limits and staged-source sketch](APACHE-SECOND-PASS-READABILITY.md) | [Full Apache authorability exercise](APACHE-COMPOSITION-AUTHORING-CHALLENGE.md) |
+
+Supporting analysis: [Original Apache/DNS Variable chains](APACHE-DNS-COMPOSITION-RESEARCH.md) · [Command composition/typing/provenance contract](COMMAND-COMPOSITION-CONTRACT.md).
 
 **Your feedback question:** Which format makes it easier to understand **and author a complete check**—existing 0.4 or proposed English-first—without needing to guess what a referenced collection or Variable means?
 
