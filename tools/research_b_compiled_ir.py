@@ -206,16 +206,36 @@ def _node(node, source_kind, depth=0):
                 all(isinstance(using[k],str) and bool(using[k]) for k in ("key","name")),
                 "source registry using identity invalid")
         state=node["state"]
-        _ensure(isinstance(state,dict) and set(state)=={
-            "field","operation","expected","entity_existence","entity_check"},
-            "source registry State IR fields invalid")
-        _ensure(state["field"]=="value" and state["operation"]=="equals" and
-                state["entity_existence"]=="at_least_one_exists" and
-                state["entity_check"]=="all" and
-                type(state["expected"]) in (str,int) and
-                (type(state["expected"]) is str or
-                 -(2**63)<=state["expected"]<2**63),
-                "source registry State value/cardinality not supported")
+        def valid_registry_field(field):
+            _ensure(isinstance(field,dict) and set(field)=={
+                "field","operation","expected","entity_existence","entity_check"},
+                "source registry State child fields invalid")
+            _ensure(field["field"] in {"value","type"} and
+                    field["operation"]=="equals" and
+                    field["entity_existence"]=="at_least_one_exists" and
+                    field["entity_check"]=="all",
+                    "unsupported source registry State child operation/cardinality")
+            v=field["expected"]
+            if field["field"]=="type":
+                _ensure(type(v) is str and v in {"string","dword","qword"},
+                        "source registry type must be recognized literal")
+            else:
+                _ensure(type(v) in (str,int) and
+                        (type(v) is str or -(2**63)<=v<2**63),
+                        "source registry value must be bounded typed literal")
+        _ensure(isinstance(state,dict),"source registry State must be a mapping")
+        if set(state)=={"all"}:
+            fields=state["all"]
+            _ensure(isinstance(fields,list) and len(fields)==2,
+                    "source registry AND must have exactly two field children")
+            for field in fields:
+                valid_registry_field(field)
+            _ensure({f["field"] for f in fields}=={"type","value"},
+                    "type/value required on the same source registry Item")
+        else:
+            valid_registry_field(state)
+            _ensure(state["field"]=="value",
+                    "unpaired source registry type comparison unsupported")
         return
 
     if kind == "compat_oval_provider_existence":
