@@ -18,6 +18,7 @@ from research_b_full_corpus_import import import_corpus, read_source
 from research_b_six_stream_compiler import (
     READY_STATUS, STATUS, FORMAT, build_six_stream_report,
     render_markdown, write_research_zip, _lower_assessment,
+    _assert_complete_source_provenance,
 )
 from research_b_compiled_ir import decode, evaluate_json
 from oval_result_truth_tables import TRUE, FALSE, UNKNOWN
@@ -115,6 +116,43 @@ class SixStreamConversionTests(unittest.TestCase):
         actual["items"]=[]
         self.assertEqual(evaluate_json(compiled[member],
                 {"linux.textfile_matches":actual}).result,FALSE)
+
+    def test_compiler_accepts_complete_source_boolean_tree(self):
+        cap=copy.deepcopy(self.capsules[self.aid])
+        assessment=cap["source_document"]["assessment"]
+        first_id, original=next(iter(assessment["tests"].items()))
+        second=copy.deepcopy(original)
+        second["object"]["select"]["pattern"]["value"] = r"^\\s*maxpoll\\s+10\\s*$"
+        second_id="chrony-maxpoll-source-test"
+        assessment["tests"][second_id]=second
+        assessment["evaluate"]={"all":[{"test":first_id},{"test":second_id}]}
+        state,reason,blob=_lower_assessment(cap)
+        self.assertEqual(state,READY_STATUS,reason)
+        compiled=decode(blob)
+        self.assertEqual(compiled["root"]["kind"],"logic")
+        self.assertEqual(compiled["root"]["operator"],"all")
+        self.assertEqual({n["source_test_id"] for n in compiled["root"]["children"]},
+                         {first_id,second_id})
+        _assert_complete_source_provenance(compiled["root"],cap)
+        # A branch with a new Test must fail compilation, not become TRUE.
+        missing=copy.deepcopy(cap)
+        missing["source_document"]["assessment"]["tests"]["unreferenced"] = copy.deepcopy(original)
+        failed,why,payload=_lower_assessment(missing)
+        self.assertEqual(failed,"unsupported_source_semantics")
+        self.assertIsNone(payload)
+
+    def test_compiled_source_provenance_cannot_hide_unreferenced_test(self):
+        cap=copy.deepcopy(self.capsules[self.aid])
+        only=decode(_lower_assessment(cap)[2])["root"]
+        extra=copy.deepcopy(cap)
+        extra["source_document"]["assessment"]["tests"]["ignored"] = copy.deepcopy(
+            next(iter(extra["source_document"]["assessment"]["tests"].values())))
+        with self.assertRaisesRegex(ValueError,"omitted Test"):
+            _assert_complete_source_provenance(only,extra)
+        forged=copy.deepcopy(only)
+        forged["source_test_id"]="invented"
+        with self.assertRaisesRegex(ValueError,"not declared"):
+            _assert_complete_source_provenance(forged,cap)
 
     def test_manual_never_silently_lowered_to_automated(self):
         status,reason,payload=_lower_assessment(self.capsules["manual-check"])
