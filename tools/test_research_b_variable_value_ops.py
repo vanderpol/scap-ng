@@ -126,7 +126,12 @@ class VariableValueOpsTests(unittest.TestCase):
         self.assertEqual(merge(values(["a","a"]),**args),
                          values(["a a"]))
         self.assertEqual(merge(values(["b","a"]),**args),
-                         values(status="unknown"))
+                         values(["b a"]))
+        self.assertEqual(merge(values(["a","b"]),**args),
+                         values(["a b"]))
+        self.assertEqual(merge(values(["b","a"]),delimiter=" ",
+                               sort="document",order="descending"),
+                         values(["b a"]))
         self.assertEqual(merge(values(status="no_values"),**args),
                          values(status="no_values"))
         self.assertEqual(merge(values(["a"]),delimiter=" ",
