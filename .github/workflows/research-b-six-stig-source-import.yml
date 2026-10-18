@@ -19,6 +19,9 @@ on:
       - 'tools/research_b_source_state_evaluator.py'
       - 'tools/test_research_b_source_textfile_state.py'
       - 'tools/research_b_source_boolean_lowering.py'
+      - 'tools/research_b_source_wmi_lowering.py'
+      - 'tools/research_b_wmi_query_snapshot.py'
+      - 'tools/test_research_b_source_wmi.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
       - 'tools/research_b_manual_lowering.py'
       - 'tools/research_b_manual_response.py'
@@ -99,6 +102,7 @@ jobs:
         env:
           STATE_OUTCOME: ${{ steps.source-state.outcome }}
           BOOLEAN_OUTCOME: ${{ steps.source-boolean.outcome }}
+          WMI_OUTCOME: ${{ steps.source-wmi.outcome }}
         run: |
           mkdir -p research/requirements-first-language/contract-candidate/corpus
           target=research/requirements-first-language/contract-candidate/corpus/source-runtime-ci.md
@@ -108,9 +112,10 @@ jobs:
             printf '| Stage | Most recent push gate outcome |\n| --- | --- |\n'
             printf '| Source State fixture tests | %s |\n' "$STATE_OUTCOME"
             printf '| Source Boolean fixture tests | %s |\n' "$BOOLEAN_OUTCOME"
-            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ]; then
+            printf '| Windows WMI source fixture tests | %s |\n' "$WMI_OUTCOME"
+            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ] || [ "$WMI_OUTCOME" != success ]; then
               printf '\n## Failed/skipped test diagnostics\n\n'
-              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log; do
+              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log work/b-corpus/wmi-test.log; do
                 printf '### %s\n\n' "$f"
                 printf '%s\n' '~~~text'
                 if [ -f "$f" ]; then tail -n 80 "$f"; else printf 'Step skipped; inspect Actions earlier steps.\n'; fi
@@ -126,6 +131,14 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
+      - name: Test B Windows WMI query state-free source and incomplete evidence
+        id: source-wmi
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_source_wmi.py 2>&1 | tee work/b-corpus/wmi-test.log
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
