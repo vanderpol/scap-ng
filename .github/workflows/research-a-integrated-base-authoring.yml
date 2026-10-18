@@ -11,6 +11,10 @@ on:
       - 'tools/test_v04_a_dataflow_index.py'
       - 'tools/v04_a_dataflow_census.py'
       - 'tools/v04_a_compile_verified_ir.py'
+      - 'tools/v04_a_truth_plan.py'
+      - 'tools/test_v04_a_truth_plan.py'
+      - 'tools/v04_a_truth_plan_census.py'
+      - 'tools/test_v04_a_truth_plan_census.py'
       - 'tools/test_v04_a_compile_verified_ir.py'
       - 'tools/test_v04_a_dataflow_census.py'
       - 'tools/test_v04_a_lossless_ir.py'
@@ -43,6 +47,8 @@ jobs:
         run: python -m unittest -v tools/test_v04_a_lossless_ir.py
       - name: Verify the single-command dual-format compiler gates
         run: python -m unittest -v tools/test_v04_a_compile_verified_ir.py
+      - name: Check supplied-six-state evaluator against independently pinned OVAL truth tables
+        run: python -m unittest -v tools/test_v04_a_truth_plan.py tools/test_v04_a_truth_plan_census.py
       - name: Fetch immutable 0.4-A r3 authoring sources
         run: |
           mkdir -p work/a-end-to-end
@@ -114,6 +120,32 @@ jobs:
           for b in report["foreach_source_bindings"]:
               print("for_each",b["assessment_id"],b["source_object"],b["item_alias"],b["projections"])
           PY
+      - name: Compile and verify six-STIG source expression plans
+        run: |
+          python tools/v04_a_truth_plan_census.py \
+            --ir "$RUNNER_TEMP/a-lossless-ir.json" \
+            --out "$RUNNER_TEMP/a-expression-plans.json" \
+            --report "$RUNNER_TEMP/a-expression-plan-report.json" \
+            --assert-six > "$RUNNER_TEMP/a-expression-plans.stdout"
+          python - "$RUNNER_TEMP/a-expression-plan-report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          c=d["counts"]
+          assert d["verified"] is True,d
+          assert c["automated_assessments_seen"]==872,c
+          assert (c.get("assessments_with_compiled_evaluate",0)
+              + sum(x["field"]=="evaluate" for x in d["blocked_sources"])
+              == 872) or d["blocked_expression_count"]>len(d["blocked_sources"]),d
+          assert d["scanner_executed"] is False,d
+          assert d["native_executable_compiler_complete"] is False,d
+          assert d["synthetic_result_execution_only"] is True,d
+          print("PASS: #229 / #232 full source expression census (supplied outcomes only)")
+          print("Compiled evaluate roots:",c.get("assessments_with_compiled_evaluate",0))
+          print("Unapproved expression blockers:",d["blocked_expression_count"])
+          print("Boolean operator nodes:",sum(n for k,n in c.items() if k.startswith("opcode_")))
+          print("Synthetic leaf-status simulations:",c["synthetic_expression_executions"])
+          print("Source plan SHA-256:",d["manifest_sha256"])
+          PY
       - name: Report exact capability limit without overstating compiler readiness
         if: always()
         run: |
@@ -130,6 +162,10 @@ jobs:
           print("for_each bindings:",json.dumps(r["foreach_source_bindings"],sort_keys=True))
           print("Complexity examples:",json.dumps(r["largest_dataflow_examples"],sort_keys=True))
           PY
+            fi
+            if test -s "$RUNNER_TEMP/a-expression-plan-report.json"; then
+              echo '### #229/#232 expression plan validation — supplied artificial six-state inputs only, NOT scanner'
+              cat "$RUNNER_TEMP/a-expression-plan-report.json"
             fi
             if test -s "$RUNNER_TEMP/a-single-compiler.json"; then
               echo '### #240 independently parsed YAML+JSON to one checked research IR'
