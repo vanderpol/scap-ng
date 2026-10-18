@@ -1,0 +1,75 @@
+name: 0.4-A integrated base-authoring research package
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-integrated-base-authoring.yml'
+      - 'tools/v04_a_end_to_end_base_authoring.py'
+      - 'tools/test_v04_a_end_to_end_base_authoring.py'
+      - 'tools/v04_a_lower_scoped_to_base.py'
+      - 'tools/v04_a_benchmark_spec_migration_preview.py'
+      - 'tools/v04_a_deterministic_research_container.py'
+      - 'schema/v0.4.0/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  six-stig-input-to-base-research-package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent YAML parser and schema validator
+        run: python -m pip install PyYAML==6.0.3 jsonschema==4.25.1
+      - name: Run adversarial integrated packaging tests
+        run: python -m unittest -v tools/test_v04_a_end_to_end_base_authoring.py
+      - name: Fetch immutable 0.4-A r3 authoring sources
+        run: |
+          mkdir -p work/a-end-to-end
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-json.zip' \
+            --output work/a-end-to-end/json.zip
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --output work/a-end-to-end/yaml.zip
+      - name: Reversibly lower, base-schema validate, stage versions and package
+        run: |
+          python tools/v04_a_end_to_end_base_authoring.py \
+            --json-archive work/a-end-to-end/json.zip \
+            --yaml-archive work/a-end-to-end/yaml.zip \
+            --assert-six \
+            --out "$RUNNER_TEMP/a-unsigned-base-research.zip" \
+            --report-json "$RUNNER_TEMP/a-end-to-end.json" \
+            > "$RUNNER_TEMP/a-end-to-end.stdout"
+          python - "$RUNNER_TEMP/a-end-to-end.json" <<'PY'
+          import json,sys
+          x=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert x["status"]=="VERIFIED_BASE_AUTHORING_RESEARCH_ONLY",x
+          assert x["source_document_count"]==4001,x
+          assert x["assessment_counts"]["lowered_automated_assessments"]==872,x
+          assert x["assessment_counts"]["validated_base_assessments"]==872,x
+          assert x["assessment_counts"]["lowered_tests"]==1375,x
+          assert x["rule_choice_links"]==2958,x
+          assert x["yaml_json_byte_parity"]=="PASS",x
+          assert x["base_schema"]=="ALL_AUTOMATED_ASSESSMENTS_VALIDATED",x
+          assert x["native_0_4_compiler_complete"] is False,x
+          assert x["allowed_to_scan"] is False,x
+          assert x["signed_bundle"] is False,x
+          print("PASS: source -> base A schema -> staged version declarations -> verified reproducible ZIP")
+          print("Unsigned research archive SHA-256:",x["archive_sha256"])
+          print("Base input graph SHA-256:",x["base_lowered_graph_sha256"])
+          print("Packaged staged graph SHA-256:",x["packaged_staged_graph_sha256"])
+          PY
+      - name: Report exact capability limit without overstating compiler readiness
+        if: always()
+        run: |
+          {
+            echo '## #232/#239 — integrated 0.4-A base grammar authoring and research package'
+            echo 'The independent YAML/JSON paths produce byte-identical, verified, UNSIGNED research ZIPs with all base-schema-valid Automated Assessments and exact Rule choices. The 0.4 language/migration approval and actual scanner executable .scapng compiler remain OUT OF SCOPE.'
+            if test -s "$RUNNER_TEMP/a-end-to-end.json"; then
+              cat "$RUNNER_TEMP/a-end-to-end.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
