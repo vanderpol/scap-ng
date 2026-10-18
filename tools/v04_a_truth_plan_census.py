@@ -26,6 +26,7 @@ MANIFEST_STAGE = "RESEARCH_SIX_STATE_EXPRESSION_PLANS_SUPPLIED_INPUT_ONLY"
 def build_manifest(ir):
     documents = decode_and_verify(ir)
     plans, blockers, counted = [], [], Counter()
+    evaluate_witnesses = []
     for path, doc in sorted(documents.items()):
         assessment = doc.get("assessment")
         if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
@@ -47,6 +48,19 @@ def build_manifest(ir):
             counted["compiled_expression_roots"] += 1
             if field == "evaluate":
                 counted["assessments_with_compiled_evaluate"] += 1
+                evaluate_witnesses.append({
+                    "assessment_id": assessment["id"],
+                    "source_path": path,
+                    "instruction_count": plan["instruction_count"],
+                    "test_leaf_occurrences": sum(i["op"] == "read_test"
+                                                 for i in plan["instructions"]),
+                    "max_source_path_depth": max(len(i["path"])
+                                                 for i in plan["instructions"]),
+                    "operators": dict(sorted(Counter(
+                        i["op"] for i in plan["instructions"]
+                        if i["op"] not in ("read_test", "read_assessment")
+                    ).items())),
+                })
             else:
                 counted["compiled_applicability_roots"] += 1
             # Exercise all six supplied outcome classes in the exact source
@@ -73,6 +87,11 @@ def build_manifest(ir):
         "source_graph_sha256": ir["source_graph_sha256"],
         "counts": dict(sorted(counted.items())),
         "unapproved_expression_blockers": blockers,
+        "largest_source_expressions": sorted(
+            evaluate_witnesses,
+            key=lambda x: (-x["instruction_count"], -x["max_source_path_depth"],
+                           x["assessment_id"], x["source_path"]),
+        )[:8],
         "plans": plans,
         "not_proven": [
             "actual Test/Item/State/Variable collection or execution",
@@ -119,6 +138,8 @@ def main(argv=None):
         "counts": c,
         "blocked_expression_count": len(manifest["unapproved_expression_blockers"]),
         "blocked_sources": manifest["unapproved_expression_blockers"][:15],
+        "operator_counts": {k:v for k,v in c.items() if k.startswith("opcode_")},
+        "largest_source_expressions": manifest["largest_source_expressions"],
         "scanner_executed": False,
         "native_executable_compiler_complete": False,
         "synthetic_result_execution_only": True,
