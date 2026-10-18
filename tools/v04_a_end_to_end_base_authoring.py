@@ -48,6 +48,37 @@ def _extract_docs(data):
     return docs, manifest
 
 
+def validate_native_capability_tests(documents):
+    """Validate every Test using its generated *version-local 0.4* capability.
+
+    No invocation of the 0.3 validator or scanner. A syntactically legal
+    Assessment that contains an unsupported/incorrect capability fails closed.
+    """
+    from collections import Counter
+    from research_04_native_deep_content_census import SUPPORTED, validator_for
+    cache, counts = {}, Counter()
+    for path, doc in sorted(documents.items()):
+        assessment = doc.get("assessment")
+        if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
+            continue
+        for test_id, test in sorted((assessment.get("tests") or {}).items()):
+            cap = test.get("capability") if isinstance(test, dict) else None
+            if not isinstance(cap, str) or cap not in SUPPORTED:
+                raise ValueError(f"{path} Test {test_id}: unsupported 0.4 capability {cap!r}")
+            errors = list(validator_for(cap, cache).iter_errors(test))
+            if errors:
+                e = sorted(errors, key=lambda e: (list(map(str, e.absolute_path)), e.message))[0]
+                raise ValueError(f"{path} Test {test_id} capability {cap}: "
+                                 f"native schema invalid at {list(e.absolute_path)!r}: {e.message}")
+            counts[cap] += 1
+    return {
+        "native_test_nodes_validated": sum(counts.values()),
+        "native_capabilities_validated": len(counts),
+        "by_capability": dict(sorted(counts.items())),
+        "stage": "generated_0.4_capability_structural_schema_only",
+    }
+
+
 def stage_and_package(documents, *, validate_base=True):
     """Return one validated research ZIP, proof report. Inputs never mutated."""
     if not validate_base:
@@ -60,6 +91,12 @@ def stage_and_package(documents, *, validate_base=True):
                   for path, doc in documents.items()}
     original_graph = graph_index(documents)
     lowered, lower_report = lower_all(documents, validate_base=validate_base)
+    capability_proof = (validate_native_capability_tests(lowered)
+                        if validate_base else {
+                            "stage": "NOT_CHECKED_RESEARCH_FIXTURE",
+                            "native_test_nodes_validated": 0,
+                            "native_capabilities_validated": 0,
+                        })
     if lower_report["source_graph_sha256"] != original_graph["graph_sha256"]:
         raise ValueError("lowering lost original source graph identity")
     metadata_plan, staged_docs = build_preview(lowered)
@@ -110,6 +147,7 @@ def stage_and_package(documents, *, validate_base=True):
         "rule_choice_links": edge_report["counts"]["choice_links"],
         "benchmark_count": len(edge_report["benchmarks"]),
         "base_schema": base_label,
+        "native_capability_proof": capability_proof,
         "source_preservation": "PASS",
         "independent_archive_verification": verified["status"],
         "allowed_to_scan": False,
