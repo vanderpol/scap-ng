@@ -35,6 +35,48 @@ def _ir_filename(assessment_id):
     return "fixture-ir/" + sha256(assessment_id.encode("utf-8")).hexdigest() + ".json"
 
 
+def _assert_complete_source_provenance(root, capsule):
+    """Require every referenced source Test to survive nested Boolean IR.
+
+    A composite AND/OR root carries no Test ID itself. The lowering is valid
+    only when ALL source Test definitions have matching, compiler-owned
+    leaves. No source branch may be silently omitted or substituted.
+    """
+    a = capsule["source_document"]["assessment"]
+    declared = a.get("tests")
+    if not isinstance(declared, dict) or not declared:
+        raise ValueError("automated source has no Test table")
+    seen = set()
+
+    def visit(node, depth=0):
+        if depth > 64 or not isinstance(node, dict):
+            raise ValueError("malformed or overdeep compiled source expression")
+        if node.get("kind") == "logic":
+            if node.get("operator") not in {"all", "any"}:
+                raise ValueError("unexpected compiler Boolean operator")
+            children = node.get("children")
+            if not isinstance(children, list) or len(children) < 2:
+                raise ValueError("missing compiler Boolean branch")
+            for child in children:
+                visit(child, depth + 1)
+            return
+        if node.get("kind") not in {
+            "compat_oval_provider_existence", "compat_oval_provider_state"
+        }:
+            raise ValueError("unsupported or native-authored source Test leaf")
+        if node.get("source_assessment_id") != capsule["id"]:
+            raise ValueError("compiled source Assessment identity changed")
+        tid = node.get("source_test_id")
+        if not isinstance(tid, str) or tid not in declared:
+            raise ValueError("compiled source Test reference is not declared")
+        seen.add(tid)
+
+    visit(root)
+    if seen != set(declared):
+        raise ValueError("compiled source omitted Test definitions: " +
+                         repr(sorted(set(declared) - seen)))
+
+
 def _lower_assessment(capsule):
     doc = capsule["source_document"]
     a = doc.get("assessment")
@@ -68,8 +110,7 @@ def _lower_assessment(capsule):
             decoded = decode(encoded)
             if decoded["source_kind"] != "compiler-compatibility":
                 raise ValueError("lowered source must retain compiler-only compatibility scope")
-            if decoded["root"]["source_assessment_id"] != capsule["id"]:
-                raise ValueError("source Assessment identity changed during lowering")
+            _assert_complete_source_provenance(decoded["root"], capsule)
             return READY_STATUS, family+"; original XML/runtime parity OPEN", encoded
         except (ValueError, KeyError, TypeError) as exc:
             rejections.append(family+": "+str(exc)[:220])
