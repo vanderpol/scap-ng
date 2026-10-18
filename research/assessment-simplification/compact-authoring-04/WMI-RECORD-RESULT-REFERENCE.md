@@ -29,7 +29,7 @@ The reference evaluator uses the repository's pinned OVAL 5.12.3 Test/existence 
 
 ## Audit and next step
 
-- [Exact-head CI 39143413127](https://github.com/vanderpol/scap-ng/actions/runs/39143413127) exercises immutable r3 source IDs, exact Test predicates, the 18 source-role expected outcomes, and the unit/adversarial boundary cases together with the maintained 4,001-document six-STIG authoring/IR gate. **Check the workflow conclusion before treating this complete integration as passed.**
+- [Exact-head CI 39143413127](https://github.com/vanderpol/scap-ng/actions/runs/39143413127) exercises immutable r3 source IDs, exact Test predicates, the 18 source-role expected outcomes, and the unit/adversarial boundary cases together with the maintained 4,001-document six-STIG authoring/IR gate. **PASS**: 11 WMI reference/mutation tests, three source-backed WMI Tests, 18 exact role-literal fixture outcomes, alongside the maintained full six-STIG authoring and IR gates.
 - Continue with an independently sourced **actual WMI collected Item/evidence provider** for this narrow record family, or a reproducible reference System Characteristics fixture. Separate record-field completeness, Item multiplicity and provenance. Then feed these Test outcomes into the already-verified nested `evaluate` trees of SV-253495 / SV-278001 without pretending the five `windows.userright` or four PowerShell Tests have been implemented.
 - Original-source scanner parity, nested **multi-field** Windows records, collection timing/errors, WMI execution, and real Compliance/Rule results are still **not proved**.
 
