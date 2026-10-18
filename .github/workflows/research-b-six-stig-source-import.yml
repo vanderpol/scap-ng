@@ -75,17 +75,57 @@ jobs:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_conversion_backlog.py
       - name: Test B source State evaluation from captured textfile Items
+        id: source-state
         env:
           PYTHONPATH: tools
-        run: python -m unittest -v tools/test_research_b_source_textfile_state.py
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_source_textfile_state.py 2>&1 | tee work/b-corpus/state-test.log
       - name: Check B textfile State shape census and unique Assessment counts
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_textfile_shape_inventory.py
       - name: Validate source AND/OR fully-lowered trees and distinct provider query acquisitions
+        id: source-boolean
         env:
           PYTHONPATH: tools
-        run: python -m unittest -v tools/test_research_b_source_boolean_lowering.py
+        run: |
+          mkdir -p work/b-corpus
+          set -o pipefail
+          python -m unittest -v tools/test_research_b_source_boolean_lowering.py 2>&1 | tee work/b-corpus/boolean-test.log
+      - name: Publish bounded State/Boolean CI outcomes directly on GitHub main
+        if: always() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          STATE_OUTCOME: ${{ steps.source-state.outcome }}
+          BOOLEAN_OUTCOME: ${{ steps.source-boolean.outcome }}
+        run: |
+          mkdir -p research/requirements-first-language/contract-candidate/corpus
+          target=research/requirements-first-language/contract-candidate/corpus/source-runtime-ci.md
+          {
+            printf '# 0.4-B source State and Boolean fixture test gate\n\n'
+            printf '**GitHub Actions research only; not a SCAP 1.4 parity certification.**\n\n'
+            printf '| Stage | Most recent push gate outcome |\n| --- | --- |\n'
+            printf '| Source State fixture tests | %s |\n' "$STATE_OUTCOME"
+            printf '| Source Boolean fixture tests | %s |\n' "$BOOLEAN_OUTCOME"
+            if [ "$STATE_OUTCOME" != success ] || [ "$BOOLEAN_OUTCOME" != success ]; then
+              printf '\n## Failed/skipped test diagnostics\n\n'
+              for f in work/b-corpus/state-test.log work/b-corpus/boolean-test.log; do
+                printf '### %s\n\n' "$f"
+                printf '%s\n' '~~~text'
+                if [ -f "$f" ]; then tail -n 80 "$f"; else printf 'Step skipped; inspect Actions earlier steps.\n'; fi
+                printf '%s\n' '~~~'
+              done
+            fi
+          } > "$target"
+          git add "$target"
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'ci(#237): report source-State and Boolean fixture gate status'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
