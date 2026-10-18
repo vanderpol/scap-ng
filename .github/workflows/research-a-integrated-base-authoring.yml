@@ -12,6 +12,7 @@ on:
       - 'tools/v04_a_dataflow_census.py'
       - 'tools/v04_a_compile_verified_ir.py'
       - 'tools/v04_a_truth_plan.py'
+      - 'tools/v04_a_truth_plan_source_oracle.py'
       - 'tools/test_v04_a_truth_plan.py'
       - 'tools/v04_a_truth_plan_census.py'
       - 'tools/test_v04_a_truth_plan_census.py'
@@ -138,12 +139,16 @@ jobs:
           assert d["scanner_executed"] is False,d
           assert d["native_executable_compiler_complete"] is False,d
           assert d["synthetic_result_execution_only"] is True,d
+          assert c["independent_oracle_topology_checks"]==c["synthetic_expression_executions"],c
+          assert c["mixed_leaf_oracle_checks"]==872*3,c
           print("PASS: #229 / #232 full source expression census (supplied outcomes only)")
           print("Compiled evaluate roots:",c.get("assessments_with_compiled_evaluate",0))
           print("Unapproved expression blockers:",d["blocked_expression_count"])
           print("Expression plan instructions including leaf references:",sum(n for k,n in c.items() if k.startswith("opcode_")))
           print("Operator counts:",{k:v for k,v in c.items() if k.startswith("opcode_")})
           print("Synthetic leaf-status simulations:",c["synthetic_expression_executions"])
+          print("Independent real-source topology oracle checks:",c["independent_oracle_topology_checks"])
+          print("Mixed six-state input cases:",c["mixed_leaf_oracle_checks"])
           print("Source plan SHA-256:",d["manifest_sha256"])
           for e in d["largest_source_expressions"]:
               print("Complex evaluate witness:",e["assessment_id"],e["source_path"],"instructions",e["instruction_count"],"operators",e["operators"])

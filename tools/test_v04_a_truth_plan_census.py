@@ -21,7 +21,9 @@ class ExpressionManifestTests(unittest.TestCase):
         self.assertEqual(manifest["stage"], MANIFEST_STAGE)
         self.assertEqual(manifest["counts"]["automated_assessments_seen"], 1)
         self.assertEqual(manifest["counts"]["assessments_with_compiled_evaluate"], 1)
-        self.assertEqual(manifest["counts"]["synthetic_expression_executions"], 6)
+        self.assertEqual(manifest["counts"]["synthetic_expression_executions"], 9)
+        self.assertEqual(manifest["counts"]["mixed_leaf_oracle_checks"], 3)
+        self.assertEqual(manifest["counts"]["independent_oracle_topology_checks"], 9)
         self.assertEqual(len(manifest["plans"]), 1)
         self.assertEqual(manifest["largest_source_expressions"][0]["instruction_count"], 1)
         self.assertEqual(manifest["largest_source_expressions"][0]["test_leaf_occurrences"], 1)
@@ -74,7 +76,7 @@ class ExpressionManifestTests(unittest.TestCase):
         manifest = build_manifest(ir)
         self.assertEqual(manifest["counts"]["compiled_applicability_roots"], 1)
         self.assertEqual(manifest["counts"]["compiled_expression_roots"], 2)
-        self.assertEqual(manifest["counts"]["synthetic_expression_executions"], 12)
+        self.assertEqual(manifest["counts"]["synthetic_expression_executions"], 18)
         self.assertEqual({x["expression_field"] for x in manifest["plans"]},
                          {"evaluate", "applicability"})
 
