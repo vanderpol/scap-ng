@@ -1,0 +1,59 @@
+name: 0.4-A parsed authoring graph identity (not compilation)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-a-parsed-graph-index.yml'
+      - 'tools/v04_a_authoring_graph_index.py'
+      - 'tools/test_v04_a_authoring_graph_index.py'
+      - 'tools/test_v04_review_reference_graph.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  format-neutral-a-authoring-index:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install strictly bounded YAML input parser
+        run: python -m pip install PyYAML==6.0.3
+      - name: Test independent parsers and deterministic logical graph
+        run: python -m unittest -v tools/test_v04_a_authoring_graph_index.py
+      - name: Download frozen original six-STIG 0.4-A authoring preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p work/a-stabilization
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
+            --repo vanderpol/scap-ng \
+            --pattern 'scap-ng-v0.4-joval-six-stig-json.zip' \
+            --pattern 'scap-ng-v0.4-joval-six-stig-yaml.zip' \
+            --dir work/a-stabilization
+      - name: Compare parsed independent JSON and YAML authoring graphs
+        run: |
+          python tools/v04_a_authoring_graph_index.py \
+            --json-archive work/a-stabilization/scap-ng-v0.4-joval-six-stig-json.zip \
+            --yaml-archive work/a-stabilization/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            | tee "$RUNNER_TEMP/a-graph-index-summary.json"
+          python - "$RUNNER_TEMP/a-graph-index-summary.json" <<'PY'
+          import json, sys
+          data=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert data["formats_equivalent"] is True
+          assert data["nodes"]==4001, data
+          assert data["counts"]["rule_choice_links"]==2958, data
+          assert data["counts"]["unresolved"]==0, data
+          PY
+      - name: Record exact verification stage
+        if: always()
+        run: |
+          {
+            echo '## 0.4-A six-STIG parsed graph parity — #232/#239'
+            echo 'Independent JSON/YAML source parsing and logical identity fingerprinting. This is NOT native 0.4 bundle compilation, signing, OVAL semantic equivalence or scanner execution.'
+            if test -f "$RUNNER_TEMP/a-graph-index-summary.json"; then
+              cat "$RUNNER_TEMP/a-graph-index-summary.json"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
