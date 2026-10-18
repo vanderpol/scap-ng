@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from oval_result_truth_tables import (
     TRUE,FALSE,ERROR,UNKNOWN,NOT_APPLICABLE,
-    evaluate_collected_object_test,
+    evaluate_collected_object_test,aggregate_operator,
 )
 
 PROVIDER="windows.registry_source_views"
@@ -55,16 +55,37 @@ def evaluate_source_registry(ast, fixtures):
                 return ERROR,"registry source Item view/value mismatch",observed
             value=fields["value"]
             kind=fields.get("value_kind")
-            if (kind=="REG_SZ" and type(value) is str) or (
-                kind in ("REG_DWORD","REG_QWORD") and type(value) is int):
-                # Type mismatch intentionally signals an unresolved source
-                # datatype crosswalk, never implicit REG_DWORD -> '0'.
-                if type(value) is not type(ast["state"]["expected"]):
-                    item_results.append(ERROR)
-                else:
-                    item_results.append(TRUE if value==ast["state"]["expected"] else FALSE)
-            else:
+            supported=(kind=="REG_SZ" and type(value) is str) or (
+                kind in ("REG_DWORD","REG_QWORD") and type(value) is int)
+            if not supported:
                 item_results.append(ERROR)
+                continue
+
+            def compare(field):
+                expected=field["expected"]
+                if field["field"]=="type":
+                    registry_type={
+                        "REG_SZ":"string","REG_DWORD":"dword","REG_QWORD":"qword",
+                    }.get(kind)
+                    if registry_type is None:
+                        return ERROR
+                    return TRUE if registry_type==expected else FALSE
+                if field["field"]!="value":
+                    return ERROR
+                # Never coerce DWORD 0 to source text "0"; original OVAL
+                # datatype behavior is still an open source-parity gate.
+                if type(value) is not type(expected):
+                    return ERROR
+                return TRUE if value==expected else FALSE
+
+            source_state=ast["state"]
+            if "all" in source_state:
+                # Both source field requirements apply to the SAME Item,
+                # not a global pool of collected registry Items.
+                parts=[compare(field) for field in source_state["all"]]
+                item_results.append(aggregate_operator("AND",parts))
+            else:
+                item_results.append(compare(source_state))
         observed+=len(items)
         result=evaluate_collected_object_test(
             flag=status,existence=ast["existence"],check=ast["check"],
