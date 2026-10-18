@@ -9,6 +9,8 @@ on:
       - 'tools/v04_a_lossless_ir.py'
       - 'tools/v04_a_dataflow_index.py'
       - 'tools/test_v04_a_dataflow_index.py'
+      - 'tools/v04_a_dataflow_census.py'
+      - 'tools/test_v04_a_dataflow_census.py'
       - 'tools/test_v04_a_lossless_ir.py'
       - 'research/assessment-simplification/compact-authoring-04/lossless-ir-envelope.schema.json'
       - 'tools/test_v04_a_end_to_end_base_authoring.py'
@@ -33,6 +35,8 @@ jobs:
         run: python -m unittest -v tools/test_v04_a_end_to_end_base_authoring.py
       - name: Verify collection/variable/set/filter graph regression cases
         run: python -m unittest -v tools/test_v04_a_dataflow_index.py
+      - name: Test independent source-backed dataflow census
+        run: python -m unittest -v tools/test_v04_a_dataflow_census.py
       - name: Verify adversarial lossless typed-IR source envelopes
         run: python -m unittest -v tools/test_v04_a_lossless_ir.py
       - name: Fetch immutable 0.4-A r3 authoring sources
@@ -97,12 +101,49 @@ jobs:
           print("PASS: #240 lossless typed envelope + independent full decode")
           print("Canonical IR SHA-256:",result["ir_sha256"])
           PY
+      - name: Independently audit source dataflow and actual six-STIG witnesses
+        run: |
+          python tools/v04_a_dataflow_census.py \
+            --ir "$RUNNER_TEMP/a-lossless-ir.json" \
+            --out-report "$RUNNER_TEMP/a-dataflow-census.json" \
+            --assert-six > "$RUNNER_TEMP/a-dataflow-census.stdout"
+          python - "$RUNNER_TEMP/a-dataflow-census.json" <<'PY'
+          import json,sys
+          report=json.load(open(sys.argv[1],encoding="utf-8"))
+          c=report["counts"]
+          assert report["status"]=="VERIFIED_SOURCE_STRUCTURE_NOT_EXECUTABLE",report
+          assert c["automated_assessments"]==872,c
+          assert c["named_test_nodes"]==1375,c
+          assert c["edge_variable_value"]>0,c
+          assert c["edge_object_acquisition"]>0,c
+          print("PASS: #240 independent source-dataflow audit")
+          print("Named Variables:",c.get("named_variable_nodes",0))
+          print("Named Objects:",c.get("named_object_nodes",0))
+          print("Variable edges:",c["edge_variable_value"])
+          print("Acquisition edges:",c["edge_object_acquisition"])
+          print("for_each sites:",c.get("site_for_each",0))
+          print("Set sites:",c.get("site_set",0))
+          print("Filter sites:",c.get("site_filter",0))
+          print("Projection sites:",c.get("site_projection",0))
+          for kind,entry in report["source_backed_examples"].items():
+              print(kind,entry["assessment_id"],entry["source_path"])
+          PY
       - name: Report exact capability limit without overstating compiler readiness
         if: always()
         run: |
           {
             echo '## #232/#239 — integrated 0.4-A base grammar authoring and research package'
             echo 'The independent YAML/JSON paths produce byte-identical, verified, UNSIGNED research ZIPs with all base-schema-valid Automated Assessments and exact Rule choices. The 0.4 language/migration approval and actual scanner executable .scapng compiler remain OUT OF SCOPE.'
+            if test -s "$RUNNER_TEMP/a-dataflow-census.json"; then
+              echo '### #240 typed source dataflow census — structural only'
+              python - "$RUNNER_TEMP/a-dataflow-census.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("Counts:",json.dumps(r["counts"],sort_keys=True))
+          print("Real witnesses:",json.dumps(r["source_backed_examples"],sort_keys=True))
+          print("Complexity examples:",json.dumps(r["largest_dataflow_examples"],sort_keys=True))
+          PY
+            fi
             if test -s "$RUNNER_TEMP/a-lossless-ir.stdout"; then
               echo '### #240 lossless source-envelope IR (NOT EXECUTABLE)'
               cat "$RUNNER_TEMP/a-lossless-ir.stdout"
