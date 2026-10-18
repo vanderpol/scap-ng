@@ -122,6 +122,38 @@ The V2 name/argument order may be easier to predict. But `join_values` must be p
 
 **Critical distinction:** The constructed **value count** in this table is *not* a guarantee of equivalent scanner collector instances or effective Test outcomes. A `for_each` over collected Items is not automatically the same as `concat` over all same-name values on an Item. An unapproved shell quoting policy, per-zone implicit iteration or missing-data fallback would invalidate a lossless conversion claim.
 
+## Owner readability feedback: fewer wrappers and accurate naming (18 October)
+
+The owner found both methods reasonable and thought **“combination” may read somewhat better**, but challenged whether the operation is *always* a combination rather than ordinary concatenation. They also rejected the last command/source example's many empty-feeling intermediate tree levels. **This is substantive design feedback, not approval of a new operator.**
+
+The answer from official OVAL 5.12.3 is: `concat` is always **ordered string concatenation** of components; it creates a collection of strings **only when** a component has multiple values (Cartesian product for multiple multi-valued components). Calling every scalar instance `build_each_combination` oversells its purpose; `combine` alone could just as easily mean string joining or Set union. Meanwhile the **single-output** `merge` operation may be clearer to novices as `join` in a value-expression context. We should test `concat` versus `combination` labels using scalar **and** collection-valued cases, not adopt a longer operator name because a plural DNS example makes it sound fitting.
+
+### Flat syntax hypothesis — no empty structural levels
+
+```yaml
+# Non-executable DNS fragment. Literal PowerShell parts match the actual IsSigned source.
+command:
+  concat:
+    - 'try {Get-DnsServerZone -Name '
+    - from: list-all-forward-lookup-zones-object
+      field: stdout_line
+    - ' | ForEach-Object {$_.IsSigned}} catch {}'
+
+# Non-executable Apache fragment. Same output intent as source merge.
+loaded-config-argument:
+  join:
+    from: all-loaded-configuration-filepaths-variable
+    separator: ' '
+    sort: document
+    order: ascending
+```
+
+No nested `command_values`, `text`, `transform`, `from: {source: ...}` or `build_each_combination` containers merely for formatting. Here `command` and `loaded-config-argument` are **illustrative host field names**, not a claim that one or many resulting values can safely feed a shell command. The `from` locator is a **research shorthand** requiring typed source/field identity rules and stable reference resolution. Source literal datatype, source Variable title/kind/provenance, stderr/error flags, zero/many outputs and six-state behavior must still be explicitly preserved; this snippet alone is **not** full lossless authoring.
+
+**Practical principle:** Every level must either introduce a genuinely new scope (named source, collector, select/where, population quantifier, check/evaluate) or an actual operation (concat, join, regex capture, Set filter). Delete wrappers that only restate the parent noun. Prefer the flat version only if a complete, independently reviewed Apache/DNS file makes errors **less likely** without hiding source operations.
+
+**Provisional updated direction:** Keep `concat` versus an explicit `combination` spelling unresolved; favor evaluating `join` against `merge` for the one-string operation. **Reject gratuitous `command_values → build_each_combination → text` and `from → source` nesting now, as a readability design defect.** No implementation or schema change follows from this preference.
+
 ## Decision filter — the simplest *correctly understood* operator wins
 
 | Check | V1 `concat` / `merge` | V2 `build_each_combination` / `join_values` | V3 template |
