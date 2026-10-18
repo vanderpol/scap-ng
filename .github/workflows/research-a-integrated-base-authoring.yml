@@ -10,6 +10,8 @@ on:
       - 'tools/v04_a_dataflow_index.py'
       - 'tools/test_v04_a_dataflow_index.py'
       - 'tools/v04_a_dataflow_census.py'
+      - 'tools/v04_a_compile_verified_ir.py'
+      - 'tools/test_v04_a_compile_verified_ir.py'
       - 'tools/test_v04_a_dataflow_census.py'
       - 'tools/test_v04_a_lossless_ir.py'
       - 'research/assessment-simplification/compact-authoring-04/lossless-ir-envelope.schema.json'
@@ -39,6 +41,8 @@ jobs:
         run: python -m unittest -v tools/test_v04_a_dataflow_census.py
       - name: Verify adversarial lossless typed-IR source envelopes
         run: python -m unittest -v tools/test_v04_a_lossless_ir.py
+      - name: Verify the single-command dual-format compiler gates
+        run: python -m unittest -v tools/test_v04_a_compile_verified_ir.py
       - name: Fetch immutable 0.4-A r3 authoring sources
         run: |
           mkdir -p work/a-end-to-end
@@ -48,58 +52,37 @@ jobs:
           curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
             'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-yaml.zip' \
             --output work/a-end-to-end/yaml.zip
-      - name: Reversibly lower, base-schema and capability validate, stage versions and package
+      - name: Independently parse both frozen formats and compile one checked A research IR
         run: |
-          python tools/v04_a_end_to_end_base_authoring.py \
+          python tools/v04_a_compile_verified_ir.py \
             --json-archive work/a-end-to-end/json.zip \
             --yaml-archive work/a-end-to-end/yaml.zip \
-            --assert-six \
-            --out "$RUNNER_TEMP/a-unsigned-base-research.zip" \
-            --report-json "$RUNNER_TEMP/a-end-to-end.json" \
-            > "$RUNNER_TEMP/a-end-to-end.stdout"
-          python - "$RUNNER_TEMP/a-end-to-end.json" <<'PY'
+            --out-ir "$RUNNER_TEMP/a-lossless-ir.json" \
+            --out-base-zip "$RUNNER_TEMP/a-unsigned-base-research.zip" \
+            --report-json "$RUNNER_TEMP/a-single-compiler.json" \
+            --assert-six > "$RUNNER_TEMP/a-single-compiler.stdout"
+          python - "$RUNNER_TEMP/a-single-compiler.json" <<'PY'
           import json,sys
-          x=json.load(open(sys.argv[1],encoding="utf-8"))
-          assert x["status"]=="VERIFIED_BASE_AUTHORING_RESEARCH_ONLY",x
-          assert x["source_document_count"]==4001,x
-          assert x["assessment_counts"]["lowered_automated_assessments"]==872,x
-          assert x["assessment_counts"]["validated_base_assessments"]==872,x
-          assert x["assessment_counts"]["lowered_tests"]==1375,x
-          assert x["native_capability_proof"]["native_test_nodes_validated"]==1375,x
-          assert x["native_capability_proof"]["native_capabilities_validated"]>0,x
-          assert x["native_capability_proof"]["stage"]=="generated_0.4_capability_structural_schema_only",x
-          assert x["rule_choice_links"]==2958,x
-          assert x["yaml_json_byte_parity"]=="PASS",x
-          assert x["base_schema"]=="ALL_AUTOMATED_ASSESSMENTS_VALIDATED",x
-          assert x["native_0_4_compiler_complete"] is False,x
-          assert x["allowed_to_scan"] is False,x
-          assert x["signed_bundle"] is False,x
-          print("PASS: source -> base A schema -> staged version declarations -> verified reproducible ZIP")
-          print("Unsigned research archive SHA-256:",x["archive_sha256"])
-          print("Base input graph SHA-256:",x["base_lowered_graph_sha256"])
-          print("Packaged staged graph SHA-256:",x["packaged_staged_graph_sha256"])
-          PY
-      - name: Compile and independently decode research-only typed Assessment IR
-        run: |
-          python tools/v04_a_lossless_ir.py \
-            --base-zip "$RUNNER_TEMP/a-unsigned-base-research.zip" \
-            --out "$RUNNER_TEMP/a-lossless-ir.json" --assert-six \
-            > "$RUNNER_TEMP/a-lossless-ir.stdout"
-          python - "$RUNNER_TEMP/a-lossless-ir.stdout" <<'PY'
-          import json,sys
-          result=json.load(open(sys.argv[1],encoding="utf-8"))
-          assert result["status"]=="RESEARCH_NOT_EXECUTABLE",result
-          assert result["document_count"]==4001,result
-          assert result["automated_assessments"]==872,result
-          assert result["automated_tests"]==1375,result
-          assert result["rule_choice_links"]==2958,result
-          assert result["roundtrip"]=="PASS",result
-          assert result["research_ir_schema"]=="PASS",result
-          assert result["source_dataflow_edges"]>=0,result
-          assert result["source_dataflow_sites"]>=0,result
-          assert result["scanner_executable"] is False,result
-          print("PASS: #240 lossless typed envelope + independent full decode")
-          print("Canonical IR SHA-256:",result["ir_sha256"])
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["status"]=="DUAL_FORMAT_VERIFIED_IR_RESEARCH_NOT_EXECUTABLE",r
+          assert r["ir_stage"]=="RESEARCH_NOT_EXECUTABLE",r
+          assert r["source_documents"]==4001,r
+          assert r["automated_assessments"]==872,r
+          assert r["automated_tests"]==1375,r
+          assert r["rule_choice_links"]==2958,r
+          assert r["native_capability_test_nodes_validated"]==1375,r
+          assert r["base_schema"]=="ALL_AUTOMATED_ASSESSMENTS_VALIDATED",r
+          assert r["full_source_preservation"]=="PASS",r
+          assert r["yaml_json_base_byte_parity"]=="PASS",r
+          assert r["yaml_json_ir_byte_parity"]=="PASS",r
+          assert r["research_ir_schema"]=="PASS",r
+          assert r["version_policy_approved"] is False,r
+          assert r["signed_bundle"] is False,r
+          assert r["scanner_executed"] is False,r
+          assert r["native_executable_compiler_completed"] is False,r
+          print("PASS: #240 one-command independently verified six-STIG research IR")
+          print("IR SHA-256:",r["ir_sha256"])
+          print("Unsigned authoring research ZIP SHA-256:",r["unsigned_base_archive_sha256"])
           PY
       - name: Independently audit source dataflow and actual six-STIG witnesses
         run: |
@@ -148,11 +131,8 @@ jobs:
           print("Complexity examples:",json.dumps(r["largest_dataflow_examples"],sort_keys=True))
           PY
             fi
-            if test -s "$RUNNER_TEMP/a-lossless-ir.stdout"; then
-              echo '### #240 lossless source-envelope IR (NOT EXECUTABLE)'
-              cat "$RUNNER_TEMP/a-lossless-ir.stdout"
-            fi
-            if test -s "$RUNNER_TEMP/a-end-to-end.json"; then
-              cat "$RUNNER_TEMP/a-end-to-end.json"
+            if test -s "$RUNNER_TEMP/a-single-compiler.json"; then
+              echo '### #240 independently parsed YAML+JSON to one checked research IR'
+              cat "$RUNNER_TEMP/a-single-compiler.json"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
