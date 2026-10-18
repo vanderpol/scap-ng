@@ -1,0 +1,46 @@
+# 0.4-A stabilization checkpoint — October 18, 2026
+
+**Working proposal, not a normative release.** Tracking: [#239](https://github.com/vanderpol/scap-ng/issues/239), [#227](https://github.com/vanderpol/scap-ng/issues/227), [#229](https://github.com/vanderpol/scap-ng/issues/229), [#232](https://github.com/vanderpol/scap-ng/issues/232).
+
+## One authoring language, one authoritative next gate
+
+Focus on the existing **0.4-A authoring grammar** and complete its review/compilation path. Do **not** revive the 0.4-B six-stream development or invent a third grammar. Do not silently change the released 0.3 specification, the versioned 0.4 base draft, or the immutable Joval r3 preview. Structural evidence, source/result parity, native compiler success, signed bundles and scanner execution are different gates.
+
+The next major engineering gate is **native YAML-only and JSON-only authoring to deterministic, version-coherent 0.4 bundles**, as specified in [#232](https://github.com/vanderpol/scap-ng/issues/232), **after** the final grammar/scope contract is reviewed. A one-assessment Linux [execution spike](https://github.com/vanderpol/scap-ng/issues/238) remains a bounded research aid, not a replacement for this work.
+
+## Consolidated design ledger
+
+| Area | Existing 0.4-A base schema | Research candidate/evidence | Current disposition |
+| --- | --- | --- | --- |
+| State field names | Inline field-name keys such as `- mount_options: {equals: nosuid, require: ...}` | Six-STIG reversible source comparison, including Windows records; [#227](https://github.com/vanderpol/scap-ng/issues/227) | **In base draft**; retained |
+| Comparison operators | Typed comparator as key, including Object selectors; forbid legacy `operation/value` State wrapper | Version-local capability mappings and generated schemas; [#228](https://github.com/vanderpol/scap-ng/issues/228) | **In base draft**; retained |
+| Test Item cardinality key | `require` (mandatory) | r3 proposed `collected_items_require` separates it from field and record requirements; [review](SCOPED-FIELD-REQUIRE-REVIEW.md) | **Owner vocabulary decision open**; do not mix both |
+| Scalar State field multiplicity | Each field has explicit `require` | `state_fields_require` at Test/group, with exceptional field overrides; 2,550 declarations down to 1,444 across six anchor **occurrences** (43.4% reduction), reversible; [CI](https://github.com/vanderpol/scap-ng/actions/runs/38808020283) | **Candidate, not promoted**; record and record-field scope must remain independent |
+| State logical groups | `all`, `any`, `one`, `odd` | r3 `and`/`or` spelling and explicit scope inheritance; 512 reversible nested field/group/record cases [CI](https://github.com/vanderpol/scap-ng/actions/runs/38831406749) | **Owner vocabulary decision open**; preserve observed fields literally named `and`/`or` |
+| Common/exact-one/rare quantifiers | Explicit context-specific `require` values | Source-backed `only_one_exists` (State-free) versus `only_one_exists_and_matches` (State-bearing); [one-grammar research](ONE-GRAMMAR-DECISION.md) | **In base draft for these names**; rare 20-combination wording is not universally approved |
+| Boolean `evaluate`, Variables, Sets/Filters, Windows records, `for_each` | Explicit expression and typed dependency graphs | Source-backed structural reconstruction; reference six-state/partial-stream fixtures [#229](https://github.com/vanderpol/scap-ng/issues/229) | **Preserve without guessed simplification**; not every scanner operation has equivalent implementation |
+| Procedural `if/else` | Not a general source-preserving replacement for OVAL criteria | Source `OR(AND(G,P),AND(NOT G,Q))` differs for **81/216** three-input six-state combinations | **Do not auto-rewrite**; require independent proof for each narrow equivalence class |
+| Apache shared Variable/source module | Named Variable chains retained | 15/15 source-exact local module expansions, 154 duplicate declarations avoided in experimental authoring [#223](https://github.com/vanderpol/scap-ng/issues/223) | **Deferred** until generalized, typed, path-scoped importer and error/provenance controls exist |
+| B/Gemini-inspired ideas | No accepted change to A | Tracked for evidence-led consideration in [#236](https://github.com/vanderpol/scap-ng/issues/236) | **Deferred**; avoid changing A during stabilization |
+
+## Validation facts (do not confuse denominators)
+
+- [Corrected immutable Joval r3 preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3): **six source-backed STIGs**, **4,001 JSON documents**, **1,567 Rules**, **2,958 resolved Rule assessment choices**.
+- [Independent JSON-only static authoring audit](https://github.com/vanderpol/scap-ng/actions/runs/38830995691): **872 distinct automated Assessments / 1,375 distinct native Test nodes**. The separately measured **1,396 Assessment / 2,144 Test occurrences** count shared content again for each Benchmark, not additional unique files.
+- 1,384 structurally source-exact automated/applicability Assessment **occurrences** and 12 separately labelled State-free model-normalized cases in the six-anchor strict-source study. This is **not** a proof that live OVAL and NG collectors return identical results.
+- **No verified native 0.4 YAML/JSON `.scapng` build** yet; a 0.3-based compiled bundle is not the same artifact. Manual choices, version coherence and provenance remain compiler acceptance criteria.
+- **No independently verified full SCAP-NG scanner conformance.** The bounded [Linux mount runner](https://github.com/vanderpol/scap-ng/issues/238) is for learning about executable evidence and errors; the existing collector is not yet proved OVAL `linux.partition` equivalent.
+
+## Concrete compiler-first acceptance sequence
+
+1. **Keep the draft and r3 research contracts separate until human review.** The [new boundary checker](../../../tools/v04_a_grammar_boundary.py) and [adversarial tests](../../../tools/test_v04_a_grammar_boundary.py) flag mixed Test-level `require` and `collected_items_require`, unapproved scoped inheritance, and accidental `and/or` group promotion. [Focused CI](https://github.com/vanderpol/scap-ng/actions/workflows/research-a-grammar-stabilization.yml) checks the current base; it **does not** validate every 0.4 construct.
+2. **Freeze a single reviewed Test/State/record vocabulary** in #227/#239 with full RHEL/Win11/DNS/Apache before/after fixtures. Preserve absent/error/incomplete cases and independent Item/field/record quantifiers; no hidden defaults.
+3. **Re-run native capability/schema validation, source reconstruction and 53+1,036 reference-model boundaries** from #228/#229. Explicitly distinguish structural versus semantic equivalence. Preserve version-local schemas.
+4. **Implement [#232](https://github.com/vanderpol/scap-ng/issues/232)**: independently read JSON, independently read YAML, normalize by *logical* IDs rather than extensions, compile/safely resolve all Benchmark/Rule/Assessment dependencies and versions, compare normalized deterministic manifest digests, and fail on mixed-version or unsupported semantic content. No unexplained 0.3-to-0.4 metadata rewrite.
+5. **Deliver complete six-STIG 0.4 authoring/bundle checkpoint**, pass tests and reference integrity, then consider expanding real collectors/Go scanner work. Full 65-source run is an intentional release gate, not an everyday regression.
+
+## Boundary discovered during this stabilization
+
+The base `schema/v0.4.0/assessment.schema.json` Test subtree currently permits `additionalProperties: true`, reflecting capability extensions. A document might carry *both* the mandatory base `require` and an unapproved research key without the generic schema alone rejecting that extra key. The added focused **boundary guard** fails such mixing before further work, without globally forbidding legitimate capability-specific extensions or silently modifying the normative draft. Strengthening full capability-specific validation and compiler input contracts remains necessary.
+
+**Next durable decision point:** select or reject the r3 `collected_items_require`/explicit scoped-field model, including naming and logical-group vocabulary. This should be decided from a few complete real examples and negative semantic fixtures, not from an additional theoretical design round.
