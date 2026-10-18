@@ -59,6 +59,41 @@ class BSpecimensTests(unittest.TestCase):
             for v in picks.values():
                 self.assertTrue((Path(path)/v["file"]).exists())
 
+    def test_picks_real_direct_nested_registry_state_all_specimen(self):
+        nested=assessment("registry-nested","windows.registry")
+        a=nested["assessment"]
+        a["evaluate"]={"test":"t1"}
+        t=a["tests"]["t1"]
+        t["object"]={"capability":"windows.registry","object_title":None,
+                     "select":{"hive":"local_machine",
+                               "key":{"operation":"equals","value":"SOFTWARE\\Example"},
+                               "name":{"operation":"equals","value":"Setting"}}}
+        t["states"]=[{"all":[
+            {"field":"type","operation":"equals","value":"dword",
+             "existence":"one_or_more","match":"all"},
+            {"field":"value","operation":"equals","value":1,
+             "existence":"one_or_more","match":"all"},
+        ]}]
+        small=assessment("registry-small","windows.registry")
+        long=assessment("registry-large","windows.registry")
+        long["assessment"]["assessment_title"]="extended-source-specimen-"*600
+        docs={
+            "authoring/ms_windows_11/rules/small.yaml":rule("SV-101","registry-small"),
+            "authoring/ms_windows_11/rules/nested.yaml":rule("SV-102","registry-nested"),
+            "authoring/ms_windows_11/rules/large.yaml":rule("SV-103","registry-large"),
+            "authoring/ms_windows_11/assessments/small.yaml":small,
+            "authoring/ms_windows_11/assessments/nested.yaml":nested,
+            "authoring/ms_windows_11/assessments/large.yaml":long,
+        }
+        report,capsules=import_corpus(docs,{k:digest(v) for k,v in docs.items()},
+                                       expected_benchmarks=1)
+        picks,_=choose(report,capsules)
+        self.assertIn("registry-nested",picks)
+        selected=picks["registry-nested"]
+        self.assertTrue(selected["file"].startswith("windows-registry-state-all-"))
+        self.assertIn("windows.registry/nested_state_all",selected["families"])
+        self.assertIn("states:",selected["content"])
+
     def test_output_filenames_do_not_use_ids_as_unsafe_paths(self):
         report,capsules=self.fixtures()
         picks,_=choose(report,capsules)
