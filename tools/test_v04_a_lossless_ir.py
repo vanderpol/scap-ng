@@ -4,6 +4,7 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 from pathlib import Path
+from jsonschema import Draft202012Validator
 import sys
 import unittest
 
@@ -31,6 +32,18 @@ def automated(docs):
 class LosslessIrTests(unittest.TestCase):
     def setUp(self):
         self.docs = fixture()
+
+    def test_draft_2020_12_research_ir_schema_accepts_lossless_envelope(self):
+        path = (Path(__file__).resolve().parents[1] /
+                "research/assessment-simplification/compact-authoring-04/"
+                "lossless-ir-envelope.schema.json")
+        schema = json.loads(path.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        ir = normalize_documents(self.docs)
+        Draft202012Validator(schema).validate(ir)
+        invalid = deepcopy(ir)
+        invalid["status"] = "COMPILER_READY"
+        self.assertTrue(list(Draft202012Validator(schema).iter_errors(invalid)))
 
     def test_roundtrip_all_source_documents_and_manual_choice(self):
         original = deepcopy(self.docs)
