@@ -174,6 +174,65 @@ class LosslessIrTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unresolved"):
             normalize_documents(self.docs)
 
+    def test_resolved_truth_dependency_is_distinct_from_collection_refs(self):
+        auto = automated(self.docs)
+        manual = next(doc["assessment"] for doc in self.docs.values()
+                      if doc.get("assessment", {}).get("mode") == "manual")
+        auto["version"], auto["purpose"] = 1, "assessment"
+        manual["version"], manual["purpose"] = 1, "assessment"
+        test_id = next(iter(auto["tests"]))
+        auto["dependencies"] = {"other": {
+            "assessment": manual["id"], "expected_version": 1,
+            "purpose": "assessment"}}
+        auto["evaluate"] = {"all": [{"test": test_id}, {"assessment": "other"}]}
+        ir = normalize_documents(self.docs)
+        index = next(d["assessment_index"] for d in ir["documents"]
+                     if d["id"] == auto["id"])
+        self.assertEqual(index["assessment_dependencies"][0]["target"], manual["id"])
+        self.assertEqual(decode_and_verify(ir), self.docs)
+
+    def test_missing_truth_dependency_target_fails_closed(self):
+        auto = automated(self.docs)
+        auto["dependencies"] = {"other": {
+            "assessment": "does-not-exist", "expected_version": 1,
+            "purpose": "assessment"}}
+        with self.assertRaisesRegex(ValueError, "unresolved Assessment dependency"):
+            normalize_documents(self.docs)
+
+    def test_truth_dependency_exact_version_and_purpose_are_checked(self):
+        auto = automated(self.docs)
+        auto["version"], auto["purpose"] = 1, "assessment"
+        auto["dependencies"] = {"self": {
+            "assessment": auto["id"], "expected_version": 2,
+            "purpose": "assessment"}}
+        with self.assertRaisesRegex(ValueError, "version mismatch"):
+            normalize_documents(self.docs)
+        auto["dependencies"]["self"]["expected_version"] = 1
+        auto["dependencies"]["self"]["purpose"] = "applicability"
+        with self.assertRaisesRegex(ValueError, "purpose mismatch"):
+            normalize_documents(self.docs)
+
+    def test_truth_dependency_cycle_fails_closed(self):
+        auto = automated(self.docs)
+        auto["version"], auto["purpose"] = 1, "assessment"
+        auto["dependencies"] = {"self": {
+            "assessment": auto["id"], "expected_version": 1,
+            "purpose": "assessment"}}
+        with self.assertRaisesRegex(ValueError, "cyclic Assessment dependency"):
+            normalize_documents(self.docs)
+
+    def test_shared_assessment_cannot_depend_on_private_other_benchmark(self):
+        auto = automated(self.docs)
+        auto["version"], auto["purpose"] = 1, "assessment"
+        private = deepcopy(self.docs["authoring/shared/assessments/ng.shared.auto.json"])
+        private["assessment"]["id"] = "ng.private"
+        self.docs["authoring/windows11/assessments/private.json"] = private
+        auto["dependencies"] = {"private": {
+            "assessment": "ng.private", "expected_version": 1,
+            "purpose": "assessment"}}
+        with self.assertRaisesRegex(ValueError, "cross-Benchmark private"):
+            normalize_documents(self.docs)
+
     def test_changed_source_produces_distinct_digest(self):
         before = canonical_json(normalize_documents(self.docs))
         auto = automated(self.docs)

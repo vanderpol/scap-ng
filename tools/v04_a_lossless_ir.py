@@ -59,6 +59,71 @@ def _collection_ref_hints(test):
     return found
 
 
+def _check_assessment_dependency_targets(documents):
+    """Resolve truth-dependency targets without running or changing them.
+
+    Collection/Variable references are intentionally excluded; this is a
+    separate Assessment dependency graph with exact declared versions.
+    """
+    sources = {
+        doc["assessment"]["id"]: (path, doc["assessment"])
+        for path, doc in documents.items() if "assessment" in doc
+    }
+    links = {}
+    for path, doc in sorted(documents.items()):
+        assessment = doc.get("assessment")
+        if not isinstance(assessment, dict):
+            continue
+        source_id = assessment["id"]
+        declared = assessment.get("dependencies", {})
+        if not isinstance(declared, dict):
+            raise ValueError(f"{path}: invalid Assessment dependency mapping")
+        links[source_id] = []
+        for alias, dep in sorted(declared.items()):
+            if not isinstance(alias, str) or not alias or not isinstance(dep, dict):
+                raise ValueError(f"{path}: malformed Assessment dependency {alias!r}")
+            target_id = dep.get("assessment")
+            target = sources.get(target_id) if isinstance(target_id, str) else None
+            if target is None:
+                raise ValueError(f"{path}: unresolved Assessment dependency {alias}: {target_id!r}")
+            target_path, target_assessment = target
+            if dep.get("expected_id", target_id) != target_id:
+                raise ValueError(f"{path}: Assessment dependency {alias} expected_id mismatch")
+            if (type(dep.get("expected_version")) is not type(target_assessment.get("version"))
+                    or dep.get("expected_version") != target_assessment.get("version")):
+                raise ValueError(f"{path}: Assessment dependency {alias} version mismatch")
+            if dep.get("purpose") != target_assessment.get("purpose"):
+                raise ValueError(f"{path}: Assessment dependency {alias} purpose mismatch")
+            from_folder = PurePosixPath(path).parts[1]
+            to_folder = PurePosixPath(target_path).parts[1]
+            if to_folder not in ("shared", from_folder):
+                raise ValueError(f"{path}: cross-Benchmark private Assessment dependency {alias}")
+            links[source_id].append(target_id)
+
+    # Assessment-truth references form a directed graph; cycles are unsafe to
+    # schedule even though this source-preservation stage never executes them.
+    done, visiting = set(), set()
+    for start in links:
+        if start in done:
+            continue
+        stack = [(start, False)]
+        while stack:
+            node, leaving = stack.pop()
+            if leaving:
+                visiting.remove(node)
+                done.add(node)
+                continue
+            if node in done:
+                continue
+            if node in visiting:
+                raise ValueError(f"cyclic Assessment dependency through {node}")
+            visiting.add(node)
+            stack.append((node, True))
+            for target in reversed(links[node]):
+                stack.append((target, False))
+    return sum(map(len, links.values()))
+
+
 def normalize_documents(documents):
     """Build deterministic lossless envelopes from validated *base* documents.
 
@@ -79,6 +144,7 @@ def normalize_documents(documents):
     edges = inspect_edges(canonical)
     if edges["incompatible_edge_count"]:
         raise ValueError("mixed Benchmark/Assessment specification versions")
+    _check_assessment_dependency_targets(canonical)
 
     entries = []
     tests_total = 0
@@ -249,6 +315,8 @@ def main(argv=None):
         "automated_tests": ir["automated_test_count"],
         "rule_choice_links": ir["rule_choice_link_count"],
         "roundtrip": "PASS",
+        "assessment_truth_dependencies": sum(len(r.get("assessment_index", {}).get(
+            "assessment_dependencies", [])) for r in ir["documents"]),
         "research_ir_schema": "PASS",
         "scanner_executable": False,
     }, sort_keys=True, indent=2))
