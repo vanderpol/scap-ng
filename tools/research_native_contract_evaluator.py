@@ -159,6 +159,34 @@ def evaluate_collection(node,evidence,fixtures,scope=None):
         return Decision(TRUE,"all selected Items meet requirements",*info)
     return Decision(uncertain,"cannot establish a complete compliant selected population",*info)
 
+def _source_acquisition(ast,fixtures):
+    """Select one collected source by normalized acquisition identity.
+
+    Per-provider lists are required for source expressions with distinct
+    textfile patterns; wrong/duplicate identities must not be merged.
+    """
+    provider=ast["provider"]
+    ev=fixtures.get(provider)
+    if ev is None:
+        return Decision(UNKNOWN,"no source-compatible acquisition supplied",provider)
+    if not isinstance(ev,dict):
+        return Decision(ERROR,"source-compatible collection envelope invalid",provider)
+    if "acquisitions" not in ev:
+        return ev
+    if set(ev)!={"acquisitions"} or not isinstance(ev["acquisitions"],list):
+        return Decision(ERROR,"invalid source acquisition set envelope",provider)
+    if any(not isinstance(acq,dict) or not isinstance(acq.get("using"),dict)
+           for acq in ev["acquisitions"]):
+        return Decision(ERROR,"source acquisition missing typed identity",provider)
+    matches=[acq for acq in ev["acquisitions"]
+             if acq.get("using")==ast["using"]]
+    if len(matches)>1:
+        return Decision(ERROR,"duplicate source acquisition query identity",provider)
+    if not matches:
+        return Decision(UNKNOWN,"requested source acquisition absent",provider)
+    return matches[0]
+
+
 def evaluate(ast,fixtures,scope=None):
     """Evaluate compiler AST over caller-provided typed evidence fixtures.
 
@@ -176,8 +204,9 @@ def evaluate(ast,fixtures,scope=None):
     # Test shape. No claim of OVAL regex/item_creation/source parity.
     if ast["kind"]=="compat_oval_provider_state":
         from research_b_source_state_evaluator import evaluate_source_textfile_state
-        result,reason,observed,selected=evaluate_source_textfile_state(
-            ast,fixtures.get(ast["provider"]))
+        ev=_source_acquisition(ast,fixtures)
+        if isinstance(ev,Decision):return ev
+        result,reason,observed,selected=evaluate_source_textfile_state(ast,ev)
         return Decision(result,reason,ast["provider"],observed,selected)
     if ast["kind"]=="compat_oval_provider_existence":
         provider=ast.get("provider")
@@ -187,9 +216,8 @@ def evaluate(ast,fixtures,scope=None):
         if (set(ast)!=required or provider not in {"linux.textfile_matches","linux.mounts"}
                 or ast["existence"]!="at_least_one_exists"):
             raise ValueError("unsupported source-compatible provider Test contract")
-        ev=fixtures.get(provider)
-        if ev is None:
-            return Decision(UNKNOWN,"no source-compatible provider acquisition supplied",provider)
+        ev=_source_acquisition(ast,fixtures)
+        if isinstance(ev,Decision):return ev
         if not isinstance(ev,dict):
             return Decision(ERROR,"source-compatible collection is not a mapping",provider)
         if provider=="linux.textfile_matches" and ev.get("using")!=ast["using"]:
