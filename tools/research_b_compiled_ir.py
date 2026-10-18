@@ -185,6 +185,39 @@ def _node(node, source_kind, depth=0):
                 raise ValueError("invalid source State regex for research provider") from exc
         return
 
+    if kind == "compat_oval_registry_view_invariant":
+        _ensure(source_kind != "native",
+                "source registry compatibility IR cannot be native authored")
+        keys={"kind","source_assessment_id","source_test_id","provider",
+              "using","source_view","existence","check","state"}
+        _ensure(set(node)==keys,"invalid source registry Test IR fields")
+        _ensure(node["provider"]=="windows.registry_source_views" and
+                node["source_view"]=="unspecified_requires_xml_parity",
+                "source registry view must not be invented")
+        _ensure(all(isinstance(node[k],str) and bool(node[k])
+                    for k in ("source_assessment_id","source_test_id")),
+                "source registry provenance is required")
+        _ensure(node["existence"]=="at_least_one_exists" and
+                node["check"] in {"all","only one","at least one"},
+                "source registry Test cardinality unsupported")
+        using=node["using"]
+        _ensure(isinstance(using,dict) and set(using)=={"hive","key","name"} and
+                using["hive"]=="HKLM" and
+                all(isinstance(using[k],str) and bool(using[k]) for k in ("key","name")),
+                "source registry using identity invalid")
+        state=node["state"]
+        _ensure(isinstance(state,dict) and set(state)=={
+            "field","operation","expected","entity_existence","entity_check"},
+            "source registry State IR fields invalid")
+        _ensure(state["field"]=="value" and state["operation"]=="equals" and
+                state["entity_existence"]=="at_least_one_exists" and
+                state["entity_check"]=="all" and
+                type(state["expected"]) in (str,int) and
+                (type(state["expected"]) is str or
+                 -(2**63)<=state["expected"]<2**63),
+                "source registry State value/cardinality not supported")
+        return
+
     if kind == "compat_oval_provider_existence":
         _ensure(source_kind != "native",
                 "source provider compatibility operation cannot be native authored")
@@ -281,7 +314,7 @@ def _classify(node, depth=0):
     if kind == "manual_procedure":
         return {"manual"}
     if kind in {"compat_oval_test","compat_oval_provider_existence",
-                "compat_oval_provider_state"}:
+                "compat_oval_provider_state","compat_oval_registry_view_invariant"}:
         return {"compiler-compatibility"}
     if kind == "logic":
         result = set()
