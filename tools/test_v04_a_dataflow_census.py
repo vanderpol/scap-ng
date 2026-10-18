@@ -58,6 +58,12 @@ class SourceCensusTests(unittest.TestCase):
                             for row in a["largest_dataflow_examples"]))
         self.assertEqual(a["source_backed_examples"]["filter"]["assessment_id"],
                          automated(sample())["id"])
+        self.assertEqual(len(a["foreach_source_bindings"]), 1)
+        binding = a["foreach_source_bindings"][0]
+        self.assertEqual(binding["source_object"], "users-object")
+        self.assertEqual(binding["item_alias"], "user")
+        self.assertEqual(binding["projections"], [
+            {"selector": "directory", "from": "user.home"}])
 
     def test_order_independence_and_reference_sha(self):
         docs = sample()

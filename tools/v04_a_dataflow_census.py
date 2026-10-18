@@ -22,6 +22,7 @@ def census(ir):
     by_namespace = defaultdict(Counter)
     totals = Counter()
     witnesses = {}
+    foreach_bindings = []
     cases = []
     for row in ir["documents"]:
         if row["kind"] != "assessment":
@@ -47,6 +48,26 @@ def census(ir):
             counts["assessments_with_named_variables"] += 1
         if any(x["kind"] == "object" for x in flow["nodes"]):
             counts["assessments_with_shared_objects"] += 1
+        for site in flow["sites"]:
+            if site["kind"] != "for_each":
+                continue
+            owner = row["source_ast"]["assessment"]
+            for segment in site["path"][:-1]:
+                owner = owner[segment]
+            definition = owner["for_each"]
+            projected = [
+                {"selector": selector_name, "from": selector["from"]}
+                for selector_name, selector in sorted((owner.get("select") or {}).items())
+                if isinstance(selector, dict) and isinstance(selector.get("from"), str)
+            ]
+            foreach_bindings.append({
+                "assessment_id": row["id"],
+                "source_path": path,
+                "site_path": site["path"],
+                "source_object": definition["in"],
+                "item_alias": definition["item"],
+                "projections": projected,
+            })
         for marker in ("set", "filter", "for_each", "projection"):
             if counts[f"site_{marker}"]:
                 counts[f"assessments_with_{marker}"] += 1
@@ -85,6 +106,8 @@ def census(ir):
             for namespace, row in sorted(by_namespace.items())
         },
         "source_backed_examples": dict(sorted(witnesses.items())),
+        "foreach_source_bindings": sorted(foreach_bindings, key=lambda x: (
+            x["assessment_id"], canonical_json(x["site_path"]))),
         "largest_dataflow_examples": complexity,
         "limitations": [
             "source namespace does not represent a deduplicated per-Benchmark reachability count",

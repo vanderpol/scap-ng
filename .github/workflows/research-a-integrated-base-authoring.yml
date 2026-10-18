@@ -127,6 +127,9 @@ jobs:
           print("Projection sites:",c.get("site_projection",0))
           for kind,entry in report["source_backed_examples"].items():
               print(kind,entry["assessment_id"],entry["source_path"])
+          print("for_each source bindings:",len(report["foreach_source_bindings"]))
+          for b in report["foreach_source_bindings"]:
+              print("for_each",b["assessment_id"],b["source_object"],b["item_alias"],b["projections"])
           PY
       - name: Report exact capability limit without overstating compiler readiness
         if: always()
@@ -141,6 +144,7 @@ jobs:
           r=json.load(open(sys.argv[1],encoding="utf-8"))
           print("Counts:",json.dumps(r["counts"],sort_keys=True))
           print("Real witnesses:",json.dumps(r["source_backed_examples"],sort_keys=True))
+          print("for_each bindings:",json.dumps(r["foreach_source_bindings"],sort_keys=True))
           print("Complexity examples:",json.dumps(r["largest_dataflow_examples"],sort_keys=True))
           PY
             fi
