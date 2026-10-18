@@ -100,13 +100,13 @@ class LowerScopedToBaseTests(unittest.TestCase):
         invalid = scoped()
         test = invalid["assessment"]["tests"]["test"]
         # Extra override identical to the inherited policy is invalid.
-        if test.get("state_fields_require"):
-            override = test["state_fields_require"]
-            test["states"][0]["and"][0]["a"]["require"] = override
-            with self.assertRaises(ValueError):
-                lower_one(invalid)
-        else:
-            self.skipTest("optimizer selected local group scope, not Test scope")
+        group = test["states"][0]
+        inherited = group.get("state_fields_require", test.get("state_fields_require"))
+        if not inherited:
+            raise AssertionError("expected test or group field scope for repeated fields")
+        group["and"][0]["a"]["require"] = inherited
+        with self.assertRaises(ValueError):
+            lower_one(invalid)
 
     def test_nonautomated_documents_are_unchanged(self):
         source = scoped()
