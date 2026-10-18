@@ -42,6 +42,8 @@ on:
       - 'tools/test_research_b_variable_value_ops.py'
       - 'tools/research_b_variable_plan_evaluator.py'
       - 'tools/test_research_b_variable_plan_evaluator.py'
+      - 'tools/research_b_variable_plan_coverage.py'
+      - 'tools/test_research_b_variable_plan_coverage.py'
       - 'tools/research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
@@ -233,6 +235,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_b_variable_schedule.py
+      - name: Check source Variable plan-only census never inflates scanner conversions
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_variable_plan_coverage.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -313,6 +319,14 @@ jobs:
           python tools/research_b_variable_schedule.py \
             --source research/requirements-first-language/contract-candidate/corpus/source-specimens/independent-shellcommand-1-3d964d126ca8.source.yaml \
             --output research/requirements-first-language/contract-candidate/corpus/apache-variable-plan.json
+      - name: Classify all six-STIG Variable Assessments as plans versus blockers
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_variable_plan_coverage.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output research/requirements-first-language/contract-candidate/corpus/variable-plan-coverage.json \
+            --markdown research/requirements-first-language/contract-candidate/corpus/variable-plan-coverage.md
       - name: Preserve partial B fixture IR separately from scanner content
         uses: actions/upload-artifact@v4
         with:
@@ -342,6 +356,8 @@ jobs:
           git add research/requirements-first-language/contract-candidate/corpus/variable-dags.json
           git add research/requirements-first-language/contract-candidate/corpus/variable-dags.md
           git add research/requirements-first-language/contract-candidate/corpus/apache-variable-plan.json
+          git add research/requirements-first-language/contract-candidate/corpus/variable-plan-coverage.json
+          git add research/requirements-first-language/contract-candidate/corpus/variable-plan-coverage.md
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.md
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
