@@ -98,8 +98,8 @@ def lower_apache_version_graph(source):
         raise ValueError("Apache version source pattern must capture one group")
 
     variables=a["variables"]
-    if not isinstance(variables,dict) or set(variables)!={target_ref,"apache-path-httpd-or-apache2-variable"}:
-        # No unused Variables: the exact graph must be closed and acyclic.
+    if not isinstance(variables,dict) or target_ref not in variables or len(variables)!=2:
+        # The graph must be a closed acyclic pair, without unused Variables.
         raise ValueError("unsupported or unreferenced Apache Variable dependency")
     build=_variable(variables[target_ref],target_ref)
     if set(build)!={"concat"} or not isinstance(build["concat"],list) or len(build["concat"])!=2:
@@ -116,8 +116,8 @@ def lower_apache_version_graph(source):
         raise ValueError("unsupported source concat dependency or suffix")
     discovery_ref=source_ref["variable"]
     if discovery_ref not in variables or discovery_ref==target_ref or (
-            len(variables)!=2):
-        raise ValueError("source dynamic command Variable missing or cyclic")
+            set(variables)!={target_ref,discovery_ref}):
+        raise ValueError("source dynamic command Variable missing, unused or cyclic")
     capture=_variable(variables[discovery_ref],discovery_ref)
     if set(capture)!={"regex_capture"} or not isinstance(capture["regex_capture"],dict):
         raise ValueError("source executable path Variable requires regex_capture")
