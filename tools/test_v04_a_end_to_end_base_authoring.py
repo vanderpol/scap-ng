@@ -10,7 +10,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from test_v04_a_benchmark_choice_version_closure import pack
 from test_v04_a_lower_scoped_to_base import scoped, base
-from v04_a_end_to_end_base_authoring import stage_and_package, _extract_docs
+from v04_a_end_to_end_base_authoring import stage_and_package, _extract_docs, validate_native_capability_tests
 from v04_a_deterministic_research_container import verify_research_container
 
 
@@ -100,6 +100,19 @@ class IntegratedPipelineTests(unittest.TestCase):
             docs["authoring/shared/assessments/ng.shared.auto.json"])
         with self.assertRaisesRegex(ValueError, "duplicate"):
             stage_and_package(docs, validate_base=False)
+
+    def test_unknown_native_0_4_capability_is_not_silently_accepted(self):
+        doc = {"assessment": {"mode": "automated", "tests": {
+            "test": {"capability": "made.up.unreviewed", "require": "only_one_exists"}
+        }}}
+        with self.assertRaisesRegex(ValueError, "unsupported 0.4 capability"):
+            validate_native_capability_tests({"authoring/rhel_9/assessment.json": doc})
+
+    def test_skipping_base_validation_is_explicitly_reported(self):
+        _, r = stage_and_package(input_documents(), validate_base=False)
+        self.assertEqual(r["native_capability_proof"]["stage"],
+                         "NOT_CHECKED_RESEARCH_FIXTURE")
+        self.assertEqual(r["native_capability_proof"]["native_test_nodes_validated"], 0)
 
     def test_invalid_semantic_source_not_claimed_as_schema_valid(self):
         docs = input_documents()
