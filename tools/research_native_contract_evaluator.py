@@ -202,6 +202,10 @@ def evaluate(ast,fixtures,scope=None):
     # node consumes RAW typed collector Items, not pre-evaluated Item results.
     # It only supports an independently pinned state-free textfile existence
     # Test shape. No claim of OVAL regex/item_creation/source parity.
+    if ast["kind"]=="compat_oval_shellcommand_state":
+        from research_b_source_shell_evaluator import evaluate_source_shell
+        result,reason,count=evaluate_source_shell(ast,fixtures)
+        return Decision(result,reason,ast["provider"],count,count)
     if ast["kind"]=="compat_oval_registry_view_invariant":
         from research_b_source_registry_evaluator import evaluate_source_registry
         result,reason,observed=evaluate_source_registry(ast,fixtures)
