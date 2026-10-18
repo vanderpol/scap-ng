@@ -164,11 +164,18 @@ def _node(node, source_kind, depth=0):
             "field","operation","expected","entity_existence","entity_check"},
             "invalid State entity IR")
         _ensure(state["field"]=="subexpression" and
-                state["operation"] in {"equals","not_equals"} and
+                state["operation"] in {"equals","not_equals","pattern_match"} and
                 isinstance(state["expected"],str) and
                 state["entity_existence"]=="at_least_one_exists" and
                 state["entity_check"]=="all",
                 "unsupported source State entity operation/type/cardinality")
+        if state["operation"]=="pattern_match":
+            _ensure(len(state["expected"])<=2048,
+                    "source State regex exceeds bounded research length")
+            try:
+                re.compile(state["expected"])
+            except re.error as exc:
+                raise ValueError("invalid source State regex for research provider") from exc
         return
 
     if kind == "compat_oval_provider_existence":
