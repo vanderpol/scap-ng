@@ -35,7 +35,7 @@ jobs:
           curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
             'https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-joval-meeting-preview-20261015-r3/scap-ng-v0.4-joval-six-stig-yaml.zip' \
             --output work/a-end-to-end/yaml.zip
-      - name: Reversibly lower, base-schema validate, stage versions and package
+      - name: Reversibly lower, base-schema and capability validate, stage versions and package
         run: |
           python tools/v04_a_end_to_end_base_authoring.py \
             --json-archive work/a-end-to-end/json.zip \
@@ -52,6 +52,9 @@ jobs:
           assert x["assessment_counts"]["lowered_automated_assessments"]==872,x
           assert x["assessment_counts"]["validated_base_assessments"]==872,x
           assert x["assessment_counts"]["lowered_tests"]==1375,x
+          assert x["native_capability_proof"]["native_test_nodes_validated"]==1375,x
+          assert x["native_capability_proof"]["native_capabilities_validated"]>0,x
+          assert x["native_capability_proof"]["stage"]=="generated_0.4_capability_structural_schema_only",x
           assert x["rule_choice_links"]==2958,x
           assert x["yaml_json_byte_parity"]=="PASS",x
           assert x["base_schema"]=="ALL_AUTOMATED_ASSESSMENTS_VALIDATED",x
