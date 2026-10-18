@@ -154,3 +154,53 @@ def lower_apache_version_graph(source):
                  "entity_existence":"at_least_one_exists",
                  "entity_check":"at least one"},
     }
+
+
+def validate_apache_version_ir(node):
+    """Validate the research IR shape; source-leaf reconstruction is separate."""
+    keys={"kind","source_assessment_id","source_test_id","provider",
+          "discovery_using","discovery_pattern","capture_pattern",
+          "capture_variable","command_variable","command_suffix",
+          "version_using","version_pattern","existence","check","state"}
+    if not isinstance(node,dict) or set(node)!=keys:
+        raise ValueError("invalid source Apache graph IR keys")
+    if node["kind"]!="compat_oval_shellcommand_variable_version" or (
+            node["provider"]!="independent.shellcommand"):
+        raise ValueError("invalid Apache graph kind/provider")
+    if any(type(node[k]) is not str or not node[k] for k in (
+            "source_assessment_id","source_test_id","capture_variable",
+            "command_variable")) or (
+            node["capture_variable"]==node["command_variable"]):
+        raise ValueError("invalid Apache graph source identity or cyclic variables")
+    if node["command_suffix"]!=" -V":
+        raise ValueError("unsupported source Apache command Variable suffix")
+    for key in ("discovery_using","version_using"):
+        using=node[key]
+        expected=USING_KEYS if key=="discovery_using" else (
+            USING_KEYS-{"command"})
+        if not isinstance(using,dict) or set(using)!=expected:
+            raise ValueError("invalid Apache graph source query arguments")
+        if key=="discovery_using":
+            if type(using["command"]) is not str or not using["command"] or (
+                    len(using["command"])>4096):
+                raise ValueError("invalid source discovery command")
+        if using["shell"]!="bash" or any(type(using[x]) is not bool for x in (
+                "error_if_exit_status_not_0","error_if_stderr_exists")):
+            raise ValueError("Apache graph source command flags invalid")
+    if _regex(node["capture_pattern"],"source executable capture").groups!=1:
+        raise ValueError("source Apache executable capture group count invalid")
+    if _regex(node["version_pattern"],"source version regex").groups!=1:
+        raise ValueError("source Apache version capture group count invalid")
+    _regex(node["discovery_pattern"],"source discovery filter")
+    state=node["state"]
+    if (not isinstance(state,dict) or set(state)!={
+            "field","operation","expected","entity_existence","entity_check"} or
+            state["field"]!="subexpression" or
+            state["operation"]!="version_greater_than_or_equal" or
+            state["entity_existence"]!="at_least_one_exists" or
+            state["entity_check"]!="at least one" or
+            type(state["expected"]) is not str or
+            not re.fullmatch(r"[0-9]+(?:\.[0-9]+){1,3}",state["expected"])):
+        raise ValueError("source Apache version State shape invalid")
+    if node["existence"]!="at_least_one_exists" or node["check"]!="all":
+        raise ValueError("source Apache version Test cardinality invalid")
