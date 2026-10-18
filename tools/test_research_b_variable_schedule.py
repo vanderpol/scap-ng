@@ -9,7 +9,7 @@ import unittest
 import yaml
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_b_variable_schedule import plan_source_variables,FORMAT
+from research_b_variable_schedule import plan_source_variables,FORMAT,shared_object_references
 from research_b_variable_dag_inventory import variable_references
 
 SOURCES=Path(__file__).resolve().parents[1]/(
@@ -50,6 +50,24 @@ class SourceVariablePlanTests(unittest.TestCase):
                              a["variables"][node["id"]]["expression"])
         self.assertEqual({n["operator"] for n in p["nodes"]},
                          {"regex_capture","concat","merge","unique"})
+
+    def test_complex_source_shared_object_closure_preserved(self):
+        a=self.load(COMPLEX)
+        plan=plan_source_variables(a)
+        self.assertIn("gather-unique-apache-http-installation-paths-object",
+                      plan["referenced_shared_object_ids"])
+        self.assertEqual(plan["source_shared_objects"],a["shared_objects"])
+        self.assertEqual(len(plan["source_shared_objects_sha256"]),64)
+        # A Variable with a named shared source Object must not be
+        # schedulable if that acquisition is absent.
+        a["shared_objects"].pop("gather-unique-apache-http-installation-paths-object")
+        with self.assertRaisesRegex(ValueError,"shared Objects"):
+            plan_source_variables(a)
+
+    def test_inline_objects_are_not_mistaken_for_shared_object_references(self):
+        self.assertEqual(shared_object_references({
+            "object":{"capability":"independent.shellcommand",
+                      "collect":{"command":"echo ok"}}}),set())
 
     def test_unbound_references_and_cycles_rejected(self):
         a=self.load(SIMPLE)
