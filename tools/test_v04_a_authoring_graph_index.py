@@ -40,6 +40,10 @@ class ResearchGraphIndexTests(unittest.TestCase):
         self.assertEqual(original["graph_sha256"], graph_index(moved)["graph_sha256"])
         self.assertEqual(original["stage"], "parsed_source_only_not_compiled")
         self.assertEqual(len(original["nodes"]), 3)
+        self.assertEqual(original["version_contract_status"],
+                         "NOT_ACCEPTED_FOR_NATIVE_0.4_BUNDLE")
+        self.assertIn("benchmark_required_specification:scap-ng.pre-alpha.assessment@0.3.0",
+                      original["version_inventory"])
 
     def test_data_mutation_changes_graph_digest(self):
         changed = deepcopy(docs())
