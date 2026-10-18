@@ -8,6 +8,14 @@
 
 The six-STIG reports are *engineering evidence*, not evidence that a person can comfortably write a new assessment. We should not ask reviewers to choose a vocabulary based on corpus statistics alone.
 
+## 18 October readability evidence — hold the decision, but narrow the options
+
+- The [complete DNS candidate](FULL-04-dns-INLINE-COMMAND-CANDIDATE.md) moves three **single-use** original command expressions next to their only checks (184→163 non-comment lines, 3→0 named Variables). The review must still resolve zero/one/many zone inputs and missing source provenance; **do not infer an implicit zone loop**.
+- The [complete Apache candidate](FULL-05-apache-INLINE-COMMAND-CANDIDATE.md) moves four final single-use command expressions into their checks (335→310 lines, 18→14 Variables). A [second-pass negative trial](APACHE-SECOND-PASS-READABILITY.md) inlining three more deeply nested single-use commands **increased** the result to 322 lines and indentation from 22 to 26 spaces. **Five** original Variable outputs are multiply referenced and worth keeping discoverable; the two Apache config-path populations are distinct.
+- **No new language has won.** A limited typed inline-command expression might help the author, but blanket inlining and a new automatic `pipe/derive` syntax are not justified by this evidence. A staged source view is a *sketch*, not a new capability. The [full DNS blind test](DNS-COMPOSITION-BLIND-REVIEW.md), [Apache authoring exercise](APACHE-COMPOSITION-AUTHORING-CHALLENGE.md) and [semantics/provenance checklist](COMMAND-COMPOSITION-CONTRACT.md) are ready, but **no independent author results have been collected**.
+
+**Next bounded action:** Test whether authors understand the complete DNS and Apache source and correctly distinguish missing Items, missing fields, plural source values, collection errors and distinct check branches. Promote only a demonstrably clearer **single** authoring language with typed reversible mapping and independent result evidence. **No schema/converter changes or 65-STIG run are requested.**
+
 ## What has actually been demonstrated
 
 | Finding | Decision relevance |
