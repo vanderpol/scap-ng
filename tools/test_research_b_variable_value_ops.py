@@ -8,7 +8,7 @@ import yaml
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from research_b_variable_value_ops import (
-    values,capture,concat,unique,MAX_VALUES,
+    values,capture,concat,unique,merge,MAX_VALUES,
 )
 
 SOURCE=(Path(__file__).resolve().parents[1]/
@@ -47,7 +47,10 @@ class VariableValueOpsTests(unittest.TestCase):
         self.assertEqual(len(commands["values"]),2)
 
     def test_no_values_not_equivalent_to_false_or_empty_string(self):
+        # OVAL regex_capture yields one empty string per unmatched target.
         self.assertEqual(capture(values(["unrelated-process"]),r"(httpd)"),
+                         values([""]))
+        self.assertEqual(capture(values(status="no_values"),r"(httpd)"),
                          values(status="no_values"))
         self.assertEqual(concat([values(status="no_values"),values([" -V"])]),
                          values(status="no_values"))
@@ -81,17 +84,54 @@ class VariableValueOpsTests(unittest.TestCase):
 
     def test_regex_capture_requires_one_group_and_bounded_strings(self):
         self.assertEqual(capture(values(["a1"]),r"(a)(1)"),
-                         values(status="error"))
+                         values(["a"]))
         self.assertEqual(capture(values(["a1"]),r"["),
                          values(status="error"))
         self.assertEqual(capture(values(["x"]),"(.+)"),
                          values(["x"]))
         self.assertEqual(capture(values(["abc"]),r"(a)?b(c)"),
-                         values(status="error"))
+                         values(["a"]))
+        self.assertEqual(capture(values(["x"]),r"x"),
+                         values([""]))
         with self.assertRaises(ValueError):
             values(["x"]*(MAX_VALUES+1))
         with self.assertRaises(ValueError):
             values(["x"*4097])
+
+    def test_actual_complex_apache_regex_alternation_uses_first_group_only(self):
+        source=(Path(__file__).resolve().parents[1]/
+                "research/requirements-first-language/contract-candidate/corpus/"
+                "source-specimens/independent-shellcommand-1-3d964d126ca8.source.yaml")
+        raw=yaml.safe_load(source.read_text())["assessment"]
+        pattern=raw["variables"]["apache-base-install-directories-unix-variable"][
+            "expression"]["regex_capture"]["pattern"]
+        self.assertEqual(capture(values(["/usr/sbin/httpd"]),pattern),
+                         values(["/usr/sbin/"]))
+        self.assertEqual(capture(values(["/usr/sbin/apache2"]),pattern),
+                         values([""]))
+
+    def test_converted_source_merge_only_order_invariant_inputs(self):
+        source=(Path(__file__).resolve().parents[1]/
+                "research/requirements-first-language/contract-candidate/corpus/"
+                "source-specimens/independent-shellcommand-1-3d964d126ca8.source.yaml")
+        a=yaml.safe_load(source.read_text())["assessment"]
+        options=a["variables"]["merged-list-all-loaded-config-files-variable"][
+            "expression"]["merge"]
+        self.assertEqual(options["sort"],"document")
+        self.assertEqual(options["order"],"ascending")
+        args={"delimiter":options["delimiter"],"sort":options["sort"],
+              "order":options["order"]}
+        self.assertEqual(merge(values(["/etc/httpd.conf"]),**args),
+                         values(["/etc/httpd.conf"]))
+        self.assertEqual(merge(values(["a","a"]),**args),
+                         values(["a a"]))
+        self.assertEqual(merge(values(["b","a"]),**args),
+                         values(status="unknown"))
+        self.assertEqual(merge(values(status="no_values"),**args),
+                         values(status="no_values"))
+        self.assertEqual(merge(values(["a"]),delimiter=" ",
+                               sort="lexicographic",order="ascending"),
+                         values(status="error"))
 
     def test_typed_envelope_cannot_carry_partial_unverified_values(self):
         with self.assertRaises(ValueError):
