@@ -1,0 +1,486 @@
+{
+  "execution_supported": false,
+  "format": "scap-ng-b-source-variable-plan/0.1",
+  "max_variable_depth": 9,
+  "nodes": [
+    {
+      "depends_on": [],
+      "id": "apache-base-install-directories-unix-variable",
+      "operator": "regex_capture",
+      "source_datatype": "string",
+      "source_expression": {
+        "regex_capture": {
+          "pattern": "(^\\/.+\\/)httpd|(^\\/.+/)apache2",
+          "value": {
+            "values": {
+              "field": "stdout_line",
+              "object": "gather-unique-apache-http-installation-paths-object"
+            }
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [],
+      "id": "apache-path-httpd-or-apache2-variable",
+      "operator": "regex_capture",
+      "source_datatype": "string",
+      "source_expression": {
+        "regex_capture": {
+          "pattern": "(^\\/.+\\/httpd|^\\/.+\\/apache2) ",
+          "value": {
+            "values": {
+              "field": "stdout_line",
+              "object": "gather-unique-apache-http-installation-paths-object"
+            }
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "apache-path-httpd-or-apache2-variable"
+      ],
+      "id": "command-gather-httpd-apache2-list-all-loaded-configuration-files-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "apache-path-httpd-or-apache2-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": " -t -D DUMP_INCLUDES"
+            }
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "apache-path-httpd-or-apache2-variable"
+      ],
+      "id": "command-gather-httpd-apache2-modules-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "apache-path-httpd-or-apache2-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": " -M"
+            }
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "apache-base-install-directories-unix-variable"
+      ],
+      "id": "httpd-root-apachectl-v-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "apache-base-install-directories-unix-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "apachectl -V | grep -i 'httpd_root'"
+            }
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "apache-base-install-directories-unix-variable"
+      ],
+      "id": "server-config-file-apachectl-v-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "apache-base-install-directories-unix-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "apachectl -V | grep -i 'server_config_file'"
+            }
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "command-gather-httpd-apache2-list-all-loaded-configuration-files-variable"
+      ],
+      "id": "all-loaded-configuration-filepaths-variable",
+      "operator": "unique",
+      "source_datatype": "string",
+      "source_expression": {
+        "unique": {
+          "regex_capture": {
+            "pattern": "\\(.*\\) (/.*)",
+            "value": {
+              "values": {
+                "field": "stdout_line",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "collect": {
+                    "command": {
+                      "variable": "command-gather-httpd-apache2-list-all-loaded-configuration-files-variable"
+                    },
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false,
+                    "pattern": " \\(",
+                    "shell": "bash"
+                  },
+                  "object_title": "Gather all loaded config files"
+                }
+              }
+            }
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "httpd-root-apachectl-v-variable"
+      ],
+      "id": "filepath-httpd-root-variable",
+      "operator": "regex_capture",
+      "source_datatype": "string",
+      "source_expression": {
+        "regex_capture": {
+          "pattern": " -D HTTPD_ROOT=\"(.+)\"",
+          "value": {
+            "values": {
+              "field": "stdout_line",
+              "object": {
+                "capability": "independent.shellcommand",
+                "collect": {
+                  "command": {
+                    "variable": "httpd-root-apachectl-v-variable"
+                  },
+                  "error_if_exit_status_not_0": false,
+                  "error_if_stderr_exists": false,
+                  "pattern": "HTTPD_ROOT",
+                  "shell": "bash"
+                },
+                "object_title": "Gather HTTPD_ROOT files via apachectl"
+              }
+            }
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "server-config-file-apachectl-v-variable"
+      ],
+      "id": "relative-server-config-file-variable",
+      "operator": "regex_capture",
+      "source_datatype": "string",
+      "source_expression": {
+        "regex_capture": {
+          "pattern": " -D SERVER_CONFIG_FILE=\"(.+)\"",
+          "value": {
+            "values": {
+              "field": "stdout_line",
+              "object": {
+                "capability": "independent.shellcommand",
+                "collect": {
+                  "command": {
+                    "variable": "server-config-file-apachectl-v-variable"
+                  },
+                  "error_if_exit_status_not_0": false,
+                  "error_if_stderr_exists": false,
+                  "pattern": "SERVER_CONFIG_FILE",
+                  "shell": "bash"
+                },
+                "object_title": "Gather SERVER_CONFIG_FILE files via apachectl"
+              }
+            }
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "filepath-httpd-root-variable",
+        "relative-server-config-file-variable"
+      ],
+      "id": "filepath-http-conf-file-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "filepath-httpd-root-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "/"
+            }
+          },
+          {
+            "variable": "relative-server-config-file-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "all-loaded-configuration-filepaths-variable"
+      ],
+      "id": "merged-list-all-loaded-config-files-variable",
+      "operator": "merge",
+      "source_datatype": "string",
+      "source_expression": {
+        "merge": {
+          "delimiter": " ",
+          "order": "ascending",
+          "sort": "document",
+          "values": {
+            "variable": "all-loaded-configuration-filepaths-variable"
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "filepath-http-conf-file-variable"
+      ],
+      "id": "shell-command-check-all-include-include-optional-files-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "grep -iEHn '^\\s*Include\\s+|^\\s*IncludeOptional\\s+' "
+            }
+          },
+          {
+            "variable": "filepath-http-conf-file-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "merged-list-all-loaded-config-files-variable"
+      ],
+      "id": "shell-command-check-session-in-all-loaded-conf-files-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "grep -iHn '^\\s*Session ' "
+            }
+          },
+          {
+            "variable": "merged-list-all-loaded-config-files-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "merged-list-all-loaded-config-files-variable"
+      ],
+      "id": "shell-command-check-sessioncookiename-in-all-loaded-conf-files-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "grep -iHn '^\\s*SessionCookieName' "
+            }
+          },
+          {
+            "variable": "merged-list-all-loaded-config-files-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "filepath-httpd-root-variable",
+        "shell-command-check-all-include-include-optional-files-variable"
+      ],
+      "id": "all-included-conf-files-from-include-refernces-in-httd-conf-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "filepath-httpd-root-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "/"
+            }
+          },
+          {
+            "regex_capture": {
+              "pattern": "\\S+\\s+(\\S+)\\s*",
+              "value": {
+                "values": {
+                  "field": "stdout_line",
+                  "object": {
+                    "capability": "independent.shellcommand",
+                    "collect": {
+                      "command": {
+                        "variable": "shell-command-check-all-include-include-optional-files-variable"
+                      },
+                      "error_if_exit_status_not_0": false,
+                      "error_if_stderr_exists": false,
+                      "pattern": "\\S+",
+                      "shell": "bash"
+                    },
+                    "object_title": "Gather Include statements from httpd.conf"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "all-included-conf-files-from-include-refernces-in-httd-conf-variable"
+      ],
+      "id": "merged-included-conf-files-from-include-refernces-in-httd-conf-variable",
+      "operator": "merge",
+      "source_datatype": "string",
+      "source_expression": {
+        "merge": {
+          "delimiter": " ",
+          "order": "ascending",
+          "sort": "document",
+          "values": {
+            "variable": "all-included-conf-files-from-include-refernces-in-httd-conf-variable"
+          }
+        }
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "filepath-http-conf-file-variable",
+        "merged-included-conf-files-from-include-refernces-in-httd-conf-variable"
+      ],
+      "id": "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "variable": "filepath-http-conf-file-variable"
+          },
+          {
+            "literal": {
+              "datatype": "string",
+              "value": " "
+            }
+          },
+          {
+            "variable": "merged-included-conf-files-from-include-refernces-in-httd-conf-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable"
+      ],
+      "id": "shell-command-check-session-in-httpd-conf-all-include-conf-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "grep -iHn '^\\s*Session ' "
+            }
+          },
+          {
+            "variable": "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    },
+    {
+      "depends_on": [
+        "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable"
+      ],
+      "id": "shell-command-check-sessioncookiename-in-httpd-conf-all-include-conf-variable",
+      "operator": "concat",
+      "source_datatype": "string",
+      "source_expression": {
+        "concat": [
+          {
+            "literal": {
+              "datatype": "string",
+              "value": "grep -iHn '^\\s*SessionCookieName' "
+            }
+          },
+          {
+            "variable": "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable"
+          }
+        ]
+      },
+      "source_kind": "local"
+    }
+  ],
+  "note": "structural Variable dependency plan, no acquisition or evaluation",
+  "original_source_parity_verified": false,
+  "source_assessment_id": "SV-214268.automated",
+  "source_variables_sha256": "3a599082afe09542e2d81409bc8ea439592d590adfa84f7ac5c92fa525433e14",
+  "test_variable_references": [
+    "command-gather-httpd-apache2-modules-variable",
+    "shell-command-check-session-in-all-loaded-conf-files-variable",
+    "shell-command-check-session-in-httpd-conf-all-include-conf-variable",
+    "shell-command-check-sessioncookiename-in-all-loaded-conf-files-variable",
+    "shell-command-check-sessioncookiename-in-httpd-conf-all-include-conf-variable"
+  ]
+}
