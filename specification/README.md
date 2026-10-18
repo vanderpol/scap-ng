@@ -4,6 +4,8 @@
 
 These pages define the current SCAP-NG contract. Research and design-history records are non-normative; unresolved proposals remain outside the normative text until decided.
 
+**New to Assessment authoring or using an AI editor?** Start with the [curated public authoring guide](../docs/public-authoring/README.md). It summarizes source/version selection, real examples and review safeguards without requiring development-history research. This introduction does not replace the specification or promote 0.4 experimental syntax.
+
 ## Start here
 
 1. [Core objectives](objectives.md)
