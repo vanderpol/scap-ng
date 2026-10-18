@@ -70,7 +70,7 @@ def _state_entries(entries, path):
         where = f"{path}[{idx}]"
         _require(isinstance(node, dict), f"{where}: invalid State expression")
         if RESEARCH_FIELD_INHERIT in node:
-            raise GrammarBoundaryError(f"{where}: scoped State inheritance is research-only")
+            raise GrammarBoundaryError(f"{where}: state_fields_require is scoped research-only")
         # A literal observed field named 'and'/'or' is a dictionary, not a group.
         for key in RESEARCH_GROUPS:
             if isinstance(node.get(key), list):
