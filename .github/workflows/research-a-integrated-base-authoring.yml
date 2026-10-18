@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/research-a-integrated-base-authoring.yml'
       - 'tools/v04_a_end_to_end_base_authoring.py'
+      - 'tools/v04_a_lossless_ir.py'
+      - 'tools/test_v04_a_lossless_ir.py'
       - 'tools/test_v04_a_end_to_end_base_authoring.py'
       - 'tools/v04_a_lower_scoped_to_base.py'
       - 'tools/v04_a_benchmark_spec_migration_preview.py'
@@ -26,6 +28,8 @@ jobs:
         run: python -m pip install PyYAML==6.0.3 jsonschema==4.25.1
       - name: Run adversarial integrated packaging tests
         run: python -m unittest -v tools/test_v04_a_end_to_end_base_authoring.py
+      - name: Verify adversarial lossless typed-IR source envelopes
+        run: python -m unittest -v tools/test_v04_a_lossless_ir.py
       - name: Fetch immutable 0.4-A r3 authoring sources
         run: |
           mkdir -p work/a-end-to-end
@@ -66,12 +70,35 @@ jobs:
           print("Base input graph SHA-256:",x["base_lowered_graph_sha256"])
           print("Packaged staged graph SHA-256:",x["packaged_staged_graph_sha256"])
           PY
+      - name: Compile and independently decode research-only typed Assessment IR
+        run: |
+          python tools/v04_a_lossless_ir.py \
+            --base-zip "$RUNNER_TEMP/a-unsigned-base-research.zip" \
+            --out "$RUNNER_TEMP/a-lossless-ir.json" --assert-six \
+            > "$RUNNER_TEMP/a-lossless-ir.stdout"
+          python - "$RUNNER_TEMP/a-lossless-ir.stdout" <<'PY'
+          import json,sys
+          result=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert result["status"]=="RESEARCH_NOT_EXECUTABLE",result
+          assert result["document_count"]==4001,result
+          assert result["automated_assessments"]==872,result
+          assert result["automated_tests"]==1375,result
+          assert result["rule_choice_links"]==2958,result
+          assert result["roundtrip"]=="PASS",result
+          assert result["scanner_executable"] is False,result
+          print("PASS: #240 lossless typed envelope + independent full decode")
+          print("Canonical IR SHA-256:",result["ir_sha256"])
+          PY
       - name: Report exact capability limit without overstating compiler readiness
         if: always()
         run: |
           {
             echo '## #232/#239 — integrated 0.4-A base grammar authoring and research package'
             echo 'The independent YAML/JSON paths produce byte-identical, verified, UNSIGNED research ZIPs with all base-schema-valid Automated Assessments and exact Rule choices. The 0.4 language/migration approval and actual scanner executable .scapng compiler remain OUT OF SCOPE.'
+            if test -s "$RUNNER_TEMP/a-lossless-ir.stdout"; then
+              echo '### #240 lossless source-envelope IR (NOT EXECUTABLE)'
+              cat "$RUNNER_TEMP/a-lossless-ir.stdout"
+            fi
             if test -s "$RUNNER_TEMP/a-end-to-end.json"; then
               cat "$RUNNER_TEMP/a-end-to-end.json"
             fi
