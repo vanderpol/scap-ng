@@ -64,6 +64,13 @@ on:
 permissions:
   contents: write
 
+# CI runs for every source change, but only the latest main revision should
+# regenerate the canonical six-STIG research ledgers. Prevent stale runs
+# racing to push incompatible ledger snapshots back to main.
+concurrency:
+  group: b-six-stig-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   import-accounting:
     runs-on: ubuntu-latest
