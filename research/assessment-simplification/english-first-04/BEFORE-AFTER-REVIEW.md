@@ -2,6 +2,9 @@
 
 **October 16, 2026 · Pre-alpha research · Not a specification adoption request**
 
+**October 18 readability iteration (current research):** [Five-case friction audit + lean complete simple candidate](READABILITY-RESET-ITERATION-1.md) · [Three-way *unprimed* first-read packet](AUDITOR-FIRST-READ-PACKET.md) · [Facilitator answer key (do not show first)](AUDITOR-FIRST-READ-SCORING.md) · [Complex Windows/Linux review maps](COMPLEX-FIRST-READ-MAPS.md). **These do not change the 0.4 grammar.** The new packet has no independent reviewer scores yet; avoid treating conversion/CI success as human usability evidence.
+
+
 **Your feedback question:** Which format makes it easier to understand **and author a complete check**—existing 0.4 or proposed English-first—without needing to guess what a referenced collection or Variable means?
 
 Each comparison below includes **both complete YAML documents directly on its own Markdown page**: metadata, source collections, variables, checks, field/Item requirements, and final evaluation. **There are no shortened snippets or omitted parts in the paired YAML blocks.** They can be read entirely on `github.com`, including on a phone or restricted proxy network.
