@@ -16,6 +16,8 @@ The six-STIG reports are *engineering evidence*, not evidence that a person can 
 
 **Next bounded action:** Test whether authors understand the complete DNS and Apache source and correctly distinguish missing Items, missing fields, plural source values, collection errors and distinct check branches. Promote only a demonstrably clearer **single** authoring language with typed reversible mapping and independent result evidence. **No schema/converter changes or 65-STIG run are requested.**
 
+**New external-source constraint (18 October):** Official [OVAL 5.12.3](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html#concatfunctiontype) confirms `concat` expands multi-valued input combinations to a **collection** of strings while `merge` produces **one** string from multiple values. This sharply distinguishes the DNS command expressions from Apache config path merging. [Meaning and authoring alternatives](OVAL-5123-CONCAT-MERGE-READABILITY.md). This does **not** settle whether a native 0.4 `for_each` over collected Items exactly represents OVAL's value combinations or how many commands a scanner executes. No grammar change is authorized.
+
 ## What has actually been demonstrated
 
 | Finding | Decision relevance |
