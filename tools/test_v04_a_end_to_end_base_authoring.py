@@ -42,7 +42,7 @@ class IntegratedPipelineTests(unittest.TestCase):
         self.assertNotIn("collected_items_require", test)
         self.assertNotIn("state_fields_require", test)
         self.assertEqual(test["states"][0]["all"][2]["c"]["require"], "none_exist")
-        self.assertEqual(packaged["authoring/rhel_9/benchmark.json"]["benchmark"][
+        self.assertEqual(packaged["authoring/rhel_9/benchmark.rhel_9.json"]["benchmark"][
             "assessment_specifications"], [{"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"}])
         self.assertEqual(packaged["authoring/shared/assessments/ng.shared.manual.json"],
                          docs["authoring/shared/assessments/ng.shared.manual.json"])
