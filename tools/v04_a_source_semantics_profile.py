@@ -62,6 +62,7 @@ def source_profile(documents, ids=KNOWN_TARGETS):
                 "require": test.get("require", test.get("collected_items_require")),
                 "has_state": bool(test.get("states")),
                 "state_count": len(test.get("states") or []),
+                "states_match": test.get("states_match"),
                 "has_inline_object": isinstance(test.get("object"), dict),
                 "shared_object_reference": test.get("object") if isinstance(
                     test.get("object"), str) else None,
