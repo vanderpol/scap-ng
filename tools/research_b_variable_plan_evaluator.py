@@ -135,7 +135,7 @@ def evaluate_source_variable_plan(plan,fixtures):
                 c["shell"] not in {"bash","powershell"}) or
                 type(c["pattern"]) is not str or len(c["pattern"])>1024 or any(
                 type(c[k]) is not bool for k in (
-                  "error_if_exit_status_not_0","error_if_stderr_exists"))):
+                  "error_if_exit_status_not_0","error_if_stderr_exists")):
                 return _fail()
             using={k:c[k] for k in ("shell","error_if_exit_status_not_0",
                                     "error_if_stderr_exists")}
