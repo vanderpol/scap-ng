@@ -82,6 +82,11 @@ jobs:
               print("  Tests:",[(x["capability"],x["require"],x["record_nodes"],
                                  x["set_nodes"],x["variable_references"])
                                 for x in record["tests"]])
+              for test in record["tests"]:
+                  if test["capability"]=="windows.wmi.query":
+                      print("  Source WMI Test ID:",test["test_id"])
+                      print("  Source WMI record states:",json.dumps(test["wmi_record_state_source"],sort_keys=True))
+                      print("  Source WMI collection object:",json.dumps(test["wmi_object_source"],sort_keys=True))
           PY
       - name: Independently parse both frozen formats and compile one checked A research IR
         run: |

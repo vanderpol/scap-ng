@@ -23,6 +23,8 @@ class ComplexSourceProfileTests(unittest.TestCase):
         self.assertEqual(len(a["tests"]), 1)
         self.assertEqual(a["tests"][0]["require"], "at_least_one_exists_and_all_match")
         self.assertEqual(len(a["source_document_sha256"]), 64)
+        self.assertIsNone(a["tests"][0]["wmi_record_state_source"])
+        self.assertIsNone(a["tests"][0]["wmi_object_source"])
 
     def test_missing_selected_source_rejected(self):
         with self.assertRaisesRegex(ValueError, "missing source Assessment anchors"):
