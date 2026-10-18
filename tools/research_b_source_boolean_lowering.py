@@ -12,6 +12,7 @@ from research_b_source_partition_lowering import lower_state_free_partition_asse
 from research_b_source_textfile_state_lowering import lower_single_capture_textfile_assessment
 from research_b_source_wmi_lowering import lower_state_free_wmi_assessment
 from research_b_source_registry_lowering import lower_source_registry_assessment
+from research_b_source_shell_lowering import lower_source_shell_assessment
 
 
 LEAF_LOWERERS=(
@@ -20,6 +21,7 @@ LEAF_LOWERERS=(
     lower_state_free_partition_assessment,
     lower_state_free_wmi_assessment,
     lower_source_registry_assessment,
+    lower_source_shell_assessment,
 )
 METADATA={"id","version","assessment_title","mode","class","purpose",
           "specification","tests","evaluate"}
