@@ -140,6 +140,47 @@ def choose(report,capsules):
         }
     elif "No bounded nested registry State all source specimen" not in warnings:
         warnings.append("No bounded nested registry State all source specimen")
+    # Platform breadth: the single smallest shellcommand family specimen is
+    # Linux and the largest happens to be Apache. Publish a distinct smallest
+    # *per-stream* source specimen for the two streams still at zero automated
+    # fixture conversions. Do not infer the command can safely run.
+    for stream,label in (("apache_server_2-4_unix_server","apache"),
+                         ("ms_windows_server_dns","dns")):
+        possible=[]
+        for aid,cap in sorted(capsules.items()):
+            if stream not in binding.get(aid,set()):
+                continue
+            assessment=cap["source_document"].get("assessment",{})
+            tests=assessment.get("tests",{})
+            if not isinstance(tests,dict) or not any(
+                isinstance(test,dict) and
+                test.get("capability")=="independent.shellcommand"
+                for test in tests.values()):
+                continue
+            body=yaml.safe_dump(cap["source_document"],sort_keys=True,allow_unicode=True)
+            size=len(body.encode("utf-8"))
+            if size<=MAX_BYTES:
+                possible.append((size,aid,cap,body,len(tests)))
+        if not possible:
+            continue
+        size,aid,cap,body,test_count=min(possible,key=lambda row:(row[0],row[1]))
+        if aid in selected:
+            selected[aid]["families"].append("independent.shellcommand/"+label+"_small")
+            continue
+        suffix=sha256(aid.encode()).hexdigest()[:12]
+        selected[aid]={
+            "id":aid,
+            "source_path":cap["source_path"],
+            "source_raw_sha256":cap["source_raw_sha256"],
+            "source_parsed_sha256":cap["source_parsed_sha256"],
+            "specimen_dump_sha256":sha256(body.encode()).hexdigest(),
+            "families":["independent.shellcommand/"+label+"_small"],
+            "benchmarks":sorted(binding[aid]),
+            "byte_count":size,
+            "test_count":test_count,
+            "file":"independent-shellcommand-"+label+"-small-"+suffix+".source.yaml",
+            "content":body,
+        }
     return selected,warnings
 
 def build_manifest(picks,warnings):
