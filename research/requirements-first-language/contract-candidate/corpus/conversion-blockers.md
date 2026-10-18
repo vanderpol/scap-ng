@@ -4,13 +4,13 @@
 Counts below are distinct *unsupported automated Assessments* referencing
 each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
-**Unsupported automated Assessments: 808**.
+**Unsupported automated Assessments: 804**.
 
 ## Highest-volume capability families
 
 | Source Test capability | Unsupported Assessments containing it |
 | --- | ---: |
-| independent.textfilecontent54 | 227 |
+| independent.textfilecontent54 | 223 |
 | windows.registry | 156 |
 | independent.shellcommand | 88 |
 | unix.file | 76 |
@@ -42,7 +42,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Feature | Unsupported Assessments containing it |
 | --- | ---: |
-| states | 632 |
+| states | 628 |
 | multiple_tests | 251 |
 | set_or_filter | 110 |
 | shared_objects | 77 |
@@ -113,7 +113,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Capability | Referenced unsupported Assessments |
 | --- | ---: |
-| independent.textfilecontent54 | 201 |
+| independent.textfilecontent54 | 197 |
 | unix.file | 64 |
 | linux.rpminfo | 33 |
 | unix.sysctl | 33 |
@@ -131,7 +131,7 @@ each capability/feature; a multi-Test Assessment may appear in multiple rows.
 
 | Capability | Referenced unsupported Assessments |
 | --- | ---: |
-| independent.textfilecontent54 | 201 |
+| independent.textfilecontent54 | 197 |
 | unix.file | 62 |
 | linux.rpminfo | 35 |
 | unix.sysctl | 33 |
