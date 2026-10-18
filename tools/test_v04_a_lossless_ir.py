@@ -85,6 +85,7 @@ class LosslessIrTests(unittest.TestCase):
         test = next(iter(auto["tests"].values()))
         test["research_unexecuted"] = {
             "for_each": {"item": "user", "in": "existing"},
+            "select": {"directory": {"from": "user.home_dir"}},
             "computed": {"variable": "loop-variable"},
             "records": [{"record": {"require": "only_one_exists",
                                    "fields": [{"sid": {"equals": "S-1-5-18",

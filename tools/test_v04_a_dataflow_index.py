@@ -112,6 +112,40 @@ class DataflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Filter action missing or ambiguous"):
             index_assessment_dataflow(d)
 
+    def test_nested_foreach_inherits_outer_alias_without_shadowing(self):
+        d = source()
+        d["shared_objects"]["inner-object"] = {
+            "capability": "unix.file",
+            "for_each": {"item": "file", "in": "files-object"},
+            "select": {"file_path": {"from": "file.name"},
+                       "user_home": {"from": "user.home_dir"}}}
+        out = index_assessment_dataflow(d)
+        self.assertEqual(len([s for s in out["sites"] if s["kind"] == "for_each"]), 2)
+
+    def test_foreach_alias_shadowing_rejected(self):
+        d = source()
+        d["shared_objects"]["inner-object"] = {
+            "capability": "unix.file",
+            "for_each": {"item": "user", "in": "files-object"},
+            "select": {"directory": {"from": "user.home_dir"}}}
+        with self.assertRaisesRegex(ValueError, "shadows inherited"):
+            index_assessment_dataflow(d)
+
+    def test_foreach_projection_requires_current_alias(self):
+        d = source()
+        d["shared_objects"]["inner-object"] = {
+            "capability": "unix.file",
+            "for_each": {"item": "file", "in": "files-object"},
+            "select": {"directory": {"from": "user.home_dir"}}}
+        with self.assertRaisesRegex(ValueError, "must project from current alias"):
+            index_assessment_dataflow(d)
+
+    def test_foreach_projection_out_of_scope_rejected(self):
+        d = source()
+        d["shared_objects"]["files-object"]["select"]["directory"]["from"] = "other.home_dir"
+        with self.assertRaisesRegex(ValueError, "out-of-scope"):
+            index_assessment_dataflow(d)
+
     def test_source_order_independent_of_definition_order(self):
         d = source()
         a = index_assessment_dataflow(d)
