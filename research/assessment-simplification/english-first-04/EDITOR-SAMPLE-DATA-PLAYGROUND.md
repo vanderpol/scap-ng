@@ -14,6 +14,13 @@ A content author edits a real Assessment while exercising it on **simulated coll
 
 The result should be **true, false, error, unknown, not_evaluated, or not_applicable**, not a red/green-only verdict. The summary can say *Assessment true → likely passing a positive compliance requirement* where appropriate, but the Rule/Benchmark layer determines **pass/fail**; do not assume all Assessments are positive-polarity or that not_applicable means passing.
 
+## Relevant existing tools — patterns to reuse, not runtimes to copy
+
+- [regex101 documentation: saved unit tests](https://support.regex101.com/editor/unit-tests/) explicitly distinguishes interactive sample strings from repeatable **expected-result assertions**. Its [accepted/rejected cases guide](https://docs.regex101.com/guides/test-several-cases/) shows that a negative input is a test that **passes** when correctly rejected. That maps directly to Assessment test cases where an expected `false` should produce a green *fixture regression* result.
+- [regex101 privacy documentation](https://docs.regex101.com/) describes matching/testing locally; for SCAP-NG, synthetic data should be the default and browser-local operation preferable where the capability and semantics can be safely implemented. We must **not** assume source OVAL regex dialect equals the browser's JavaScript regexp.
+- The [Open Policy Agent Rego Playground](https://play.openpolicyagent.org/) demonstrates a compact **policy / input JSON / output** loop with an explicit Evaluate operation and examples; it also provides a **coverage view**. For SCAP-NG, the equivalent is Assessment source / typed collected Items & statuses / six-state Test and Assessment trace, including where a predicate was not evaluated.
+- **Differentiator:** Neither a generic regex matcher nor a generic JSON input pane by itself models SCAP-NG's Item completeness, variable expansion, correlated records, `collected_items_require` vs nested State-field `require`, and unknown/error/not-applicable propagation. These cannot be replaced with a generic green/red “matches” indicator.
+
 ## First screen: one file, one scenario, three meaningful areas
 
 ```text
