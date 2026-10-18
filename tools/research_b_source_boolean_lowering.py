@@ -61,8 +61,9 @@ def lower_source_boolean_assessment(source):
         if not isinstance(node,dict) or len(node)!=1:
             raise ValueError("source evaluate branch must have one operator")
         if "test" in node:
+            lowered=lower_leaf(node["test"])
             active.add(node["test"])
-            return lower_leaf(node["test"])
+            return lowered
         operator=next(iter(node))
         if operator not in {"all","any"}:
             raise ValueError("unsupported source Boolean operator "+str(operator))
