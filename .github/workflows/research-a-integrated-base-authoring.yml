@@ -15,6 +15,8 @@ on:
       - 'tools/v04_a_truth_plan_source_oracle.py'
       - 'tools/v04_a_source_semantics_profile.py'
       - 'tools/test_v04_a_source_semantics_profile.py'
+      - 'tools/v04_a_wmi_domainrole_source_fixture.py'
+      - 'tools/test_v04_a_wmi_domainrole_source_fixture.py'
       - 'tools/test_v04_a_truth_plan.py'
       - 'tools/v04_a_truth_plan_census.py'
       - 'tools/test_v04_a_truth_plan_census.py'
@@ -54,6 +56,8 @@ jobs:
         run: python -m unittest -v tools/test_v04_a_truth_plan.py tools/test_v04_a_truth_plan_census.py
       - name: Verify focused real-source Test profile fixtures
         run: python -m unittest -v tools/test_v04_a_source_semantics_profile.py
+      - name: Verify source-exact WMI DomainRole record fixture boundaries
+        run: python -m unittest -v tools/test_v04_a_wmi_domainrole_source_fixture.py
       - name: Fetch immutable 0.4-A r3 authoring sources
         run: |
           mkdir -p work/a-end-to-end
@@ -87,6 +91,24 @@ jobs:
                       print("  Source WMI Test ID:",test["test_id"])
                       print("  Source WMI record states:",json.dumps(test["wmi_record_state_source"],sort_keys=True))
                       print("  Source WMI collection object:",json.dumps(test["wmi_object_source"],sort_keys=True))
+          PY
+      - name: Verify source-exact Windows WMI record role truth fixtures
+        run: |
+          python tools/v04_a_wmi_domainrole_source_fixture.py \
+            --json-archive work/a-end-to-end/json.zip \
+            --report "$RUNNER_TEMP/a-wmi-domainrole-fixtures.json" \
+            > "$RUNNER_TEMP/a-wmi-domainrole.stdout"
+          python - "$RUNNER_TEMP/a-wmi-domainrole-fixtures.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["stage"]=="SOURCE_EXACT_WMI_DOMAINROLE_OVAL_REFERENCE_FIXTURE_NOT_SCANNER",d
+          assert d["anchored_assessments"]==2,d
+          assert d["anchored_WMI_tests"]==3,d
+          assert d["complete_single_record_role_cases"]==18,d
+          assert all(c["expected"]==c["observed"] for c in d["cases"]),d
+          print("PASS: original-source WMI record literals, 3 Tests, 18 six-role cases")
+          print("Source role group truth rows:",[
+            (x["test_id"],x["role"],x["expected"]) for x in d["cases"]])
           PY
       - name: Independently parse both frozen formats and compile one checked A research IR
         run: |
@@ -198,6 +220,10 @@ jobs:
           print("for_each bindings:",json.dumps(r["foreach_source_bindings"],sort_keys=True))
           print("Complexity examples:",json.dumps(r["largest_dataflow_examples"],sort_keys=True))
           PY
+            fi
+            if test -s "$RUNNER_TEMP/a-wmi-domainrole-fixtures.json"; then
+              echo '### #229 source-exact Windows WMI domain-role record reference fixtures (NO live WMI)'
+              cat "$RUNNER_TEMP/a-wmi-domainrole-fixtures.json"
             fi
             if test -s "$RUNNER_TEMP/a-complex-source-profiles.json"; then
               echo '### Real-source Test/result fixture selection facts — NOT evaluated'
