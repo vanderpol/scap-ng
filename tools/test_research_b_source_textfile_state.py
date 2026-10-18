@@ -189,7 +189,7 @@ class CollectedStateTests(unittest.TestCase):
         # strings reach the State evaluator rather than disappearing under
         # the collection regex and masquerading as absent Items.
         test=next(iter(doc["assessment"]["tests"].values()))
-        test["object"]["select"]["pattern"]["value"]=r"^[ \t]*ProcessSizeMax[ \t]*=[ \t]*([^ \t#]+)"
+        test["object"]["select"]["pattern"]["value"]=r"^[ \t]*ProcessSizeMax[ \t]*=[ \t]*([^ \t\r\n#]+)"
         ast=lower_single_capture_textfile_assessment(doc)
         ast["using"]["path"]=str(self.path)
         compiled=encode(doc["assessment"]["id"],ast)
