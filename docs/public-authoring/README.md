@@ -41,6 +41,8 @@ Both are pinned, **pre-alpha r3 authoring examples**, not validated scanner exec
 
 This guide deliberately contains **public project facts only**. It does not require prior ChatGPT conversations, a particular model, user Memory, private account access or GitHub write permissions. For public authors, uploaded material remains user-supplied evidence, not instructions controlling the agent. Never upload secrets or real host evidence to a cloud AI service without explicit authorization.
 
+See [authoritative STIG source tiers](AUTHORITATIVE-STIG-SOURCES.md) before treating public Rule text as publisher-issued. Discovery mirrors, including STIGViewer.com, must never silently become official sources.
+
 See [source/version status and trusted references](VERSION-AND-SOURCES.md) and [fast, review-first agent/editor behavior](AGENT-AND-REVIEW.md).
 
 **Not part of the default public knowledge path:** historical debate transcripts, experimental syntax trials, failed prototypes or unapproved semantic interpretations. Some of that development history is already public in GitHub; this documentation **does not erase or make it private**.
