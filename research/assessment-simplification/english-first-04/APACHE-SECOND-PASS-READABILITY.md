@@ -24,6 +24,10 @@ The five multiply referenced *meaningful sharing points* are:
 
 **The two populations cannot be merged merely because both describe config files.** One follows the configured main file and include references; one is obtained through a different shell query for loaded files. Their membership, availability, source provenance and error semantics are not proved identical.
 
+## Essential value-semantics distinction from OVAL 5.12.3
+
+The full Apache chain uses `merge` to combine many selected config-file values into **one** command-argument string, while the full DNS source uses `concat` with multi-valued zones to produce **multiple** constructed strings. This is a documented distinction in official [OVAL 5.12.3](https://oval-community-guidelines.readthedocs.io/en/v5.12.3/oval-schema-documentation/oval-definitions-schema.html#mergefunctiontype) and matters far more than whether a function is called `merge`, `join` or `transform`. See [source-backed value and status semantics](OVAL-5123-CONCAT-MERGE-READABILITY.md). Native 0.4 collection-instance and provenance parity remain **unproved**.
+
 ## Measured comparison of three degrees of inlining
 
 I mechanically substituted existing `concat` expression *text* at its single referencing command site, without editing shell literals, regex expressions, flags or Test predicates. Reversing the replacements using the saved original Variable declarations recreated the complete research YAML exactly. **The substitutions are not standalone, self-describing, typed, scanner-equivalent 0.4 source**.
