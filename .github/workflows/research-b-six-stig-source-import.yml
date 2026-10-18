@@ -26,6 +26,8 @@ on:
       - 'tools/research_b_source_registry_snapshot.py'
       - 'tools/research_b_source_registry_evaluator.py'
       - 'tools/test_research_b_source_registry.py'
+      - 'tools/research_b_registry_shape_inventory.py'
+      - 'tools/test_research_b_registry_shape_inventory.py'
       - 'tools/test_research_b_source_boolean_lowering.py'
       - 'tools/research_b_manual_lowering.py'
       - 'tools/research_b_manual_response.py'
@@ -153,6 +155,10 @@ jobs:
             git pull --rebase origin main
             git push origin HEAD:main
           fi
+      - name: Verify source registry feature census Assessment/Test denominators
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_b_registry_shape_inventory.py
       - name: Retrieve immutable published six-STIG authoring source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -210,6 +216,14 @@ jobs:
             --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
             --output research/requirements-first-language/contract-candidate/corpus/textfile-shapes.json \
             --markdown research/requirements-first-language/contract-candidate/corpus/textfile-shapes.md
+      - name: Inventory source registry matching, selection and State shape across six STIGs
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_b_registry_shape_inventory.py \
+            --authoring-zip work/b-corpus/scap-ng-0.3-six-stig-authoring.zip \
+            --output research/requirements-first-language/contract-candidate/corpus/registry-shapes.json \
+            --markdown research/requirements-first-language/contract-candidate/corpus/registry-shapes.md
       - name: Preserve partial B fixture IR separately from scanner content
         uses: actions/upload-artifact@v4
         with:
@@ -234,6 +248,8 @@ jobs:
           git add research/requirements-first-language/contract-candidate/corpus/conversion-blockers.md
           git add research/requirements-first-language/contract-candidate/corpus/textfile-shapes.json
           git add research/requirements-first-language/contract-candidate/corpus/textfile-shapes.md
+          git add research/requirements-first-language/contract-candidate/corpus/registry-shapes.json
+          git add research/requirements-first-language/contract-candidate/corpus/registry-shapes.md
           git add research/requirements-first-language/contract-candidate/corpus/conversion-progress.md
           git add research/requirements-first-language/contract-candidate/corpus/source-accounting.md
           git add research/requirements-first-language/contract-candidate/corpus/feature-inventory.json
