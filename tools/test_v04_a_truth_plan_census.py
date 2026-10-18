@@ -23,6 +23,8 @@ class ExpressionManifestTests(unittest.TestCase):
         self.assertEqual(manifest["counts"]["assessments_with_compiled_evaluate"], 1)
         self.assertEqual(manifest["counts"]["synthetic_expression_executions"], 6)
         self.assertEqual(len(manifest["plans"]), 1)
+        self.assertEqual(manifest["largest_source_expressions"][0]["instruction_count"], 1)
+        self.assertEqual(manifest["largest_source_expressions"][0]["test_leaf_occurrences"], 1)
         self.assertEqual(manifest["unapproved_expression_blockers"], [])
         self.assertEqual(manifest["plans"][0][
             "synthetic_result_scenarios_not_collections"], {
