@@ -140,7 +140,15 @@ def main(argv=None):
     report, staged = build_preview(read_authoring_archive(args.json_archive, "json"))
     if args.yaml_archive:
         alternate, yaml_staged = build_preview(read_authoring_archive(args.yaml_archive, "yaml"))
-        if alternate != report:
+        def normalized_paths(value):
+            if isinstance(value, dict):
+                return {key: normalized_paths(child) for key, child in value.items()}
+            if isinstance(value, list):
+                return [normalized_paths(child) for child in value]
+            if isinstance(value, str) and value.startswith("authoring/"):
+                return value.removesuffix(".json").removesuffix(".yaml").removesuffix(".yml")
+            return value
+        if normalized_paths(alternate) != normalized_paths(report):
             raise ValueError("YAML/JSON migration reports are not identical")
         if graph_index(staged)["graph_sha256"] != graph_index(yaml_staged)["graph_sha256"]:
             raise ValueError("YAML/JSON staged source graphs are not identical")
