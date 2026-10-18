@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """#237: fail-closed SCAP-NG 0.3 -> B fixture IR registry-source lowerer.
 
-Only direct single-Test, one literal HKLM registry value and one literal
-State comparison. The source's unspecified Windows registry view is retained
+Only direct single-Test, one literal HKLM registry value and one literal State comparison or a bounded type/value AND on the same Item. The source's unspecified Windows registry view is retained
 as an explicitly UNRESOLVED compatibility question, not set to 64-bit.
 Source 0.3 YAML is not original SCAP 1.4 OVAL XML: no parity claim.
 """
@@ -32,17 +31,43 @@ def lower_source_registry_assessment(source):
         t["reported_elements"]!="all"):
         raise ValueError("unsupported source registry Test existence/matching")
     states=t["states"]
-    if not isinstance(states,list) or len(states)!=1:
-        raise ValueError("only one literal registry State supported")
+    if not isinstance(states,list) or len(states)!=1 or not isinstance(states[0],dict):
+        raise ValueError("one source registry State entry required")
+
+    def lower_field(state):
+        if not isinstance(state,dict) or set(state)!={
+            "existence","field","match","operation","value"}:
+            raise ValueError("unsupported registry State child/cardinality")
+        if state["existence"]!="one_or_more" or state["match"]!="all" or (
+                state["operation"]!="equals"):
+            raise ValueError("registry State child requires literal equality and source entity cardinality")
+        field=state["field"]
+        value=state["value"]
+        if field=="value":
+            if type(value) not in (int,str) or (
+                    type(value) is int and not -(2**63)<=value<(2**63)):
+                raise ValueError("registry State value requires a typed scalar literal")
+        elif field=="type":
+            if type(value) is not str or value not in {"dword","qword","string"}:
+                raise ValueError("registry State type requires a recognized source type")
+        else:
+            raise ValueError("unsupported registry source State field")
+        return {"field":field,"operation":"equals","expected":value,
+                "entity_existence":"at_least_one_exists","entity_check":"all"}
+
     state=states[0]
-    if not isinstance(state,dict) or set(state)!={"existence","field","match","operation","value"}:
-        raise ValueError("unsupported registry State fields/datatype/cardinality")
-    if (state["field"]!="value" or state["existence"]!="one_or_more" or
-        state["match"]!="all" or state["operation"]!="equals" or
-        type(state["value"]) not in (int,str) or
-        (type(state["value"]) is int and
-         not -(2**63)<=state["value"]<(2**63))):
-        raise ValueError("unsupported registry typed literal State comparison")
+    if set(state)=={"all"}:
+        all_states=state["all"]
+        if not isinstance(all_states,list) or len(all_states)!=2:
+            raise ValueError("bounded registry source AND requires two child fields")
+        children=[lower_field(child) for child in all_states]
+        if {c["field"] for c in children}!={"type","value"}:
+            raise ValueError("registry State AND requires type and value on same Item")
+        normalized_state={"all":children}
+    else:
+        normalized_state=lower_field(state)
+        if normalized_state["field"]!="value":
+            raise ValueError("standalone registry pilot only supports value State")
     obj=t["object"]
     if not isinstance(obj,dict) or set(obj)!={"capability","object_title","select"} or (
         obj["capability"]!="windows.registry"):
@@ -68,6 +93,5 @@ def lower_source_registry_assessment(source):
         "source_view":"unspecified_requires_xml_parity",
         "existence":"at_least_one_exists",
         "check":{"all":"all","one":"only one","one_or_more":"at least one"}[t["match"]],
-        "state":{"field":"value","operation":"equals","expected":state["value"],
-                 "entity_existence":"at_least_one_exists","entity_check":"all"},
+        "state":normalized_state,
     }
