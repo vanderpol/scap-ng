@@ -139,6 +139,23 @@ jobs:
           print("Real Apache SV-214268 variable/Object source scope:")
           print(json.dumps(result["summary"], sort_keys=True))
           PY
+      - name: Audit real Apache Variable consumers before splitting authored value roles
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import json
+          import yaml
+          from pathlib import Path
+          from research_c_variable_roles import audit_value_roles
+          source=Path("research/requirements-first-language/contract-candidate/corpus/source-specimens/independent-shellcommand-1-3d964d126ca8.source.yaml")
+          assessment=yaml.safe_load(source.read_text(encoding="utf-8"))["assessment"]
+          report=audit_value_roles(assessment)
+          assert report["variable_count"]==19
+          assert not report["C_language_decision_made"]
+          print("Real original Apache 19-Variable usage contexts:")
+          print(json.dumps(report["role_summary"],sort_keys=True))
+          PY
       - name: Assert C proof is labelled research only
         run: |
           grep -q 'scanner_executed": False' tools/research_c_shared_engine.py
