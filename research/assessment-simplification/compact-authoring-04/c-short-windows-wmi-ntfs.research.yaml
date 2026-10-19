@@ -1,0 +1,9 @@
+# Research #245 source-compatibility illustration, NOT native A or accepted C.
+# Windows 11 SV-253265.automated (source converted from 0.3).
+# This query explicitly collects NON-NTFS disks: requiring zero rows is safe
+# only when the query finished successfully and all rows were collected.
+from:
+  windows.wmi.query:
+    namespace: 'root\cimv2'
+    query: 'SELECT deviceid FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!="NTFS"'
+must: absent
