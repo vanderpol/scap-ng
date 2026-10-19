@@ -46,7 +46,9 @@ def freeze_observation(request, scope, evidence):
         raise ValueError("duplicate source Item identities")
     return {"kind":"C_RESEARCH_FROZEN_OBSERVATION", "identity":key,
             "request":deepcopy(request),"scope":deepcopy(scope),
-            "evidence":deepcopy(evidence),"runtime_collector_executed":False,
+            "evidence":deepcopy(evidence),
+            "evidence_sha256":sha256(canonical(evidence).encode()).hexdigest(),
+            "runtime_collector_executed":False,
             "source_oval_parity_verified":False}
 
 def read_observation(frozen, request, scope):
@@ -54,6 +56,7 @@ def read_observation(frozen, request, scope):
         frozen.get("runtime_collector_executed") is not False or
         frozen.get("source_oval_parity_verified") is not False or
         frozen.get("identity")!=identity(request,scope) or
+        frozen.get("evidence_sha256")!=sha256(canonical(frozen.get("evidence")).encode()).hexdigest() or
         frozen.get("request")!=request or frozen.get("scope")!=scope
     ):
         raise ValueError("observation cannot cross request/snapshot/provenance boundary")
