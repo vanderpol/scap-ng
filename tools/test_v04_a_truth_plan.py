@@ -32,6 +32,33 @@ class ExpressionTruthTests(unittest.TestCase):
                         ).replace(" ", "_")
                         self.assertEqual(combine(operator, sample), expected)
 
+    def test_invalid_combiner_inputs_fail_closed_before_iterator_consumption(self):
+        consumed = []
+        def outcomes():
+            consumed.append(True)
+            yield "true"
+        for bad_operator in ("bogus", None, []):
+            with self.subTest(operator=bad_operator):
+                with self.assertRaises(ValueError):
+                    combine(bad_operator, outcomes())
+                self.assertEqual(consumed, [])
+        for bad_values in (None, 5, False, [], [None], [{}], [["true"]]):
+            with self.subTest(values=bad_values):
+                with self.assertRaises(ValueError):
+                    combine("all", bad_values)
+
+    def test_one_shot_iterables_do_not_lose_six_state_outcomes(self):
+        # #229: iterators must not be consumed during validation.
+        operations = {"all": "AND", "any": "OR", "one": "ONE", "odd": "XOR"}
+        for operator, reference in operations.items():
+            for size in (1, 2, 3):
+                for sample in product(sorted(SIX), repeat=size):
+                    expected = aggregate_operator(
+                        reference, [s.replace("_", " ") for s in sample]
+                    ).replace(" ", "_")
+                    with self.subTest(operator=operator, values=sample):
+                        self.assertEqual(combine(operator, iter(sample)), expected)
+
     def test_evaluate_nested_six_state_and_source_paths(self):
         exp = {"all": [{"test": "a-test"},
                        {"any": [{"test": "b-test"},
@@ -114,6 +141,23 @@ class ExpressionTruthTests(unittest.TestCase):
             with self.subTest(supplied=supplied):
                 with self.assertRaises(ValueError):
                     execute_supplied_results(plan, supplied)
+
+    def test_explicit_malformed_dependency_table_never_coerced_to_empty(self):
+        # Omitted optional dependencies are valid; explicit malformed values
+        # must not silently become an empty dependency mapping.
+        expression = {"test": "a-test"}
+        omitted = source(expression)
+        del omitted["dependencies"]
+        self.assertEqual(compile_expression(omitted)["requires"]["dependencies"], [])
+        self.assertEqual(compile_expression(source(expression))["requires"]["dependencies"], [])
+        for invalid in (None, [], "", 0, False):
+            malformed = source(expression)
+            malformed["dependencies"] = invalid
+            with self.subTest(dependencies=invalid):
+                with self.assertRaisesRegex(
+                    ValueError, "invalid Test or Assessment dependency table"
+                ):
+                    compile_expression(malformed)
 
     def test_undeclared_test_and_dependency_fail_at_compile(self):
         with self.assertRaisesRegex(ValueError, "unresolved test"):

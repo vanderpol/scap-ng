@@ -109,8 +109,13 @@ def combine(operator, values):
     This is NOT an Item-existence, State/record, incomplete-collection or
     conditional evaluator. 'not applicable' values do not become true/false.
     """
-    values = list(values)
-    if operator not in OPS or not values or any(v not in SIX for v in values):
+    if type(operator) is not str or operator not in OPS:
+        raise ValueError("unsupported six-state operator or outcome")
+    try:
+        values = list(values)
+    except TypeError as exc:
+        raise ValueError("unsupported six-state operator or outcome") from exc
+    if not values or any(type(v) is not str or v not in SIX for v in values):
         raise ValueError("unsupported six-state operator or outcome")
     c = Counter(values)
     t, f, e, u, ne, na = (c[x] for x in
