@@ -13,6 +13,8 @@ on:
       - 'tools/test_research_c_hybrid_must_overlay.py'
       - 'tools/research_c_hybrid_inline_expectations.py'
       - 'tools/test_research_c_hybrid_inline_expectations.py'
+      - 'tools/research_c_oval_hybrid_provenance.py'
+      - 'tools/test_research_c_oval_hybrid_provenance.py'
       - 'tools/verify_c_published_original_oval_examples.py'
       - 'research/assessment-simplification/compact-authoring-04/oval-self-assertion-c-review/**'
   workflow_dispatch:
@@ -124,6 +126,9 @@ jobs:
           from research_c_hybrid_inline_expectations import (
               present_inline_expectations,compile_inline_expectations,
               prove_inline_original)
+          from research_c_oval_hybrid_provenance import (
+              present_oval_set_provenance,compile_oval_set_provenance,
+              prove_oval_set_provenance)
           reviews=[]
           for file in sorted(Path("c-review").glob("*.review.json")):
               raw=json.loads(file.read_text(encoding="utf-8"))
@@ -186,6 +191,56 @@ jobs:
                          indent=2,sort_keys=True)+"\n",encoding="utf-8")
           print("Original 7-Test OVAL nested Set with inline authoring constants:",
                 json.dumps(inline_proof,sort_keys=True))
+
+          # Third C prototype: full author-editable named observation/State
+          #/require Set expression plus mandatory typed source provenance.
+          author,sidecar=present_oval_set_provenance(native)
+          source_proof=prove_oval_set_provenance(native,author,sidecar)
+          assert compile_oval_set_provenance(author,sidecar)==native
+          assert source_proof["original_Test_count"]==7
+          assert source_proof["original_Object_count"]==11
+          assert source_proof["original_Set_count"]==7
+          assert source_proof["original_State_count"]==4
+          assert source_proof["original_Variable_count"]==3
+          assert source_proof["legacy_source_object_ids_in_authoring"]==0
+          assert source_proof["legacy_source_state_ids_in_authoring"]==0
+          assert source_proof["legacy_source_test_ids_in_authoring"]==0
+          author_path=Path("c-hybrid")/"oval-set-seven-tests-author-only.research.yaml"
+          provenance_path=Path("c-hybrid")/"oval-set-seven-tests-provenance.research.yaml"
+          author_path.write_text(
+              "# Research-only 0.4-C source-backed Set authoring, not OVAL scanner parity.\n"
+              +yaml.safe_dump(author,sort_keys=False,allow_unicode=True),
+              encoding="utf-8")
+          provenance_path.write_text(
+              "# Research-only companion source identity/provenance; not a signature.\n"
+              +yaml.safe_dump(sidecar,sort_keys=False,allow_unicode=True),
+              encoding="utf-8")
+          loaded_author=yaml.safe_load(author_path.read_text(encoding="utf-8"))
+          loaded_prov=yaml.safe_load(provenance_path.read_text(encoding="utf-8"))
+          assert compile_oval_set_provenance(loaded_author,loaded_prov)==native
+          from hashlib import sha256
+          metrics={
+              "original_inlined_bytes":len(
+                  (Path("c-hybrid")/
+                   "nested-set-filter-inline-constants.research.yaml").read_bytes()),
+              "author_only_bytes":len(author_path.read_bytes()),
+              "provenance_bytes":len(provenance_path.read_bytes()),
+              "original_inlined_lines":len(
+                  (Path("c-hybrid")/
+                   "nested-set-filter-inline-constants.research.yaml").read_text().splitlines()),
+              "author_only_lines":len(author_path.read_text().splitlines()),
+              "provenance_lines":len(provenance_path.read_text().splitlines()),
+              "source_original_sha256":sha256(
+                  Path("original-oval/SCAP_1.4/OVAL_Test_Content/unix/oval-def_set-unix.xml"
+                  ).read_bytes()).hexdigest(),
+              "scanner_parity_proven":False,
+          }
+          (Path("c-hybrid")/"oval-set-seven-tests-provenance-proof.json").write_text(
+              json.dumps({"proof":source_proof,"metrics":metrics},
+                         indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("Original OVAL 7-Test, 7-Set C authoring/provenance split:",
+                json.dumps({"proof":source_proof,"metrics":metrics},sort_keys=True))
+
           PY
       - name: Compile independently authored C subset of every source-compatible original OVAL Definition
         run: |
