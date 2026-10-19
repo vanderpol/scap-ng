@@ -220,6 +220,31 @@ jobs:
           loaded_author=yaml.safe_load(author_path.read_text(encoding="utf-8"))
           loaded_prov=yaml.safe_load(provenance_path.read_text(encoding="utf-8"))
           assert compile_oval_set_provenance(loaded_author,loaded_prov)==native
+          # All seven supplied Test results exercise the pinned OVAL 5.12.3
+          # Boolean combiner through both original and C-produced criteria.
+          # This is NOT Item collection/State evaluation or a scanner.
+          from v04_a_truth_plan import compile_expression,execute_supplied_results
+          original_plan=compile_expression(native)
+          generated_plan=compile_expression(
+              compile_oval_set_provenance(loaded_author,loaded_prov))
+          assert original_plan["requires"]["tests"]==generated_plan["requires"]["tests"]
+          cases=[
+              ("all_true",["true"],"true"),
+              ("all_na",["not_applicable"],"not_applicable"),
+              ("false_over_error",["false","error"],"false"),
+              ("error_over_unknown",["error","unknown"],"error"),
+              ("unknown_over_ne",["unknown","not_evaluated"],"unknown"),
+              ("ne_over_na",["not_evaluated","not_applicable"],"not_evaluated"),
+              ("true_over_na",["true","not_applicable"],"true"),
+          ]
+          for name,statuses,expected in cases:
+              tests={key:statuses[i%len(statuses)] for i,key in enumerate(
+                  original_plan["requires"]["tests"])}
+              actual=execute_supplied_results(original_plan,tests)
+              lower=execute_supplied_results(generated_plan,tests)
+              assert actual["outcome"]==lower["outcome"]==expected,(name,actual,lower)
+              assert lower["scanner_executed"] is False
+              assert lower["collections_evaluated"] is False
           from hashlib import sha256
           metrics={
               "original_inlined_bytes":len(
@@ -236,6 +261,7 @@ jobs:
                   Path("original-oval/SCAP_1.4/OVAL_Test_Content/unix/oval-def_set-unix.xml"
                   ).read_bytes()).hexdigest(),
               "scanner_parity_proven":False,
+              "original_oval_supplied_Test_truth_cases":len(cases),
           }
           (Path("c-hybrid")/"oval-set-seven-tests-provenance-proof.json").write_text(
               json.dumps({"proof":source_proof,"metrics":metrics},
