@@ -246,3 +246,49 @@ def compile_c_requirement(document):
         if len(states)>1:result["states_match"]="all"
     return {"stage":"C_RESEARCH_LOWERED_TO_A_TEST_PIECES_NOT_EXECUTABLE",
             "test":result,"scanner_executed":False,"source_parity_verified":False}
+
+# Only source-backed and audited common pair meanings enter the executable
+# supplied-results seam. Every other A token remains preserved as authored
+# compatibility data but is NOT guessed into one of these common operators.
+TEST_OUTCOMES={
+    "at_least_one_exists_and_some_match":("at_least_one_exists","one_of",True),
+    "at_least_one_exists_and_all_match":("at_least_one_exists","every",True),
+    "at_least_one_exists_and_only_one_matches":("at_least_one_exists","exactly_one",True),
+    "at_least_one_exists_and_none_match":("at_least_one_exists","none",True),
+}
+PRESENCE_OUTCOMES={
+    "at_least_one_exists":"at_least_one_exists",
+    "none_exist":"none_exist",
+    "only_one_exists":"only_one_exists",
+    "all_exist":"all_exist",
+    "may_be_absent":"any_exist",
+}
+
+def evaluate_compiled_c_supplied_items(compiled,evidence):
+    """Reuse A's generic Test logic with externally supplied *Item* outcomes.
+
+    All state-field evaluation is external. No OS collection, datatype
+    comparison, Variable resolution, or source scanner parity is claimed.
+    Unsupported advanced combinations are REPRESENTABLE but NOT executed.
+    """
+    from research_c_common_evaluation import population_outcome
+    if not isinstance(compiled,dict) or compiled.get("stage")!=(
+        "C_RESEARCH_LOWERED_TO_A_TEST_PIECES_NOT_EXECUTABLE"
+    ) or compiled.get("source_parity_verified") is not False:
+        raise ValueError("untrusted or executable C contract")
+    t=compiled["test"]
+    token=t["require"]
+    if token in TEST_OUTCOMES and t.get("states"):
+        exists,match,has_state=TEST_OUTCOMES[token]
+    elif token in PRESENCE_OUTCOMES and not t.get("states"):
+        exists,match,has_state=PRESENCE_OUTCOMES[token],"every",False
+    else:
+        raise ValueError("advanced C requirement preserved but not runtime-proven")
+    if evidence.get("capability")!=t["capability"]:
+        raise ValueError("collected Item capability differs from authored C selector")
+    outcome=population_outcome(
+        {"exists":exists,"items_match":match,"has_state":has_state},evidence)
+    return {"outcome":outcome,
+            "stage":"RESEARCH_SUPPLIED_ITEM_RESULTS_ONLY_NOT_SCANNER",
+            "source_parity_verified":False,"collector_executed":False}
+
