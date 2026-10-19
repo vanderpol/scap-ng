@@ -31,6 +31,8 @@ The source-independent C compiler enforces the supported field capability mappin
 
 ### More challenging C research examples to read *after* the seven real source conversions
 
+- [**New: original UNIX seven-Test nested Set / Filter / Variable hybrid proof**](./C-HYBRID-MUST-OVER-ORIGINAL-OVAL-SET-2026-10-19.md) — exact source-compatible dataflow is preserved; `must`/AND requirements are clearer, and all three fixed constant Variables have been removed from the C authoring view and reconstructed by the compiler. This is a **source-equality-tested hybrid experiment**, not a completed fully author-friendly native C Set conversion or scanner execution proof.
+
 - [Real Windows 11 seven-check account-rights/role composition](./c-source-exact-windows-rdp-rights.research.yaml) — two shared observations, a role-dependent logic tree, source-backed **read-only C research view**, not one of the seven converted Self-Assertion Definitions. Does its `require` tree convey enough without hiding evidence?
 - [Apache derived value with private observation](./c-derived-apache-version.research.yaml) — demonstrates `observation` and derived values instead of a separate authored Object; this is a narrowly source-reconstructed Apache example, not the complete complex Apache Assessment.
 
