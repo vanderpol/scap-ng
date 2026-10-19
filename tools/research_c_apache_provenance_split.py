@@ -13,15 +13,14 @@ result evaluator. No accepted 0.4-C grammar.
 """
 from __future__ import annotations
 from copy import deepcopy
-from hashlib import sha256
-import json
 from pathlib import Path
 
 from research_c_apache_hybrid_authoring import (
     STAGE as FULL_STAGE,compile_c_apache_hybrid,
     present_c_apache_hybrid,prove_c_apache_hybrid)
 from research_c_apache_hybrid_authoring import META
-from research_c_source_identity_contract import require_author_binding_catalog
+from research_c_source_identity_contract import (require_author_binding_catalog,
+    source_digest as _digest,require_pinned_authoring)
 
 STAGE="C_RESEARCH_APACHE_AUTHORING_WITH_REQUIRED_PROVENANCE_SIDECAR"
 PROVENANCE="C_RESEARCH_SOURCE_ID_TYPE_BINDINGS_NOT_AUTHORING"
@@ -34,10 +33,6 @@ PROV_KEYS={"stage","assessment_metadata","original_source_sha256",
 
 def _fail(message):
     raise ValueError("C Apache provenance split: "+message)
-
-def _digest(node):
-    return sha256(json.dumps(node,sort_keys=True,ensure_ascii=False,
-         separators=(",",":"),allow_nan=False).encode("utf-8")).hexdigest()
 
 def _bound_mapping(mapping,keyset,label,field=None):
     # All C source families now share one fail-closed bijective alias/ID
@@ -203,7 +198,9 @@ def compile_apache_split(author,provenance, *, require_original_source=True):
         full,require_original_graph_digest=require_original_source)
 
 def prove_apache_split(original,author,provenance):
-    if _digest(author)!=provenance["original_authoring_sha256"]:
+    try:
+        require_pinned_authoring(author,provenance["original_authoring_sha256"])
+    except ValueError:
         _fail("authoring changed; original source proof invalid")
     full=_full_from_parts(author,provenance)
     report=prove_c_apache_hybrid(original,full)
