@@ -51,16 +51,19 @@ def population_outcome(requirement, evidence):
     names=set()
     outcomes=[]
     for item in items:
-        if not isinstance(item,dict) or set(item)!={"id","outcome"} or (
+        expected={"id","outcome"} if requirement["has_state"] else {"id"}
+        if not isinstance(item,dict) or set(item)!=expected or (
             type(item["id"]) is not str or not item["id"] or item["id"] in names
         ):
             raise ValueError("duplicate/malformed collected Item identity")
         names.add(item["id"])
+        if not requirement["has_state"]:
+            # Presence-only checks consume Item identity without fabricating
+            # a State comparison or a vacuous matching result.
+            continue
         result=item["outcome"]
         if type(result) is not str or result not in SIX:
             raise ValueError("unrecognized six-state typed Item result")
-        if not requirement["has_state"]:
-            raise ValueError("existence-only Test cannot carry comparison outcomes")
         outcomes.append(result.replace("_"," "))
     if status=="complete" and requirement["has_state"] and not items and (
         requirement["exists"] in {"none_exist","any_exist"}
