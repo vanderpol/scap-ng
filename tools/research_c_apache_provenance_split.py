@@ -21,6 +21,7 @@ from research_c_apache_hybrid_authoring import (
     STAGE as FULL_STAGE,compile_c_apache_hybrid,
     present_c_apache_hybrid,prove_c_apache_hybrid)
 from research_c_apache_hybrid_authoring import META
+from research_c_source_identity_contract import require_author_binding_catalog
 
 STAGE="C_RESEARCH_APACHE_AUTHORING_WITH_REQUIRED_PROVENANCE_SIDECAR"
 PROVENANCE="C_RESEARCH_SOURCE_ID_TYPE_BINDINGS_NOT_AUTHORING"
@@ -38,9 +39,11 @@ def _digest(node):
     return sha256(json.dumps(node,sort_keys=True,ensure_ascii=False,
          separators=(",",":"),allow_nan=False).encode("utf-8")).hexdigest()
 
-def _bound_mapping(mapping,keyset,label):
-    if not isinstance(mapping,dict) or set(mapping)!=keyset:
-        _fail(label+" identity catalog differs from author aliases")
+def _bound_mapping(mapping,keyset,label,field=None):
+    # All C source families now share one fail-closed bijective alias/ID
+    # contract; no guessing, auto-renaming or merging source collection IDs.
+    require_author_binding_catalog({k:True for k in keyset},mapping,
+        label=label,source_id_field=field)
 
 def _source_projection(full):
     authored={
@@ -131,7 +134,8 @@ def _full_from_parts(author,sidecar):
     aliases=[x["name"] for x in steps]
     if len(set(aliases))!=len(steps):
         _fail("duplicate source-independent C value alias")
-    _bound_mapping(sidecar["value_sources"],set(aliases),"derived value")
+    _bound_mapping(sidecar["value_sources"],set(aliases),"derived value",
+                   field="source_id")
     result_steps=[]
     identities=[]
     for x in steps:
