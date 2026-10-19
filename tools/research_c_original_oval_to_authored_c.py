@@ -271,15 +271,19 @@ def batch_convert_review_folder(review,output):
             # Bounded multi-Test conversion uses the SAME unified C
             # observations/checks/require frontend. It may legally reject
             # a source Definition, but unexpected exceptions are fatal.
-            from research_c_oval_multicheck import convert_objectless_many
+            from research_c_oval_multicheck import (
+                convert_objectless_many,convert_selected_shared_many)
             try:
                 c=convert_objectless_many(source["A_source_compatibility_fallback"])
-            except ValueError as multi:
-                if multi.__class__.__name__!="NotNativeCConvertible":
-                    raise
-                unsupported.append({"definition_id":ident,"file":rel,
-                                    "reason":"MULTI_TEST: "+str(multi)})
-                continue
+            except NotNativeCConvertible as objectless:
+                try:
+                    c=convert_selected_shared_many(
+                        source["A_source_compatibility_fallback"])
+                except NotNativeCConvertible as selected:
+                    unsupported.append({"definition_id":ident,"file":rel,
+                                        "reason":"MULTI_TEST: "+
+                                        str(objectless)+"; SELECTED: "+str(selected)})
+                    continue
         src_path=path.stem.replace(".review","")
         file=src_path+".c.research.yaml"
         # Header carries source Test documentation that the tiny standalone C
@@ -287,9 +291,15 @@ def batch_convert_review_folder(review,output):
         title=(c["source_test_title"] if "source_test_title" in c
                else source["source"].get("definition_title") or
                source["A_source_compatibility_fallback"]["id"]).replace("\n"," ")
+        original_docs=c.get("source_test_documentation") or {}
+        check_comments="".join(
+            "# Check "+str(alias)+": "+str(description).replace("\\n"," ").replace(
+                "\\r"," ")+"\\n"
+            for alias,description in sorted(original_docs.items()))
         yaml_txt=("# 0.4-C research only. Exact A Test projection, NOT scanner parity.\n"
                   +"# Original source: "+rel+"\n"
                   +"# Test: "+title+"\n"
+                  +check_comments
                   +yaml.safe_dump(c["authored_c"],sort_keys=False,allow_unicode=True))
         (output/file).write_text(yaml_txt,encoding="utf-8")
         native.append({"definition_id":ident,"file":rel,"c_source":file,
