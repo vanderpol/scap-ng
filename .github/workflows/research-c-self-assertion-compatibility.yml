@@ -73,10 +73,34 @@ jobs:
                   output["source_definition_count"])
           assert output["native_0_4_C_converted_definitions"]==0
           assert output["scanner_execution_parity_proven"] is False
+          print("Original-OVAL source Test count:", output["source_test_count"])
           print("Original-OVAL source accounting:", output["source_definition_count"],
                 "definitions, A-compatible review",
                 output["A_source_parity_review_definitions"],
                 "unsupported/failed",output["failed_A_roundtrip_or_unsupported_definitions"])
+          expected={
+            ("ios/ios-def_version55_test.xml",
+             "oval:navy.navwar.niwcatlantic.scc.ios:def:1"):"deprecated_oval_test",
+            ("junos/junos-def_xml_config_test.xml",
+             "oval:org.joval.junos.test:def:1"):"deprecated_oval_test",
+            ("macos/ind-def_environmentvariable58_test_mac.xml",
+             "oval:navy.navwar.niwcatlantic.scc.test:def:1"):"var_ref_datatype_mismatch",
+            ("solaris/sol-def_package511_test.xml",
+             "oval:navy.navwar.niwcatlantic.scc.test:def:1"):"var_ref_datatype_mismatch",
+            ("windows/win-def_wuaupdatesearcher_test.xml",
+             "oval:navy.navwar.niwcatlantic.scc.windows.update:def:1"):"var_ref_datatype_mismatch",
+          }
+          found={(r["file"],r["definition_id"]):r for r in output["blocked_definitions"]}
+          if set(found)!=set(expected):
+            raise ValueError("unexpected original OVAL Self-Assertion blockers "+
+                             repr(sorted(set(found)^set(expected))))
+          for key,kind in expected.items():
+            features=found[key].get("unsupported_features") or []
+            if {x.get("feature") for x in features}!={kind}:
+              raise ValueError("source blocker meaning changed at "+repr(key))
+          assert output["source_definition_count"]==167
+          assert output["A_source_parity_review_definitions"]==162
+          print("Pinned original OVAL source blockers exactly match five v003 baseline exceptions.")
           print("True native 0.4-C conversions: 0; this is a source-preserving A review.")
           PY
       - name: Hash and archive review outputs
