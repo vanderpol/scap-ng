@@ -174,7 +174,10 @@ def _selectors(selector, native):
         raise ValueError("selector fields don't match an A mapping alternative")
     converted={}
     for field,value in selector.items():
-        if field not in native["selector_map"]:
+        # The 0.4-A selector alternatives use canonical *native* names,
+        # whereas selector_map keys are legacy OVAL source names. Never
+        # force C authors back to the OVAL "filepath/path/filename" tokens.
+        if field not in native["selector_map"].values():
             raise ValueError("unsupported Object selector")
         if type(value) in (str,int):
             converted[field]={"equals":value}
