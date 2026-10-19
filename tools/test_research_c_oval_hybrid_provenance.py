@@ -58,12 +58,12 @@ class OVALTypedSetSourceProvenanceTests(unittest.TestCase):
         native=source();author,provenance=present_oval_set_provenance(native)
         broken=deepcopy(provenance)
         broken["object_source_ids"].pop(next(iter(broken["object_source_ids"])))
-        with self.assertRaisesRegex(ValueError,"bindings missing"):
+        with self.assertRaisesRegex(ValueError,"binding catalog incomplete"):
             compile_oval_set_provenance(author,broken)
         broken=deepcopy(provenance)
         values=list(broken["object_source_ids"])
         broken["object_source_ids"][values[1]]=broken["object_source_ids"][values[0]]
-        with self.assertRaisesRegex(ValueError,"bindings missing"):
+        with self.assertRaisesRegex(ValueError,"binding catalog incomplete"):
             compile_oval_set_provenance(author,broken)
 
     def test_unsupported_original_value_match_not_repaired(self):
