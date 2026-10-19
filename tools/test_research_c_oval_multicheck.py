@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_oval_multicheck import convert_objectless_many, convert_selected_shared_many, alias_of
+from research_c_oval_multicheck import convert_objectless_many, convert_selected_shared_many, convert_distinct_selected_many, alias_of
 from research_c_original_oval_to_authored_c import NotNativeCConvertible
 from test_research_c_original_oval_to_authored_c import original_plist
 
@@ -177,6 +177,70 @@ class OriginalOVALSelectedSharedC(unittest.TestCase):
         b["states"]=a["states"]
         with self.assertRaisesRegex(NotNativeCConvertible,"STATE_REUSE"):
             convert_selected_shared_many(doc)
+
+
+
+def two_test_distinct_source():
+    doc=two_test_selected_source()
+    oid=next(iter(doc["objects"]))
+    other_obj="retrieve-second-power-management-plist-object"
+    doc["objects"][other_obj]=deepcopy(doc["objects"][oid])
+    doc["objects"][other_obj]["object_title"]="Second original power setting"
+    doc["objects"][other_obj]["select"]["filepath"]["value"]=(
+        "/Library/Preferences/com.apple.OtherSettings.plist")
+    tid=next(tid for tid in doc["tests"] if tid!="test-test-plist511-filepath-entity")
+    doc["tests"][tid]["object"]=other_obj
+    return doc
+
+class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
+    def test_two_source_selected_objects_remain_independent_and_typed(self):
+        doc=two_test_distinct_source()
+        before=deepcopy(doc)
+        out=convert_distinct_selected_many(doc)
+        self.assertEqual(doc,before)
+        self.assertEqual(out["stage"],
+            "NATIVE_C_DISTINCT_MULTI_SOURCE_COMPATIBILITY_PROVED")
+        self.assertEqual(len(out["authored_c"]["checks"]),2)
+        self.assertEqual(len(out["authored_c"]["require"]["every"]),2)
+        self.assertEqual(set(out["source_test_crosswalk"].values()),set(doc["tests"]))
+        self.assertEqual(len(out["source_test_documentation"]),2)
+        self.assertEqual({t["object"]["select"]["filepath"]["equals"]
+            for t in out["native_c_compiled_tests"].values()},
+            {"/Library/Preferences/com.apple.PowerManagement.plist",
+             "/Library/Preferences/com.apple.OtherSettings.plist"})
+        self.assertTrue(out["A_source_semantic_projection_passed"])
+        self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
+
+    def test_shared_selected_object_requires_different_proven_scope(self):
+        doc=two_test_distinct_source()
+        first=next(iter(doc["tests"]))
+        other=next(t for t in doc["tests"] if t!=first)
+        doc["tests"][other]["object"]=doc["tests"][first]["object"]
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "OBJECT_MISSING_OR_SHARED"):
+            convert_distinct_selected_many(doc)
+
+    def test_set_filter_or_orphan_source_object_cannot_disappear(self):
+        doc=two_test_distinct_source()
+        oid=next(iter(doc["objects"]))
+        doc["objects"][oid]["filters"]=[{"exclude":{"state":"unknown"}}]
+        with self.assertRaisesRegex(NotNativeCConvertible,"SET_FILTER"):
+            convert_distinct_selected_many(doc)
+        doc=two_test_distinct_source()
+        doc["objects"]["orphan"]={
+            "capability":"macos.plist511","object_title":"Unreferenced data"}
+        with self.assertRaisesRegex(NotNativeCConvertible,"EXTRA_SOURCE"):
+            convert_distinct_selected_many(doc)
+
+    def test_boolean_tree_or_missing_check_never_rewritten_as_and(self):
+        doc=two_test_distinct_source()
+        doc["evaluate"]={"any":deepcopy(doc["evaluate"]["all"])}
+        with self.assertRaisesRegex(NotNativeCConvertible,"EXPLICIT_AND"):
+            convert_distinct_selected_many(doc)
+        doc=two_test_distinct_source()
+        doc["evaluate"]["all"].pop()
+        with self.assertRaisesRegex(NotNativeCConvertible,"TEST_COVERAGE_DRIFT"):
+            convert_distinct_selected_many(doc)
 
 if __name__=="__main__":
     unittest.main()
