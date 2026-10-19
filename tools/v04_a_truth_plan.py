@@ -37,7 +37,7 @@ def compile_expression(assessment, field="evaluate", *, max_nodes=16384):
     if field not in ("evaluate", "applicability") or assessment.get(field) is None:
         raise ValueError("missing explicit evaluate/applicability expression")
     tests = assessment.get("tests")
-    deps = assessment.get("dependencies") or {}
+    deps = assessment.get("dependencies", {})
     if not isinstance(tests, dict) or not isinstance(deps, dict):
         raise ValueError("invalid Test or Assessment dependency table")
     tree = assessment[field]
@@ -109,6 +109,7 @@ def combine(operator, values):
     This is NOT an Item-existence, State/record, incomplete-collection or
     conditional evaluator. 'not applicable' values do not become true/false.
     """
+    values = list(values)
     if operator not in OPS or not values or any(v not in SIX for v in values):
         raise ValueError("unsupported six-state operator or outcome")
     c = Counter(values)
