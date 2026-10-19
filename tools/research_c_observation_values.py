@@ -94,10 +94,10 @@ def _convert_expression(node, named, used, depth=0):
 
 def compile_c_observation_values(authored):
     """Compile without reading any source Assessment or original A Variables."""
-    if not isinstance(authored,dict) or set(authored) not in (
-        {"assessment_id","observations","steps"},
-        {"assessment_id","observations","steps","expected_source_variables_sha256",
-         "expected_source_shared_objects_sha256"}):
+    required={"assessment_id","observations","steps"}
+    optional={"expected_source_variables_sha256","expected_source_shared_objects_sha256"}
+    if not isinstance(authored,dict) or (
+        not required<=set(authored) or set(authored)-required-optional):
         raise ValueError("one C observation/value authoring form required")
     entries=authored["observations"]
     steps=authored["steps"]
@@ -125,6 +125,7 @@ def compile_c_observation_values(authored):
     translated=deepcopy(authored)
     translated["shared_objects"]=shared
     translated.pop("observations")
+    translated.pop("expected_source_shared_objects_sha256",None)
     translated["steps"]=[]
     for step in steps:
         if not isinstance(step,dict):
