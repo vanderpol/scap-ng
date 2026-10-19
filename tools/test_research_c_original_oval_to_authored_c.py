@@ -57,6 +57,37 @@ class OriginalOVALNativeCCompilationTests(unittest.TestCase):
         self.assertTrue(result["A_source_semantic_projection_passed"])
         self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
 
+    def test_source_bool_not_equal_is_typed_native_not_equal_not_python_negation(self):
+        source=original_plist()
+        state=next(iter(source["states"].values()))["state"]
+        state["operation"]="not equal"
+        result=compile_one_original_definition(source)
+        self.assertEqual(result["authored_c"]["must"],
+            {"every_item":{"value_of":{"not_equal":True}}})
+        self.assertEqual(result["native_c_compiled_test"]["states"],[
+            {"value_of":{"require":"at_least_one_exists_and_all_match",
+                         "not_equal":True}}])
+        self.assertTrue(result["A_source_semantic_projection_passed"])
+
+    def test_state_free_all_exist_is_exact_native_presence_token(self):
+        source=original_plist()
+        source["states"]={}
+        test=next(iter(source["tests"].values()))
+        test.pop("states")
+        test["check_existence"]="all_exist"
+        result=compile_one_original_definition(source)
+        self.assertEqual(result["authored_c"]["must"],"all_items_exist")
+        self.assertEqual(result["native_c_compiled_test"]["require"],"all_exist")
+        self.assertNotIn("states",result["native_c_compiled_test"])
+
+    def test_not_equal_selector_is_not_guessed_as_equal(self):
+        source=original_plist()
+        obj=next(iter(source["objects"].values()))
+        obj["select"]["filepath"]["operation"]="not equal"
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "SELECTOR_OPERATOR_OR_TYPE_UNSUPPORTED"):
+            compile_one_original_definition(source)
+
     def test_original_expectation_changed_from_bool_to_string_cannot_pass(self):
         source=original_plist()
         ste=next(iter(source["states"]))
