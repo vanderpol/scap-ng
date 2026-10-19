@@ -157,7 +157,7 @@ def present_c_apache_hybrid(source):
         }
         reverse[source_id]=name
     requirement=_eval_parts(source["evaluate"],reverse)
-    if Counter(x["check"] for x in requirement["and"])!=Counter(checks):
+    if Counter(x["check"] for x in requirement["and"])!=Counter(checks.keys()):
         _no("missing/duplicated source Test reference")
     return {
         "stage":STAGE,
@@ -248,7 +248,7 @@ def compile_c_apache_hybrid(authored):
         if not isinstance(x,dict) or set(x)!={"check"} or x["check"] not in aliases:
             _no("unknown authored check requirement")
         parts.append({"test":aliases[x["check"]]})
-    if Counter(x["test"] for x in parts)!=Counter(tests):
+    if Counter(x["test"] for x in parts)!=Counter(tests.keys()):
         _no("source Test coverage incomplete or duplicated")
     restored={**deepcopy(metadata),"evaluate":{"all":parts},
               "shared_objects":compiled["shared_objects"],
