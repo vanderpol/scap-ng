@@ -165,8 +165,11 @@ def _requirement(must,has_fields):
         raise ValueError("must is explicit; no hidden defaults")
     # Bare must means a successful, NONEMPTY Item population with SOME match.
     # No invented exact-one-exists or all-match default.
-    if set(must)=={"fields"}:
-        fields=must["fields"]
+    if not any(k in must for k in (
+        "any_item","every_item","one_matching_item","no_matching_item",
+        "exactly_one_item","items_exist","items_match","special_source_requirement",
+        "fields")):
+        fields=must
         token=SHORTHANDS["any_item"]
     elif len(must)==1 and next(iter(must)) in SHORTHANDS:
         mode=next(iter(must))
