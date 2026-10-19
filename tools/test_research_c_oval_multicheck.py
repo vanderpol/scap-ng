@@ -152,6 +152,22 @@ class OriginalOVALSelectedSharedC(unittest.TestCase):
         self.assertTrue(result["A_source_semantic_projection_passed"])
         self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
 
+    def test_shared_selected_polymorphic_string_does_not_become_version(self):
+        doc=two_test_selected_source()
+        source_states=list(doc["states"].values())
+        source_states[0]["state"].update({"datatype":"string","value":"1.0"})
+        source_states[1]["state"].update({"datatype":"string","value":"1.0.0"})
+        result=convert_selected_shared_many(doc)
+        checks=result["native_c_compiled_tests"]
+        self.assertEqual(len(checks),2)
+        comparisons=[t["states"][0]["value_of"] for t in checks.values()]
+        self.assertEqual({s["datatype"] for s in comparisons},{"string"})
+        self.assertEqual({s["require"] for s in comparisons},
+                         {"at_least_one_exists_and_all_match"})
+        self.assertEqual({tuple((k,str(v)) for k,v in sorted(s.items()))
+                          for s in comparisons}.__len__(),2)
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
+
     def test_must_keep_original_set_filter_and_unsupported_scope(self):
         doc=two_test_selected_source()
         oid=next(iter(doc["objects"]))
