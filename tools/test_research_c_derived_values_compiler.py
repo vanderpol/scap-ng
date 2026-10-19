@@ -11,8 +11,7 @@ import unittest
 import yaml
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_derived_values_compiler import compile_c_derived_values
-from research_c_shared_engine import present_c_variable_steps
+from research_c_observation_values import compile_c_observation_values, present_c_observation_values
 from research_b_variable_schedule import plan_source_variables
 from research_b_variable_plan_evaluator import evaluate_source_variable_plan
 from research_b_source_shell_snapshot import normalize, PROVIDER
@@ -43,7 +42,7 @@ class DerivedValuesCompilerTests(unittest.TestCase):
     def test_manually_authored_two_step_without_source_document(self):
         document=authored()
         before=deepcopy(document)
-        compiled=compile_c_derived_values(document)
+        compiled=compile_c_observation_values(document)
         self.assertEqual(document,before)
         self.assertEqual(len(compiled["variables"]),2)
         self.assertEqual(compiled["variables"]["command-gather-apache-version-variable"][
@@ -56,20 +55,20 @@ class DerivedValuesCompilerTests(unittest.TestCase):
 
     def test_real_apache_small_exact_source_variable_graph(self):
         src=source(SMALL)
-        compiled=compile_c_derived_values(authored())
+        compiled=compile_c_observation_values(authored())
         self.assertEqual(compiled["variables"],src["variables"])
         self.assertEqual(compiled["shared_objects"],src.get("shared_objects",{}))
 
     def test_real_apache_nineteen_step_lowering_without_original_variable_input(self):
         src=source(FULL)
         self.assertEqual(len(src["variables"]),19)
-        view=present_c_variable_steps(src)
+        view=present_c_observation_values(src)
         doc={"assessment_id":src["id"],
-             "shared_objects":deepcopy(src["shared_objects"]),
+             "observations":deepcopy(view["observations"]),
              "steps":deepcopy(view["steps"]),
-             "expected_source_variables_sha256":view["source_variables_sha256"]}
+             "expected_source_variables_sha256":view["expected_source_variables_sha256"]}
         src_copy=deepcopy(src)
-        compiled=compile_c_derived_values(doc)
+        compiled=compile_c_observation_values(doc)
         self.assertEqual(src,src_copy)
         self.assertEqual(compiled["variables"],src["variables"])
         self.assertTrue(compiled["original_source_reconstructed_if_pinned"])
@@ -81,7 +80,7 @@ class DerivedValuesCompilerTests(unittest.TestCase):
     def test_hand_written_two_step_values_match_independent_expected(self):
         src=source(SMALL)
         clone=deepcopy(src)
-        clone["variables"]=compile_c_derived_values(authored())["variables"]
+        clone["variables"]=compile_c_observation_values(authored())["variables"]
         for lines, expected in [
             (["/usr/sbin/httpd -DFOREGROUND"],["/usr/sbin/httpd -V"]),
             (["/usr/sbin/apache2 -DFOREGROUND"],["/usr/sbin/apache2 -V"]),
@@ -101,7 +100,7 @@ class DerivedValuesCompilerTests(unittest.TestCase):
     def test_unavailable_partial_and_empty_never_become_values(self):
         src=source(SMALL)
         clone=deepcopy(src)
-        clone["variables"]=compile_c_derived_values(authored())["variables"]
+        clone["variables"]=compile_c_observation_values(authored())["variables"]
         for snap,expected in (
             ({}, "unknown"),
             (evidence(src,lines=["/usr/sbin/httpd -DFOREGROUND"],status="incomplete"),"unknown"),
@@ -117,35 +116,35 @@ class DerivedValuesCompilerTests(unittest.TestCase):
     def test_forward_references_and_duplicate_source_ids(self):
         doc=authored()
         doc["steps"].reverse()
-        self.assertEqual(len(compile_c_derived_values(doc)["variables"]),2)
+        self.assertEqual(len(compile_c_observation_values(doc)["variables"]),2)
         doc["steps"][1]["source_id"]=doc["steps"][0]["source_id"]
         with self.assertRaisesRegex(ValueError,"duplicate"):
-            compile_c_derived_values(doc)
+            compile_c_observation_values(doc)
 
     def test_cycle_and_unresolved_source_fail_closed(self):
         doc=authored()
         doc["steps"][0]["derive"]={"use":"apache_version_command"}
         with self.assertRaisesRegex(ValueError,"cyclic"):
-            compile_c_derived_values(doc)
+            compile_c_observation_values(doc)
         doc=authored()
         doc["steps"][1]["derive"]["combine"][0]["use"]="nonexistent"
         with self.assertRaisesRegex(ValueError,"unknown"):
-            compile_c_derived_values(doc)
+            compile_c_observation_values(doc)
 
     def test_source_pin_and_bad_private_acquisition_fail_closed(self):
         doc=authored()
-        doc["expected_source_variables_sha256"]=compile_c_derived_values(doc)[
+        doc["expected_source_variables_sha256"]=compile_c_observation_values(doc)[
             "source_variables_sha256"]
-        self.assertTrue(compile_c_derived_values(doc)["original_source_reconstructed_if_pinned"])
+        self.assertTrue(compile_c_observation_values(doc)["original_source_reconstructed_if_pinned"])
         changed=deepcopy(doc)
         changed["steps"][0]["derive"]["extract"]["pattern"]="different"
         with self.assertRaisesRegex(ValueError,"pinned source"):
-            compile_c_derived_values(changed)
+            compile_c_observation_values(changed)
         changed=deepcopy(doc)
-        obj=changed["steps"][0]["derive"]["extract"]["value"]["read_field"]["object"]
-        obj["filters"]=[{"exclude":{"type":{"equals":"directory"}}}]
-        with self.assertRaisesRegex(ValueError,"complex private Object"):
-            compile_c_derived_values(changed)
+        obj=changed["steps"][0]["derive"]["extract"]["value"]["read_field"]["observation"]
+        obj["from"]["independent.shellcommand"]["filters"]=[{"exclude":{"type":{"equals":"directory"}}}]
+        with self.assertRaisesRegex(ValueError,"observation must preserve"):
+            compile_c_observation_values(changed)
 
     def test_no_hidden_types_ops_or_titles(self):
         for change in ("type","title","operator","extra","missing_id"):
@@ -158,7 +157,7 @@ class DerivedValuesCompilerTests(unittest.TestCase):
             if change=="missing_id":step.pop("source_id")
             with self.subTest(change=change):
                 with self.assertRaises(ValueError):
-                    compile_c_derived_values(d)
+                    compile_c_observation_values(d)
 
 if __name__=="__main__":
     unittest.main()
