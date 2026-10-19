@@ -28,7 +28,7 @@ class NativeCOriginalGapTests(unittest.TestCase):
         self.assertEqual((r["converted"],r["unsupported"]),(2,2))
         self.assertEqual(r["categories"],{"OBJECT_ADVANCED_OR_UNREVIEWED_METADATA":1,
                                           "MULTI_TEST":1})
-        self.assertIn("original-OVAL",r["markdown"].lower().replace(" ","-"))
+        self.assertIn("original-oval",r["markdown"].lower().replace(" ","-"))
         self.assertIn("OVAL-Community/SCAP-Self-Assertion",r["markdown"])
         self.assertIn("unix/unix-def_c.xml",r["markdown"])
         self.assertIn("not an exhaustive",r["markdown"])
