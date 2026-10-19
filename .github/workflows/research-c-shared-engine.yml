@@ -1,0 +1,36 @@
+name: 0.4-C shared A engine research (bounded)
+
+on:
+  push:
+    paths:
+      - 'tools/research_c_shared_engine.py'
+      - 'tools/test_research_c_shared_engine.py'
+      - 'tools/v04_a_dataflow_index.py'
+      - 'tools/v04_a_authoring_graph_index.py'
+      - 'research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json'
+      - 'research/requirements-first-language/contract-candidate/corpus/source-specimens/independent-shellcommand*.source.yaml'
+      - '.github/workflows/research-c-shared-engine.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pinned-source-compatibility-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install parser for original Apache source fixture
+        run: python -m pip install 'PyYAML>=6,<7'
+      - name: Source-backed A collection identity and Apache Variable graph roundtrip
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_c_shared_engine.py
+      - name: Assert C proof is labelled research only
+        run: |
+          grep -q 'scanner_executed": False' tools/research_c_shared_engine.py
+          grep -q 'original_source_parity_verified": False' tools/research_c_shared_engine.py
+          echo 'C/A bounded structural + fixture-only proof, not scanner parity'
