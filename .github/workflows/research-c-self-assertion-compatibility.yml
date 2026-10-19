@@ -7,6 +7,10 @@ on:
       - '.github/workflows/research-c-self-assertion-compatibility.yml'
       - 'tools/research_c_oval_self_assertion_bridge.py'
       - 'tools/test_research_c_oval_self_assertion_bridge.py'
+      - 'tools/research_c_original_oval_to_authored_c.py'
+      - 'tools/research_c_oval_multicheck.py'
+      - 'tools/verify_c_published_original_oval_examples.py'
+      - 'research/assessment-simplification/compact-authoring-04/oval-self-assertion-c-review/**'
   workflow_dispatch:
 
 permissions:
@@ -122,6 +126,11 @@ jobs:
                 summary["source_compatible_not_yet_native_C"])
           print("Scanner and full expression/Set/Filter/Variable runtime parity NOT asserted")
           PY
+      - name: Verify permanent GitHub sample files against generated original-source C
+        run: |
+          python scap-ng/tools/verify_c_published_original_oval_examples.py \
+            --published scap-ng/research/assessment-simplification/compact-authoring-04/oval-self-assertion-c-review \
+            --generated c-native --manifest c-native/conversion-manifest.json
       - name: Hash and archive review outputs
         shell: bash
         run: |
