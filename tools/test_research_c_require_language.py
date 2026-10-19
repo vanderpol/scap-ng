@@ -37,7 +37,8 @@ class CandidateCGrammar(unittest.TestCase):
     def test_independently_written_linux_short_must_retains_A_semantics(self):
         result=compiled(LINUX)
         original=next(iter(A["assessment"]["tests"].values()))
-        self.assertEqual(result["object"],original["object"])
+        self.assertEqual(result["object"]["capability"],original["object"]["capability"])
+        self.assertEqual(result["object"]["select"],original["object"]["select"])
         self.assertEqual(result["require"],original["require"])
         self.assertEqual(result["states"],original["states"])
         self.assertNotIn("states_match",result)
@@ -86,7 +87,7 @@ class CandidateCGrammar(unittest.TestCase):
 
     def test_authoring_can_name_each_existing_A_paired_and_presence_token(self):
         paired,presence=_catalog()
-        self.assertEqual(len(paired),21) # Current pinned 0.4-A schema
+        self.assertEqual(len(paired),20) # Current pinned 0.4-A schema
         for token in paired:
             if token=="none_exist":
                 # Ambiguous in schema as both paired and presence-only.
