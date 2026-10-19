@@ -1,0 +1,12 @@
+# Research #245: source-aligned C for real Windows DNS SV-259417.automated.
+# This is not a native compiled STIG. The collector uses A's native
+# independent.shellcommand contract, including the original explicit error flags.
+from:
+  independent.shellcommand:
+    shell: powershell
+    command: '(Get-DnsServerResponseRateLimiting -ComputerName $env:COMPUTERNAME).Mode'
+    error_if_exit_status_not_0: false
+    error_if_stderr_exists: false
+must:
+  every_item:
+    stdout_line: Enable
