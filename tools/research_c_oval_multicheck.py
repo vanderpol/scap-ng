@@ -11,7 +11,7 @@ from copy import deepcopy
 import re
 
 from research_c_original_oval_to_authored_c import (
-    NotNativeCConvertible, reject, project_fields, _entities, _same_source_semantics)
+    NotNativeCConvertible, reject, project_fields, _entities, _same_source_semantics, OPS)
 from research_c_require_language import _mapping
 from research_c_unified_compiler import compile_c_unified
 
@@ -131,7 +131,9 @@ def convert_objectless_many(a):
             reject("C_FIELDS_COUNT_DRIFT")
         for out,original in zip(generated["states"],expected):
             field=original["field"]
-            op={"equals":"equals","pattern match":"matches_regex"}[original["operation"]]
+            op=OPS.get(original["operation"])
+            if op is None:
+                reject("COMPOUND_SOURCE_FIELD_OPERATION_UNSUPPORTED")
             if out!={field:{"require":"at_least_one_exists_and_all_match",
                             op:original["value"]}}:
                 reject("C_FIELDS_TYPED_CONTENT_DRIFT")
