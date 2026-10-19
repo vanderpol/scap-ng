@@ -101,7 +101,7 @@ def present_hybrid_must(source):
     doc={"stage":STAGE,"compatibility":compat,"checks":checks,
          "require":requirement,"source_ir_sha256":_pin(source)}
     if Counter(_refs(_tree(requirement,
-        {k:v["source_id"] for k,v in checks.items()},False)))!=Counter(source["tests"]):
+        {k:v["source_id"] for k,v in checks.items()},False)))!=Counter(source["tests"].keys()):
         reject("original Tests not all referenced exactly once")
     return doc
 
@@ -153,7 +153,7 @@ def compile_hybrid_must(authored):
             test["states"]=deepcopy(refs)
         tests[test_id]=test;test_ids[alias]=test_id
     evaluate=_tree(authored["require"],test_ids,False)
-    if Counter(_refs(evaluate))!=Counter(tests):
+    if Counter(_refs(evaluate))!=Counter(tests.keys()):
         reject("require must reference each Test exactly once")
     result={**deepcopy(compat),"tests":tests,"evaluate":evaluate}
     if set(result)!=NATIVE:reject("source A contract missing fields")
