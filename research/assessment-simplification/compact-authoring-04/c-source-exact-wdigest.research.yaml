@@ -1,0 +1,26 @@
+# Research #245: Independently authored C-shaped source-preservation witness.
+# Source: source-specimens/windows-registry-state-all-0fef40d33c90.source.yaml
+# NOT approved SCAP-NG 0.4-A syntax. Windows registry view remains unresolved.
+id: research-c-windows-wdigest-disabled
+require:
+  each: windows.registry
+  where:
+    hive: local_machine
+    key:
+      equals: 'SYSTEM\CurrentControlSet\Control\SecurityProviders\Wdigest'
+    name:
+      equals: UseLogonCredential
+  registry_view: unspecified_requires_xml_parity
+  collected_items:
+    exists: one_or_more
+    match: all
+  on_same_item:
+    all:
+      - type:
+          equals: dword
+          field_exists: one_or_more
+          field_match: all
+      - value:
+          equals: 0
+          field_exists: one_or_more
+          field_match: all
