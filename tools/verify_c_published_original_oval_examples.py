@@ -42,8 +42,8 @@ def compare_published(published,generated,manifest):
     if len(index)!=len(table["native_C_converted"]):
         raise ValueError("duplicated source identity in C manifest")
     files=sorted(Path(published).glob("*.research.yaml"))
-    if len(files)!=7:
-        raise ValueError("expected exactly seven published verified original C examples")
+    if len(files)!=8:
+        raise ValueError("expected exactly eight published verified original C examples")
     found=set()
     for path in files:
         if not NAME.fullmatch(path.name):
@@ -60,9 +60,9 @@ def compare_published(published,generated,manifest):
         source_path=Path(generated)/index[key]["c_source"]
         if _strict_yaml(text)!=_strict_yaml(source_path.read_text(encoding="utf-8")):
             raise ValueError("published C representation drifted from source compiler: "+path.name)
-    if len(found)!=7:
-        raise ValueError("published sample coverage is not seven source Definitions")
-    return {"verified_published_C_examples":7,
+    if len(found)!=8:
+        raise ValueError("published sample coverage is not eight source Definitions")
+    return {"verified_published_C_examples":8,
             "original_source_revision":HEADER_PIN,
             "generated_native_C_Definitions":table["native_C_Definitions"],
             "scanner_parity_proven":False}
