@@ -80,7 +80,7 @@ class ComplexWindowsSevenChecks(unittest.TestCase):
 
     def test_all_rights_share_one_observation_with_separate_requirements(self):
         rights=[c for c in self.view["checks"].values()
-                if c["on"]=="denied_remote_logon_trustees"]
+                if c["observation"]=="denied_remote_logon_trustees"]
         self.assertEqual(len(rights),5)
         for requirement in rights:
             self.assertEqual(requirement["must"]["items"],"any_item")
