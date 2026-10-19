@@ -23,8 +23,12 @@ def _hash(x):
     return sha256(json.dumps(x,sort_keys=True,separators=(",",":"),ensure_ascii=False).encode()).hexdigest()
 
 
-def compile_fused_command_pipeline(assessment):
+def compile_fused_command_pipeline(assessment, *, pinned_variables_sha256):
     source=assessment.get("variables")
+    if not isinstance(pinned_variables_sha256,str) or len(pinned_variables_sha256)!=64 or (
+        _hash(source)!=pinned_variables_sha256
+    ):
+        raise ValueError("source Variable fingerprint changed; C fusion cannot claim lossless source")
     if not isinstance(source,dict) or set(source)!={KEY_SOURCE,KEY_DERIVED}:
         raise ValueError("C fusion only proven for this exact Apache two-node dependency")
     capture=source[KEY_SOURCE]["expression"]
@@ -59,7 +63,7 @@ def compile_fused_command_pipeline(assessment):
     return {
         "kind":"c-research-fused-typed-value-pipeline",
         "source_assessment_id":assessment["id"],
-        "source_variables_sha256":_hash(source),
+        "source_variables_sha256":pinned_variables_sha256,
         "source_ids":[KEY_SOURCE,KEY_DERIVED],
         "collect":deepcopy(collect),
         "capture_first_group":step["pattern"],
