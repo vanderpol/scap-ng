@@ -94,3 +94,16 @@ Every observation must explicitly carry:
 4. **First-read human review:** can an auditor correctly explain the two different file populations, conditional checks and absent/incomplete results using only the observation-oriented C view? Do not accept a shorter source if those distinctions disappear.
 
 **Recommendation:** promote shared observations to a **primary C research hypothesis**, but not yet to normative syntax or an optimization requiring a new scanner implementation. This is likely to achieve larger gains than renaming OVAL operators, especially when observations are reused across many Rules. A-compatible import remains the safety baseline.
+
+## Executable native-observation micro-probe (not legacy source conversion)
+
+A separate [precollected Apache directive observation](../../../tools/research_c_apache_directive_observations.py) and [adversarial tests](../../../tools/test_research_c_apache_directive_observations.py) now test the architectural *value* of actual shared facts, not just shortening a source Variable graph:
+
+- One explicitly named file population of precollected typed `{file_id, path, line, text}` records is read **once** by the prototype; two independent consumers select `Session` and `SessionCookieName` directive Items without executing additional commands.
+- Items preserve parent file identity and line number. A `SessionCookieName` missing `Secure` in one source file cannot borrow `Secure` from a directive in another file merely because the fields were extracted from a shared source.
+- A complete-empty population stays distinct from incomplete/error/not-collected; a partial collection retains the `incomplete` status and observed lines, **without assigning Pass**. Unsupported file identities/line ordering and terminal errors carrying trusted Items are rejected.
+- Shared observations carry facts and provenance; they do **not** impose the existence or all/some comparison semantics for any consuming Rule. A consumer may judge two `Session` lines differently depending on its explicit policy.
+
+**Hard limitation:** this reads already-acquired lines; it does not resolve Include/IncludeOptional, Apache quoting or effective configuration contexts, and it does not replace the legacy source's four distinct grep commands. It is not a new OS collector and is **not** an OVAL 5.12.3 execution oracle. The focused GitHub Actions regression now includes the probe, but its latest exact-head result must be inspected before saying CI passed.
+
+The benefit to measure next is whether a reviewed **existing A-derived file collection** can supply these shared typed lines for many Rules. If that proof fails, maintain the original shell-based source-compatible plan and keep the typed observation approach explicitly native.
