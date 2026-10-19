@@ -10,6 +10,8 @@ from research_c_apache_hybrid_authoring import (
     present_c_apache_hybrid,compile_c_apache_hybrid,prove_c_apache_hybrid)
 from research_c_apache_grouped_values import (
     present_grouped_apache,compile_grouped_apache,prove_grouped_apache)
+from research_c_apache_provenance_split import (
+    present_apache_provenance_split,compile_apache_split,prove_apache_split)
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT.joinpath("research/requirements-first-language/contract-candidate/"
@@ -51,6 +53,27 @@ def export_review(source_path,output_dir):
     if compile_grouped_apache(yaml.safe_load(
         grouped_path.read_text(encoding="utf-8")))!=source:
         raise ValueError("grouped C YAML would alter original source IR")
+    # Distinct machine-managed provenance must be available to the
+    # compiler, but original IDs/kind/datatype no longer clutter the
+    # author's editable file. These two files are independently loadable.
+    compact_author,source_provenance=present_apache_provenance_split(source)
+    compact_proof=prove_apache_split(source,compact_author,source_provenance)
+    compact_path=output_dir/"apache-sv214268-author-edited-only.research.yaml"
+    provenance_path=output_dir/"apache-sv214268-compiler-provenance.research.yaml"
+    compact_path.write_text(
+        "# 0.4-C RESEARCH: author-edited values, evidence, checks, must.\n"
+        "# Original typed source IDs/kinds live in REQUIRED separate provenance.\n"
+        +yaml.safe_dump(compact_author,sort_keys=False,allow_unicode=True),
+        encoding="utf-8")
+    provenance_path.write_text(
+        "# 0.4-C RESEARCH: compiler-managed typed source bindings and digests.\n"
+        "# Not a cryptographic signature. Do not edit in authored Assessment.\n"
+        +yaml.safe_dump(source_provenance,sort_keys=False,allow_unicode=True),
+        encoding="utf-8")
+    reloaded_compact=yaml.safe_load(compact_path.read_text(encoding="utf-8"))
+    reloaded_provenance=yaml.safe_load(provenance_path.read_text(encoding="utf-8"))
+    if compile_apache_split(reloaded_compact,reloaded_provenance)!=source:
+        raise ValueError("sidecar-based C YAML would alter original source IR")
     original_render=out.read_text(encoding="utf-8")
     grouped_render=grouped_path.read_text(encoding="utf-8")
     presentation_comparison={
@@ -74,6 +97,19 @@ def export_review(source_path,output_dir):
         "grouped_output_sha256":hashlib.sha256(grouped_path.read_bytes()).hexdigest(),
         "grouped_proof":grouped_proof,
         "presentation_comparison":presentation_comparison,
+        "compact_authoring_file":compact_path.name,
+        "managed_provenance_file":provenance_path.name,
+        "compact_authoring_sha256":hashlib.sha256(compact_path.read_bytes()).hexdigest(),
+        "managed_provenance_sha256":hashlib.sha256(provenance_path.read_bytes()).hexdigest(),
+        "compact_proof":compact_proof,
+        "compact_editable_metrics":{
+            "bytes":len(compact_path.read_bytes()),
+            "lines":len(compact_path.read_text(encoding="utf-8").splitlines()),
+            "visible_derived_value_steps":len(compact_author["derived_values"]),
+            "legacy_source_ids_in_editable_steps":0},
+        "provenance_sidecar_metrics":{
+            "bytes":len(provenance_path.read_bytes()),
+            "lines":len(provenance_path.read_text(encoding="utf-8").splitlines())},
         "C_normative_acceptance":False,"scanner_runtime_parity":False,
     }
     (output_dir/"proof.json").write_text(
