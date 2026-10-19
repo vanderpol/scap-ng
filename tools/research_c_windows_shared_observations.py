@@ -186,7 +186,7 @@ def present_windows_shared_observations(source):
         if obs_alias is None:
             raise ValueError("unknown source observation reference")
         checks[alias] = {
-            "on":obs_alias,
+            "observation":obs_alias,
             "source_test":source_id,
             "must":_require_state(t, reference),
         }
