@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_oval_multicheck import convert_objectless_many
+from research_c_oval_multicheck import convert_objectless_many, alias_of
 from research_c_original_oval_to_authored_c import NotNativeCConvertible
 from test_research_c_original_oval_to_authored_c import original_plist
 
@@ -78,6 +78,20 @@ class OriginalCOVALMultiNumeric(unittest.TestCase):
         doc["states"]["state-load-count"]["state"]["value"]="0"
         with self.assertRaisesRegex(NotNativeCConvertible,"STATE_ORDERED_COMPARISON_NOT_INTEGER"):
             convert_objectless_many(doc)
+
+    def test_original_field_names_prevent_truncated_opaque_aliases(self):
+        self.assertEqual(alias_of(
+            "Test if the passwordpolicy_test is supported. reversible_encryption",
+            {"reversible_encryption":False}), "reversible_encryption")
+        self.assertEqual(alias_of(
+            "Test iosxe version test 'major_release' with operation greater than",
+            {"major_release":{"greater_than":0}}), "major_release")
+        self.assertEqual(alias_of(
+            "Test current_mode",
+            {"selinux_status":"enabled","current_mode":"enforcing"}),
+            "test_current_mode")
+        with self.assertRaisesRegex(NotNativeCConvertible,"UNSUITABLE"):
+            alias_of("Test "+"very long source title "*20,{"other_field":True})
 
     def test_duplicate_source_test_in_require_fails_closed(self):
         doc=source()
