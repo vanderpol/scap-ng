@@ -91,6 +91,45 @@ The new [bounded grouping adapter](../../../tools/research_c_apache_grouped_valu
 
 The next promising experiment is to separate compiler-owned source provenance (legacy source IDs/titles/types) from *author-edited* transformations without losing reproducibility, and then compare the complete source-linked example with a real author-facing editor. Do not count invisible/expanded declarations as eliminated work until a non-OVAL author can meaningfully navigate them.
 
+## Third iteration: separate actual authoring from source-conversion provenance
+
+The [two-file, source-independent Apache compiler](../../../tools/research_c_apache_provenance_split.py) splits the Assessment into:
+
+- **`apache-sv214268-author-edited-only.research.yaml`**, containing the Assessment identity/title, explicit observations and acquisition commands, nineteen `derived_values` with meaningful `name`/`description`/`derive`, five `from`/`must` checks, and the AND requirement. Authors do **not** edit 19 source Variable IDs, 19 local/type declarations, five original Test IDs or shared Object IDs.
+- **`apache-sv214268-compiler-provenance.research.yaml`**, a separate required, validated source binding containing 19 source Variable identities/kinds/datatypes, five Test identity bindings, one shared Object identity, original specification metadata, and immutable reference hashes. This file is **not secret** or a signature; losing or misbinding it causes an explicit compilation error rather than guessed conversion.
+
+The compiler reconstructs all 19 original typed Variables, five Tests, one shared Object, command/selector chains and exact requirement conditions without reading the original Assessment during compilation. Source-equivalence mode rejects changed author values; a separate, explicitly requested **modified-authoring mode** compiles legitimate edits into a *changed* typed A graph without falsely claiming they match the original.
+
+| Original full Apache C YAML | Compact author-edited C YAML | Required provenance sidecar |
+| ---: | ---: | ---: |
+| **428 lines** | **354 lines** | **100 lines** |
+| 15,596 bytes | 12,716 bytes | 4,571 bytes |
+| 19 Variables with ID/kind/datatype fields visible | 19 meaningful derived values, **zero legacy Variable identity/type declarations** | 19 typed source identity bindings |
+| Five Test source IDs in authored checks | Five named checks, **zero legacy Test IDs in check declarations** | Five original Test identity bindings |
+
+The **editable portion** is reduced by 74 lines (17.3%) and 2,880 bytes (18.5%). Total serialized content **increases**, because the provenance sidecar stores conversion metadata explicitly rather than hiding or discarding it. This is desirable separation of responsibility, not compression of evidence.
+
+Verified [full Apache C/provenance reconstruction, run 39339714557](https://github.com/vanderpol/scap-ng/actions/runs/39339714557) with **327 focused tests passed**, including a YAML serialization round-trip and explicit checks for absent, incomplete, duplicated, or crosswired source bindings and for author-modified content. The source-equal compiler never silently edits OVAL source identity.
+
+### Offline value-status evidence (not scanner parity)
+
+The same full Apache source's nineteen-Variable evaluator was run on **eight independent fixture scenarios** using both the original source and the C/provenance-compiled graph. The resulting per-Variable values and evaluation trace match exactly, and the following expected boundaries are explicit:
+
+| Fixture condition | Expected derived source value status |
+| --- | --- |
+| Missing process-command evidence | `unknown` |
+| Complete httpd process evidence | `values` (path and dependent `httpd -M` command) |
+| Two Apache executable paths | `values` (two paths and two downstream commands) |
+| Incomplete collection | `unknown` |
+| Not collected | `unknown` |
+| Not applicable | `not_applicable` |
+| Complete collection with no matching lines | `error` in the bounded existing evaluator |
+| Explicit error or untrusted acquisition provider | `error` |
+
+[CI run 39339921258](https://github.com/vanderpol/scap-ng/actions/runs/39339921258) passes **335 focused tests**, including the eight new source/C offline comparison cases in [the source-backed test module](../../../tools/test_research_c_apache_compact_evidence.py). It is an **offline Variable evaluator**, using supplied source-typed Items, not a full Test result evaluator, no live commands, no full OVAL six-valued differential proof. Those remain separate acceptance gates.
+
+**Independent recommendation:** Continue using a user-edited Assessment plus required typed source provenance, but test the same split against a second, non-Apache complex OVAL source before promoting it into a universal 0.4-C compiler. No OVAL normative dataflow engine change follows from this result.
+
 ## Independent assessment
 
 **This is a real C authoring gain beyond `must` renaming.** A reviewer can follow a derived value into the specific command it parameterizes and then the evidence/requirement it supports. The full graph remains exactly OVAL-compatible; we didn't build a new shell collector or Set evaluator.
