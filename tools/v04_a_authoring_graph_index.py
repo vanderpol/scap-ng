@@ -35,8 +35,11 @@ def read_authoring_archive(path, fmt):
             if not (name.startswith("authoring/") and name.endswith("." + fmt)):
                 continue
             components = PurePosixPath(name).parts
-            if ".." in components or name.startswith("/"):
-                raise ValueError("unsafe authoring member name")
+            # ZIP member paths are provenance identities: PurePosixPath would
+            # otherwise erase redundant separators and explicit './'.
+            if (name != str(PurePosixPath(name)) or "\\" in name
+                    or ".." in components or name.startswith("/")):
+                raise ValueError("unsafe or noncanonical authoring member name")
             if name in docs:
                 raise ValueError(f"duplicate ZIP member: {name}")
             raw = zf.read(name)

@@ -96,6 +96,23 @@ class ResearchGraphIndexTests(unittest.TestCase):
             y = graph_index(read_authoring_archive(yamlzip, "yaml"))
             self.assertEqual(j["graph_sha256"], y["graph_sha256"])
 
+    def test_noncanonical_archive_source_names_rejected_before_parsing(self):
+        # #232/#239: a ZIP member's spelling is part of source provenance.
+        for fmt in ("json", "yaml"):
+            for name in (
+                f"authoring//assessments/a.{fmt}",
+                f"authoring/./assessments/a.{fmt}",
+                f"authoring/assessments//a.{fmt}",
+                f"authoring/assessments\\\\a.{fmt}",
+            ):
+                with self.subTest(name=name):
+                    with TemporaryDirectory() as d:
+                        path = Path(d)/"noncanonical.zip"
+                        with ZipFile(path, "w") as archive:
+                            archive.writestr(name, "{}")
+                        with self.assertRaisesRegex(ValueError, "noncanonical"):
+                            read_authoring_archive(path, fmt)
+
     def test_duplicate_json_member_key_fails(self):
         with TemporaryDirectory() as d:
             path = Path(d)/"duplicate.zip"
