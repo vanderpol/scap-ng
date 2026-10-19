@@ -194,6 +194,34 @@ def _selectors(selector, native):
             raise ValueError(f"{field} selector must use native enum")
     return converted
 
+def _source_object(capability, authored, native):
+    """One A contract: a selector OR a typed collection-parameter shape."""
+    if "object_selector_alternatives" in native:
+        return {"capability":capability,"select":_selectors(authored,native)}
+    parameters=native.get("collection_parameters")
+    if not isinstance(parameters,dict) or not isinstance(authored,dict):
+        raise ValueError("capability lacks supported native acquisition contract")
+    required={name for name,definition in parameters.items()
+              if definition.get("required") is True}
+    if not required <= set(authored) or set(authored)-set(parameters):
+        raise ValueError("missing or unexpected source collection parameter")
+    result={}
+    for name,value in authored.items():
+        definition=parameters[name]
+        if definition.get("type")=="string":
+            if type(value) is not str or not value or len(value)>4096:
+                raise ValueError("bounded literal collection argument required")
+        elif definition.get("type")=="boolean":
+            if type(value) is not bool:
+                raise ValueError("explicit Boolean collector flag required")
+        else:
+            raise ValueError("unsupported native collector parameter type")
+        if definition.get("enum") and value not in definition["enum"]:
+            raise ValueError("collection parameter not in versioned capability enum")
+        result[name]=deepcopy(value)
+    return {"capability":capability,"collect":result}
+
+
 def _requirement(must,has_fields):
     paired,presence=_catalog()
     if must in PRESENCE_WORDS if isinstance(must,str) else False:
@@ -243,7 +271,7 @@ def compile_c_requirement(document):
         raise ValueError("from must identify one capability")
     cap, selectors=next(iter(source.items()))
     native=_mapping(cap)
-    obj={"capability":cap,"select":_selectors(selectors,native)}
+    obj=_source_object(cap,selectors,native)
     must=document["must"]
     has_fields=isinstance(must,dict)
     token,raw_fields=_requirement(must,has_fields)
