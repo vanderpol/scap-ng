@@ -1,0 +1,29 @@
+# #245 research policy: three separately source-backed kinds of *objectless*
+# A native system checks, composed as a NEW policy. Not an original DISA Rule.
+# No Object or fake singleton identifier should appear after C lowering.
+id: c-research-windows-objectless-combined
+checks:
+  operating_system_is_windows:
+    from:
+      independent.family: {}
+    must:
+      every_item:
+        family: windows
+  password_history_at_least_24:
+    from:
+      windows.passwordpolicy: {}
+    must:
+      every_item:
+        password_hist_len:
+          greater_than_or_equal: 24
+  audit_file_share_success_failure:
+    from:
+      windows.auditeventpolicysubcategories: {}
+    must:
+      every_item:
+        file_share: AUDIT_SUCCESS_FAILURE
+require:
+  every:
+    - check: operating_system_is_windows
+    - check: password_history_at_least_24
+    - check: audit_file_share_success_failure
