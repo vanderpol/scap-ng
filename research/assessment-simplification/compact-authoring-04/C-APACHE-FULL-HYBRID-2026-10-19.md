@@ -73,6 +73,24 @@ The pinned successful CI run packages `apache-sv214268-five-checks-nineteen-deri
 
 **312 focused C tests passed** at [Actions run 39337906612](https://github.com/vanderpol/scap-ng/actions/runs/39337906612), including seven new complete Apache regression cases.
 
+## Follow-up: independently audited value grouping is *not* a textual readability win
+
+The [source-backed folding audit](../../../tools/research_c_variable_folding_safety.py) identified **four** genuine single-consumer, pure-value steps eligible for *presentation* grouping. It deliberately excluded other single-use steps that feed commands/selectors and all shared/reused nodes.
+
+The new [bounded grouping adapter](../../../tools/research_c_apache_grouped_values.py) nests exactly those four steps inside their consumers and restores each original Variable on compilation. [CI run 39338548987](https://github.com/vanderpol/scap-ng/actions/runs/39338548987) passed **319 focused tests**, including adversarial changes to source scope and acquisition behavior. The generated review artifact contains *both* complete forms, with matching source-graph proofs.
+
+| Metric on actual generated Apache YAML | All 19 named | 4 grouped, 15 named |
+| --- | ---: | ---: |
+| Top-level derived-value declarations | 19 | 15 |
+| Total YAML lines | 428 | 428 |
+| UTF-8 bytes | 15,596 | 16,179 |
+| Native Variables reconstructed | 19 | 19 |
+| Original Test/command semantics changed | No | No |
+
+**Decision: do not automatically adopt this grouping as cleaner authoring.** It saves four *top-level names*, but no lines, and adds 583 bytes by nesting metadata. It may be useful as a collapsible graphical *presentation*, but that requires an actual comprehension study and avoids hiding the four downstream command-driving dependencies.
+
+The next promising experiment is to separate compiler-owned source provenance (legacy source IDs/titles/types) from *author-edited* transformations without losing reproducibility, and then compare the complete source-linked example with a real author-facing editor. Do not count invisible/expanded declarations as eliminated work until a non-OVAL author can meaningfully navigate them.
+
 ## Independent assessment
 
 **This is a real C authoring gain beyond `must` renaming.** A reviewer can follow a derived value into the specific command it parameterizes and then the evidence/requirement it supports. The full graph remains exactly OVAL-compatible; we didn't build a new shell collector or Set evaluator.
