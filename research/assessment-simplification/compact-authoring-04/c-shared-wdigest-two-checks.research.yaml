@@ -1,0 +1,27 @@
+# #245 NEW NATIVE C research policy, NOT a converted original STIG Rule.
+# Two independent Test predicates consume the same single Registry selection.
+# The compiler shares the authoring Object ID, not a runtime snapshot/cache.
+id: c-research-wdigest-shared-collection
+observations:
+  wdigest_setting:
+    from:
+      windows.registry:
+        hive: local_machine
+        key: 'SYSTEM\CurrentControlSet\Control\SecurityProviders\Wdigest'
+        name: UseLogonCredential
+checks:
+  value_disabled:
+    observation: wdigest_setting
+    must:
+      every_item:
+        type: dword
+        value: 0
+  contains_dword:
+    observation: wdigest_setting
+    must:
+      any_item:
+        type: dword
+require:
+  every:
+    - check: value_disabled
+    - check: contains_dword
