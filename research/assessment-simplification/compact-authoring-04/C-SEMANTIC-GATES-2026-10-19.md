@@ -55,3 +55,7 @@ For any attempted source migration, gather all consumers of the source State by 
 - **NO-GO:** semantic ambiguity, source population mismatch, ungrounded global reuse, silent coercion, lost parent correlation, lost six-state/error distinction, or a shorter surface that cannot be reversed to a faithful policy/evidence trace.
 
 **Overall status at this checkpoint:** architectural feasibility demonstrated in bounded fixtures; high-value semantic and human readability gates remain open. No new acceptance decision has been taken.
+
+## Bounded cross-Rule consumer census implementation
+
+[Read-only State consumer census](../../../tools/research_c_state_consumers.py) and [focused adversarial tests](../../../tools/test_research_c_state_consumers.py) now enumerate known Test-State and nested Object Set/Filter State consumers across caller-supplied source documents. The synthetic fixture includes a Test in one Rule and an excluding Filter in a different Rule. It records uncertain or unsupported input shapes and intentionally **never returns source-conversion authorization**, even when the caller claims the inventory is complete. It does not independently discover complete upstream OVAL XML documents or authorize any 0740 permission State rewrite. The focused research workflow includes these checks; CI verification should be independently inspected at the exact commit SHA.
