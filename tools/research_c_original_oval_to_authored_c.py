@@ -53,7 +53,8 @@ def project_selection(obj):
     for field,entity in select.items():
         if not isinstance(entity,dict) or set(entity)!={"datatype","operation","value"}:
             reject("SELECTOR_ENTITY_EXPLICIT_TYPE_OR_NIL_REQUIRED")
-        if entity["operation"] not in OPS or not value_is_type(entity["value"],entity["datatype"]):
+        if (entity["operation"] not in ("equals","pattern match")
+            or not value_is_type(entity["value"],entity["datatype"])):
             reject("SELECTOR_OPERATOR_OR_TYPE_UNSUPPORTED")
         # Explicit field mapping is enforced again by the C/A compiler.
         value=deepcopy(entity["value"])
@@ -88,7 +89,12 @@ def project_fields(state):
             reject("STATE_FIELD_SPECIALIZED_COMPARISON")
         value=deepcopy(entity["value"])
         op=OPS[entity["operation"]]
-        out[field]=value if op=="equals" else {"matches_regex":value}
+        if op in ("greater_than","greater_than_or_equal","less_than",
+                  "less_than_or_equal") and type(value) is not int:
+            reject("STATE_ORDERED_COMPARISON_NOT_INTEGER")
+        if op=="matches_regex" and type(value) is not str:
+            reject("STATE_REGEX_EXPECTS_STRING")
+        out[field]=value if op=="equals" else {op:value}
     return out
 
 def _same_source_semantics(original,compiled,obj,states, *, source_singleton_objectless=False):
