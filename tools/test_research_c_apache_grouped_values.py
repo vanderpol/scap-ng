@@ -4,7 +4,10 @@ from copy import deepcopy
 from pathlib import Path
 import sys
 import unittest
+from tempfile import TemporaryDirectory
 import yaml
+
+from generate_c_apache_full_hybrid import export_review
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from research_c_apache_grouped_values import (
@@ -88,6 +91,20 @@ class GroupedApacheC(unittest.TestCase):
             "items_exist"]="optional"
         with self.assertRaises(ValueError):
             prove_grouped_apache(orig,authored)
+
+    def test_raw_yaml_measurement_keeps_unproven_readability_claims_out(self):
+        with TemporaryDirectory() as folder:
+            report=export_review(SOURCE,folder)
+            a=report["presentation_comparison"]["full"]
+            b=report["presentation_comparison"]["grouped"]
+            self.assertEqual(a["visible_derived_value_declarations"],19)
+            self.assertEqual(b["visible_derived_value_declarations"],15)
+            self.assertEqual(a["lines"],b["lines"])
+            self.assertGreaterEqual(b["bytes"],a["bytes"])
+            self.assertTrue(report["presentation_comparison"]["source_graph_equal_in_both"])
+            self.assertFalse(report["presentation_comparison"]["automatic_grouping_promoted"])
+            self.assertFalse(report["presentation_comparison"][
+                "authoring_comprehension_test_completed"])
 
     def test_not_every_single_consumer_may_be_folded(self):
         orig=source()
