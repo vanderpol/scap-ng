@@ -21,6 +21,7 @@ from research_c_hybrid_inline_expectations import (
     INLINE_STAGE,present_inline_expectations,compile_inline_expectations,
     prove_inline_original)
 from research_c_hybrid_must_overlay import reject, NATIVE
+from research_c_source_identity_contract import require_author_binding_catalog
 
 STAGE="C_RESEARCH_OVAL_TYPED_SET_AUTHORING_WITH_PROVENANCE_SIDECAR"
 PROV_STAGE="C_RESEARCH_OVAL_OBJECT_STATE_TEST_VARIABLE_SOURCE_BINDINGS"
@@ -174,11 +175,7 @@ def compile_oval_set_provenance(author,sidecar):
         (author["observations"],obj_map,"observations"),
         (author["expected_values"],st_map,"expected values"),
         (author["checks"],tests_map,"checks")):
-        if (not isinstance(writable,dict) or
-            not isinstance(source_ids,dict) or
-            set(writable)!=set(source_ids) or
-            len(set(source_ids.values()))!=len(source_ids)):
-            reject("source identity bindings missing or duplicated: "+label)
+        require_author_binding_catalog(writable,source_ids,label=label)
     if not isinstance(constants,dict) or not set(constants)<=set(st_map):
         reject("constant provenance source bindings invalid")
     back_objects={alias:source for alias,source in obj_map.items()}
