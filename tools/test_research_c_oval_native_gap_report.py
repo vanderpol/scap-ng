@@ -31,7 +31,7 @@ class NativeCOriginalGapTests(unittest.TestCase):
         self.assertIn("original-oval",r["markdown"].lower().replace(" ","-"))
         self.assertIn("OVAL-Community/SCAP-Self-Assertion",r["markdown"])
         self.assertIn("unix/unix-def_c.xml",r["markdown"])
-        self.assertIn("not an exhaustive",r["markdown"])
+        self.assertIn("not an exhaustive",r["markdown"].lower())
 
     def test_missing_source_definition_and_double_count_fail(self):
         m=fixture()
@@ -64,7 +64,8 @@ class NativeCOriginalGapTests(unittest.TestCase):
 
     def test_all_compatible_no_unsupported_is_a_valid_future_result(self):
         m=fixture()
-        m["native_C_converted"].extend(m.pop("unsupported"))
+        m["native_C_converted"].extend(m["unsupported"])
+        m["unsupported"]=[]
         m["native_C_Definitions"]=4
         m["source_compatible_not_yet_native_C"]=0
         out=gap_report(m)
