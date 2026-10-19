@@ -15,6 +15,13 @@ The newer [**21-test focused CI gate PASS**](https://github.com/vanderpol/scap-n
 
 The results now establish **C architectural feasibility for focused source-backed Linux, Windows and Apache cases** without implementing another OS collector. They **do not** prove all six-STIG migration, original 1.4 XML parity, runtime scanner behavior or cross-OVAL regex identity. An explicit **complete/empty State-bearing Test whose existence passes** remains a semantic-review boundary. The [simple and complex examples review](C-AUTHORING-SAMPLE-REVIEW-2026-10-19.md) clearly distinguishes compiled research examples from narrative-only complex sketches. The separate repository-wide rebaseline smoke remains red in unrelated B source/crosswalk fixture tests; focused C pass is not a global-green claim.
 
+
+## 19 October: source-backed shared-observation direction (research only)
+
+The [Apache shared-observation research checkpoint](C-APACHE-SHARED-OBSERVATIONS-2026-10-19.md) identifies the more consequential readability opportunity: let several requirements consume a versioned, provenance-bearing **observation** instead of exposing every source Variable or repeating discovery. The pinned Apache SV-214268 source contains **19 Variables, five Tests, ten collection declarations and six Variables with multiple direct consumers**. The [read-only census](../../../tools/research_c_shared_observations.py) and [exact-scope evidence binding research](../../../tools/research_c_observation_bindings.py) distinguish a collection request, a collected observation, derived values and Test truth. Added focused tests cover source inventory, non-equivalent command/parameter coalescing, identity across target/snapshot/privilege/source Inputs, independently evaluated consumers and tamper detection. New tests are **not claimed CI-passing** until exact-head workflow verification.
+
+**Do not equate** reusing the original source request/evidence with replacing four different Apache grep commands by a new typed directive reader. The latter could provide larger cross-Rule benefits but needs independently demonstrated Include semantics, file lineage, scope, errors and policy parity; until proved, it is **new native policy**, not lossless imported SCAP 1.4 semantics. A's source-preserving compatibility path remains mandatory.
+
 ## 1. Division of responsibility
 
 ```text
