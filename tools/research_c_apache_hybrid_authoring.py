@@ -28,7 +28,7 @@ EXIST={"one_or_more":"one_or_more","optional":"optional",
        "none":"none","exactly_one":"exactly_one"}
 OP={"pattern_match":"matches_regex","equals":"equals"}
 OP_BACK={v:k for k,v in OP.items()}
-META={"assessment_title","class","id","mode","purpose","specification"}
+META={"assessment_title","class","id","mode","purpose","specification","version"}
 TOP=META|{"evaluate","shared_objects","tests","variables"}
 
 def _no(message):
