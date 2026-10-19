@@ -99,7 +99,12 @@ def _mapping(capability):
         raise ValueError("native capability mapping unsupported")
     return m["native"]
 
-def _typed_fields(fields, native):
+def _typed_fields(fields, native, capability):
+    if isinstance(fields,dict) and "permission_bits" in fields:
+        if capability!="unix.file" or set(fields)!={"permission_bits"}:
+            raise ValueError("permission macro only valid as explicit unix.file Item predicate")
+        from research_c_permissions_macro import lower_no_more_permissive_than
+        return lower_no_more_permissive_than(fields["permission_bits"])["states"]
     if not isinstance(fields,dict) or not fields or len(fields)>MAX_FIELDS:
         raise ValueError("must name 1..100 fields tested on the SAME Item")
     allowed=native["state_field_map"]
@@ -239,7 +244,7 @@ def compile_c_requirement(document):
     must=document["must"]
     has_fields=isinstance(must,dict)
     token,raw_fields=_requirement(must,has_fields)
-    states=_typed_fields(raw_fields,native) if has_fields else []
+    states=_typed_fields(raw_fields,native,cap) if has_fields else []
     result={"capability":cap,"object":obj,"require":token}
     if states:
         result["states"]=states
