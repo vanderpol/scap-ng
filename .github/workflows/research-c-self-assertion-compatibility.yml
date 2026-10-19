@@ -1,0 +1,108 @@
+name: 0.4-C source-backed Self-Assertion compatibility review
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-c-self-assertion-compatibility.yml'
+      - 'tools/research_c_oval_self_assertion_bridge.py'
+      - 'tools/test_research_c_oval_self_assertion_bridge.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SCAP_NG_OVAL_SCHEMA_ROOT: oval-language/oval-schemas
+
+jobs:
+  source-backed-c-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out current SCAP-NG main
+        uses: actions/checkout@v4
+        with:
+          path: scap-ng
+          persist-credentials: false
+      - name: Check out pinned original OVAL 5.12.3 Self-Assertion
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - name: Check out OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify original source identity
+        run: |
+          set -euo pipefail
+          test "$(git -C original-oval rev-parse HEAD)" = "e3538595c5083b9c34d937a81d319234df9bbfaa"
+          test -d original-oval/SCAP_1.4/OVAL_Test_Content
+      - name: Install parser prerequisites
+        run: python -m pip install 'PyYAML>=6,<7' 'lxml>=5,<7' 'jsonschema>=4,<5'
+      - name: Run pinned 0.3 source/OVAL semantic roundtrips (does not claim C parity)
+        run: |
+          python scap-ng/tools/scap_ng_roundtrip_v003/roundtrip_corpus_v003.py \
+            --corpus original-oval/SCAP_1.4/OVAL_Test_Content \
+            --out a-roundtrip \
+            --report a-roundtrip.json \
+            --inventory-only > a-roundtrip-summary.json
+      - name: Build original-comment-preserving C review package and coverage manifest
+        run: |
+          python scap-ng/tools/research_c_oval_self_assertion_bridge.py \
+            --corpus original-oval/SCAP_1.4/OVAL_Test_Content \
+            --report a-roundtrip.json --native-out a-roundtrip \
+            --output c-review > c-review-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          source=json.loads(Path("a-roundtrip.json").read_text())
+          output=json.loads(Path("c-review/manifest.json").read_text())
+          assert source["definitions"]==output["source_definition_count"]
+          assert (output["A_source_parity_review_definitions"]+
+                  output["failed_A_roundtrip_or_unsupported_definitions"]==
+                  output["source_definition_count"])
+          assert output["native_0_4_C_converted_definitions"]==0
+          assert output["scanner_execution_parity_proven"] is False
+          print("Original-OVAL source accounting:", output["source_definition_count"],
+                "definitions, A-compatible review",
+                output["A_source_parity_review_definitions"],
+                "unsupported/failed",output["failed_A_roundtrip_or_unsupported_definitions"])
+          print("True native 0.4-C conversions: 0; this is a source-preserving A review.")
+          PY
+      - name: Hash and archive review outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          root=Path("c-review")
+          with (root/"file-sha256.txt").open("w",encoding="utf-8") as fd:
+              for p in sorted(root.rglob("*.json")):
+                  fd.write(hashlib.sha256(p.read_bytes()).hexdigest()+"  "+p.relative_to(root).as_posix()+"\n")
+          PY
+          tar -czf c-review-source-backed.tar.gz c-review a-roundtrip.json c-review-summary.json
+          sha256sum c-review-source-backed.tar.gz > c-review-source-backed.sha256
+      - name: Upload original-source-backed review (NOT native C conversion)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-original-oval-compatibility-review-not-native-conversion
+          path: |
+            c-review/
+            c-review-summary.json
+            c-review-source-backed.tar.gz
+            c-review-source-backed.sha256
+            a-roundtrip.json
+          if-no-files-found: warn
+          retention-days: 14
