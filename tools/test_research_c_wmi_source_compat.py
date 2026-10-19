@@ -43,7 +43,10 @@ class CWindowsWmiAbsenceProof(unittest.TestCase):
         c=evaluate_c_wmi_absence(self.c,witness)
         previous=evaluate_json(self.payload,{PROVIDER:witness}).result
         self.assertEqual(c,expected)
-        self.assertEqual(previous,expected)
+        # The earlier B fixture adapter uses OVAL's space-delimited
+        # "not applicable"; the shared A/C result contract uses underscores.
+        # Compare normalized status spelling, never reinterpret truth value.
+        self.assertEqual(previous.replace(" ","_"),expected)
         return c
 
     def test_same_capability_and_source_query_without_new_implementation(self):
