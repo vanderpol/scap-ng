@@ -28,10 +28,23 @@ class NativeCOriginalGapTests(unittest.TestCase):
         self.assertEqual((r["converted"],r["unsupported"]),(2,2))
         self.assertEqual(r["categories"],{"OBJECT_ADVANCED_OR_UNREVIEWED_METADATA":1,
                                           "MULTI_TEST":1})
+        self.assertEqual(r["selected_multi_test_categories"],
+                         {"SELECTED_ROUTE_NOT_ATTEMPTED":1})
         self.assertIn("original-oval",r["markdown"].lower().replace(" ","-"))
         self.assertIn("OVAL-Community/SCAP-Self-Assertion",r["markdown"])
         self.assertIn("unix/unix-def_c.xml",r["markdown"])
         self.assertIn("not an exhaustive",r["markdown"].lower())
+
+    def test_multi_test_nested_selected_blockers_are_not_double_counted(self):
+        m=fixture()
+        m["unsupported"][1]["reason"]=(
+            "MULTI_TEST: SOURCE_OBJECTS_NOT_SINGLETON; "
+            "SELECTED: SHARED_SELECTED_SOURCE_INVENTORY_UNSUPPORTED")
+        report=gap_report(m)
+        self.assertEqual(report["categories"]["MULTI_TEST"],1)
+        self.assertEqual(report["selected_multi_test_categories"],{
+            "SHARED_SELECTED_SOURCE_INVENTORY_UNSUPPORTED":1})
+        self.assertIn("Selected multi-Test blocker",report["markdown"])
 
     def test_missing_source_definition_and_double_count_fail(self):
         m=fixture()
