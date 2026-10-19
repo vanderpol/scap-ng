@@ -100,9 +100,10 @@ class ObservationValueResearch(unittest.TestCase):
             ("not collected","unknown"),("incomplete","unknown"),
         ):
             with self.subTest(status=status):
-                snapshot=normalize({"query":using,"status":status,"records":[{
+                records=[{
                   "stdout_line":["/usr/sbin/httpd -DFOREGROUND"],
-                  "stderr_line":[],"exit_status":0}]},**using)
+                  "stderr_line":[],"exit_status":0}] if status=="incomplete" else []
+                snapshot=normalize({"query":using,"status":status,"records":records},**using)
                 got=evaluate_source_variable_plan(
                     plan_source_variables(clone),
                     {PROVIDER:{"acquisitions":[snapshot]}})["variable_values"]
