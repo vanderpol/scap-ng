@@ -103,6 +103,25 @@ jobs:
           print("Pinned original OVAL source blockers exactly match five v003 baseline exceptions.")
           print("True native 0.4-C conversions: 0; this is a source-preserving A review.")
           PY
+      - name: Compile independently authored C subset of every source-compatible original OVAL Definition
+        run: |
+          python scap-ng/tools/research_c_original_oval_to_authored_c.py \
+            --a-review c-review --output c-native > c-native-summary.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          summary=json.loads(Path("c-native/conversion-manifest.json").read_text())
+          assert summary["A_compatible_Definitions_seen"]==162
+          assert summary["native_C_Definitions"]>=1, (
+              "regression: no source-independent native C compiler proof")
+          assert summary["native_C_Definitions"]+summary[
+              "source_compatible_not_yet_native_C"]==162
+          print("Independently compiled original OVAL Definitions in native 0.4-C authoring:",
+                summary["native_C_Definitions"])
+          print("Fail-closed source-compatible A-only remainder:",
+                summary["source_compatible_not_yet_native_C"])
+          print("Scanner and full expression/Set/Filter/Variable runtime parity NOT asserted")
+          PY
       - name: Hash and archive review outputs
         shell: bash
         run: |
@@ -115,7 +134,7 @@ jobs:
               for p in sorted(root.rglob("*.json")):
                   fd.write(hashlib.sha256(p.read_bytes()).hexdigest()+"  "+p.relative_to(root).as_posix()+"\n")
           PY
-          tar -czf c-review-source-backed.tar.gz c-review a-roundtrip.json c-review-summary.json
+          tar -czf c-review-source-backed.tar.gz c-review c-native a-roundtrip.json c-review-summary.json c-native-summary.json
           sha256sum c-review-source-backed.tar.gz > c-review-source-backed.sha256
       - name: Upload original-source-backed review (NOT native C conversion)
         if: always()
@@ -124,6 +143,8 @@ jobs:
           name: c-original-oval-compatibility-review-not-native-conversion
           path: |
             c-review/
+            c-native/
+            c-native-summary.json
             c-review-summary.json
             c-review-source-backed.tar.gz
             c-review-source-backed.sha256
