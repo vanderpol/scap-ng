@@ -85,8 +85,21 @@ def evaluate_loaded_files_fusion(plan,evidence,*,resolved_command):
         return {"status":status,"values":list(seq)}
     def both(status):
         return {"paths":envelope(status),"merged":envelope(status)}
-    if type(resolved_command) is not str or not resolved_command or len(resolved_command)>MAX_VALUE:
+    if not isinstance(resolved_command,dict) or set(resolved_command)!={
+        "source_variable","status","values"
+    } or resolved_command["source_variable"]!=plan["dynamic_command_source_id"]:
+        return both("error")
+    if resolved_command["status"]!="values":
+        if resolved_command["values"]!=[]:
+            return both("error")
+        return both(resolved_command["status"] if resolved_command["status"] in (
+            "unknown","error","not_applicable","no_values") else "error")
+    commands=resolved_command["values"]
+    if not isinstance(commands,list) or len(commands)!=1:
         return both("unknown")
+    command=commands[0]
+    if type(command) is not str or not command or len(command)>MAX_VALUE:
+        return both("error")
     got=evidence.get(PROVIDER)
     if got is None:return both("unknown")
     if not isinstance(got,dict) or set(got)!={"acquisitions"} or (
@@ -94,7 +107,7 @@ def evaluate_loaded_files_fusion(plan,evidence,*,resolved_command):
     ):
         return both("error")
     collect=plan["collect"]
-    using={"command":resolved_command,"shell":collect["shell"],
+    using={"command":command,"shell":collect["shell"],
            "error_if_exit_status_not_0":collect["error_if_exit_status_not_0"],
            "error_if_stderr_exists":collect["error_if_stderr_exists"]}
     matching=[row for row in got["acquisitions"] if isinstance(row,dict) and
