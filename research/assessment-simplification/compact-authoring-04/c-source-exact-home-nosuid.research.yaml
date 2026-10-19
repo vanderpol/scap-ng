@@ -1,0 +1,17 @@
+# Refs #245: independent, hand-authored 0.4-C research witness.
+# NOT valid accepted SCAP-NG 0.4-A syntax and NOT a live scanner policy.
+# Source: research/assessment-simplification/compact-authoring-04/runtime-slice/home-nosuid.assessment.json
+#
+# Important: preserve the imported source regex; this may select more than an
+# exact /home mount. The intentionally "cleaner" where equals /home C native
+# example in the design document is a NEW policy, not a faithful conversion.
+id: research-c-source-exact-rhel-home-nosuid
+require:
+  each: linux.partition
+  where:
+    mount_point:
+      matches_regex: '.*\/home'
+  minimum_items: 1
+  all_found_items:
+    mount_options:
+      contains: nosuid
