@@ -50,6 +50,8 @@ def _ref_expr(node,lookup,to_c,depth=0):
     if isinstance(node,list):
         return [_ref_expr(x,lookup,to_c,depth+1) for x in node]
     if not isinstance(node,dict):return deepcopy(node)
+    if "inline_derived_value" in node:
+        _no("nested derived-value declarations prohibited in acquisitions")
     if len(node)==1:
         key,value=next(iter(node.items()))
         src_key="variable" if to_c else "use"
