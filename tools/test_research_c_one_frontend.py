@@ -108,6 +108,17 @@ class OneCFrontendShape(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"unknown named"):
             normalize_c_frontend(c)
 
+    def test_duplicate_source_identity_is_not_silently_reused_under_new_alias(self):
+        c=sample("c-source-exact-windows-rdp-rights.research.yaml")
+        c["checks"]["standalone"]["source_test"]=c["checks"]["domain_joined_non_dc"]["source_test"]
+        with self.assertRaisesRegex(ValueError,"duplicate source Test"):
+            normalize_c_frontend(c)
+        c=sample("c-source-exact-windows-rdp-rights.research.yaml")
+        c["observations"]["denied_remote_logon_trustees"]["source_object"]=(
+            c["observations"]["system_role"]["source_object"])
+        with self.assertRaisesRegex(ValueError,"duplicate source Object"):
+            normalize_c_frontend(c)
+
     def test_boolean_ambiguity_is_parse_error_not_a_second_check(self):
         for ambiguous in ("on: subject\n", "yes: subject\n"):
             with self.assertRaisesRegex(ValueError,"mapping key must be a string"):
