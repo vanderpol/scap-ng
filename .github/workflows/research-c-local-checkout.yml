@@ -1,0 +1,61 @@
+name: 0.4-C full tracked-source checkout snapshot for local testing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/research-c-local-checkout.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: c-local-checkout-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export-exact-main-tree:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Create reproducible tracked-source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/c-checkout"
+          git status --porcelain
+          git archive --format=tar HEAD | gzip -1 > "$RUNNER_TEMP/c-checkout/scap-ng-source.tar.gz"
+          tar -tzf "$RUNNER_TEMP/c-checkout/scap-ng-source.tar.gz" > /dev/null
+          printf '{"commit_sha":"%s","tracked_file_count":%s,"archive_bytes":%s,"source":"git-archive-HEAD","branch":"%s"}\n' \
+            "$GITHUB_SHA" \
+            "$(git ls-files | wc -l)" \
+            "$(stat -c '%s' "$RUNNER_TEMP/c-checkout/scap-ng-source.tar.gz")" \
+            "$GITHUB_REF_NAME" > "$RUNNER_TEMP/c-checkout/snapshot.json"
+          sha256sum "$RUNNER_TEMP/c-checkout/scap-ng-source.tar.gz" > "$RUNNER_TEMP/c-checkout/snapshot.sha256"
+          cat "$RUNNER_TEMP/c-checkout/snapshot.json"
+          {
+            echo "# C local checkout source snapshot"
+            echo
+            echo "Commit: \`$GITHUB_SHA\`"
+            echo
+            echo "Tracked source files: $(git ls-files | wc -l)"
+            echo
+            echo "Compressed archive bytes: $(stat -c '%s' "$RUNNER_TEMP/c-checkout/scap-ng-source.tar.gz")"
+            echo
+            echo "This archive includes the tracked repository tree at HEAD, but not Git history or untracked build products."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload source for local Python testing
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-full-source-checkout
+          path: |
+            ${{ runner.temp }}/c-checkout/scap-ng-source.tar.gz
+            ${{ runner.temp }}/c-checkout/snapshot.json
+            ${{ runner.temp }}/c-checkout/snapshot.sha256
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 14
