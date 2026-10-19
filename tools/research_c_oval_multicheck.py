@@ -11,7 +11,7 @@ from copy import deepcopy
 import re
 
 from research_c_original_oval_to_authored_c import (
-    NotNativeCConvertible, reject, project_fields, _entities, _same_source_semantics, OPS)
+    NotNativeCConvertible, reject, project_selection, project_fields, _entities, _same_source_semantics, OPS)
 from research_c_require_language import _mapping
 from research_c_unified_compiler import compile_c_unified
 
@@ -161,3 +161,108 @@ def convert_objectless_many(a):
             "A_source_semantic_projection_passed":True,
             "OVAL_actual_scanner_parity_proven":False}
     return result
+
+
+def convert_selected_shared_many(a):
+    """Conservatively lower one genuine OVAL Object selected by 2+ Tests.
+
+    C names the observation once, preserves its original Object identity,
+    and uses the established unified compiler for each typed Test and AND.
+    No source Variables, Sets, Filters, behaviors, shared States, unsupported
+    existence/matching or hidden source attributes may be discarded.
+    """
+    if not isinstance(a,dict) or a.get("mode")!="automated":
+        reject("SHARED_SELECTED_ASSESSMENT_NOT_AUTOMATED")
+    if a.get("variables"):
+        reject("VARIABLE_SOURCE_GRAPH_NEEDS_COMPATIBILITY")
+    tests=a.get("tests") or {}
+    objects=a.get("objects") or {}
+    states=a.get("states") or {}
+    if (not isinstance(tests,dict) or not 2<=len(tests)<=64 or
+        not isinstance(objects,dict) or len(objects)!=1 or
+        not isinstance(states,dict)):
+        reject("SHARED_SELECTED_SOURCE_INVENTORY_UNSUPPORTED")
+    oid,obj=next(iter(objects.items()))
+    if (not isinstance(obj,dict) or
+        set(obj)!={"capability","object_title","select"}):
+        reject("SHARED_SELECTED_OBJECT_HAS_COMPLEX_COLLECTION")
+    selectors=project_selection(obj)
+    cap=obj["capability"]
+    used_states=set()
+    checks={}
+    reverse={}
+    entities={}
+    for tid,t in sorted(tests.items()):
+        if (not isinstance(t,dict) or set(t)-{
+            "capability","check","check_existence","object",
+            "states","reported_elements","test_title"}):
+            reject("SHARED_SELECTED_TEST_HAS_EXTRA_SOURCE_FIELDS")
+        if (t.get("object")!=oid or t.get("capability")!=cap or
+            t.get("reported_elements")!="all" or
+            t.get("check")!="all" or
+            t.get("check_existence")!="at_least_one_exists"):
+            reject("SHARED_SELECTED_TEST_HAS_DIFFERENT_SOURCE_SCOPE")
+        refs=t.get("states")
+        if not isinstance(refs,list) or len(refs)!=1 or refs[0] not in states:
+            reject("SHARED_SELECTED_TEST_NEEDS_ONE_TYPED_STATE")
+        sid=refs[0]
+        if sid in used_states:
+            reject("SHARED_SELECTED_STATE_REUSE_UNPROVEN")
+        used_states.add(sid)
+        st=states[sid]
+        if (not isinstance(st,dict) or
+            set(st)!={"capability","state_title","state"} or
+            st["capability"]!=cap):
+            reject("SHARED_SELECTED_STATE_METADATA_UNSUPPORTED")
+        fields=project_fields(st["state"])
+        alias=alias_of(t.get("test_title"),fields)
+        if alias in checks or len(alias)>63:
+            reject("SHARED_SELECTED_TEST_ALIAS_COLLISION_OR_TOO_LONG")
+        checks[alias]={"observation":"original_collection",
+                       "source_test":tid,
+                       "must":{"every_item":fields}}
+        reverse[tid]=alias
+        entities[tid]=_entities(st["state"])
+    if used_states!=set(states):
+        reject("SHARED_SELECTED_UNUSED_SOURCE_STATES")
+    evaluate=a.get("evaluate")
+    if (not isinstance(evaluate,dict) or set(evaluate)!={"all"} or
+        not isinstance(evaluate["all"],list)):
+        reject("SHARED_SELECTED_SOURCE_AND_REQUIRED")
+    ordered=[]
+    for part in evaluate["all"]:
+        if (not isinstance(part,dict) or set(part)!={"test"} or
+            part["test"] not in reverse):
+            reject("SHARED_SELECTED_UNRESOLVED_OR_NESTED_CRITERIA")
+        ordered.append(reverse[part["test"]])
+    if len(ordered)!=len(tests) or len(set(ordered))!=len(tests):
+        reject("SHARED_SELECTED_SOURCE_CHECK_INVENTORY_CHANGED")
+    doc={"id":a["id"],
+         "observations":{"original_collection":{
+             "source_object":oid,"from":{cap:selectors}}},
+         "checks":checks,
+         "require":{"every":[{"check":alias} for alias in ordered]}}
+    try:
+        compiled=compile_c_unified(doc)
+    except (ValueError,KeyError,TypeError) as exc:
+        reject("SHARED_SELECTED_UNIFIED_C_NOT_SUPPORTED: "+str(exc))
+    if (set(compiled["tests"])!=set(checks) or
+        set(compiled["shared_objects"])!={oid} or
+        compiled.get("shared_singletons")):
+        reject("SHARED_SELECTED_COMPILER_CHANGED_COLLECTION_IDENTITY")
+    for tid,alias in reverse.items():
+        output=deepcopy(compiled["tests"][alias])
+        if output.get("object")!=oid:
+            reject("SHARED_SELECTED_TEST_NO_LONGER_REFERENCES_ONE_OBJECT")
+        output["object"]=deepcopy(compiled["shared_objects"][oid])
+        _same_source_semantics(tests[tid],output,obj,entities[tid])
+    return {"stage":"NATIVE_C_SHARED_SELECTED_MULTI_SOURCE_COMPATIBILITY_PROVED",
+            "source_assessment_id":a["id"],
+            "authored_c":doc,
+            "source_test_crosswalk":{alias:tid for tid,alias in reverse.items()},
+            "source_test_documentation":{
+                alias:tests[tid]["test_title"] for tid,alias in reverse.items()},
+            "native_c_compiled_tests":deepcopy(compiled["tests"]),
+            "C_uses_one_shared_observation":True,
+            "A_source_semantic_projection_passed":True,
+            "OVAL_actual_scanner_parity_proven":False}
