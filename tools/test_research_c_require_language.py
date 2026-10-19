@@ -158,7 +158,7 @@ class CandidateCGrammar(unittest.TestCase):
             "from:\\n  linux.partition:\\n    mount_point: /home\\nmust:\\n  every_item: {mount_point: /home}\\n  every_item: {mount_point: /var}\\n",
             "from: {linux.partition: {mount_point: /home}}\\nmust: {every_item: {mount_point: /home}}\\n---\\nextra: 5\\n",
         ):
-            raw=raw.replace("\\\\n","\\n")
+            raw=raw.replace("\\n","\n")
             with self.subTest(raw=raw):
                 with self.assertRaises(ValueError):
                     parse_c_yaml(raw)
@@ -166,11 +166,11 @@ class CandidateCGrammar(unittest.TestCase):
     def test_numeric_regex_is_not_valid_predicate_or_selector(self):
         original=deepcopy(WIN)
         original["must"]={"every_item":{"value":{"matches_regex":0}}}
-        with self.assertRaisesRegex(ValueError,"regex"):
+        with self.assertRaisesRegex(ValueError,"(regex|regular expression)"):
             compiled(original)
         original=deepcopy(LINUX)
         original["from"]["linux.partition"]["mount_point"]={"matches_regex":101}
-        with self.assertRaisesRegex(ValueError,"regex"):
+        with self.assertRaisesRegex(ValueError,"(regex|regular expression)"):
             compiled(original)
 
     def test_incomplete_empty_not_equal_complete_empty(self):
