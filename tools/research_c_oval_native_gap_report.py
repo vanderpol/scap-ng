@@ -13,7 +13,7 @@ import re
 
 ORIGINAL="https://github.com/OVAL-Community/SCAP-Self-Assertion/blob/e3538595c5083b9c34d937a81d319234df9bbfaa/SCAP_1.4/OVAL_Test_Content/"
 CODE="https://github.com/vanderpol/scap-ng/blob/main/tools/research_c_original_oval_to_authored_c.py"
-SOURCE_PATH=re.compile(r"^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+\.xml$")
+SOURCE_PATH=re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.-]*/[a-zA-Z0-9][a-zA-Z0-9_.-]*\.xml$")
 REASON=re.compile(r"^[A-Z][A-Z0-9_]*")
 
 def gap_report(manifest, *, min_expected_total=None):
