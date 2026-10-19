@@ -271,3 +271,110 @@ def convert_selected_shared_many(a):
             "C_uses_one_shared_observation":True,
             "A_source_semantic_projection_passed":True,
             "OVAL_actual_scanner_parity_proven":False}
+
+
+def convert_distinct_selected_many(a):
+    """Original OVAL AND with 2+ independent, explicitly selected Objects.
+
+    Use ONE C frontend, not a second execution model. Fail closed unless
+    every Object and State belongs to exactly one source Test, and there
+    are no Variables, Sets, Filters, behavior side effects or hidden dataflow.
+    """
+    if not isinstance(a,dict) or a.get("mode")!="automated":
+        reject("MULTI_DISTINCT_ASSESSMENT_UNSUPPORTED")
+    if a.get("variables"):
+        reject("VARIABLE_SOURCE_GRAPH_NEEDS_COMPATIBILITY")
+    tests=a.get("tests") or {}
+    objects=a.get("objects") or {}
+    states=a.get("states") or {}
+    if (not isinstance(tests,dict) or not 2<=len(tests)<=64 or
+        not isinstance(objects,dict) or not isinstance(states,dict)):
+        reject("MULTI_DISTINCT_BOUNDED_SOURCE_INVENTORY_REQUIRED")
+    source_to_alias={}
+    checks={}
+    used_objects=set()
+    used_states=set()
+    comparisons={}
+    for tid,t in sorted(tests.items()):
+        if (not isinstance(t,dict) or set(t)-{
+            "capability","check","check_existence","object","states",
+            "reported_elements","test_title"} or
+            t.get("check")!="all" or
+            t.get("check_existence")!="at_least_one_exists" or
+            t.get("reported_elements")!="all"):
+            reject("MULTI_DISTINCT_TEST_QUANTIFIER_OR_ATTRS_UNSUPPORTED")
+        oid=t.get("object")
+        if oid not in objects or oid in used_objects:
+            reject("MULTI_DISTINCT_OBJECT_MISSING_OR_SHARED")
+        used_objects.add(oid)
+        obj=objects[oid]
+        if (not isinstance(obj,dict) or
+            set(obj)!={"capability","object_title","select"} or
+            obj["capability"]!=t.get("capability")):
+            reject("MULTI_DISTINCT_OBJECT_SET_FILTER_OR_CAPABILITY_UNSUPPORTED")
+        selectors=project_selection(obj)
+        refs=t.get("states")
+        if (not isinstance(refs,list) or len(refs)!=1 or
+            refs[0] not in states or refs[0] in used_states):
+            reject("MULTI_DISTINCT_STATE_REUSE_OR_MISSING")
+        sid=refs[0]
+        used_states.add(sid)
+        state=states[sid]
+        if (not isinstance(state,dict) or
+            set(state)!={"capability","state_title","state"} or
+            state["capability"]!=t["capability"]):
+            reject("MULTI_DISTINCT_STATE_METADATA_UNSUPPORTED")
+        fields=project_fields(state["state"])
+        alias=alias_of(t.get("test_title"),fields)
+        if alias in checks:
+            # Same State field with a different source Test condition:
+            # use the full source Test purpose, not an ambiguous field ID.
+            alias=ID.sub("_",t["test_title"].lower()).strip("_")
+        if (alias in checks or len(alias)>63 or
+            not re.fullmatch(r"[a-z][a-z0-9_]*",alias)):
+            reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
+        checks[alias]={"source_test":tid,
+                       "from":{t["capability"]:selectors},
+                       "must":{"every_item":fields}}
+        source_to_alias[tid]=alias
+        comparisons[tid]=(obj,_entities(state["state"]))
+    if used_objects!=set(objects) or used_states!=set(states):
+        reject("MULTI_DISTINCT_EXTRA_SOURCE_OBJECT_OR_STATE")
+    tree=a.get("evaluate")
+    if (not isinstance(tree,dict) or set(tree)!={"all"} or
+        not isinstance(tree["all"],list)):
+        reject("MULTI_DISTINCT_REQUIRE_EXPLICIT_AND")
+    ordered=[]
+    for branch in tree["all"]:
+        if (not isinstance(branch,dict) or set(branch)!={"test"} or
+            branch["test"] not in source_to_alias):
+            reject("MULTI_DISTINCT_UNPROVEN_NESTED_SOURCE_LOGIC")
+        ordered.append(source_to_alias[branch["test"]])
+    if len(ordered)!=len(tests) or len(set(ordered))!=len(tests):
+        reject("MULTI_DISTINCT_SOURCE_TEST_COVERAGE_DRIFT")
+    c={"id":a["id"],"checks":checks,
+       "require":{"every":[{"check":alias} for alias in ordered]}}
+    try:
+        compiled=compile_c_unified(c)
+    except (ValueError,TypeError,KeyError) as exc:
+        reject("MULTI_DISTINCT_UNIFIED_COMPILER_REJECTED: "+str(exc))
+    if (set(compiled["tests"])!=set(checks) or
+        compiled.get("shared_objects") or compiled.get("shared_singletons")):
+        reject("MULTI_DISTINCT_COMPILER_CONFLATED_SOURCE_OBJECTS")
+    for tid,alias in source_to_alias.items():
+        out=compiled["tests"][alias]
+        obj,original_entities=comparisons[tid]
+        _same_source_semantics(tests[tid],out,obj,original_entities)
+    return {
+        "stage":"NATIVE_C_DISTINCT_MULTI_SOURCE_COMPATIBILITY_PROVED",
+        "source_assessment_id":a["id"],
+        "authored_c":c,
+        "source_test_crosswalk":{alias:tid for tid,alias in source_to_alias.items()},
+        "source_test_documentation":{
+            alias:tests[tid]["test_title"]
+            for tid,alias in source_to_alias.items()},
+        "native_c_compiled_tests":deepcopy(compiled["tests"]),
+        "C_uses_independent_selected_objects":True,
+        "A_source_semantic_projection_passed":True,
+        "OVAL_actual_scanner_parity_proven":False,
+    }
