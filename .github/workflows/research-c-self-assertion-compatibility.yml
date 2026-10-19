@@ -8,6 +8,8 @@ on:
       - 'tools/research_c_oval_self_assertion_bridge.py'
       - 'tools/test_research_c_oval_self_assertion_bridge.py'
       - 'tools/research_c_original_oval_to_authored_c.py'
+      - 'tools/research_c_oval_native_gap_report.py'
+      - 'tools/test_research_c_oval_native_gap_report.py'
       - 'tools/research_c_oval_multicheck.py'
       - 'tools/research_c_hybrid_must_overlay.py'
       - 'tools/test_research_c_hybrid_must_overlay.py'
@@ -279,8 +281,8 @@ jobs:
           from pathlib import Path
           summary=json.loads(Path("c-native/conversion-manifest.json").read_text())
           assert summary["A_compatible_Definitions_seen"]==162
-          assert summary["native_C_Definitions"]>=1, (
-              "regression: no source-independent native C compiler proof")
+          assert summary["native_C_Definitions"]>=34, (
+              "regression: fewer than 34 source-verified native C Definitions")
           assert summary["native_C_Definitions"]+summary[
               "source_compatible_not_yet_native_C"]==162
           print("Independently compiled original OVAL Definitions in native 0.4-C authoring:",
@@ -289,6 +291,11 @@ jobs:
                 summary["source_compatible_not_yet_native_C"])
           print("Scanner and full expression/Set/Filter/Variable runtime parity NOT asserted")
           PY
+          python scap-ng/tools/research_c_oval_native_gap_report.py \
+            --manifest c-native/conversion-manifest.json \
+            --output c-native/first-rejection-gap-report.md --expected-total 162
+          cat c-native/first-rejection-gap-report.md >> "$GITHUB_STEP_SUMMARY"
+          sed -n '1,32p' c-native/first-rejection-gap-report.md
       - name: Verify permanent GitHub sample files against generated original-source C
         run: |
           python scap-ng/tools/verify_c_published_original_oval_examples.py \
