@@ -293,8 +293,8 @@ def batch_convert_review_folder(review,output):
                source["A_source_compatibility_fallback"]["id"]).replace("\n"," ")
         original_docs=c.get("source_test_documentation") or {}
         check_comments="".join(
-            "# Check "+str(alias)+": "+str(description).replace("\\n"," ").replace(
-                "\\r"," ")+"\\n"
+            "# Check "+str(alias)+": "+str(description).replace(chr(10)," ").replace(
+                chr(13)," ")+chr(10)
             for alias,description in sorted(original_docs.items()))
         yaml_txt=("# 0.4-C research only. Exact A Test projection, NOT scanner parity.\n"
                   +"# Original source: "+rel+"\n"
