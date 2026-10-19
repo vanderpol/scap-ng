@@ -44,6 +44,12 @@ The key discriminator is **ownership of the evidence and its population**. An in
 
 **What this proves:** where a simpler primary authoring *view* can preserve every source reference and where it must expose a dependency. **What it does not prove:** native C compilation of this view, reductions in runtime commands, equivalence of the 19-Variable evaluation graph, complete SCAP 1.4 Set/Filter semantics, OVAL scanner results, or a new accepted language feature.
 
+## Verified Apache size of this opportunity
+
+At the pinned **Apache SV-214268** source fixture, the read-only audit found **19 named Variables, four private inline Object acquisitions (four simple derived-value presentation cards), two named-shared Object value-source sites, and zero unclassified Object expression contexts**. This shows a genuine but **limited** authoring improvement: a private acquisition can appear alongside the value it creates, but the other Variable/DAG responsibilities do not disappear. The audit does **not** claim four source Variables can be deleted, and it cannot justify combining the ten distinct Apache collection contracts.
+
+**Verified focused C CI:** [232 tests passed, including all seven scope tests and the real 19-Variable source](https://github.com/vanderpol/scap-ng/actions/runs/39311727939) at commit `6d0708de2d8350ce4656adf047384d0f9a34e68f`. These are graph/view and bounded fixture tests, **not** original OVAL runtime parity or C language acceptance.
+
 ## Next meaningful experiment
 
 Compare the private-derived-value view and the current A source for one real Apache Variable that owns an Object, then for a dynamic-command Variable with a nested Object. Require (1) exact source-object/variable/selector hashes and identity, (2) independent typed value outcomes on complete/empty/incomplete/error evidence, (3) unchanged downstream Test existence, matching and trace, and (4) a blind auditor explanation of which population supplies which value. If these checks fail, **keep the original explicit graph instead of adding syntactic sugar**.
