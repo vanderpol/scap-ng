@@ -1,0 +1,53 @@
+# 0.4-C research only. Exact A Test projection, NOT scanner parity.
+# Source revision: OVAL-Community/SCAP-Self-Assertion@e3538595c5083b9c34d937a81d319234df9bbfaa
+# Original: iosxe/iosxe-def_version_test.xml
+# Definition: oval:navy.navwar.niwcatlantic.scc.iosxe:def:1
+# Original test family: Five IOS-XE version fields, mixed typed integer and string regex operations
+id: roundtrip.oval-navy-navwar-niwcatlantic-scc-iosxe-def-1
+observations:
+  system_status:
+    from:
+      iosxe.version: {}
+checks:
+  major_release:
+    observation: system_status
+    source_test: test-test-iosxe-version-test-major-release-operation-greater-than
+    must:
+      every_item:
+        major_release:
+          greater_than: 0
+  rebuild:
+    observation: system_status
+    source_test: test-test-iosxe-version-test-rebuild-operation-greater-than-or-equal
+    must:
+      every_item:
+        rebuild:
+          greater_than_or_equal: 0
+  release:
+    observation: system_status
+    source_test: test-test-iosxe-version-test-release-operation-greater-than-or-equal
+    must:
+      every_item:
+        release:
+          greater_than_or_equal: 0
+  train:
+    observation: system_status
+    source_test: test-test-iosxe-version-test-train-pattern-match
+    must:
+      every_item:
+        train:
+          matches_regex: .*
+  version_string:
+    observation: system_status
+    source_test: test-test-iosxe-version-test-version-string-pattern-match
+    must:
+      every_item:
+        version_string:
+          matches_regex: .+
+require:
+  every:
+  - check: version_string
+  - check: major_release
+  - check: release
+  - check: rebuild
+  - check: train
