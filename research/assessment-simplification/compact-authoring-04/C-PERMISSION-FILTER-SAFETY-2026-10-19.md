@@ -27,8 +27,12 @@ For the **exact proven State shape only**, the research compiler **expands** thi
 - [Negative tests](../../../tools/test_research_c_permissions_macro.py) inject the same permission State as a direct Object exclude Filter **or inside a Set operand Filter**, remove/duplicate a required permission term, change a term from false to true, weaken its field presence/check requirement, change AND to OR, or change a consuming Test's matching requirement. Each must fail rather than claim lossless substitution.
 - No default source-converter or scanner change is made. The standalone C macro is still a **research-only authoring mechanism**. New native authoring of other policies is a separate use from automatic rewriting of existing SCAP 1.4 source.
 
+## Cross-Rule and global-State reference limitation
+
+The checks above inspect the **one source Assessment closure** supplied to the guard. The original OVAL State may be shared by other Rules or references in the same source datastream, including Filters outside this closure. Therefore local structural eligibility is **not global conversion eligibility**. The research guard now reports `LOCAL_STATE_PATTERN_ONLY_GLOBAL_USES_UNAUDITED`, with `global_source_consumers_audited: false` and `source_conversion_authorized: false`. A complete datastream/benchmark-wide reverse-reference audit (including object filter uses) is a separate prerequisite before any source-converter rewrite. The authoring shortcut can still compile to eight native conditions for a newly authored check, without claiming a source migration.
+
 ## Decision
 
-**Conditional GO for a visible authoring alias over this exact, fully guarded Test-State pattern; NO-GO for rewriting a State used by a Filter/Set or for changing collector behavior.** Retain all eight native bit predicates in the compiled evaluation contract. Do not promote the alias or its present English spelling before the other C semantic and first-read authoring gates pass.
+**Conditional GO for researching a visible authoring alias over this exact local Test-State pattern; NO-GO for automatic source rewriting until benchmark-wide consumers and filter semantics are independently checked, and NO-GO for changing collector behavior.** Retain all eight native bit predicates in the compiled evaluation contract. Do not promote the alias or its present English spelling before the other C semantic and first-read authoring gates pass.
 
 This is one bounded case study and cannot authorize substituting an octal-mask comparator for arbitrary `unix.file` States, changing `SV-257889`'s account populations, or extending the shortcut to other source States.
