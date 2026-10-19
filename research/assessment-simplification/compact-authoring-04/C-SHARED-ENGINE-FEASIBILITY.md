@@ -5,6 +5,10 @@
 
 > **Proposed answer:** Yes, a **C** approach could deliver a substantially different human authoring language while leveraging 0.4-A's capability/collector contracts and SCAP 1.4 source-preservation work. We may also **redesign Variable syntax and execution**, but only if the resulting collected populations, typed values, dependencies, statuses and evidence are independently verified to be lossless. Do not restart the B provider rewrite. This is **not** a new normative grammar or a proven drop-in scanner.
 
+## First executable feasibility checkpoint (19 October)
+
+The first C prototype now has a [**one-page source-backed proof and negative-case report**](C-SHARED-ENGINE-PROOF-2026-10-19.md), with [8/8 focused tests PASS](https://github.com/vanderpol/scap-ng/actions/runs/39249073388). It consumes a **separately authored, research-only C YAML** for the original RHEL9 `/home` mount selector and reconstructs exactly the existing A collection/State/Item-requirement descriptor. An intuitive but source-changing `equals /home` rewrite fails closed. It also renders actual Apache **2- and 19-Variable** source dependency graphs as readable C steps and reconstructs the original A-indexed DAG and precollected-shell fixture values/statuses without new OS collectors. **Those Apache source specimens are 0.3-derived**, and the fixture outcomes use the existing research evaluator rather than an independent OVAL/scanner oracle. This validates a first **integration seam, not lossless rewritten Variable algorithms**. The C/A design remains non-normative; the exact next gate is source-pinned Windows typed Registry/records and a genuinely modified Variable operator with independent expected outcomes.
+
 ## 1. Division of responsibility
 
 ```text
