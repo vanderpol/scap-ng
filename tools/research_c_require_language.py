@@ -116,6 +116,7 @@ def _typed_fields(fields, native, capability):
                        else registry_type.get("equals") if isinstance(registry_type,dict)
                        else None)
     for field,raw in fields.items():
+        explicit_datatype=None
         if field not in allowed or not isinstance(field,str):
             raise ValueError(f"unknown or unsupported State field {field!r}")
         if type(raw) in SCALAR:
@@ -128,8 +129,17 @@ def _typed_fields(fields, native, capability):
             op,value=next(iter(raw.items()))
         elif isinstance(raw,dict) and set(raw)=={"equals","datatype"}:
             op,value="equals",raw["equals"]
-            if raw["datatype"] not in native["field_datatypes"].get(field,[]):
+            explicit_datatype=raw["datatype"]
+            if explicit_datatype not in native["field_datatypes"].get(field,[]):
                 raise ValueError(f"invalid typed {field} datatype")
+            expected_python_type={
+                "string":str,"version":str,"ipv4":str,"ipv6":str,
+                "rpm_evr":str,"debian_evr":str,"fileset_revision":str,
+                "ios_version":str,"binary":str,"integer":int,
+                "boolean":bool,"float":float,
+            }.get(explicit_datatype)
+            if expected_python_type is None or type(value) is not expected_python_type:
+                raise ValueError(f"typed {field} literal does not match declared datatype")
         elif isinstance(raw,dict) and set(raw)=={"contains"}:
             # Exists+some-match over observed MULTI-VALUED field, not an
             # ordinary substring operation. The field must be explicitly
@@ -164,7 +174,10 @@ def _typed_fields(fields, native, capability):
         field_req=("at_least_one_exists_and_some_match" if
                    isinstance(raw,dict) and "contains" in raw else
                    "at_least_one_exists_and_all_match")
-        out.append({field:{"require":field_req,op:deepcopy(value)}})
+        predicate={"require":field_req,op:deepcopy(value)}
+        if explicit_datatype is not None:
+            predicate["datatype"]=explicit_datatype
+        out.append({field:predicate})
     if registry_expected in ("dword","qword") and "value" in fields:
         v=fields["value"]
         v=v.get("equals") if isinstance(v,dict) else v
