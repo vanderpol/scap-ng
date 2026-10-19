@@ -15,7 +15,7 @@ import unittest
 import yaml
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_require_language import compile_c_requirement,EXISTENCE,MATCH,_catalog
+from research_c_require_language import compile_c_requirement,EXISTENCE,MATCH,_catalog,parse_c_yaml
 from oval_result_truth_tables import evaluate_collected_object_test
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -148,6 +148,30 @@ class CandidateCGrammar(unittest.TestCase):
         self.assertEqual(check("at_least_one_exists","only one",items),"true")
         self.assertEqual(check("only_one_exists","all",items),"false")
         self.assertEqual(check("at_least_one_exists","only one",["true","true"]),"false")
+
+    def test_yaml_duplicate_predicates_and_multiple_documents_do_not_silently_win(self):
+        import yaml
+        self.assertEqual(compile_c_requirement(parse_c_yaml(
+            (BASE/"c-short-windows-wdigest.research.yaml").read_text()))["test"]["require"],
+            "at_least_one_exists_and_all_match")
+        for raw in (
+            "from:\\n  linux.partition:\\n    mount_point: /home\\nmust:\\n  every_item: {mount_point: /home}\\n  every_item: {mount_point: /var}\\n",
+            "from: {linux.partition: {mount_point: /home}}\\nmust: {every_item: {mount_point: /home}}\\n---\\nextra: 5\\n",
+        ):
+            raw=raw.replace("\\\\n","\\n")
+            with self.subTest(raw=raw):
+                with self.assertRaises(ValueError):
+                    parse_c_yaml(raw)
+
+    def test_numeric_regex_is_not_valid_predicate_or_selector(self):
+        original=deepcopy(WIN)
+        original["must"]={"every_item":{"value":{"matches_regex":0}}}
+        with self.assertRaisesRegex(ValueError,"regex"):
+            compiled(original)
+        original=deepcopy(LINUX)
+        original["from"]["linux.partition"]["mount_point"]={"matches_regex":101}
+        with self.assertRaisesRegex(ValueError,"regex"):
+            compiled(original)
 
     def test_incomplete_empty_not_equal_complete_empty(self):
         self.assertEqual(check("at_least_one_exists","all",[]),"false")
