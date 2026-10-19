@@ -13,22 +13,17 @@ No scanner parity claim; aliases are presentation names not execution IDs.
 from __future__ import annotations
 from collections import Counter
 from copy import deepcopy
-from hashlib import sha256
-import json
 import re
 
 from research_c_hybrid_inline_expectations import (
     INLINE_STAGE,present_inline_expectations,compile_inline_expectations,
     prove_inline_original)
 from research_c_hybrid_must_overlay import reject, NATIVE
-from research_c_source_identity_contract import require_author_binding_catalog
+from research_c_source_identity_contract import (require_author_binding_catalog,
+    source_digest as _digest,require_pinned_authoring)
 
 STAGE="C_RESEARCH_OVAL_TYPED_SET_AUTHORING_WITH_PROVENANCE_SIDECAR"
 PROV_STAGE="C_RESEARCH_OVAL_OBJECT_STATE_TEST_VARIABLE_SOURCE_BINDINGS"
-
-def _digest(node):
-    return sha256(json.dumps(node,sort_keys=True,separators=(",",":"),
-                     ensure_ascii=False,allow_nan=False).encode()).hexdigest()
 
 def _slug(value):
     if type(value) is not str or not value:
@@ -238,7 +233,9 @@ def compile_oval_set_provenance(author,sidecar):
     return compile_inline_expectations(doc)
 
 def prove_oval_set_provenance(source,author,sidecar):
-    if _digest(author)!=sidecar["original_authored_sha256"]:
+    try:
+        require_pinned_authoring(author,sidecar["original_authored_sha256"])
+    except ValueError:
         reject("authoring changed; pinned original source not proven")
     compiled=compile_oval_set_provenance(author,sidecar)
     if compiled!=source:
