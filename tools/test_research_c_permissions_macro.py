@@ -15,7 +15,7 @@ import yaml
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from research_c_permissions_macro import (
     lower_no_more_permissive_than,evaluate_mode_against_C_macro,
-    OVAL_BITS)
+    OVAL_BITS,prove_legacy_source_permission_state_context)
 from research_c_require_language import compile_c_requirement
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -70,6 +70,74 @@ class PosixPermissionMacroAgainstRealSource(unittest.TestCase):
             self.assertEqual(evaluate_mode_against_C_macro(mode,self.macro),expected)
         self.assertLess(0o604,0o740)  # Shows why numeric <= is NOT equivalent.
         self.assertFalse(evaluate_mode_against_C_macro(0o604,self.macro))
+
+    def test_macro_is_only_a_source_State_alias_not_a_filter_rewrite(self):
+        before=deepcopy(self.raw)
+        proof=prove_legacy_source_permission_state_context(
+            self.raw,state_id="state-mode-0740-or-less-permissive",permitted="0740")
+        self.assertEqual(self.raw,before,"proof guard must not mutate source")
+        self.assertEqual(proof["status"],
+                         "SOURCE_STATE_ONLY_REWRITE_ELIGIBLE_NOT_EXECUTABLE")
+        self.assertFalse(proof["filters_rewritten"])
+        self.assertFalse(proof["runtime_parity_verified"])
+        self.assertTrue(proof["authoring_only"])
+        self.assertEqual(len(proof["source_test_consumers"]),2)
+        self.assertEqual(set(t["check_existence"] for t in
+            proof["source_test_consumers"].values()),
+            {"any_exist","at_least_one_exists"})
+        self.assertEqual(len(proof["expanded_native_states"]),8)
+        objects=proof["source_context"]["source_objects"]
+        self.assertEqual(objects,before["objects"])
+        self.assertEqual(proof["source_context"]["source_variables"],
+                         before["variables"])
+        self.assertTrue(any("filters" in str(x) for x in objects.values()),
+                        "source includes filters unrelated to permission State")
+
+    def test_macro_in_filters_or_set_filters_is_not_source_equivalent(self):
+        state_id="state-mode-0740-or-less-permissive"
+        variants=[
+            lambda a:a["objects"]["local-initialization-files-root-user-object"][
+                "filters"].append({"action":"exclude","state":state_id}),
+            lambda a:a["objects"][
+                "only-root-users-uid-0-home-dirs-excluding-root-directory-object"][
+                "set"]["operands"][0]["filters"].append(
+                    {"action":"exclude","state":state_id}),
+        ]
+        for mutation in variants:
+            altered=deepcopy(self.raw)
+            mutation(altered)
+            with self.subTest(object=altered["objects"]):
+                with self.assertRaisesRegex(ValueError,"Set/Filter"):
+                    prove_legacy_source_permission_state_context(
+                        altered,state_id=state_id)
+        # This restriction is deliberately narrower than potential generic
+        # source macros: filter logic can invert or change populations before
+        # the Test's existence/matching computation even starts.
+
+    def test_source_permission_macro_requires_full_eight_field_AND_semantics(self):
+        state_id="state-mode-0740-or-less-permissive"
+        actions=[
+            lambda a:a["states"][state_id]["state"]["all"].pop(),
+            lambda a:a["states"][state_id]["state"]["all"][0].update(value="true"),
+            lambda a:a["states"][state_id]["state"]["all"][0].update(
+                entity_existence="may_be_absent"),
+            lambda a:a["states"][state_id]["state"]["all"][0].update(
+                entity_check="at least one"),
+            lambda a:a["states"][state_id]["state"]["all"].append(
+                deepcopy(a["states"][state_id]["state"]["all"][0])),
+            lambda a:a["states"][state_id]["state"].update(
+                {"any":a["states"][state_id]["state"].pop("all")}),
+            lambda a:a["tests"][
+                "test-local-initialization-files-root-have-mode-0740-or-less-permissive"
+            ].update(check="at least one"),
+        ]
+        for mutate in actions:
+            altered=deepcopy(self.raw)
+            mutate(altered)
+            with self.subTest(mutate=str(mutate)):
+                with self.assertRaises(ValueError):
+                    prove_legacy_source_permission_state_context(
+                        altered,state_id=state_id)
 
     def test_macro_fails_closed_on_unknown_fields_types_and_masks(self):
         for invalid in (
