@@ -9,6 +9,8 @@ on:
       - 'tools/test_research_c_oval_self_assertion_bridge.py'
       - 'tools/research_c_original_oval_to_authored_c.py'
       - 'tools/research_c_oval_multicheck.py'
+      - 'tools/research_c_hybrid_must_overlay.py'
+      - 'tools/test_research_c_hybrid_must_overlay.py'
       - 'tools/verify_c_published_original_oval_examples.py'
       - 'research/assessment-simplification/compact-authoring-04/oval-self-assertion-c-review/**'
   workflow_dispatch:
@@ -107,6 +109,56 @@ jobs:
           print("Pinned original OVAL source blockers exactly match five v003 baseline exceptions.")
           print("True native 0.4-C conversions: 0; this is a source-preserving A review.")
           PY
+      - name: Prove 7-Test nested original OVAL Set/Filter/Variable hybrid C must overlay
+        run: |
+          mkdir -p c-hybrid
+          PYTHONPATH=scap-ng/tools python - <<'PY'
+          import json
+          from pathlib import Path
+          from copy import deepcopy
+          import yaml
+          from research_c_hybrid_must_overlay import (
+              present_hybrid_must,compile_hybrid_must,prove_original_hybrid)
+          reviews=[]
+          for file in sorted(Path("c-review").glob("*.review.json")):
+              raw=json.loads(file.read_text(encoding="utf-8"))
+              if raw["source"]["file"]=="unix/oval-def_set-unix.xml":
+                  reviews.append(raw)
+          assert len(reviews)==1,"pinned Self-Assertion Set source absent/duplicated"
+          review=reviews[0]
+          assert review["source"]["definition_id"]=="oval:org.mitre.oval.test:def:276"
+          native=review["A_source_compatibility_fallback"]
+          assert len(native["tests"])==7
+          assert len(native["objects"])==11
+          assert len(native["variables"])==3
+          assert sum("set" in obj for obj in native["objects"].values())==7
+          assert any("filters" in obj["set"] for obj in native["objects"].values()
+                     if "set" in obj)
+          authored=present_hybrid_must(native)
+          proof=prove_original_hybrid(native,authored)
+          assert compile_hybrid_must(authored)==native
+          assert proof["source_set_count"]==7
+          assert proof["source_variable_count"]==3
+          assert proof["OVAL_runtime_parity_proven"] is False
+          changed=deepcopy(authored)
+          changed["checks"]["complement"]["must"]["items_exist"]="one_or_more"
+          try:
+              prove_original_hybrid(native,changed)
+          except ValueError:
+              pass
+          else:
+              raise AssertionError("mutated source cardinality escaped parity gate")
+          (Path("c-hybrid")/"nested-set-filter-must.research.yaml").write_text(
+              "# Source-backed hybrid 0.4-C experiment; not normative or scanner-proven.\n"
+              +"# Original original OVAL 5.12.3 source: unix/oval-def_set-unix.xml\n"
+              +yaml.safe_dump(authored,sort_keys=False,allow_unicode=True),
+              encoding="utf-8")
+          (Path("c-hybrid")/"proof.json").write_text(
+              json.dumps({"source":review["source"],"proof":proof},
+                         indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("Pinned original OVAL nested Set/Filter/Variable hybrid C proof:",
+                json.dumps(proof,sort_keys=True))
+          PY
       - name: Compile independently authored C subset of every source-compatible original OVAL Definition
         run: |
           python scap-ng/tools/research_c_original_oval_to_authored_c.py \
@@ -143,7 +195,7 @@ jobs:
               for p in sorted(root.rglob("*.json")):
                   fd.write(hashlib.sha256(p.read_bytes()).hexdigest()+"  "+p.relative_to(root).as_posix()+"\n")
           PY
-          tar -czf c-review-source-backed.tar.gz c-review c-native a-roundtrip.json c-review-summary.json c-native-summary.json
+          tar -czf c-review-source-backed.tar.gz c-review c-hybrid c-native a-roundtrip.json c-review-summary.json c-native-summary.json
           sha256sum c-review-source-backed.tar.gz > c-review-source-backed.sha256
       - name: Upload original-source-backed review (NOT native C conversion)
         if: always()
@@ -153,6 +205,7 @@ jobs:
           path: |
             c-review/
             c-native/
+            c-hybrid/
             c-native-summary.json
             c-review-summary.json
             c-review-source-backed.tar.gz
