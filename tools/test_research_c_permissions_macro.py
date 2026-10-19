@@ -77,10 +77,12 @@ class PosixPermissionMacroAgainstRealSource(unittest.TestCase):
             self.raw,state_id="state-mode-0740-or-less-permissive",permitted="0740")
         self.assertEqual(self.raw,before,"proof guard must not mutate source")
         self.assertEqual(proof["status"],
-                         "SOURCE_STATE_ONLY_REWRITE_ELIGIBLE_NOT_EXECUTABLE")
+                         "LOCAL_STATE_PATTERN_ONLY_GLOBAL_USES_UNAUDITED")
         self.assertFalse(proof["filters_rewritten"])
         self.assertFalse(proof["runtime_parity_verified"])
         self.assertTrue(proof["authoring_only"])
+        self.assertFalse(proof["global_source_consumers_audited"])
+        self.assertFalse(proof["source_conversion_authorized"])
         self.assertEqual(len(proof["source_context"]["source_test_consumers"]),2)
         self.assertEqual(set(t["check_existence"] for t in
             proof["source_context"]["source_test_consumers"].values()),
