@@ -127,8 +127,15 @@ def _typed_fields(fields, native, capability):
             "less_than","less_than_or_equal"
         ):
             op,value=next(iter(raw.items()))
-        elif isinstance(raw,dict) and set(raw)=={"equals","datatype"}:
-            op,value="equals",raw["equals"]
+        elif (isinstance(raw,dict) and len(raw)==2 and
+              "datatype" in raw and
+              len(set(raw)-{"datatype"})==1 and
+              next(iter(set(raw)-{"datatype"})) in (
+                  "equals","not_equal","matches_regex",
+                  "greater_than","greater_than_or_equal",
+                  "less_than","less_than_or_equal")):
+            op=next(iter(set(raw)-{"datatype"}))
+            value=raw[op]
             explicit_datatype=raw["datatype"]
             if explicit_datatype not in native["field_datatypes"].get(field,[]):
                 raise ValueError(f"invalid typed {field} datatype")
