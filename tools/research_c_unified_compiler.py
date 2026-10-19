@@ -43,6 +43,56 @@ def compile_c_unified(document, *, source_documents=None):
         {c["id"] for c in normalized["checks"]}
     ):
         raise ValueError("unknown pinned source compatibility input")
+    # The already pinned seven-check Windows record family has a separately
+    # audited native-A lowering. Route it through this SAME frontend entry
+    # point, but do not silently generalize its WMI record or trustee scopes.
+    if any(
+        isinstance(check["must"],dict) and (
+            "any_record_state_every_value_equals" in check["must"] or
+            "same_item_field" in check["must"]
+        )
+        for check in normalized["checks"]
+    ):
+        if source_documents:
+            raise ValueError("pinned native Windows record compiler needs no legacy source")
+        from research_c_windows_shared_native import compile_native_c_windows
+        backend=compile_native_c_windows(document)
+        compiled_by_alias={}
+        source_tests={}
+        for check in normalized["checks"]:
+            alias=check["id"]
+            source_test=check["source_test"]
+            if type(source_test) is not str or source_test not in backend["tests"]:
+                raise ValueError("source Test identity required for record-family bridge")
+            source_tests[alias]=source_test
+            compiled_by_alias[alias]=deepcopy(backend["tests"][source_test])
+        if len(set(source_tests.values()))!=len(source_tests):
+            raise ValueError("duplicate pinned Windows source Test")
+        logic=_c_logic(normalized["require"])
+        assessment={"id":normalized["assessment_id"] or "internal-c-research",
+                    "mode":"automated","tests":{name:{} for name in compiled_by_alias}}
+        lowered=lower_c_assessment_logic(logic,assessment)
+        if set(lowered["plan"]["requires"]["tests"])!=set(compiled_by_alias):
+            raise ValueError("named record checks missing from C logic tree")
+        return {
+            "stage":"C_RESEARCH_UNIFIED_A_COMPILER_NO_SCANNER",
+            "assessment_id":normalized["assessment_id"],
+            "shared_objects":deepcopy(backend["shared_objects"]),
+            "shared_singletons":{},
+            "tests":compiled_by_alias,
+            "checks":{alias:{"kind":"native_A_record_test_pieces",
+                             "test":deepcopy(test),
+                             "independent_collection_plan":False}
+                      for alias,test in compiled_by_alias.items()},
+            "expression":lowered,
+            "authored_check_ids":sorted(compiled_by_alias),
+            "source_compatibility_inputs":[],
+            "source_test_provenance":source_tests,
+            "record_support":"PINNED_WINDOWS_SEVEN_CHECK_FAMILY_ONLY",
+            "scanner_executed":False,
+            "source_parity_verified":False,
+            "runtime_acquisition_sharing_verified":False,
+        }
     sources={}
     by_alias={}
     for alias, source in normalized["observations"].items():
