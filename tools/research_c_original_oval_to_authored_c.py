@@ -29,7 +29,11 @@ OPS={"equals":"equals","pattern match":"matches_regex",
 PAIR_CHECK={"all":"all_match","at least one":"some_match",
             "only one":"only_one_matches","none satisfy":"none_match"}
 PRESENCE={"at_least_one_exists":"present","none_exist":"absent",
-          "only_one_exists":"one_item_exists"}
+          "only_one_exists":"one_item_exists",
+          # OVAL any_exist is true for complete empty source populations.
+          # 0.4-A canonical may_be_absent is equivalent at this State-free
+          # Test scope, unlike present (at_least_one_exists).
+          "any_exist":"optional"}
 BASIC_TYPES={"string":str,"integer":int,"boolean":bool}
 MAX_FIELDS=64
 
@@ -128,7 +132,8 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
             reject("SOURCE_PRESENCE_NOT_PROVEN")
         expected_token={"present":"at_least_one_exists",
                         "absent":"none_exist",
-                        "one_item_exists":"only_one_exists"}[expected_token]
+                        "one_item_exists":"only_one_exists",
+                        "optional":"may_be_absent"}[expected_token]
         if compiled["require"]!=expected_token or "states" in compiled:
             reject("SOURCE_COMPILER_PRESENCE_DRIFT")
         return
@@ -220,6 +225,10 @@ def compile_one_original_definition(original_assessment):
     else:
         if old.get("check_existence") not in PRESENCE:
             reject("TEST_UNSUPPORTED_PRESENCE")
+        # These original OVAL State-free any_exist content probes all set
+        # check=all. Do not silently discard a novel Check aggregation.
+        if old["check_existence"]=="any_exist" and old.get("check")!="all":
+            reject("STATE_FREE_ANY_EXIST_MATCHING_UNPROVEN")
         entities=[]
         must=PRESENCE[old["check_existence"]]
     c={"from":{old["capability"]:selectors},"must":must}
