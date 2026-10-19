@@ -1,0 +1,49 @@
+# SCAP-NG 0.4-C research: evidence and next decision gates
+
+**19 October 2026 · owner priority #1 · [issue #245](https://github.com/vanderpol/scap-ng/issues/245). This is a research handoff, NOT an adopted specification.**
+
+## Architecture conclusion so far
+
+**Continue C:** a human-oriented authoring frontend can reuse A's capability mappings, typed Objects/Items, source-compatibility adapters, six-state Boolean/existence tables, and eventually one execution IR. Do not rebuild B providers or fork a second scanner. C's strongest improvement is in **shared observations, explicit Item scope and a requirement tree that uses checks instead of OVAL structures**.
+
+**One research language shape:** a check chooses **exactly one** of direct *from* or a named *observation*. It then has an explicit *must* Item/record/field requirement; independent named checks combine in *require* with Boolean operators. Named observations each specify a *from* acquisition. The [single-frontend normalizer](../../../tools/research_c_one_frontend.py) accepts the already-tested direct Linux/Windows/DNS and the seven-check shared Windows case as one static shape; it does not yet execute, validate arbitrary A capabilities, compile arbitrary Variables or establish scanner parity.
+
+## Confirmed bounded engineering gates
+
+| Proof | Evidence | Result classification |
+| --- | --- | --- |
+| Linux /home selector and mount_options | [C/A proof](C-SHARED-ENGINE-PROOF-2026-10-19.md) | Structural source identity + synthetic collection outcomes |
+| Windows WDigest DWORD=0 + WMI absence | [composed research sample](c-two-windows-checks.research.yaml) | Both inputs compile through A/source adapters; 36 independent six-state pairs |
+| DNS response limiting | [DNS source example](c-short-windows-dns-rrl.research.yaml) | Exact shell collection arguments + selected result fixtures |
+| RHEL mode 0740 eight source bits | [permission macro](../../../tools/research_c_permissions_macro.py) | All 4,096 POSIX bit combinations; full source account/Filter parity unproven |
+| Apache limited Variable fusions | [shared-engine analysis](C-APACHE-SHARED-OBSERVATIONS-2026-10-19.md) | Pinned acquisition and bounded differential fixtures, NOT complete 19-Variable source conversion |
+| Real Windows 11 SV-253495 | [7-check C reviewer sample](c-source-exact-windows-rdp-rights.research.yaml) | Two shared observations, seven Checks, full original AND/OR structure and 0.3 source read-only inverse |
+| Source-independent Windows authoring | [C native research compiler](../../../tools/research_c_windows_shared_native.py) | Generates version-pinned A Test/State structures without reading original source document; schema/focused real-source regressions; NOT generalized or scanned |
+| Same-record requirement scope | [adversarial record evidence](../../../tools/test_research_c_same_record_evidence.py) | Two partial parent records cannot form a false matching whole; six-state/partial cases, synthetic |
+| Guided view feasibility | [shared projection](../../../tools/research_c_guided_observations.py) | 2 source cards + 7 check cards + one requirement tree, no existing A editor changes; still an adapter, not a deployed GUI |
+| YAML portability | [strict C loader](../../../tools/research_c_require_language.py) | Rejects unquoted YAML 1.1 on/off/yes/no mapping keys; use explicit observation reference instead of on |
+ 
+Green [C source-independent compiler CI](https://github.com/vanderpol/scap-ng/actions/runs/39276658341) and [C record correlation CI](https://github.com/vanderpol/scap-ng/actions/runs/39277075573). Later focused C tests are only to be called green after the exact-head run is inspected.
+
+## What is NOT earned yet
+
+- No production-grade C authoring compiler for **all** A capabilities; the source-independent Windows compiler is deliberately bounded to the pinned seven-check family and exact source aliases.
+- No complete forward migration of all six representative STIGs into independently authored C. The original A source-envelope census is not C coverage.
+- No independent OVAL 5.12.3 XML/SCAP runtime oracle confirming collected real Items, regex dialect, WMI namespace/registry view, or Variable/record semantics.
+- No general source-preserving nested Variable composition, per-parent foreach, filters, unknown/error source propagation, scope-dependent optional records or full shared observation caching.
+- No tested production scanner, platform collection parity, signed C compiled package or authoritative evaluator; fixture Pass/Fail never becomes an editor compliance result.
+- No blind auditor usability acceptance. A read-only source view can be more pleasant without genuinely removing concepts; shared observations must not hide Item correlations.
+
+## Highest-value non-Apache next gate
+
+RHEL9 **SV-257889** (initialization files under account-derived home directories): retain TWO original Tests with DIFFERENT existence requirements and distinct dynamically derived populations, one State with eight independent forbidden permission-bit comparisons, source Variables/Objects/Sets/Filters, and global versus per-parent correlation. An author should see clear named observations for regular users versus root without a single merged union. It must refuse a shorter representation if the source population or optional/required existence changes. Confirm matching against pinned original source Items and independently expected six-state outcomes; do not invent a faster full collector or claim success from the already-verified 0740 bit macro alone.
+
+## Vocabulary still open to falsification
+
+- Prefer explicit *any_item*, *every_item*, *absent*, etc.; do not approve bare *must* as hidden some-match without blind reviewer evidence.
+- Preserve a visible distinction between **Item population**, **field values within one Item**, **whole record-state alternatives**, and **logic over separate Tests**.
+- A single shared observation exposes data, not a policy outcome; every check retains independent requirements.
+- Do not use implicit IF/ELSE for multi-branch six-state source expressions when the original is OR-of-AND.
+- Do not use a superficially shorter record *in* comparator unless its full cardinality and missing/incomplete behavior is independently shown equivalent.
+
+**State:** GO for continued C feasibility work. NO-GO for language freeze or "as capable as A" claim. Keep trunk-based issue-linked changes in research only.
