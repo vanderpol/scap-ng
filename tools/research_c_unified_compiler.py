@@ -81,7 +81,12 @@ def compile_c_unified(document, *, source_documents=None):
                 raise ValueError("shared observation collection mismatch")
             test["object"]=identifier
         native_tests[alias]=test
-        checks[alias]={"kind":"native_A_test_pieces","plan":compiled}
+        # The ONE native Test graph is authoritative. Do not publish a second
+        # inline Object alongside its shared-Object reference: a later runtime
+        # could accidentally recollect the same request or lose provenance.
+        checks[alias]={"kind":"native_A_test_pieces",
+                       "test":deepcopy(test),
+                       "independent_collection_plan":False}
     if set(sources)!={by_alias[k] for k in by_alias}:
         raise ValueError("dangling shared observation cannot be discarded")
     logic=_c_logic(normalized["require"])
