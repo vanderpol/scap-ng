@@ -1,0 +1,45 @@
+name: 0.4-C pinned SCAP 1.4 OVAL Self-Assertion fixtures
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/research-c-self-assertion-fixtures.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-oval-self-assertion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Fetch pinned public OVAL Self-Assertion repository
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: self-assertion
+          persist-credentials: false
+      - name: Verify pinned source and create one local-use fixture archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git -C self-assertion rev-parse HEAD)"
+          test "$actual" = "e3538595c5083b9c34d937a81d319234df9bbfaa"
+          mkdir -p bundle
+          root=SCAP_1.4/OVAL_Test_Content
+          test -d "self-assertion/$root"
+          tar -czf bundle/oval-self-assertion-scap14.tar.gz -C self-assertion "$root"
+          find "self-assertion/$root" -type f | sort > bundle/source-files.txt
+          sha256sum bundle/oval-self-assertion-scap14.tar.gz > bundle/source-archive.sha256
+          printf 'source=OVAL-Community/SCAP-Self-Assertion\nrevision=%s\nfiles=%s\n' \
+            "$actual" "$(wc -l < bundle/source-files.txt)" > bundle/source-identity.txt
+          cat bundle/source-identity.txt
+      - name: Upload pinned offline SCAP 1.4 OVAL Test Content only
+        uses: actions/upload-artifact@v4
+        with:
+          name: c-oval-self-assertion-scap14-pinned
+          path: bundle/
+          if-no-files-found: error
+          retention-days: 14
