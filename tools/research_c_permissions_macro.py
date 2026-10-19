@@ -28,7 +28,7 @@ OVAL_BITS=(
 ALL=0o7777
 
 def parse_allowed_mode(spec):
-    if type(spec) is not str or not re.fullmatch(r"0?[0-7]{3,4}",spec):
+    if type(spec) is not str or not re.fullmatch(r"[0-7]{3,4}",spec):
         raise ValueError("POSIX allowed mode must be quoted octal with three or four digits")
     value=int(spec,8)
     if not 0<=value<=ALL:
