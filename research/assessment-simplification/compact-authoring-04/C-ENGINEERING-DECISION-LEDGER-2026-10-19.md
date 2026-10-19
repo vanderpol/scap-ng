@@ -65,3 +65,11 @@ The seven-check Windows 11 source-backed C sample is now routed through the **sa
 - In the available isolated Python environment, normalizing one shared C authoring example 10,000 times took about 0.25 seconds. Twelve structural compiler tests ran in about 0.05 seconds with explicitly **stubbed** native-A and Boolean evaluation dependencies. These verify authoring graph relationships and local control flow, **not** the full pinned A compiler or source parity. The prior completed Actions run executed 164 C tests in roughly 1.3 seconds once scheduled; CI wait time, not raw Python execution, was the primary throughput blocker.
 
 The bundled workflow revision must independently pass at its exact SHA before declaring this checkpoint verified.
+
+## Verified-source six-STIG triage (not C coverage)
+
+The [C coverage triage](../../../tools/research_c_coverage_triage.py) can read the independently verified A lossless source IR and classify every automated Assessment into **simple**, **composed**, **record**, or **dynamic source** complexity buckets. The source's Variables, Objects, ordered Set/Filter sites, foreach, selector projections, record predicates and Assessment dependencies remain distinct; categories are non-authoritative planning queues, not results or compiler proof. [Seven synthetic regressions](../../../tools/test_research_c_coverage_triage.py) passed locally in approximately 0.001 seconds. Example usage from a prepared checkout:
+
+`python tools/research_c_coverage_triage.py --verified-ir /path/to/a-lossless-ir.json --output /path/to/c-triage.json --assert-six`
+
+The full six-STIG IR was **not available in the lightweight local workspace**, so **no category totals** have been claimed yet. The command requires the existing independent A IR decoder to succeed before outputting any report. The historical baseline expected by `--assert-six` is 872 automated Assessments and 1,375 named Tests. This is a measure of C's remaining challenge, not a reason to lower capability standards.
