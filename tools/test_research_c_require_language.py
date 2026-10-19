@@ -208,6 +208,14 @@ class CandidateCGrammar(unittest.TestCase):
         self.assertEqual(check("only_one_exists","all",items),"false")
         self.assertEqual(check("at_least_one_exists","only one",["true","true"]),"false")
 
+    def test_yaml_boolean_coerced_mapping_keys_fail_closed(self):
+        for candidate in ("on: item\n", "off: item\n", "yes: item\n",
+                          "no: item\n", "true: item\n", "false: item\n"):
+            with self.subTest(source=candidate):
+                with self.assertRaisesRegex(ValueError, "mapping key must be a string"):
+                    parse_c_yaml(candidate)
+        self.assertEqual(parse_c_yaml("'on': item\n"), {"on": "item"})
+
     def test_yaml_duplicate_predicates_and_multiple_documents_do_not_silently_win(self):
         import yaml
         self.assertEqual(compile_c_requirement(parse_c_yaml(
