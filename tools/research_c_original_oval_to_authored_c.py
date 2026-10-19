@@ -36,6 +36,11 @@ PRESENCE={"at_least_one_exists":"present","none_exist":"absent",
           # Test scope, unlike present (at_least_one_exists).
           "any_exist":"optional"}
 BASIC_TYPES={"string":str,"integer":int,"boolean":bool}
+# A source Version is lexical YAML text, but equality is version-aware.
+# More complex comparators remain unsupported until separately verified.
+STATE_TYPES={**BASIC_TYPES,"version":str}
+LEXICAL_TYPES={"string","version","ipv4","ipv6","rpm_evr","debian_evr",
+               "fileset_revision","ios_version","binary"}
 MAX_FIELDS=64
 
 class NotNativeCConvertible(ValueError):
@@ -75,7 +80,28 @@ def _entities(state):
         return group
     return [state]
 
-def project_fields(state):
+def _needs_explicit_state_datatype(entity,native):
+    """Do not turn source string equality into version/IP/package equality.
+
+    A YAML string cannot encode its effective OVAL comparison algorithm where
+    the selected capability Item field admits multiple lexical datatypes.
+    """
+    field=entity["field"]
+    datatype=entity["datatype"]
+    types=native.get("field_datatypes",{}).get(field,[])
+    if datatype not in types:
+        reject("STATE_SOURCE_DATATYPE_NOT_SUPPORTED_BY_A_CAPABILITY")
+    if datatype not in STATE_TYPES:
+        reject("STATE_SOURCE_DATATYPE_NOT_YET_C_SUPPORTED")
+    return (datatype not in BASIC_TYPES or
+            (datatype=="string" and len(LEXICAL_TYPES.intersection(types))>1))
+
+
+def project_fields(state,capability):
+    try:
+        native=_mapping(capability)
+    except (ValueError,KeyError,TypeError) as exc:
+        reject("STATE_CAPABILITY_MAPPING_UNSUPPORTED: "+str(exc))
     entities=_entities(state)
     if not 1<=len(entities)<=MAX_FIELDS:
         reject("STATE_EMPTY_OR_TOO_LARGE")
@@ -90,7 +116,9 @@ def project_fields(state):
         field=entity["field"]
         if type(field) is not str or not field or field in out:
             reject("STATE_FIELD_REPEATED_OR_MISSING")
-        if entity["operation"] not in OPS or not value_is_type(entity["value"],entity["datatype"]):
+        if (entity["operation"] not in OPS or
+            not (entity["datatype"] in STATE_TYPES and
+                 type(entity["value"]) is STATE_TYPES[entity["datatype"]])):
             reject("STATE_FIELD_SPECIALIZED_COMPARISON")
         value=deepcopy(entity["value"])
         op=OPS[entity["operation"]]
@@ -99,7 +127,11 @@ def project_fields(state):
             reject("STATE_ORDERED_COMPARISON_NOT_INTEGER")
         if op=="matches_regex" and type(value) is not str:
             reject("STATE_REGEX_EXPECTS_STRING")
-        out[field]=value if op=="equals" else {op:value}
+        typed=_needs_explicit_state_datatype(entity,native)
+        if typed:
+            out[field]={op:value,"datatype":entity["datatype"]}
+        else:
+            out[field]=value if op=="equals" else {op:value}
     return out
 
 def _same_source_semantics(original,compiled,obj,states, *, source_singleton_objectless=False):
@@ -153,9 +185,18 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
         field=original_entity["field"]
         comparison=actual.get(field) if isinstance(actual,dict) else None
         operation=OPS[original_entity["operation"]]
-        if comparison!={"require":"at_least_one_exists_and_all_match",
-                       operation:original_entity["value"]}:
-            reject("SOURCE_COMPILER_STATE_VALUE_DRIFT")
+        expected={"require":"at_least_one_exists_and_all_match",
+                  operation:original_entity["value"]}
+        # Compare the effective source datatype independently of the C
+        # authoring representation, including explicitly typed not_equal.
+        try:
+            source_native=_mapping(original["capability"])
+        except (ValueError,KeyError,TypeError) as exc:
+            reject("SOURCE_COMPILER_STATE_CAPABILITY_NOT_MAPPED: "+str(exc))
+        if _needs_explicit_state_datatype(original_entity,source_native):
+            expected["datatype"]=original_entity["datatype"]
+        if comparison!=expected:
+            reject("SOURCE_COMPILER_STATE_VALUE_OR_DATATYPE_DRIFT")
 
 def compile_one_original_definition(original_assessment):
     """Independently compile ONE OVAL-imported Definition to original C grammar.
@@ -213,7 +254,7 @@ def compile_one_original_definition(original_assessment):
             state["capability"]!=old["capability"]):
             reject("STATE_CAPABILITY_OR_UNREVIEWED_FIELDS")
         entities=_entities(state["state"])
-        fields=project_fields(state["state"])
+        fields=project_fields(state["state"],state["capability"])
         if old.get("check_existence")!="at_least_one_exists":
             reject("TEST_ADVANCED_EXISTENCE")
         token=PAIR_CHECK.get(old.get("check"))
