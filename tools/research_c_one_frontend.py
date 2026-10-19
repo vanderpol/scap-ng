@@ -23,8 +23,8 @@ def _from(value):
     if not isinstance(value,dict) or len(value)!=1:
         raise ValueError("from requires exactly one pinned capability")
     cap,args=next(iter(value.items()))
-    if type(cap) is not str or not cap or not isinstance(args,dict) or not args:
-        raise ValueError("capability and selector/collection arguments are required")
+    if type(cap) is not str or not cap or not isinstance(args,dict):
+        raise ValueError("capability and explicit selector/collection mapping are required")
     return {"capability":cap,"arguments":deepcopy(args)}
 
 def _logic(node,valid):
