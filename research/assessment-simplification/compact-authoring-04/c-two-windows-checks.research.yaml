@@ -1,0 +1,29 @@
+# Research #245: a NEW combined Windows assessment composed from two REAL
+# Windows 11 source checks. This combination is a *new research policy*, not
+# an alleged converted, source-equivalent single original SCAP 1.4 Rule.
+# Source checks: SV-253358 (WDigest) and SV-253265 (WMI NTFS). The latter's
+# WQL is preserved unchanged by the source-compatibility path.
+id: c-research-windows-security-combination
+checks:
+  wdigest:
+    from:
+      windows.registry:
+        hive: local_machine
+        key: 'SYSTEM\CurrentControlSet\Control\SecurityProviders\Wdigest'
+        name: UseLogonCredential
+    must:
+      every_item:
+        type: dword
+        value: 0
+
+  non_ntfs_local_volumes:
+    from:
+      windows.wmi.query:
+        namespace: 'root\cimv2'
+        query: 'SELECT deviceid FROM win32_logicaldisk WHERE drivetype=3 AND filesystem!="NTFS"'
+    must: absent
+
+require:
+  every:
+    - check: wdigest
+    - check: non_ntfs_local_volumes
