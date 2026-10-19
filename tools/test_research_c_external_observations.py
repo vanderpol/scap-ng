@@ -165,5 +165,29 @@ class ExternalObservationResearchTests(unittest.TestCase):
                 self.assertEqual(got["status"],status)
                 self.assertEqual(got["items"],[])
 
+    def test_checked_in_cross_rule_review_packet_compiles_both_c_assessments(self):
+        from pathlib import Path
+        from research_c_require_language import parse_c_yaml
+        packet=Path(__file__).resolve().parents[1]/(
+            "research/assessment-simplification/compact-authoring-04/"
+            "c-shared-cross-rule-packet.research.yaml"
+        )
+        source=parse_c_yaml(packet.read_text(encoding="utf-8"))
+        self.assertEqual(set(source),{"catalog","assessments"})
+        self.assertEqual(len(source["assessments"]),2)
+        plans=[compile_c_pinned_catalog(doc,source["catalog"])
+               for doc in source["assessments"]]
+        self.assertEqual(set(plans[0]["compiled"]["tests"]),{"history_24"})
+        self.assertEqual(set(plans[1]["compiled"]["tests"]),{"complexity_enabled"})
+        self.assertEqual(plans[0]["catalog_dependencies"][0]["sha256"],
+                         plans[1]["catalog_dependencies"][0]["sha256"])
+        for plan in plans:
+            self.assertEqual(plan["compiled"]["shared_objects"],{})
+            self.assertFalse(plan["compiled"]["source_parity_verified"])
+            self.assertFalse(plan["catalog_signature_verified"])
+            self.assertFalse(plan["cross_rule_runtime_collection_sharing_verified"])
+            self.assertTrue(all("object" not in t
+                                for t in plan["compiled"]["tests"].values()))
+
 if __name__=="__main__":
     unittest.main()

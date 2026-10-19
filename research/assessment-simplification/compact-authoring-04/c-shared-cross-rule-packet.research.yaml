@@ -1,0 +1,35 @@
+# Refs #245: two separate C Assessments import the same source definition.
+# RESEARCH review packet, not normative SCAP-NG authored grammar or scanner.
+# SHA-256 pins the source shape, NOT signed provenance or runtime snapshot.
+catalog:
+  'shared/windows/password_policy@2026-10':
+    from:
+      windows.passwordpolicy: {}
+assessments:
+  - id: c-research-password-history
+    observations:
+      host_password_policy:
+        use: 'shared/windows/password_policy@2026-10'
+        sha256: 86874bfbf9ab94c780a3fdd64a7db6cbd8fff6b78b7de4e6ea7529e27fdb14ad
+    checks:
+      history_24:
+        observation: host_password_policy
+        must:
+          every_item:
+            password_hist_len:
+              greater_than_or_equal: 24
+    require:
+      check: history_24
+  - id: c-research-password-complexity
+    observations:
+      host_password_policy:
+        use: 'shared/windows/password_policy@2026-10'
+        sha256: 86874bfbf9ab94c780a3fdd64a7db6cbd8fff6b78b7de4e6ea7529e27fdb14ad
+    checks:
+      complexity_enabled:
+        observation: host_password_policy
+        must:
+          every_item:
+            password_complexity: true
+    require:
+      check: complexity_enabled
