@@ -272,7 +272,8 @@ def batch_convert_review_folder(review,output):
             # observations/checks/require frontend. It may legally reject
             # a source Definition, but unexpected exceptions are fatal.
             from research_c_oval_multicheck import (
-                convert_objectless_many,convert_selected_shared_many)
+                convert_objectless_many,convert_selected_shared_many,
+                convert_distinct_selected_many)
             try:
                 c=convert_objectless_many(source["A_source_compatibility_fallback"])
             except ValueError as objectless:
@@ -289,10 +290,17 @@ def batch_convert_review_folder(review,output):
                 except ValueError as selected:
                     if type(selected).__name__!="NotNativeCConvertible":
                         raise
-                    unsupported.append({"definition_id":ident,"file":rel,
-                                        "reason":"MULTI_TEST: "+
-                                        str(objectless)+"; SELECTED: "+str(selected)})
-                    continue
+                    try:
+                        c=convert_distinct_selected_many(
+                            source["A_source_compatibility_fallback"])
+                    except ValueError as distinct:
+                        if type(distinct).__name__!="NotNativeCConvertible":
+                            raise
+                        unsupported.append({"definition_id":ident,"file":rel,
+                            "reason":"MULTI_TEST: "+str(objectless)+
+                            "; SELECTED: "+str(selected)+
+                            "; DISTINCT: "+str(distinct)})
+                        continue
         src_path=path.stem.replace(".review","")
         file=src_path+".c.research.yaml"
         # Header carries source Test documentation that the tiny standalone C
