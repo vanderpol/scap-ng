@@ -69,6 +69,57 @@ class OriginalOVALNativeCCompilationTests(unittest.TestCase):
                          "not_equal":True}}])
         self.assertTrue(result["A_source_semantic_projection_passed"])
 
+    def test_ambiguous_oval_string_equality_remains_string_not_version(self):
+        source=original_plist()
+        state=next(iter(source["states"].values()))["state"]
+        state.update({"datatype":"string","value":"1.0"})
+        result=compile_one_original_definition(source)
+        self.assertEqual(result["authored_c"]["must"],{
+            "every_item":{"value_of":{"equals":"1.0","datatype":"string"}}})
+        self.assertEqual(result["native_c_compiled_test"]["states"],[
+            {"value_of":{"require":"at_least_one_exists_and_all_match",
+                         "equals":"1.0","datatype":"string"}}])
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
+
+    def test_original_version_and_string_have_distinct_compiled_meaning(self):
+        source=original_plist()
+        state=next(iter(source["states"].values()))["state"]
+        state.update({"datatype":"string","value":"1.0"})
+        string=compile_one_original_definition(source)
+        state["datatype"]="version"
+        version=compile_one_original_definition(source)
+        self.assertEqual(version["authored_c"]["must"],{
+            "every_item":{"value_of":{"equals":"1.0","datatype":"version"}}})
+        self.assertEqual(version["native_c_compiled_test"]["states"][0][
+            "value_of"]["datatype"],"version")
+        self.assertNotEqual(string["native_c_compiled_test"]["states"],
+                            version["native_c_compiled_test"]["states"])
+
+    def test_original_typed_not_equal_retains_comparison_type(self):
+        source=original_plist()
+        state=next(iter(source["states"].values()))["state"]
+        state.update({"datatype":"string","value":"1.0","operation":"not equal"})
+        result=compile_one_original_definition(source)
+        self.assertEqual(result["authored_c"]["must"],{
+            "every_item":{"value_of":{"not_equal":"1.0","datatype":"string"}}})
+        self.assertEqual(result["native_c_compiled_test"]["states"][0][
+            "value_of"],{"require":"at_least_one_exists_and_all_match",
+                         "not_equal":"1.0","datatype":"string"})
+
+    def test_original_specialized_source_comparison_stays_fail_closed(self):
+        source=original_plist()
+        state=next(iter(source["states"].values()))["state"]
+        state.update({"datatype":"version","value":"2.10",
+                      "operation":"greater than"})
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "STATE_ORDERED_COMPARISON_NOT_INTEGER"):
+            compile_one_original_definition(source)
+        state.update({"datatype":"ipv4","value":"192.0.2.0/24",
+                      "operation":"equals"})
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "STATE_FIELD_SPECIALIZED_COMPARISON"):
+            compile_one_original_definition(source)
+
     def test_state_free_all_exist_is_exact_native_presence_token(self):
         source=original_plist()
         source["states"]={}
