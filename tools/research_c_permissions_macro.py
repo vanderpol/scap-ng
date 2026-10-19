@@ -70,6 +70,109 @@ def lower_no_more_permissive_than(candidate):
             "scanner_executed":False,
             "source_parity_verified":False}
 
+def prove_legacy_source_permission_state_context(assessment, *, state_id,
+                                                 permitted="0740"):
+    """Guard a converted source rewrite as an authoring-only State alias.
+
+    This is stricter than generic C-native authoring. All bit States must be
+    referenced ONLY as an AND State in Tests, and NOT as a collection filter.
+    The source Object/filter, Variable and Test references remain untouched.
+    Passing proves rewrite ELIGIBILITY, not data acquisition/runtime parity.
+    """
+    from copy import deepcopy
+    from hashlib import sha256
+
+    if type(state_id) is not str or not isinstance(assessment,dict):
+        raise ValueError("explicit legacy Assessment and State identity required")
+    states=assessment.get("states")
+    objects=assessment.get("objects")
+    tests=assessment.get("tests")
+    variables=assessment.get("variables")
+    if not all(isinstance(x,dict) for x in (states,objects,tests,variables)) or (
+        state_id not in states
+    ):
+        raise ValueError("full source State/Object/Variable/Test context required")
+    source=states[state_id]
+    if not isinstance(source,dict) or source.get("capability")!="unix.file" or (
+        not isinstance(source.get("state"),dict) or
+        set(source["state"])!={"all"} or
+        not isinstance(source["state"]["all"],list)
+    ):
+        raise ValueError("permission State must be an explicit AND over native Unix file bits")
+    macro=lower_no_more_permissive_than({"no_more_permissive_than":permitted})
+    expected={b["source_field"] for b in macro["forbidden"]}
+    original=source["state"]["all"]
+    names=[]
+    for term in original:
+        if not isinstance(term,dict) or set(term)!={
+            "field","value","operation","datatype",
+            "entity_check","entity_existence"
+        } or (
+            term["field"] not in expected or
+            term["value"]!="false" or
+            term["operation"]!="equals" or
+            term["datatype"]!="boolean" or
+            term["entity_check"]!="all" or
+            term["entity_existence"]!="at_least_one_exists"
+        ):
+            raise ValueError("permission State differs in field, operator or entity presence")
+        names.append(term["field"])
+    if len(names)!=len(expected) or set(names)!=expected:
+        raise ValueError("permission bit State incomplete, duplicated or extra")
+
+    def state_filter_refs(value):
+        if isinstance(value,dict):
+            for key,child in value.items():
+                if key=="state" and child==state_id:
+                    return True
+                if state_filter_refs(child):
+                    return True
+        elif isinstance(value,list):
+            return any(state_filter_refs(v) for v in value)
+        return False
+
+    for object_name,obj in objects.items():
+        if state_filter_refs(obj):
+            raise ValueError("permission State used by a collection Set/Filter: macro rewrite prohibited")
+
+    consumers={}
+    for name,test in tests.items():
+        refs=test.get("states") if isinstance(test,dict) else None
+        if not isinstance(refs,list):
+            raise ValueError("unsupported original Test State references")
+        if state_id in refs:
+            if refs!=[state_id] or test.get("check")!="all" or (
+                type(test.get("object")) is not str or
+                test["object"] not in objects
+            ):
+                raise ValueError("shared State has nontrivial Test use")
+            consumers[name]={
+                "object":test["object"],
+                "check_existence":test.get("check_existence"),
+                "check":test["check"],
+            }
+    if not consumers:
+        raise ValueError("permission State is not referenced by an Assessment Test")
+    # The alias changes no legacy source graph; save a stable context witness
+    # so a later compiler can assert that the source did not change.
+    evidence={
+        "source_state":state_id,
+        "source_state_terms":deepcopy(original),
+        "source_test_consumers":consumers,
+        "source_objects":deepcopy(objects),
+        "source_variables":deepcopy(variables),
+    }
+    digest=sha256(json.dumps(assessment,sort_keys=True,separators=(",",":"),
+                              ensure_ascii=False).encode("utf-8")).hexdigest()
+    return {"status":"SOURCE_STATE_ONLY_REWRITE_ELIGIBLE_NOT_EXECUTABLE",
+            "source_assessment_sha256":digest,
+            "source_context":evidence,
+            "expanded_native_states":deepcopy(macro["states"]),
+            "authoring_only":True,
+            "filters_rewritten":False,
+            "runtime_parity_verified":False}
+
+
 def evaluate_mode_against_C_macro(mode,compiled):
     """Independent source mode oracle: no disallowed POSIX permission bit."""
     if type(mode) is not int or not 0<=mode<=ALL:
