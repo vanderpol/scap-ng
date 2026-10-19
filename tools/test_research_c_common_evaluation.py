@@ -55,6 +55,30 @@ class UniversalPopulationTests(unittest.TestCase):
                 self.assertEqual(population_outcome(none,request(cap,"incomplete")), "unknown")
                 self.assertEqual(population_outcome(none,request(cap,"does_not_exist")), "true")
 
+    def test_state_free_presence_and_absence_on_identified_items(self):
+        for cap in ("linux.partition","unix.file","windows.registry","windows.wmi.query"):
+            with self.subTest(capability=cap):
+                for mode,expect_empty,expect_one in (
+                    ("at_least_one_exists","false","true"),
+                    ("none_exist","true","false"),
+                    ("only_one_exists","false","true"),
+                    ("all_exist","false","true"),
+                    ("any_exist","true","true"),
+                ):
+                    contract={"exists":mode,"items_match":"every","has_state":False}
+                    empty=request(cap,"complete")
+                    found=dict(empty,items=[{"id":"observed-1"}])
+                    self.assertEqual(population_outcome(contract,empty),expect_empty)
+                    self.assertEqual(population_outcome(contract,found),expect_one)
+                    if mode=="only_one_exists":
+                        two=dict(empty,items=[{"id":"a"},{"id":"b"}])
+                        self.assertEqual(population_outcome(contract,two),"false")
+                    wrong=dict(empty,items=[{"id":"observed-1","outcome":"true"}])
+                    with self.assertRaisesRegex(ValueError,"Item identity"):
+                        population_outcome(contract,wrong)
+                    self.assertEqual(population_outcome(contract,request(cap,"error")),"error")
+                    self.assertEqual(population_outcome(contract,request(cap,"not_collected")),"unknown")
+
     def test_incomplete_can_be_decisive_but_cannot_infer_success(self):
         for cap in ("linux.partition","windows.registry"):
             base={"exists":"at_least_one_exists","items_match":"every","has_state":True}
