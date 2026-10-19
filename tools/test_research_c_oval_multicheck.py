@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_oval_multicheck import convert_objectless_many, alias_of
+from research_c_oval_multicheck import convert_objectless_many, convert_selected_shared_many, alias_of
 from research_c_original_oval_to_authored_c import NotNativeCConvertible
 from test_research_c_original_oval_to_authored_c import original_plist
 
@@ -107,6 +107,76 @@ class OriginalCOVALMultiNumeric(unittest.TestCase):
         with self.assertRaisesRegex(NotNativeCConvertible,"SOURCE_TEST_UNSUPPORTED_QUANTIFIER"):
             convert_objectless_many(doc)
 
+
+
+
+def two_test_selected_source():
+    doc=original_plist()
+    tid=next(iter(doc["tests"]))
+    old=doc["tests"][tid]
+    old["test_title"]="Check DarkWake value_of is true"
+    sid=old["states"][0]
+    doc["states"][sid]["state_title"]="Expected enabled"
+    other="test-darkwake-value-of-not-true"
+    other_state="state-darkwake-not-true"
+    doc["tests"][other]={**deepcopy(old),
+        "test_title":"Check DarkWake value_of is not true",
+        "states":[other_state]}
+    doc["states"][other_state]={**deepcopy(doc["states"][sid]),
+        "state_title":"Expected not enabled",
+        "state":{**deepcopy(doc["states"][sid]["state"]),
+                 "operation":"not equal"}}
+    doc["evaluate"]={"all":[{"test":tid},{"test":other}]}
+    return doc
+
+class OriginalOVALSelectedSharedC(unittest.TestCase):
+    def test_two_source_tests_share_original_selected_object_id(self):
+        doc=two_test_selected_source()
+        before=deepcopy(doc)
+        result=convert_selected_shared_many(doc)
+        self.assertEqual(doc,before)
+        self.assertEqual(result["stage"],
+                         "NATIVE_C_SHARED_SELECTED_MULTI_SOURCE_COMPATIBILITY_PROVED")
+        c=result["authored_c"]
+        self.assertEqual(len(c["observations"]),1)
+        self.assertEqual(len(c["checks"]),2)
+        self.assertEqual(len(c["require"]["every"]),2)
+        self.assertEqual(set(result["source_test_crosswalk"].values()),set(doc["tests"]))
+        self.assertEqual(set(result["source_test_documentation"]),set(c["checks"]))
+        self.assertTrue(all(x["description"].startswith("Check") for x in
+                            [{"description":x} for x in
+                             result["source_test_documentation"].values()]))
+        self.assertEqual({x["object"] for x in
+                          result["native_c_compiled_tests"].values()},
+                         set(doc["objects"]))
+        self.assertTrue(result["A_source_semantic_projection_passed"])
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
+
+    def test_must_keep_original_set_filter_and_unsupported_scope(self):
+        doc=two_test_selected_source()
+        oid=next(iter(doc["objects"]))
+        doc["objects"][oid]["filters"]=[{"action":"exclude","state":"a-state"}]
+        with self.assertRaises(NotNativeCConvertible):
+            convert_selected_shared_many(doc)
+        doc=two_test_selected_source()
+        tid=next(iter(doc["tests"]))
+        doc["tests"][tid]["check_existence"]="any_exist"
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "DIFFERENT_SOURCE_SCOPE"):
+            convert_selected_shared_many(doc)
+
+    def test_missing_test_or_reused_state_never_vanishes(self):
+        doc=two_test_selected_source()
+        keys=list(doc["tests"])
+        doc["evaluate"]={"all":[{"test":keys[0]},{"test":keys[0]}]}
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "CHECK_INVENTORY_CHANGED"):
+            convert_selected_shared_many(doc)
+        doc=two_test_selected_source()
+        a,b=list(doc["tests"].values())
+        b["states"]=a["states"]
+        with self.assertRaisesRegex(NotNativeCConvertible,"STATE_REUSE"):
+            convert_selected_shared_many(doc)
 
 if __name__=="__main__":
     unittest.main()
