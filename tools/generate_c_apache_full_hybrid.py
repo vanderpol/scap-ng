@@ -51,6 +51,18 @@ def export_review(source_path,output_dir):
     if compile_grouped_apache(yaml.safe_load(
         grouped_path.read_text(encoding="utf-8")))!=source:
         raise ValueError("grouped C YAML would alter original source IR")
+    original_render=out.read_text(encoding="utf-8")
+    grouped_render=grouped_path.read_text(encoding="utf-8")
+    presentation_comparison={
+        "full":{"bytes":len(original_render.encode("utf-8")),
+                "lines":len(original_render.splitlines()),
+                "visible_derived_value_declarations":len(authored["derived_values"])},
+        "grouped":{"bytes":len(grouped_render.encode("utf-8")),
+                   "lines":len(grouped_render.splitlines()),
+                   "visible_derived_value_declarations":len(grouped["derived_values"])},
+        "authoring_comprehension_test_completed":False,
+        "automatic_grouping_promoted":False,
+        "source_graph_equal_in_both":True}
     manifest={
         "stage":"C_RESEARCH_APACHE_FULL_HYBRID_REVIEW_SOURCE_EXACT",
         "original_source_sha256":hashlib.sha256(raw).hexdigest(),
@@ -61,6 +73,7 @@ def export_review(source_path,output_dir):
         "grouped_output":grouped_path.name,
         "grouped_output_sha256":hashlib.sha256(grouped_path.read_bytes()).hexdigest(),
         "grouped_proof":grouped_proof,
+        "presentation_comparison":presentation_comparison,
         "C_normative_acceptance":False,"scanner_runtime_parity":False,
     }
     (output_dir/"proof.json").write_text(
