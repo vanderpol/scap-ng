@@ -36,15 +36,13 @@ def home_source():
 
 
 def c_home(source):
-    test = next(iter(source["assessment"]["tests"].values()))
-    return {
-        "each": "linux.partition",
-        "where": deepcopy(test["object"]["select"]),
-        "minimum_items": 1,
-        "all_found_items": {"mount_options": {
-            "contains": test["states"][0]["mount_options"]["equals"]
-        }},
-    }
+    """Independent C-authored fixture; never synthesize it from the A source."""
+    fixture = ROOT / ("research/assessment-simplification/compact-authoring-04/"
+                      "c-source-exact-home-nosuid.research.yaml")
+    parsed = yaml.safe_load(fixture.read_text(encoding="utf-8"))
+    if parsed["id"] != "research-c-source-exact-rhel-home-nosuid":
+        raise ValueError("unrecognized authored C source witness")
+    return parsed["require"]
 
 
 def apache(path):
