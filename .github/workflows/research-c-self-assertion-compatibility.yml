@@ -11,6 +11,8 @@ on:
       - 'tools/research_c_oval_multicheck.py'
       - 'tools/research_c_hybrid_must_overlay.py'
       - 'tools/test_research_c_hybrid_must_overlay.py'
+      - 'tools/research_c_hybrid_inline_expectations.py'
+      - 'tools/test_research_c_hybrid_inline_expectations.py'
       - 'tools/verify_c_published_original_oval_examples.py'
       - 'research/assessment-simplification/compact-authoring-04/oval-self-assertion-c-review/**'
   workflow_dispatch:
@@ -119,6 +121,9 @@ jobs:
           import yaml
           from research_c_hybrid_must_overlay import (
               present_hybrid_must,compile_hybrid_must,prove_original_hybrid)
+          from research_c_hybrid_inline_expectations import (
+              present_inline_expectations,compile_inline_expectations,
+              prove_inline_original)
           reviews=[]
           for file in sorted(Path("c-review").glob("*.review.json")):
               raw=json.loads(file.read_text(encoding="utf-8"))
@@ -158,6 +163,29 @@ jobs:
                          indent=2,sort_keys=True)+"\n",encoding="utf-8")
           print("Pinned original OVAL nested Set/Filter/Variable hybrid C proof:",
                 json.dumps(proof,sort_keys=True))
+          # Second, substantial authoring simplification: source constants
+          # are now in expected-value declarations, not authored Variables.
+          inlined=present_inline_expectations(native)
+          inline_proof=prove_inline_original(native,inlined)
+          assert compile_inline_expectations(inlined)==native
+          assert inline_proof["authored_constant_variable_declarations"]==0
+          assert inline_proof["compiler_rehydrated_source_variables"]==3
+          assert inline_proof["authored_named_expected_values"]==4
+          assert inlined["compatibility"]["states"]=={}
+          assert inlined["compatibility"]["variables"]=={}
+          for field in inlined["expected_values"].values():
+              if "source_constant" in field:
+                  assert field["value_match"]=="one"
+          (Path("c-hybrid")/"nested-set-filter-inline-constants.research.yaml").write_text(
+              "# Source-backed C hybrid: expected literals replace authored constant Variables.\n"
+              +"# Original pinned OVAL XML: unix/oval-def_set-unix.xml\n"
+              +yaml.safe_dump(inlined,sort_keys=False,allow_unicode=True),
+              encoding="utf-8")
+          (Path("c-hybrid")/"inline-proof.json").write_text(
+              json.dumps({"source":review["source"],"proof":inline_proof},
+                         indent=2,sort_keys=True)+"\n",encoding="utf-8")
+          print("Original 7-Test OVAL nested Set with inline authoring constants:",
+                json.dumps(inline_proof,sort_keys=True))
           PY
       - name: Compile independently authored C subset of every source-compatible original OVAL Definition
         run: |
