@@ -44,6 +44,10 @@ class CUnifiedCompilerTest(unittest.TestCase):
         one=list(plan["shared_objects"])[0]
         self.assertTrue(one.endswith("-object"))
         self.assertEqual({t["object"] for t in plan["tests"].values()}, {one})
+        self.assertEqual({c["test"]["object"] for c in plan["checks"].values()}, {one})
+        self.assertTrue(all(c["independent_collection_plan"] is False
+                            for c in plan["checks"].values()))
+        self.assertEqual({name:c["test"] for name,c in plan["checks"].items()},plan["tests"])
         self.assertEqual(plan["tests"]["value_disabled"]["require"],
                          "at_least_one_exists_and_all_match")
         self.assertEqual(plan["tests"]["contains_dword"]["require"],
