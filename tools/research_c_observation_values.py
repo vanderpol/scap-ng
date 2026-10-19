@@ -11,6 +11,8 @@ from __future__ import annotations
 from copy import deepcopy
 import re
 
+from research_c_derived_values_compiler import _hash
+
 from research_c_derived_values_compiler import compile_c_derived_values
 from research_c_shared_engine import present_c_variable_steps
 
@@ -94,7 +96,8 @@ def compile_c_observation_values(authored):
     """Compile without reading any source Assessment or original A Variables."""
     if not isinstance(authored,dict) or set(authored) not in (
         {"assessment_id","observations","steps"},
-        {"assessment_id","observations","steps","expected_source_variables_sha256"}):
+        {"assessment_id","observations","steps","expected_source_variables_sha256",
+         "expected_source_shared_objects_sha256"}):
         raise ValueError("one C observation/value authoring form required")
     entries=authored["observations"]
     steps=authored["steps"]
@@ -131,6 +134,10 @@ def compile_c_observation_values(authored):
         translated["steps"].append(change)
     if used!=set(named):
         raise ValueError("unused observation cannot silently disappear")
+    if "expected_source_shared_objects_sha256" in authored:
+        expected=authored["expected_source_shared_objects_sha256"]
+        if type(expected) is not str or _hash(shared)!=expected:
+            raise ValueError("shared observation acquisition does not reproduce pinned source graph")
     result=compile_c_derived_values(translated)
     if result["shared_objects"]!=shared:
         raise ValueError("named observation graph unexpectedly changed")
@@ -194,4 +201,5 @@ def present_c_observation_values(source):
     return {"assessment_id":source["id"],"observations":observations,
             "steps":[{**deepcopy(step),"derive":converted(step["derive"])}
                      for step in view["steps"]],
-            "expected_source_variables_sha256":view["source_variables_sha256"]}
+            "expected_source_variables_sha256":view["source_variables_sha256"],
+            "expected_source_shared_objects_sha256":_hash(shared)}
