@@ -11,7 +11,7 @@ import unittest
 import yaml
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_fused_apache import compile_fused_command_pipeline,evaluate_fused_command_pipeline
+from research_c_fused_apache import compile_fused_command_pipeline,evaluate_fused_command_pipeline,_hash
 from research_b_variable_schedule import plan_source_variables
 from research_b_variable_plan_evaluator import evaluate_source_variable_plan
 from research_b_source_shell_snapshot import normalize,PROVIDER
@@ -26,7 +26,8 @@ DERIVED="command-gather-apache-version-variable"
 class FusedApacheCProof(unittest.TestCase):
     def setUp(self):
         self.source=yaml.safe_load(SOURCE.read_text(encoding="utf-8"))["assessment"]
-        self.plan=compile_fused_command_pipeline(self.source)
+        self.pinned=_hash(self.source["variables"])
+        self.plan=compile_fused_command_pipeline(self.source,pinned_variables_sha256=self.pinned)
         self.assertEqual(self.plan["source_ids"],[CAPTURE,DERIVED])
         self.assertFalse(self.plan["original_scanner_parity_verified"])
         self.assertFalse(self.plan["collector_executed"])
@@ -101,7 +102,7 @@ class FusedApacheCProof(unittest.TestCase):
                 changed=copy.deepcopy(self.source)
                 broken(changed)
                 with self.assertRaises(ValueError):
-                    compile_fused_command_pipeline(changed)
+                    compile_fused_command_pipeline(changed,pinned_variables_sha256=self.pinned)
 
 
 if __name__=="__main__":
