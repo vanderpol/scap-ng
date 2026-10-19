@@ -15,7 +15,7 @@ import unittest
 import yaml
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_require_language import compile_c_requirement,EXISTENCE,MATCH,_catalog,parse_c_yaml
+from research_c_require_language import compile_c_requirement,EXISTENCE,MATCH,_catalog,parse_c_yaml,evaluate_compiled_c_supplied_items
 from oval_result_truth_tables import evaluate_collected_object_test
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -141,6 +141,65 @@ class CandidateCGrammar(unittest.TestCase):
             with self.subTest(change=bad):
                 with self.assertRaises(ValueError):
                     compiled(doc)
+
+    def test_compiled_C_runs_only_source_audited_generic_item_modes(self):
+        cases=[
+            ({"type":"dword","value":0},(["true","false"],"true"),
+             (["false"],"false"),([],"false")),
+            ({"every_item":{"type":"dword","value":0}},
+             (["true","false"],"false"),(["true"],"true"),([],"false")),
+            ({"one_matching_item":{"type":"dword","value":0}},
+             (["true","false"],"true"),(["true","true"],"false"),([],"false")),
+            ({"no_matching_item":{"type":"dword","value":0}},
+             (["false","false"],"true"),(["true","false"],"false"),([],"false")),
+        ]
+        for mode,*witnesses in cases:
+            d=deepcopy(WIN)
+            d["must"]=mode
+            plan=compile_c_requirement(d)
+            for observed,expected in witnesses:
+                with self.subTest(mode=mode,observed=observed):
+                    blob={"capability":"windows.registry","status":"complete",
+                          "items":[{"id":f"i{x}","outcome":v}
+                                   for x,v in enumerate(observed)],
+                          "does_not_exist":0,"error":0,"not_collected":0}
+                    out=evaluate_compiled_c_supplied_items(plan,blob)
+                    self.assertEqual(out["outcome"],expected)
+                    self.assertFalse(out["collector_executed"])
+            # Independent capability identity is never inferred from the results.
+            bad={"capability":"unix.file","status":"complete","items":[],
+                 "does_not_exist":0,"error":0,"not_collected":0}
+            with self.assertRaisesRegex(ValueError,"capability differs"):
+                evaluate_compiled_c_supplied_items(plan,bad)
+
+    def test_existence_only_C_compiles_and_runs_on_identified_items(self):
+        for text,complete_empty,complete_one in (
+            ("present","false","true"),
+            ("absent","true","false"),
+            ("one_item_exists","false","true"),
+            ("all_items_exist","false","true"),
+            ("optional","true","true"),
+        ):
+            d=deepcopy(WIN)
+            d["must"]=text
+            plan=compile_c_requirement(d)
+            for items,expected in (([],complete_empty),([{"id":"i1"}],complete_one)):
+                blob={"capability":"windows.registry","status":"complete",
+                      "items":items,"does_not_exist":0,"error":0,"not_collected":0}
+                with self.subTest(mode=text,count=len(items)):
+                    self.assertEqual(evaluate_compiled_c_supplied_items(plan,blob)[
+                        "outcome"],expected)
+
+    def test_unproven_rare_A_pair_remains_representable_but_cannot_execute(self):
+        d=deepcopy(WIN)
+        d["must"]={"special_source_requirement":"none_exist_and_some_match",
+                   "fields":{"type":"dword","value":0}}
+        compiled=compile_c_requirement(d)
+        self.assertEqual(compiled["test"]["require"],"none_exist_and_some_match")
+        blob={"capability":"windows.registry","status":"complete","items":[],
+              "does_not_exist":0,"error":0,"not_collected":0}
+        with self.assertRaisesRegex(ValueError,"not runtime-proven"):
+            evaluate_compiled_c_supplied_items(compiled,blob)
 
     def test_one_matching_item_and_exactly_one_existing_item_not_conflated(self):
         # One matching Item amongst two is not one Item in collection.
