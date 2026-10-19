@@ -1,0 +1,102 @@
+# #245 — read-only C source-compatible research view of real Windows 11
+# SV-253495; NOT native validated C authoring and NOT scanner evaluated.
+# Two source-backed shared observations supply seven separate Tests.
+# Alternative WMI record STATES are kept separate, NOT "some field in 1,3".
+observations:
+  system_role:
+    source_object: windows-wmi57-object
+    from:
+      windows.wmi.query:
+        namespace: 'root\cimv2'
+        query: SELECT DomainRole FROM win32_computersystem
+  denied_remote_logon_trustees:
+    source_object: windows-userright-object
+    from:
+      windows.userright:
+        userright: SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME
+
+checks:
+  domain_joined_non_dc:
+    on: system_role
+    source_test: system-non-dc-domain-joined-windows-server-or-workstation-test
+    must:
+      items: every_item
+      record: result
+      record_requirement: at_least_one_exists_and_all_match
+      field: domainrole
+      field_requirement: at_least_one_exists_and_all_match
+      any_record_state_every_value_equals: ['1', '3']
+
+  standalone:
+    on: system_role
+    source_test: system-standalone-windows-server-or-workstation-test
+    must:
+      items: every_item
+      record: result
+      record_requirement: at_least_one_exists_and_all_match
+      field: domainrole
+      field_requirement: at_least_one_exists_and_all_match
+      any_record_state_every_value_equals: ['0', '2']
+
+  deny_local_accounts:
+    on: denied_remote_logon_trustees
+    source_test: deny-log-on-through-remote-desktop-services-local-account-test
+    must:
+      items: any_item
+      same_item_field: trustee_name
+      field_values: at_least_one_exists_and_all_match
+      predicate:
+        pattern_match: '^(?i)(NT Authority\\)?Local account$'
+
+  deny_guests:
+    on: denied_remote_logon_trustees
+    source_test: deny-log-on-through-remote-desktop-services-guests-test
+    must:
+      items: any_item
+      same_item_field: trustee_name
+      field_values: at_least_one_exists_and_all_match
+      predicate:
+        case_insensitive_equals: Guests
+
+  deny_domain_admins:
+    on: denied_remote_logon_trustees
+    source_test: deny-log-on-through-remote-desktop-services-domain-admins-test
+    must:
+      items: any_item
+      same_item_field: trustee_name
+      field_values: at_least_one_exists_and_all_match
+      predicate:
+        pattern_match: '^(?i)(.+\\)?Domain Admins$'
+
+  deny_enterprise_admins:
+    on: denied_remote_logon_trustees
+    source_test: deny-log-on-through-remote-desktop-services-enterprise-admins-test
+    must:
+      items: any_item
+      same_item_field: trustee_name
+      field_values: at_least_one_exists_and_all_match
+      predicate:
+        pattern_match: '^(?i)(.+\\)?Enterprise Admins$'
+
+  deny_everyone:
+    on: denied_remote_logon_trustees
+    source_test: deny-log-on-through-remote-desktop-services-everyone-test
+    must:
+      items: any_item
+      same_item_field: trustee_name
+      field_values: at_least_one_exists_and_all_match
+      predicate:
+        case_insensitive_equals: Everyone
+
+require:
+  one_of:
+    - every:
+        - check: domain_joined_non_dc
+        - check: deny_local_accounts
+        - check: deny_guests
+        - check: deny_domain_admins
+        - check: deny_enterprise_admins
+    - every:
+        - check: standalone
+        - check: deny_guests
+    - check: deny_everyone
