@@ -65,13 +65,41 @@ All eleven Objects, Set ordering and operand nesting, Filters, all three constan
 
 **Scope caveat:** A semantic round-trip, structural deep equality and synthetic negative tests are not a six-state scanner run. The module has not replaced the native Self-Assertion C compiler; that converter remains at **20 of 162** supported Definitions. Call this **one independently validated hybrid authoring experiment**, not 21 C-native Definitions and not a completed Set/Filter/Variable simplification.
 
+## Second iteration: remove authored constant-Variable declarations (verified)
+
+The first hybrid proof retained three OVAL constants inside the typed compatibility graph. The second iteration now lifts the **four authored State expectations** into an author-facing `expected_values` mapping, which can contain the value itself, or an explicit list and its exact value-match quantifier. **All three redundant constant-Variable declarations disappear from authoring**, while their original IDs and comments remain available as compilation provenance.
+
+This is a source-backed example of a real two-valued expected path:
+
+```yaml
+expected_values:
+  state-this-file-state-represents-a-file-object-with-a-path-tha-3:
+    description: This file_state represents a file_object with a path ...
+    field: path
+    equals:
+      - /opt/support/txt/txtfile
+      - /opt/support/txt/txtfile/subtxtfile
+    value_match: one
+    source_constant:
+      id: this-constant-variable-represents-string-values-c-support-txt-txtfile-variable-2
+      description: Original publisher constant Variable title
+```
+
+The long `source_constant` and State IDs are retained **for exact original source provenance**, not because a new author would be required to invent that OVAL-style identity. Authoring-level alias simplification is a further presentation task.
+
+The independent [inline-value C compiler](../../../tools/research_c_hybrid_inline_expectations.py) starts with a C document containing **zero `compatibility.variables` entries and zero `compatibility.states` entries**; it reconstructs the four original typed States and three exact original constant Variables from the four C expectations, including `variable_check="only one"`. It then routes through the same C `must` compiler and reconstructs the **entire original 7-Test / 11-Object / 7-Set / 4-State / 3-Variable A graph**.
+
+[Real original-source full-corpus proof, run 39334419927](https://github.com/vanderpol/scap-ng/actions/runs/39334419927), under the artifact's `c-hybrid/nested-set-filter-inline-constants.research.yaml` and `c-hybrid/inline-proof.json`. [305 focused tests passed](https://github.com/vanderpol/scap-ng/actions/runs/39334442439), including fail-closed checks for accidental multi-value changes, shared-use constant removal, wrong datatypes, missing State refs, source-ID drift, and altered `value_match`.
+
+**This is a real gain beyond `must`: three authored constant Variable nodes are eliminated without altering internal OVAL-compatible execution.** The bounded compiler deliberately rejects genuinely derived Variables, cross-consumer sharing, complex/untyped expressions, or arbitrary source State shapes. It is **not yet** a generic original OVAL corpus C converter and does not establish scanner six-state evaluation parity.
+
 ## Independent engineering assessment: go/no-go
 
 **GO: investigate the hybrid architecture further.** Existing native OVAL-compatible graph semantics are sophisticated and have already survived real roundtrips. Rewriting them simply to gain shorter syntax creates risk and delay without demonstrated benefit.
 
 **NOT YET GO: accept the present authored format as satisfactory.** Replacing `check`/`check_existence` with `must` and `all` with `and` is useful but insufficient. A human author still confronts long legacy State/Object identifiers and a large typed execution graph. The next material gains must be demonstrable rather than cosmetic:
 
-1. **Inline fixed literal values at the consumer** while keeping exact multi-value `var_check`, datatype, provenance and sharing. Do not remove real runtime derived inputs or mixed acquisition/comparison uses.
+1. **Extend the now source-backed literal inlining proof to other datatypes and safely shared constants**, keeping exact multi-value `var_check`, datatype, provenance and sharing. Do not remove real runtime derived inputs or mixed acquisition/comparison uses.
 2. **Separate reusable observations from per-check requirements** without losing Set population, filter order, Items or collection behavior. Show dependency arrows and source comments in a graphical/editor view.
 3. **Keep true derived-data dependencies explicit**, including downstream commands/selector parameterization, without redeclaring intermediary Variables only for presentation.
 4. **Measure before/after authoring burden** on this seven-Test UNIX source and the nineteen-Variable Apache source: number of declarations authors must edit, number of cross-references, and whether a non-OVAL expert correctly interprets empty/error/unknown paths. Less YAML alone is not semantic clarity.
