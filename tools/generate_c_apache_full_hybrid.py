@@ -8,6 +8,8 @@ from pathlib import Path
 import yaml
 from research_c_apache_hybrid_authoring import (
     present_c_apache_hybrid,compile_c_apache_hybrid,prove_c_apache_hybrid)
+from research_c_apache_grouped_values import (
+    present_grouped_apache,compile_grouped_apache,prove_grouped_apache)
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT.joinpath("research/requirements-first-language/contract-candidate/"
@@ -36,6 +38,19 @@ def export_review(source_path,output_dir):
           +yaml.safe_dump(authored,sort_keys=False,allow_unicode=True))
     out=output_dir/FILENAME
     out.write_text(body,encoding="utf-8")
+    # Group only four independently audited *pure value* single consumers.
+    # Command-acquisition dependencies remain named steps.
+    grouped=present_grouped_apache(source)
+    grouped_proof=prove_grouped_apache(source,grouped)
+    grouped_path=output_dir/"apache-sv214268-fifteen-visible-four-nested-derived.research.yaml"
+    grouped_path.write_text(
+        "# C grouped-value research; 4 value-only steps nested, all 19 A Variables recoverable.\n"
+        "# Original full Apache source graph and scanner caveats remain unchanged.\n"
+        +yaml.safe_dump(grouped,sort_keys=False,allow_unicode=True),
+        encoding="utf-8")
+    if compile_grouped_apache(yaml.safe_load(
+        grouped_path.read_text(encoding="utf-8")))!=source:
+        raise ValueError("grouped C YAML would alter original source IR")
     manifest={
         "stage":"C_RESEARCH_APACHE_FULL_HYBRID_REVIEW_SOURCE_EXACT",
         "original_source_sha256":hashlib.sha256(raw).hexdigest(),
@@ -43,6 +58,9 @@ def export_review(source_path,output_dir):
         "original_repository_source":str(source_path.relative_to(ROOT)) if (
             source_path.is_relative_to(ROOT)) else str(source_path),
         "output":FILENAME,"proof":proof,
+        "grouped_output":grouped_path.name,
+        "grouped_output_sha256":hashlib.sha256(grouped_path.read_bytes()).hexdigest(),
+        "grouped_proof":grouped_proof,
         "C_normative_acceptance":False,"scanner_runtime_parity":False,
     }
     (output_dir/"proof.json").write_text(
