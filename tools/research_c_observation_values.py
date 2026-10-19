@@ -85,7 +85,7 @@ def _convert_expression(node, named, used, depth=0):
             raise ValueError("observation must be one alias or one private descriptor")
         return {"read_field":{"field":field["field"],"object":deepcopy(obj)}}
     # Reject ambiguous or legacy internal Object spelling, even when nested.
-    if "object" in node or "variable" in node or "values" in node:
+    if set(node) in ({"object"},{"variable"},{"values"}):
         raise ValueError("source-only Object/Variable vocabulary is not C authoring")
     return {key:_convert_expression(value,named,used,depth+1)
             for key,value in node.items()}
@@ -131,19 +131,6 @@ def compile_c_observation_values(authored):
         translated["steps"].append(change)
     if used!=set(named):
         raise ValueError("unused observation cannot silently disappear")
-    # Scalar shared acquisition ID references are lowered to A source Object
-    # IDs and are never guessed from their author-facing name.
-    def bind(node):
-        if isinstance(node,dict):
-            if set(node)=={"read_field"}:
-                val=node["read_field"]
-                if type(val["object"]) is str:
-                    return node
-            return {k:bind(v) for k,v in node.items()}
-        if isinstance(node,list):
-            return [bind(x) for x in node]
-        return node
-    # The read_field already lowers to source ID for named acquisition.
     result=compile_c_derived_values(translated)
     if result["shared_objects"]!=shared:
         raise ValueError("named observation graph unexpectedly changed")
@@ -169,7 +156,6 @@ def _private_observations(node):
 
 def present_c_observation_values(source):
     """Source-backed initial view; output is editable but still non-normative."""
-    original=source["variables"]
     shared=source.get("shared_objects",{})
     if not isinstance(shared,dict):
         raise ValueError("source shared Objects require mapping")
