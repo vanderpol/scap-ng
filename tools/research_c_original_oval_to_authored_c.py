@@ -246,10 +246,10 @@ def batch_convert_review_folder(review,output):
 
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--A-review",type=Path,required=True)
+    parser.add_argument("--a-review",type=Path,required=True)
     parser.add_argument("--output",type=Path,required=True)
     args=parser.parse_args(argv)
-    r=batch_convert_review_folder(args.A_review,args.output)
+    r=batch_convert_review_folder(args.a_review,args.output)
     counts=Counter(x["reason"].split(":")[0] for x in r["unsupported"])
     print(json.dumps({"A_compatible_Definitions_seen":r["A_compatible_Definitions_seen"],
           "native_C_Definitions":r["native_C_Definitions"],
