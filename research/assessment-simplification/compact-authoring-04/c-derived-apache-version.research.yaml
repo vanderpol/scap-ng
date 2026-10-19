@@ -1,6 +1,6 @@
 # C research-only authored example. Not normative; source OVAL runtime parity unproven.
 assessment_id: SV-214273.automated
-shared_objects: {}
+observations: {}
 steps:
   - name: apache_executable_paths
     source_id: apache-path-httpd-or-apache2-variable
@@ -13,16 +13,17 @@ steps:
         value:
           read_field:
             field: stdout_line
-            object:
-              capability: independent.shellcommand
-              object_title: Gather unique apache http installation paths
-              collect:
-                command: >-
-                  ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
-                shell: bash
-                pattern: '^\/\S+(\/httpd|\/apache2)\s*'
-                error_if_exit_status_not_0: false
-                error_if_stderr_exists: false
+            observation:
+              description: Gather unique apache http installation paths
+              from:
+                independent.shellcommand:
+                  collect:
+                    command: >-
+                      ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq
+                    shell: bash
+                    pattern: '^\/\S+(\/httpd|\/apache2)\s*'
+                    error_if_exit_status_not_0: false
+                    error_if_stderr_exists: false
   - name: apache_version_command
     source_id: command-gather-apache-version-variable
     title: command to gather apache version
