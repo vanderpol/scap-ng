@@ -36,6 +36,7 @@ def gap_report(manifest, *, min_expected_total=None):
     seen=set()
     by_reason=defaultdict(list)
     by_selected_multi_reason=defaultdict(list)
+    by_native_stage=defaultdict(list)
     for status,rows in (("converted",converted),("unsupported",unsupported)):
         for entry in rows:
             if not isinstance(entry,dict):
@@ -49,6 +50,13 @@ def gap_report(manifest, *, min_expected_total=None):
             if identity in seen:
                 raise ValueError("one source Definition counted more than once")
             seen.add(identity)
+            if status=="converted":
+                stage=entry.get("C_compilation_stage")
+                if (type(stage) is not str or not stage.startswith("NATIVE_C_") or
+                    entry.get("native_C_compilation_passed") is not True or
+                    entry.get("A_projection_equivalence_checked") is not True):
+                    raise ValueError("native C conversion lacks checked stage/proof")
+                by_native_stage[stage].append(entry)
             if status=="unsupported":
                 reason=entry.get("reason")
                 if type(reason) is not str or not reason.strip():
@@ -86,6 +94,20 @@ def gap_report(manifest, *, min_expected_total=None):
         lines.append(f"| {chr(96)}{reason}{chr(96)} | {len(items)} | {', '.join(links)} |")
     lines += [
         "",
+        "## Native conversions by independently checked C lowering route",
+        "",
+        "| Source-compatible C route | Definitions | Pinned source examples |",
+        "| --- | ---: | --- |",
+    ]
+    for stage,items in sorted(by_native_stage.items(),
+                              key=lambda kv:(-len(kv[1]),kv[0])):
+        samples=", ".join(
+            "["+x["file"]+"]("+ORIGINAL+x["file"]+")"
+            for x in sorted(items,key=lambda x:(x["file"],x["definition_id"]))[:3])
+        lines.append("| "+chr(96)+stage+chr(96)+" | "+str(len(items))+
+                     " | "+samples+" |")
+    lines += [
+        "",
         "## Multi-Test selected-collection fallback",
         "",
         "These are first errors from the selected shared-collection route, "
@@ -116,6 +138,7 @@ def gap_report(manifest, *, min_expected_total=None):
     return {"total":source_total,"converted":len(converted),
             "unsupported":len(unsupported),
             "categories":{k:len(v) for k,v in sorted(by_reason.items())},
+            "native_stages":{k:len(v) for k,v in sorted(by_native_stage.items())},
             "selected_multi_test_categories":{k:len(v) for k,v in
                                               sorted(by_selected_multi_reason.items())},
             "markdown":"\n".join(lines)}
