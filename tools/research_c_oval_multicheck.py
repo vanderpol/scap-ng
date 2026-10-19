@@ -86,7 +86,7 @@ def convert_objectless_many(a):
         if (not isinstance(st,dict) or set(st)!={"capability","state_title","state"}
                 or st["capability"]!=capability):
             reject("STATE_UNREVIEWED_METADATA")
-        fields=project_fields(st["state"])
+        fields=project_fields(st["state"],st["capability"])
         alias=alias_of(t.get("test_title"),fields)
         if alias in reverse:
             reject("DUPLICATE_MEANINGFUL_TEST_TITLE")
@@ -139,17 +139,8 @@ def convert_objectless_many(a):
         if generated["capability"]!=capability or (
             generated.get("require")!="at_least_one_exists_and_all_match"):
             reject("C_TEST_SEMANTIC_DRIFT")
-        expected=native_states[alias]
-        if len(generated.get("states") or [])!=len(expected):
-            reject("C_FIELDS_COUNT_DRIFT")
-        for out,original in zip(generated["states"],expected):
-            field=original["field"]
-            op=OPS.get(original["operation"])
-            if op is None:
-                reject("COMPOUND_SOURCE_FIELD_OPERATION_UNSUPPORTED")
-            if out!={field:{"require":"at_least_one_exists_and_all_match",
-                            op:original["value"]}}:
-                reject("C_FIELDS_TYPED_CONTENT_DRIFT")
+        _same_source_semantics(tests[tid],generated,obj,native_states[alias],
+                               source_singleton_objectless=True)
     # The C AND compiler shares the source OVAL six-state truth-table model;
     # this gate does NOT infer truth from source Item collection.
     result={"stage":"NATIVE_C_MULTICHECK_SOURCE_COMPATIBILITY_PROVED",
@@ -214,7 +205,7 @@ def convert_selected_shared_many(a):
             set(st)!={"capability","state_title","state"} or
             st["capability"]!=cap):
             reject("SHARED_SELECTED_STATE_METADATA_UNSUPPORTED")
-        fields=project_fields(st["state"])
+        fields=project_fields(st["state"],st["capability"])
         alias=alias_of(t.get("test_title"),fields)
         if alias in checks:
             # Two source Tests may assert different values on the SAME
@@ -324,7 +315,7 @@ def convert_distinct_selected_many(a):
             set(state)!={"capability","state_title","state"} or
             state["capability"]!=t["capability"]):
             reject("MULTI_DISTINCT_STATE_METADATA_UNSUPPORTED")
-        fields=project_fields(state["state"])
+        fields=project_fields(state["state"],state["capability"])
         alias=alias_of(t.get("test_title"),fields)
         if alias in checks:
             # Same State field with a different source Test condition:
