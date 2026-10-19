@@ -73,3 +73,9 @@ The [C coverage triage](../../../tools/research_c_coverage_triage.py) can read t
 `python tools/research_c_coverage_triage.py --verified-ir /path/to/a-lossless-ir.json --output /path/to/c-triage.json --assert-six`
 
 The full six-STIG IR was **not available in the lightweight local workspace**, so **no category totals** have been claimed yet. The command requires the existing independent A IR decoder to succeed before outputting any report. The historical baseline expected by `--assert-six` is 872 automated Assessments and 1,375 named Tests. This is a measure of C's remaining challenge, not a reason to lower capability standards.
+
+## Cross-Rule shared observation catalog: source resolver, not runtime cache
+
+The [version-and-SHA-256-pinned resolver](../../../tools/research_c_external_observations.py) permits separate C Assessments/Rules to import the same immutable `shared/...@version` acquisition contract via `observations: {name: {use: ..., sha256: ...}}` and feed the resolved, source-independent form into **the same** C compiler. [Nine focused local tests](../../../tools/test_research_c_external_observations.py) passed in roughly 0.003 seconds using a lightweight native A compilation stub, exercising two independent consumer policies, immutable hashes, provenance, rejection of changed/missing versions, and no invented singleton Objects. Full pinned A verification remains on the focused Actions gate.
+
+This is **only definition sharing**. It does NOT establish a signed catalog, one cross-Rule runtime collection, shared scan snapshot, privilege/session equivalence, cache safety, or source OVAL parity. The resolver preserves source identity and fails closed rather than silently rebinding an existing Rule to a changed source contract. A later execution compiler must explicitly decide whether the host/snapshot/provider/privilege/parent scope permits reuse.
