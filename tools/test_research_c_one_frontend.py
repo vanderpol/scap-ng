@@ -85,7 +85,7 @@ class OneCFrontendShape(unittest.TestCase):
         c=sample("c-source-exact-windows-rdp-rights.research.yaml")
         c["checks"]["standalone"]["from"]={
             "windows.registry":{"name":"Example"}}
-        with self.assertRaisesRegex(ValueError,"two acquisition routes"):
+        with self.assertRaisesRegex(ValueError,"cannot also reference observation"):
             normalize_c_frontend(c)
 
     def test_unresolved_and_orphan_shared_observation_fail_closed(self):
