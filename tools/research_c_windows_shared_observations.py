@@ -29,6 +29,18 @@ CHECKS = {
 }
 REVERSE_CHECKS = {source: alias for alias, source in CHECKS.items()}
 SOURCE_OPERATORS = {"all": "every", "any": "one_of", "one": "exactly_one", "odd": "odd_count"}
+# Narrow proof only. Never silently bless another source version as equivalent.
+ROLE_VALUES = {
+    "domain_joined_non_dc": ["1", "3"],
+    "standalone": ["0", "2"],
+}
+TRUSTEE_PREDICATES = {
+    "deny_local_accounts": ("pattern_match", r"^(?i)(NT Authority\\)?Local account$"),
+    "deny_guests": ("case_insensitive_equals", "Guests"),
+    "deny_domain_admins": ("pattern_match", r"^(?i)(.+\\)?Domain Admins$"),
+    "deny_enterprise_admins": ("pattern_match", r"^(?i)(.+\\)?Enterprise Admins$"),
+    "deny_everyone": ("case_insensitive_equals", "Everyone"),
+}
 
 
 def fingerprint(value):
@@ -191,6 +203,19 @@ def present_windows_shared_observations(source):
         ]
     }:
         raise ValueError("source conditional branches differ")
+    if any(checks[k]["must"]["any_record_state_every_value_equals"] != values
+           for k, values in ROLE_VALUES.items()):
+        raise ValueError("pinned DomainRole source alternatives changed")
+    if any(next(iter(checks[k]["must"]["predicate"].items())) != predicate
+           for k, predicate in TRUSTEE_PREDICATES.items()):
+        raise ValueError("pinned trustee source predicate changed")
+    if obs["system_role"]["from"] != {"windows.wmi.query": {
+        "namespace": r"root\cimv2",
+        "query": "SELECT DomainRole FROM win32_computersystem",
+    }} or obs["denied_remote_logon_trustees"]["from"] != {
+        "windows.userright": {"userright": "SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME"}
+    }:
+        raise ValueError("pinned source collection selector/query changed")
     return {
         "stage":VIEW_VERSION, "source_assessment":SOURCE_ASSESSMENT_ID,
         "source_sha256":fingerprint(a), "observations":obs,
