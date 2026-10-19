@@ -21,9 +21,11 @@ from pathlib import Path
 import re
 import yaml
 
-from research_c_require_language import compile_c_requirement
+from research_c_require_language import compile_c_requirement, _mapping
 
-OPS={"equals":"equals","pattern match":"matches_regex"}
+OPS={"equals":"equals","pattern match":"matches_regex",
+     "greater than":"greater_than","greater than or equal":"greater_than_or_equal",
+     "less than":"less_than","less than or equal":"less_than_or_equal"}
 PAIR_CHECK={"all":"all_match","at least one":"some_match",
             "only one":"only_one_matches","none satisfy":"none_match"}
 PRESENCE={"at_least_one_exists":"present","none_exist":"absent",
@@ -89,21 +91,31 @@ def project_fields(state):
         out[field]=value if op=="equals" else {"matches_regex":value}
     return out
 
-def _same_source_semantics(original,compiled,obj,states):
+def _same_source_semantics(original,compiled,obj,states, *, source_singleton_objectless=False):
     if original["capability"]!=compiled["capability"]:
         reject("SOURCE_COMPILER_CAPABILITY_DRIFT")
-    if (not isinstance(compiled.get("object"),dict) or
-        compiled["object"].get("capability")!=obj["capability"]):
-        reject("SOURCE_COMPILER_ACQUISITION_DRIFT")
-    original_select=obj["select"]
-    emitted_select=compiled["object"].get("select")
-    if not isinstance(emitted_select,dict) or set(emitted_select)!=set(original_select):
-        reject("SOURCE_COMPILER_SELECTOR_DRIFT")
-    for field,ent in original_select.items():
-        expected={"equals":ent["value"]} if ent["operation"]=="equals" else {
-            "matches_regex":ent["value"]}
-        if emitted_select[field]!=expected:
-            reject("SOURCE_COMPILER_SELECTOR_VALUE_DRIFT")
+    if source_singleton_objectless:
+        # 0.3 represents an OVAL singleton with one legacy Object reference.
+        # C's exact versioned capability contract explicitly has no Object:
+        # the provider itself supplies system-level evidence. Do not
+        # generalize this to a selector-free Object merely from its shape.
+        if (set(obj)!={"capability","object_title"} or
+            compiled.get("object") is not None or
+            _mapping(original["capability"]).get("test_source",{}).get("kind")!="none"):
+            reject("SOURCE_COMPILER_OBJECTLESS_ACQUISITION_DRIFT")
+    else:
+        if (not isinstance(compiled.get("object"),dict) or
+            compiled["object"].get("capability")!=obj["capability"]):
+            reject("SOURCE_COMPILER_ACQUISITION_DRIFT")
+        original_select=obj["select"]
+        emitted_select=compiled["object"].get("select")
+        if not isinstance(emitted_select,dict) or set(emitted_select)!=set(original_select):
+            reject("SOURCE_COMPILER_SELECTOR_DRIFT")
+        for field,ent in original_select.items():
+            expected={"equals":ent["value"]} if ent["operation"]=="equals" else {
+                "matches_regex":ent["value"]}
+            if emitted_select[field]!=expected:
+                reject("SOURCE_COMPILER_SELECTOR_VALUE_DRIFT")
     if not states:
         expected_token=PRESENCE.get(original["check_existence"])
         if expected_token is None:
@@ -162,7 +174,21 @@ def compile_one_original_definition(original_assessment):
     obj=objects[old["object"]]
     if not isinstance(obj,dict) or obj.get("capability")!=old.get("capability"):
         reject("OBJECT_CAPABILITY_MISMATCH")
-    selectors=project_selection(obj)
+    source_singleton_objectless=False
+    if (isinstance(obj,dict) and set(obj)=={"capability","object_title"}):
+        # This is a real OVAL singleton ONLY when the pinned A mapping
+        # explicitly models this capability as a system source with no
+        # acquisition Object. Never infer it from a missing selector.
+        try:
+            native_mapping=_mapping(old["capability"])
+        except (ValueError,KeyError,TypeError) as exc:
+            reject("SINGLETON_CAPABILITY_NOT_MAPPED: "+str(exc))
+        if native_mapping.get("test_source",{}).get("kind")!="none":
+            reject("SINGLETON_SOURCE_NOT_PROVEN_OBJECTLESS")
+        source_singleton_objectless=True
+        selectors={}
+    else:
+        selectors=project_selection(obj)
     states=a.get("states") or {}
     refs=old.get("states",[])
     if not isinstance(refs,list) or len(refs)>1 or set(states)!=set(refs):
@@ -195,7 +221,8 @@ def compile_one_original_definition(original_assessment):
         compiled=compile_c_requirement(c)
     except (KeyError,ValueError,TypeError) as exc:
         reject("C_COMPILER_NOT_SUPPORTED: "+str(exc))
-    _same_source_semantics(old,compiled["test"],obj,entities)
+    _same_source_semantics(old,compiled["test"],obj,entities,
+                           source_singleton_objectless=source_singleton_objectless)
     return {"stage":"NATIVE_C_FROM_MUST_SOURCE_COMPATIBILITY_PROVED",
             "authored_c":c,
             "source_assessment_id":a["id"],
@@ -203,6 +230,7 @@ def compile_one_original_definition(original_assessment):
             "source_test_title":old["test_title"],
             "native_c_compiled_test":compiled["test"],
             "A_source_semantic_projection_passed":True,
+            "source_singleton_objectless_mapping_proved":source_singleton_objectless,
             "OVAL_actual_scanner_parity_proven":False}
 
 def batch_convert_review_folder(review,output):
