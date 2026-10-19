@@ -120,7 +120,11 @@ def _typed_fields(fields, native, capability):
             raise ValueError(f"unknown or unsupported State field {field!r}")
         if type(raw) in SCALAR:
             op,value="equals",raw
-        elif isinstance(raw,dict) and set(raw) in ({ "equals" },{"not_equal"},{"matches_regex"}):
+        elif isinstance(raw,dict) and len(raw)==1 and next(iter(raw)) in (
+            "equals","not_equal","matches_regex",
+            "greater_than","greater_than_or_equal",
+            "less_than","less_than_or_equal"
+        ):
             op,value=next(iter(raw.items()))
         elif isinstance(raw,dict) and set(raw)=={"equals","datatype"}:
             op,value="equals",raw["equals"]
@@ -139,6 +143,9 @@ def _typed_fields(fields, native, capability):
             type(value) is str and not value
         ):
             raise ValueError("typed literal required; no implicit values or coercion")
+        if op in ("greater_than","greater_than_or_equal",
+                  "less_than","less_than_or_equal") and type(value) is not int:
+            raise ValueError("integer comparison requires an explicit integer literal")
         if op=="matches_regex" and type(value) is not str:
             raise ValueError("regular expression requires a string pattern")
         expected_types=native["field_datatypes"].get(field,[])
@@ -148,10 +155,9 @@ def _typed_fields(fields, native, capability):
             raise ValueError("integer value incompatible with native field datatype")
         if type(value) is bool and "boolean" not in expected_types:
             raise ValueError("boolean value incompatible with native field datatype")
-        if field=="type" and "type" in native.get("state_value_enums",{}) and (
-            value not in native["state_value_enums"]["type"]
-        ):
-            raise ValueError("registry storage type is not a pinned native enum")
+        enums=native.get("state_value_enums",{}).get(field)
+        if enums and value not in enums:
+            raise ValueError(f"{field} is not a pinned native State value")
         # A single Item's field can itself be many-valued; the shorthand
         # 'contains' is explicitly some of the available values. Plain
         # equals is all matches for an ordinary scalar field in this pilot.
@@ -197,7 +203,11 @@ def _selectors(selector, native):
     return converted
 
 def _source_object(capability, authored, native):
-    """One A contract: a selector OR a typed collection-parameter shape."""
+    """One A contract: objectless system source OR selector OR collection."""
+    if native.get("test_source",{}).get("kind")=="none":
+        if not isinstance(authored,dict) or authored:
+            raise ValueError("objectless native source takes explicit empty parameters only")
+        return None
     if "object_selector_alternatives" in native:
         return {"capability":capability,"select":_selectors(authored,native)}
     parameters=native.get("collection_parameters")
@@ -278,7 +288,9 @@ def compile_c_requirement(document):
     has_fields=isinstance(must,dict)
     token,raw_fields=_requirement(must,has_fields)
     states=_typed_fields(raw_fields,native,cap) if has_fields else []
-    result={"capability":cap,"object":obj,"require":token}
+    result={"capability":cap,"require":token}
+    if obj is not None:
+        result["object"]=obj
     if states:
         result["states"]=states
         if len(states)>1:result["states_match"]="all"
