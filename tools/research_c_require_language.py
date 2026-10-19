@@ -106,6 +106,8 @@ def _typed_fields(fields, native):
             type(value) is str and not value
         ):
             raise ValueError("typed literal required; no implicit values or coercion")
+        if op=="matches_regex" and type(value) is not str:
+            raise ValueError("regular expression requires a string pattern")
         expected_types=native["field_datatypes"].get(field,[])
         if type(value) is str and not any(t in expected_types for t in ("string","version")):
             raise ValueError("string value incompatible with native field datatype")
@@ -149,6 +151,10 @@ def _selectors(selector, native):
             converted[field]=deepcopy(value)
         else:
             raise ValueError("unsupported/implicit Object predicate")
+        if "matches_regex" in converted[field] and (
+            type(converted[field]["matches_regex"]) is not str
+        ):
+            raise ValueError("selector regex requires a string pattern")
         enumerated=native.get("selector_value_enums",{}).get(field)
         if enumerated and converted[field].get("equals") not in enumerated:
             raise ValueError(f"{field} selector must use native enum")
