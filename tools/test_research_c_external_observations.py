@@ -106,5 +106,64 @@ class ExternalObservationResearchTests(unittest.TestCase):
         self.assertFalse(x["catalog_signature_verified"])
         self.assertFalse(x["cross_rule_runtime_collection_sharing_verified"])
 
+    def test_cross_rule_same_scoped_evidence_read_twice_but_not_recollected(self):
+        from research_c_observation_bindings import (
+            freeze_observation,read_observation
+        )
+        cat={REF:ENTRY}
+        a,b=(resolve_external_observations(assessment(i),cat)
+             for i in ("one","two"))
+        req=a["resolved_C_ast"]["observations"]["password_policy"]["from"]
+        self.assertEqual(req,
+                         b["resolved_C_ast"]["observations"]["password_policy"]["from"])
+        scope={
+            "host":"target-1","snapshot":"scan-1",
+            "execution_identity":"scanner-admin",
+            "environment":"system-env","provider_version":"v0.4-A",
+            "input_fingerprint":"none","parent_identity":"root",
+        }
+        evidence={
+            "status":"complete",
+            "items":[{"id":"policy-item","fields":{"history":24}}],
+            "provenance":{"source":"typed-test-fixture"},
+        }
+        frozen=freeze_observation(req,scope,evidence)
+        first=read_observation(frozen,req,scope)
+        second=read_observation(frozen,req,scope)
+        self.assertEqual(first,second)
+        self.assertFalse(frozen["runtime_collector_executed"])
+        self.assertFalse(frozen["source_oval_parity_verified"])
+        first["items"].clear()
+        self.assertEqual(len(read_observation(frozen,req,scope)["items"]),1)
+        for field in scope:
+            other=dict(scope);other[field]+="-different"
+            with self.subTest(field=field),self.assertRaisesRegex(
+                ValueError,"boundary"
+            ):
+                read_observation(frozen,req,other)
+
+    def test_cross_rule_partial_and_error_observations_never_upgrade_status(self):
+        from research_c_observation_bindings import (
+            freeze_observation,read_observation
+        )
+        request={"windows.passwordpolicy":{}}
+        scope={
+            "host":"target-1","snapshot":"scan-1",
+            "execution_identity":"scanner-admin",
+            "environment":"system-env","provider_version":"v0.4-A",
+            "input_fingerprint":"none","parent_identity":"root",
+        }
+        for status in ("complete","incomplete","error",
+                       "not_collected","not_applicable"):
+            evidence={
+                "status":status,"items":[],
+                "provenance":{"source":"typed-test-fixture"},
+            }
+            frozen=freeze_observation(request,scope,evidence)
+            got=read_observation(frozen,request,scope)
+            with self.subTest(status=status):
+                self.assertEqual(got["status"],status)
+                self.assertEqual(got["items"],[])
+
 if __name__=="__main__":
     unittest.main()
