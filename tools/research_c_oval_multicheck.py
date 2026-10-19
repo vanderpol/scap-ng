@@ -216,7 +216,12 @@ def convert_selected_shared_many(a):
             reject("SHARED_SELECTED_STATE_METADATA_UNSUPPORTED")
         fields=project_fields(st["state"])
         alias=alias_of(t.get("test_title"),fields)
-        if alias in checks or len(alias)>63:
+        if alias in checks:
+            # Two source Tests may assert different values on the SAME
+            # observed field. Do not collapse them to the same field alias.
+            alias=ID.sub("_",t["test_title"].lower()).strip("_")
+        if alias in checks or len(alias)>63 or not re.fullmatch(
+            r"[a-z][a-z0-9_]*",alias):
             reject("SHARED_SELECTED_TEST_ALIAS_COLLISION_OR_TOO_LONG")
         checks[alias]={"observation":"original_collection",
                        "source_test":tid,
