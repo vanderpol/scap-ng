@@ -45,6 +45,18 @@ class ComplexWindowsSevenChecks(unittest.TestCase):
         self.assertFalse(self.view["scanner_executed"])
         self.assertTrue(self.view["read_only_source_reconstruction"])
 
+    def test_repository_auditor_yaml_exactly_matches_source_projection(self):
+        # Derive repository root from source fixture, not the cwd.
+        candidate=Path(__file__).resolve().parents[1]/(
+            "research/assessment-simplification/compact-authoring-04/"
+            "c-source-exact-windows-rdp-rights.research.yaml"
+        )
+        reviewed=yaml.safe_load(candidate.read_text(encoding="utf-8"))
+        self.assertEqual(set(reviewed),{"observations","checks","require"})
+        for key in reviewed:
+            self.assertEqual(reviewed[key],self.view[key],
+                             f"C reviewer sample differs from source on {key}")
+
     def test_source_reconstruction_is_exact_and_nonmutating(self):
         saved=deepcopy(self.source)
         compiled=reconstruct_windows_source(self.view,self.source)
