@@ -172,7 +172,7 @@ def present_c_apache_hybrid(source):
         "source_assessment_sha256":_hash(source),
     }
 
-def compile_c_apache_hybrid(authored):
+def compile_c_apache_hybrid(authored, *, require_original_graph_digest=True):
     required={"stage","metadata","observations","derived_values",
               "expected_source_variables_sha256",
               "expected_source_shared_objects_sha256","checks","require",
@@ -192,11 +192,16 @@ def compile_c_apache_hybrid(authored):
     if len(sources)!=len(steps):_no("duplicate/invalid derived alias")
     value_input={"assessment_id":metadata["id"],
                  "observations":deepcopy(authored["observations"]),
-                 "steps":deepcopy(steps),
-                 "expected_source_variables_sha256":
-                     authored["expected_source_variables_sha256"],
-                 "expected_source_shared_objects_sha256":
-                     authored["expected_source_shared_objects_sha256"]}
+                 "steps":deepcopy(steps)}
+    # Editing an authored requirement legitimately changes the source graph.
+    # Only the explicit source-parity gate should demand source variable/
+    # acquisition digests; never pass a modified graph off as original.
+    if require_original_graph_digest:
+        value_input.update({
+            "expected_source_variables_sha256":
+                authored["expected_source_variables_sha256"],
+            "expected_source_shared_objects_sha256":
+                authored["expected_source_shared_objects_sha256"]})
     compiled=compile_c_observation_values(value_input)
     checks=authored["checks"]
     if not isinstance(checks,dict) or not 1<=len(checks)<=128:
