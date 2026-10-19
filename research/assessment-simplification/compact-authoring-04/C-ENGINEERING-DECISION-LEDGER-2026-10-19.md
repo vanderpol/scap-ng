@@ -57,3 +57,11 @@ The new focused CI run must be verified against its exact commit SHA before call
 ## Same frontend compiles the complex Windows record family
 
 The seven-check Windows 11 source-backed C sample is now routed through the **same** `compile_c_unified` entrypoint as inline direct, named shared-Object and objectless singleton C. This is a narrowly pinned record-family backend, not a general WMI implementation. It reuses the already reviewed original ID and multi-valued record-State guards, produces native 0.4-A Tests/Objects, and uses the same six-state expression engine. The additional [integrated tests](../../../tools/test_research_c_unified_complex_windows.py) assert source-independent compilation, schema shape, 128 Boolean and mixed six-state source expression outcomes, and negative unsupported-record mutations. Native collection and original SCAP XML parity remain unverified.
+
+## Local-first C testing and superseded CI reduction
+
+- [Local C runner](../../../tools/run_research_c_locally.py) parses the **same** focused unittest list as the maintained GitHub workflow. Run `python tools/run_research_c_locally.py --quick` for the six key compiler/source tests or `--all` for the entire source regression gate. Requires a local repository checkout and PyYAML/jsonschema dependencies, but no GitHub clone and no network per run.
+- The dedicated [C workflow](../../../.github/workflows/research-c-shared-engine.yml) now uses a C-specific GitHub Actions concurrency group, so a superseding main-branch C run cancels earlier C runs. It **does not** affect other workflows.
+- In the available isolated Python environment, normalizing one shared C authoring example 10,000 times took about 0.25 seconds. Twelve structural compiler tests ran in about 0.05 seconds with explicitly **stubbed** native-A and Boolean evaluation dependencies. These verify authoring graph relationships and local control flow, **not** the full pinned A compiler or source parity. The prior completed Actions run executed 164 C tests in roughly 1.3 seconds once scheduled; CI wait time, not raw Python execution, was the primary throughput blocker.
+
+The bundled workflow revision must independently pass at its exact SHA before declaring this checkpoint verified.

@@ -38,6 +38,7 @@ on:
       - 'research/requirements-first-language/contract-candidate/corpus/source-specimens/windows-wmi-query-0-a5018a53e0f6.source.yaml'
       - 'research/assessment-simplification/compact-authoring-04/c-source-exact-windows-rdp-rights.research.yaml'
       - 'research/requirements-first-language/contract-candidate/corpus/source-specimens/windows-userright-1-39dad4df5336.source.yaml'
+      - 'tools/run_research_c_locally.py'
       - 'tools/test_research_c_objectless.py'
       - 'research/assessment-simplification/compact-authoring-04/c-shared-objectless-policy.research.yaml'
       - 'research/assessment-simplification/compact-authoring-04/c-windows-objectless-policy.research.yaml'
@@ -73,6 +74,12 @@ on:
       - 'research/requirements-first-language/contract-candidate/corpus/source-specimens/independent-shellcommand*.source.yaml'
       - '.github/workflows/research-c-shared-engine.yml'
   workflow_dispatch:
+
+# A single main-branch C checkpoint supersedes obsolete queued runs.
+# Keep this gate limited to C; do not cancel other research workflows.
+concurrency:
+  group: research-c-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
