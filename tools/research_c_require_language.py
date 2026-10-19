@@ -14,6 +14,32 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 import json
+import yaml
+
+def parse_c_yaml(source):
+    """Strict, one-document YAML input; silent duplicate predicates are unsafe."""
+    if type(source) is not str or not source or len(source)>200000:
+        raise ValueError("bounded C YAML source text required")
+
+    class StrictLoader(yaml.SafeLoader):
+        pass
+
+    def mapping(loader,node):
+        out={}
+        for kn,vn in node.value:
+            key=loader.construct_object(kn)
+            try:known=key in out
+            except TypeError as exc:raise ValueError("non-scalar mapping key") from exc
+            if known:raise ValueError("duplicate YAML mapping key "+str(key))
+            out[key]=loader.construct_object(vn)
+        return out
+
+    StrictLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,mapping)
+    docs=list(yaml.load_all(source,Loader=StrictLoader))
+    if len(docs)!=1 or not isinstance(docs[0],dict):
+        raise ValueError("exactly one C YAML mapping required")
+    return docs[0]
 
 ROOT=Path(__file__).resolve().parents[1]
 MAPPINGS=ROOT/"schema/v0.4.0/capability-mappings/supported"
