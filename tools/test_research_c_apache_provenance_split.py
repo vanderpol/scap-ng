@@ -60,18 +60,18 @@ class ProvenanceBoundApacheTests(unittest.TestCase):
             compile_apache_split(author,{})
         p2=deepcopy(p)
         p2["value_sources"].pop(next(iter(p2["value_sources"])))
-        with self.assertRaisesRegex(ValueError,"catalog differs"):
+        with self.assertRaisesRegex(ValueError,"binding catalog incomplete"):
             compile_apache_split(author,p2)
         p2=deepcopy(p)
         names=list(p2["value_sources"])
         p2["value_sources"][names[0]]["source_id"]=p2[
             "value_sources"][names[1]]["source_id"]
-        with self.assertRaisesRegex(ValueError,"same source Variable"):
+        with self.assertRaisesRegex(ValueError,"source identity reused"):
             compile_apache_split(author,p2)
         p2=deepcopy(p)
         aliases=list(p2["check_sources"])
         p2["check_sources"][aliases[0]]=p2["check_sources"][aliases[1]]
-        with self.assertRaisesRegex(ValueError,"reuse one"):
+        with self.assertRaisesRegex(ValueError,"source identity reused"):
             compile_apache_split(author,p2)
 
     def test_changed_author_values_need_explicit_edit_mode_no_false_source_parity(self):
