@@ -1,0 +1,32 @@
+# #245 NEW native C demonstration policy: not source STIG conversion.
+# Two test-source.none capabilities, one shared twice, no synthetic A Objects.
+id: c-research-shared-objectless-policy
+observations:
+  system_family:
+    from:
+      independent.family: {}
+  windows_password_policy:
+    from:
+      windows.passwordpolicy: {}
+checks:
+  is_windows_family:
+    observation: system_family
+    must:
+      every_item:
+        family: windows
+  password_history_24:
+    observation: windows_password_policy
+    must:
+      every_item:
+        password_hist_len:
+          greater_than_or_equal: 24
+  password_complexity_enabled:
+    observation: windows_password_policy
+    must:
+      every_item:
+        password_complexity: true
+require:
+  every:
+    - check: is_windows_family
+    - check: password_history_24
+    - check: password_complexity_enabled

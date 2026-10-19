@@ -47,3 +47,9 @@ RHEL9 **SV-257889** (initialization files under account-derived home directories
 - Do not use a superficially shorter record *in* comparator unless its full cardinality and missing/incomplete behavior is independently shown equivalent.
 
 **State:** GO for continued C feasibility work. NO-GO for language freeze or "as capable as A" claim. Keep trunk-based issue-linked changes in research only.
+
+## Shared A objectless capabilities (C-only research checkpoint)
+
+The unified C compiler now handles one named `observations:` source for multiple checks on A capabilities whose versioned `test_source.kind` is `none`, e.g. `windows.passwordpolicy`, **without introducing a fake Object**. See [review sample](c-shared-objectless-policy.research.yaml) and [targeted negative and six-state tests](../../../tools/test_research_c_objectless.py). `shared_singletons` is authoring/provenance metadata for direct native Test checks, not a physical A collection Object or a verified runtime cache. This also exposes an important compiler invariant: shared evidence does not imply the same policy result for multiple checks.
+
+The new focused CI run must be verified against its exact commit SHA before calling this checkpoint green. It does not demonstrate live collection or full six-STIG parity.

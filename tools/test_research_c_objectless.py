@@ -100,6 +100,63 @@ class ObjectlessSources(unittest.TestCase):
         with self.assertRaises(ValueError):
             compile_c_unified(document)
 
+    def test_named_objectless_observations_do_not_create_fake_A_objects(self):
+        doc=parse_c_yaml((ROOT/"research/assessment-simplification/compact-authoring-04/"
+                          "c-shared-objectless-policy.research.yaml").read_text())
+        old=deepcopy(doc)
+        plan=compile_c_unified(doc)
+        self.assertEqual(doc,old)
+        self.assertEqual(plan["shared_objects"],{})
+        self.assertEqual(len(plan["tests"]),3)
+        self.assertEqual(set(plan["shared_singletons"]),
+                         {"system_family","windows_password_policy"})
+        self.assertEqual(plan["shared_singletons"]["windows_password_policy"],{
+            "capability":"windows.passwordpolicy",
+            "consumer_tests":["password_history_24","password_complexity_enabled"]})
+        self.assertEqual(plan["shared_singletons"]["system_family"]["consumer_tests"],
+                         ["is_windows_family"])
+        for test in plan["tests"].values():
+            self.assertNotIn("object",test)
+        for check in plan["checks"].values():
+            self.assertNotIn("object",check["test"])
+            self.assertFalse(check["independent_collection_plan"])
+        self.assertFalse(plan["runtime_acquisition_sharing_verified"])
+        Draft202012Validator(self.schema).validate(
+            {"assessment":{"tests":plan["tests"]}})
+
+    def test_named_objectless_shared_check_results_are_independent(self):
+        doc=parse_c_yaml((ROOT/"research/assessment-simplification/compact-authoring-04/"
+                          "c-shared-objectless-policy.research.yaml").read_text())
+        plan=compile_c_unified(doc)
+        expr={"all":[{"test":key} for key in doc["checks"]]}
+        for values in product(sorted(SIX),repeat=3):
+            supplied=dict(zip(doc["checks"],values))
+            expected=source_expected_outcome(expr,supplied,{})
+            actual=evaluate_c_unified_supplied_results(plan,checks=supplied)
+            with self.subTest(values=values):
+                self.assertEqual(actual["outcome"],expected)
+
+    def test_fabricated_source_object_for_singleton_fails_closed(self):
+        doc=parse_c_yaml((ROOT/"research/assessment-simplification/compact-authoring-04/"
+                          "c-shared-objectless-policy.research.yaml").read_text())
+        doc["observations"]["windows_password_policy"]["source_object"]="fake-object"
+        with self.assertRaisesRegex(ValueError,"objectless observation"):
+            compile_c_unified(doc)
+
+    def test_shared_singleton_rejects_unsupported_parameters_and_types(self):
+        doc=parse_c_yaml((ROOT/"research/assessment-simplification/compact-authoring-04/"
+                          "c-shared-objectless-policy.research.yaml").read_text())
+        doc["observations"]["windows_password_policy"]["from"]["windows.passwordpolicy"]={
+            "invented_parameter":"no"}
+        with self.assertRaisesRegex(ValueError,"objectless"):
+            compile_c_unified(doc)
+        doc=parse_c_yaml((ROOT/"research/assessment-simplification/compact-authoring-04/"
+                          "c-shared-objectless-policy.research.yaml").read_text())
+        doc["checks"]["password_complexity_enabled"]["must"]["every_item"][
+            "password_complexity"]="true"
+        with self.assertRaisesRegex(ValueError,"string value incompatible"):
+            compile_c_unified(doc)
+
     def test_no_mutation_of_parsed_C_input(self):
         d=deepcopy(self.document)
         compile_c_unified(self.document)

@@ -52,6 +52,7 @@ def compile_c_unified(document, *, source_documents=None):
         by_alias[alias]=ident
     checks={}
     native_tests={}
+    singleton_observations={}
     for check in normalized["checks"]:
         alias=check["id"]
         cap=check["from"]["capability"]
@@ -74,12 +75,23 @@ def compile_c_unified(document, *, source_documents=None):
         ref=check["observation"]
         if ref is not None:
             identifier=by_alias[ref]
-            collection=test["object"]
-            if identifier not in sources:
-                sources[identifier]=deepcopy(collection)
-            elif sources[identifier]!=collection:
-                raise ValueError("shared observation collection mismatch")
-            test["object"]=identifier
+            if "object" not in test:
+                # A supports test_source.kind=none. Sharing its *evidence*
+                # must not fabricate an Object just to satisfy C's syntax.
+                if normalized["observations"][ref]["source_object"] is not None:
+                    raise ValueError("objectless observation cannot claim a source Object")
+                entry=singleton_observations.setdefault(
+                    ref, {"capability":cap,"consumer_tests":[]})
+                if entry["capability"]!=cap:
+                    raise ValueError("objectless observation capability mismatch")
+                entry["consumer_tests"].append(alias)
+            else:
+                collection=test["object"]
+                if identifier not in sources:
+                    sources[identifier]=deepcopy(collection)
+                elif sources[identifier]!=collection:
+                    raise ValueError("shared observation collection mismatch")
+                test["object"]=identifier
         native_tests[alias]=test
         # The ONE native Test graph is authoritative. Do not publish a second
         # inline Object alongside its shared-Object reference: a later runtime
@@ -87,7 +99,8 @@ def compile_c_unified(document, *, source_documents=None):
         checks[alias]={"kind":"native_A_test_pieces",
                        "test":deepcopy(test),
                        "independent_collection_plan":False}
-    if set(sources)!={by_alias[k] for k in by_alias}:
+    if set(sources)!={by_alias[k] for k in by_alias
+                      if k not in singleton_observations}:
         raise ValueError("dangling shared observation cannot be discarded")
     logic=_c_logic(normalized["require"])
     assessment={"id":normalized["assessment_id"] or "internal-c-research",
@@ -103,7 +116,9 @@ def compile_c_unified(document, *, source_documents=None):
     return {
         "stage":"C_RESEARCH_UNIFIED_A_COMPILER_NO_SCANNER",
         "assessment_id":normalized["assessment_id"],
-        "shared_objects":sources,"tests":native_tests,
+        "shared_objects":sources,
+        "shared_singletons":singleton_observations,
+        "tests":native_tests,
         "checks":checks,"expression":lowered,
         "authored_check_ids":sorted(expected),
         "source_compatibility_inputs":sorted(source_documents),
