@@ -16,12 +16,25 @@ from research_c_require_language import _mapping
 from research_c_unified_compiler import compile_c_unified
 
 ID=re.compile(r"[^a-z0-9]+")
-def alias_of(title):
+def alias_of(title, fields):
+    """Prefer the actual State field over boilerplate OVAL Test descriptions.
+
+    The original title remains in the source review/provenance; never cut
+    a meaningful identifier halfway through. Ambiguous collisions reject.
+    """
     if type(title) is not str or not title.strip():
         reject("SOURCE_TEST_DESCRIPTION_MISSING")
-    result=ID.sub("_",title.lower()).strip("_")[:63].rstrip("_")
-    if not result or not result[0].isalpha():
-        reject("SOURCE_TEST_TITLE_HAS_NO_SAFE_ALIAS")
+    if len(fields)==1:
+        field=next(iter(fields))
+        # Recognize only when the source title actually identifies the field,
+        # not a fabricated assertion meaning or meaningless Test number.
+        if (type(field) is str and re.fullmatch(r"[a-z][a-z0-9_]*",field)
+                and re.search(r"(?<![a-z0-9_])"+re.escape(field)+r"(?![a-z0-9_])",
+                              title.lower())):
+            return field
+    result=ID.sub("_",title.lower()).strip("_")
+    if not result or not result[0].isalpha() or len(result)>90:
+        reject("SOURCE_TEST_TITLE_UNSUITABLE_FOR_MEANINGFUL_ALIAS")
     return result
 
 def convert_objectless_many(a):
@@ -74,7 +87,7 @@ def convert_objectless_many(a):
                 or st["capability"]!=capability):
             reject("STATE_UNREVIEWED_METADATA")
         fields=project_fields(st["state"])
-        alias=alias_of(t.get("test_title"))
+        alias=alias_of(t.get("test_title"),fields)
         if alias in reverse:
             reject("DUPLICATE_MEANINGFUL_TEST_TITLE")
         reverse[alias]=tid
