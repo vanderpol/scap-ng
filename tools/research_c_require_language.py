@@ -28,6 +28,8 @@ def parse_c_yaml(source):
         out={}
         for kn,vn in node.value:
             key=loader.construct_object(kn)
+            if type(key) is not str:
+                raise ValueError("C YAML mapping key must be a string; quote YAML 1.1 boolean-like words")
             try:known=key in out
             except TypeError as exc:raise ValueError("non-scalar mapping key") from exc
             if known:raise ValueError("duplicate YAML mapping key "+str(key))
