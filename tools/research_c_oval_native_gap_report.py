@@ -35,6 +35,7 @@ def gap_report(manifest, *, min_expected_total=None):
         raise ValueError("source corpus total differs from pinned baseline")
     seen=set()
     by_reason=defaultdict(list)
+    by_selected_multi_reason=defaultdict(list)
     for status,rows in (("converted",converted),("unsupported",unsupported)):
         for entry in rows:
             if not isinstance(entry,dict):
@@ -56,6 +57,11 @@ def gap_report(manifest, *, min_expected_total=None):
                 if not group:
                     raise ValueError("unsupported reason lacks machine-readable category")
                 by_reason[group.group(0)].append(entry)
+                if group.group(0)=="MULTI_TEST":
+                    sub=re.search(r"; SELECTED: ([A-Z][A-Z0-9_]+)",reason)
+                    by_selected_multi_reason[
+                        sub.group(1) if sub else "SELECTED_ROUTE_NOT_ATTEMPTED"
+                    ].append(entry)
     lines=[
         "# Original OVAL Self-Assertion: 0.4-C native-conversion blockers",
         "",
@@ -80,6 +86,20 @@ def gap_report(manifest, *, min_expected_total=None):
         lines.append(f"| {chr(96)}{reason}{chr(96)} | {len(items)} | {', '.join(links)} |")
     lines += [
         "",
+        "## Multi-Test selected-collection fallback",
+        "",
+        "These are first errors from the selected shared-collection route, "
+        "after objectless multi-Test conversion rejected. They are NOT "
+        "independent failed Definitions; their counts sum to the MULTI_TEST row.",
+        "",
+        "| Selected multi-Test blocker | Definitions |",
+        "| --- | ---: |",
+    ]
+    for reason,items in sorted(by_selected_multi_reason.items(),
+                               key=lambda kv:(-len(kv[1]),kv[0])):
+        lines.append("| "+chr(96)+reason+chr(96)+" | "+str(len(items))+" |")
+    lines += [
+        "",
         "## Limits of this histogram",
         "",
         "Each category is the **first rejected construct** encountered by the "
@@ -96,6 +116,8 @@ def gap_report(manifest, *, min_expected_total=None):
     return {"total":source_total,"converted":len(converted),
             "unsupported":len(unsupported),
             "categories":{k:len(v) for k,v in sorted(by_reason.items())},
+            "selected_multi_test_categories":{k:len(v) for k,v in
+                                              sorted(by_selected_multi_reason.items())},
             "markdown":"\n".join(lines)}
 
 def main():
