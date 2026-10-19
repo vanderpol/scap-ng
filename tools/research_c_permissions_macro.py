@@ -61,6 +61,8 @@ def lower_no_more_permissive_than(candidate):
             "require":"at_least_one_exists_and_all_match",
             "equals":False
         }})
+    if not native_states:
+        raise ValueError("permission macro allows every bit; use an explicit existence-only requirement")
     return {"stage":"C_RESEARCH_PERMISSION_BIT_SUBSET_TO_A_STATES",
             "capability":"unix.file","allowed_octal":format(allowed,"04o"),
             "forbidden":forbidden,"states":native_states,
