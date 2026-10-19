@@ -63,7 +63,7 @@ class OVALTypedSetSourceProvenanceTests(unittest.TestCase):
         broken=deepcopy(provenance)
         values=list(broken["object_source_ids"])
         broken["object_source_ids"][values[1]]=broken["object_source_ids"][values[0]]
-        with self.assertRaisesRegex(ValueError,"binding catalog incomplete"):
+        with self.assertRaisesRegex(ValueError,"source identity reused"):
             compile_oval_set_provenance(author,broken)
 
     def test_unsupported_original_value_match_not_repaired(self):
