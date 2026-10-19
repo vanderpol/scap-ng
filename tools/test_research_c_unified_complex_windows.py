@@ -100,6 +100,19 @@ class ComplexWindowsUnifiedCompiler(unittest.TestCase):
                 any_record_state_every_value_equals=["1","3","4"]),
             lambda a:a["observations"]["system_role"]["from"][
                 "windows.wmi.query"].update(query="SELECT OS FROM win32_computersystem"),
+            lambda a:a["observations"]["system_role"]["from"][
+                "windows.wmi.query"].update(namespace=r"root\other"),
+            lambda a:a["observations"]["denied_remote_logon_trustees"]["from"][
+                "windows.userright"].update(userright="SE_DENY_INTERACTIVE_LOGON_NAME"),
+            lambda a:a["checks"]["domain_joined_non_dc"]["must"].update(
+                any_record_state_every_value_equals=["2","3"]),
+            lambda a:a["checks"]["deny_guests"]["must"].update(
+                predicate={"case_insensitive_equals":"Domain Users"}),
+            lambda a:a["checks"]["domain_joined_non_dc"].update(
+                observation="denied_remote_logon_trustees"),
+            lambda a:a["require"]["one_of"][0].update(
+                one_of=a["require"]["one_of"][0].pop("every")),
+
         ):
             doc=deepcopy(self.c)
             alteration(doc)

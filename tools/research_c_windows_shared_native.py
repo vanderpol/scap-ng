@@ -15,7 +15,7 @@ import json
 
 from research_c_require_language import _mapping
 from research_c_windows_shared_observations import (
-    _source_logic, CHECKS, OBSERVATIONS
+    _source_logic, CHECKS, OBSERVATIONS, ROLE_VALUES, TRUSTEE_PREDICATES
 )
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -25,6 +25,31 @@ PAIRED_ANY="at_least_one_exists_and_some_match"
 CAPABILITIES={"windows.userright","windows.wmi.query"}
 FIELD_OPS={"case_insensitive_equals","pattern_match"}
 STAGE="C_RESEARCH_WINDOWS_SHARED_NATIVE_A_TESTS_NOT_SCANNER"
+
+# This backend recognizes ONLY the real SV-253495 source family, not general
+# authored WMI/user-right rules. A new query is a valid *new* authored check
+# elsewhere, but it must not silently retain these exact source Object/Test IDs.
+PINNED_OBSERVATION_FROM = {
+    "system_role": {"windows.wmi.query": {
+        "namespace": r"root\cimv2",
+        "query": "SELECT DomainRole FROM win32_computersystem",
+    }},
+    "denied_remote_logon_trustees": {"windows.userright": {
+        "userright": "SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME",
+    }},
+}
+PINNED_REQUIRE = {
+    "one_of": [
+        {"every": [{"check": "domain_joined_non_dc"},
+                   {"check": "deny_local_accounts"},
+                   {"check": "deny_guests"},
+                   {"check": "deny_domain_admins"},
+                   {"check": "deny_enterprise_admins"}]},
+        {"every": [{"check": "standalone"}, {"check": "deny_guests"}]},
+        {"check": "deny_everyone"},
+    ],
+}
+
 
 def compile_native_c_windows(view):
     """Compile *the C authored view itself*, not a pinned original source."""
@@ -48,6 +73,8 @@ def compile_native_c_windows(view):
         ):
             raise ValueError("unknown shared source identity")
         cap, selectors=next(iter(frm.items()))
+        if frm != PINNED_OBSERVATION_FROM[name]:
+            raise ValueError("pinned Windows source acquisition changed; use a new C assessment for a new query")
         if cap not in CAPABILITIES or not isinstance(selectors,dict):
             raise ValueError("unrecognized native collection capability")
         native=_mapping(cap)
@@ -99,6 +126,11 @@ def compile_native_c_windows(view):
             op,value=next(iter(must["predicate"].items()))
             if op not in FIELD_OPS or type(value) is not str or not value:
                 raise ValueError("unsupported original operation/type")
+            if reference != "denied_remote_logon_trustees" or (
+                alias not in TRUSTEE_PREDICATES or
+                (op,value) != TRUSTEE_PREDICATES[alias]
+            ):
+                raise ValueError("pinned source Trustee predicate or observation changed")
             field="trustee_name"
             native=_mapping("windows.userright")
             if field not in native["state_field_map"].values() or (
@@ -122,6 +154,11 @@ def compile_native_c_windows(view):
                     must["any_record_state_every_value_equals"])
             ):
                 raise ValueError("unsupported nested WMI record and Item quantifiers")
+            if reference != "system_role" or (
+                alias not in ROLE_VALUES or
+                must["any_record_state_every_value_equals"] != ROLE_VALUES[alias]
+            ):
+                raise ValueError("pinned DomainRole source values or observation changed")
             native=_mapping("windows.wmi.query")
             if "result" not in native["record_state_fields"] or (
                 native["field_datatypes"]["result"]!=["record"]
@@ -143,6 +180,8 @@ def compile_native_c_windows(view):
                                "source_capability":source["capability"],
                                "original_source_parity_verified":False,
                                "caveats":caveats}
+    if view["require"] != PINNED_REQUIRE:
+        raise ValueError("pinned source AND/OR branches changed")
     expression=_source_logic(view["require"])
     def references(node):
         if isinstance(node,dict):
