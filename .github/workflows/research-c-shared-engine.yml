@@ -107,6 +107,23 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python -m unittest -v tools/test_research_c_shared_engine.py tools/test_research_c_common_evaluation.py tools/test_research_c_fused_apache.py tools/test_research_c_require_language.py tools/test_research_c_fused_apache_loaded_files.py tools/test_research_c_wmi_source_compat.py tools/test_research_c_composed_assessment.py tools/test_research_c_permissions_macro.py tools/test_research_c_rhel_accounts_counterexamples.py tools/test_research_c_dns_shell.py tools/test_research_c_state_consumers.py tools/test_research_c_shared_observations.py tools/test_research_c_observation_bindings.py tools/test_research_c_apache_directive_observations.py tools/test_research_c_apache_directive_requirements.py tools/test_research_c_guided_projection.py tools/test_research_c_windows_shared_observations.py tools/test_research_c_windows_shared_native.py tools/test_research_c_same_record_evidence.py tools/test_research_c_guided_observations.py tools/test_research_c_one_frontend.py tools/test_research_c_rhel_account_observations.py tools/test_research_c_unified_compiler.py tools/test_research_c_objectless.py tools/test_research_c_unified_complex_windows.py tools/test_research_c_coverage_triage.py tools/test_research_c_external_observations.py tools/test_research_c_set_filter_variable_probe.py tools/test_research_c_private_value_sources.py
+      - name: Summarize private Object-derived Apache values (read-only source audit)
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import json, yaml
+          from pathlib import Path
+          from research_c_private_value_sources import inspect_private_value_sources
+          path = Path("research/requirements-first-language/contract-candidate/corpus/source-specimens/independent-shellcommand-1-3d964d126ca8.source.yaml")
+          assessment = yaml.safe_load(path.read_text(encoding="utf-8"))["assessment"]
+          result = inspect_private_value_sources(assessment)
+          assert result["summary"]["named_variables"] == 19
+          assert result["source_parity_proven"] is False
+          assert result["automatic_migration_authorized"] is False
+          print("Real Apache SV-214268 variable/Object source scope:")
+          print(json.dumps(result["summary"], sort_keys=True))
+          PY
       - name: Assert C proof is labelled research only
         run: |
           grep -q 'scanner_executed": False' tools/research_c_shared_engine.py
