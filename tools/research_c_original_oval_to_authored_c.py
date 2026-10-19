@@ -23,12 +23,13 @@ import yaml
 
 from research_c_require_language import compile_c_requirement, _mapping
 
-OPS={"equals":"equals","pattern match":"matches_regex",
+OPS={"equals":"equals","not equal":"not_equal","pattern match":"matches_regex",
      "greater than":"greater_than","greater than or equal":"greater_than_or_equal",
      "less than":"less_than","less than or equal":"less_than_or_equal"}
 PAIR_CHECK={"all":"all_match","at least one":"some_match",
             "only one":"only_one_matches","none satisfy":"none_match"}
 PRESENCE={"at_least_one_exists":"present","none_exist":"absent",
+          "all_exist":"all_items_exist",
           "only_one_exists":"one_item_exists",
           # OVAL any_exist is true for complete empty source populations.
           # 0.4-A canonical may_be_absent is equivalent at this State-free
@@ -132,6 +133,7 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
             reject("SOURCE_PRESENCE_NOT_PROVEN")
         expected_token={"present":"at_least_one_exists",
                         "absent":"none_exist",
+                        "all_items_exist":"all_exist",
                         "one_item_exists":"only_one_exists",
                         "optional":"may_be_absent"}[expected_token]
         if compiled["require"]!=expected_token or "states" in compiled:
