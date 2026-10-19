@@ -275,11 +275,20 @@ def batch_convert_review_folder(review,output):
                 convert_objectless_many,convert_selected_shared_many)
             try:
                 c=convert_objectless_many(source["A_source_compatibility_fallback"])
-            except NotNativeCConvertible as objectless:
+            except ValueError as objectless:
+                # When this file runs as __main__, the imported multi-Test
+                # adapter holds the SAME rejection class under its module
+                # identity, not the separately loaded __main__ class.
+                # Match only that known fail-closed exception class; other
+                # errors (including bugs/KeyError/TypeError) must crash CI.
+                if type(objectless).__name__!="NotNativeCConvertible":
+                    raise
                 try:
                     c=convert_selected_shared_many(
                         source["A_source_compatibility_fallback"])
-                except NotNativeCConvertible as selected:
+                except ValueError as selected:
+                    if type(selected).__name__!="NotNativeCConvertible":
+                        raise
                     unsupported.append({"definition_id":ident,"file":rel,
                                         "reason":"MULTI_TEST: "+
                                         str(objectless)+"; SELECTED: "+str(selected)})
