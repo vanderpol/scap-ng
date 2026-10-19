@@ -34,7 +34,7 @@ def _logic(node,valid):
             raise ValueError("nonempty single-operator logic tree required")
         operator,payload=next(iter(expr.items()))
         if operator=="check":
-            if payload not in valid:
+            if type(payload) is not str or payload not in valid:
                 raise ValueError("unknown named check reference")
             referenced.append(payload)
             return {"op":"check","id":payload}
@@ -86,6 +86,7 @@ def normalize_c_frontend(document):
     ):
         raise ValueError("bounded named checks and observations required")
     sources={}
+    source_object_ids=set()
     for key,source in observations.items():
         _named(key,"observation")
         if not isinstance(source,dict) or set(source) not in (
@@ -95,9 +96,14 @@ def normalize_c_frontend(document):
         ident=source.get("source_object")
         if ident is not None and (type(ident) is not str or not ident):
             raise ValueError("source Object provenance identity must be nonempty")
+        if ident is not None:
+            if ident in source_object_ids:
+                raise ValueError("duplicate source Object provenance identity")
+            source_object_ids.add(ident)
         sources[key]={"from":_from(source["from"]),"source_object":ident}
     normalized=[]
     used_obs=set()
+    source_test_ids=set()
     for check_name,check in checks.items():
         _named(check_name,"check")
         if not isinstance(check,dict) or "must" not in check or (
@@ -126,6 +132,10 @@ def normalize_c_frontend(document):
             type(source_test) is not str or not source_test
         ):
             raise ValueError("source Test provenance must be explicit string")
+        if source_test is not None:
+            if source_test in source_test_ids:
+                raise ValueError("duplicate source Test provenance identity")
+            source_test_ids.add(source_test)
         normalized.append({
             "id":check_name,"source_test":source_test,
             "from":source,"observation":observed,
