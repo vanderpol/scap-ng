@@ -14,8 +14,12 @@ def fixture():
         "native_C_Definitions":2,
         "source_compatible_not_yet_native_C":2,
         "native_C_converted":[
-            {"definition_id":"oval:example:def:1","file":"unix/unix-def_a.xml"},
-            {"definition_id":"oval:example:def:2","file":"windows/win-def_b.xml"}],
+            {"definition_id":"oval:example:def:1","file":"unix/unix-def_a.xml",
+             "C_compilation_stage":"NATIVE_C_FROM_MUST_SOURCE_COMPATIBILITY_PROVED",
+             "native_C_compilation_passed":True,"A_projection_equivalence_checked":True},
+            {"definition_id":"oval:example:def:2","file":"windows/win-def_b.xml",
+             "C_compilation_stage":"NATIVE_C_FROM_MUST_SOURCE_COMPATIBILITY_PROVED",
+             "native_C_compilation_passed":True,"A_projection_equivalence_checked":True}],
         "unsupported":[
             {"definition_id":"oval:example:def:3","file":"unix/unix-def_c.xml",
              "reason":"OBJECT_ADVANCED_OR_UNREVIEWED_METADATA"},
@@ -30,6 +34,8 @@ class NativeCOriginalGapTests(unittest.TestCase):
                                           "MULTI_TEST":1})
         self.assertEqual(r["selected_multi_test_categories"],
                          {"SELECTED_ROUTE_NOT_ATTEMPTED":1})
+        self.assertEqual(r["native_stages"],
+                         {"NATIVE_C_FROM_MUST_SOURCE_COMPATIBILITY_PROVED":2})
         self.assertIn("original-oval",r["markdown"].lower().replace(" ","-"))
         self.assertIn("OVAL-Community/SCAP-Self-Assertion",r["markdown"])
         self.assertIn("unix/unix-def_c.xml",r["markdown"])
@@ -75,8 +81,18 @@ class NativeCOriginalGapTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"pinned baseline"):
             gap_report(fixture(),min_expected_total=162)
 
+    def test_conversion_without_source_compiler_proof_is_not_counted(self):
+        m=fixture()
+        m["native_C_converted"][0]["native_C_compilation_passed"]=False
+        with self.assertRaisesRegex(ValueError,"lacks checked stage"):
+            gap_report(m)
+
     def test_all_compatible_no_unsupported_is_a_valid_future_result(self):
         m=fixture()
+        for item in m["unsupported"]:
+            item.update({"C_compilation_stage":"NATIVE_C_FROM_MUST_SOURCE_COMPATIBILITY_PROVED",
+                         "native_C_compilation_passed":True,
+                         "A_projection_equivalence_checked":True})
         m["native_C_converted"].extend(m["unsupported"])
         m["unsupported"]=[]
         m["native_C_Definitions"]=4
