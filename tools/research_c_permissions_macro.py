@@ -72,12 +72,13 @@ def lower_no_more_permissive_than(candidate):
 
 def prove_legacy_source_permission_state_context(assessment, *, state_id,
                                                  permitted="0740"):
-    """Guard a converted source rewrite as an authoring-only State alias.
+    """Guard a *local* original-Assessment State alias, NOT conversion authorization.
 
-    This is stricter than generic C-native authoring. All bit States must be
-    referenced ONLY as an AND State in Tests, and NOT as a collection filter.
+    These checks know only the supplied Assessment's source closure. A shared
+    original OVAL State may have additional cross-Rule/Benchmark users, even as
+    a Filter. Never rewrite source globally without auditing *all* references.
     The source Object/filter, Variable and Test references remain untouched.
-    Passing proves rewrite ELIGIBILITY, not data acquisition/runtime parity.
+    Passing proves local Test-State PATTERN eligibility only.
     """
     from copy import deepcopy
     from hashlib import sha256
@@ -164,12 +165,14 @@ def prove_legacy_source_permission_state_context(assessment, *, state_id,
     }
     digest=sha256(json.dumps(assessment,sort_keys=True,separators=(",",":"),
                               ensure_ascii=False).encode("utf-8")).hexdigest()
-    return {"status":"SOURCE_STATE_ONLY_REWRITE_ELIGIBLE_NOT_EXECUTABLE",
+    return {"status":"LOCAL_STATE_PATTERN_ONLY_GLOBAL_USES_UNAUDITED",
             "source_assessment_sha256":digest,
             "source_context":evidence,
             "expanded_native_states":deepcopy(macro["states"]),
             "authoring_only":True,
             "filters_rewritten":False,
+            "global_source_consumers_audited":False,
+            "source_conversion_authorized":False,
             "runtime_parity_verified":False}
 
 
