@@ -83,7 +83,7 @@ class PosixPermissionMacroAgainstRealSource(unittest.TestCase):
         self.assertTrue(proof["authoring_only"])
         self.assertEqual(len(proof["source_context"]["source_test_consumers"]),2)
         self.assertEqual(set(t["check_existence"] for t in
-            proof["source_test_consumers"].values()),
+            proof["source_context"]["source_test_consumers"].values()),
             {"any_exist","at_least_one_exists"})
         self.assertEqual(len(proof["expanded_native_states"]),8)
         objects=proof["source_context"]["source_objects"]
