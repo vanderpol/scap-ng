@@ -1,0 +1,137 @@
+{
+  "format": "scap-ng-authoring-vocabulary/0.1",
+  "schema_version": "0.4.0",
+  "language": "en",
+  "status": "pre-alpha-advisory-ui-metadata",
+  "normative": false,
+  "description": "Version-local labels and explanatory prompts for authoring tools. No new grammar, result semantics, datatype inference, or allowed-value definitions. Always validate against the pinned native schemas and capability mappings.",
+  "term_scopes": {
+    "assessment.assessment_title": {
+      "label": "Security requirement",
+      "prompt": "What security requirement should be checked?",
+      "description": "Human-authored summary, not an executable condition."
+    },
+    "assessment.evaluate": {
+      "label": "How the checks combine",
+      "prompt": "Which checks must pass together?",
+      "description": "Combines independent named Test outcomes; not a collection or State-field condition."
+    },
+    "assessment.evaluate.all": {
+      "label": "All checks must pass",
+      "description": "Logical AND over Test/Assessment expressions. Do not infer behavior of absent evidence from this operator alone."
+    },
+    "assessment.evaluate.any": {
+      "label": "At least one check must pass",
+      "description": "Logical OR over Test/Assessment expressions. This does not imply any particular Item-existence requirement."
+    },
+    "test.capability": {
+      "label": "How to inspect",
+      "prompt": "Which capability will collect the evidence?"
+    },
+    "test.object": {
+      "label": "Data source",
+      "description": "Identifies where and how to collect evidence. Collection and comparison are different operations."
+    },
+    "object.select": {
+      "label": "Where to look",
+      "prompt": "Which items should be collected?",
+      "description": "Capability-specific selectors; do not confuse an Object selector with a State expectation."
+    },
+    "test.states": {
+      "label": "What must be true",
+      "prompt": "Which expected fields or values should be checked?"
+    },
+    "test.states_match": {
+      "label": "Combine expected conditions on one collected item",
+      "prompt": "How must the State entries apply to the same collected item?",
+      "values": {
+        "all": {
+          "label": "All conditions",
+          "description": "Evaluate each State entry as authored on the same collected item."
+        },
+        "any": {
+          "label": "Any condition"
+        },
+        "one": {
+          "label": "Exactly one condition"
+        },
+        "odd": {
+          "label": "An odd number of conditions"
+        }
+      }
+    },
+    "test.require": {
+      "label": "How many collected items must exist and match?",
+      "description": "Test-level existence and matching scope. Use the exact versioned requirement token; do not silently reinterpret unknown, error, incomplete, or empty collection outcomes."
+    },
+    "state.field.require": {
+      "label": "How many values of this field must exist and match?",
+      "description": "Applies inside a collected item to the State field (or record member) being checked, not to the collection of Tests."
+    },
+    "state.field.equals": {
+      "label": "Must equal",
+      "description": "Exact comparison as defined by the authored field's datatype."
+    },
+    "state.field.matches_regex": {
+      "label": "Must match pattern",
+      "description": "Regular-expression comparison, not a literal-text comparison; a Guided literal-text field may escape the pattern for the author."
+    },
+    "object.shared_reference": {
+      "label": "Use an existing data source",
+      "description": "Referenced shared Object must resolve in this Assessment's authoring context."
+    },
+    "expression.for_each": {
+      "label": "Repeat for each collected item",
+      "description": "Correlation and source scoping must be preserved; the authoring UI must not turn per-parent requirements into a global union."
+    }
+  },
+  "capabilities": {
+    "independent.textfilecontent54": {
+      "label": "Read and match text from a file",
+      "description": "Text collection and pattern/instance selection; do not assume complete-file or rendered-login-banner equivalence."
+    },
+    "unix.file": {
+      "label": "Inspect Unix file properties"
+    },
+    "unix.symlink": {
+      "label": "Inspect Unix symbolic link target"
+    },
+    "windows.registry": {
+      "label": "Read Windows Registry settings",
+      "selectors": {
+        "hive": {
+          "label": "Registry hive",
+          "allowed_values_source": "native.selector_value_enums.hive"
+        },
+        "key": {
+          "label": "Registry key",
+          "prompt": "Which Registry key?"
+        },
+        "name": {
+          "label": "Value name",
+          "prompt": "Which named value (or supported default value)?"
+        }
+      },
+      "state_fields": {
+        "type": {
+          "label": "Registry storage type",
+          "prompt": "Which kind of Registry data must this entry contain?",
+          "allowed_values_source": "native.state_value_enums.type",
+          "description": "The Registry value TYPE, such as dword, string or multi_string. This is distinct from the comparison datatype of the data stored in value."
+        },
+        "value": {
+          "label": "Stored Registry value",
+          "prompt": "What should the data contain?",
+          "datatype_choices_source": "native.field_datatypes.value",
+          "description": "Comparison datatype must be selected explicitly when ambiguous, and must be compatible with the asserted Registry type. The mapping's semantic validator governs cross-type compatibility."
+        }
+      }
+    }
+  },
+  "conformance_rules": [
+    "Never synthesize native enumeration values from displayed labels.",
+    "Resolve *_source pointers only within the same pinned capability mapping.",
+    "If a referenced enum is missing or mismatched, disable the affected control rather than supplying a guessed list.",
+    "Display text is advisory; the normative schema and semantic contract win any disagreement."
+  ]
+}
