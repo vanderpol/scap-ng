@@ -100,10 +100,14 @@
               },
               "capability": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "title": "Evidence collection capability",
+                "description": "Identifies the native collector and its supported selector and result fields."
               },
               "object": {
-                "$ref": "https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/object_use"
+                "$ref": "https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/object_use",
+                "title": "Collection Object",
+                "description": "Defines the evidence source and selectors; an inline Object inherits its Test capability."
               },
               "states": {
                 "type": "array",
@@ -132,7 +136,8 @@
                     "$ref": "assessment-language.schema.json#/$defs/all_items_requirement"
                   }
                 ],
-                "description": "Explicit observed Items and matching requirement; no hidden default."
+                "description": "Explicit observed Items and matching requirement; no hidden default.",
+                "title": "Required evidence conditions"
               }
             },
             "additionalProperties": true,
@@ -162,7 +167,9 @@
                 "if": {
                   "properties": {
                     "require": {
-                      "$ref": "assessment-language.schema.json#/$defs/all_items_requirement"
+                      "$ref": "assessment-language.schema.json#/$defs/all_items_requirement",
+                      "title": "Required evidence conditions",
+                      "description": "Specifies Item-existence and the expected predicate conditions, reflecting distinct OVAL check_existence and check scopes."
                     }
                   },
                   "required": [
@@ -201,10 +208,13 @@
           "propertyNames": {
             "type": "string",
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-test$"
-          }
+          },
+          "title": "Named automated Tests"
         },
         "evaluate": {
-          "$ref": "expression.schema.json"
+          "$ref": "expression.schema.json",
+          "title": "Test result evaluation",
+          "description": "Combines Test outcomes with OVAL-aligned Boolean operators."
         },
         "procedure": {
           "type": "string"
@@ -290,7 +300,8 @@
               "assessment": {
                 "type": "string",
                 "minLength": 1,
-                "description": "Logical Assessment ID in 0.3 authoring; compiler resolves kind, identity, exact version and scope to a packaged reference. Relative source paths are a legacy converter bridge only."
+                "description": "Logical Assessment ID in 0.3 authoring; compiler resolves kind, identity, exact version and scope to a packaged reference. Relative source paths are a legacy converter bridge only.",
+                "title": "Assessment"
               },
               "expected_id": {
                 "type": "string",
@@ -355,7 +366,8 @@
           "propertyNames": {
             "type": "string",
             "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
-          }
+          },
+          "title": "Shared collection Objects"
         }
       },
       "additionalProperties": false,
@@ -435,7 +447,8 @@
           }
         }
       ],
-      "description": "Automated Assessments contain Test-local typed predicates and Object/Set-operand Filters with no named State registry. Shared Objects retain explicit acquisition identity."
+      "description": "Automated Assessments contain Test-local typed predicates and Object/Set-operand Filters with no named State registry. Shared Objects retain explicit acquisition identity.",
+      "title": "Assessment"
     }
   },
   "additionalProperties": false
