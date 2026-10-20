@@ -41,6 +41,9 @@ class SyntheticWrapperTests(unittest.TestCase):
         self.assertEqual(report["candidate_count"],1)
         self.assertEqual(docs,before)
         self.assertTrue(report["requires_source_oval_provenance_before_bulk_rewrite"])
+        self.assertIsNone(report["bluetooth_original_oval_set_present"])
+        self.assertFalse(report["bluetooth_case_source_proven"])
+        self.assertTrue(report["source_provenance_required"])
 
 if __name__=="__main__":
     unittest.main()
