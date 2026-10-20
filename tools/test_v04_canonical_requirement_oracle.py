@@ -46,8 +46,13 @@ class SourceRequirementOracleTests(unittest.TestCase):
         # No supported structured axes exists; old Test is preserved verbatim.
         with self.assertRaisesRegex(ValueError, "exceptional"):
             source_axes(source["authoring/demo/a.json"]["assessment"]["tests"]["test"])
-        result = compare_original_to_canonical(source, newer) if False else None
-        self.assertIsNone(result)
+        source["authoring/demo/a.json"]["assessment"]["tests"]["presence-test"] = {
+            "capability": "unix.file", "require": "none_exist"}
+        newer = {path: promote(doc)[0] for path, doc in source.items()}
+        result = compare_original_to_canonical(source, newer)
+        self.assertEqual(result["test_population"]["exceptional_source_exact"], 1)
+        self.assertEqual(result["test_population"]["converted_presence"], 1)
+        self.assertFalse(result["source_exception_matching_equivalence_proved"])
 
     def test_source_change_or_fake_result_fails(self):
         source, newer = self._docs({
