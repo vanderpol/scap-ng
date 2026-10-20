@@ -1,0 +1,62 @@
+name: 0.4.0 singleton-Set original OVAL source triage
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_remaining_singletons_oval.py'
+      - 'tools/test_audit_v04_remaining_singletons_oval.py'
+      - '.github/workflows/v04-singleton-source-triage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  singleton-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source-identity and real-Set negative fixtures
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_remaining_singletons_oval.py
+      - name: Download exact source-verified canonical 0.4.0 JSON sample
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/verified-authoring
+          gh run download 39490327901 --name scap-ng-040-six-stig-board-authoring --dir work/verified-authoring
+          echo 'd073b6bd267cdce105a3aaa75f53c776c5c7a63edad734d983067ab00dae6178  work/verified-authoring/scap-ng-0.4.0-six-stigs.json.zip' | sha256sum -c -
+      - name: Retrieve six immutable original source OVAL archives
+        run: |
+          mkdir -p work/original-oval
+          for name in \
+            U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip \
+            U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip \
+            U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip \
+            U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip \
+            U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip \
+            U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          do
+            curl --fail --silent --show-error --location --retry 3 \
+              "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/$name" \
+              --output "work/original-oval/$name"
+          done
+      - name: Classify all 50 current singleton Sets against pinned original XML
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/audit_v04_remaining_singletons_oval.py \
+            --archive work/verified-authoring/scap-ng-0.4.0-six-stigs.json.zip \
+            --source-dir work/original-oval \
+            --report work/v04-remaining-singleton-source-triage.json --assert-six
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: 0.4-singleton-oval-source-triage
+          path: work/v04-remaining-singleton-source-triage.json
+          if-no-files-found: warn
