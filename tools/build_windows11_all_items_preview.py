@@ -11,6 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import zipfile
+import yaml
 
 TOKEN_TO_EXISTENCE = {
     "at_least_one_exists_and_all_match": "one_or_more",
@@ -72,12 +73,14 @@ def restore(candidate, original):
 def run(source, out):
     counts = Counter()
     originals, candidates = {}, {}
+    is_yaml = "six-stig-yaml" in source.name
+    extension = ".yaml" if is_yaml else ".json"
     with zipfile.ZipFile(source) as z:
         for member in z.namelist():
-            if member.endswith("/") or not member.startswith("authoring/") or not member.endswith(".json"):
+            if member.endswith("/") or not member.startswith("authoring/") or not member.endswith(extension):
                 continue
             raw = z.read(member)
-            doc = json.loads(raw)
+            doc = yaml.safe_load(raw) if is_yaml else json.loads(raw)
             originals[member] = doc
             if "/ms_windows_11/" in member:
                 candidate, n = transform(doc)
@@ -95,7 +98,8 @@ def run(source, out):
         raise ValueError("Unexpected complete r3 source document count")
     with zipfile.ZipFile(out, "w", compression=zipfile.ZIP_DEFLATED) as z:
         for path, doc in sorted(candidates.items()):
-            z.writestr(path, json.dumps(doc, sort_keys=True, indent=2, ensure_ascii=False)+"\n")
+            rendered = yaml.safe_dump(doc, sort_keys=False, allow_unicode=True) if is_yaml else json.dumps(doc, sort_keys=True, indent=2, ensure_ascii=False)+"\n"
+            z.writestr(path, rendered)
         z.writestr("RESEARCH-ONLY-ALL-ITEMS-MUST.txt", (
             "0.4-A Windows 11 all_items_must review overlay. NOT native schema-valid 0.4-A, "
             "NOT signed, NOT scanner parity. Other STIG content is included unchanged "
@@ -107,6 +111,7 @@ def run(source, out):
         "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "output_sha256": hashlib.sha256(out.read_bytes()).hexdigest(),
         "document_count": len(candidates),
+        "format": "yaml" if is_yaml else "json",
         "scope": "Windows 11 Item requirements only; complete source AST reversible",
         "counts": dict(counts),
         "candidate_is_native_0_4a": False,
