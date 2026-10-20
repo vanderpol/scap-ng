@@ -137,10 +137,16 @@
                   },
                   {
                     "$ref": "assessment-language.schema.json#/$defs/item_presence_requirement"
+                  },
+                  {
+                    "$ref": "assessment-language.schema.json#/$defs/scoped_all_items_requirement"
                   }
                 ],
                 "description": "Explicit observed Items and matching requirement; no hidden default.",
                 "title": "Required evidence conditions"
+              },
+              "state_fields_require": {
+                "$ref": "assessment-language.schema.json#/$defs/paired_requirement"
               }
             },
             "additionalProperties": true,
@@ -212,6 +218,35 @@
                         ]
                       }
                     ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "not": {
+                    "required": [
+                      "state_fields_require"
+                    ]
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "require": {
+                      "anyOf": [
+                        {
+                          "$ref": "assessment-language.schema.json#/$defs/paired_requirement"
+                        },
+                        {
+                          "$ref": "assessment-language.schema.json#/$defs/presence_requirement"
+                        },
+                        {
+                          "$ref": "assessment-language.schema.json#/$defs/all_items_requirement"
+                        },
+                        {
+                          "$ref": "assessment-language.schema.json#/$defs/item_presence_requirement"
+                        }
+                      ]
+                    }
                   }
                 }
               }
