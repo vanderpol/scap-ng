@@ -32,4 +32,17 @@ for x in ({"items":"one_or_more"},{"items":"none"},{"items":"exactly_one"},{"ite
     assert not list(presence.iter_errors(x)), x
 for x in ({"items":"unexpected"},{"items":"none","all_items_must":[]},{}):
     assert list(presence.iter_errors(x)), x
+# Scoped field cardinality must be retained on a Boolean State group,
+# rather than silently promoted into Test Item existence.
+scoped={
+ "items":"one_or_more",
+ "all_items_must":[{"and":[
+    {"type":{"require":"at_least_one_exists_and_all_match","equals":"dword"}},
+    {"value":{"require":"at_least_one_exists_and_all_match","equals":0}}
+ ],"state_fields_require":"at_least_one_exists_and_all_match"}]
+}
+assert not list(validator.iter_errors(scoped)), "Scoped field requirement rejected"
+scoped_bad=json.loads(json.dumps(scoped))
+scoped_bad["all_items_must"][0]["state_fields_require"]="invented_requirement"
+assert list(validator.iter_errors(scoped_bad)), "Invalid scoped field requirement accepted"
 print("PASS: State-free structured presence required/invalid cases")
