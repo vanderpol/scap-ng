@@ -16,17 +16,25 @@ import zipfile
 
 OD="http://oval.mitre.org/XMLSchema/oval-definitions-5"
 SOURCE_ZIP_GIT_BLOB="712cc3176b1e44616aaf2f3ba5e62b299ad0643c"
-SOURCE_CMD="(Get-PnpDevice -class bluetooth -status OK).class"
-SOURCE_TEST="oval:navy.navwar.niwcatlantic.scc.windows:tst:101"
-SOURCE_OBJ="oval:navy.navwar.niwcatlantic.scc.windows:obj:101"
-SOURCE_STATE="oval:navy.navwar.niwcatlantic.scc.windows:ste:101"
+DEVICE_GRAPH={
+    "bluetooth":{"test":101,"object":101,"state":101},
+    "camera":{"test":201,"object":201,"state":201},
+}
 
 
 def local(tag):
     return tag.rsplit("}",1)[-1]
 
 
-def extract(archive_bytes):
+def extract(archive_bytes, device="bluetooth"):
+    if device not in DEVICE_GRAPH:
+        raise ValueError("Unsupported pinned original OVAL device: "+str(device))
+    ids=DEVICE_GRAPH[device]
+    prefix="oval:navy.navwar.niwcatlantic.scc.windows:"
+    source_test=prefix+"tst:"+str(ids["test"])
+    source_object=prefix+"obj:"+str(ids["object"])
+    source_state=prefix+"ste:"+str(ids["state"])
+    source_command=f"(Get-PnpDevice -class {device} -status OK).class"
     blob=hashlib.sha1(b"blob "+str(len(archive_bytes)).encode()+b"\0"+archive_bytes).hexdigest()
     if blob!=SOURCE_ZIP_GIT_BLOB:
         raise ValueError("Original pinned Win11 SCAP ZIP source bytes changed")
@@ -40,25 +48,25 @@ def extract(archive_bytes):
     matches=[]
     for root in roots:
         ids={e.get("id"):e for e in root.iter() if e.get("id")}
-        if SOURCE_TEST not in ids:
+        if source_test not in ids:
             continue
-        test=ids[SOURCE_TEST]
-        obj=ids.get(SOURCE_OBJ)
-        state=ids.get(SOURCE_STATE)
+        test=ids[source_test]
+        obj=ids.get(source_object)
+        state=ids.get(source_state)
         if obj is None or state is None:
             raise ValueError("Original Bluetooth Test Object/Filter State missing")
-        if not any(node.get("object_ref")==SOURCE_OBJ for node in test.iter()):
+        if not any(node.get("object_ref")==source_object for node in test.iter()):
             raise ValueError("Original Bluetooth Test no longer refers to pinned Object")
         direct_filter=[node for node in obj if local(node.tag)=="filter"]
         original_sets=[node for node in obj.iter() if local(node.tag)=="set"]
         command=[node.text for node in obj.iter() if local(node.tag)=="command"]
         if (len(direct_filter)!=1 or direct_filter[0].get("action")!="include"
-            or (direct_filter[0].text or "").strip()!=SOURCE_STATE
-            or original_sets or command!=[SOURCE_CMD]):
+            or (direct_filter[0].text or "").strip()!=source_state
+            or original_sets or command!=[source_command]):
             raise ValueError("Original Bluetooth direct Filter/Set/command graph changed")
         defs=[d for d in root.iter()
               if d.tag=="{"+OD+"}definition"
-              and any(c.get("test_ref")==SOURCE_TEST for c in d.iter())]
+              and any(c.get("test_ref")==source_test for c in d.iter())]
         if not defs:
             raise ValueError("No original OVAL Definition directly refers to Bluetooth Test")
         exact=[d for d in defs if any(local(e.tag)=="title" and "bluetooth" in (e.text or "").lower()
@@ -77,10 +85,11 @@ def extract(archive_bytes):
     # Only a copy of source XML is used as the comparator's source graph;
     # it is NEVER handed to the independent 0.4.0 exporter.
     return ET.ElementTree(root),{
+        "device":device,
         "source_definition":definition.get("id"),
-        "source_test":SOURCE_TEST,
-        "source_object":SOURCE_OBJ,
-        "source_state":SOURCE_STATE,
+        "source_test":source_test,
+        "source_object":source_object,
+        "source_state":source_state,
         "source_xml_sha256":hashlib.sha256(payload).hexdigest(),
         "source_archive_sha256":hashlib.sha256(archive_bytes).hexdigest(),
         "source_original_set_count":0,
@@ -90,11 +99,12 @@ def extract(archive_bytes):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--device",choices=sorted(DEVICE_GRAPH),default="bluetooth")
     p.add_argument("--source-zip",type=Path,required=True)
     p.add_argument("--output",type=Path,required=True)
     p.add_argument("--proof",type=Path,required=True)
     a=p.parse_args()
-    tree,proof=extract(a.source_zip.read_bytes())
+    tree,proof=extract(a.source_zip.read_bytes(),a.device)
     a.output.parent.mkdir(exist_ok=True,parents=True)
     tree.write(a.output,encoding="utf-8",xml_declaration=True)
     proof["extracted_oval_component_sha256"]=hashlib.sha256(a.output.read_bytes()).hexdigest()
