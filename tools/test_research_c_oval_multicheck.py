@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from research_c_oval_multicheck import convert_objectless_many, convert_selected_shared_many, convert_distinct_selected_many, alias_of
+from research_c_oval_multicheck import convert_objectless_many, convert_selected_shared_many, convert_distinct_selected_many, alias_of, descriptive_distinct_alias
 from research_c_original_oval_to_authored_c import NotNativeCConvertible
 from test_research_c_original_oval_to_authored_c import original_plist
 
@@ -226,6 +226,19 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
              "/Library/Preferences/com.apple.OtherSettings.plist"})
         self.assertTrue(out["A_source_semantic_projection_passed"])
         self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
+
+
+    def test_long_original_linux_kernelmodule_title_preserves_all_technical_words(self):
+        title="Ensure kernel module scsi_hostadapter is neither loaded nor loadable"
+        alias=descriptive_distinct_alias(title,{"module_name":"scsi_hostadapter"},set())
+        self.assertEqual(alias,
+                         "kernel_module_scsi_hostadapter_is_neither_loaded_nor_loadable")
+        self.assertLessEqual(len(alias),63)
+        # Never drop negation or collide when the concise alias was used.
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE"):
+            descriptive_distinct_alias(title,{"module_name":"scsi_hostadapter"},
+                                       {alias})
 
     def test_source_long_descriptions_get_meaningful_nontruncated_aliases(self):
         source=two_test_distinct_source()
