@@ -214,12 +214,20 @@ def _selectors(selector, native):
         # force C authors back to the OVAL "filepath/path/filename" tokens.
         if field not in native["selector_map"].values():
             raise ValueError("unsupported Object selector")
-        if type(value) in (str,int):
+        if value is None:
+            # Explicit OVAL xsi:nil selects an unconstrained nullable
+            # component; it is NOT the same as a Registry default name "".
+            if field not in native.get("nullable_selectors",[]):
+                raise ValueError("null selector forbidden by A capability mapping")
+            converted[field]=None
+        elif type(value) in (str,int):
             converted[field]={"equals":value}
         elif isinstance(value,dict) and set(value) in ({"equals"},{"matches_regex"},{"case_insensitive_equals"},{"case_insensitive_not_equal"}):
             converted[field]=deepcopy(value)
         else:
             raise ValueError("unsupported/implicit Object predicate")
+        if converted[field] is None:
+            continue
         if "matches_regex" in converted[field] and (
             type(converted[field]["matches_regex"]) is not str
         ):
