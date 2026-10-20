@@ -156,8 +156,13 @@ def _typed_fields(fields, native, capability):
             op,value="equals",raw["contains"]
         else:
             raise ValueError(f"unsupported / ambiguous predicate at {field}")
+        # Windows permits the unnamed/default Registry value entry. Empty
+        # name is a real OVAL string literal, unlike absent/nullable selector.
+        registry_default_name=(capability=="windows.registry" and field=="name"
+                               and type(value) is str and value==""
+                               and op in ("equals","case_insensitive_equals"))
         if type(value) not in SCALAR or isinstance(value,float) or (
-            type(value) is str and not value
+            type(value) is str and not value and not registry_default_name
         ):
             raise ValueError("typed literal required; no implicit values or coercion")
         if op in ("greater_than","greater_than_or_equal",
@@ -225,8 +230,16 @@ def _selectors(selector, native):
         ):
             raise ValueError("case-insensitive selector requires a string literal")
         enumerated=native.get("selector_value_enums",{}).get(field)
-        if enumerated and converted[field].get("equals") not in enumerated:
-            raise ValueError(f"{field} selector must use native enum")
+        if enumerated:
+            # Keep the original comparison operation. For canonical enum
+            # values both equals and case-insensitive equals remain valid;
+            # do not mistake an explicit casefold operation for a missing
+            # equality value, or silently allow regex/negated enum matches.
+            if not set(converted[field]) <= {"equals","case_insensitive_equals"}:
+                raise ValueError(f"{field} selector enum operation unsupported")
+            enum_value=next(iter(converted[field].values()))
+            if enum_value not in enumerated:
+                raise ValueError(f"{field} selector must use native enum")
     return converted
 
 def _source_object(capability, authored, native):
