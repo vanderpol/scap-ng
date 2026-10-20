@@ -77,9 +77,14 @@ def _leaf_object(raw):
     result={"capability":CAP,
             "object_title":raw["object_title"],
             "select":{"directory":{"equals":path["value"]},"name":None},
-            # Input provenance exact; whether this source OVAL behavior maps
-            # natively in 0.4-A is separately capability-schema checked.
-            "behaviors":deepcopy(old)}
+            "filesystem":"local",
+            "traversal":{
+                "max_depth":None if old["recurse_direction"]=="down" else 0,
+                "recurse":"directories",
+            }}
+    # Source native v003 imported neither the original recurse value nor
+    # the XML default: selecting "directories" here is a proposed source
+    # interpretation, NOT a scanner-proven identical collector.
     return result
 
 
@@ -245,6 +250,7 @@ def audit(original):
       "compiled_04a_shared_objects":len(doc["assessment"]["shared_objects"]),
       "original_v003_source_graph_deep_equal_to_04a":False,
       "runtime_oracle_equivalence_proven":False,
+      "traversal_recurse_default_needs_original_oval_verification":True,
       "source_id_crosswalk":ids,
       "basis":"Pinned v003 original OVAL source re-authored against actual v0.4.0 schemas",
     }
