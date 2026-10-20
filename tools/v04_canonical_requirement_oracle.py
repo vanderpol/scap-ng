@@ -14,6 +14,9 @@ import argparse
 from migrate_v04_oval_proven_direct_filters import (
     index_provenance, migrate as migrate_source_proven_filter,
 )
+from migrate_v04_additional_source_filters import (
+    index_source_proof, migrate as migrate_additional_filter,
+)
 
 from collections import Counter
 from itertools import product
@@ -100,7 +103,8 @@ def comparison_matrix(axis):
     return {"compared": tested, "unresolved_empty_aggregate": unresolved}
 
 
-def compare_original_to_canonical(original, canonical, *, filter_proof=None):
+def compare_original_to_canonical(original, canonical, *, filter_proof=None,
+                                  additional_proof=None):
     if set(original) != set(canonical):
         raise ValueError("different original/canonical document path sets")
     # The reviewed Benchmark 0.3 -> 0.4 declaration update is the only
@@ -110,6 +114,10 @@ def compare_original_to_canonical(original, canonical, *, filter_proof=None):
         proposed, _ = promote(doc)
         if filter_proof is not None:
             proposed, _ = migrate_source_proven_filter(proposed, path, filter_proof)
+        if additional_proof is not None:
+            if filter_proof is None:
+                raise ValueError("Second-pass Filter proof requires original first-pass proof")
+            proposed, _ = migrate_additional_filter(proposed, path, additional_proof)
         promoted[path] = proposed
     if any("benchmark" in doc for doc in original.values()):
         promoted, _ = reconcile_benchmark_specifications(promoted)
@@ -165,12 +173,16 @@ def main():
     p.add_argument("--assert-six", action="store_true")
     p.add_argument("--filter-proof", type=Path, default=None,
                    help="Original-OVAL source Filter classification; required for migrated 0.4 sources")
+    p.add_argument("--additional-filter-proof",type=Path,default=None)
     a = p.parse_args()
     original = read_authoring_archive(a.original_json, "json")
     canonical = read_authoring_archive(a.canonical_json, "json")
     proof = (index_provenance(json.loads(a.filter_proof.read_text()), assert_six=True)
              if a.filter_proof else None)
-    result = compare_original_to_canonical(original, canonical, filter_proof=proof)
+    additional = (index_source_proof(json.loads(a.additional_filter_proof.read_text()),
+                                      assert_six=True) if a.additional_filter_proof else None)
+    result = compare_original_to_canonical(
+        original, canonical, filter_proof=proof, additional_proof=additional)
     if a.assert_six and (
         result["documents"],
         result["test_population"].get("converted_presence"),
