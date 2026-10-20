@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/audit_v04_bluetooth_oval_source.py'
       - 'tools/test_audit_v04_bluetooth_oval_source.py'
+      - 'tools/audit_v04_synthetic_filter_unions.py'
+      - 'tools/test_audit_v04_synthetic_filter_unions.py'
       - '.github/workflows/v04-bluetooth-source-audit.yml'
   workflow_dispatch:
 permissions:
@@ -31,8 +33,23 @@ jobs:
           python tools/audit_v04_bluetooth_oval_source.py \
             --source-zip work/source-windows-11-scap.zip \
             --report work/bluetooth-source-oval-audit.json
+      - name: Review synthetic singleton filtered-Unions in published 0.4.0 samples
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: tools
+        run: |
+          python tools/test_audit_v04_synthetic_filter_unions.py
+          gh release download v0.4.0-six-stig-authoring-approved-20261020 \
+            --pattern scap-ng-0.4.0-six-stigs.json.zip --dir work
+          echo '5037dc29085ad6a4487133962d9c07b1fbc09c2ce14198011c6bb8f7a7437dcb  work/scap-ng-0.4.0-six-stigs.json.zip' | sha256sum -c -
+          python tools/audit_v04_synthetic_filter_unions.py \
+            --archive work/scap-ng-0.4.0-six-stigs.json.zip \
+            --report work/v04-synthetic-filter-union-census.json --assert-six
       - uses: actions/upload-artifact@v4
         with:
           name: bluetooth-original-oval-source-audit
-          path: work/bluetooth-source-oval-audit.json
+          path: |
+            work/bluetooth-source-oval-audit.json
+            work/v04-synthetic-filter-union-census.json
           retention-days: 30
