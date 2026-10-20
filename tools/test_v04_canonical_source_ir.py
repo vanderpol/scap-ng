@@ -79,7 +79,7 @@ class CanonicalIRTests(unittest.TestCase):
             lambda t: t.update(collected_items_require="at_least_one_exists"),
             lambda t: t["object"].update(capability="unix.file"),
             lambda t: t.update(states=[]),
-            lambda t: t.update(require={"items": "one_or_more"}),
+            lambda t: t.update(require={"items": "one_or_more", "all_items_must": []}),
         ):
             src = sample()
             t = src["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"]
