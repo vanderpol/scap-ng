@@ -26,3 +26,10 @@ for x in good:
 for x in bad:
     if not list(validator.iter_errors(x)):raise AssertionError(f"Invalid 0.4 requirement accepted: {x}")
 print(f"PASS: {len(good)} positive and {len(bad)} negative scoped 0.4 all-items schema cases")
+
+presence=Draft202012Validator({"$ref":"#/$defs/item_presence_requirement","$defs":d["$defs"]},resolver=resolver)
+for x in ({"items":"one_or_more"},{"items":"none"},{"items":"exactly_one"},{"items":"all"},{"items":"may_be_absent"}):
+    assert not list(presence.iter_errors(x)), x
+for x in ({"items":"unexpected"},{"items":"none","all_items_must":[]},{}):
+    assert list(presence.iter_errors(x)), x
+print("PASS: State-free structured presence required/invalid cases")
