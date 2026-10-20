@@ -1,0 +1,66 @@
+name: 0.4.0 original Self-Assertion language coverage inventory
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_original_self_assertion_coverage.py'
+      - 'tools/test_audit_v04_original_self_assertion_coverage.py'
+      - '.github/workflows/v04-oval-self-assertion-coverage.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v04-original-oval-language-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout SCAP-NG main
+        uses: actions/checkout@v4
+      - name: Checkout SHA-pinned original OVAL Test Content
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: source/self-assertion
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm original source pin and negative fixtures
+        env:
+          PYTHONPATH: tools
+        run: |
+          test "$(git -C source/self-assertion rev-parse HEAD)" = e3538595c5083b9c34d937a81d319234df9bbfaa
+          python tools/test_audit_v04_original_self_assertion_coverage.py -v
+      - name: Inventory every original Definition and Test and feature family
+        run: |
+          python tools/audit_v04_original_self_assertion_coverage.py \
+            --source source/self-assertion/SCAP_1.4/OVAL_Test_Content \
+            --report work/v04-original-self-assertion-language-ledger.json \
+            --assert-pinned
+      - name: Fail if old v003/A parity is represented as true native 0.4 proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('work/v04-original-self-assertion-language-ledger.json').read_text())
+          assert report['summary']=={
+              'files':144,'definitions':167,'tests':785,
+              'prior_source_blockers':5,'current_040_converted_and_proven':0,
+              'current_040_unverified':167,
+          }
+          assert len(report['definitions'])==167
+          assert report['current_040_semantic_roundtrip_proven'] is False
+          assert all(row['current_040_import']=='NOT_RUN'
+                     and row['oval_xml_semantic_roundtrip']=='NOT_RUN'
+                     for row in report['definitions'])
+          print('PASS: complete original source identity denominator.')
+          print('Native 0.4.0 Self-Assertion roundtrips still required: 167.')
+          PY
+      - name: Preserve full source language inventory and exception ledger
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-original-self-assertion-source-obligations
+          path: work/v04-original-self-assertion-language-ledger.json
+          if-no-files-found: ignore
