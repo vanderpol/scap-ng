@@ -138,22 +138,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          cat > work/RELEASE-NOTES.md <<'EOF'
-          Owner-approved SCAP-NG 0.4.0 six-STIG AUTHORING SAMPLE FILES (YAML + JSON).
-          Includes Windows 11, Windows Server 2025, RHEL 9, Oracle Linux 9, DNS and Apache.
-          Includes all 4,001 source-backed documents and complete Rule-choice closure.
-          The six Benchmarks declare only the exact reachable 0.4.0 automated
-          Assessment specification, as approved October 20, 2026.
-          Original 0.3 declarations and all 0.3 files remain archived at
-          v0.3.0-six-stig-typed-operators-5796d016b12f and Git history.
-          Version-change source/target hashes are recorded in both manifests.
-          The common all-items-must requirements and inline Object capability inheritance
-          are reversible to pinned October 15 source; the six Benchmark version
-          declaration changes are separately recorded and reversible.
-          Uncommon requirement combinations remain explicit source-preserving tokens.
-          These are authoring content, not compiled/signed scanner bundles; no scanner
-          runtime parity is established. Review source schema and compiler gates separately.
-          EOF
+          cp docs/releases/0.4.0-six-stig-authoring.md work/RELEASE-NOTES.md
           if gh release view v0.4.0-six-stig-authoring-approved-20261020 >/dev/null 2>&1; then
             echo 'Existing immutable review release found; verification and workflow artifact are complete. No overwrite.'
             exit 0
@@ -166,5 +151,5 @@ jobs:
             work/canonical-benchmark-version-preview.json \
             work/canonical-requirement-oval-oracle.json \
             --prerelease --target "$GITHUB_SHA" \
-            --title 'SCAP-NG 0.4.0 · approved six-STIG authoring samples' \
+            --title 'SCAP-NG 0.4.0 - Six-STIG authoring samples' \
             --notes-file work/RELEASE-NOTES.md

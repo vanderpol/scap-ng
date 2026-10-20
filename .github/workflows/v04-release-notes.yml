@@ -1,0 +1,42 @@
+name: SCAP-NG 0.4 sample release description
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/releases/0.4.0-six-stig-authoring.md'
+      - '.github/workflows/v04-release-notes.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update-release-description:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update existing 0.4 authoring release text, preserving assets and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          tag='v0.4.0-six-stig-authoring-approved-20261020'
+          expected=(
+            scap-ng-0.4.0-six-stigs.yaml.zip
+            scap-ng-0.4.0-six-stigs.json.zip
+            yaml-manifest.json
+            json-manifest.json
+            input-native-report.json
+            canonical-benchmark-version-preview.json
+            canonical-requirement-oval-oracle.json
+          )
+          gh release view "$tag" >/dev/null
+          actual="$(gh release view "$tag" --json assets --jq '.assets[].name' | sort)"
+          wanted="$(printf '%s\n' "${expected[@]}" | sort)"
+          if [[ "$actual" != "$wanted" ]]; then
+            echo 'Unexpected release asset list: refusing metadata-only update' >&2
+            exit 1
+          fi
+          gh release edit "$tag" \
+            --title 'SCAP-NG 0.4.0 - Six-STIG authoring samples' \
+            --notes-file docs/releases/0.4.0-six-stig-authoring.md
+          gh release view "$tag" --json name,body --jq '{title:.name,body:.body}'
