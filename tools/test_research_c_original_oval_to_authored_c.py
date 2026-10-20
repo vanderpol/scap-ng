@@ -106,6 +106,38 @@ class BasicOriginalWindowsRegistryCTest(unittest.TestCase):
         self.assertTrue(out["A_source_semantic_projection_passed"])
         self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
 
+    def test_original_registry_nullable_name_is_not_default_empty_name(self):
+        source=original_windows_registry_1020_test()
+        object_value=next(iter(source["objects"].values()))["select"]
+        object_value["name"]={"datatype":"string","operation":"equals",
+                              "value":"","nil":True}
+        state=next(iter(source["states"].values()))["state"]["all"]
+        state.pop()  # selector is unconstrained, but State still checks hive/key
+        before=deepcopy(source)
+        result=compile_one_original_definition(source)
+        self.assertEqual(source,before)
+        self.assertEqual(result["authored_c"]["from"]["windows.registry"]["name"],
+                         None)
+        self.assertIsNone(
+            result["native_c_compiled_test"]["object"]["select"]["name"])
+        self.assertEqual(len(result["native_c_compiled_test"]["states"]),2)
+        self.assertNotEqual(result["authored_c"]["from"]["windows.registry"]["name"],
+                            "")
+        source=original_windows_registry_1020_test()
+        obj=next(iter(source["objects"].values()))["select"]
+        obj["hive"]={"datatype":"string","operation":"equals",
+                      "value":"","nil":True}
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "SELECTOR_NIL_SOURCE_SHAPE_UNSUPPORTED"):
+            compile_one_original_definition(source)
+        source=original_windows_registry_1020_test()
+        obj=next(iter(source["objects"].values()))["select"]
+        obj["name"]={"datatype":"string","operation":"equals",
+                      "value":"CurrentVersion","nil":True}
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "SELECTOR_NIL_SOURCE_SHAPE_UNSUPPORTED"):
+            compile_one_original_definition(source)
+
     def test_registry_source_type_and_scope_fail_closed(self):
         original=original_windows_registry_1020_test()
         old=next(iter(original["states"].values()))["state"]["all"][1]
