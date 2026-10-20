@@ -49,6 +49,20 @@ jobs:
           assert m["a_schema_modified"] is False
           print("D Apache source-backed proof:",json.dumps(m,sort_keys=True))
           PY
+      - name: Print verified review YAML for permanent publication
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path("d-apache-review")
+          for name in ("apache-sv214268.0.4-D-author.yaml",
+                       "apache-sv214268.0.4-D-provenance.yaml",
+                       "proof.json"):
+              content=(root/name).read_text(encoding="utf-8")
+              print("D_REVIEW_BEGIN "+name)
+              for line in content.splitlines():
+                  print("D_REVIEW_DATA "+line)
+              print("D_REVIEW_END "+name)
+          PY
       - name: Upload source-backed D review packet
         uses: actions/upload-artifact@v4
         with:
