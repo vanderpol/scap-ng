@@ -21,14 +21,18 @@ from pathlib import Path
 
 from v04_a_authoring_graph_index import read_authoring_archive, canonical_json
 
+# Only newly introduced *strong* structural smells block canonical CI.
+# A genuine original OVAL singleton Set, scoped Boolean grouping, or native
+# schema-required inner capability MUST NOT become a false-positive failure.
+# Every blocking hit still requires original OVAL/source review before rewriting.
 HIGH_CONFIDENCE = frozenset((
-    "singleton_set", "mirrored_singleton_set_object",
+    "mirrored_singleton_set_object",
     "repeated_identical_set_operand", "identical_consecutive_filters",
-    "nested_singleton_set", "same_operator_boolean_nesting",
-    "single_child_boolean", "redundant_inline_capability",
 ))
 REVIEW_ONLY = frozenset((
-    "singleton_set_with_filters", "empty_set_operand_filters",
+    "singleton_set", "singleton_set_with_filters", "nested_singleton_set",
+    "same_operator_boolean_nesting", "single_child_boolean",
+    "redundant_inline_capability", "empty_set_operand_filters",
     "unreferenced_test", "passthrough_variable",
 ))
 MAX_EXAMPLES = 15
@@ -191,6 +195,16 @@ def scan(documents):
                           for name, rows in sorted(pattern_sites.items())},
         "high_confidence_non_growth": sorted(HIGH_CONFIDENCE),
         "review_only_no_automatic_rewrite": sorted(REVIEW_ONLY),
+        "interpretation": {
+            "redundant_inline_capability":
+                "Same as enclosing Test, but nested native Object schema currently REQUIRES capability; not a proven redundant authored field",
+            "empty_set_operand_filters":
+                "Current 0.4 native Set operand schema REQUIRES a filters array, including [] when no Filter is applied",
+            "same_operator_boolean_nesting":
+                "Could preserve meaningful architecture/check grouping; do not flatten without source/evaluation evidence",
+            "singleton_set":
+                "Might be original OVAL Set or converter-generated identity; only pinned original XML resolves it",
+        },
         "original_oval_identity_checked": False,
         "scanner_runtime_equivalence_checked": False,
     }
