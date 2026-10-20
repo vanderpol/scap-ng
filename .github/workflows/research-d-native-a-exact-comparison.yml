@@ -1,0 +1,50 @@
+name: 0.4-D exact native 0.4-A versus D original OVAL comparison
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/research_d_native_a_exact_comparison.py'
+      - '.github/workflows/research-d-native-a-exact-comparison.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validated-native-a-versus-d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install source and schema tools
+        run: python -m pip install 'PyYAML>=6,<7' 'jsonschema>=4,<5' 'referencing>=0.35'
+      - name: Independently check exact 0.4-A against native schema
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_d_native_a_exact_comparison.py --out d-a-review
+          cat d-a-review/a-conversion-proof.json
+      - name: Print actual authored A comparison to preserve directly in GitHub
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for name in ("unix-set-seven-tests.0.4-A-conversion-candidate.yaml",
+                       "a-conversion-proof.json"):
+              doc=(Path("d-a-review")/name).read_text()
+              print("D_NATIVE_A_BEGIN "+name)
+              for line in doc.splitlines():
+                  print("D_NATIVE_A_DATA "+line)
+              print("D_NATIVE_A_END "+name)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: original-oval-actual-04a-migration-schema-proof
+          path: d-a-review/
+          if-no-files-found: error
+          retention-days: 21
