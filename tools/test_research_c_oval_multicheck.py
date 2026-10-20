@@ -227,6 +227,35 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
         self.assertTrue(out["A_source_semantic_projection_passed"])
         self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
 
+    def test_source_long_descriptions_get_meaningful_nontruncated_aliases(self):
+        source=two_test_distinct_source()
+        tids=list(source["tests"])
+        source["tests"][tids[0]]["test_title"]=(
+            "Test that the plist511_object is supported with the filepath entity "
+            "equal to some value.")
+        source["tests"][tids[1]]["test_title"]=(
+            "Test that the plist511_object is supported with the filepath entity "
+            "not equal to some value.")
+        result=convert_distinct_selected_many(source)
+        checks=result["authored_c"]["checks"]
+        self.assertEqual(set(checks),{"filepath_equals","filepath_not_equals"})
+        self.assertEqual(set(result["source_test_crosswalk"].values()),set(tids))
+        self.assertEqual(len(result["native_c_compiled_tests"]),2)
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
+
+    def test_source_title_alias_never_guesses_unknown_purpose(self):
+        source=two_test_distinct_source()
+        tids=list(source["tests"])
+        source["tests"][tids[0]]["test_title"]=(
+            "Test that the plist511_object does something unclear to the host "
+            "and somehow ignores the comparison.")
+        source["tests"][tids[1]]["test_title"]=(
+            "Test that the plist511_object is supported with the filepath entity "
+            "equal to some value.")
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE"):
+            convert_distinct_selected_many(source)
+
     def test_shared_selected_object_requires_different_proven_scope(self):
         doc=two_test_distinct_source()
         first=next(iter(doc["tests"]))
