@@ -262,8 +262,46 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
         other=next(t for t in doc["tests"] if t!=first)
         doc["tests"][other]["object"]=doc["tests"][first]["object"]
         with self.assertRaisesRegex(NotNativeCConvertible,
-                                    "OBJECT_MISSING_OR_SHARED"):
+                                    "EXTRA_SOURCE_OBJECT_OR_STATE"):
             convert_distinct_selected_many(doc)
+
+    def test_mixed_reused_and_distinct_source_object_identity(self):
+        doc=two_test_distinct_source()
+        first,second=list(doc["tests"])
+        third="test-additional-original-reused-object"
+        third_state="state-original-independent-check"
+        doc["tests"][third]=deepcopy(doc["tests"][first])
+        doc["tests"][third]["test_title"]=(
+            "Check independent DarkWake value_of is true")
+        doc["tests"][third]["states"]=[third_state]
+        old_state=doc["tests"][first]["states"][0]
+        doc["states"][third_state]=deepcopy(doc["states"][old_state])
+        doc["states"][third_state]["state_title"]=(
+            "Independent source State referring to same source Object")
+        doc["evaluate"]={"all":[{"test":first},
+            {"any":[{"test":second},{"test":third}]}]}
+        before=deepcopy(doc)
+        result=convert_distinct_selected_many(doc)
+        self.assertEqual(doc,before)
+        self.assertTrue(result["C_preserves_mixed_original_object_reuse"])
+        authored=result["authored_c"]
+        self.assertEqual(len(authored["observations"]),1)
+        shared_oid=doc["tests"][first]["object"]
+        shared_alias=next(iter(authored["observations"]))
+        self.assertEqual(authored["observations"][shared_alias]["source_object"],
+                         shared_oid)
+        crosswalk={tid:alias for alias,tid in
+                   result["source_test_crosswalk"].items()}
+        self.assertEqual(authored["checks"][crosswalk[first]]["observation"],
+                         shared_alias)
+        self.assertEqual(authored["checks"][crosswalk[third]]["observation"],
+                         shared_alias)
+        self.assertIn("from",authored["checks"][crosswalk[second]])
+        tests=result["native_c_compiled_tests"]
+        self.assertEqual(tests[crosswalk[first]]["object"],shared_oid)
+        self.assertEqual(tests[crosswalk[third]]["object"],shared_oid)
+        self.assertIsInstance(tests[crosswalk[second]]["object"],dict)
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
 
     def test_set_filter_or_orphan_source_object_cannot_disappear(self):
         doc=two_test_distinct_source()
