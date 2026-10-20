@@ -35,6 +35,8 @@ def main():
     examples=collections.defaultdict(list)
     grouped=collections.Counter()
     group_examples=collections.defaultdict(list)
+    nested_groups=collections.Counter()
+    nested_examples=collections.defaultdict(list)
     skipped=[]
     with zipfile.ZipFile(args.archive) as z:
         names=sorted(n for n in z.namelist() if n.startswith("authoring/") and n.endswith((".yaml",".json")))
