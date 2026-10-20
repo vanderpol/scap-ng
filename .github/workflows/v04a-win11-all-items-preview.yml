@@ -7,7 +7,7 @@ on:
       - '.github/workflows/v04a-win11-all-items-preview.yml'
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   windows11-review:
     runs-on: ubuntu-latest
@@ -62,3 +62,28 @@ jobs:
             work/windows11-v04a-all-items-review.manifest.json
             work/source-schema-report.json
           if-no-files-found: error
+      - name: Publish durable Windows 11 research review packages
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cat > work/REVIEW-NOTES.md <<'EOF'
+          Windows 11 0.4-A + bounded all_items_must research review.
+
+          Both archives contain the complete pinned six-STIG source set to preserve
+          authoring references. Only 94 Windows 11 Test declarations in 66 Assessment
+          documents are rewritten; full parsed source reconstruction passes.
+          This is NOT native-schema-approved 0.4-A, NOT a signed scanner bundle
+          and NOT evidence of six-state runtime assessment parity.
+
+          Windows 11 content is under authoring/ms_windows_11/.
+          EOF
+          gh release create v0.4.0-win11-all-items-review-20261020 \
+            work/windows11-v04a-all-items-review.zip \
+            work/windows11-v04a-all-items-review-yaml.zip \
+            work/windows11-v04a-all-items-review.manifest.json \
+            work/windows11-v04a-all-items-review-yaml.manifest.json \
+            --prerelease --target "$GITHUB_SHA" \
+            --title 'Windows 11 0.4-A all-items research review · 2026-10-20' \
+            --notes-file work/REVIEW-NOTES.md
