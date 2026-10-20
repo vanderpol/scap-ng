@@ -1,0 +1,58 @@
+name: 0.4-D Apache lossless authoring pilot
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/research_d_apache_native_states.py'
+      - 'tools/test_research_d_apache_native_states.py'
+      - '.github/workflows/research-d-lossless-apache.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: research-d-apache-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-bound-04d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install minimal research dependencies
+        run: python -m pip install 'PyYAML>=6,<7' 'jsonschema>=4,<5'
+      - name: Prove 0.4-D Apache Test and State syntax against full original graph
+        env:
+          PYTHONPATH: tools
+        run: python -m unittest -v tools/test_research_d_apache_native_states.py
+      - name: Export complete browser-reviewable D YAML and required provenance
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_d_apache_native_states.py --out d-apache-review
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("d-apache-review/proof.json")
+          m=json.loads(p.read_text())
+          assert m["original_source_structural_equality"] is True
+          assert (m["tests"],m["variables"],m["shared_objects"]) == (5,19,1)
+          assert m["source_scanner_runtime_parity"] is False
+          assert m["a_schema_modified"] is False
+          print("D Apache source-backed proof:",json.dumps(m,sort_keys=True))
+          PY
+      - name: Upload source-backed D review packet
+        uses: actions/upload-artifact@v4
+        with:
+          name: d-apache-lossless-source-backed-research
+          path: d-apache-review/
+          if-no-files-found: error
+          retention-days: 30
