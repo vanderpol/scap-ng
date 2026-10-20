@@ -110,14 +110,15 @@ def normalize_c_frontend(document):
             not isinstance(check["must"],dict) and type(check["must"]) is not str
         ):
             raise ValueError("check requires an explicit Item requirement")
+        provenance={"source_test","source_state"}
         if "from" in check:
-            if set(check) not in ({"from","must"},{"from","must","source_test"}):
+            if not {"from","must"} <= set(check) or set(check)-({"from","must"}|provenance):
                 raise ValueError("direct check cannot also reference observation")
             source=_from(check["from"])
             observed=None
         elif "observation" in check:
-            if set(check) not in (
-                {"observation","must"},{"observation","must","source_test"}
+            if not {"observation","must"} <= set(check) or (
+                set(check)-({"observation","must"}|provenance)
             ):
                 raise ValueError("shared check cannot have two acquisition routes")
             observed=check["observation"]
@@ -136,8 +137,16 @@ def normalize_c_frontend(document):
             if source_test in source_test_ids:
                 raise ValueError("duplicate source Test provenance identity")
             source_test_ids.add(source_test)
+        source_state=check.get("source_state")
+        if source_state is not None and (
+            type(source_state) is not str or not source_state
+        ):
+            raise ValueError("source State provenance must be explicit string")
+        if source_state is not None and type(check["must"]) is not dict:
+            raise ValueError("presence-only C check cannot claim a source State")
         normalized.append({
             "id":check_name,"source_test":source_test,
+            "source_state":source_state,
             "from":source,"observation":observed,
             "must":deepcopy(check["must"]),
         })
