@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Small source-triage fixtures for all remaining 0.4.0 singleton Sets (#248)."""
+import unittest
+import xml.etree.ElementTree as ET
+
+from audit_v04_remaining_singletons_oval import audit, local_set_sites
+
+
+P="authoring/ms_windows_11/assessments/automated/example.json"
+
+
+def doc():
+    return {P: {"assessment": {
+        "id":"example", "mode":"automated",
+        "tests":{"check-test":{"capability":"windows.registry",
+            "object":{"object_title":"Registry keys",
+                "set":{"operator":"union","operands":[
+                    {"object":{"object_title":"Registry keys",
+                               "capability":"windows.registry",
+                               "select":{"key":{"equals":"Example"}}},
+                     "filters":[{"include":{"key":{"equals":"Example"}}}]}
+                ]}},
+            "require":{"items":"one_or_more"}}},
+        "evaluate":{"test":"check-test"},
+    }}}
+
+
+def xml(comment, with_set=False):
+    child='<set set_operator="UNION"><object_reference>oval:obj:other</object_reference></set>' if with_set else '<filter action="include">oval:state:1</filter>'
+    return ET.fromstring(f'<objects><registry_object id="oval:obj:1" comment="{comment}">{child}</registry_object></objects>')[0]
+
+
+def pins():
+    return {"ms_windows_11":"pinned-hash"}
+
+
+class RemainingSingletonTests(unittest.TestCase):
+    def test_source_direct_filter_without_set_is_triage_only(self):
+        r=audit(doc(),{"ms_windows_11":[xml("Registry keys")]},pins())
+        self.assertEqual(r["singleton_set_occurrences"],1)
+        self.assertEqual(r["classifications"],{"UNIQUE_SOURCE_DIRECT_FILTER_NO_SET":1})
+        self.assertFalse(r["rewrites_authorized"])
+        self.assertFalse(r["scanner_semantics_verified"])
+
+    def test_source_real_set_is_explicitly_preserved(self):
+        r=audit(doc(),{"ms_windows_11":[xml("Registry keys",True)]},pins())
+        self.assertEqual(r["classifications"],{"SOURCE_CONTAINS_SET":1})
+
+    def test_ambiguous_source_titles_not_guessed(self):
+        r=audit(doc(),{"ms_windows_11":[xml("Registry keys"),xml("Registry keys",True)]},pins())
+        self.assertEqual(r["classifications"],{"MULTIPLE_SOURCE_MATCHES":1})
+        self.assertEqual(len(r["items"][0]["source_matches"]),2)
+
+    def test_no_title_is_not_assumed_oval_identity(self):
+        d=doc()
+        ob=d[P]["assessment"]["tests"]["check-test"]["object"]
+        ob.pop("object_title")
+        ob["set"]["operands"][0]["object"]["object_title"]=None
+        r=audit(d,{"ms_windows_11":[xml("Registry keys")]},pins())
+        self.assertEqual(r["classifications"],{"NO_SOURCE_TITLE":1})
+
+    def test_mixed_test_and_variable_sites_preserve_provenance_path(self):
+        d=doc()
+        a=d[P]["assessment"]
+        a["variables"]={"value-variable":{"expression":{"values":{
+            "object":a["tests"]["check-test"]["object"],"field":"value"}}}}
+        rows=local_set_sites(d)
+        self.assertEqual(len(rows),2)
+        self.assertEqual({r["test"] for r in rows},{"check-test",None})
+        self.assertTrue(any("variables" in r["site"] for r in rows))
+
+
+if __name__=="__main__":
+    unittest.main()
