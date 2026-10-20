@@ -132,6 +132,27 @@ def convert(original):
     if (len(original["tests"]),len(original["objects"]),
         len(original["states"]),len(original["variables"]))!=(7,11,4,3):
         _fail("pinned original OVAL inventory changed")
+
+    # 0.4-A named source IDs must end -object / -variable. Preserve
+    # original source IDs in a reversible crosswalk rather than weakening
+    # the A grammar or pretending original OVAL suffices as native A.
+    object_names={
+        ident:(ident.rsplit("-object-",1)[0]+"-variant-"+
+               ident.rsplit("-object-",1)[1]+"-object")
+        if "-object-" in ident else ident
+        for ident in original["objects"]}
+    var_names={
+        ident:(ident.rsplit("-variable-",1)[0]+"-variant-"+
+               ident.rsplit("-variable-",1)[1]+"-variable")
+        if "-variable-" in ident else ident
+        for ident in original["variables"]}
+    renames={**object_names,**var_names}
+    def rename(node):
+        if isinstance(node,str):return renames.get(node,node)
+        if isinstance(node,list):return [rename(x) for x in node]
+        if isinstance(node,dict):return {renames.get(k,k):rename(v) for k,v in node.items()}
+        return deepcopy(node)
+    original=rename(original)
     test_ids={sid:sid.replace("test-test-that-","").replace("test-test-","")+
                "-test" for sid in original["tests"]}
     if len(set(test_ids.values()))!=7:
@@ -182,7 +203,7 @@ def convert(original):
             return {"test":test_ids[node["test"]]}
         return {k:rewrite(v) for k,v in node.items()}
     native["evaluate"]=rewrite(original["evaluate"])
-    return {"assessment":native},test_ids
+    return {"assessment":native},{"tests":test_ids,"objects":object_names,"variables":var_names}
 
 
 def audit(original):
@@ -208,7 +229,7 @@ def audit(original):
       "compiled_04a_shared_objects":len(doc["assessment"]["shared_objects"]),
       "original_v003_source_graph_deep_equal_to_04a":False,
       "runtime_oracle_equivalence_proven":False,
-      "source_test_id_crosswalk":ids,
+      "source_id_crosswalk":ids,
       "basis":"Pinned v003 original OVAL source re-authored against actual v0.4.0 schemas",
     }
     return doc,report
