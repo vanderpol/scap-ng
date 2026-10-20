@@ -13,6 +13,8 @@ on:
       - 'tools/test_v04_canonical_source_ir.py'
       - 'tools/v04_canonical_version_preview.py'
       - 'tools/test_v04_canonical_version_preview.py'
+      - 'tools/v04_canonical_requirement_oracle.py'
+      - 'tools/test_v04_canonical_requirement_oracle.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
       - 'schema/v0.4.0/assessment.schema.json'
       - 'schema/v0.4.0/capability-common.schema.json'
@@ -86,6 +88,16 @@ jobs:
             --yaml-archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
             --report work/canonical-benchmark-version-preview.json \
             --assert-six
+      - name: Prove source-exact canonical Test axes against pinned OVAL six-state results
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_canonical_requirement_oracle.py
+          python tools/v04_canonical_requirement_oracle.py \
+            --original-json work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --canonical-json work/scap-ng-0.4.0-six-stigs.json.zip \
+            --report work/canonical-requirement-oval-oracle.json \
+            --assert-six
       - name: Confirm equivalent YAML/JSON sources and exact scope
         run: |
           python - <<'PY'
@@ -115,6 +127,7 @@ jobs:
             work/canonical-typed-source-ir.json
             work/canonical-typed-source-ir-report.json
             work/canonical-benchmark-version-preview.json
+            work/canonical-requirement-oval-oracle.json
           if-no-files-found: error
       - name: Publish durable six-STIG authoring candidate
         if: github.ref == 'refs/heads/main'
