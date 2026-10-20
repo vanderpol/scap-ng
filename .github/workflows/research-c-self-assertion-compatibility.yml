@@ -13,6 +13,8 @@ on:
       - 'tools/verify_c_linux_windows_basic_source.py'
       - 'tools/research_c_original_platform_test_census.py'
       - 'tools/research_c_original_a_vs_c_review.py'
+      - 'tools/research_d_oval_sets.py'
+      - 'tools/test_research_d_oval_sets.py'
       - 'research/assessment-simplification/compact-authoring-04/c-original-windows-registry-test-1020-native.research.yaml'
       - 'tools/research_c_oval_native_gap_report.py'
       - 'tools/test_research_c_oval_native_gap_report.py'
@@ -483,6 +485,55 @@ jobs:
           python scap-ng/tools/verify_c_published_original_oval_examples.py \
             --published scap-ng/research/assessment-simplification/compact-authoring-04/oval-self-assertion-c-review \
             --generated c-native --manifest c-native/conversion-manifest.json
+      - name: D independent seven-Test original OVAL Sets, Filters and literal Values
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from research_d_oval_sets import export_d_oval_sets
+          matches=[]
+          for p in sorted(Path("c-review").glob("*.review.json")):
+              row=json.loads(p.read_text(encoding="utf-8"))
+              if row["source"]["file"] == "unix/oval-def_set-unix.xml":
+                  matches.append(row)
+          assert len(matches)==1, "the source-pinned UNIX Set Definition must be unique"
+          row=matches[0]
+          assert row["source"]["definition_id"] == "oval:org.mitre.oval.test:def:276"
+          native=row["A_source_compatibility_fallback"]
+          assert len(native["tests"])==7
+          assert len(native["objects"])==11
+          assert len(native["variables"])==3
+          assert sum("set" in o for o in native["objects"].values())==7
+          out=Path("d-oval-review")
+          out.mkdir(exist_ok=True)
+          (out/"original-source-compatible-a.json").write_text(
+              json.dumps(native,indent=2,sort_keys=True,ensure_ascii=False)+"\n",
+              encoding="utf-8")
+          proof=export_d_oval_sets(native,out)
+          assert proof["native_source_graph_identical"]
+          assert (proof["source_test_count"],proof["source_set_count"],
+                  proof["source_variable_count"])==(7,7,3)
+          print("Verified D exact original OVAL seven-Test source graph:",proof)
+          PY
+          D_OVAL_SEVEN_SOURCE=d-oval-review/original-source-compatible-a.json \
+            python -m unittest -v scap-ng/tools/test_research_d_oval_sets.py
+      - name: Emit verified complete 0.4-D UNIX Set review for GitHub publication
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          root=Path("d-oval-review")
+          for name in ("original-source-compatible-a.json",
+                       "unix-set-seven-tests.0.4-D-author.yaml",
+                       "unix-set-seven-tests.0.4-D-provenance.yaml",
+                       "proof.json"):
+              value=(root/name).read_text(encoding="utf-8")
+              print("D_OVAL_BEGIN "+name)
+              for line in value.splitlines():
+                  print("D_OVAL_DATA "+line)
+              print("D_OVAL_END "+name)
+          PY
       - name: Hash and archive review outputs
         shell: bash
         run: |
@@ -495,7 +546,7 @@ jobs:
               for p in sorted(root.rglob("*.json")):
                   fd.write(hashlib.sha256(p.read_bytes()).hexdigest()+"  "+p.relative_to(root).as_posix()+"\n")
           PY
-          tar -czf c-review-source-backed.tar.gz c-review c-hybrid c-native a-roundtrip.json c-review-summary.json c-native-summary.json
+          tar -czf c-review-source-backed.tar.gz c-review c-hybrid c-native d-oval-review a-roundtrip.json c-review-summary.json c-native-summary.json
           sha256sum c-review-source-backed.tar.gz > c-review-source-backed.sha256
       - name: Upload original-source-backed review (NOT native C conversion)
         if: always()
@@ -506,6 +557,7 @@ jobs:
             c-review/
             c-native/
             c-hybrid/
+            d-oval-review/
             c-native-summary.json
             c-review-summary.json
             c-review-source-backed.tar.gz
