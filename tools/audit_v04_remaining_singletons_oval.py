@@ -61,6 +61,20 @@ def local_set_sites(documents):
     return rows
 
 
+def normalized_xml_structure(element):
+    """Namespace/prefix independent exact element+attribute+text structure."""
+    return {
+        "tag":local(element),
+        "attributes":sorted((local_name(key),value) for key,value in element.attrib.items()),
+        "text":(element.text or "").strip(),
+        "children":[normalized_xml_structure(child) for child in element],
+    }
+
+
+def local_name(name):
+    return name.rsplit("}",1)[-1]
+
+
 def originals(source_dir):
     sources={}
     checksums={}
@@ -99,6 +113,9 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
             graph.append({
                 "source_id":obj.get("id"),
                 "source_type":local(obj),
+                "source_structure_sha256":hashlib.sha256(
+                    json.dumps(normalized_xml_structure(obj),sort_keys=True,
+                               separators=(",",":")).encode()).hexdigest(),
                 "direct_filters":actions,
                 "source_sets":[{"operator":s.get("set_operator","UNION"),
                                 "references":[(c.text or "").strip()
@@ -112,7 +129,18 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         elif not graph:
             classifications=["NO_SOURCE_COMMENT_MATCH"]
         elif len(graph)>1:
-            classifications=["MULTIPLE_SOURCE_MATCHES"]
+            # Shared NG Assessments may originate from both Linux package
+            # archives. Same exact OVAL Object ID/structure in both is a
+            # repeated source copy, not competing identity.
+            source_shapes={(m["source_id"],m["source_structure_sha256"])
+                           for m in graph}
+            identities={m["source_id"] for m in graph}
+            if len(source_shapes)==1:
+                classifications=["REPEATED_IDENTICAL_SOURCE_OBJECT"]
+            elif len(identities)==1:
+                classifications=["SAME_ID_DIVERGENT_SOURCE_XML"]
+            else:
+                classifications=["MULTIPLE_DISTINCT_SOURCE_OBJECTS"]
         elif graph[0]["source_sets"]:
             classifications=["SOURCE_CONTAINS_SET"]
         elif graph[0]["direct_filters"]==item["filter_actions"]:
