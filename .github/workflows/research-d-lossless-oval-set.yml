@@ -6,8 +6,10 @@ on:
     paths:
       - 'tools/research_d_oval_sets.py'
       - 'tools/research_d_set_factoring.py'
+      - 'tools/research_d_compact_collections.py'
       - 'tools/test_research_d_oval_sets.py'
       - 'tools/test_research_d_set_factoring.py'
+      - 'tools/test_research_d_compact_collections.py'
       - 'research/assessment-simplification/04d-lossless-oval-set/**'
       - '.github/workflows/research-d-lossless-oval-set.yml'
   workflow_dispatch:
@@ -35,7 +37,7 @@ jobs:
         env:
           PYTHONPATH: tools
         run: |
-          python -m unittest -v tools/test_research_d_oval_sets.py tools/test_research_d_set_factoring.py
+          python -m unittest -v tools/test_research_d_oval_sets.py tools/test_research_d_set_factoring.py tools/test_research_d_compact_collections.py
       - name: Export independently verified shorter authored Set view
         env:
           PYTHONPATH: tools
@@ -53,6 +55,37 @@ jobs:
           assert not p["new_runtime_set_collector_required"]
           print("D source-equal Set factoring:", json.dumps(p,sort_keys=True))
           PY
+      - name: Export actual original OVAL typed selector and provenance compaction
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/research_d_compact_collections.py --source research/assessment-simplification/04d-lossless-oval-set/original-source-compatible-a.json --out d-compact-review
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("d-compact-review/compact-proof.json").read_text())
+          assert p["native_source_graph_identical"]
+          assert (p["source_object_count"],p["source_set_count"],
+                  p["source_test_count"],p["source_variable_count"])==(11,7,7,3)
+          assert p["compact_literal_path_selectors"]==4
+          assert p["authored_redundant_source_titles"]==0
+          assert p["exact_set_reuses"]>=2
+          assert not p["runtime_oval_scanner_parity_proven"]
+          print("D compact typed selector proof:",json.dumps(p,sort_keys=True))
+          PY
+      - name: Emit complete verified compact D authoring and managed metadata
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          for name in ("unix-set-seven-tests.0.4-D-compact-author.yaml",
+                       "unix-set-seven-tests.0.4-D-compact-provenance.yaml",
+                       "compact-proof.json"):
+              doc=(Path("d-compact-review")/name).read_text()
+              print("D_COMPACT_BEGIN "+name)
+              for line in doc.splitlines():
+                  print("D_COMPACT_DATA "+line)
+              print("D_COMPACT_END "+name)
+          PY
       - name: Emit reviewed content as verified log-backed source
         run: |
           python - <<'PY'
@@ -68,6 +101,8 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: d-original-oval-source-exact-set-factoring
-          path: d-set-review/
+          path: |
+            d-set-review/
+            d-compact-review/
           if-no-files-found: error
           retention-days: 21
