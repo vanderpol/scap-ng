@@ -4,7 +4,7 @@ Updated October 20, 2026. **Current authoring review: 0.4.0.** The 0.3.0 compile
 
 ## Now — finalize 0.4.0 authoring and native compilation
 
-The owner approved one 0.4.0 authoring grammar and an exact-reachable **0.4-only Benchmark specification declaration** policy. The [six-STIG authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) contain 4,001 YAML and JSON documents and resolve 2,958 Rule-choice links. [Versioned gate tracking](review/current/0.4.0-FINALIZATION-GATES.md) records schema, source graph and generic OVAL-result evidence.
+The current 0.4.0 authoring grammar incorporates an exact-reachable **0.4-only Benchmark specification declaration** policy. The [six-STIG authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) contain 4,001 YAML and JSON documents and resolve 2,958 Rule-choice links. [Versioned gate tracking](review/current/0.4.0-FINALIZATION-GATES.md) records schema, source graph and generic OVAL-result evidence.
 
 1. Finish native 0.4.0 authoring-to-bundle compilation, deterministic manifests, checksums and independent signature verification.
 2. Verify exceptional source matching and capability-specific OVAL semantics, including Variables, Sets, Filters, record fields and incomplete/error/unknown results.

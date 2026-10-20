@@ -10,7 +10,7 @@ The packages contain **4,001 authoring documents** for RHEL 9, Oracle Linux 9, W
 
 A Benchmark's `rules` list refers to logical Rule IDs; a Rule's `assessment_choices` refers to logical Assessment IDs. Authors should not need to jump through filenames to understand the relationship.
 
-In the approved 0.4.0 sample set, **all six Benchmarks declare the exact reachable automated Assessment specification at version 0.4.0**, rather than carrying obsolete 0.3.0 declarations. Original source files, version-declaration changes, hashes and reversible source transformations are preserved in the release evidence.
+In the current 0.4.0 sample set, **all six Benchmarks declare the exact reachable automated Assessment specification at version 0.4.0**, rather than carrying obsolete 0.3.0 declarations. Original source files, version-declaration changes, hashes and reversible source transformations are preserved in the release evidence.
 
 Start with `authoring/rhel_9/` or `authoring/ms_windows_server_2025/`, open a Rule under `rules/`, follow its `assessment_choices` logical ID to the matching Assessment, and then read its `tests` and `evaluate`.
 

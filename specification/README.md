@@ -1,6 +1,6 @@
 # SCAP-NG draft specification
 
-**Status:** pre-alpha. **0.4.0 is the current owner-approved authoring-sample version**, not an OVAL Board standard or a completed scanner. See the [canonical 0.4.0 decision](../research/assessment-simplification/compact-authoring-04/OWNER-0.4.0-CANONICAL-DECISION.md), [current examples](examples/README.md), [0.4 schema](../schema/v0.4.0/README.md) and [release gates](../review/current/0.4.0-FINALIZATION-GATES.md). Previous 0.3 samples and compiled demonstrations remain [archived](../archive/0.3.0/README.md).
+**Status:** pre-alpha. **0.4.0 is the current pre-alpha authoring-sample version**, not an OVAL Board standard or a completed scanner. See the [canonical 0.4.0 decision](../research/assessment-simplification/compact-authoring-04/OWNER-0.4.0-CANONICAL-DECISION.md), [current examples](examples/README.md), [0.4 schema](../schema/v0.4.0/README.md) and [release gates](../review/current/0.4.0-FINALIZATION-GATES.md). Previous 0.3 samples and compiled demonstrations remain [archived](../archive/0.3.0/README.md).
 
 These pages define the current SCAP-NG contract. Research and design-history records are non-normative; unresolved proposals remain outside the normative text until decided.
 
