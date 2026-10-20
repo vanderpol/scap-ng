@@ -78,7 +78,7 @@ def project_selection(obj):
             continue
         if not isinstance(entity,dict) or set(entity)!={"datatype","operation","value"}:
             reject("SELECTOR_ENTITY_EXPLICIT_TYPE_OR_NIL_REQUIRED")
-        if (entity["operation"] not in ("equals","pattern match","case insensitive equals","case insensitive not equal")
+        if (entity["operation"] not in ("equals","not equal","pattern match","case insensitive equals","case insensitive not equal")
             or not value_is_type(entity["value"],entity["datatype"])):
             reject("SELECTOR_OPERATOR_OR_TYPE_UNSUPPORTED")
         # Explicit field mapping is enforced again by the C/A compiler.
