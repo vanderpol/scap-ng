@@ -24,6 +24,11 @@ FIXED_TIME = (1980, 1, 1, 0, 0, 0)
 EXPECTED_SPEC = {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"}
 MANIFEST_MEMBER = "META-INF/manifest.json"
 SOURCE_FORMAT = "canonical-authoring-json-no-execution"
+PROVENANCE_KEYS = frozenset((
+    "stage", "source_format", "scope", "source_graph_sha256",
+    "rule_choice_links", "source_documents", "executable_compiler_complete",
+    "scanner_evaluation_verified", "publisher_signature_verified",
+))
 
 
 def _package_member(kind, ident):
@@ -178,6 +183,8 @@ def verify_package(raw, *, validate_schema=True):
             raise ValueError("noncanonical manifest serialization")
         _manifest_schema().validate(manifest)
         prov = manifest["build_provenance"]
+        if not isinstance(prov, dict) or set(prov) != PROVENANCE_KEYS:
+            raise ValueError("unknown or falsely executable source package provenance")
         if (prov.get("stage") != STAGE or prov.get("source_format") != SOURCE_FORMAT
                 or prov.get("executable_compiler_complete") is not False
                 or prov.get("scanner_evaluation_verified") is not False
