@@ -222,7 +222,7 @@ def _selectors(selector, native):
             converted[field]=None
         elif type(value) in (str,int):
             converted[field]={"equals":value}
-        elif isinstance(value,dict) and set(value) in ({"equals"},{"matches_regex"},{"case_insensitive_equals"},{"case_insensitive_not_equal"}):
+        elif isinstance(value,dict) and set(value) in ({"equals"},{"not_equal"},{"matches_regex"},{"case_insensitive_equals"},{"case_insensitive_not_equal"}):
             converted[field]=deepcopy(value)
         else:
             raise ValueError("unsupported/implicit Object predicate")
