@@ -18,6 +18,10 @@ from pathlib import Path
 import zipfile
 import yaml
 
+from migrate_v04_oval_proven_direct_filters import (
+    index_provenance, migrate as migrate_proven_filter, recover_migration,
+)
+
 PAIRS={"at_least_one_exists_and_all_match":"one_or_more",
        "may_be_absent_and_all_match":"may_be_absent"}
 INVERSE={v:k for k,v in PAIRS.items()}
@@ -134,8 +138,10 @@ def reconcile_benchmark_specifications(documents, *, expected_benchmarks=6,
     return staged, changes
 
 
-def run(src,dest,manifest_path):
+def run(src,dest,manifest_path,filter_proof_path=None):
     if src.suffix!=".zip": raise ValueError("ZIP input required")
+    filter_proof = (index_provenance(json.loads(filter_proof_path.read_text()),
+                                     assert_six=True) if filter_proof_path else None)
     is_yaml="six-stig-yaml" in src.name
     ext=".yaml" if is_yaml else ".json"
     counts=Counter()
@@ -151,6 +157,11 @@ def run(src,dest,manifest_path):
             source[name]=old
             new,stats=promote(old)
             recover(new,old)
+            if filter_proof is not None:
+                canonical_before_filter=deepcopy(new)
+                new, filtered_stats=migrate_proven_filter(new,name,filter_proof)
+                recover_migration(new,canonical_before_filter,name,filter_proof)
+                stats.update(filtered_stats)
             promoted[name]=new
             counts.update(stats)
             if stats:
@@ -173,7 +184,12 @@ def run(src,dest,manifest_path):
                 if restored!=source[name]:
                     raise ValueError("Benchmark migration changed non-version content")
             else:
-                recover(new,source[name])
+                if filter_proof is not None:
+                    before_filters,_=promote(source[name])
+                    recover_migration(new,before_filters,name,filter_proof)
+                    recover(before_filters,source[name])
+                else:
+                    recover(new,source[name])
             rendered=(yaml.safe_dump(new,sort_keys=False,allow_unicode=True,width=110)
                       if is_yaml else json.dumps(new,indent=2,ensure_ascii=False)+"\n")
             output.writestr(name,rendered)
@@ -187,6 +203,10 @@ def run(src,dest,manifest_path):
             "Do not interpret this authoring ZIP as a signed scanner bundle or runtime parity result.\n")
     if counts["all_items_must"]<1 or counts["inline_capabilities_removed"]<1:
         raise ValueError("Expected real migration did not happen")
+    if filter_proof is not None and (
+            counts["source_proven_direct_filters"] != 28
+            or counts["source_review_required_unchanged"] != 8):
+        raise ValueError("Proven original OVAL Filter migration baseline changed")
     report={"source_sha256":hashlib.sha256(src.read_bytes()).hexdigest(),
             "output_sha256":hashlib.sha256(dest.read_bytes()).hexdigest(),
             "format":"yaml" if is_yaml else "json",
@@ -198,6 +218,9 @@ def run(src,dest,manifest_path):
                 {**row,"path":row["path"].removesuffix(".json").removesuffix(".yaml")}
                 for row in version_changes],
             "source_ast_recovered":True,
+            "source_filter_proof_sha256": (hashlib.sha256(filter_proof_path.read_bytes()).hexdigest()
+                                           if filter_proof_path else None),
+            "source_filter_migration":"source_verified_direct_only" if filter_proof else "not_requested",
             "schema_validated":False,
             "scanner_equivalence_proven":False}
     manifest_path.write_text(json.dumps(report,indent=2)+"\n")
@@ -208,4 +231,6 @@ if __name__=="__main__":
     p.add_argument("--source",type=Path,required=True)
     p.add_argument("--out",type=Path,required=True)
     p.add_argument("--manifest",type=Path,required=True)
-    a=p.parse_args();run(a.source,a.out,a.manifest)
+    p.add_argument("--filter-proof",type=Path,default=None,
+                   help="Pinned original OVAL six-STIG Filter classification JSON; only 28 source-proven leaves migrate")
+    a=p.parse_args();run(a.source,a.out,a.manifest,a.filter_proof)
