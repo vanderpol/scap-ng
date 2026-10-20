@@ -27,6 +27,8 @@ jobs:
           mkdir -p work
           gh release download v0.4.0-joval-meeting-preview-20261015-r3 --pattern scap-ng-v0.4-joval-six-stig-json.zip --dir work
           echo "a1837c03133021f4d13814516a91b372f83b03771519f8361398ff1663056fea  work/scap-ng-v0.4-joval-six-stig-json.zip" | sha256sum -c -
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 --pattern scap-ng-v0.4-joval-six-stig-yaml.zip --dir work
+          echo "03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d  work/scap-ng-v0.4-joval-six-stig-yaml.zip" | sha256sum -c -
       - name: Existing 0.4-A scoped authoring and reference regression
         env:
           PYTHONPATH: tools
@@ -35,6 +37,7 @@ jobs:
       - name: Build reversible complete Windows 11 research authoring preview
         run: |
           python tools/build_windows11_all_items_preview.py --source work/scap-ng-v0.4-joval-six-stig-json.zip --out work/windows11-v04a-all-items-review.zip
+          python tools/build_windows11_all_items_preview.py --source work/scap-ng-v0.4-joval-six-stig-yaml.zip --out work/windows11-v04a-all-items-review-yaml.zip
       - name: Guard against silent structural drift
         run: |
           python - <<'PY'
@@ -45,6 +48,8 @@ jobs:
           assert m['counts']['changed_tests']>0
           assert not m['candidate_is_native_0_4a']
           assert not m['scanner_equivalence_tested']
+          y=json.loads(Path('work/windows11-v04a-all-items-review-yaml.manifest.json').read_text())
+          assert y['document_count']==4001 and y['counts']==m['counts']
           print(m['counts'])
           PY
       - uses: actions/upload-artifact@v4
@@ -52,6 +57,8 @@ jobs:
           name: win11-v04a-all-items-unratified-review
           path: |
             work/windows11-v04a-all-items-review.zip
+            work/windows11-v04a-all-items-review-yaml.zip
+            work/windows11-v04a-all-items-review-yaml.manifest.json
             work/windows11-v04a-all-items-review.manifest.json
             work/source-schema-report.json
           if-no-files-found: error
