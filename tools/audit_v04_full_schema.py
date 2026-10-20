@@ -15,6 +15,7 @@ def main():
     ap.add_argument("--schema-dir",type=pathlib.Path,default=pathlib.Path("schema/v0.4.0"))
     ap.add_argument("--out",type=pathlib.Path,required=True)
     ap.add_argument("--limit",type=int,default=0,help="0 checks every document")
+    ap.add_argument("--strict",action="store_true",help="Fail on any invalid Rule/Assessment source document")
     args=ap.parse_args()
     schemas={}
     for p in args.schema_dir.rglob("*.json"):
@@ -53,6 +54,7 @@ def main():
             kind="assessment" if "assessment" in doc else "rule" if "rule" in doc else None
             if kind is None:
                 totals["non_assessment_rule"]+=1
+                skipped.append(path)
                 continue
             totals[kind+"_documents"]+=1
             try:
@@ -111,6 +113,7 @@ def main():
                         examples[key].append({"path":path,"error":error.message[:240]})
     report={"status":"diagnostic_only","archive":str(args.archive),
             "checked_documents":len(names),"counts":dict(totals),
+            "other_source_documents":skipped,
             "examples":dict(examples),"grouped_failure_counts":dict(grouped.most_common()),
             "group_examples":dict(group_examples),
             "nested_leaf_counts":dict(nested_groups.most_common()),
@@ -128,4 +131,14 @@ def main():
         "top_nested_leaves":nested_groups.most_common(12),
         "failure_test_features":failure_features.most_common(12)},indent=2))
     assert len(names)==4001 if not args.limit else len(names)<=args.limit
+    if args.strict:
+        if args.limit:raise ValueError("Strict corpus gate cannot use --limit")
+        expected={"assessment_documents":2422,"assessment_schema_pass":2422,
+                  "rule_documents":1567,"rule_schema_pass":1567,"non_assessment_rule":12}
+        for k,v in expected.items():
+            if totals.get(k)!=v:raise ValueError(f"Strict schema gate: {k} is {totals.get(k)} not {v}")
+        failures={k:v for k,v in totals.items() if k.endswith("_schema_fail") or k.startswith("resolver_or_validator")}
+        if failures:raise ValueError(f"Strict schema gate failed: {failures}")
+        print("PASS strict six-STIG Rules/Assessments; 12 other documents separately identified")
+
 if __name__=="__main__":main()
