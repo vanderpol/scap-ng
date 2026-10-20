@@ -8,6 +8,8 @@ on:
       - 'tools/audit_v04_oval_xml_roundtrip.py'
       - 'tools/test_audit_v04_oval_xml_roundtrip.py'
       - 'tools/test_export_v04_shellcommand_pilot.py'
+      - 'tools/combine_v04_oval_xml_proofs.py'
+      - 'tools/test_combine_v04_oval_xml_proofs.py'
       - 'tools/validate_v04_oval_5123.py'
       - '.github/workflows/v04-oval-bluetooth-xml-pilot.yml'
   workflow_dispatch:
@@ -36,6 +38,7 @@ jobs:
         run: |
           python tools/test_audit_v04_oval_xml_roundtrip.py -v
           python tools/test_export_v04_shellcommand_pilot.py -v
+          python tools/test_combine_v04_oval_xml_proofs.py -v
       - name: Obtain pinned original OVAL source XML and verified 0.4.0 authored output
         env:
           GH_TOKEN: ${{ github.token }}
@@ -141,6 +144,13 @@ jobs:
             --schema-dir work/oval-5123/oval-schemas \
             --xml work/compare/camera-exported-oval.xml \
             --report work/compare/camera-export-xsd.json
+      - name: SHA-bind independent semantic and schema reports per Definition
+        run: |
+          python tools/combine_v04_oval_xml_proofs.py \
+            --semantic work/compare/semantic-roundtrip-result.json \
+            --xsd work/compare/oval-export-xsd.json \
+            --xsd work/compare/camera-export-xsd.json \
+            --report work/compare/final-roundtrip-evidence.json
       - name: Publish proof and mismatch diagnostics even on failure
         if: always()
         uses: actions/upload-artifact@v4
