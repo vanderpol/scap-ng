@@ -2,7 +2,7 @@
 
 **Status:** versioned pre-alpha native schemas and capability mappings.
 
-- [v0.4.0](v0.4.0/README.md) is the **current owner-approved pre-alpha authoring-sample schema**, not an OVAL Board standard, compiled bundle or scanner conformance result. [Six-STIG source samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020).
+- [v0.4.0](v0.4.0/README.md) is the **current pre-alpha authoring-sample schema**, not an OVAL Board standard, compiled bundle or scanner conformance result. [Six-STIG source samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020).
 - [v0.3.0](v0.3.0/README.md) is the **archived previous version**. Its original schema, authoring and historical compiled demonstrations are [preserved](../archive/0.3.0/README.md).
 - [v0.2.0](v0.2.0/README.md) and earlier versions are historical snapshots.
 

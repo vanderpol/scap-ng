@@ -1,6 +1,6 @@
 # Current SCAP-NG 0.4.0 owner review
 
-**Status: owner-approved 0.4.0 pre-alpha authoring samples; not a final scanner release or OVAL Board ratification.** The canonical authoring decision was recorded on October 20, 2026.
+**Status: current 0.4.0 pre-alpha authoring samples; not a final scanner release, certification, or OVAL Board ratification.** The authoring-language decision and its rationale are documented separately.
 
 ## Start with the actual six-STIG source
 
