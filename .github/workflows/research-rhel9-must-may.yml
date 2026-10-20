@@ -1,0 +1,31 @@
+name: RHEL9 Must-May Research Vocabulary
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/research_rhel9_must_may_item_language.py'
+      - 'tools/test_rhel9_must_may_pairs.py'
+      - 'tools/test_rhel9_must_may_source_fragments.py'
+      - 'tools/test_rhel9_must_may_full_source.py'
+      - 'tools/test_rhel9_must_may_inline_states.py'
+      - '.github/workflows/research-rhel9-must-may.yml'
+  workflow_dispatch:
+jobs:
+  test-vocabulary:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install YAML parser
+        run: python3 -m pip install --disable-pip-version-check PyYAML
+      - name: Check bounded requirement pairs
+        run: |
+          python3 tools/research_rhel9_must_may_item_language.py
+          python3 tools/test_rhel9_must_may_pairs.py
+      - name: Check RHEL9 source fragments
+        run: python3 tools/test_rhel9_must_may_source_fragments.py
+      - name: Check complete pinned RHEL9 original documents
+        run: python3 tools/test_rhel9_must_may_full_source.py
+      - name: Check local predicates under all_items_must
+        run: python3 tools/test_rhel9_must_may_inline_states.py
