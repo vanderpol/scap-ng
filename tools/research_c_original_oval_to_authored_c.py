@@ -194,10 +194,11 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
         if compiled["require"]!=expected_token or "states" in compiled:
             reject("SOURCE_COMPILER_PRESENCE_DRIFT")
         return
-    if original["check_existence"]!="at_least_one_exists":
+    if original["check_existence"] not in ("at_least_one_exists","all_exist"):
         reject("SOURCE_EXISTENCE_NOT_PROVEN")
     match=PAIR_CHECK.get(original["check"])
-    if match is None or compiled["require"]!="at_least_one_exists_and_"+match:
+    expected_require=original["check_existence"]+"_and_"+match if match else None
+    if match is None or compiled["require"]!=expected_require:
         reject("SOURCE_COMPILER_MATCH_DRIFT")
     native_states=compiled.get("states")
     if not isinstance(native_states,list) or len(native_states)!=len(states):
@@ -278,16 +279,24 @@ def compile_one_original_definition(original_assessment):
             reject("STATE_CAPABILITY_OR_UNREVIEWED_FIELDS")
         entities=_entities(state["state"])
         fields=project_fields(state["state"],state["capability"])
-        if old.get("check_existence")!="at_least_one_exists":
+        if old.get("check_existence") not in ("at_least_one_exists","all_exist"):
             reject("TEST_ADVANCED_EXISTENCE")
         token=PAIR_CHECK.get(old.get("check"))
         if token is None:
             reject("TEST_UNKNOWN_MATCHING")
-        # This is the established single C from/must grammar, not a new one.
-        must={("every_item" if token=="all_match" else
-               "any_item" if token=="some_match" else
-               "one_matching_item" if token=="only_one_matches" else
-               "no_matching_item"):fields}
+        # Keep source existence and matching independent. A already has
+        # every all_exist_and_* pair. The ordinary shorthand is restricted
+        # to the usual at_least_one_exists scope.
+        if old["check_existence"]=="all_exist":
+            must={"items_exist":"all","items_match":{
+                "all_match":"every","some_match":"some",
+                "only_one_matches":"one","none_match":"none"}[token],
+                "fields":fields}
+        else:
+            must={("every_item" if token=="all_match" else
+                   "any_item" if token=="some_match" else
+                   "one_matching_item" if token=="only_one_matches" else
+                   "no_matching_item"):fields}
     else:
         if old.get("check_existence") not in PRESENCE:
             reject("TEST_UNSUPPORTED_PRESENCE")
