@@ -164,7 +164,10 @@ def run(src,dest,manifest_path,filter_proof_path=None):
                 stats.update(filtered_stats)
             promoted[name]=new
             counts.update(stats)
-            if stats:
+            # An unresolved source-provenance review flag is not an edit.
+            # Count changed documents only when source authoring actually moves.
+            if any(value and key != "source_review_required_unchanged"
+                   for key,value in stats.items()):
                 path_stats[name]=dict(stats)
     # This explicit, user-approved version migration is performed *after*
     # all Test/Object exact inversions and independently verified edge closure.
