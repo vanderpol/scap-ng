@@ -282,6 +282,12 @@ def descriptive_distinct_alias(title,fields,existing):
         return candidate
     if type(title) is not str:
         reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
+    # A different Test over the same State field may still have a concise
+    # complete purpose title; prefer that over inventing a shortened alias.
+    full_purpose=ID.sub("_",title.lower()).strip("_")
+    if (full_purpose not in existing and len(full_purpose)<=63 and
+        re.fullmatch(r"[a-z][a-z0-9_]*",full_purpose)):
+        return full_purpose
     match=re.fullmatch(
         r"Test that the ([a-z][a-z0-9_]*)_object is supported with the "
         r"([a-z][a-z0-9_]*) entity "
