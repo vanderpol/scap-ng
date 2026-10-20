@@ -51,7 +51,7 @@ def original_tests(root):
     require(tests is not None,"no source OVAL Tests")
     return {node.get("id"):node for node in tests if node.get("id")}
 
-def verify_complete_platform_definitions(corpus,native):
+def verify_complete_platform_definitions(corpus,review,native):
     manifest=json.loads((native/"conversion-manifest.json").read_text(encoding="utf-8"))
     require(manifest.get("stage")=="SOURCE_BACKED_NATIVE_C_SUBSET_NOT_SCANNER_PARITY",
             "C manifest lacks pinned source compilation classification")
@@ -78,14 +78,27 @@ def verify_complete_platform_definitions(corpus,native):
         require(isinstance(checks,dict) and len(checks)==count,
                 "C Test count differs from original OVAL")
         test_ids=[c.get("source_test") for c in checks.values()]
-        require(len(set(test_ids))==count and set(test_ids)==set(tests),
-                "generated C dropped or added original source Tests")
+        matched=[]
+        for file in review.glob("*.review.json"):
+            source=json.loads(file.read_text(encoding="utf-8"))
+            origin=source.get("source",{})
+            if origin.get("file")==rel and origin.get("definition_id")==selected["definition_id"]:
+                matched.append(source)
+        original_A=one(matched,"original "+platform+" A-compatible Definition")
+        imported_ids=set(original_A["A_source_compatibility_fallback"]["tests"])
+        source_documentation=original_A["source"]["original_test_documentation"]
+        doc_ids={entry["id"] for entry in source_documentation}
+        require(doc_ids==set(tests) and len(source_documentation)==count,
+                "original XML Test IDs missing from A source-provenance review")
+        require(len(set(test_ids))==count and set(test_ids)==imported_ids,
+                "generated C dropped or added original A source Test identities")
         for alias,c in checks.items():
             require("must" in c and ("observation" in c or "from" in c),
                     "C check lacks explicit acquisition/requirement: "+alias)
         report[platform]={
             "source":rel,"full_definition_source_id":selected["definition_id"],
-            "original_tests":count,"C_test_crosswalk_equal":True,
+            "original_tests":count,"A_test_identity_crosswalk_equal":True,
+            "original_OVAL_test_ids_verified_in_provenance":True,
             "full_definition_compiles":True,
             "A_source_projection_equivalence_checked":True,
         }
@@ -198,7 +211,7 @@ def main():
     parser.add_argument("--published",type=Path,required=True)
     parser.add_argument("--out",type=Path,required=True)
     args=parser.parse_args()
-    full=verify_complete_platform_definitions(args.corpus,args.native)
+    full=verify_complete_platform_definitions(args.corpus,args.review,args.native)
     registry=registry_from_original_A(args.corpus,args.review,args.published)
     report={"stage":"PINNED_OVAL_C_BASIC_PLATFORM_GATE_NOT_SCANNER_PARITY",
             "pinned_source_commit":PIN,
