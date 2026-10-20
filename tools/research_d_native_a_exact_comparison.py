@@ -214,9 +214,28 @@ def audit(original):
             cap_errors[tid]=[
                 {"path":list(x.absolute_path),"message":x.message[:420]}
                 for x in err[:5]]
+    # A Test that references a shared Object by ID validates its reference
+    # shape, not the capability-specific body. Validate EVERY actual reusable
+    # unix.file source Object independently by embedding it in a synthetic
+    # native Test of the SAME capability. Do not mistake a valid reference ID
+    # for validated nested Set/Filter/traversal content.
+    object_errors={}
+    for oid,obj in doc["assessment"]["shared_objects"].items():
+        synthetic={
+            "test_title":"Validate shared Object body: "+oid,
+            "reported_elements":"all","capability":CAP,
+            "object":deepcopy(obj),"require":"at_least_one_exists"
+        }
+        problems=list(v.iter_errors(synthetic))
+        if problems:
+            object_errors[oid]=[
+                {"path":list(e.absolute_path),"message":e.message[:500]}
+                for e in problems[:3]]
     report={
       "real_04a_base_assessment_schema_validation":not bool(errors),
       "real_04a_unix_file_test_schema_validation":not bool(cap_errors),
+      "real_04a_shared_objects_native_validation":not bool(object_errors),
+      "native_shared_object_errors":object_errors,
       "assessment_schema_errors":[{"path":list(e.absolute_path),"message":e.message[:420]}
                                   for e in errors[:12]],
       "native_capability_test_errors":cap_errors,
