@@ -24,6 +24,8 @@ import yaml
 from research_c_require_language import compile_c_requirement, _mapping
 
 OPS={"equals":"equals","not equal":"not_equal","pattern match":"matches_regex",
+     "case insensitive equals":"case_insensitive_equals",
+     "case insensitive not equal":"case_insensitive_not_equal",
      "greater than":"greater_than","greater than or equal":"greater_than_or_equal",
      "less than":"less_than","less than or equal":"less_than_or_equal"}
 PAIR_CHECK={"all":"all_match","at least one":"some_match",
@@ -63,13 +65,13 @@ def project_selection(obj):
     for field,entity in select.items():
         if not isinstance(entity,dict) or set(entity)!={"datatype","operation","value"}:
             reject("SELECTOR_ENTITY_EXPLICIT_TYPE_OR_NIL_REQUIRED")
-        if (entity["operation"] not in ("equals","pattern match")
+        if (entity["operation"] not in ("equals","pattern match","case insensitive equals","case insensitive not equal")
             or not value_is_type(entity["value"],entity["datatype"])):
             reject("SELECTOR_OPERATOR_OR_TYPE_UNSUPPORTED")
         # Explicit field mapping is enforced again by the C/A compiler.
         value=deepcopy(entity["value"])
         op=OPS[entity["operation"]]
-        out[field]=value if op=="equals" else {"matches_regex":value}
+        out[field]=value if op=="equals" else {op:value}
     return out
 
 def _entities(state):
@@ -127,6 +129,8 @@ def project_fields(state,capability):
             reject("STATE_ORDERED_COMPARISON_NOT_INTEGER")
         if op=="matches_regex" and type(value) is not str:
             reject("STATE_REGEX_EXPECTS_STRING")
+        if op in ("case_insensitive_equals","case_insensitive_not_equal") and type(value) is not str:
+            reject("STATE_CASE_INSENSITIVE_REQUIRES_STRING")
         typed=_needs_explicit_state_datatype(entity,native)
         if typed:
             out[field]={op:value,"datatype":entity["datatype"]}
@@ -155,8 +159,11 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
         if not isinstance(emitted_select,dict) or set(emitted_select)!=set(original_select):
             reject("SOURCE_COMPILER_SELECTOR_DRIFT")
         for field,ent in original_select.items():
-            expected={"equals":ent["value"]} if ent["operation"]=="equals" else {
-                "matches_regex":ent["value"]}
+            operation=OPS.get(ent["operation"])
+            if operation is None:
+                reject("SOURCE_COMPILER_SELECTOR_OPERATOR_UNSUPPORTED")
+            expected={"equals":ent["value"]} if operation=="equals" else {
+                operation:ent["value"]}
             if emitted_select[field]!=expected:
                 reject("SOURCE_COMPILER_SELECTOR_VALUE_DRIFT")
     if not states:
