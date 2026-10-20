@@ -401,6 +401,55 @@ jobs:
               "*.collection-inputs.research.yaml")))==8
           print("23 original typed local literals rehydrated at Object bindings.")
           PY
+      - name: Verify A-first Windows Registry comparison against exact original Test
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import yaml
+          src=[]
+          for p in Path("c-review").glob("*.review.json"):
+              row=json.loads(p.read_text(encoding="utf-8"))
+              if (row.get("source",{}).get("file")=="windows/win-def_registry_test.xml"
+                  and row.get("source",{}).get("definition_id")==
+                  "oval:org.mitre.oval.test:def:38"):
+                  src.append(row)
+          assert len(src)==1, "original OVAL Registry Definition missing"
+          a=src[0]["A_source_compatibility_fallback"]
+          doc=yaml.safe_load(Path(
+            "scap-ng/research/assessment-simplification/compact-authoring-04/"
+            "c-original-windows-registry-typed-collection-inputs.research.yaml"
+          ).read_text(encoding="utf-8"))
+          assert set(doc)=={"original_oval_test"}, "no new Registry C dialect"
+          example=doc["original_oval_test"]
+          tid="oval:org.mitre.oval.test:tst:1020"
+          assert example["id"]==tid
+          assert any(r["id"]==tid for r in src[0]["source"]["original_test_documentation"])
+          t=a["tests"]["test-test-if-registry-object-hive-key-name-supported"]
+          obj=a["objects"][t["object"]]["select"]
+          state=a["states"][t["states"][0]]["state"]["all"]
+          assert list(obj)==["hive","key","name"]
+          assert list(example["collection"])==["hive","key","name"]
+          assert list(example["state"])==["hive","key","name"]
+          assert example["capability"]==t["capability"]=="windows.registry"
+          assert example["check_existence"]==t["check_existence"]
+          assert example["check"]==t["check"]
+          assert [x["field"] for x in state]==["hive","key","name"]
+          for name,original_field in obj.items():
+              assert original_field["operation"]=="equals"
+              assert example["collection"][name]==original_field["value"]
+          for original_field in state:
+              field=original_field["field"]
+              rendered=example["state"][field]
+              if original_field["operation"]=="case insensitive equals":
+                  assert rendered=={"operation":"case insensitive equals",
+                                   "value":original_field["value"]}
+              else:
+                  assert original_field["operation"]=="equals"
+                  assert rendered==original_field["value"]
+          assert "value" not in example["state"]
+          print("Registry authoring comparison matches one exact source Test; no invented value predicate.")
+          PY
       - name: Verify permanent GitHub sample files against generated original-source C
         run: |
           python scap-ng/tools/verify_c_published_original_oval_examples.py \
