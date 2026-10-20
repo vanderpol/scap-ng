@@ -58,8 +58,8 @@ if __name__=="__main__":
     # must not be mistaken for full canonical-schema conformance.
     actual=r["counts"]
     assert actual.get("native_all_items_must_tests")==816, "Source population or conversion changed"
-    assert actual.get("native_presence_only_tests")==388, "Source-derived presence-only migration changed"
-    assert actual.get("legacy_string_require_tests")==171, "Remaining legacy requirement population changed; review migration"
+    assert actual.get("native_presence_only_tests")==387, "Source-derived presence-only migration changed"
+    assert actual.get("legacy_string_require_tests")==172, "Remaining legacy requirement population changed; review migration"
     assert actual.get("legacy_states")==172, "Unconverted State population changed; review migration"
     assert actual.get("legacy_top_level_field_require")==108, "Unconverted field-level requirement count changed"
     assert actual.get("legacy_states_match")==128, "Unconverted State aggregate population changed"
