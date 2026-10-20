@@ -12,12 +12,12 @@ class CurrentMarkdownSampleAuditTests(unittest.TestCase):
         for relative in CURRENT:
             f=root/relative
             f.parent.mkdir(parents=True,exist_ok=True)
-            f.write_text("# SCAP-NG 0.4.0 current examples\\n"
+            f.write_text("# SCAP-NG 0.4.0 current examples\n"
                          + (RELEASE if relative in NEEDS_CURRENT_RELEASE else "")
-                         + "\\n",encoding="utf-8")
+                         + "\n",encoding="utf-8")
         f=root/"archive/0.3.0/README.md"
         f.parent.mkdir(parents=True,exist_ok=True)
-        f.write_text("# Historical v0.3.0-six-stig-typed-operators\\n")
+        f.write_text("# Historical v0.3.0-six-stig-typed-operators\n")
 
     def test_valid_current_and_preserved_history(self):
         with tempfile.TemporaryDirectory() as d:
@@ -32,7 +32,7 @@ class CurrentMarkdownSampleAuditTests(unittest.TestCase):
             r=Path(d)
             self.create(r)
             f=r/"specification/examples/assessments.md"
-            f.write_text(f.read_text()+"\\nhttps://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig/old.zip\\n")
+            f.write_text(f.read_text()+"\nhttps://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig/old.zip\n")
             _,errors=check(r)
             self.assertTrue(any("stale 0.3" in e for e in errors))
 
@@ -41,7 +41,7 @@ class CurrentMarkdownSampleAuditTests(unittest.TestCase):
             r=Path(d)
             self.create(r)
             f=r/"README.md"
-            f.write_text("# SCAP-NG 0.3 examples\\n0.3.0 remains the active baseline.")
+            f.write_text("# SCAP-NG 0.3 examples\n0.3.0 remains the active baseline.")
             _,errors=check(r)
             self.assertTrue(any("approved 0.4" in e for e in errors))
             self.assertTrue(any("current status" in e for e in errors))

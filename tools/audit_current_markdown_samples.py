@@ -21,9 +21,9 @@ CURRENT = (
 )
 RELEASE = "v0.4.0-six-stig-authoring-approved-20261020"
 STALE = (
-    re.compile(r"https://github\\.com/vanderpol/scap-ng/releases/(?:tag|download)/v0\\.3\\.0-",re.I),
-    re.compile(r"0\\.3(?:\\.0)?\\s+(?:is|remains)\\s+(?:the\\s+)?(?:current|active)\\b",re.I),
-    re.compile(r"^#\\s+SCAP-NG\\s+0\\.3\\s+examples\\b",re.I|re.M),
+    re.compile(r"https://github\.com/vanderpol/scap-ng/releases/(?:tag|download)/v0\.3\.0-",re.I),
+    re.compile(r"0\.3(?:\.0)?\s+(?:is|remains)\s+(?:the\s+)?(?:current|active)\b",re.I),
+    re.compile(r"^#\s+SCAP-NG\s+0\.3\s+examples\b",re.I|re.M),
 )
 # The pages actively recommending a source download must link the exact
 # approved source release. Informative version lists can use nearby docs links.
@@ -52,7 +52,7 @@ def check(root: Path):
             problems.append(f"{relative}: approved 0.4 sample release missing")
         for pattern in STALE:
             for m in pattern.finditer(text):
-                line=text.count("\\n",0,m.start())+1
+                line=text.count("\n",0,m.start())+1
                 problems.append(f"{relative}:{line}: stale 0.3 source/current status: {m.group(0)}")
     archive=root/"archive/0.3.0/README.md"
     if not archive.is_file() or "v0.3.0-six-stig-typed-operators" not in archive.read_text(encoding="utf-8"):
