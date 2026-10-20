@@ -54,7 +54,8 @@ jobs:
           python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-172-review-ledger.json
       - name: Diagnose native schema validity across all source documents
         run: |
-          python tools/audit_v04_full_schema.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/full-native-schema-audit.json
+          python tools/audit_v04_full_schema.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/full-native-schema-audit.json --strict
+          python tools/audit_v04_full_schema.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip --out work/full-native-yaml-schema-audit.json --strict
       - name: Confirm equivalent YAML/JSON sources and exact scope
         run: |
           python - <<'PY'
@@ -80,6 +81,7 @@ jobs:
             work/*blocker-audit.json
             work/residual-172-review-ledger.json
             work/full-native-schema-audit.json
+            work/full-native-yaml-schema-audit.json
           if-no-files-found: error
       - name: Publish durable six-STIG authoring candidate
         if: github.ref == 'refs/heads/main'
