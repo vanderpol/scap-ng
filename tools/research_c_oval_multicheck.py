@@ -326,7 +326,7 @@ def convert_selected_shared_many(a):
             "OVAL_actual_scanner_parity_proven":False}
 
 
-def descriptive_distinct_alias(title,fields,existing):
+def descriptive_distinct_alias(title,fields,existing,*,selectors=None,capability=None):
     """Keep source-purpose names, including long distinct-Object Test titles.
 
     The repeated OVAL Self-Assertion boilerplate can be removed only if its
@@ -365,6 +365,58 @@ def descriptive_distinct_alias(title,fields,existing):
         r"(equal to some value|not equal to some value|matching some regular expression)\.",
         title.strip(),re.I)
     if match is None:
+        # This is a controlled subset of original OVAL Self-Assertion
+        # purpose names, not a heuristic truncating arbitrary English.
+        if capability=="unix.sysctl":
+            m=re.fullmatch(
+                r"Test that the sysctl test is supported with the name entity "
+                r"with operation of '(equals|not equal|pattern match|"
+                r"case insensitive equals|case insensitive not equal)'\\.",
+                title.strip(),re.I)
+            if m:
+                op={"equals":"equals","not equal":"not_equal",
+                    "pattern match":"matches_regex",
+                    "case insensitive equals":"case_insensitive_equals",
+                    "case insensitive not equal":"case_insensitive_not_equal"}[
+                    m.group(1).lower()]
+                candidate="name_"+op
+                if candidate not in existing and len(candidate)<=63:
+                    return candidate
+        if capability=="linux.systemdunitproperty":
+            # OVAL Test comments for this fixture repeat, and some claim
+            # "not equal" when the actual Object predicate is equals.
+            # Base the C ID on the real native Object selector, not an
+            # inaccurate comment or opaque numeric source Test ID.
+            if (re.match(r"^Test that systemdunitproperty test is supported",
+                         title.strip(),re.I) and isinstance(selectors,dict) and
+                set(selectors)=={"unit","property"}):
+                pieces=[]
+                for field in ("unit","property"):
+                    sel=selectors[field]
+                    if isinstance(sel,str):
+                        op,value="equals",sel
+                    elif isinstance(sel,dict) and len(sel)==1:
+                        op,value=next(iter(sel.items()))
+                    else:
+                        break
+                    if op not in ("equals","not_equal","matches_regex",
+                                  "case_insensitive_equals",
+                                  "case_insensitive_not_equal") or type(value) is not str:
+                        break
+                    slug=ID.sub("_",value.lower()).strip("_")
+                    if not slug:
+                        break
+                    pieces.append((field,slug,{
+                        "equals":"eq","not_equal":"ne",
+                        "matches_regex":"re",
+                        "case_insensitive_equals":"eq_ci",
+                        "case_insensitive_not_equal":"ne_ci"}[op]))
+                if len(pieces)==2:
+                    candidate=("_".join((pieces[0][0],pieces[0][1],pieces[0][2],
+                                          pieces[1][0],pieces[1][1],pieces[1][2])))
+                    if (candidate not in existing and len(candidate)<=63 and
+                        re.fullmatch(r"[a-z][a-z0-9_]*",candidate)):
+                        return candidate
         reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
     _,selected_field,operation=match.groups()
     operation={"equal to some value":"equals",
@@ -452,7 +504,8 @@ def convert_distinct_selected_many(a):
             fields={}
             must=PRESENCE[t["check_existence"]]
             original_entities=[]
-        alias=descriptive_distinct_alias(t.get("test_title"),fields,checks)
+        alias=descriptive_distinct_alias(t.get("test_title"),fields,checks,
+                                         selectors=selectors,capability=t["capability"])
         repeated_state=(sid if refs and state_usage[sid]>1 else None)
         source={"from":{t["capability"]:selectors}}
         if oid in reused:
