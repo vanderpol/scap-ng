@@ -10,6 +10,10 @@ on:
       - 'tools/test_v04_all_items_schema.py'
       - 'tools/test_v04_canonical_authoring_guard.py'
       - 'tools/guard_v04_filtered_union_migration.py'
+      - 'tools/migrate_v04_oval_proven_direct_filters.py'
+      - 'tools/test_migrate_v04_oval_proven_direct_filters.py'
+      - 'tools/audit_v04_filtered_union_oval_provenance.py'
+      - 'tools/test_audit_v04_filtered_union_oval_provenance.py'
       - 'tools/test_guard_v04_filtered_union_migration.py'
       - 'tools/audit_v04_synthetic_filter_unions.py'
       - 'tools/v04_canonical_source_ir.py'
@@ -67,20 +71,50 @@ jobs:
           PYTHONPATH: tools
         run: |
           python tools/test_v04_json_authoring_readiness.py --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip --report work/input-native-report.json
-      - name: Generate complete 0.4 authoring formats and prove reversibility
+      - name: Build original OVAL Filter provenance before any authoring rewrite
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: tools
         run: |
-          python tools/build_v04_canonical_six_stigs.py --source work/scap-ng-v0.4-joval-six-stig-json.zip --out work/scap-ng-0.4.0-six-stigs.json.zip --manifest work/json-manifest.json
-          python tools/build_v04_canonical_six_stigs.py --source work/scap-ng-v0.4-joval-six-stig-yaml.zip --out work/scap-ng-0.4.0-six-stigs.yaml.zip --manifest work/yaml-manifest.json
+          python tools/test_migrate_v04_oval_proven_direct_filters.py
+          python tools/test_audit_v04_filtered_union_oval_provenance.py
+          mkdir -p work/filter-baseline work/oval-source
+          gh release download v0.4.0-six-stig-authoring-approved-20261020 \
+            --pattern 'scap-ng-0.4.0-six-stigs.json.zip' --dir work/filter-baseline
+          echo '5037dc29085ad6a4487133962d9c07b1fbc09c2ce14198011c6bb8f7a7437dcb  work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip' | sha256sum -c -
+          python tools/audit_v04_synthetic_filter_unions.py \
+            --archive work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip \
+            --report work/v04-filter-source-census.json --assert-six
+          for name in \
+            U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip \
+            U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip \
+            U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip \
+            U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip \
+            U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip \
+            U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          do
+            curl --fail --silent --show-error --location --retry 3 \
+              "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/$name" \
+              --output "work/oval-source/$name"
+          done
+          python tools/audit_v04_filtered_union_oval_provenance.py \
+            --census work/v04-filter-source-census.json \
+            --source-dir work/oval-source \
+            --report work/v04-filter-original-oval-proof.json --assert-six
+      - name: Generate source-backed 0.4 authoring formats and prove exact inverse
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/build_v04_canonical_six_stigs.py --source work/scap-ng-v0.4-joval-six-stig-json.zip --out work/scap-ng-0.4.0-six-stigs.json.zip --manifest work/json-manifest.json --filter-proof work/v04-filter-original-oval-proof.json
+          python tools/build_v04_canonical_six_stigs.py --source work/scap-ng-v0.4-joval-six-stig-yaml.zip --out work/scap-ng-0.4.0-six-stigs.yaml.zip --manifest work/yaml-manifest.json --filter-proof work/v04-filter-original-oval-proof.json
       - name: Guard against missing Filters and new synthetic one-operand Sets
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PYTHONPATH: tools
         run: |
-          mkdir -p work/filter-baseline
-          gh release download v0.4.0-six-stig-authoring-approved-20261020 \
-            --pattern 'scap-ng-0.4.0-six-stigs.json.zip' --dir work/filter-baseline
-          echo '5037dc29085ad6a4487133962d9c07b1fbc09c2ce14198011c6bb8f7a7437dcb  work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip' | sha256sum -c -
+          # Baseline was SHA-256 verified before source-proven conversion.
           python tools/guard_v04_filtered_union_migration.py \
             --baseline-archive work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip \
             --archive work/scap-ng-0.4.0-six-stigs.json.zip \
@@ -174,6 +208,9 @@ jobs:
           assert {p.removesuffix('.json') for p in a['changed_paths']}=={p.removesuffix('.yaml') for p in b['changed_paths']}
           assert a['counts']['all_items_must']>0
           assert a['counts']['inline_capabilities_removed']>0
+          assert a['counts']['source_proven_direct_filters']==28
+          assert a['counts']['source_review_required_unchanged']==8
+          assert a['source_filter_proof_sha256']==b['source_filter_proof_sha256']
           assert a['benchmark_version_policy']==b['benchmark_version_policy']=='owner_approved_exact_reachable_0.4_only'
           assert a['counts']['benchmark_version_declarations_updated']==b['counts']['benchmark_version_declarations_updated']==6
           assert a['benchmark_version_changes']==b['benchmark_version_changes']
@@ -189,6 +226,8 @@ jobs:
             work/input-native-report.json
             work/*blocker-audit.json
             work/v04-filter-guard-*.json
+            work/v04-filter-source-census.json
+            work/v04-filter-original-oval-proof.json
             work/residual-172-review-ledger.json
             work/v04-exception-source-oracle.json
             work/full-native-schema-audit.json
