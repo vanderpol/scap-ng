@@ -136,8 +136,41 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         linkage=( "UNIQUE_OVAL_TEST_OBJECT_REF" if len(unique_linked_refs)==1 else
                   "MULTIPLE_OVAL_TEST_OBJECT_REFS" if unique_linked_refs else
                   "NO_MATCHED_OVAL_TEST_COMMENT")
+        # The original Test's explicit object_ref is stronger than comment
+        # equality: inspect that exact original Object ID in its pinned source
+        # package. It is still a provenance candidate, not runtime parity.
+        linked_graph=[]
+        if len(unique_linked_refs)==1:
+            linked_obj_id=unique_linked_refs[0]
+            for obj in source_candidates:
+                if obj.get("id") != linked_obj_id:
+                    continue
+                linked_graph.append({
+                    "source_id":linked_obj_id,
+                    "source_object_title":obj.get("comment"),
+                    "source_has_set":any(local(child)=="set" for child in obj),
+                    "source_direct_filter_actions":[
+                        child.get("action","exclude") for child in obj
+                        if local(child)=="filter"
+                    ],
+                    "source_structure_sha256":hashlib.sha256(
+                        json.dumps(normalized_xml_structure(obj),sort_keys=True,
+                                   separators=(",",":")).encode()).hexdigest(),
+                })
+        linked_shapes={x["source_structure_sha256"] for x in linked_graph}
+        if len(unique_linked_refs)!=1:
+            linked_status="OBJECT_REF_NOT_UNIQUE"
+        elif not linked_graph:
+            linked_status="TEST_REF_OBJECT_NOT_PRESENT"
+        elif len(linked_shapes)>1:
+            linked_status="ORIGINAL_OBJECT_ID_HAS_CONFLICTING_XML"
+        elif linked_graph[0]["source_has_set"]:
+            linked_status="TEST_REFERENCES_ORIGINAL_SET"
+        elif linked_graph[0]["source_direct_filter_actions"]:
+            linked_status="TEST_REFERENCES_ORIGINAL_DIRECT_FILTER"
+        else:
+            linked_status="TEST_REFERENCES_ORIGINAL_LEAF_NO_FILTER"
         graph=[]
-        for obj in matches:
             direct_filters=[node for node in obj if local(node)=="filter"]
             sets=[node for node in obj if local(node)=="set"]
             actions=[e.get("action","exclude") for e in direct_filters]
@@ -182,11 +215,16 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
                         "source_matches":graph, "classification":classifications[0],
                         "source_test_linkage":linkage,
                         "source_test_object_refs":unique_linked_refs,
-                        "source_test_candidates":linked})
+                        "source_test_candidates":linked,
+                        "source_test_linked_object_status":linked_status,
+                        "source_test_linked_object_candidates":linked_graph})
     counts=Counter(r["classification"] for r in records)
     links=Counter(r["source_test_linkage"] for r in records)
     missing_title_links=Counter(r["source_test_linkage"]
                                 for r in records if r["classification"]=="NO_SOURCE_TITLE")
+    linked_source_shapes=Counter(r["source_test_linked_object_status"] for r in records)
+    missing_title_linked_shapes=Counter(r["source_test_linked_object_status"]
+                                       for r in records if r["classification"]=="NO_SOURCE_TITLE")
     if assert_six and (len(ng_docs)!=4001 or len(singletons)!=50):
         raise ValueError("Pinned 0.4.0 singleton-Set baseline changed")
     return {
@@ -196,6 +234,8 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         "classifications":dict(sorted(counts.items())),
         "test_linkage":dict(sorted(links.items())),
         "missing_title_test_linkage":dict(sorted(missing_title_links.items())),
+        "source_test_linked_object_shapes":dict(sorted(linked_source_shapes.items())),
+        "missing_title_source_object_shapes":dict(sorted(missing_title_linked_shapes.items())),
         "by_parent_area":dict(Counter(
             ("test" if r["test"] else r["site"][1])
             for r in records)),
@@ -224,6 +264,8 @@ def main():
         "classifications":report["classifications"],
         "test_linkage":report["test_linkage"],
         "missing_title_test_linkage":report["missing_title_test_linkage"],
+        "source_test_linked_object_shapes":report["source_test_linked_object_shapes"],
+        "missing_title_source_object_shapes":report["missing_title_source_object_shapes"],
         "by_parent_area":report["by_parent_area"],
         "sample_needing_review": [
             {"path":r["path"], "test":r["test"],
