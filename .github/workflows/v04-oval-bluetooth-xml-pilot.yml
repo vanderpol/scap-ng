@@ -7,6 +7,7 @@ on:
       - 'tools/extract_v04_win11_bluetooth_oval.py'
       - 'tools/audit_v04_oval_xml_roundtrip.py'
       - 'tools/test_audit_v04_oval_xml_roundtrip.py'
+      - 'tools/validate_v04_oval_5123.py'
       - '.github/workflows/v04-oval-bluetooth-xml-pilot.yml'
   workflow_dispatch:
 permissions:
@@ -21,7 +22,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install PyYAML==6.0.3
+      - name: Checkout pinned OVAL 5.12.3 schemas
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: work/oval-5123
+      - run: python -m pip install PyYAML==6.0.3 lxml==6.0.2
       - name: Negative Filter and source integrity fixture tests
         env:
           PYTHONPATH: tools
@@ -98,6 +105,12 @@ jobs:
             --manifest work/compare/roundtrip-manifest.json \
             --expected-cases 1 \
             --report work/compare/semantic-roundtrip-result.json
+      - name: Validate independently exported OVAL against pinned 5.12.3 XSD
+        run: |
+          python tools/validate_v04_oval_5123.py \
+            --schema-dir work/oval-5123/oval-schemas \
+            --xml work/compare/exported-oval.xml \
+            --report work/compare/oval-export-xsd.json
       - name: Publish proof and mismatch diagnostics even on failure
         if: always()
         uses: actions/upload-artifact@v4
