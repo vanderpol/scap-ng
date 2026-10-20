@@ -36,6 +36,7 @@ def gap_report(manifest, *, min_expected_total=None):
     seen=set()
     by_reason=defaultdict(list)
     by_selected_multi_reason=defaultdict(list)
+    by_distinct_multi_reason=defaultdict(list)
     by_native_stage=defaultdict(list)
     for status,rows in (("converted",converted),("unsupported",unsupported)):
         for entry in rows:
@@ -69,6 +70,10 @@ def gap_report(manifest, *, min_expected_total=None):
                     sub=re.search(r"; SELECTED: ([A-Z][A-Z0-9_]+)",reason)
                     by_selected_multi_reason[
                         sub.group(1) if sub else "SELECTED_ROUTE_NOT_ATTEMPTED"
+                    ].append(entry)
+                    distinct=re.search(r"; DISTINCT: ([A-Z][A-Z0-9_]+)",reason)
+                    by_distinct_multi_reason[
+                        distinct.group(1) if distinct else "DISTINCT_ROUTE_NOT_ATTEMPTED"
                     ].append(entry)
     lines=[
         "# Original OVAL Self-Assertion: 0.4-C native-conversion blockers",
@@ -122,6 +127,25 @@ def gap_report(manifest, *, min_expected_total=None):
         lines.append("| "+chr(96)+reason+chr(96)+" | "+str(len(items))+" |")
     lines += [
         "",
+        "## Multi-Test distinct-collection final blocker",
+        "",
+        "These are the final rejection codes after objectless and shared-Object "
+        "routes reject the same Definition. Each source Definition appears "
+        "at most once here, and these entries do NOT add to the headline "
+        "unsupported count.",
+        "",
+        "| Distinct multi-Test blocker | Definitions | Pinned original examples |",
+        "| --- | ---: | --- |",
+    ]
+    for reason,items in sorted(by_distinct_multi_reason.items(),
+                               key=lambda kv:(-len(kv[1]),kv[0])):
+        links=", ".join(
+            "["+x["file"]+"]("+ORIGINAL+x["file"]+")"
+            for x in sorted(items,key=lambda x:(x["file"],x["definition_id"]))[:2])
+        lines.append("| "+chr(96)+reason+chr(96)+" | "+str(len(items))+
+                     " | "+links+" |")
+    lines += [
+        "",
         "## Limits of this histogram",
         "",
         "Each category is the **first rejected construct** encountered by the "
@@ -141,6 +165,8 @@ def gap_report(manifest, *, min_expected_total=None):
             "native_stages":{k:len(v) for k,v in sorted(by_native_stage.items())},
             "selected_multi_test_categories":{k:len(v) for k,v in
                                               sorted(by_selected_multi_reason.items())},
+            "distinct_multi_test_categories":{k:len(v) for k,v in
+                                              sorted(by_distinct_multi_reason.items())},
             "markdown":"\n".join(lines)}
 
 def main():
