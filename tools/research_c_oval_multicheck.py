@@ -37,6 +37,57 @@ def alias_of(title, fields):
         reject("SOURCE_TEST_TITLE_UNSUITABLE_FOR_MEANINGFUL_ALIAS")
     return result
 
+def source_boolean_tree_to_c(tree, source_to_alias, *, inventory_error):
+    """Faithfully map original A/OVAL AND/OR, including nested groups.
+
+    This is NOT a boolean rewrite: retain operand order, group boundaries,
+    and one-to-one Test membership. Other source operations fail closed.
+    """
+    if (not isinstance(source_to_alias,dict) or not source_to_alias or
+        len(set(source_to_alias.values()))!=len(source_to_alias)):
+        reject("SOURCE_LOGIC_INVALID_TEST_CROSSWALK")
+    encountered=[]
+    def visit(node,depth=0):
+        if depth>64 or not isinstance(node,dict) or len(node)!=1:
+            reject("SOURCE_LOGIC_UNSUPPORTED_DEPTH_OR_NODE")
+        op,value=next(iter(node.items()))
+        if op=="test":
+            if type(value) is not str or value not in source_to_alias:
+                reject("SOURCE_LOGIC_UNKNOWN_TEST")
+            encountered.append(value)
+            return {"check":source_to_alias[value]}
+        if op not in ("all","any") or not isinstance(value,list) or (
+            not 1<=len(value)<=64
+        ):
+            reject("SOURCE_LOGIC_UNSUPPORTED_OPERATOR_OR_ARITY")
+        return {("every" if op=="all" else "one_of"):
+                [visit(child,depth+1) for child in value]}
+    authored=visit(tree)
+    if (set(encountered)!=set(source_to_alias) or
+        len(encountered)!=len(source_to_alias)):
+        reject(inventory_error)
+    return authored
+
+
+def verify_compiled_source_boolean_tree(compiled, original, source_to_alias):
+    """Require exact structural re-projection, never mere leaf-set parity."""
+    projected=compiled.get("expression",{}).get("source_tree")
+    reverse={alias:tid for tid,alias in source_to_alias.items()}
+    def visit(node):
+        if not isinstance(node,dict) or len(node)!=1:
+            reject("COMPILED_SOURCE_LOGIC_SHAPE_DRIFT")
+        op,value=next(iter(node.items()))
+        if op=="test":
+            if type(value) is not str or value not in reverse:
+                reject("COMPILED_SOURCE_LOGIC_TEST_DRIFT")
+            return {"test":reverse[value]}
+        if op not in ("all","any") or not isinstance(value,list):
+            reject("COMPILED_SOURCE_LOGIC_OPERATOR_DRIFT")
+        return {op:[visit(child) for child in value]}
+    if visit(projected)!=original:
+        reject("COMPILED_SOURCE_LOGIC_TREE_DRIFT")
+
+
 def convert_objectless_many(a):
     if not isinstance(a,dict) or a.get("mode")!="automated":
         reject("ASSESSMENT_NOT_AUTOMATED")
@@ -99,31 +150,21 @@ def convert_objectless_many(a):
         }
     if used_states!=set(states):
         reject("UNUSED_SOURCE_STATE")
-    source_expr=a.get("evaluate")
-    if (not isinstance(source_expr,dict) or set(source_expr)!={"all"}
-            or not isinstance(source_expr["all"],list)):
-        reject("NOT_PROVEN_0_3_OVAL_AND_REQUIREMENT")
-    ordered=[]
-    for part in source_expr["all"]:
-        if not isinstance(part,dict) or set(part)!={"test"}:
-            reject("NESTED_SOURCE_EXPRESSION_REQUIRES_SEPARATE_PROOF")
-        old=part["test"]
-        matches=[alias for alias,tid in reverse.items() if tid==old]
-        if len(matches)!=1 or matches[0] in ordered:
-            reject("DUPLICATE_OR_MISSING_SOURCE_TEST_IN_AND")
-        ordered.append(matches[0])
-    if len(ordered)!=len(tests):
-        reject("SOURCE_EVALUATE_LOST_TEST")
+    original_logic=a.get("evaluate")
+    source_to_alias={tid:alias for alias,tid in reverse.items()}
+    c_logic=source_boolean_tree_to_c(original_logic,source_to_alias,
+        inventory_error="DUPLICATE_OR_MISSING_SOURCE_TEST_IN_LOGIC")
     doc={
         "id":a["id"],
         "observations":{"system_status":{"from":{capability:{}}}},
         "checks":checks,
-        "require":{"every":[{"check":alias} for alias in ordered]},
+        "require":c_logic,
     }
     try:
         compiled=compile_c_unified(doc)
     except (ValueError,TypeError,KeyError) as exc:
         reject("UNIFIED_NATIVE_C_COMPILER_BLOCKER: "+str(exc))
+    verify_compiled_source_boolean_tree(compiled,original_logic,source_to_alias)
     if set(compiled["tests"])!=set(checks):
         reject("COMPILED_TEST_COVERAGE_MISMATCH")
     if (compiled.get("shared_objects") or
@@ -221,27 +262,20 @@ def convert_selected_shared_many(a):
         entities[tid]=_entities(st["state"])
     if used_states!=set(states):
         reject("SHARED_SELECTED_UNUSED_SOURCE_STATES")
-    evaluate=a.get("evaluate")
-    if (not isinstance(evaluate,dict) or set(evaluate)!={"all"} or
-        not isinstance(evaluate["all"],list)):
-        reject("SHARED_SELECTED_SOURCE_AND_REQUIRED")
-    ordered=[]
-    for part in evaluate["all"]:
-        if (not isinstance(part,dict) or set(part)!={"test"} or
-            part["test"] not in reverse):
-            reject("SHARED_SELECTED_UNRESOLVED_OR_NESTED_CRITERIA")
-        ordered.append(reverse[part["test"]])
-    if len(ordered)!=len(tests) or len(set(ordered))!=len(tests):
-        reject("SHARED_SELECTED_SOURCE_CHECK_INVENTORY_CHANGED")
+    original_logic=a.get("evaluate")
+    source_to_alias=dict(reverse)
+    c_logic=source_boolean_tree_to_c(original_logic,source_to_alias,
+        inventory_error="SHARED_SELECTED_SOURCE_CHECK_INVENTORY_CHANGED")
     doc={"id":a["id"],
          "observations":{"original_collection":{
              "source_object":oid,"from":{cap:selectors}}},
          "checks":checks,
-         "require":{"every":[{"check":alias} for alias in ordered]}}
+         "require":c_logic}
     try:
         compiled=compile_c_unified(doc)
     except (ValueError,KeyError,TypeError) as exc:
         reject("SHARED_SELECTED_UNIFIED_C_NOT_SUPPORTED: "+str(exc))
+    verify_compiled_source_boolean_tree(compiled,original_logic,source_to_alias)
     if (set(compiled["tests"])!=set(checks) or
         set(compiled["shared_objects"])!={oid} or
         compiled.get("shared_singletons")):
@@ -366,24 +400,16 @@ def convert_distinct_selected_many(a):
         comparisons[tid]=(obj,_entities(state["state"]))
     if used_objects!=set(objects) or used_states!=set(states):
         reject("MULTI_DISTINCT_EXTRA_SOURCE_OBJECT_OR_STATE")
-    tree=a.get("evaluate")
-    if (not isinstance(tree,dict) or set(tree)!={"all"} or
-        not isinstance(tree["all"],list)):
-        reject("MULTI_DISTINCT_REQUIRE_EXPLICIT_AND")
-    ordered=[]
-    for branch in tree["all"]:
-        if (not isinstance(branch,dict) or set(branch)!={"test"} or
-            branch["test"] not in source_to_alias):
-            reject("MULTI_DISTINCT_UNPROVEN_NESTED_SOURCE_LOGIC")
-        ordered.append(source_to_alias[branch["test"]])
-    if len(ordered)!=len(tests) or len(set(ordered))!=len(tests):
-        reject("MULTI_DISTINCT_SOURCE_TEST_COVERAGE_DRIFT")
+    original_logic=a.get("evaluate")
+    c_logic=source_boolean_tree_to_c(original_logic,source_to_alias,
+        inventory_error="MULTI_DISTINCT_SOURCE_TEST_COVERAGE_DRIFT")
     c={"id":a["id"],"checks":checks,
-       "require":{"every":[{"check":alias} for alias in ordered]}}
+       "require":c_logic}
     try:
         compiled=compile_c_unified(c)
     except (ValueError,TypeError,KeyError) as exc:
         reject("MULTI_DISTINCT_UNIFIED_COMPILER_REJECTED: "+str(exc))
+    verify_compiled_source_boolean_tree(compiled,original_logic,source_to_alias)
     if (set(compiled["tests"])!=set(checks) or
         compiled.get("shared_objects") or compiled.get("shared_singletons")):
         reject("MULTI_DISTINCT_COMPILER_CONFLATED_SOURCE_OBJECTS")
