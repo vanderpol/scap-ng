@@ -44,13 +44,17 @@ def source_test_field_must(test, fields):
     Existence is a distinct axis. No advanced check_existence is inferred from
     the matching operation; unsupported pairs must remain compatibility data.
     """
-    if test.get("check_existence") not in ("at_least_one_exists","all_exist"):
+    if test.get("check_existence") not in ("at_least_one_exists","all_exist","only_one_exists"):
         reject("SOURCE_TEST_ADVANCED_EXISTENCE_UNSUPPORTED")
     token=PAIR_CHECK.get(test.get("check"))
     modes={"all_match":"every_item","some_match":"any_item",
            "only_one_matches":"one_matching_item","none_match":"no_matching_item"}
     if token not in modes:
         reject("SOURCE_TEST_MATCHING_QUANTIFIER_UNSUPPORTED")
+    if test["check_existence"]=="only_one_exists":
+        if token!="all_match":
+            reject("SOURCE_TEST_ONLY_ONE_MATCH_PAIR_NOT_REVIEWED")
+        return {"exactly_one_item":fields}
     if test["check_existence"]=="all_exist":
         return {"items_exist":"all","items_match":{
             "all_match":"every","some_match":"some",
