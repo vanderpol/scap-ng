@@ -16,7 +16,23 @@ def check(schema_dir, xml_file):
     if not schema.is_file() or not xml_file.is_file():
         raise ValueError("Missing OVAL 5.12.3 Definitions schema or XML artifact")
     parser=etree.XMLParser(resolve_entities=False,no_network=True)
-    validator=etree.XMLSchema(etree.parse(str(schema),parser))
+    platform_schema=schema_dir/"independent-definitions-schema.xsd"
+    if not platform_schema.is_file():
+        raise ValueError("Missing pinned OVAL 5.12.3 independent platform schema")
+    # The base Definitions XSD has substitution points for platform typed
+    # Test/Object/State declarations, but does not itself register all of
+    # those namespaces. Import both in a local, pinned, no-network umbrella.
+    # Validating against base-only silently misclassifies every ind:* element
+    # as an unexpected subtype; do not weaken/skip validation for that.
+    umbrella=b'''<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+       <xs:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  schemaLocation="oval-definitions-schema.xsd"/>
+       <xs:import namespace="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent"
+                  schemaLocation="independent-definitions-schema.xsd"/>
+    </xs:schema>'''
+    wrapper=etree.fromstring(
+        umbrella,parser,base_url=(schema_dir.resolve().as_uri()+"/"))
+    validator=etree.XMLSchema(wrapper)
     document=etree.parse(str(xml_file),parser)
     valid=validator.validate(document)
     return {"status":"PASS" if valid else "FAIL",
