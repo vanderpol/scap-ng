@@ -14,6 +14,8 @@ on:
       - 'tools/test_research_c_constant_state_source.py'
       - 'tools/research_c_oval_variable_usage_census.py'
       - 'tools/test_research_c_oval_variable_usage_census.py'
+      - 'tools/research_c_local_literal_inputs.py'
+      - 'tools/test_research_c_local_literal_inputs.py'
       - 'tools/research_c_oval_multicheck.py'
       - 'tools/research_c_hybrid_must_overlay.py'
       - 'tools/test_research_c_hybrid_must_overlay.py'
@@ -373,6 +375,31 @@ jobs:
           Path("c-native/original-family-fixed-pattern.sidecar.json").write_text(
               json.dumps(sidecar,sort_keys=True,indent=2)+"\\n",encoding="utf-8")
           print("Original family fixed pattern authoring restores exact A source graph.")
+          PY
+      - name: Prove typed local literal Object inputs retain the exact original OVAL graph
+        env:
+          PYTHONPATH: scap-ng/tools
+          SCAP_NG_C_REVIEW_DIR: c-review
+          SCAP_NG_C_NATIVE_MANIFEST: c-native/conversion-manifest.json
+        run: |
+          python -m unittest -v scap-ng/tools/test_research_c_local_literal_inputs.py
+          python scap-ng/tools/research_c_local_literal_inputs.py \
+            --review c-review --manifest c-native/conversion-manifest.json \
+            --out c-native/literal-collection-inputs-census.json \
+            --examples-dir c-native/literal-collection-inputs
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("c-native/literal-collection-inputs-census.json").read_text())
+          assert x["variable_blocked_definitions"]==68
+          assert x["original_definitions_with_inline_local_literals"]==8
+          assert x["inlined_local_literal_variables"]==23
+          assert x["still_native_C_converted_definitions"]>=36
+          assert x["native_C_conversion_proven"] is False
+          assert x["scanner_execution_proven"] is False
+          assert len(list(Path("c-native/literal-collection-inputs").glob(
+              "*.collection-inputs.research.yaml")))==8
+          print("23 original typed local literals rehydrated at Object bindings.")
           PY
       - name: Verify permanent GitHub sample files against generated original-source C
         run: |
