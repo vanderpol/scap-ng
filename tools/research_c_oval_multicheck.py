@@ -381,8 +381,8 @@ def convert_distinct_selected_many(a):
     """Original OVAL AND with 2+ independent, explicitly selected Objects.
 
     Use ONE C frontend, not a second execution model. Fail closed unless
-    every Object and State belongs to exactly one source Test, and there
-    are no Variables, Sets, Filters, behavior side effects or hidden dataflow.
+    every Object belongs to a known source Test; reused immutable source States
+    retain exact identity/provenance. No Variables, Sets, Filters or hidden dataflow.
     """
     if not isinstance(a,dict) or a.get("mode")!="automated":
         reject("MULTI_DISTINCT_ASSESSMENT_UNSUPPORTED")
@@ -403,6 +403,10 @@ def convert_distinct_selected_many(a):
            for t in tests.values()):
         reject("MULTI_DISTINCT_TEST_OBJECT_ID_REQUIRED")
     usage=Counter(t["object"] for t in tests.values())
+    state_usage=Counter(
+        sid for t in tests.values() if isinstance(t,dict)
+        and isinstance(t.get("states"),list)
+        for sid in t["states"] if type(sid) is str)
     reused={oid:"reused_collection_"+str(i+1)
             for i,oid in enumerate(sorted(o for o,n in usage.items() if n>1))}
     observations={}
@@ -427,7 +431,7 @@ def convert_distinct_selected_many(a):
             reject("MULTI_DISTINCT_STATE_REUSE_OR_MISSING")
         if refs:
             sid=refs[0]
-            if sid not in states or sid in used_states:
+            if sid not in states:
                 reject("MULTI_DISTINCT_STATE_REUSE_OR_MISSING")
             used_states.add(sid)
             state=states[sid]
@@ -449,6 +453,7 @@ def convert_distinct_selected_many(a):
             must=PRESENCE[t["check_existence"]]
             original_entities=[]
         alias=descriptive_distinct_alias(t.get("test_title"),fields,checks)
+        repeated_state=(sid if refs and state_usage[sid]>1 else None)
         source={"from":{t["capability"]:selectors}}
         if oid in reused:
             collection_alias=reused[oid]
@@ -462,6 +467,8 @@ def convert_distinct_selected_many(a):
                            "must":must}
         else:
             checks[alias]={"source_test":tid,**source,"must":must}
+        if repeated_state is not None:
+            checks[alias]["source_state"]=repeated_state
         source_to_alias[tid]=alias
         comparisons[tid]=(obj,original_entities)
     if used_objects!=set(objects) or used_states!=set(states):
@@ -478,6 +485,11 @@ def convert_distinct_selected_many(a):
     except (ValueError,TypeError,KeyError) as exc:
         reject("MULTI_DISTINCT_UNIFIED_COMPILER_REJECTED: "+str(exc))
     verify_compiled_source_boolean_tree(compiled,original_logic,source_to_alias)
+    source_state_crosswalk={
+        alias:check["source_state"] for alias,check in checks.items()
+        if "source_state" in check}
+    if compiled.get("source_state_provenance")!=source_state_crosswalk:
+        reject("MULTI_DISTINCT_REUSED_SOURCE_STATE_IDENTITY_DRIFT")
     if (set(compiled["tests"])!=set(checks) or
         set(compiled.get("shared_objects",{}))!=set(reused) or
         compiled.get("shared_singletons")):
@@ -498,6 +510,7 @@ def convert_distinct_selected_many(a):
         "source_assessment_id":a["id"],
         "authored_c":c,
         "source_test_crosswalk":{alias:tid for tid,alias in source_to_alias.items()},
+        "source_state_crosswalk":source_state_crosswalk,
         "source_test_documentation":{
             alias:tests[tid]["test_title"]
             for tid,alias in source_to_alias.items()},
