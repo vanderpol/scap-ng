@@ -7,6 +7,7 @@ on:
       - 'tools/extract_v04_win11_bluetooth_oval.py'
       - 'tools/audit_v04_oval_xml_roundtrip.py'
       - 'tools/test_audit_v04_oval_xml_roundtrip.py'
+      - 'tools/test_export_v04_shellcommand_pilot.py'
       - 'tools/validate_v04_oval_5123.py'
       - '.github/workflows/v04-oval-bluetooth-xml-pilot.yml'
   workflow_dispatch:
@@ -32,7 +33,9 @@ jobs:
       - name: Negative Filter and source integrity fixture tests
         env:
           PYTHONPATH: tools
-        run: python tools/test_audit_v04_oval_xml_roundtrip.py -v
+        run: |
+          python tools/test_audit_v04_oval_xml_roundtrip.py -v
+          python tools/test_export_v04_shellcommand_pilot.py -v
       - name: Obtain pinned original OVAL source XML and verified 0.4.0 authored output
         env:
           GH_TOKEN: ${{ github.token }}
