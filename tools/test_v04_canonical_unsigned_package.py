@@ -29,6 +29,7 @@ def mutate(raw, fn):
 class PackageTests(unittest.TestCase):
     def setUp(self):
         self.docs = sample()
+        self.docs['authoring/demo/benchmark.demo.json']['benchmark']['rules'] = ['r1']
 
     def test_deterministic_and_manifest_v04(self):
         archive, manifest = build_package(self.docs, validate_schema=False)
