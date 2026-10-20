@@ -1,10 +1,10 @@
 # SCAP-NG draft specification
 
-**Status:** pre-alpha working draft. SCAP-NG 0.3.0 is the active development version; historical [0.2.0 schemas](../schema/v0.2.0/) are retained as an archived design checkpoint, not a content-reproduction release gate. This is not a released standard.
+**Status:** pre-alpha. **0.4.0 is the current owner-approved authoring-sample version**, not an OVAL Board standard or a completed scanner. See the [canonical 0.4.0 decision](../research/assessment-simplification/compact-authoring-04/OWNER-0.4.0-CANONICAL-DECISION.md), [current examples](examples/README.md), [0.4 schema](../schema/v0.4.0/README.md) and [release gates](../review/current/0.4.0-FINALIZATION-GATES.md). Previous 0.3 samples and compiled demonstrations remain [archived](../archive/0.3.0/README.md).
 
 These pages define the current SCAP-NG contract. Research and design-history records are non-normative; unresolved proposals remain outside the normative text until decided.
 
-**New to Assessment authoring or using an AI editor?** Start with the [curated public authoring guide](../docs/public-authoring/README.md). It summarizes source/version selection, real examples and review safeguards without requiring development-history research. This introduction does not replace the specification or promote 0.4 experimental syntax.
+**New to Assessment authoring or using an AI editor?** Start with the [curated public authoring guide](../docs/public-authoring/README.md). It summarizes source/version selection, real examples and review safeguards without requiring development-history research. This introduction does not replace the specification, and experimental r3/0.4-A research syntax must not be confused with the owner-approved 0.4.0 samples.
 
 ## Start here
 

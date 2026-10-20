@@ -1,79 +1,25 @@
 # SCAP-NG
 
-SCAP-NG is a pre-alpha successor to SCAP 1.4 focused on preserving supported
-assessment meaning while making security content easier to author, review,
-implement, execute, package, and consume.
+SCAP-NG is a pre-alpha successor to SCAP 1.4 designed to preserve supported assessment meaning while simplifying authoring, review, collection, results and scalable distribution.
 
-## Core objectives
+## Start here — current 0.4.0 sample files
 
-1. Preserve meaning through migration.
-2. Make authoring and review substantially simpler.
-3. Make semantics explicit and predictable.
-4. Scale through safe reuse of content and collected facts.
-5. Produce smaller, more useful results.
-6. Cover the complete policy lifecycle.
-7. Be trustworthy, interoperable, and governable.
-8. Reduce implementation complexity and enable efficient execution.
+**[Download the approved six-STIG 0.4.0 authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020)** — complete, version-pinned YAML and JSON ZIPs containing **4,001 source documents**, including reusable shared Assessments.
 
-See the [full objectives](specification/objectives.md) and
-[objective-to-issue traceability](OBJECTIVES.md).
+- **Learn the content model:** [Benchmark and Rule examples](specification/examples/README.md) · [Assessment examples](specification/examples/assessments.md)
+- **Review a real STIG:** [current six-STIG review](review/current/README.md) · [short review guide](review/current/REVIEW-GUIDE.md)
+- **Validate a source file:** [0.4.0 schema](schema/v0.4.0/README.md) · [source/version guide](docs/public-authoring/VERSION-AND-SOURCES.md)
+- **Understand what is still open:** [0.4.0 finalization gates](review/current/0.4.0-FINALIZATION-GATES.md) · [owner's canonical grammar decision](research/assessment-simplification/compact-authoring-04/OWNER-0.4.0-CANONICAL-DECISION.md)
+- **Browse historical material:** [archived 0.3.0 release, examples and synthetic results](archive/0.3.0/README.md) · [OVAL Board records](board/README.md)
 
-## Start here
+All six current Benchmarks declare the exact reachable `0.4.0` automated Assessment specification. Their obsolete `0.3.0` declarations, source hashes and original authoring content remain in pinned historical releases and migration evidence. **0.3.0 is preserved, not deleted or silently converted.**
 
-- **Specification:** [specification/README.md](specification/README.md)
-- **Real-world examples:** [Benchmark and Rule policy](specification/examples/README.md) · [technical Assessments](specification/examples/assessments.md) · [result fixtures](specification/examples/0.3.0/results/README.md)
-- **0.4 pre-alpha preview:** [Example-led technical overview](research/assessment-simplification/compact-authoring-04/ASSESSMENT-REVIEW-OVERVIEW.md) · [deeper authoring/semantics review](research/assessment-simplification/compact-authoring-04/ASSESSMENT-REVIEW-TECHNICAL.md)
-- **0.4 complex examples:** [Three larger source-backed Assessment walkthroughs](research/assessment-simplification/compact-authoring-04/COMPLEX-REAL-WORLD-EXAMPLES.md) — Windows user rights, DNS, and Apache.
-- **Current review:** [review/current/README.md](review/current/README.md)
-- **0.3.0 schema:** [schema/v0.3.0/](schema/v0.3.0/)
-- **Six complete STIGs:** [One native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [six compiled scanning bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
-- **Open issues / 0.3 work:** [GitHub issues](https://github.com/vanderpol/scap-ng/issues)
-- **Governance and published votes:** [board/README.md](board/README.md)
+## What SCAP-NG changes
 
+SCAP-NG uses **Benchmark → Rule → Assessment** for policy, requirement and evaluation method. Automated Assessments retain useful OVAL concepts—Test, Object, Variable and collected Item—but ordinarily put collection and expected `require` predicates near each Test instead of requiring readers to chase separate XML IDs.
 
-## Six-STIG authoring and scanning downloads
+Content is modular and reusable, with explicit applicability, manual choices, source provenance, bounded result evidence, signatures and cross-platform implementation as project objectives.
 
-The [current owner-reviewed **SCAP-NG 0.3 six-STIG prerelease**](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f)
-contains **one native authoring ZIP** (all six STIGs and shared Assessments),
-plus **six separately compiled `.scapng` packages**—one each for RHEL 9,
-Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS, and
-Apache HTTP Server 2.4 (UNIX).
+**0.4.0 is an owner-approved pre-alpha authoring format, not a completed scanner standard.** The YAML/JSON authoring samples passed schema and source-closure gates and 25,628 generic result-model checks passed. **172 uncommon requirement cases remain source-exact** and native `.scapng` compilation, signing and scanner runtime semantic parity remain open. The historical 0.3.0 compiled bundles are **not** native 0.4.0 packages.
 
-**[Download the complete native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip)**
-· [open the six compiled bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f).
-
-The native Rules select Assessments by logical ID, use a single explicit
-publisher default, and avoid redundant datatype declarations for ordinary
-literal comparisons. The authoring compiler expands rare typed operations,
-such as `version_greater_than_or_equal`, to the original OVAL-compatible
-typed canonical comparison. Source migration remains faithful: Variables,
-Inputs, arrays and ambiguous values retain explicit types. **4,532 of 5,267
-authored datatype fields (86%)** were removable in this conservative
-six-STIG authoring presentation.
-
-**Verified build property:** The CI release gate compiled all six content
-bundles independently from the older fully typed source and new concise
-source, and verified matching SHA-256 hashes for every resulting `.scapng`
-file. The older source-only candidate/faithful downloads remain in GitHub
-release history as evidence, but are no longer the recommended review entry
-point.
-
-**Status:** Experimental pre-alpha content, neither DISA-issued nor OVAL
-Board-ratified. Compilation identity proves identical scanner-facing
-content—not that an independent scanner has executed OVAL 5.12.3
-Self-Assertion successfully. The special-float migration coverage gap
-is tracked in [#218](https://github.com/vanderpol/scap-ng/issues/218).
-See the [current review](review/current/README.md),
-[Assessment examples](specification/examples/assessments.md),
-and [OVAL Board A/B/C/D discussion](https://github.com/vanderpol/scap-ng/discussions/213).
-
-## Architecture
-
-SCAP-NG uses **Benchmark → Rule → Assessment**. Native automated Assessments
-retain useful OVAL concepts such as Test, Object, local typed State predicates, Variable, and Item while
-removing legacy serialization and packaging machinery where it is not
-semantically required. Distribution uses modular source compiled into a
-self-contained manifest-based package.
-
-**Status:** pre-alpha. Green CI, schema validation, conversion evidence, human
-acceptance, and Board ratification are distinct states.
+[Objectives](specification/objectives.md) · [Maintaining](MAINTAINING.md) · [Roadmap](ROADMAP.md) · [Issues](https://github.com/vanderpol/scap-ng/issues)

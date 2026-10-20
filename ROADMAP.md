@@ -1,53 +1,24 @@
 # SCAP-NG roadmap
 
-Updated: October 15, 2026. **0.3.0 remains the active pre-alpha release checkpoint**;
-0.2.0 is historical and does not require rebuilding as a 0.3 gate.
+Updated October 20, 2026. **Current authoring review: 0.4.0.** The 0.3.0 compiled demonstration release and source research remain [archived](archive/0.3.0/README.md), not erased or relabeled as 0.4.
 
-## Now — finish the 0.3 checkpoint
+## Now — finalize 0.4.0 authoring and native compilation
 
-The [first full 65-source active-0.3 pipeline](https://github.com/vanderpol/scap-ng/actions/runs/37838382899)
-**succeeded** on `799d083`: 61 supported generated benchmark packages, four
-known nonstandard SQL-extension source blockers, schema and semantic checks,
-graph checks, normalization, compilation and test signing.
-The [follow-up run](https://github.com/vanderpol/scap-ng/actions/runs/37846666574)
-covers subsequent Organizational Input and Result changes and must pass
-independently. The [six-benchmark regression](https://github.com/vanderpol/scap-ng/actions/runs/37849528026)
-and [current documentation audit](https://github.com/vanderpol/scap-ng/actions/runs/37849528014)
-have passed at the later documentation checkpoint.
+The owner approved one 0.4.0 authoring grammar and an exact-reachable **0.4-only Benchmark specification declaration** policy. The [six-STIG authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) contain 4,001 YAML and JSON documents and resolve 2,958 Rule-choice links. [Versioned gate tracking](review/current/0.4.0-FINALIZATION-GATES.md) records schema, source graph and generic OVAL-result evidence.
 
-Finish the final full-corpus gate, reconcile any real correctness failures,
-and obtain owner acceptance. Then publish a durable, checksum-identified
-review/prerelease package; an expiring Actions ZIP is not the final release
-asset. Keep the [release issue](https://github.com/vanderpol/scap-ng/issues/191)
-as the single authoritative release checklist.
+1. Finish native 0.4.0 authoring-to-bundle compilation, deterministic manifests, checksums and independent signature verification.
+2. Verify exceptional source matching and capability-specific OVAL semantics, including Variables, Sets, Filters, record fields and incomplete/error/unknown results.
+3. Align the browser editor with current 0.4.0 files and schemas; test import/edit/export roundtrips.
+4. Complete concise versioned reviewer material and release evidence before considering a final native package checkpoint.
 
-No new 0.3 feature design is required. Shared Observation and changes to
-`evaluate` are deferred; see the
-[scope boundary](specification/deferred-after-0.3.md).
+**Parsed source, a signed bundle and scanner parity are different milestones.** An independent full scanner/evaluator remains to be demonstrated.
 
-## 0.4 — single authoring-language draft (research in progress)
+## Archived 0.3.0
 
-The project-owner-directed [0.4 scope and validation gates](research/assessment-simplification/compact-authoring-04/0.4-SCOPE-AND-RELEASE-GATES.md) propose **one standard human-readable Assessment grammar**, including direct State field names (`owner_uid:` rather than `field: owner_uid`), explicit human-language `require` semantics, typed comparator keys, nested Windows record fields, and preservation of existing Object/State literal arrays and `value_match`. No hidden optional compact dialect and no unrelated `evaluate` redesign.
+The historical six-STIG source ZIP and independently compiled `.scapng` samples are preserved in the [0.3 archive](archive/0.3.0/README.md). Earlier full-corpus runs, decisions and issue records remain historical; the 0.3 pipeline is not the default for new 0.4 demonstrations.
 
-[Three-benchmark source reconstruction](https://github.com/vanderpol/scap-ng/actions/runs/38737558392) demonstrated representation for all **921** default-automated Linux/Windows Rules; [focused draft syntax validation](https://github.com/vanderpol/scap-ng/actions/runs/38740807220) passed on **942** automated/applicability Assessment fragments. These proofs justify a **draft**, not an approved normative version. Next: finalize readable names and edge outcomes, build a full independent `schema/v0.4.0/` snapshot with capability validation, and run the maintained six-anchor suite before a version checkpoint.
+## Next — independent implementations and conformance
 
-No SCAP-NG scanner exists yet. Implementation/scanner parity is a **later milestone**, not a condition for drafting or adopting authoring syntax. Keep the current 0.3 release and Board vote unchanged until a distinct promotion decision. [Owner research tracking #227](https://github.com/vanderpol/scap-ng/issues/227).
+Compare real scanner execution against reviewed OVAL 5.12.3 oracles; test result evidence, redaction, signed bundles, caching and enterprise-scale performance. Full automated Self-Assertion generation/execution/comparison remains a later checkpoint ([#206](https://github.com/vanderpol/scap-ng/issues/206)).
 
-## Next — independent implementation and conformance
-
-Build and exercise a reference evaluator/scanner, compare actual vendor
-execution against independently reviewed oracles, and test collected Item
-semantics, redaction, evidence retention, signing, caching, offline operation
-and enterprise-scale performance. Full automated Self-Assertion
-generation/execution/comparison is targeted at 1.0
-([#206](https://github.com/vanderpol/scap-ng/issues/206)).
-
-## Later — governance and standards
-
-Stabilize trust and packaging profiles, vendor-facing conformance material,
-versioned releases, and the standards path.
-
-[Core objectives](specification/objectives.md) ·
-[Current review](review/current/README.md) ·
-[Draft specification](specification/README.md) ·
-[Issues](https://github.com/vanderpol/scap-ng/issues)
+[Core objectives](specification/objectives.md) · [Current review](review/current/README.md) · [Issues](https://github.com/vanderpol/scap-ng/issues)

@@ -23,3 +23,7 @@ Iteration 003 still contains mixed current design, focused evidence, and histori
 The separate `vanderpol/scap-ng-evidence` repository is the durable home for migrated bulk evidence. The main repository retains compact summaries, provenance maps, and representative examples.
 
 [Decision reconciliation](../docs/decision-reconciliation.md) · [Lossless rebaseline procedure](../docs/lossless-rebaseline.md)
+
+## Archived version 0.3.0 samples
+
+Current authoring documentation moved to 0.4.0 on October 20, 2026. The [0.3.0 archive index](0.3.0/README.md) links original release assets, compiled examples, Markdown walkthroughs and synthetic result files pinned by immutable Git commit. No historical repository rewriting or bulk duplication was required.
