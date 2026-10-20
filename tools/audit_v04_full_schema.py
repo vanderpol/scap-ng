@@ -55,6 +55,7 @@ def main():
             if kind is None:
                 totals["non_assessment_rule"]+=1
                 skipped.append(path)
+                print("OTHER_SOURCE",path,"top_level_keys=",list(doc) if isinstance(doc,dict) else type(doc).__name__)
                 continue
             totals[kind+"_documents"]+=1
             try:
