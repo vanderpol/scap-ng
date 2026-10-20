@@ -194,11 +194,17 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
         if compiled["require"]!=expected_token or "states" in compiled:
             reject("SOURCE_COMPILER_PRESENCE_DRIFT")
         return
-    if original["check_existence"] not in ("at_least_one_exists","all_exist"):
-        reject("SOURCE_EXISTENCE_NOT_PROVEN")
+    existence=original["check_existence"]
     match=PAIR_CHECK.get(original["check"])
-    expected_require=original["check_existence"]+"_and_"+match if match else None
-    if match is None or compiled["require"]!=expected_require:
+    if existence=="only_one_exists" and match=="all_match":
+        # Exactly one extant Item and all such Items matching means that
+        # one Item must match. A already represents this exact scope.
+        expected_require="only_one_exists_and_matches"
+    elif existence in ("at_least_one_exists","all_exist") and match:
+        expected_require=existence+"_and_"+match
+    else:
+        reject("SOURCE_EXISTENCE_OR_MATCH_PAIR_NOT_PROVEN")
+    if compiled["require"]!=expected_require:
         reject("SOURCE_COMPILER_MATCH_DRIFT")
     native_states=compiled.get("states")
     if not isinstance(native_states,list) or len(native_states)!=len(states):
@@ -279,7 +285,7 @@ def compile_one_original_definition(original_assessment):
             reject("STATE_CAPABILITY_OR_UNREVIEWED_FIELDS")
         entities=_entities(state["state"])
         fields=project_fields(state["state"],state["capability"])
-        if old.get("check_existence") not in ("at_least_one_exists","all_exist"):
+        if old.get("check_existence") not in ("at_least_one_exists","all_exist","only_one_exists"):
             reject("TEST_ADVANCED_EXISTENCE")
         token=PAIR_CHECK.get(old.get("check"))
         if token is None:
@@ -287,7 +293,13 @@ def compile_one_original_definition(original_assessment):
         # Keep source existence and matching independent. A already has
         # every all_exist_and_* pair. The ordinary shorthand is restricted
         # to the usual at_least_one_exists scope.
-        if old["check_existence"]=="all_exist":
+        if old["check_existence"]=="only_one_exists":
+            if token!="all_match":
+                # A may have other one-exists pairings, but they require
+                # an explicit independently reviewed source equivalence.
+                reject("TEST_ONLY_ONE_EXISTENCE_CHECK_NOT_REVIEWED")
+            must={"exactly_one_item":fields}
+        elif old["check_existence"]=="all_exist":
             must={"items_exist":"all","items_match":{
                 "all_match":"every","some_match":"some",
                 "only_one_matches":"one","none_match":"none"}[token],
