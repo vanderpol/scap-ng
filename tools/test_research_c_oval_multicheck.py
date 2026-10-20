@@ -361,7 +361,7 @@ class OriginalOVALMultiTestMatchCardinality(unittest.TestCase):
         doc["tests"][tid]["check"]="none satisfy"
         doc["tests"][tid]["check_existence"]="none_exist"
         with self.assertRaisesRegex(NotNativeCConvertible,
-                                    "QUANTIFIER_OR_ATTRS_UNSUPPORTED"):
+                                    "SOURCE_TEST_ADVANCED_EXISTENCE_UNSUPPORTED"):
             convert_distinct_selected_many(doc)
 
 
