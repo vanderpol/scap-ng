@@ -21,6 +21,10 @@ import yaml
 from migrate_v04_oval_proven_direct_filters import (
     index_provenance, migrate as migrate_proven_filter, recover_migration,
 )
+from migrate_v04_additional_source_filters import (
+    index_source_proof, migrate as migrate_additional_filter,
+    recover_migration as recover_additional_filter,
+)
 
 PAIRS={"at_least_one_exists_and_all_match":"one_or_more",
        "may_be_absent_and_all_match":"may_be_absent"}
@@ -138,10 +142,14 @@ def reconcile_benchmark_specifications(documents, *, expected_benchmarks=6,
     return staged, changes
 
 
-def run(src,dest,manifest_path,filter_proof_path=None):
+def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None):
     if src.suffix!=".zip": raise ValueError("ZIP input required")
     filter_proof = (index_provenance(json.loads(filter_proof_path.read_text()),
                                      assert_six=True) if filter_proof_path else None)
+    if additional_proof_path and filter_proof is None:
+        raise ValueError("Second-pass Filter source proof requires first-pass proof")
+    additional_proof = (index_source_proof(json.loads(additional_proof_path.read_text()),
+                                           assert_six=True) if additional_proof_path else None)
     is_yaml="six-stig-yaml" in src.name
     ext=".yaml" if is_yaml else ".json"
     counts=Counter()
@@ -162,6 +170,11 @@ def run(src,dest,manifest_path,filter_proof_path=None):
                 new, filtered_stats=migrate_proven_filter(new,name,filter_proof)
                 recover_migration(new,canonical_before_filter,name,filter_proof)
                 stats.update(filtered_stats)
+            if additional_proof is not None:
+                before_additional=deepcopy(new)
+                new, additional_stats=migrate_additional_filter(new,name,additional_proof)
+                recover_additional_filter(new,before_additional,name,additional_proof)
+                stats.update(additional_stats)
             promoted[name]=new
             counts.update(stats)
             # An unresolved source-provenance review flag is not an edit.
@@ -189,7 +202,13 @@ def run(src,dest,manifest_path,filter_proof_path=None):
             else:
                 if filter_proof is not None:
                     before_filters,_=promote(source[name])
-                    recover_migration(new,before_filters,name,filter_proof)
+                    prior,_=migrate_proven_filter(before_filters,name,filter_proof)
+                    if additional_proof is not None:
+                        recover_additional_filter(new,prior,name,additional_proof)
+                    else:
+                        if new!=prior:
+                            raise ValueError("First-stage canonical Filter output differs")
+                    recover_migration(prior,before_filters,name,filter_proof)
                     recover(before_filters,source[name])
                 else:
                     recover(new,source[name])
@@ -210,6 +229,8 @@ def run(src,dest,manifest_path,filter_proof_path=None):
             counts["source_proven_direct_filters"] != 28
             or counts["source_review_required_unchanged"] != 8):
         raise ValueError("Proven original OVAL Filter migration baseline changed")
+    if additional_proof is not None and counts["source_linked_additional_direct_filters"]!=19:
+        raise ValueError("Second-pass 0.4 source Filter population changed")
     report={"source_sha256":hashlib.sha256(src.read_bytes()).hexdigest(),
             "output_sha256":hashlib.sha256(dest.read_bytes()).hexdigest(),
             "format":"yaml" if is_yaml else "json",
@@ -224,6 +245,10 @@ def run(src,dest,manifest_path,filter_proof_path=None):
             "source_filter_proof_sha256": (hashlib.sha256(filter_proof_path.read_bytes()).hexdigest()
                                            if filter_proof_path else None),
             "source_filter_migration":"source_verified_direct_only" if filter_proof else "not_requested",
+            "additional_filter_source_proof_sha256":(
+                hashlib.sha256(additional_proof_path.read_bytes()).hexdigest()
+                if additional_proof_path else None),
+            "additional_filter_migration":"source_test_object_ref_verified" if additional_proof else "not_requested",
             "schema_validated":False,
             "scanner_equivalence_proven":False}
     manifest_path.write_text(json.dumps(report,indent=2)+"\n")
@@ -236,4 +261,6 @@ if __name__=="__main__":
     p.add_argument("--manifest",type=Path,required=True)
     p.add_argument("--filter-proof",type=Path,default=None,
                    help="Pinned original OVAL six-STIG Filter classification JSON; only 28 source-proven leaves migrate")
-    a=p.parse_args();run(a.source,a.out,a.manifest,a.filter_proof)
+    p.add_argument("--additional-filter-proof",type=Path,default=None,
+                   help="Pinned six-OVAL Test-object-ref ledger for second-pass 19 leaf Filters")
+    a=p.parse_args();run(a.source,a.out,a.manifest,a.filter_proof,a.additional_filter_proof)
