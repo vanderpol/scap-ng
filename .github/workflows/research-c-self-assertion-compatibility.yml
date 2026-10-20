@@ -11,6 +11,7 @@ on:
       - 'tools/research_c_require_language.py'
       - 'tools/test_research_c_require_language.py'
       - 'tools/verify_c_linux_windows_basic_source.py'
+      - 'tools/research_c_original_platform_test_census.py'
       - 'research/assessment-simplification/compact-authoring-04/c-original-windows-registry-test-1020-native.research.yaml'
       - 'tools/research_c_oval_native_gap_report.py'
       - 'tools/test_research_c_oval_native_gap_report.py'
@@ -314,6 +315,14 @@ jobs:
             --published scap-ng/research/assessment-simplification/compact-authoring-04/c-original-windows-registry-test-1020-native.research.yaml \
             --out c-native/basic-linux-windows-source-gate.json
           echo "Basic Linux/Windows original OVAL gate is source/IR parity, not live scanner parity." >> "$GITHUB_STEP_SUMMARY"
+      - name: Census pinned Linux Unix Windows original OVAL Tests independently
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_c_original_platform_test_census.py \
+            --review c-review --manifest c-native/conversion-manifest.json \
+            --out c-native/linux-unix-windows-test-census.json \
+            > c-native/linux-unix-windows-test-summary.json
+          cat c-native/linux-unix-windows-test-summary.json
+          echo "Full native-C Definition counts and isolated C Test counts are deliberately separate." >> "$GITHUB_STEP_SUMMARY"
       - name: Source-backed C fixed State constant reconstruction census
         run: |
           PYTHONPATH=scap-ng/tools python -m unittest -v scap-ng/tools/test_research_c_constant_state_source.py
