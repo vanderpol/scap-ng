@@ -14,6 +14,7 @@ from pathlib import Path
 
 CATEGORIES=(
     "runtime_derived",
+    "local_fixed_literal",
     "constant_collection_binding",
     "constant_derived_dependency",
     "constant_single_state_expectation",
@@ -35,6 +36,13 @@ def references(node, var_id, path=()):
 
 def classify(variable, paths):
     if variable.get("kind")=="local":
+        expression=variable.get("expression")
+        if isinstance(expression,dict) and set(expression)=={"literal"}:
+            # OVAL calls this Variable 'local', but it has a fixed literal
+            # expression and no Object-based/derived computation. Preserve
+            # its source kind; this is a research classification, not a
+            # license to replace its typed collection binding.
+            return "local_fixed_literal"
         return "runtime_derived"
     if variable.get("kind")!="constant":
         raise ValueError("unknown original OVAL Variable kind; do not infer")
