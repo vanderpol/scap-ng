@@ -96,8 +96,10 @@ def build_package(documents, *, validate_schema=True):
         raise ValueError("package requires source documents")
     graph = graph_index(documents)
     edges = inspect_edges(documents)
-    if edges["incompatible_edge_count"] or len(edges["benchmarks"]) != 1:
-        raise ValueError("package requires one complete version-compatible Benchmark")
+    if edges["incompatible_edge_count"]:
+        raise ValueError("incompatible Benchmark Assessment specification/Rule choices")
+    if len(edges["benchmarks"]) != 1:
+        raise ValueError("package requires exactly one complete Benchmark")
     if validate_schema:
         validate_docs(documents, _schema_validators(Path(__file__).resolve().parents[1] / "schema/v0.4.0"))
     rows, contents = {}, {}
