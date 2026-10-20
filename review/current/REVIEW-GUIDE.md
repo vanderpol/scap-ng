@@ -1,34 +1,22 @@
-# 0.3 quick review — real STIG authoring in ten minutes
+# SCAP-NG 0.4.0 — a short six-STIG review
 
-**Audience:** project owner and OVAL Board visitors. These are pre-alpha examples, not a request to ratify 0.3 or a claim of scanner runtime conformance.
+**Audience:** owner, implementers and OVAL Board reviewers. This is an authoring-sample review, not a request to certify or ratify a scanner.
 
-**Download:** [one six-STIG native authoring ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-typed-operators-5796d016b12f/scap-ng-0.3-six-stig-authoring.zip) · [release with six compiled scanner bundles](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-5796d016b12f).
+**Download:** [YAML source](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.yaml.zip) · [JSON source](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.json.zip) · [all release evidence](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020)
 
-Open the ZIP; all native source paths begin with `authoring/`.
+Open either ZIP and follow `authoring/`. Both contain the same **4,001 logical source documents**.
 
-| Time | Review | Real file in the ZIP |
-| --- | --- | --- |
-| 2 min | **Rule → Assessment selection** by logical ID; automated or manual default, no redundant `default` entry | `authoring/rhel_9/rules/SV-257851.rule.yaml` |
-| 2 min | **Simplified comparison**: rare OVAL version type represented by `version_greater_than_or_equal` instead of separate `datatype` | `authoring/apache_server_2-4_unix_server/assessments/automated/SV-214273.automated.yaml` |
-| 2 min | **Local acquisition, variables, checks and decision logic** in a complete Assessment | Same Apache Assessment, then any Windows or Linux automated Assessment |
-| 2 min | **Reusable shared acquisition/Assessment** stored separately without relative-path authoring links | `authoring/shared/assessments/linux/accounts/interactive-users-dir-assigned-in.assessment.yaml` |
-| 2 min | **Scanner-facing package**: open one `.scapng` archive from the same GitHub Release and inspect its manifest and canonical typed Assessment JSON | Six `.scapng` release assets |
+| Explore | What to verify |
+| --- | --- |
+| `authoring/rhel_9/` | Benchmark policy and Rule `assessment_choices` resolving to actual logical Assessment IDs |
+| `authoring/ms_windows_server_2025/` | Complex `windows.wmi.query`, `windows.userright`, record fields and composed `evaluate` branches |
+| `authoring/ms_windows_server_dns/` | Windows record predicates and multi-source collection requirements |
+| `authoring/apache_server_2-4_unix_server/` | Filters, Sets and Variables alongside the simple inline-Test contract |
+| `authoring/shared/assessments/` | Reuse without missing or duplicate Assessment IDs |
+| Each `benchmark*.yaml` or `.json` | Exact reachable `assessment_specifications` version **0.4.0**, without unused 0.3.0 declarations |
 
-The old and new source forms **compiled into byte-for-byte identical six-STIG
-bundles** in the publication gate; see [#200](https://github.com/vanderpol/scap-ng/issues/200).
-In the authoring ZIP 4,532 of 5,267 originally authored datatype declarations
-are omitted; 735 are retained in noninferable cases. This metric counts
-occurrences rather than unique STIG Rules.
+**Start with simple Tests before complicated Windows ones.** Inside `tests`, read `test_title`, `capability`, `object`, `require`, then the enclosing `evaluate` expression. Legacy-looking converted IDs are not new capability names. A more readable authoring presentation is covered in the [Assessment examples](../../specification/examples/assessments.md).
 
-## Important limits
+**Known limits:** 172 exceptional matching requirements remain source-exact; 25,628 generic existence/matching result checks passed, but there is not yet a full capability-specific scanner equivalence proof or native signed 0.4 bundle compiler. See [finalization gates](0.4.0-FINALIZATION-GATES.md).
 
-The full supported SCAP 1.4/OVAL 5.12.3 **lossless forward-conversion**
-requirement is unchanged. Compilation identity only demonstrates that removing
-redundant syntax did not change the current canonical scanner packages; it
-does not establish independent OVAL runtime comparator conformance, target
-data collection, or Board approval. The specialized nonfinite-float gap is
-tracked in [#218](https://github.com/vanderpol/scap-ng/issues/218).
-
-For richer examples, see the [short Assessment showcase](../../specification/examples/assessments.md),
-[0.3 schema](../../schema/v0.3.0/README.md) and the
-[informal vocabulary discussion](https://github.com/vanderpol/scap-ng/discussions/213).
+The historical [0.3.0 compiled/prerelease content](../../archive/0.3.0/README.md) remains independently accessible; do not compare its scanner bundles as if they were compiled 0.4.0 content.

@@ -1,13 +1,7 @@
-# Windows 11 review example
+# Windows 11 — SCAP-NG 0.4.0 authoring review
 
-Inspect the [direct, durable Windows 11 source ZIP](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-windows11-source-preview.zip) alongside [RHEL 9](https://github.com/vanderpol/scap-ng/releases/download/v0.3.0-six-stig-preview-324b6d4802c2/scap-ng-0.3-rhel9-source-preview.zip).
-Browse `windows11/candidate-authoring/` for the current 0.3 Benchmark, Rules,
-Assessments, embedded Object/Set Filters and typed arrays; compare against
-`windows11/faithful-authoring/` and the per-benchmark `SCORECARD.md`.
-These archives contain source and readability evidence, not observed target results.
+Open the [approved six-STIG sample release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and inspect `authoring/ms_windows_11/` from the [YAML](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.yaml.zip) or [JSON](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.json.zip) ZIP. It contains source-backed Rules, Assessments, and shared Assessments in one verified cross-reference graph.
 
-The original pre-rebaseline Windows 11 tree is preserved in Git history,
-not the current repository. For the maintained explanation, begin with the
-[review guide](../REVIEW-GUIDE.md) and the
-[Assessment showcase](../../../specification/examples/assessments.md).
-For illustrative results, use the separate [synthetic result fixtures](../../../specification/examples/0.3.0/results/README.md); this source ZIP is not scanner output.
+Start with [the current review guide](../REVIEW-GUIDE.md), then read [Assessment examples](../../../specification/examples/assessments.md). For complex Windows Tests, keep `windows.wmi.query` capability separate from older OVAL-derived Object IDs such as `wmi57`; the latter are source provenance, not alternate SCAP-NG collection capabilities. Do not rename compiled Object IDs unless every reference and source mapping is preserved.
+
+These are authoring samples, **not observed Windows scan results**. Historic 0.3 comparison trees and illustrative 0.3 result files remain under [archived 0.3 content](../../../archive/0.3.0/README.md).
