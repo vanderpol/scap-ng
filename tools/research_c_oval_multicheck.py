@@ -193,8 +193,9 @@ def convert_objectless_many(a):
         generated=compiled["tests"][alias]
         if generated.get("object") is not None:
             reject("OBJECTLESS_PROVIDER_INCORRECTLY_RECOLLECTED")
+        expected_requirement="at_least_one_exists_and_"+PAIR_CHECK[tests[tid]["check"]]
         if generated["capability"]!=capability or (
-            generated.get("require")!="at_least_one_exists_and_all_match"):
+            generated.get("require")!=expected_requirement):
             reject("C_TEST_SEMANTIC_DRIFT")
         _same_source_semantics(tests[tid],generated,obj,native_states[alias],
                                source_singleton_objectless=True)
