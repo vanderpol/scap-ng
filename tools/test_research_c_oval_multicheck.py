@@ -228,6 +228,29 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
         self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
 
 
+    def test_original_only_one_exists_all_match_in_distinct_object_multi_test(self):
+        original=two_test_distinct_source()
+        tid=next(iter(original["tests"]))
+        original["tests"][tid]["check_existence"]="only_one_exists"
+        before=deepcopy(original)
+        out=convert_distinct_selected_many(original)
+        self.assertEqual(original,before)
+        alias=next(a for a,t in out["source_test_crosswalk"].items() if t==tid)
+        self.assertEqual(out["authored_c"]["checks"][alias]["must"],{
+            "exactly_one_item":{"value_of":True}})
+        self.assertEqual(out["native_c_compiled_tests"][alias]["require"],
+                         "only_one_exists_and_matches")
+        self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
+
+    def test_original_only_one_exists_with_none_satisfy_fails_closed(self):
+        original=two_test_distinct_source()
+        test=next(iter(original["tests"].values()))
+        test["check_existence"]="only_one_exists"
+        test["check"]="none satisfy"
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                 "SOURCE_TEST_ONLY_ONE_MATCH_PAIR_NOT_REVIEWED"):
+            convert_distinct_selected_many(original)
+
     def test_long_original_linux_kernelmodule_title_preserves_all_technical_words(self):
         title="Ensure kernel module scsi_hostadapter is neither loaded nor loadable"
         alias=descriptive_distinct_alias(title,{"module_name":"scsi_hostadapter"},set())
