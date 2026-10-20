@@ -13,6 +13,8 @@ on:
       - 'tools/test_v04_canonical_source_ir.py'
       - 'tools/v04_canonical_version_preview.py'
       - 'tools/test_v04_canonical_version_preview.py'
+      - 'tools/v04_canonical_unsigned_package.py'
+      - 'tools/test_v04_canonical_unsigned_package.py'
       - 'tools/v04_canonical_requirement_oracle.py'
       - 'tools/test_v04_canonical_requirement_oracle.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
@@ -88,6 +90,17 @@ jobs:
             --yaml-archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
             --report work/canonical-benchmark-version-preview.json \
             --assert-six
+      - name: Build six deterministic unsigned 0.4.0 native-schema source packages
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_canonical_unsigned_package.py
+          python tools/v04_canonical_unsigned_package.py \
+            --json-archive work/scap-ng-0.4.0-six-stigs.json.zip \
+            --yaml-archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --out-dir work/v04-native-source-packages \
+            --report work/v04-native-source-package-report.json \
+            --assert-six
       - name: Prove source-exact canonical Test axes against pinned OVAL six-state results
         env:
           PYTHONPATH: tools
@@ -129,6 +142,8 @@ jobs:
             work/full-native-yaml-schema-audit.json
             work/canonical-typed-source-ir.json
             work/canonical-typed-source-ir-report.json
+            work/v04-native-source-packages/*.source-preview.zip
+            work/v04-native-source-package-report.json
             work/canonical-benchmark-version-preview.json
             work/canonical-requirement-oval-oracle.json
           if-no-files-found: error
