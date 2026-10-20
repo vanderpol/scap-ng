@@ -88,9 +88,18 @@ def audit(census, zip_dir, *, assert_six=False):
     result=[]
     for candidate in census["candidate_entries"]:
         parts=candidate["path"].split("/")
-        if len(parts)<3 or parts[0]!="authoring" or parts[1] not in sources:
+        if len(parts)<3 or parts[0]!="authoring":
             raise ValueError("unmapped candidate authoring source: "+candidate["path"])
-        result.append(inspect_candidate(candidate,sources[parts[1]]["objects"]))
+        if parts[1] == "shared":
+            # Shared Assessment identities can be reused by multiple distinct
+            # original STIG XMLs. A title match in more than one source is
+            # ambiguous until exact provenance resolves the copies.
+            collection = [node for source in sources.values() for node in source["objects"]]
+        elif parts[1] in sources:
+            collection = sources[parts[1]]["objects"]
+        else:
+            raise ValueError("unmapped candidate authoring source: "+candidate["path"])
+        result.append(inspect_candidate(candidate,collection))
     observed=Counter(x["status"] for x in result)
     bluetooth=[x for x in result if x["assessment"]=="condition.bluetooth-installation.assessment"]
     if assert_six and (len(result)!=36 or len(bluetooth)!=1
