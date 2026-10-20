@@ -1,0 +1,533 @@
+{
+  "assessment_title": "Evaluate to true if the oval-def:set construct is properly supported",
+  "class": "miscellaneous",
+  "evaluate": {
+    "all": [
+      {
+        "test": "test-test-that-set-construct-supported-complement-operation"
+      },
+      {
+        "test": "test-test-that-set-object-supported-set-operator-equal-intersection"
+      },
+      {
+        "test": "test-test-that-set-construct-supported-union-operation"
+      },
+      {
+        "test": "test-test-that-set-object-supported-filter-element"
+      },
+      {
+        "test": "test-test-that-set-object-supported-one-level-set-elements"
+      },
+      {
+        "test": "test-test-that-set-object-supported-two-levels-set-elements"
+      },
+      {
+        "test": "test-test-that-set-object-supported-three-levels-set-elements"
+      }
+    ]
+  },
+  "id": "roundtrip.oval-org-mitre-oval-test-def-276",
+  "mode": "automated",
+  "objects": {
+    "this-object-represents-file-object-path-equal-c-support-txt-object": {
+      "behaviors": {
+        "max_depth": "-1",
+        "recurse_direction": "down",
+        "recurse_file_system": "local"
+      },
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object with a path equal to 'C:\\support\\txt\\'.",
+      "select": {
+        "filename": {
+          "datatype": "string",
+          "nil": true,
+          "operation": "equals",
+          "value": ""
+        },
+        "path": {
+          "datatype": "string",
+          "operation": "equals",
+          "value": "/opt/support"
+        }
+      }
+    },
+    "this-object-represents-file-object-path-that-matches-regular-expression-object": {
+      "behaviors": {
+        "max_depth": "-1",
+        "recurse_direction": "none",
+        "recurse_file_system": "local"
+      },
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object with a path that matches the regular expression 'C:\\\\support\\\\txt.*'.",
+      "select": {
+        "filename": {
+          "datatype": "string",
+          "nil": true,
+          "operation": "equals",
+          "value": ""
+        },
+        "path": {
+          "datatype": "string",
+          "operation": "equals",
+          "value": "/opt/support/txt"
+        }
+      }
+    },
+    "this-object-represents-file-object-path-that-matches-regular-expression-object-2": {
+      "behaviors": {
+        "max_depth": "-1",
+        "recurse_direction": "down",
+        "recurse_file_system": "local"
+      },
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object with a path that matches the regular expression 'C:\\\\support\\\\txt.+'.",
+      "select": {
+        "filename": {
+          "datatype": "string",
+          "nil": true,
+          "operation": "equals",
+          "value": ""
+        },
+        "path": {
+          "datatype": "string",
+          "operation": "equals",
+          "value": "/opt/support/xml"
+        }
+      }
+    },
+    "this-object-represents-file-object-path-that-matches-regular-expression-object-3": {
+      "behaviors": {
+        "max_depth": "-1",
+        "recurse_direction": "none",
+        "recurse_file_system": "local"
+      },
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object with a path that matches the regular expression 'C:\\\\support\\\\txt.*'.",
+      "select": {
+        "filename": {
+          "datatype": "string",
+          "nil": true,
+          "operation": "equals",
+          "value": ""
+        },
+        "path": {
+          "datatype": "string",
+          "operation": "equals",
+          "value": "/opt/support/xml"
+        }
+      }
+    },
+    "this-object-represents-file-object-that-set-b-c-complement-object": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set ( {a,b,c} COMPLEMENT {b,c} ) which equals set {a}.",
+      "set": {
+        "members": [
+          {
+            "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+          },
+          {
+            "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-2"
+          }
+        ],
+        "operator": "complement"
+      }
+    },
+    "this-object-represents-file-object-that-set-b-c-complement-object-2": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set ( ( {a,b,c} COMPLEMENT {b,c} ) INTERSECTION ( {a} UNION {b,c} ) ) which equals set {a}.",
+      "set": {
+        "members": [
+          {
+            "set": {
+              "members": [
+                {
+                  "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+                },
+                {
+                  "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-2"
+                }
+              ],
+              "operator": "complement"
+            }
+          },
+          {
+            "set": {
+              "members": [
+                {
+                  "object": "this-object-represents-file-object-path-equal-c-support-txt-object"
+                },
+                {
+                  "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-2"
+                }
+              ],
+              "operator": "union"
+            }
+          }
+        ],
+        "operator": "intersection"
+      }
+    },
+    "this-object-represents-file-object-that-set-b-c-filtered-object": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set {a,b,c} filtered by b and c which equals set {a}.",
+      "set": {
+        "filters": [
+          {
+            "action": "exclude",
+            "state": "state-this-file-state-represents-a-file-object-with-a-path-tha-3"
+          }
+        ],
+        "members": [
+          {
+            "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+          }
+        ],
+        "operator": "union"
+      }
+    },
+    "this-object-represents-file-object-that-set-b-c-intersection-object": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set ( {a,b,c} INTERSECTION {b,c} ) which equals set {b,c}.",
+      "set": {
+        "members": [
+          {
+            "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+          },
+          {
+            "object": "this-object-represents-file-object-path-equal-c-support-txt-object"
+          }
+        ],
+        "operator": "intersection"
+      }
+    },
+    "this-object-represents-file-object-that-set-union-b-c-object": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set ( {a} UNION {b,c} ) which equals set {a,b,c}.",
+      "set": {
+        "members": [
+          {
+            "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+          },
+          {
+            "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-3"
+          }
+        ],
+        "operator": "union"
+      }
+    },
+    "this-object-represents-file-object-that-set-union-complement-b-object": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set ( ( ( {a} UNION {} ) COMPLEMENT ( {a,b,c} INTERSECTION {b,c} ) ) INTERSECTION ( ( {a,b,c} COMPLEMENT {b,c} ) UNION ( {a} UNION {a,b,c} ) ) ) which equals set {a}.",
+      "set": {
+        "members": [
+          {
+            "set": {
+              "members": [
+                {
+                  "set": {
+                    "members": [
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+                      }
+                    ],
+                    "operator": "union"
+                  }
+                },
+                {
+                  "set": {
+                    "members": [
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-3"
+                      },
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-2"
+                      }
+                    ],
+                    "operator": "intersection"
+                  }
+                }
+              ],
+              "operator": "complement"
+            }
+          },
+          {
+            "set": {
+              "members": [
+                {
+                  "set": {
+                    "members": [
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-3"
+                      },
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-2"
+                      }
+                    ],
+                    "operator": "complement"
+                  }
+                },
+                {
+                  "set": {
+                    "members": [
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+                      },
+                      {
+                        "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-3"
+                      }
+                    ],
+                    "operator": "union"
+                  }
+                }
+              ],
+              "operator": "union"
+            }
+          }
+        ],
+        "operator": "intersection"
+      }
+    },
+    "this-object-represents-file-object-that-set-union-complement-b-object-2": {
+      "capability": "unix.file",
+      "object_title": "This object represents a file_object that is the set ( ( ( {a} UNION {} ) COMPLEMENT ( ( {a,b,c} COMPLEMENT {b,c} ) UNION ( ( {a} UNION {a,b,c} ) filtered by {b,c} ) ) ) INTERSECTION {} ) which equals {}.",
+      "set": {
+        "members": [
+          {
+            "set": {
+              "members": [
+                {
+                  "set": {
+                    "members": [
+                      {
+                        "object": "this-object-represents-file-object-path-equal-c-support-txt-object"
+                      }
+                    ],
+                    "operator": "union"
+                  }
+                },
+                {
+                  "set": {
+                    "members": [
+                      {
+                        "set": {
+                          "members": [
+                            {
+                              "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+                            },
+                            {
+                              "object": "this-object-represents-file-object-path-that-matches-regular-expression-object-2"
+                            }
+                          ],
+                          "operator": "complement"
+                        }
+                      },
+                      {
+                        "set": {
+                          "filters": [
+                            {
+                              "action": "exclude",
+                              "state": "state-this-file-state-represents-a-file-object-with-a-path-tha-3"
+                            }
+                          ],
+                          "members": [
+                            {
+                              "object": "this-object-represents-file-object-path-equal-c-support-txt-object"
+                            },
+                            {
+                              "object": "this-object-represents-file-object-path-that-matches-regular-expression-object"
+                            }
+                          ],
+                          "operator": "union"
+                        }
+                      }
+                    ],
+                    "operator": "union"
+                  }
+                }
+              ],
+              "operator": "complement"
+            }
+          }
+        ],
+        "operator": "intersection"
+      }
+    }
+  },
+  "purpose": "assessment",
+  "specification": {
+    "id": "scap-ng.pre-alpha.assessment",
+    "version": "0.3.0"
+  },
+  "states": {
+    "state-this-file-state-represents-a-file-object-with-a-path-equ": {
+      "capability": "unix.file",
+      "state": {
+        "datatype": "string",
+        "entity_check": "all",
+        "entity_existence": "at_least_one_exists",
+        "field": "path",
+        "operation": "equals",
+        "value": "/opt/support/txt"
+      },
+      "state_title": "This file_state represents a file_object with a path equal to 'C:\\support\\txt'."
+    },
+    "state-this-file-state-represents-a-file-object-with-a-path-tha": {
+      "capability": "unix.file",
+      "state": {
+        "datatype": "string",
+        "entity_check": "all",
+        "entity_existence": "at_least_one_exists",
+        "field": "path",
+        "operation": "equals",
+        "value": {
+          "variable": "this-constant-variable-represents-string-values-c-support-txt-txtfile-variable"
+        },
+        "variable_check": "only one"
+      },
+      "state_title": "This file_state represents a file_object with a path that equals 'C:\\support\\txt', 'C:\\support\\txt\\txtfile', or 'C:\\support\\txt\\txtfile\\subtxtfile'."
+    },
+    "state-this-file-state-represents-a-file-object-with-a-path-tha-2": {
+      "capability": "unix.file",
+      "state": {
+        "datatype": "string",
+        "entity_check": "all",
+        "entity_existence": "at_least_one_exists",
+        "field": "path",
+        "operation": "equals",
+        "value": {
+          "variable": "this-constant-variable-represents-string-values-c-support-txt-c-variable"
+        },
+        "variable_check": "only one"
+      },
+      "state_title": "This file_state represents a file_object with a path that equals 'C:\\support\\txt', 'C:\\support\\txt\\txtfile', or 'C:\\support\\txt\\txtfile\\subtxtfile'."
+    },
+    "state-this-file-state-represents-a-file-object-with-a-path-tha-3": {
+      "capability": "unix.file",
+      "state": {
+        "datatype": "string",
+        "entity_check": "all",
+        "entity_existence": "at_least_one_exists",
+        "field": "path",
+        "operation": "equals",
+        "value": {
+          "variable": "this-constant-variable-represents-string-values-c-support-txt-txtfile-variable-2"
+        },
+        "variable_check": "only one"
+      },
+      "state_title": "This file_state represents a file_object with a path that equals 'C:\\support\\txt\\txtfile' or 'C:\\support\\txt\\txtfile\\subtxtfile'."
+    }
+  },
+  "tests": {
+    "test-test-that-set-construct-supported-complement-operation": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "only_one_exists",
+      "object": "this-object-represents-file-object-that-set-b-c-complement-object",
+      "reported_elements": "all",
+      "states": [
+        "state-this-file-state-represents-a-file-object-with-a-path-equ"
+      ],
+      "test_title": "Test that the set construct is supported with the COMPLEMENT operation."
+    },
+    "test-test-that-set-construct-supported-union-operation": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object": "this-object-represents-file-object-that-set-union-b-c-object",
+      "reported_elements": "all",
+      "states": [
+        "state-this-file-state-represents-a-file-object-with-a-path-tha"
+      ],
+      "test_title": "Test that the set construct is supported with the UNION operation."
+    },
+    "test-test-that-set-object-supported-filter-element": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "only_one_exists",
+      "object": "this-object-represents-file-object-that-set-b-c-filtered-object",
+      "reported_elements": "all",
+      "states": [
+        "state-this-file-state-represents-a-file-object-with-a-path-equ"
+      ],
+      "test_title": "Test that the set object is supported with the filter element."
+    },
+    "test-test-that-set-object-supported-one-level-set-elements": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object": "this-object-represents-file-object-that-set-b-c-complement-object-2",
+      "reported_elements": "all",
+      "states": [
+        "state-this-file-state-represents-a-file-object-with-a-path-tha-2"
+      ],
+      "test_title": "Test that the set object is supported with one level of set elements."
+    },
+    "test-test-that-set-object-supported-set-operator-equal-intersection": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "only_one_exists",
+      "object": "this-object-represents-file-object-that-set-b-c-intersection-object",
+      "reported_elements": "all",
+      "states": [
+        "state-this-file-state-represents-a-file-object-with-a-path-equ"
+      ],
+      "test_title": "Test that the set object is supported with the set_operator equal to 'INTERSECTION'."
+    },
+    "test-test-that-set-object-supported-three-levels-set-elements": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "none_exist",
+      "object": "this-object-represents-file-object-that-set-union-complement-b-object-2",
+      "reported_elements": "all",
+      "test_title": "Test that the set object is supported with three levels of set elements."
+    },
+    "test-test-that-set-object-supported-two-levels-set-elements": {
+      "capability": "unix.file",
+      "check": "all",
+      "check_existence": "at_least_one_exists",
+      "object": "this-object-represents-file-object-that-set-union-complement-b-object",
+      "reported_elements": "all",
+      "states": [
+        "state-this-file-state-represents-a-file-object-with-a-path-equ"
+      ],
+      "test_title": "Test that the set object is supported with two levels of set elements."
+    }
+  },
+  "variables": {
+    "this-constant-variable-represents-string-values-c-support-txt-c-variable": {
+      "datatype": "string",
+      "expression": {
+        "literal": [
+          "/opt/support/txt",
+          "/opt/support/txt/txtfile",
+          "/opt/support/txt/txtfile/subtxtfile"
+        ]
+      },
+      "kind": "constant",
+      "title": "This constant_variable represents the string values 'C:\\support\\txt\\', 'C:\\support\\txt\\txtfile', and 'C:\\support\\txt\\txtfile\\subtxtfile'."
+    },
+    "this-constant-variable-represents-string-values-c-support-txt-txtfile-variable": {
+      "datatype": "string",
+      "expression": {
+        "literal": [
+          "/opt/support/txt",
+          "/opt/support/xml"
+        ]
+      },
+      "kind": "constant",
+      "title": "This constant_variable represents the string values 'C:\\support\\txt\\txtfile' and 'C:\\support\\txt\\txtfile\\subtxtfile'."
+    },
+    "this-constant-variable-represents-string-values-c-support-txt-txtfile-variable-2": {
+      "datatype": "string",
+      "expression": {
+        "literal": [
+          "/opt/support/txt/txtfile",
+          "/opt/support/txt/txtfile/subtxtfile"
+        ]
+      },
+      "kind": "constant",
+      "title": "This constant_variable represents the string values 'C:\\support\\txt\\txtfile' and 'C:\\support\\txt\\txtfile\\subtxtfile'."
+    }
+  },
+  "version": 1
+}
