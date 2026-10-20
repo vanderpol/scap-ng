@@ -10,6 +10,8 @@ on:
       - 'tools/test_export_v04_shellcommand_pilot.py'
       - 'tools/export_v04_oval_registry_pilot.py'
       - 'tools/test_export_v04_registry_pilot.py'
+      - 'tools/audit_v04_original_oval_forward.py'
+      - 'tools/test_audit_v04_original_oval_forward.py'
       - 'tools/check_v04_oval_xml_mutation_regressions.py'
       - 'tools/combine_v04_oval_xml_proofs.py'
       - 'tools/test_combine_v04_oval_xml_proofs.py'
@@ -42,6 +44,7 @@ jobs:
           python tools/test_audit_v04_oval_xml_roundtrip.py -v
           python tools/test_export_v04_shellcommand_pilot.py -v
           python tools/test_export_v04_registry_pilot.py -v
+          python tools/test_audit_v04_original_oval_forward.py -v
           python tools/test_combine_v04_oval_xml_proofs.py -v
       - name: Obtain pinned original OVAL source XML and verified 0.4.0 authored output
         env:
@@ -186,6 +189,40 @@ jobs:
             --manifest work/compare/roundtrip-manifest.json \
             --expected-cases 4 \
             --report work/compare/semantic-roundtrip-result.json
+      - name: Independently compare original OVAL Test/Object/State to authored 0.4.0 fields
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('work/compare')
+          configs=[
+              ('source-proof.json','bluetooth-native-v04.json'),
+              ('camera-source-proof.json','camera-native-v04.json'),
+          ]
+          for proof,native in configs:
+              metadata=json.loads((root/proof).read_text())
+              print(proof,metadata['source_definition'])
+          PY
+          python tools/audit_v04_original_oval_forward.py \
+            --source-xml work/compare/source-oval.xml \
+            --native work/compare/bluetooth-native-v04.json \
+            --definition-id oval:navy.navwar.niwcatlantic.scc.windows:def:102 \
+            --report work/compare/bluetooth-original-forward.json
+          python tools/audit_v04_original_oval_forward.py \
+            --source-xml work/compare/source-oval.xml \
+            --native work/compare/camera-native-v04.json \
+            --definition-id oval:navy.navwar.niwcatlantic.scc.windows:def:201 \
+            --report work/compare/camera-original-forward.json
+          for rule in SV-253291 SV-253350; do
+            suffix="${rule#SV-}"
+            python tools/audit_v04_original_oval_forward.py \
+              --source-xml work/compare/source-oval.xml \
+              --native "work/compare/$rule-native-v04.json" \
+              --definition-id "oval:navy.navwar.niwcatlantic.scc.windows:def:$suffix" \
+              --report "work/compare/$rule-original-forward.json"
+          done
       - name: Validate independently exported OVAL against pinned 5.12.3 XSD
         run: |
           python tools/validate_v04_oval_5123.py \
