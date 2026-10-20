@@ -109,10 +109,11 @@ class OriginalOVALFilterMigrationTests(unittest.TestCase):
                 index_source_proof(e)
 
     def test_variable_shared_object_location_cannot_be_authorized(self):
-        r=report()["items"][0]
-        r["site"]=["assessment","variables","value-variable","expression","object","set"]
+        evidence=report()
+        evidence["items"][0]["site"]=[
+            "assessment","variables","value-variable","expression","object","set"]
         with self.assertRaisesRegex(ValueError,"Test-local"):
-            index_source_proof(report())
+            index_source_proof(evidence)
 
     def test_pinned_original_corpus_must_contain_all_50(self):
         with self.assertRaisesRegex(ValueError,"baseline changed"):
