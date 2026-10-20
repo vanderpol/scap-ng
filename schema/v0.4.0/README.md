@@ -1,8 +1,8 @@
 # SCAP-NG v0.4.0 — working schema draft
 
-**Owner-approved pre-alpha 0.4.0 authoring-sample schema**, not OVAL Board ratification or scanner conformance. Historical 0.3.0 schemas remain [archived](../../archive/0.3.0/README.md).
+**Current pre-alpha 0.4.0 authoring-sample schema**, not OVAL Board ratification or scanner conformance. Historical 0.3.0 schemas remain [archived](../../archive/0.3.0/README.md).
 
-**[Download current six-STIG 0.4.0 YAML and JSON authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020).** All 4,001 files passed strict version-local schema checks in both formats. The 2,958 Rule-choice links resolve and all six Benchmarks declare the exact reachable automated Assessment specification **0.4.0**, under the owner's approved version policy. The build preserves the earlier source, its hashes and 172 exceptional source-exact Tests.
+**[Download current six-STIG 0.4.0 YAML and JSON authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020).** All 4,001 files passed strict version-local schema checks in both formats. The 2,958 Rule-choice links resolve and all six Benchmarks declare the exact reachable automated Assessment specification **0.4.0**, under the documented 0.4.0 version policy. The build preserves the earlier source, its hashes and 172 exceptional source-exact Tests.
 
 The earlier 0.4-A research syntax and October 15 r3 source preview remain pinned **research inputs**, not current authoring dialects. The canonical Test `require` carries source-proven structured `items` and `all_items_must` when supported, without redundant inline Object `capability`. See [current Assessment examples](../../specification/examples/assessments.md), [canonical decision](../../research/assessment-simplification/compact-authoring-04/OWNER-0.4.0-CANONICAL-DECISION.md), and [validation gates](../../review/current/0.4.0-FINALIZATION-GATES.md).
 
