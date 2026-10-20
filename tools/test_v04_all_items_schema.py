@@ -46,3 +46,20 @@ scoped_bad=json.loads(json.dumps(scoped))
 scoped_bad["all_items_must"][0]["state_fields_require"]="invented_requirement"
 assert list(validator.iter_errors(scoped_bad)), "Invalid scoped field requirement accepted"
 print("PASS: State-free structured presence required/invalid cases")
+
+# Strict context: inherited field predicates require explicit group or Test
+# state_fields_require. No implicit fallback is valid.
+test_validator=Draft202012Validator({"$ref":"#/$defs/test","$defs":d["$defs"]},resolver=resolver)
+no_field_scope={
+  "require":{"items":"one_or_more","all_items_must":[
+    {"and":[{"type":{"equals":"dword"}},{"value":{"equals":0}}]}
+  ]}
+}
+test_level_scope=json.loads(json.dumps(no_field_scope))
+test_level_scope["state_fields_require"]="at_least_one_exists_and_all_match"
+assert list(test_validator.iter_errors(no_field_scope)), "Unscoped predicates cannot omit field require"
+assert not list(test_validator.iter_errors(test_level_scope)), "Explicit Test field requirement rejected"
+group_scope=json.loads(json.dumps(no_field_scope))
+group_scope["require"]["all_items_must"][0]["state_fields_require"]="at_least_one_exists_and_all_match"
+assert not list(test_validator.iter_errors(group_scope)), "Scoped Boolean group rejected"
+print("PASS: explicit Test/group State-field cardinality guards")
