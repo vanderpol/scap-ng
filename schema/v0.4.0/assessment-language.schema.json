@@ -9720,6 +9720,38 @@
             }
           },
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/state_entry"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/state_entry"
+              }
+            }
+          },
+          "additionalProperties": false
         }
       ]
     },
@@ -9736,6 +9768,9 @@
             },
             {
               "$ref": "#/$defs/presence_requirement"
+            },
+            {
+              "$ref": "#/$defs/all_items_requirement"
             }
           ]
         },
@@ -9780,7 +9815,14 @@
           "then": {
             "properties": {
               "require": {
-                "$ref": "#/$defs/presence_requirement"
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/presence_requirement"
+                  },
+                  {
+                    "$ref": "#/$defs/all_items_requirement"
+                  }
+                ]
               }
             }
           }
@@ -9838,6 +9880,25 @@
               "require": {
                 "$ref": "#/$defs/paired_requirement"
               }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "require": {
+                "$ref": "#/$defs/all_items_requirement"
+              }
+            },
+            "required": [
+              "require"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "states"
+              ]
             }
           }
         }
@@ -19950,6 +20011,33 @@
         }
       ],
       "description": "WMI/cmdlet native collector record field. One explicit comparator plus required selection_match; no existence/require hidden default."
+    },
+    "all_items_requirement": {
+      "type": "object",
+      "required": [
+        "items",
+        "all_items_must"
+      ],
+      "properties": {
+        "items": {
+          "type": "string",
+          "enum": [
+            "one_or_more",
+            "may_be_absent"
+          ],
+          "description": "Explicit selected Item population requirement; distinct from predicates."
+        },
+        "all_items_must": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/state_entry"
+          },
+          "description": "Every selected Item must satisfy the enclosed State conditions; field requirements remain independently explicit."
+        }
+      },
+      "additionalProperties": false,
+      "description": "0.4.0 authoring: explicit existence plus all collected Items satisfy Test-local States."
     }
   },
   "x-scap-ng-version": "0.4.0",
