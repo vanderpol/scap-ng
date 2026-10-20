@@ -222,7 +222,21 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         "additionalProperties":False,
     }
     if "object" in defs:
-        defs["object"]["properties"]["set"]={"$ref":"#/$defs/native_set_expression"}
+        obj = defs["object"]
+        obj["properties"]["set"]={"$ref":"#/$defs/native_set_expression"}
+        # 0.4.0: a filtered leaf Object is not a Set. Permit the same
+        # ordered, observed-Item include/exclude predicates already supported
+        # on Set operands, without inventing a one-operand Union.
+        obj["properties"]["filters"]={
+            "type":"array", "minItems":1,
+            "items":{"$ref":COMMON+"#/$defs/state_filter"},
+            "description":"Ordered observed-Item Filters applied after acquisition and before Test matching.",
+        }
+        # Applying a direct leaf Filter to a composite Set is a different
+        # evaluation position; force source-explicit Set operand placement.
+        obj.setdefault("allOf",[]).append({
+            "not":{"required":["set","filters"]}
+        })
 
     state_fields, records = _generated_state_fields(mapping,repo_root)
     entries = []
