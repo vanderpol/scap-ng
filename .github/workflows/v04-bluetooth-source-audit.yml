@@ -6,6 +6,8 @@ on:
       - 'tools/audit_v04_bluetooth_oval_source.py'
       - 'tools/test_audit_v04_bluetooth_oval_source.py'
       - 'tools/audit_v04_synthetic_filter_unions.py'
+      - 'tools/audit_v04_filtered_union_oval_provenance.py'
+      - 'tools/test_audit_v04_filtered_union_oval_provenance.py'
       - 'tools/test_audit_v04_synthetic_filter_unions.py'
       - '.github/workflows/v04-bluetooth-source-audit.yml'
   workflow_dispatch:
@@ -46,10 +48,20 @@ jobs:
           python tools/audit_v04_synthetic_filter_unions.py \
             --archive work/scap-ng-0.4.0-six-stigs.json.zip \
             --report work/v04-synthetic-filter-union-census.json --assert-six
+      - name: Classify every filtered-Union candidate against original six SCAP OVAL XML
+        run: |
+          PYTHONPATH=tools python tools/test_audit_v04_filtered_union_oval_provenance.py
+          mkdir -p work/oval-source
+          for name in             U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip             U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip             U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip             U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip             U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip             U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip
+          do
+            curl --fail --silent --show-error --location --retry 3               "https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/$name"               --output "work/oval-source/$name"
+          done
+          PYTHONPATH=tools python tools/audit_v04_filtered_union_oval_provenance.py             --census work/v04-synthetic-filter-union-census.json             --source-dir work/oval-source             --report work/v04-filter-union-original-oval-classification.json --assert-six
       - uses: actions/upload-artifact@v4
         with:
           name: bluetooth-original-oval-source-audit
           path: |
             work/bluetooth-source-oval-audit.json
             work/v04-synthetic-filter-union-census.json
+            work/v04-filter-union-original-oval-classification.json
           retention-days: 30
