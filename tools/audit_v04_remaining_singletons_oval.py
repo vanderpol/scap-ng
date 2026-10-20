@@ -171,6 +171,7 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         else:
             linked_status="TEST_REFERENCES_ORIGINAL_LEAF_NO_FILTER"
         graph=[]
+        for obj in matches:
             direct_filters=[node for node in obj if local(node)=="filter"]
             sets=[node for node in obj if local(node)=="set"]
             actions=[e.get("action","exclude") for e in direct_filters]
