@@ -156,15 +156,13 @@ def main():
         "singleton_set_occurrences":report["singleton_set_occurrences"],
         "classifications":report["classifications"],
         "by_parent_area":report["by_parent_area"],
-        "sample_unresolved":[{"path":r["path"],"test":r["test"],
-                             "classification":r["classification"],
-                             "matched_sources":[x["source_id"] for x in r["source_matches"]]}
-                            for r in records[:15]] if False else
-                             [{"path":r["path"],"test":r["test"],
-                               "classification":r["classification"],
-                               "matched_sources":[x["source_id"] for x in r["source_matches"]]}
-                              for r in report["items"] if r["classification"]!=
-                              "SOURCE_CONTAINS_SET"][:12],
+        "sample_needing_review": [
+            {"path":r["path"], "test":r["test"],
+             "classification":r["classification"],
+             "matched_sources":[x["source_id"] for x in r["source_matches"]]}
+            for r in report["items"] if r["classification"] not in (
+                "UNIQUE_SOURCE_DIRECT_FILTER_NO_SET", "SOURCE_CONTAINS_SET")
+        ][:12],
     },indent=2,sort_keys=True))
 
 
