@@ -48,7 +48,7 @@ jobs:
           b=json.loads(Path('work/yaml-manifest.json').read_text())
           assert a['documents']==b['documents']==4001
           assert a['counts']==b['counts']
-          assert a['changed_paths'].keys()==b['changed_paths'].keys()
+          assert {p.removesuffix('.json') for p in a['changed_paths']}=={p.removesuffix('.yaml') for p in b['changed_paths']}
           assert a['counts']['all_items_must']>0
           assert a['counts']['inline_capabilities_removed']>0
           print('PASS',a['counts'])
