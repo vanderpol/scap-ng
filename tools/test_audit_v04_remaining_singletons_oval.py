@@ -74,6 +74,24 @@ class RemainingSingletonTests(unittest.TestCase):
         r=audit(d,{"ms_windows_11":[xml("Registry keys")]},pins())
         self.assertEqual(r["classifications"],{"NO_SOURCE_TITLE":1})
 
+    def test_missing_object_title_can_be_traced_to_original_test_ref(self):
+        d=doc()
+        a=d[P]["assessment"]
+        test=a["tests"]["check-test"]
+        test["test_title"]="Original registry Test"
+        outer=test["object"]
+        outer.pop("object_title")
+        outer["set"]["operands"][0]["object"]["object_title"]=None
+        original_test=ET.fromstring(
+            '<registry_test id="oval:test:4" comment="Original registry Test">'
+            '<object object_ref="oval:obj:1"/></registry_test>')
+        source={"objects":[xml("Registry keys",True)],"tests":[original_test]}
+        result=audit(d,{"ms_windows_11":source},pins())
+        row=result["items"][0]
+        self.assertEqual(row["classification"],"NO_SOURCE_TITLE")
+        self.assertEqual(row["source_test_linkage"],"UNIQUE_OVAL_TEST_OBJECT_REF")
+        self.assertEqual(row["source_test_object_refs"],["oval:obj:1"])
+
     def test_mixed_test_and_variable_sites_preserve_provenance_path(self):
         d=doc()
         a=d[P]["assessment"]
