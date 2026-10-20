@@ -99,7 +99,8 @@ def recover(candidate,original):
     if restored!=original:
         raise ValueError("Original authoring source differs after exact reverse translation")
 
-def reconcile_benchmark_specifications(documents):
+def reconcile_benchmark_specifications(documents, *, expected_benchmarks=6,
+                                      expected_conflicts=1391):
     """Owner-approved 0.4 source migration; never edit pinned source input.
 
     Use *actual reachable automated Rule choices per Benchmark* rather than
@@ -110,8 +111,8 @@ def reconcile_benchmark_specifications(documents):
     from v04_a_benchmark_spec_migration_preview import build_preview
     report, staged = build_preview(documents)
     changes = report["benchmark_changes"]
-    if (len(changes) != 6 or report["candidate_incompatible_edges"] != 0
-            or report["source_incompatible_edges"] != 1391):
+    if (len(changes) != expected_benchmarks or report["candidate_incompatible_edges"] != 0
+            or report["source_incompatible_edges"] != expected_conflicts):
         raise ValueError("six-STIG Benchmark version-migration source baseline changed")
     for item in changes:
         before = item["existing_specs"]
@@ -174,16 +175,16 @@ def run(src,dest,manifest_path):
             else:
                 recover(new,source[name])
             rendered=(yaml.safe_dump(new,sort_keys=False,allow_unicode=True,width=110)
-                      if is_yaml else json.dumps(new,indent=2,ensure_ascii=False)+"\\n")
+                      if is_yaml else json.dumps(new,indent=2,ensure_ascii=False)+"\n")
             output.writestr(name,rendered)
         output.writestr("READ-ME-FIRST.txt",
-            "SCAP-NG 0.4.0 six-benchmark authoring candidate. Source-exact inversion verified.\\n"
-            "Six Benchmark 0.3 Assessment specification declarations were replaced by exact\\n"
-            "reachable 0.4 declarations with owner approval; original source is preserved\\n"
-            "in the immutable pinned Oct 15 r3 release and SHA-256 migration manifest.\\n"
-            "Object capability inherits from Test; common all-match predicates live inside require.\\n"
-            "Remaining explicit require strings are original uncommon semantics, not inferred defaults.\\n"
-            "Do not interpret this authoring ZIP as a signed scanner bundle or runtime parity result.\\n")
+            "SCAP-NG 0.4.0 six-benchmark authoring candidate. Source-exact inversion verified.\n"
+            "Six Benchmark 0.3 Assessment specification declarations were replaced by exact\n"
+            "reachable 0.4 declarations with owner approval; original source is preserved\n"
+            "in the immutable pinned Oct 15 r3 release and SHA-256 migration manifest.\n"
+            "Object capability inherits from Test; common all-match predicates live inside require.\n"
+            "Remaining explicit require strings are original uncommon semantics, not inferred defaults.\n"
+            "Do not interpret this authoring ZIP as a signed scanner bundle or runtime parity result.\n")
     if counts["all_items_must"]<1 or counts["inline_capabilities_removed"]<1:
         raise ValueError("Expected real migration did not happen")
     report={"source_sha256":hashlib.sha256(src.read_bytes()).hexdigest(),

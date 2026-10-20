@@ -169,11 +169,25 @@ def main():
     p.add_argument("--assert-six", action="store_true")
     args = p.parse_args()
     result = preview_pair(args.json_archive, args.yaml_archive)
-    if args.assert_six and (
-        result["source_document_count"], result["benchmarks_changed"],
-        result["conflicts_before"], result["conflicts_after"], result["rule_choice_links"]
-    ) != (4001, 6, 1391, 0, 2958):
-        raise ValueError("six-STIG version reconciliation baseline changed")
+    if args.assert_six:
+        if (
+            result["source_document_count"], result["benchmarks_changed"],
+            result["conflicts_before"], result["conflicts_after"], result["rule_choice_links"]
+        ) != (4001, 0, 0, 0, 2958):
+            raise ValueError("approved six-STIG version closure baseline changed")
+        # The reviewed 0.4 declaration was applied by source generation.
+        documents = read_authoring_archive(args.json_archive, "json")
+        specs = [doc["benchmark"]["assessment_specifications"]
+                 for doc in documents.values() if "benchmark" in doc]
+        if (len(specs) != 6 or any(
+            len(rows) != 1 or rows[0] != {
+                "id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"
+            } for rows in specs
+        )):
+            raise ValueError("Benchmark source carries unexpected Assessment specifications")
+        result["version_policy_approved"] = True
+        result["owner_decision"] = "2026-10-20 exact-reachable 0.4-only Benchmark declarations"
+        result["approved_declared_benchmarks"] = len(specs)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n",
                            encoding="utf-8")

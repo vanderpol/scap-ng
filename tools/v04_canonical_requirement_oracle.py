@@ -16,7 +16,7 @@ from itertools import product
 import json
 from pathlib import Path
 
-from build_v04_canonical_six_stigs import promote, PAIRS, PRESENCE
+from build_v04_canonical_six_stigs import promote, PAIRS, PRESENCE, reconcile_benchmark_specifications
 from v04_a_authoring_graph_index import read_authoring_archive
 from oval_result_truth_tables import evaluate_collected_object_test
 from research_english_first_04_six_state import (
@@ -99,12 +99,16 @@ def comparison_matrix(axis):
 def compare_original_to_canonical(original, canonical):
     if set(original) != set(canonical):
         raise ValueError("different original/canonical document path sets")
+    # The reviewed Benchmark 0.3 -> 0.4 declaration update is the only
+    # intentional source difference outside lossless Test/Object promotion.
+    promoted = {path: promote(doc)[0] for path, doc in original.items()}
+    if any("benchmark" in doc for doc in original.values()):
+        promoted, _ = reconcile_benchmark_specifications(promoted)
     counts = Counter()
     axes = set()
     by_capability = Counter()
     for path, doc in sorted(original.items()):
-        promoted, _ = promote(doc)
-        if promoted != canonical[path]:
+        if promoted[path] != canonical[path]:
             raise ValueError(f"{path}: canonical content differs from exact source promotion")
         old = doc.get("assessment")
         if not isinstance(old, dict) or old.get("mode") != "automated":

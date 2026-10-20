@@ -110,6 +110,9 @@ jobs:
           assert {p.removesuffix('.json') for p in a['changed_paths']}=={p.removesuffix('.yaml') for p in b['changed_paths']}
           assert a['counts']['all_items_must']>0
           assert a['counts']['inline_capabilities_removed']>0
+          assert a['benchmark_version_policy']==b['benchmark_version_policy']=='owner_approved_exact_reachable_0.4_only'
+          assert a['counts']['benchmark_version_declarations_updated']==b['counts']['benchmark_version_declarations_updated']==6
+          assert a['benchmark_version_changes']==b['benchmark_version_changes']
           print('PASS',a['counts'])
           PY
       - uses: actions/upload-artifact@v4
@@ -136,24 +139,32 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           cat > work/RELEASE-NOTES.md <<'EOF'
-          Complete SCAP-NG 0.4.0 source-backed six-STIG authoring review candidate.
+          Owner-approved SCAP-NG 0.4.0 six-STIG AUTHORING SAMPLE FILES (YAML + JSON).
           Includes Windows 11, Windows Server 2025, RHEL 9, Oracle Linux 9, DNS and Apache.
-          Retains all 4,001 authoring documents and references in both YAML and JSON.
+          Includes all 4,001 source-backed documents and complete Rule-choice closure.
+          The six Benchmarks declare only the exact reachable 0.4.0 automated
+          Assessment specification, as approved October 20, 2026.
+          Original 0.3 declarations and all 0.3 files remain archived at
+          v0.3.0-six-stig-typed-operators-5796d016b12f and Git history.
+          Version-change source/target hashes are recorded in both manifests.
           The common all-items-must requirements and inline Object capability inheritance
-          are source-exactly reversible to the pinned predecessor.
+          are reversible to pinned October 15 source; the six Benchmark version
+          declaration changes are separately recorded and reversible.
           Uncommon requirement combinations remain explicit source-preserving tokens.
           These are authoring content, not compiled/signed scanner bundles; no scanner
           runtime parity is established. Review source schema and compiler gates separately.
           EOF
-          if gh release view v0.4.0-board-authoring-20261020 >/dev/null 2>&1; then
+          if gh release view v0.4.0-six-stig-authoring-approved-20261020 >/dev/null 2>&1; then
             echo 'Existing immutable review release found; verification and workflow artifact are complete. No overwrite.'
             exit 0
           fi
-          gh release create v0.4.0-board-authoring-20261020 \
+          gh release create v0.4.0-six-stig-authoring-approved-20261020 \
             work/scap-ng-0.4.0-six-stigs.json.zip \
             work/scap-ng-0.4.0-six-stigs.yaml.zip \
             work/json-manifest.json work/yaml-manifest.json \
             work/input-native-report.json \
+            work/canonical-benchmark-version-preview.json \
+            work/canonical-requirement-oval-oracle.json \
             --prerelease --target "$GITHUB_SHA" \
-            --title 'SCAP-NG 0.4.0 · six-STIG Board authoring candidate' \
+            --title 'SCAP-NG 0.4.0 · approved six-STIG authoring samples' \
             --notes-file work/RELEASE-NOTES.md
