@@ -67,6 +67,12 @@ def main():
             else:
                 totals[kind+"_schema_fail"]+=1
                 if kind=="assessment":
+                    print("SCHEMA_FAIL",path,"assessment_id=",doc["assessment"].get("id"),"checks=",len(errors))
+                    for e in errors[:2]:
+                        print("  FAIL_PATH",list(e.absolute_path),"validator",e.validator)
+                        for child in e.context[:5]:
+                            print("    BRANCH",list(child.absolute_path),child.validator,str(child.message)[:160])
+                if kind=="assessment":
                     for tid,t in (doc["assessment"].get("tests") or {}).items():
                         if not isinstance(t,dict):continue
                         req=t.get("require")
