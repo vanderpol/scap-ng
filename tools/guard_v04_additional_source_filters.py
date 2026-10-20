@@ -16,10 +16,23 @@ import json
 from v04_a_authoring_graph_index import read_authoring_archive
 from migrate_v04_additional_source_filters import (
     index_source_proof, migrate, recover_migration, EXPECTED_DIRECT_TESTS,
+    canonical_path,
 )
 
 
 def compare(prior, current, proof):
+    # XML-pinned identity is logical authoring path, regardless of whether the
+    # final human source format is JSON or YAML.
+    def logical(documents):
+        names={}
+        for path,doc in documents.items():
+            ident=canonical_path(path)
+            if ident in names:
+                raise ValueError("Duplicate logical authoring path across source formats")
+            names[ident]=doc
+        return names
+    prior=logical(prior)
+    current=logical(current)
     if set(prior) != set(current):
         raise ValueError("Source and resulting authoring document paths differ")
     counts=Counter()
