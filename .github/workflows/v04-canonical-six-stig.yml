@@ -78,6 +78,10 @@ jobs:
           These are authoring content, not compiled/signed scanner bundles; no scanner
           runtime parity is established. Review source schema and compiler gates separately.
           EOF
+          if gh release view v0.4.0-board-authoring-20261020 >/dev/null 2>&1; then
+            echo 'Existing immutable review release found; verification and workflow artifact are complete. No overwrite.'
+            exit 0
+          fi
           gh release create v0.4.0-board-authoring-20261020 \
             work/scap-ng-0.4.0-six-stigs.json.zip \
             work/scap-ng-0.4.0-six-stigs.yaml.zip \
