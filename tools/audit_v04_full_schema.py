@@ -37,6 +37,8 @@ def main():
     group_examples=collections.defaultdict(list)
     nested_groups=collections.Counter()
     nested_examples=collections.defaultdict(list)
+    failure_features=collections.Counter()
+    failure_examples=collections.defaultdict(list)
     skipped=[]
     with zipfile.ZipFile(args.archive) as z:
         names=sorted(n for n in z.namelist() if n.startswith("authoring/") and n.endswith((".yaml",".json")))
@@ -64,6 +66,20 @@ def main():
                 totals[kind+"_schema_pass"]+=1
             else:
                 totals[kind+"_schema_fail"]+=1
+                if kind=="assessment":
+                    for tid,t in (doc["assessment"].get("tests") or {}).items():
+                        if not isinstance(t,dict):continue
+                        req=t.get("require")
+                        shape="all_items_must" if isinstance(req,dict) and "all_items_must" in req else "presence_only" if isinstance(req,dict) else "string" if isinstance(req,str) else "other"
+                        features=["capability:"+str(t.get("capability","missing")),"require_form:"+shape]
+                        if t.get("states"):features.append("has_legacy_states")
+                        if t.get("states_match"):features.append("has_legacy_states_match")
+                        if t.get("state_fields_require"):features.append("has_top_level_field_require")
+                        for item in features:
+                            failure_features[item]+=1
+                            if len(failure_examples[item])<4:
+                                failure_examples[item].append({"path":path,"test":tid})
+
                 for error in sorted(errors,key=lambda e:(len(e.path),str(e.path)))[:5]:
                     # anyOf/oneOf wrappers hide the real rejected field path.
                     # Preserve leaf contexts separately without claiming each
@@ -93,6 +109,8 @@ def main():
             "group_examples":dict(group_examples),
             "nested_leaf_counts":dict(nested_groups.most_common()),
             "nested_leaf_examples":dict(nested_examples),
+            "failure_test_features":dict(failure_features.most_common()),
+            "failure_feature_examples":dict(failure_examples),
             "schema_release_conformant":False,
             "warning":"This audit does not prove native semantic checks, compiler support or scanner equivalence."}
     args.out.parent.mkdir(parents=True,exist_ok=True)
@@ -101,6 +119,7 @@ def main():
         "schema_passes":{k:v for k,v in totals.items() if k.endswith("_schema_pass")},
         "schema_failures":{k:v for k,v in totals.items() if k.endswith("_schema_fail")},
         "error_classes":len(examples),"top_failure_groups":grouped.most_common(12),
-        "top_nested_leaves":nested_groups.most_common(12)},indent=2))
+        "top_nested_leaves":nested_groups.most_common(12),
+        "failure_test_features":failure_features.most_common(12)},indent=2))
     assert len(names)==4001 if not args.limit else len(names)<=args.limit
 if __name__=="__main__":main()
