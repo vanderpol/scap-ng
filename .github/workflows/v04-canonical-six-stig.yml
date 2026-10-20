@@ -11,6 +11,8 @@ on:
       - 'tools/test_v04_canonical_authoring_guard.py'
       - 'tools/v04_canonical_source_ir.py'
       - 'tools/test_v04_canonical_source_ir.py'
+      - 'tools/v04_canonical_version_preview.py'
+      - 'tools/test_v04_canonical_version_preview.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
       - 'schema/v0.4.0/assessment.schema.json'
       - 'schema/v0.4.0/capability-common.schema.json'
@@ -74,6 +76,16 @@ jobs:
             --out-ir work/canonical-typed-source-ir.json \
             --report work/canonical-typed-source-ir-report.json \
             --assert-six
+      - name: Independently verify source-exact six-Benchmark version reconciliation preview
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_canonical_version_preview.py
+          python tools/v04_canonical_version_preview.py \
+            --json-archive work/scap-ng-0.4.0-six-stigs.json.zip \
+            --yaml-archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --report work/canonical-benchmark-version-preview.json \
+            --assert-six
       - name: Confirm equivalent YAML/JSON sources and exact scope
         run: |
           python - <<'PY'
@@ -102,6 +114,7 @@ jobs:
             work/full-native-yaml-schema-audit.json
             work/canonical-typed-source-ir.json
             work/canonical-typed-source-ir-report.json
+            work/canonical-benchmark-version-preview.json
           if-no-files-found: error
       - name: Publish durable six-STIG authoring candidate
         if: github.ref == 'refs/heads/main'
