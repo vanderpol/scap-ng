@@ -277,15 +277,94 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
         with self.assertRaisesRegex(NotNativeCConvertible,"EXTRA_SOURCE"):
             convert_distinct_selected_many(doc)
 
-    def test_boolean_tree_or_missing_check_never_rewritten_as_and(self):
+    def test_source_or_is_not_rewritten_as_and_or_dropped(self):
         doc=two_test_distinct_source()
         doc["evaluate"]={"any":deepcopy(doc["evaluate"]["all"])}
-        with self.assertRaisesRegex(NotNativeCConvertible,"EXPLICIT_AND"):
-            convert_distinct_selected_many(doc)
+        out=convert_distinct_selected_many(doc)
+        self.assertEqual(out["authored_c"]["require"],{"one_of":[
+            {"check":out["source_test_crosswalk"] and next(
+                alias for alias,tid in out["source_test_crosswalk"].items()
+                if tid==source_tid)}
+            for source_tid in [x["test"] for x in doc["evaluate"]["any"]]]})
         doc=two_test_distinct_source()
         doc["evaluate"]["all"].pop()
         with self.assertRaisesRegex(NotNativeCConvertible,"TEST_COVERAGE_DRIFT"):
             convert_distinct_selected_many(doc)
+
+
+class OriginalSourceBooleanExpressionRegression(unittest.TestCase):
+    """No boolean flattening; compare every supplied six-state combination.
+
+    These checks operate on supplied Test results, NOT live OVAL collections.
+    """
+
+    def test_original_nested_or_and_preserved_across_all_six_state_inputs(self):
+        from itertools import product
+        from research_c_unified_compiler import (
+            compile_c_unified, evaluate_c_unified_supplied_results)
+        from v04_a_truth_plan import (
+            SIX, compile_expression, execute_supplied_results)
+        doc=source()
+        ids=list(doc["tests"])
+        third="test-ensure-apparmor-audit-count"
+        state_id="state-apparmor-audit-count"
+        doc["states"][state_id]=deepcopy(doc["states"]["state-load-count"])
+        doc["states"][state_id]["state"]["value"]=2
+        doc["tests"][third]=deepcopy(doc["tests"][ids[0]])
+        doc["tests"][third]["test_title"]="Ensure AppArmor reports audit count"
+        doc["tests"][third]["states"]=[state_id]
+        doc["evaluate"]={"any":[{"test":ids[0]},
+            {"all":[{"test":ids[1]},{"test":third}]}]}
+        before=deepcopy(doc)
+        result=convert_objectless_many(doc)
+        self.assertEqual(doc,before)
+        source_to_alias={tid:alias for alias,tid in
+                         result["source_test_crosswalk"].items()}
+        expected={"one_of":[{"check":source_to_alias[ids[0]]},
+            {"every":[{"check":source_to_alias[ids[1]]},
+                      {"check":source_to_alias[third]}]}]}
+        self.assertEqual(result["authored_c"]["require"],expected)
+        compiled=compile_c_unified(result["authored_c"])
+        original_plan=compile_expression(doc)
+        for values in product(sorted(SIX),repeat=3):
+            source_results=dict(zip([*ids,third],values))
+            c_results={alias:source_results[tid]
+                       for alias,tid in result["source_test_crosswalk"].items()}
+            expected_result=execute_supplied_results(
+                original_plan,source_results)["outcome"]
+            actual=evaluate_c_unified_supplied_results(
+                compiled,checks=c_results)["outcome"]
+            self.assertEqual(actual,expected_result,
+                f"nested OR/AND changed semantics at {source_results}")
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
+
+    def test_shared_selected_or_retains_collection_and_source_order(self):
+        doc=two_test_selected_source()
+        doc["evaluate"]={"any":deepcopy(doc["evaluate"]["all"])}
+        before=deepcopy(doc)
+        result=convert_selected_shared_many(doc)
+        self.assertEqual(doc,before)
+        self.assertEqual(len(result["authored_c"]["require"]["one_of"]),2)
+        self.assertEqual(len(result["authored_c"]["observations"]),1)
+        self.assertEqual(set(result["source_test_crosswalk"].values()),
+                         set(doc["tests"]))
+
+    def test_unsupported_negation_unknown_test_and_duplicate_fail_closed(self):
+        doc=source()
+        original=deepcopy(doc["evaluate"])
+        doc["evaluate"]={"not":original}
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "UNSUPPORTED_OPERATOR"):
+            convert_objectless_many(doc)
+        doc["evaluate"]={"all":[{"test":"missing-original-test"},
+                                 original["all"][1]]}
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "UNKNOWN_TEST"):
+            convert_objectless_many(doc)
+        doc["evaluate"]={"any":[original["all"][0],original["all"][0]]}
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "DUPLICATE_OR_MISSING"):
+            convert_objectless_many(doc)
 
 if __name__=="__main__":
     unittest.main()
