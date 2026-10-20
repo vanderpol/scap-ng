@@ -2,7 +2,7 @@
 
 **Status:** retained implementation guidance, not SCAP-NG authoring schema.
 **Source:** [OVAL 5.12.3 Windows system characteristics XSD, `ntuser_item`](https://github.com/OVAL-Community/OVAL/blob/v5.12.3/oval-schemas/windows-system-characteristics-schema.xsd).
-**Pinned source:** `OVAL-Community/OVAL` tag `v5.12.3`, Git blob SHA `(verify on import)`.
+**Pinned source:** `OVAL-Community/OVAL` tag `v5.12.3`, Git blob SHA `8fc2fd4dbfc52f0b00666f7637a5e9fac34c5d4d`.
 **Preservation policy:** keep this guide and pinned upstream link with the capability. Do not delete it during schema generation, and do not replace the upstream documentation with a paraphrase when resolving implementation ambiguity.
 
 ## OVAL implementation notes to retain
