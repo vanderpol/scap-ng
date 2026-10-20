@@ -4,6 +4,23 @@ This file summarizes material SCAP-NG changes by release. Each entry links to
 the GitHub issue that explains the work. Research-only, deferred, and rejected
 proposals are not listed as delivered features.
 
+## 0.4.0 — Unreleased
+
+### Converter and authoring safeguards
+
+- Added source-verified Object-local Filters for the 28 unambiguous
+  single-operand synthetic Set cases in the six-STIG authoring corpus,
+  retaining eight provenance-ambiguous cases unchanged. Conversion requires
+  pinned original OVAL source classification, exact reconstruction of the
+  prior authored graph, and matching ordered Filter predicates. This is not
+  a scanner-execution or six-state conformance claim.
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+- Added version-local Filter validation and canonical YAML/JSON generation
+  regression checks to reject disappearing/altered Filters and newly
+  introduced synthetic one-operand Sets. Earlier published authoring archives
+  remain immutable.
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 ## 0.3.0 — Unreleased
 
 ### Governance and review process
