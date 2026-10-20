@@ -248,14 +248,14 @@ def census(review_dir, manifest, *, examples_dir=None):
             # Authoring is purpose-oriented; source IDs and complete A graph
             # reside in the mandatory provenance file, never in the editable
             # expected-value declarations.
-            note=("# 0.4-C research only; NOT a full native C Assessment or scanner result.\\n"
-                  +"# Original OVAL: "+key[0]+"\\n"
-                  +"# Definition: "+key[1]+"\\n")
+            note=("# 0.4-C research only; NOT a full native C Assessment or scanner result.\n"
+                  +"# Original OVAL: "+key[0]+"\n"
+                  +"# Definition: "+key[1]+"\n")
             (examples_dir/author_file).write_text(
                 note+yaml.safe_dump(author,sort_keys=False,allow_unicode=True),
                 encoding="utf-8")
             (examples_dir/sidecar_file).write_text(
-                json.dumps(sidecar,sort_keys=True,indent=2)+"\\n",encoding="utf-8")
+                json.dumps(sidecar,sort_keys=True,indent=2)+"\n",encoding="utf-8")
             # Actually reload the emitted files, not just in-memory copies.
             loaded_author=yaml.safe_load((examples_dir/author_file).read_text(
                 encoding="utf-8"))
@@ -271,7 +271,7 @@ def census(review_dir, manifest, *, examples_dir=None):
             json.dumps({"stage":STAGE,"source_definitions":proof_rows,
                         "scanner_parity_proven":False,
                         "full_native_C_compilation_proven":False},
-                       sort_keys=True,indent=2)+"\\n",encoding="utf-8")
+                       sort_keys=True,indent=2)+"\n",encoding="utf-8")
     return {
         "variable_blocked_definitions": len(target),
         "hybrid_source_graph_proven_definitions": len(proof_rows),
