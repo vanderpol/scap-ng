@@ -27,11 +27,15 @@ def check(archive):
                     elif not t.get("capability"):hit("inline_capability_missing_test_source")
                 req=t.get("require")
                 if isinstance(req,dict):
-                    if set(req)!={"items","all_items_must"}:hit("unrecognized_structured_requirement")
-                    if not isinstance(req.get("all_items_must"),list):hit("invalid_all_items_must_shape")
-                    else:
-                        hit("native_all_items_must_tests")
-                        if t.get("states") is not None:hit("both_states_and_all_items_must")
+                    if set(req)=={"items"}:
+                        hit("native_presence_only_tests")
+                        if "states" in t or "states_match" in t:hit("presence_only_with_legacy_states")
+                    elif set(req)=={"items","all_items_must"}:
+                        if not isinstance(req.get("all_items_must"),list):hit("invalid_all_items_must_shape")
+                        else:
+                            hit("native_all_items_must_tests")
+                            if t.get("states") is not None:hit("both_states_and_all_items_must")
+                    else:hit("unrecognized_structured_requirement")
                 elif isinstance(req,str):
                     hit("legacy_string_require_tests")
                     hit("legacy_"+req)
@@ -54,7 +58,8 @@ if __name__=="__main__":
     # must not be mistaken for full canonical-schema conformance.
     actual=r["counts"]
     assert actual.get("native_all_items_must_tests")==816, "Source population or conversion changed"
-    assert actual.get("legacy_string_require_tests")==559, "Remaining legacy requirement population changed; review migration"
+    assert actual.get("native_presence_only_tests")==388, "Source-derived presence-only migration changed"
+    assert actual.get("legacy_string_require_tests")==171, "Remaining legacy requirement population changed; review migration"
     assert actual.get("legacy_states")==172, "Unconverted State population changed; review migration"
     assert actual.get("legacy_top_level_field_require")==108, "Unconverted field-level requirement count changed"
     assert actual.get("legacy_states_match")==128, "Unconverted State aggregate population changed"
