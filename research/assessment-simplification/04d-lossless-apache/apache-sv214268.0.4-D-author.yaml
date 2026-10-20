@@ -1,0 +1,337 @@
+# 0.4-D lossless Apache authoring prototype; research only.
+# Source-equivalent reconstruction of all 5 Tests and 19 Variables.
+stage: D_RESEARCH_APACHE_NATIVE_STATE_GROUPS_LOSSLESS
+assessment:
+  id: SV-214268.automated
+  title: Cookies exchanged between the Apache web server and the client, such as session
+    cookies, must have cookie properties set to prohibit client-side scripts from
+    reading the cookie data.
+observations:
+  gather-unique-apache-http-installation-paths-object:
+    from:
+      independent.shellcommand:
+        collect:
+          command: ps -e -o command --no-headers | grep -e httpd -e apache2 | sort
+            | uniq
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: ^\/\S+(\/httpd|\/apache2)\s*
+          shell: bash
+    description: Gather unique apache http installation paths
+derived_values:
+- name: all_included_conf_files_from_include_refernces_in_httd_conf
+  description: All included conf files from Include refernces in httd.conf
+  derive:
+    combine:
+    - use: filepath_to_httpd_root
+    - constant:
+        datatype: string
+        value: /
+    - extract:
+        pattern: \S+\s+(\S+)\s*
+        value:
+          read_field:
+            field: stdout_line
+            observation:
+              from:
+                independent.shellcommand:
+                  collect:
+                    command:
+                      use: shell_command_to_check_for_all_include_and_include_optional_file
+                    error_if_exit_status_not_0: false
+                    error_if_stderr_exists: false
+                    pattern: \S+
+                    shell: bash
+              description: Gather Include statements from httpd.conf
+- name: all_loaded_configuration_filepaths
+  description: All loaded configuration filepaths
+  derive:
+    distinct:
+      extract:
+        pattern: \(.*\) (/.*)
+        value:
+          read_field:
+            field: stdout_line
+            observation:
+              from:
+                independent.shellcommand:
+                  collect:
+                    command:
+                      use: command_to_gather_httpd_apache2_list_of_all_loaded_configuration
+                    error_if_exit_status_not_0: false
+                    error_if_stderr_exists: false
+                    pattern: ' \('
+                    shell: bash
+              description: Gather all loaded config files
+- name: apache_base_install_directories_unix
+  description: Apache base install directories (unix)
+  derive:
+    extract:
+      pattern: (^\/.+\/)httpd|(^\/.+/)apache2
+      value:
+        read_field:
+          field: stdout_line
+          observation: gather-unique-apache-http-installation-paths-object
+- name: apache_path_to_httpd_or_apache2
+  description: Apache path to httpd or apache2
+  derive:
+    extract:
+      pattern: '(^\/.+\/httpd|^\/.+\/apache2) '
+      value:
+        read_field:
+          field: stdout_line
+          observation: gather-unique-apache-http-installation-paths-object
+- name: command_to_gather_httpd_apache2_list_of_all_loaded_configuration
+  description: command to gather httpd/apache2 list of all loaded configuration files
+  derive:
+    combine:
+    - use: apache_path_to_httpd_or_apache2
+    - constant:
+        datatype: string
+        value: ' -t -D DUMP_INCLUDES'
+- name: command_to_gather_httpd_apache2_modules
+  description: command to gather httpd/apache2 modules
+  derive:
+    combine:
+    - use: apache_path_to_httpd_or_apache2
+    - constant:
+        datatype: string
+        value: ' -M'
+- name: filepath_to_http_conf_file
+  description: Filepath to http conf file
+  derive:
+    combine:
+    - use: filepath_to_httpd_root
+    - constant:
+        datatype: string
+        value: /
+    - use: relative_to_server_config_file
+- name: filepath_to_httpd_root
+  description: Filepath to HTTPD_ROOT
+  derive:
+    extract:
+      pattern: ' -D HTTPD_ROOT="(.+)"'
+      value:
+        read_field:
+          field: stdout_line
+          observation:
+            from:
+              independent.shellcommand:
+                collect:
+                  command:
+                    use: httpd_root_to_apachectl_v
+                  error_if_exit_status_not_0: false
+                  error_if_stderr_exists: false
+                  pattern: HTTPD_ROOT
+                  shell: bash
+            description: Gather HTTPD_ROOT files via apachectl
+- name: httpd_conf_and_merged_included_conf_files_from_include_refernces
+  description: httpd.conf and merged included conf files from Include refernces in
+    httd.conf
+  derive:
+    combine:
+    - use: filepath_to_http_conf_file
+    - constant:
+        datatype: string
+        value: ' '
+    - use: merged_included_conf_files_from_include_refernces_in_httd_conf
+- name: httpd_root_to_apachectl_v
+  description: httpd_root to apachectl -V
+  derive:
+    combine:
+    - use: apache_base_install_directories_unix
+    - constant:
+        datatype: string
+        value: apachectl -V | grep -i 'httpd_root'
+- name: merged_included_conf_files_from_include_refernces_in_httd_conf
+  description: merged included conf files from Include refernces in httd.conf
+  derive:
+    merge_values:
+      delimiter: ' '
+      order: ascending
+      sort: document
+      values:
+        use: all_included_conf_files_from_include_refernces_in_httd_conf
+- name: merged_list_of_all_loaded_config_files
+  description: Merged list of all loaded config files
+  derive:
+    merge_values:
+      delimiter: ' '
+      order: ascending
+      sort: document
+      values:
+        use: all_loaded_configuration_filepaths
+- name: relative_to_server_config_file
+  description: relative to SERVER_CONFIG_FILE
+  derive:
+    extract:
+      pattern: ' -D SERVER_CONFIG_FILE="(.+)"'
+      value:
+        read_field:
+          field: stdout_line
+          observation:
+            from:
+              independent.shellcommand:
+                collect:
+                  command:
+                    use: server_config_file_to_apachectl_v
+                  error_if_exit_status_not_0: false
+                  error_if_stderr_exists: false
+                  pattern: SERVER_CONFIG_FILE
+                  shell: bash
+            description: Gather SERVER_CONFIG_FILE files via apachectl
+- name: server_config_file_to_apachectl_v
+  description: server_config_file to apachectl -V
+  derive:
+    combine:
+    - use: apache_base_install_directories_unix
+    - constant:
+        datatype: string
+        value: apachectl -V | grep -i 'server_config_file'
+- name: shell_command_to_check_for_all_include_and_include_optional_file
+  description: shell command to check for all Include and Include Optional files
+  derive:
+    combine:
+    - constant:
+        datatype: string
+        value: 'grep -iEHn ''^\s*Include\s+|^\s*IncludeOptional\s+'' '
+    - use: filepath_to_http_conf_file
+- name: shell_command_to_check_session_in_all_loaded_conf_files
+  description: shell command to check Session in all loaded conf files
+  derive:
+    combine:
+    - constant:
+        datatype: string
+        value: 'grep -iHn ''^\s*Session '' '
+    - use: merged_list_of_all_loaded_config_files
+- name: shell_command_to_check_session_in_httpd_conf_and_all_include_con
+  description: shell command to check Session in httpd.conf and all Include conf files
+  derive:
+    combine:
+    - constant:
+        datatype: string
+        value: 'grep -iHn ''^\s*Session '' '
+    - use: httpd_conf_and_merged_included_conf_files_from_include_refernces
+- name: shell_command_to_check_sessioncookiename_in_all_loaded_conf_file
+  description: shell command to check SessionCookieName in all loaded conf files
+  derive:
+    combine:
+    - constant:
+        datatype: string
+        value: 'grep -iHn ''^\s*SessionCookieName'' '
+    - use: merged_list_of_all_loaded_config_files
+- name: shell_command_to_check_sessioncookiename_in_httpd_conf_and_all_i
+  description: shell command to check SessionCookieName in httpd.conf and all Include
+    conf files
+  derive:
+    combine:
+    - constant:
+        datatype: string
+        value: 'grep -iHn ''^\s*SessionCookieName'' '
+    - use: httpd_conf_and_merged_included_conf_files_from_include_refernces
+checks:
+  apache-session-cookie-module-enabled:
+    description: Apache session_cookie_module must be enabled
+    from:
+      independent.shellcommand:
+        description: Gather all installed modules and filter on session_cookie_module
+        collect:
+          command:
+            use: command_to_gather_httpd_apache2_modules
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: session_cookie_module
+          shell: bash
+    require: at_least_one_exists_and_all_match
+    states:
+    - stdout_line:
+        require: at_least_one_exists_and_some_match
+        matches_regex: session_cookie_module
+  if-session-directive-exists-in-other-loaded-configuration-files-verify:
+    description: If the Session directive exists in other loaded configuration files,
+      verify is is configured to On
+    from:
+      independent.shellcommand:
+        description: Gather all Session data from all loaded conf files
+        collect:
+          command:
+            use: shell_command_to_check_session_in_all_loaded_conf_files
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: .+
+          shell: bash
+    require: at_least_one_exists_and_all_match
+    states:
+    - stdout_line:
+        require: may_be_absent_and_all_match
+        matches_regex: (?i)Session On
+  if-sessioncookiename-directive-exists-in-other-loaded-configuration-files-verify:
+    description: If the SessionCookieName directive exists in other loaded configuration
+      files, verify it is configured with HttpOnly
+    from:
+      independent.shellcommand:
+        description: Gather all SessionCookieName data from all loaded conf files
+        collect:
+          command:
+            use: shell_command_to_check_sessioncookiename_in_all_loaded_conf_file
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: SessionCookieName .+
+          shell: bash
+    require: at_least_one_exists_and_all_match
+    states:
+    - stdout_line:
+        require: may_be_absent_and_all_match
+        matches_regex: (?i)HttpOnly
+    - stdout_line:
+        require: may_be_absent_and_all_match
+        matches_regex: (?i)Secure
+    states_match: all
+  verify-session-directive-exists-configured-on-all-httpd-conf-apache2:
+    description: Verify the Session directive exists and is configured to On for all
+      httpd.conf/apache2.conf or included conf files
+    from:
+      independent.shellcommand:
+        description: Gather all Session data from httpd and all Include conf files
+        collect:
+          command:
+            use: shell_command_to_check_session_in_httpd_conf_and_all_include_con
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: .+
+          shell: bash
+    require: at_least_one_exists_and_all_match
+    states:
+    - stdout_line:
+        require: at_least_one_exists_and_all_match
+        matches_regex: (?i)Session On
+  verify-that-sessioncookiename-directive-exists-configured-httponly-secure-in-httpd:
+    description: Verify that SessionCookieName directive exists and is configured
+      with HttpOnly and Secure in httpd.conf/apache2.conf or included conf files
+    from:
+      independent.shellcommand:
+        description: Gather all SessionCookieName data from httpd and all Include
+          conf files
+        collect:
+          command:
+            use: shell_command_to_check_sessioncookiename_in_httpd_conf_and_all_i
+          error_if_exit_status_not_0: false
+          error_if_stderr_exists: false
+          pattern: SessionCookieName .+
+          shell: bash
+    require: at_least_one_exists_and_all_match
+    states:
+    - stdout_line:
+        require: at_least_one_exists_and_all_match
+        matches_regex: (?i)HttpOnly
+    - stdout_line:
+        require: at_least_one_exists_and_all_match
+        matches_regex: (?i)Secure
+    states_match: all
+require:
+  and:
+  - check: verify-session-directive-exists-configured-on-all-httpd-conf-apache2
+  - check: if-session-directive-exists-in-other-loaded-configuration-files-verify
+  - check: verify-that-sessioncookiename-directive-exists-configured-httponly-secure-in-httpd
+  - check: if-sessioncookiename-directive-exists-in-other-loaded-configuration-files-verify
+  - check: apache-session-cookie-module-enabled
