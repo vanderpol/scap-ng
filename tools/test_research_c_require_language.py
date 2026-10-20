@@ -57,6 +57,48 @@ class CandidateCGrammar(unittest.TestCase):
         self.assertEqual(result["object"]["select"]["key"]["equals"],
             r"SYSTEM\CurrentControlSet\Control\SecurityProviders\Wdigest")
 
+    def test_original_registry_casefold_enum_and_default_empty_name(self):
+        c=deepcopy(WIN)
+        c["from"]["windows.registry"]["hive"]={
+            "case_insensitive_equals":"local_machine"}
+        native=compiled(c)
+        self.assertEqual(native["object"]["select"]["hive"],
+                         {"case_insensitive_equals":"local_machine"})
+
+        # The original OVAL Registry Test checks an empty value NAME
+        # (the default entry), not a missing field or a Registry value.
+        c=deepcopy(WIN)
+        c["from"]["windows.registry"]["name"]=""
+        c["must"]={"one_matching_item":{"name":""}}
+        native=compiled(c)
+        self.assertEqual(native["object"]["select"]["name"],{"equals":""})
+        self.assertEqual(native["states"],[
+            {"name":{"require":"at_least_one_exists_and_all_match",
+                     "equals":""}}])
+        self.assertEqual(native["require"],
+                         "at_least_one_exists_and_only_one_matches")
+
+        c=deepcopy(WIN)
+        c["must"]={"every_item":{"value":""}}
+        with self.assertRaisesRegex(ValueError,"typed literal required"):
+            compiled(c)
+
+        c=deepcopy(WIN)
+        c["from"]["windows.registry"]["hive"]={
+            "case_insensitive_equals":"HKEY_LOCAL_MACHINE"}
+        with self.assertRaisesRegex(ValueError,"native enum"):
+            compiled(c)
+
+        c=deepcopy(WIN)
+        c["from"]["windows.registry"]["hive"]={"matches_regex":".*"}
+        with self.assertRaisesRegex(ValueError,"enum operation unsupported"):
+            compiled(c)
+
+        c=deepcopy(WIN)
+        c["must"]={"every_item":{"value":{"case_insensitive_equals":1}}}
+        with self.assertRaisesRegex(ValueError,"string literal"):
+            compiled(c)
+
     def test_plain_must_some_not_all_with_independent_oval_check(self):
         c=deepcopy(WIN)
         c["must"]={"type":"dword","value":0}
