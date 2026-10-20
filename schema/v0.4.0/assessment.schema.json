@@ -127,6 +127,9 @@
                   },
                   {
                     "$ref": "assessment-language.schema.json#/$defs/presence_requirement"
+                  },
+                  {
+                    "$ref": "assessment-language.schema.json#/$defs/all_items_requirement"
                   }
                 ],
                 "description": "Explicit observed Items and matching requirement; no hidden default."
@@ -154,6 +157,25 @@
               },
               {
                 "$ref": "assessment-language.schema.json#/$defs/test"
+              },
+              {
+                "if": {
+                  "properties": {
+                    "require": {
+                      "$ref": "assessment-language.schema.json#/$defs/all_items_requirement"
+                    }
+                  },
+                  "required": [
+                    "require"
+                  ]
+                },
+                "then": {
+                  "not": {
+                    "required": [
+                      "states"
+                    ]
+                  }
+                }
               }
             ],
             "not": {
@@ -316,7 +338,8 @@
               {
                 "type": "object",
                 "required": [
-                  "object_title"
+                  "object_title",
+                  "capability"
                 ],
                 "properties": {
                   "object_title": {
