@@ -59,6 +59,7 @@ def inspect_candidate(candidate, objects):
     return {
         "assessment":candidate["assessment"],"test_id":candidate["test_id"],
         "capability":candidate["capability"],"path":candidate["path"],
+        "source_title":candidate["outer_title"],
         "match_count":len(matching),
         "source_candidates":matching,
         "source_direct_filter_without_set_confirmed":confirmed,
@@ -127,7 +128,14 @@ def main():
     report=audit(json.loads(a.census.read_text()),a.source_dir,assert_six=a.assert_six)
     a.report.parent.mkdir(parents=True,exist_ok=True)
     a.report.write_text(json.dumps(report,sort_keys=True,indent=2,ensure_ascii=False)+"\n")
-    print(json.dumps({k:v for k,v in report.items() if k not in ("entries","source_archive_checksums")},indent=2))
+    summary={k:v for k,v in report.items() if k not in ("entries","source_archive_checksums")}
+    summary["unresolved_review_rows"]=[
+        {"path":item["path"],"test_id":item["test_id"],
+         "source_title":item["source_title"],"match_count":item["match_count"],
+         "source_ids":[x["id"] for x in item["source_candidates"]]}
+        for item in report["entries"] if item["status"]=="SOURCE_REVIEW_REQUIRED"
+    ]
+    print(json.dumps(summary,indent=2))
 
 if __name__=="__main__":
     main()
