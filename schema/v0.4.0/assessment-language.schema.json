@@ -9873,6 +9873,9 @@
             },
             {
               "$ref": "#/$defs/all_items_requirement"
+            },
+            {
+              "$ref": "#/$defs/item_presence_requirement"
             }
           ]
         },
@@ -9923,6 +9926,9 @@
                   },
                   {
                     "$ref": "#/$defs/all_items_requirement"
+                  },
+                  {
+                    "$ref": "#/$defs/item_presence_requirement"
                   }
                 ]
               }
@@ -10000,6 +10006,34 @@
             "not": {
               "required": [
                 "states"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "require": {
+                "$ref": "#/$defs/item_presence_requirement"
+              }
+            },
+            "required": [
+              "require"
+            ]
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "states"
+                  ]
+                },
+                {
+                  "required": [
+                    "states_match"
+                  ]
+                }
               ]
             }
           }
@@ -20277,6 +20311,29 @@
       "additionalProperties": false,
       "description": "For each selected Item, verify the nested field predicates; population existence is checked independently.",
       "title": "Item existence and all-Items conditions"
+    },
+    "item_presence_requirement": {
+      "type": "object",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "items": {
+          "type": "string",
+          "enum": [
+            "one_or_more",
+            "none",
+            "exactly_one",
+            "all",
+            "may_be_absent"
+          ],
+          "title": "Required Item existence",
+          "description": "Explicit selected-Item existence only; no States and no Item matching. The 'all' token retains the original OVAL all_exist population semantics."
+        }
+      },
+      "additionalProperties": false,
+      "title": "Item existence requirement",
+      "description": "Checks population existence without comparing State predicates; corresponds to State-free OVAL check_existence."
     }
   },
   "x-scap-ng-version": "0.4.0",
