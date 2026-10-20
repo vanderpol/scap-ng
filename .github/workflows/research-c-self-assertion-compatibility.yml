@@ -12,6 +12,8 @@ on:
       - 'tools/test_research_c_oval_native_gap_report.py'
       - 'tools/research_c_constant_state_source.py'
       - 'tools/test_research_c_constant_state_source.py'
+      - 'tools/research_c_oval_variable_usage_census.py'
+      - 'tools/test_research_c_oval_variable_usage_census.py'
       - 'tools/research_c_oval_multicheck.py'
       - 'tools/research_c_hybrid_must_overlay.py'
       - 'tools/test_research_c_hybrid_must_overlay.py'
@@ -315,6 +317,27 @@ jobs:
           assert r["scanner_parity_proven"] is False
           assert r["full_native_C_compilation_proven"] is False
           print("This is safe authoring of fixed Values, not a native C Definition conversion.")
+          PY
+      - name: Audit source Variable consumers for all 68 native-C Variable blockers
+        run: |
+          PYTHONPATH=scap-ng/tools python -m unittest -v scap-ng/tools/test_research_c_oval_variable_usage_census.py
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_c_oval_variable_usage_census.py \
+            --review c-review --manifest c-native/conversion-manifest.json \
+            --out c-native/original-oval-variable-usage-census.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("c-native/original-oval-variable-usage-census.json").read_text())
+          assert x["blocked_source_definitions"]==68
+          assert x["variable_declarations"]==245
+          assert x["variable_roles"]["runtime_derived"]==126
+          assert x["variable_roles"]["constant_collection_binding"]==84
+          assert x["variable_roles"]["constant_single_state_expectation"]==17
+          assert x["variable_roles"]["constant_shared_state_expectation"]==4
+          assert x["variable_roles"]["constant_derived_dependency"]==14
+          assert x["new_native_C_conversions_proven"]==0
+          assert x["authoring_optimization_not_automatically_safe"] is True
+          print("Pinned exact source Variables and collection/State/derived consumers accounted for.")
           PY
       - name: Verify published original family fixed-expected-value C authoring
         run: |
