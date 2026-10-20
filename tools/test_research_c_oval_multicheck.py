@@ -368,6 +368,41 @@ class OriginalOVALMultiTestMatchCardinality(unittest.TestCase):
          "at_least_one_exists_and_none_match"),
     )
 
+
+    def test_all_exist_with_four_match_operators_in_all_three_source_routes(self):
+        routes=(
+            (source,convert_objectless_many),
+            (two_test_selected_source,convert_selected_shared_many),
+            (two_test_distinct_source,convert_distinct_selected_many),
+        )
+        matches={
+            "all":("every","all_exist_and_all_match"),
+            "at least one":("some","all_exist_and_some_match"),
+            "only one":("one","all_exist_and_only_one_matches"),
+            "none satisfy":("none","all_exist_and_none_match"),
+        }
+        for make,convert in routes:
+            for check,(word,token) in matches.items():
+                with self.subTest(route=make.__name__,source_check=check):
+                    doc=make()
+                    tid=next(iter(doc["tests"]))
+                    doc["tests"][tid]["check_existence"]="all_exist"
+                    doc["tests"][tid]["check"]=check
+                    before=deepcopy(doc)
+                    proof=convert(doc)
+                    self.assertEqual(doc,before)
+                    inverse={src:alias for alias,src in
+                             proof["source_test_crosswalk"].items()}
+                    alias=inverse[tid]
+                    self.assertEqual(proof["authored_c"]["checks"][alias]["must"][
+                                     "items_exist"],"all")
+                    self.assertEqual(proof["authored_c"]["checks"][alias]["must"][
+                                     "items_match"],word)
+                    self.assertEqual(proof["native_c_compiled_tests"][alias]["require"],
+                                     token)
+                    self.assertTrue(proof["A_source_semantic_projection_passed"])
+                    self.assertFalse(proof["OVAL_actual_scanner_parity_proven"])
+
     def test_all_four_original_source_matching_operators_in_three_multi_routes(self):
         routes=(
             (source,convert_objectless_many),
