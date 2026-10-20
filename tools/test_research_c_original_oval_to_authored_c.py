@@ -287,6 +287,38 @@ class OriginalOVALNativeCCompilationTests(unittest.TestCase):
                                    "VARIABLE_SOURCE_GRAPH"):
             compile_one_original_definition(source)
 
+
+    def test_all_exist_with_state_preserves_existence_and_matching(self):
+        original=original_plist()
+        original["tests"][next(iter(original["tests"]))]["check_existence"]="all_exist"
+        before=deepcopy(original)
+        proof=compile_one_original_definition(original)
+        self.assertEqual(original,before)
+        self.assertEqual(proof["authored_c"]["must"],{
+            "items_exist":"all","items_match":"every",
+            "fields":{"value_of":True}})
+        self.assertEqual(proof["native_c_compiled_test"]["require"],
+                         "all_exist_and_all_match")
+        self.assertTrue(proof["A_source_semantic_projection_passed"])
+        self.assertFalse(proof["OVAL_actual_scanner_parity_proven"])
+
+    def test_all_exist_and_four_original_check_operators_remain_orthogonal(self):
+        expectations={
+            "all":("every","all_exist_and_all_match"),
+            "at least one":("some","all_exist_and_some_match"),
+            "only one":("one","all_exist_and_only_one_matches"),
+            "none satisfy":("none","all_exist_and_none_match"),
+        }
+        for check,(word,token) in expectations.items():
+            with self.subTest(check=check):
+                src=original_plist()
+                tst=src["tests"][next(iter(src["tests"]))]
+                tst["check_existence"]="all_exist"
+                tst["check"]=check
+                proof=compile_one_original_definition(src)
+                self.assertEqual(proof["authored_c"]["must"]["items_match"],word)
+                self.assertEqual(proof["native_c_compiled_test"]["require"],token)
+
     def test_source_six_state_quantifier_scope_not_guessed(self):
         source=original_plist()
         tid=next(iter(source["tests"]))
