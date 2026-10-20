@@ -8,6 +8,8 @@ on:
       - 'tools/research_c_oval_self_assertion_bridge.py'
       - 'tools/test_research_c_oval_self_assertion_bridge.py'
       - 'tools/research_c_original_oval_to_authored_c.py'
+      - 'tools/verify_c_linux_windows_basic_source.py'
+      - 'research/assessment-simplification/compact-authoring-04/c-original-windows-registry-test-1020-native.research.yaml'
       - 'tools/research_c_oval_native_gap_report.py'
       - 'tools/test_research_c_oval_native_gap_report.py'
       - 'tools/research_c_constant_state_source.py'
@@ -302,6 +304,14 @@ jobs:
             --output c-native/first-rejection-gap-report.md --expected-total 162
           cat c-native/first-rejection-gap-report.md >> "$GITHUB_STEP_SUMMARY"
           sed -n '1,32p' c-native/first-rejection-gap-report.md
+      - name: Verify basic Linux/Windows native C against exact original OVAL and A source
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/verify_c_linux_windows_basic_source.py \
+            --corpus original-oval/SCAP_1.4/OVAL_Test_Content \
+            --review c-review --native c-native \
+            --published scap-ng/research/assessment-simplification/compact-authoring-04/c-original-windows-registry-test-1020-native.research.yaml \
+            --out c-native/basic-linux-windows-source-gate.json
+          echo "Basic Linux/Windows original OVAL gate is source/IR parity, not live scanner parity." >> "$GITHUB_STEP_SUMMARY"
       - name: Source-backed C fixed State constant reconstruction census
         run: |
           PYTHONPATH=scap-ng/tools python -m unittest -v scap-ng/tools/test_research_c_constant_state_source.py
