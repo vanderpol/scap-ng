@@ -45,13 +45,13 @@ def main():
         names=sorted(n for n in z.namelist() if n.startswith("authoring/") and n.endswith((".yaml",".json")))
         if args.limit:names=names[:args.limit]
         validators={}
-        for kind in ("assessment","rule"):
+        for kind in ("assessment","rule","benchmark","applicability"):
             d=schemas[kind+".schema.json"]
             resolver=RefResolver.from_schema(d,store=schemas)
             validators[kind]=Draft202012Validator(d,resolver=resolver)
         for path in names:
             doc=yaml.safe_load(z.read(path)) if path.endswith(".yaml") else json.loads(z.read(path))
-            kind="assessment" if "assessment" in doc else "rule" if "rule" in doc else None
+            kind=next((k for k in ("assessment","rule","benchmark","applicability") if k in doc),None)
             if kind is None:
                 totals["non_assessment_rule"]+=1
                 skipped.append(path)
@@ -135,11 +135,13 @@ def main():
     if args.strict:
         if args.limit:raise ValueError("Strict corpus gate cannot use --limit")
         expected={"assessment_documents":2422,"assessment_schema_pass":2422,
-                  "rule_documents":1567,"rule_schema_pass":1567,"non_assessment_rule":12}
+                  "rule_documents":1567,"rule_schema_pass":1567,
+                  "benchmark_documents":6,"benchmark_schema_pass":6,
+                  "applicability_documents":6,"applicability_schema_pass":6}
         for k,v in expected.items():
             if totals.get(k)!=v:raise ValueError(f"Strict schema gate: {k} is {totals.get(k)} not {v}")
         failures={k:v for k,v in totals.items() if k.endswith("_schema_fail") or k.startswith("resolver_or_validator")}
         if failures:raise ValueError(f"Strict schema gate failed: {failures}")
-        print("PASS strict six-STIG Rules/Assessments; 12 other documents separately identified")
+        print("PASS strict six-STIG source authoring: 2,422 Assessments, 1,567 Rules, 6 Benchmarks, 6 Applicability documents")
 
 if __name__=="__main__":main()
