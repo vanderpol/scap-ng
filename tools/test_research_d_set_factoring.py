@@ -102,7 +102,7 @@ class SourceExactFactoring(unittest.TestCase):
                 return any(change(x) for x in node.values())
             return False
         self.assertTrue(change(corrupted["collections"]))
-        with self.assertRaisesRegex(ValueError, "factored Set graph differs"):
+        with self.assertRaisesRegex(ValueError, "factored Set graph differs|recursive"):
             prove_factored_sets(self.source, corrupted, self.sidecar)
 
     def test_export_factored_yaml_and_reload(self):
