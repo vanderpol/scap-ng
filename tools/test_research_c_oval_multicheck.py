@@ -228,6 +228,44 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
         self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
 
 
+    def test_two_original_Tests_reusing_same_immutable_State_preserve_identity(self):
+        source=two_test_distinct_source()
+        tests=list(source["tests"].values())
+        first,second=tests
+        same_state=first["states"][0]
+        old_state=second["states"][0]
+        second["states"]=[same_state]
+        source["states"].pop(old_state)
+        before=deepcopy(source)
+        result=convert_distinct_selected_many(source)
+        self.assertEqual(source,before)
+        self.assertEqual(len(result["source_state_crosswalk"]),2)
+        self.assertEqual(set(result["source_state_crosswalk"].values()),{same_state})
+        self.assertEqual({c["source_state"] for c in
+            result["authored_c"]["checks"].values()},{same_state})
+        tests_out=list(result["native_c_compiled_tests"].values())
+        self.assertEqual(tests_out[0]["states"],tests_out[1]["states"])
+        self.assertNotEqual(tests_out[0]["object"],tests_out[1]["object"])
+        self.assertTrue(result["A_source_semantic_projection_passed"])
+
+    def test_same_source_State_id_cannot_hide_different_predicates(self):
+        from research_c_unified_compiler import compile_c_unified
+        source=two_test_distinct_source()
+        ids=list(source["tests"])
+        source["tests"][ids[1]]["states"]=source["tests"][ids[0]]["states"]
+        existing_states={x for t in source["tests"].values() for x in t["states"]}
+        source["states"]={k:v for k,v in source["states"].items()
+                          if k in existing_states}
+        result=convert_distinct_selected_many(source)
+        mutated=deepcopy(result["authored_c"])
+        checks=list(mutated["checks"].values())
+        must=checks[1]["must"]
+        mode=next(iter(must))
+        must[mode]["value_of"]=False
+        with self.assertRaisesRegex(ValueError,
+                         "same source State identity has contradictory predicates"):
+            compile_c_unified(mutated)
+
     def test_original_only_one_exists_all_match_in_distinct_object_multi_test(self):
         original=two_test_distinct_source()
         tid=next(iter(original["tests"]))
