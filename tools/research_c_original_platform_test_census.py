@@ -143,8 +143,29 @@ def main():
     a.out.parent.mkdir(parents=True,exist_ok=True)
     a.out.write_text(json.dumps(result,indent=2,sort_keys=True)+"\n",
                      encoding="utf-8")
-    print(json.dumps({"stage":result["stage"],
-                      "families":result["families"]},indent=2,sort_keys=True))
+    priority={
+        "linux/unix-def_sysctl_test.xml",
+        "linux/linux-def_partition_test.xml",
+        "linux/linux-def_systemdunitproperty_test.xml",
+        "linux/linux-def_kernelmodule_test.xml",
+        "windows/win-def_service_test.xml",
+        "windows/win-def_registry_test.xml",
+        "unix/unix-def_file_test.xml",
+    }
+    selected=[]
+    for row in result["definitions"]:
+        if row["source"] in priority:
+            failed=[{"source_test":x["A_source_test_id"],
+                     "reason":x["rejection"]}
+                    for x in row["tests"] if not x["C_native_single_Test_compilation"]]
+            selected.append({"source":row["source"],
+                             "full_native_C_Definition":row["full_native_C_Definition"],
+                             "source_Tests":row["original_imported_Tests"],
+                             "single_C_Tests_passed":row["original_imported_Tests"]-len(failed),
+                             "first_Test_rejections":failed})
+    print(json.dumps({"stage":result["stage"],"families":result["families"],
+                      "priority_Definition_diagnostics":selected},
+                     indent=2,sort_keys=True))
 
 if __name__=="__main__":
     main()
