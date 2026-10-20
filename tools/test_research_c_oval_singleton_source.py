@@ -93,12 +93,19 @@ class OriginalOVALSingletonC(unittest.TestCase):
             compile_one_original_definition(source)
 
     def test_various_source_existence_must_not_be_reinterpreted(self):
-        for mode in ["any_exist","only_one_exists","none_exist"]:
+        for mode in ["any_exist","none_exist"]:
             with self.subTest(mode=mode):
                 source=singleton("macos.filevault",title="source",state=field(
                     "status","string","equals","enabled"),existence=mode)
                 with self.assertRaisesRegex(NotNativeCConvertible,"TEST_ADVANCED_EXISTENCE"):
                     compile_one_original_definition(source)
+        source=singleton("macos.filevault",title="source",state=field(
+            "status","string","equals","enabled"),existence="only_one_exists")
+        result=compile_one_original_definition(source)
+        self.assertEqual(result["authored_c"]["must"],{
+            "exactly_one_item":{"status":"enabled"}})
+        self.assertEqual(result["native_c_compiled_test"]["require"],
+                         "only_one_exists_and_matches")
 
     def test_noninteger_version_compare_remains_unsupported(self):
         source=singleton("asa.version",title="source",state=field(
