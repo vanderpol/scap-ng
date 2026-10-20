@@ -104,20 +104,26 @@ def _set_expr(raw,states,depth=0):
     operands=[_set_member(x,states,depth+1) for x in raw["members"]]
     if not operands:
         _fail("empty Set operands")
-    if "filters" in raw:
-        # The one source filter Set has one raw Object member. This is
-        # a single-operand Set, so the original filter is correlated to
-        # that one operand and is not silently applied to a later union.
-        if len(operands)!=1 or set(operands[0])!={"object","filters"}:
-            _fail("cannot relocate multi-operand filter")
-        for entry in raw["filters"]:
-            if set(entry)!={"action","state"} or entry["action"] not in ("include","exclude"):
-                _fail("unknown Filter action/State")
-            if entry["state"] not in states:
-                _fail("unresolved source Filter State")
-            operands[0]["filters"].append({
-                entry["action"]:_state(states[entry["state"]])})
-    return {"operator":op,"operands":operands}
+    core={"operator":op,"operands":operands}
+    if "filters" not in raw:
+        return core
+    # Source filter applies to the *whole* union/intersection/difference
+    # result, not necessarily to one of its operands. Versioned 0.4-A
+    # filters belong to individual object operands. Wrap the entire
+    # computed Set in an inline Object and filter that one Set Item stream.
+    # This does not distribute filters across operands or silently alter
+    # their order. It adds no new shared source identity.
+    applied=[]
+    for entry in raw["filters"]:
+        if set(entry)!={"action","state"} or entry["action"] not in ("include","exclude"):
+            _fail("unknown Filter action/State")
+        if entry["state"] not in states:
+            _fail("unresolved source Filter State")
+        applied.append({entry["action"]:_state(states[entry["state"]])})
+    return {"operator":"union","operands":[{
+        "object":{"capability":CAP,"set":core},
+        "filters":applied,
+    }]}
 
 
 def convert(original):
