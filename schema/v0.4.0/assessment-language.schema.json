@@ -9766,7 +9766,25 @@
               "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "all": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -9789,7 +9807,25 @@
               "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "any": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -9812,7 +9848,25 @@
               "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "one": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -9835,7 +9889,25 @@
               "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "odd": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -9858,7 +9930,25 @@
               "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "and": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         },
         {
           "type": "object",
@@ -9881,7 +9971,25 @@
               "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "or": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
         }
       ],
       "title": "Expected evidence condition",
@@ -9906,6 +10014,9 @@
             },
             {
               "$ref": "#/$defs/item_presence_requirement"
+            },
+            {
+              "$ref": "#/$defs/scoped_all_items_requirement"
             }
           ]
         },
@@ -9922,6 +10033,10 @@
             "one",
             "odd"
           ]
+        },
+        "state_fields_require": {
+          "$ref": "#/$defs/paired_requirement",
+          "description": "Explicit field cardinality inherited by Test State predicates when they do not declare their own."
         }
       },
       "not": {
@@ -10065,6 +10180,36 @@
                   ]
                 }
               ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "state_fields_require"
+            ]
+          },
+          "then": {
+            "properties": {
+              "require": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/paired_requirement"
+                  },
+                  {
+                    "$ref": "#/$defs/presence_requirement"
+                  },
+                  {
+                    "$ref": "#/$defs/all_items_requirement"
+                  },
+                  {
+                    "$ref": "#/$defs/scoped_all_items_requirement"
+                  },
+                  {
+                    "$ref": "#/$defs/item_presence_requirement"
+                  }
+                ]
+              }
             }
           }
         }
@@ -20364,6 +20509,6180 @@
       "additionalProperties": false,
       "title": "Item existence requirement",
       "description": "Checks population existence without comparing State predicates; corresponds to State-free OVAL check_existence."
+    },
+    "inherited_field_predicate": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "require": {
+          "$ref": "#/$defs/paired_requirement"
+        },
+        "datatype": {
+          "type": "string",
+          "minLength": 1
+        },
+        "value_match": {
+          "enum": [
+            "all",
+            "one",
+            "one_or_more",
+            "none"
+          ],
+          "description": "Required on arrays, Variable references and Organizational Inputs. Independent of the observed-Item/State/record requirement."
+        },
+        "redact_result": {
+          "const": true
+        },
+        "equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Equals",
+          "description": "Compare the observed value to the expected value using its datatype; corresponds to OVAL 'equals'."
+        },
+        "not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Does not equal",
+          "description": "Compare observed and expected values for inequality using native datatype; corresponds to OVAL 'not equal'."
+        },
+        "case_insensitive_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Equals, ignoring case",
+          "description": "Compare strings for equality without case sensitivity; aligns with OVAL case-insensitive equals."
+        },
+        "case_insensitive_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Does not equal, ignoring case",
+          "description": "Compare strings for inequality without case sensitivity; aligns with OVAL case-insensitive not equal."
+        },
+        "greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Greater than",
+          "description": "Native typed comparison equivalent to OVAL greater than."
+        },
+        "greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Greater than or equal to",
+          "description": "Native typed comparison equivalent to OVAL greater than or equal."
+        },
+        "less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Less than",
+          "description": "Native typed comparison equivalent to OVAL less than."
+        },
+        "less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Less than or equal to",
+          "description": "Native typed comparison equivalent to OVAL less than or equal."
+        },
+        "bitwise_and": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Bitwise AND",
+          "description": "Apply OVAL bitwise AND comparison semantics; do not confuse with Boolean AND across predicates."
+        },
+        "bitwise_or": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Bitwise OR",
+          "description": "Apply OVAL bitwise OR comparison semantics; do not confuse with Boolean OR across predicates."
+        },
+        "matches_regex": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ],
+          "title": "Matches regular expression",
+          "description": "Compare an observed value with a regular-expression pattern; aligns with OVAL pattern match."
+        },
+        "subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "float_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "binary_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "binary_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "version_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv4_superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_subset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ipv6_superset_of": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "rpm_evr_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "debian_evr_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "fileset_revision_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_equals": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_not_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_greater_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_greater_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_less_than": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        },
+        "ios_version_less_than_or_equal": {
+          "oneOf": [
+            {
+              "type": [
+                "string",
+                "number",
+                "boolean"
+              ]
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "variable"
+              ],
+              "properties": {
+                "variable": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "required": [
+                "input"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "oneOf": [
+            {
+              "required": [
+                "equals"
+              ]
+            },
+            {
+              "required": [
+                "not_equal"
+              ]
+            },
+            {
+              "required": [
+                "case_insensitive_equals"
+              ]
+            },
+            {
+              "required": [
+                "case_insensitive_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "greater_than"
+              ]
+            },
+            {
+              "required": [
+                "greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "less_than"
+              ]
+            },
+            {
+              "required": [
+                "less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "bitwise_and"
+              ]
+            },
+            {
+              "required": [
+                "bitwise_or"
+              ]
+            },
+            {
+              "required": [
+                "matches_regex"
+              ]
+            },
+            {
+              "required": [
+                "subset_of"
+              ]
+            },
+            {
+              "required": [
+                "superset_of"
+              ]
+            },
+            {
+              "required": [
+                "float_equals"
+              ]
+            },
+            {
+              "required": [
+                "float_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "float_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "float_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "float_less_than"
+              ]
+            },
+            {
+              "required": [
+                "float_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "binary_equals"
+              ]
+            },
+            {
+              "required": [
+                "binary_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_equals"
+              ]
+            },
+            {
+              "required": [
+                "version_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "version_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "version_less_than"
+              ]
+            },
+            {
+              "required": [
+                "version_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_equals"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_subset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv4_superset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_equals"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_subset_of"
+              ]
+            },
+            {
+              "required": [
+                "ipv6_superset_of"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_equals"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_less_than"
+              ]
+            },
+            {
+              "required": [
+                "rpm_evr_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_equals"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_less_than"
+              ]
+            },
+            {
+              "required": [
+                "debian_evr_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_equals"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_less_than"
+              ]
+            },
+            {
+              "required": [
+                "fileset_revision_less_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_equals"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_not_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_greater_than"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_greater_than_or_equal"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_less_than"
+              ]
+            },
+            {
+              "required": [
+                "ios_version_less_than_or_equal"
+              ]
+            }
+          ]
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "field"
+                ]
+              },
+              {
+                "required": [
+                  "existence"
+                ]
+              },
+              {
+                "required": [
+                  "match"
+                ]
+              },
+              {
+                "required": [
+                  "operation"
+                ]
+              },
+              {
+                "required": [
+                  "value"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "anyOf": [
+              {
+                "required": [
+                  "equals"
+                ],
+                "properties": {
+                  "equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Equals",
+                    "description": "Compare the observed value to the expected value using its datatype; corresponds to OVAL 'equals'."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "not_equal"
+                ],
+                "properties": {
+                  "not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Does not equal",
+                    "description": "Compare observed and expected values for inequality using native datatype; corresponds to OVAL 'not equal'."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "case_insensitive_equals"
+                ],
+                "properties": {
+                  "case_insensitive_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Equals, ignoring case",
+                    "description": "Compare strings for equality without case sensitivity; aligns with OVAL case-insensitive equals."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "case_insensitive_not_equal"
+                ],
+                "properties": {
+                  "case_insensitive_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Does not equal, ignoring case",
+                    "description": "Compare strings for inequality without case sensitivity; aligns with OVAL case-insensitive not equal."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "greater_than"
+                ],
+                "properties": {
+                  "greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Greater than",
+                    "description": "Native typed comparison equivalent to OVAL greater than."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "greater_than_or_equal"
+                ],
+                "properties": {
+                  "greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Greater than or equal to",
+                    "description": "Native typed comparison equivalent to OVAL greater than or equal."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "less_than"
+                ],
+                "properties": {
+                  "less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Less than",
+                    "description": "Native typed comparison equivalent to OVAL less than."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "less_than_or_equal"
+                ],
+                "properties": {
+                  "less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Less than or equal to",
+                    "description": "Native typed comparison equivalent to OVAL less than or equal."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "bitwise_and"
+                ],
+                "properties": {
+                  "bitwise_and": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Bitwise AND",
+                    "description": "Apply OVAL bitwise AND comparison semantics; do not confuse with Boolean AND across predicates."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "bitwise_or"
+                ],
+                "properties": {
+                  "bitwise_or": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Bitwise OR",
+                    "description": "Apply OVAL bitwise OR comparison semantics; do not confuse with Boolean OR across predicates."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "matches_regex"
+                ],
+                "properties": {
+                  "matches_regex": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Matches regular expression",
+                    "description": "Compare an observed value with a regular-expression pattern; aligns with OVAL pattern match."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "subset_of"
+                ],
+                "properties": {
+                  "subset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "superset_of"
+                ],
+                "properties": {
+                  "superset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_equals"
+                ],
+                "properties": {
+                  "float_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_not_equal"
+                ],
+                "properties": {
+                  "float_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_greater_than"
+                ],
+                "properties": {
+                  "float_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_greater_than_or_equal"
+                ],
+                "properties": {
+                  "float_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_less_than"
+                ],
+                "properties": {
+                  "float_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_less_than_or_equal"
+                ],
+                "properties": {
+                  "float_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "binary_equals"
+                ],
+                "properties": {
+                  "binary_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "binary_not_equal"
+                ],
+                "properties": {
+                  "binary_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_equals"
+                ],
+                "properties": {
+                  "version_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_not_equal"
+                ],
+                "properties": {
+                  "version_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_greater_than"
+                ],
+                "properties": {
+                  "version_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_greater_than_or_equal"
+                ],
+                "properties": {
+                  "version_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_less_than"
+                ],
+                "properties": {
+                  "version_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_less_than_or_equal"
+                ],
+                "properties": {
+                  "version_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_equals"
+                ],
+                "properties": {
+                  "ipv4_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_not_equal"
+                ],
+                "properties": {
+                  "ipv4_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_greater_than"
+                ],
+                "properties": {
+                  "ipv4_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_greater_than_or_equal"
+                ],
+                "properties": {
+                  "ipv4_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_less_than"
+                ],
+                "properties": {
+                  "ipv4_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_less_than_or_equal"
+                ],
+                "properties": {
+                  "ipv4_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_subset_of"
+                ],
+                "properties": {
+                  "ipv4_subset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_superset_of"
+                ],
+                "properties": {
+                  "ipv4_superset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_equals"
+                ],
+                "properties": {
+                  "ipv6_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_not_equal"
+                ],
+                "properties": {
+                  "ipv6_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_greater_than"
+                ],
+                "properties": {
+                  "ipv6_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_greater_than_or_equal"
+                ],
+                "properties": {
+                  "ipv6_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_less_than"
+                ],
+                "properties": {
+                  "ipv6_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_less_than_or_equal"
+                ],
+                "properties": {
+                  "ipv6_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_subset_of"
+                ],
+                "properties": {
+                  "ipv6_subset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_superset_of"
+                ],
+                "properties": {
+                  "ipv6_superset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_equals"
+                ],
+                "properties": {
+                  "rpm_evr_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_not_equal"
+                ],
+                "properties": {
+                  "rpm_evr_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_greater_than"
+                ],
+                "properties": {
+                  "rpm_evr_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_greater_than_or_equal"
+                ],
+                "properties": {
+                  "rpm_evr_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_less_than"
+                ],
+                "properties": {
+                  "rpm_evr_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_less_than_or_equal"
+                ],
+                "properties": {
+                  "rpm_evr_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_equals"
+                ],
+                "properties": {
+                  "debian_evr_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_not_equal"
+                ],
+                "properties": {
+                  "debian_evr_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_greater_than"
+                ],
+                "properties": {
+                  "debian_evr_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_greater_than_or_equal"
+                ],
+                "properties": {
+                  "debian_evr_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_less_than"
+                ],
+                "properties": {
+                  "debian_evr_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_less_than_or_equal"
+                ],
+                "properties": {
+                  "debian_evr_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_equals"
+                ],
+                "properties": {
+                  "fileset_revision_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_not_equal"
+                ],
+                "properties": {
+                  "fileset_revision_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_greater_than"
+                ],
+                "properties": {
+                  "fileset_revision_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_greater_than_or_equal"
+                ],
+                "properties": {
+                  "fileset_revision_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_less_than"
+                ],
+                "properties": {
+                  "fileset_revision_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_less_than_or_equal"
+                ],
+                "properties": {
+                  "fileset_revision_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_equals"
+                ],
+                "properties": {
+                  "ios_version_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_not_equal"
+                ],
+                "properties": {
+                  "ios_version_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_greater_than"
+                ],
+                "properties": {
+                  "ios_version_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_greater_than_or_equal"
+                ],
+                "properties": {
+                  "ios_version_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_less_than"
+                ],
+                "properties": {
+                  "ios_version_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_less_than_or_equal"
+                ],
+                "properties": {
+                  "ios_version_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "value_match"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "value_match"
+            ]
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "equals"
+                ],
+                "properties": {
+                  "equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Equals",
+                    "description": "Compare the observed value to the expected value using its datatype; corresponds to OVAL 'equals'."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "not_equal"
+                ],
+                "properties": {
+                  "not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Does not equal",
+                    "description": "Compare observed and expected values for inequality using native datatype; corresponds to OVAL 'not equal'."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "case_insensitive_equals"
+                ],
+                "properties": {
+                  "case_insensitive_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Equals, ignoring case",
+                    "description": "Compare strings for equality without case sensitivity; aligns with OVAL case-insensitive equals."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "case_insensitive_not_equal"
+                ],
+                "properties": {
+                  "case_insensitive_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Does not equal, ignoring case",
+                    "description": "Compare strings for inequality without case sensitivity; aligns with OVAL case-insensitive not equal."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "greater_than"
+                ],
+                "properties": {
+                  "greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Greater than",
+                    "description": "Native typed comparison equivalent to OVAL greater than."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "greater_than_or_equal"
+                ],
+                "properties": {
+                  "greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Greater than or equal to",
+                    "description": "Native typed comparison equivalent to OVAL greater than or equal."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "less_than"
+                ],
+                "properties": {
+                  "less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Less than",
+                    "description": "Native typed comparison equivalent to OVAL less than."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "less_than_or_equal"
+                ],
+                "properties": {
+                  "less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Less than or equal to",
+                    "description": "Native typed comparison equivalent to OVAL less than or equal."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "bitwise_and"
+                ],
+                "properties": {
+                  "bitwise_and": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Bitwise AND",
+                    "description": "Apply OVAL bitwise AND comparison semantics; do not confuse with Boolean AND across predicates."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "bitwise_or"
+                ],
+                "properties": {
+                  "bitwise_or": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Bitwise OR",
+                    "description": "Apply OVAL bitwise OR comparison semantics; do not confuse with Boolean OR across predicates."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "matches_regex"
+                ],
+                "properties": {
+                  "matches_regex": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ],
+                    "title": "Matches regular expression",
+                    "description": "Compare an observed value with a regular-expression pattern; aligns with OVAL pattern match."
+                  }
+                }
+              },
+              {
+                "required": [
+                  "subset_of"
+                ],
+                "properties": {
+                  "subset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "superset_of"
+                ],
+                "properties": {
+                  "superset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_equals"
+                ],
+                "properties": {
+                  "float_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_not_equal"
+                ],
+                "properties": {
+                  "float_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_greater_than"
+                ],
+                "properties": {
+                  "float_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_greater_than_or_equal"
+                ],
+                "properties": {
+                  "float_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_less_than"
+                ],
+                "properties": {
+                  "float_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "float_less_than_or_equal"
+                ],
+                "properties": {
+                  "float_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "binary_equals"
+                ],
+                "properties": {
+                  "binary_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "binary_not_equal"
+                ],
+                "properties": {
+                  "binary_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_equals"
+                ],
+                "properties": {
+                  "version_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_not_equal"
+                ],
+                "properties": {
+                  "version_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_greater_than"
+                ],
+                "properties": {
+                  "version_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_greater_than_or_equal"
+                ],
+                "properties": {
+                  "version_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_less_than"
+                ],
+                "properties": {
+                  "version_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "version_less_than_or_equal"
+                ],
+                "properties": {
+                  "version_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_equals"
+                ],
+                "properties": {
+                  "ipv4_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_not_equal"
+                ],
+                "properties": {
+                  "ipv4_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_greater_than"
+                ],
+                "properties": {
+                  "ipv4_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_greater_than_or_equal"
+                ],
+                "properties": {
+                  "ipv4_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_less_than"
+                ],
+                "properties": {
+                  "ipv4_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_less_than_or_equal"
+                ],
+                "properties": {
+                  "ipv4_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_subset_of"
+                ],
+                "properties": {
+                  "ipv4_subset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv4_superset_of"
+                ],
+                "properties": {
+                  "ipv4_superset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_equals"
+                ],
+                "properties": {
+                  "ipv6_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_not_equal"
+                ],
+                "properties": {
+                  "ipv6_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_greater_than"
+                ],
+                "properties": {
+                  "ipv6_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_greater_than_or_equal"
+                ],
+                "properties": {
+                  "ipv6_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_less_than"
+                ],
+                "properties": {
+                  "ipv6_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_less_than_or_equal"
+                ],
+                "properties": {
+                  "ipv6_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_subset_of"
+                ],
+                "properties": {
+                  "ipv6_subset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ipv6_superset_of"
+                ],
+                "properties": {
+                  "ipv6_superset_of": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_equals"
+                ],
+                "properties": {
+                  "rpm_evr_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_not_equal"
+                ],
+                "properties": {
+                  "rpm_evr_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_greater_than"
+                ],
+                "properties": {
+                  "rpm_evr_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_greater_than_or_equal"
+                ],
+                "properties": {
+                  "rpm_evr_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_less_than"
+                ],
+                "properties": {
+                  "rpm_evr_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "rpm_evr_less_than_or_equal"
+                ],
+                "properties": {
+                  "rpm_evr_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_equals"
+                ],
+                "properties": {
+                  "debian_evr_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_not_equal"
+                ],
+                "properties": {
+                  "debian_evr_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_greater_than"
+                ],
+                "properties": {
+                  "debian_evr_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_greater_than_or_equal"
+                ],
+                "properties": {
+                  "debian_evr_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_less_than"
+                ],
+                "properties": {
+                  "debian_evr_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "debian_evr_less_than_or_equal"
+                ],
+                "properties": {
+                  "debian_evr_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_equals"
+                ],
+                "properties": {
+                  "fileset_revision_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_not_equal"
+                ],
+                "properties": {
+                  "fileset_revision_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_greater_than"
+                ],
+                "properties": {
+                  "fileset_revision_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_greater_than_or_equal"
+                ],
+                "properties": {
+                  "fileset_revision_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_less_than"
+                ],
+                "properties": {
+                  "fileset_revision_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "fileset_revision_less_than_or_equal"
+                ],
+                "properties": {
+                  "fileset_revision_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_equals"
+                ],
+                "properties": {
+                  "ios_version_equals": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_not_equal"
+                ],
+                "properties": {
+                  "ios_version_not_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_greater_than"
+                ],
+                "properties": {
+                  "ios_version_greater_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_greater_than_or_equal"
+                ],
+                "properties": {
+                  "ios_version_greater_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_less_than"
+                ],
+                "properties": {
+                  "ios_version_less_than": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "required": [
+                  "ios_version_less_than_or_equal"
+                ],
+                "properties": {
+                  "ios_version_less_than_or_equal": {
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "type": "object"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "description": "Only valid when a containing State group or Test explicitly supplies state_fields_require; no implicit field cardinality."
+    },
+    "scoped_state_entry": {
+      "oneOf": [
+        {
+          "type": "object",
+          "minProperties": 1,
+          "maxProperties": 1,
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/inherited_field_predicate"
+              },
+              {
+                "$ref": "#/$defs/record_wrapper_predicate"
+              }
+            ]
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "all"
+          ],
+          "properties": {
+            "all": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "All conditions must hold",
+              "description": "Legacy named aggregate: AND of nested conditions under the OVAL-style result model."
+            },
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "any"
+          ],
+          "properties": {
+            "any": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "At least one condition must hold",
+              "description": "Legacy named aggregate: OR of nested conditions under the OVAL-style result model."
+            },
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "one"
+          ],
+          "properties": {
+            "one": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "Exactly one condition must hold",
+              "description": "The OVAL-style exactly-one aggregation, preserving unknown and error outcomes."
+            },
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "odd"
+          ],
+          "properties": {
+            "odd": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "An odd number of conditions must hold",
+              "description": "The OVAL-style odd-count aggregation, preserving unknown and error outcomes."
+            },
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "All conditions must hold",
+              "description": "Combine nested condition results using OVAL-aligned Boolean AND, including non-Boolean evaluation outcomes."
+            },
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "At least one condition must hold",
+              "description": "Combine nested condition results using OVAL-aligned Boolean OR, including non-Boolean evaluation outcomes."
+            },
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "title": "Expected evidence condition",
+      "description": "A field predicate or logical combination of predicates applied to one collected Item."
+    },
+    "scoped_all_items_requirement": {
+      "type": "object",
+      "required": [
+        "items",
+        "all_items_must"
+      ],
+      "properties": {
+        "items": {
+          "type": "string",
+          "enum": [
+            "one_or_more",
+            "may_be_absent"
+          ],
+          "description": "Explicit Item-existence requirement, corresponding to OVAL check_existence (not check).",
+          "title": "How many Items must exist"
+        },
+        "all_items_must": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/scoped_state_entry"
+          },
+          "description": "For each selected Item, these conditions must be satisfied under the OVAL check='all' aggregation; empty-set behavior is controlled separately by items.",
+          "title": "Conditions every Item must satisfy"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Test-level state_fields_require is explicit, allowing nested predicates to inherit their field cardinality.",
+      "title": "Item existence and all-Items conditions"
     }
   },
   "x-scap-ng-version": "0.4.0",
