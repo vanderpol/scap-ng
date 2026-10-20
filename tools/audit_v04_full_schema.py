@@ -33,6 +33,8 @@ def main():
         raise ValueError("Native 0.4 Rule schema not found")
     totals=collections.Counter()
     examples=collections.defaultdict(list)
+    grouped=collections.Counter()
+    group_examples=collections.defaultdict(list)
     skipped=[]
     with zipfile.ZipFile(args.archive) as z:
         names=sorted(n for n in z.namelist() if n.startswith("authoring/") and n.endswith((".yaml",".json")))
@@ -63,17 +65,22 @@ def main():
                 for error in sorted(errors,key=lambda e:(len(e.path),str(e.path)))[:5]:
                     key=kind+":"+error.validator+":"+("/".join(map(str,error.absolute_path)) or "$root")
                     totals[key]+=1
+                    group=kind+":"+error.validator+":"+(str(next(iter(error.absolute_path),"root")))
+                    grouped[group]+=1
+                    if len(group_examples[group])<4:
+                        group_examples[group].append({"path":path,"message":error.message[:220]})
                     if len(examples[key])<3:
                         examples[key].append({"path":path,"error":error.message[:240]})
     report={"status":"diagnostic_only","archive":str(args.archive),
             "checked_documents":len(names),"counts":dict(totals),
-            "examples":dict(examples),"schema_release_conformant":False,
+            "examples":dict(examples),"grouped_failure_counts":dict(grouped.most_common()),
+            "group_examples":dict(group_examples),"schema_release_conformant":False,
             "warning":"This audit does not prove native semantic checks, compiler support or scanner equivalence."}
     args.out.parent.mkdir(parents=True,exist_ok=True)
     args.out.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
     print(json.dumps({"checked_documents":len(names),
         "schema_passes":{k:v for k,v in totals.items() if k.endswith("_schema_pass")},
         "schema_failures":{k:v for k,v in totals.items() if k.endswith("_schema_fail")},
-        "error_classes":len(examples)},indent=2))
+        "error_classes":len(examples),"top_failure_groups":grouped.most_common(12)},indent=2))
     assert len(names)==4001 if not args.limit else len(names)<=args.limit
 if __name__=="__main__":main()
