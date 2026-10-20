@@ -292,6 +292,54 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
             convert_distinct_selected_many(doc)
 
 
+
+class OriginalOVALMultiTestMatchCardinality(unittest.TestCase):
+    """C matches ORIGINAL OVAL check, never silently makes every Item pass."""
+
+    MODES=(
+        ("all","every_item","at_least_one_exists_and_all_match"),
+        ("at least one","any_item","at_least_one_exists_and_some_match"),
+        ("only one","one_matching_item",
+         "at_least_one_exists_and_only_one_matches"),
+        ("none satisfy","no_matching_item",
+         "at_least_one_exists_and_none_match"),
+    )
+
+    def test_all_four_original_source_matching_operators_in_three_multi_routes(self):
+        routes=(
+            (source,convert_objectless_many),
+            (two_test_selected_source,convert_selected_shared_many),
+            (two_test_distinct_source,convert_distinct_selected_many),
+        )
+        for make,convert in routes:
+            for op,word,token in self.MODES:
+                with self.subTest(source=make.__name__,source_check=op):
+                    doc=make()
+                    tid=next(iter(doc["tests"]))
+                    doc["tests"][tid]["check"]=op
+                    before=deepcopy(doc)
+                    result=convert(doc)
+                    self.assertEqual(doc,before)
+                    alias=next(alias for alias,original in
+                               result["source_test_crosswalk"].items()
+                               if original==tid)
+                    self.assertEqual(
+                        set(result["authored_c"]["checks"][alias]["must"]),
+                        {word})
+                    self.assertEqual(
+                        result["native_c_compiled_tests"][alias]["require"],
+                        token)
+
+    def test_existence_is_not_inferred_from_match_quantifier(self):
+        doc=two_test_distinct_source()
+        tid=next(iter(doc["tests"]))
+        doc["tests"][tid]["check"]="none satisfy"
+        doc["tests"][tid]["check_existence"]="none_exist"
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "QUANTIFIER_OR_ATTRS_UNSUPPORTED"):
+            convert_distinct_selected_many(doc)
+
+
 class OriginalSourceBooleanExpressionRegression(unittest.TestCase):
     """No boolean flattening; compare every supplied six-state combination.
 
