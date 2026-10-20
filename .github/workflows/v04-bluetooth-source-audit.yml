@@ -1,0 +1,38 @@
+name: Win11 Bluetooth original OVAL source audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_bluetooth_oval_source.py'
+      - 'tools/test_audit_v04_bluetooth_oval_source.py'
+      - '.github/workflows/v04-bluetooth-source-audit.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exact-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Focused XML-source trace fixtures
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_bluetooth_oval_source.py
+      - name: Download exact NIWC source SCAP ZIP and trace XML provenance
+        run: |
+          mkdir -p work
+          curl --fail --silent --show-error --location --retry 3 \
+            -o work/source-windows-11-scap.zip \
+            'https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip'
+          python tools/audit_v04_bluetooth_oval_source.py \
+            --source-zip work/source-windows-11-scap.zip \
+            --report work/bluetooth-source-oval-audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bluetooth-original-oval-source-audit
+          path: work/bluetooth-source-oval-audit.json
+          retention-days: 30
