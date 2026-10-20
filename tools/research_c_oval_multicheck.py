@@ -11,7 +11,7 @@ from copy import deepcopy
 import re
 
 from research_c_original_oval_to_authored_c import (
-    NotNativeCConvertible, reject, project_selection, project_fields, _entities, _same_source_semantics, OPS, PAIR_CHECK)
+    NotNativeCConvertible, reject, project_selection, project_fields, _entities, _same_source_semantics, OPS, PAIR_CHECK, PRESENCE)
 from research_c_require_language import _mapping
 from research_c_unified_compiler import compile_c_unified
 
@@ -383,8 +383,6 @@ def convert_distinct_selected_many(a):
         if (not isinstance(t,dict) or set(t)-{
             "capability","check","check_existence","object","states",
             "reported_elements","test_title"} or
-            t.get("check") not in PAIR_CHECK or
-            t.get("check_existence")!="at_least_one_exists" or
             t.get("reported_elements")!="all"):
             reject("MULTI_DISTINCT_TEST_QUANTIFIER_OR_ATTRS_UNSUPPORTED")
         oid=t.get("object")
@@ -398,23 +396,37 @@ def convert_distinct_selected_many(a):
             reject("MULTI_DISTINCT_OBJECT_SET_FILTER_OR_CAPABILITY_UNSUPPORTED")
         selectors=project_selection(obj)
         refs=t.get("states")
-        if (not isinstance(refs,list) or len(refs)!=1 or
-            refs[0] not in states or refs[0] in used_states):
+        if not isinstance(refs,list) or len(refs)>1:
             reject("MULTI_DISTINCT_STATE_REUSE_OR_MISSING")
-        sid=refs[0]
-        used_states.add(sid)
-        state=states[sid]
-        if (not isinstance(state,dict) or
-            set(state)!={"capability","state_title","state"} or
-            state["capability"]!=t["capability"]):
-            reject("MULTI_DISTINCT_STATE_METADATA_UNSUPPORTED")
-        fields=project_fields(state["state"],state["capability"])
+        if refs:
+            sid=refs[0]
+            if sid not in states or sid in used_states:
+                reject("MULTI_DISTINCT_STATE_REUSE_OR_MISSING")
+            used_states.add(sid)
+            state=states[sid]
+            if (not isinstance(state,dict) or
+                set(state)!={"capability","state_title","state"} or
+                state["capability"]!=t["capability"]):
+                reject("MULTI_DISTINCT_STATE_METADATA_UNSUPPORTED")
+            fields=project_fields(state["state"],state["capability"])
+            must=source_test_field_must(t,fields)
+            original_entities=_entities(state["state"])
+        else:
+            # A State-free original Test evaluates collection existence only.
+            # Its check aggregation is irrelevant only in the reviewed
+            # check=all source shape; do not fabricate a matching State.
+            if (t.get("check")!="all" or
+                t.get("check_existence") not in PRESENCE):
+                reject("MULTI_DISTINCT_STATE_FREE_PRESENCE_UNSUPPORTED")
+            fields={}
+            must=PRESENCE[t["check_existence"]]
+            original_entities=[]
         alias=descriptive_distinct_alias(t.get("test_title"),fields,checks)
         checks[alias]={"source_test":tid,
                        "from":{t["capability"]:selectors},
-                       "must":source_test_field_must(t,fields)}
+                       "must":must}
         source_to_alias[tid]=alias
-        comparisons[tid]=(obj,_entities(state["state"]))
+        comparisons[tid]=(obj,original_entities)
     if used_objects!=set(objects) or used_states!=set(states):
         reject("MULTI_DISTINCT_EXTRA_SOURCE_OBJECT_OR_STATE")
     original_logic=a.get("evaluate")
