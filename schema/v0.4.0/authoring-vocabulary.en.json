@@ -2,9 +2,9 @@
   "format": "scap-ng-authoring-vocabulary/0.1",
   "schema_version": "0.4.0",
   "language": "en",
-  "status": "pre-alpha-advisory-ui-metadata",
+  "status": "0.4.0-owner-approved-shared-display-contract-draft",
   "normative": false,
-  "description": "Version-local labels and explanatory prompts for authoring tools. No new grammar, result semantics, datatype inference, or allowed-value definitions. Always validate against the pinned native schemas and capability mappings.",
+  "description": "Version-local human-facing labels and concise operation/field explanations shared by editors and scanner reports. UI explanations do not alter grammar, datatypes or result semantics; source- and version-pinned native schema is authoritative.",
   "term_scopes": {
     "authoring.target_platform": {
       "label": "Target platform",
@@ -35,7 +35,7 @@
     },
     "test.object": {
       "label": "Data source",
-      "description": "Identifies where and how to collect evidence. Collection and comparison are different operations."
+      "description": "An Object specifies what evidence to collect, not the expected outcome. Inline Objects inherit the enclosing Test capability; independently shared Objects declare it."
     },
     "object.select": {
       "label": "Where to look",
@@ -88,6 +88,38 @@
     "expression.for_each": {
       "label": "Repeat for each collected item",
       "description": "Correlation and source scoping must be preserved; the authoring UI must not turn per-parent requirements into a global union."
+    },
+    "test.require.items": {
+      "label": "Required collected Items",
+      "description": "Explicit number of Items that must exist before applying matching predicates. Existence is separate from State matching."
+    },
+    "test.require.items.one_or_more": {
+      "label": "At least one Item must exist",
+      "description": "The collection must contain one or more selected Items. An empty collection does not satisfy this requirement."
+    },
+    "test.require.items.may_be_absent": {
+      "label": "Items may be absent",
+      "description": "No minimum number of selected Items is required; matching and incomplete/error status remain independently significant."
+    },
+    "test.require.all_items_must": {
+      "label": "Every collected Item must satisfy",
+      "description": "Apply the enclosed expected conditions independently to every selected Item. This does not itself require that any Item exists."
+    },
+    "test.require.all_items_must.and": {
+      "label": "All conditions must match",
+      "description": "Logical AND of the expected field/record conditions on the same collected Item; field-level cardinality is independent."
+    },
+    "test.require.all_items_must.or": {
+      "label": "At least one condition must match",
+      "description": "Logical OR over expected State alternatives on the same collected Item. It does not mean that at least one collected Item must exist."
+    },
+    "object.capability_inheritance": {
+      "label": "Collection capability",
+      "description": "An inline Object inherits its enclosing Test capability. A shared or independently addressable Object declares its capability explicitly."
+    },
+    "state.field.type": {
+      "label": "Collected value type",
+      "description": "Interpretation is capability-specific; for Windows Registry this is the stored Registry type, not necessarily the comparison datatype."
     }
   },
   "capabilities": {
@@ -137,7 +169,9 @@
     "Never synthesize native enumeration values from displayed labels.",
     "Resolve *_source pointers only within the same pinned capability mapping.",
     "If a referenced enum is missing or mismatched, disable the affected control rather than supplying a guessed list.",
-    "Display text is advisory; the normative schema and semantic contract win any disagreement."
+    "Display text is advisory; the normative schema and semantic contract win any disagreement.",
+    "Editors and scanners SHALL resolve displayed operation titles from the same version-pinned vocabulary catalog; titles never replace machine-readable operation identifiers.",
+    "Descriptions explain author intent, not authoritative six-state scanner outcomes; native evaluation semantics and versioned schema remain controlling."
   ],
   "platform_labels": {
     "linux": "Linux",
@@ -146,5 +180,47 @@
     "solaris": "Solaris",
     "aix": "AIX",
     "other": "Other / unsupported in this preview"
+  },
+  "operations": {
+    "equals": {
+      "label": "Equals",
+      "description": "Compare the collected field value with the expected value, according to its native datatype."
+    },
+    "not_equal": {
+      "label": "Does not equal",
+      "description": "Compare for inequality using the field's native comparison datatype."
+    },
+    "case_insensitive_equals": {
+      "label": "Equals, ignoring case",
+      "description": "Perform a case-insensitive string equality comparison."
+    },
+    "matches_regex": {
+      "label": "Matches regular expression",
+      "description": "Use regular-expression pattern matching; not literal substring matching."
+    },
+    "greater_than": {
+      "label": "Greater than",
+      "description": "Compare values using the operation's supported datatype and ordering."
+    },
+    "greater_than_or_equal": {
+      "label": "Greater than or equal to",
+      "description": "Compare values using the operation's supported datatype and ordering."
+    },
+    "less_than": {
+      "label": "Less than",
+      "description": "Compare values using the operation's supported datatype and ordering."
+    },
+    "less_than_or_equal": {
+      "label": "Less than or equal to",
+      "description": "Compare values using the operation's supported datatype and ordering."
+    },
+    "and": {
+      "label": "All conditions must match",
+      "description": "All nested conditions in this Boolean group must hold under native multi-state result semantics."
+    },
+    "or": {
+      "label": "At least one condition must match",
+      "description": "At least one nested condition in this Boolean group must hold under native multi-state result semantics."
+    }
   }
 }
