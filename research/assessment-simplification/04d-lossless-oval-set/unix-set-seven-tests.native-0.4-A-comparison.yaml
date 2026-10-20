@@ -1,0 +1,337 @@
+# 0.4-A attempt from original OVAL def 276; see explicit validator report.
+assessment:
+  id: roundtrip.oval-org-mitre-oval-test-def-276
+  version: 1
+  assessment_title: Evaluate to true if the oval-def:set construct is properly supported
+  mode: automated
+  class: miscellaneous
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  variables:
+    this-constant-variable-represents-string-values-c-support-txt-c-variable:
+      datatype: string
+      expression:
+        literal:
+        - /opt/support/txt
+        - /opt/support/txt/txtfile
+        - /opt/support/txt/txtfile/subtxtfile
+      kind: constant
+      title: This constant_variable represents the string values 'C:\support\txt\',
+        'C:\support\txt\txtfile', and 'C:\support\txt\txtfile\subtxtfile'.
+    this-constant-variable-represents-string-values-c-support-txt-txtfile-variable:
+      datatype: string
+      expression:
+        literal:
+        - /opt/support/txt
+        - /opt/support/xml
+      kind: constant
+      title: This constant_variable represents the string values 'C:\support\txt\txtfile'
+        and 'C:\support\txt\txtfile\subtxtfile'.
+    this-constant-variable-represents-string-values-c-support-txt-txtfile-variant-2-variable:
+      datatype: string
+      expression:
+        literal:
+        - /opt/support/txt/txtfile
+        - /opt/support/txt/txtfile/subtxtfile
+      kind: constant
+      title: This constant_variable represents the string values 'C:\support\txt\txtfile'
+        and 'C:\support\txt\txtfile\subtxtfile'.
+  shared_objects:
+    this-object-represents-file-object-path-equal-c-support-txt-object:
+      capability: unix.file
+      object_title: This object represents a file_object with a path equal to 'C:\support\txt\'.
+      select:
+        directory:
+          equals: /opt/support
+        name: null
+      filesystem: local
+      traversal:
+        max_depth: null
+        recurse: symlinks_and_directories
+    this-object-represents-file-object-path-that-matches-regular-expression-object:
+      capability: unix.file
+      object_title: This object represents a file_object with a path that matches
+        the regular expression 'C:\\support\\txt.*'.
+      select:
+        directory:
+          equals: /opt/support/txt
+        name: null
+      filesystem: local
+      traversal:
+        max_depth: 0
+        recurse: symlinks_and_directories
+    this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object:
+      capability: unix.file
+      object_title: This object represents a file_object with a path that matches
+        the regular expression 'C:\\support\\txt.+'.
+      select:
+        directory:
+          equals: /opt/support/xml
+        name: null
+      filesystem: local
+      traversal:
+        max_depth: null
+        recurse: symlinks_and_directories
+    this-object-represents-file-object-path-that-matches-regular-expression-variant-3-object:
+      capability: unix.file
+      object_title: This object represents a file_object with a path that matches
+        the regular expression 'C:\\support\\txt.*'.
+      select:
+        directory:
+          equals: /opt/support/xml
+        name: null
+      filesystem: local
+      traversal:
+        max_depth: 0
+        recurse: symlinks_and_directories
+    this-object-represents-file-object-that-set-b-c-complement-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set ( {a,b,c}
+        COMPLEMENT {b,c} ) which equals set {a}.
+      set:
+        operator: difference
+        operands:
+        - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+          filters: []
+        - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object
+          filters: []
+    this-object-represents-file-object-that-set-b-c-complement-variant-2-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set ( ( {a,b,c}
+        COMPLEMENT {b,c} ) INTERSECTION ( {a} UNION {b,c} ) ) which equals set {a}.
+      set:
+        operator: intersection
+        operands:
+        - set:
+            operator: difference
+            operands:
+            - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+              filters: []
+            - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object
+              filters: []
+        - set:
+            operator: union
+            operands:
+            - object: this-object-represents-file-object-path-equal-c-support-txt-object
+              filters: []
+            - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object
+              filters: []
+    this-object-represents-file-object-that-set-b-c-filtered-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set {a,b,c} filtered
+        by b and c which equals set {a}.
+      set:
+        operator: union
+        operands:
+        - object:
+            capability: unix.file
+            set:
+              operator: union
+              operands:
+              - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+                filters: []
+          filters:
+          - exclude:
+              directory:
+                require: at_least_one_exists_and_all_match
+                equals:
+                  variable: this-constant-variable-represents-string-values-c-support-txt-txtfile-variant-2-variable
+                datatype: string
+                value_match: one
+    this-object-represents-file-object-that-set-b-c-intersection-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set ( {a,b,c}
+        INTERSECTION {b,c} ) which equals set {b,c}.
+      set:
+        operator: intersection
+        operands:
+        - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+          filters: []
+        - object: this-object-represents-file-object-path-equal-c-support-txt-object
+          filters: []
+    this-object-represents-file-object-that-set-union-b-c-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set ( {a} UNION
+        {b,c} ) which equals set {a,b,c}.
+      set:
+        operator: union
+        operands:
+        - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+          filters: []
+        - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-3-object
+          filters: []
+    this-object-represents-file-object-that-set-union-complement-b-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set ( ( ( {a}
+        UNION {} ) COMPLEMENT ( {a,b,c} INTERSECTION {b,c} ) ) INTERSECTION ( ( {a,b,c}
+        COMPLEMENT {b,c} ) UNION ( {a} UNION {a,b,c} ) ) ) which equals set {a}.
+      set:
+        operator: intersection
+        operands:
+        - set:
+            operator: difference
+            operands:
+            - set:
+                operator: union
+                operands:
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+                  filters: []
+            - set:
+                operator: intersection
+                operands:
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-3-object
+                  filters: []
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object
+                  filters: []
+        - set:
+            operator: union
+            operands:
+            - set:
+                operator: difference
+                operands:
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-3-object
+                  filters: []
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object
+                  filters: []
+            - set:
+                operator: union
+                operands:
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+                  filters: []
+                - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-3-object
+                  filters: []
+    this-object-represents-file-object-that-set-union-complement-b-variant-2-object:
+      capability: unix.file
+      object_title: This object represents a file_object that is the set ( ( ( {a}
+        UNION {} ) COMPLEMENT ( ( {a,b,c} COMPLEMENT {b,c} ) UNION ( ( {a} UNION {a,b,c}
+        ) filtered by {b,c} ) ) ) INTERSECTION {} ) which equals {}.
+      set:
+        operator: intersection
+        operands:
+        - set:
+            operator: difference
+            operands:
+            - set:
+                operator: union
+                operands:
+                - object: this-object-represents-file-object-path-equal-c-support-txt-object
+                  filters: []
+            - set:
+                operator: union
+                operands:
+                - set:
+                    operator: difference
+                    operands:
+                    - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+                      filters: []
+                    - object: this-object-represents-file-object-path-that-matches-regular-expression-variant-2-object
+                      filters: []
+                - set:
+                    operator: union
+                    operands:
+                    - object:
+                        capability: unix.file
+                        set:
+                          operator: union
+                          operands:
+                          - object: this-object-represents-file-object-path-equal-c-support-txt-object
+                            filters: []
+                          - object: this-object-represents-file-object-path-that-matches-regular-expression-object
+                            filters: []
+                      filters:
+                      - exclude:
+                          directory:
+                            require: at_least_one_exists_and_all_match
+                            equals:
+                              variable: this-constant-variable-represents-string-values-c-support-txt-txtfile-variant-2-variable
+                            datatype: string
+                            value_match: one
+  tests:
+    set-construct-supported-complement-operation-test:
+      test_title: Test that the set construct is supported with the COMPLEMENT operation.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-b-c-complement-object
+      require: only_one_exists_and_matches
+      states:
+      - directory:
+          require: at_least_one_exists_and_all_match
+          equals: /opt/support/txt
+          datatype: string
+    set-construct-supported-union-operation-test:
+      test_title: Test that the set construct is supported with the UNION operation.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-union-b-c-object
+      require: at_least_one_exists_and_all_match
+      states:
+      - directory:
+          require: at_least_one_exists_and_all_match
+          equals:
+            variable: this-constant-variable-represents-string-values-c-support-txt-txtfile-variable
+          datatype: string
+          value_match: one
+    set-object-supported-filter-element-test:
+      test_title: Test that the set object is supported with the filter element.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-b-c-filtered-object
+      require: only_one_exists_and_matches
+      states:
+      - directory:
+          require: at_least_one_exists_and_all_match
+          equals: /opt/support/txt
+          datatype: string
+    set-object-supported-one-level-set-elements-test:
+      test_title: Test that the set object is supported with one level of set elements.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-b-c-complement-variant-2-object
+      require: at_least_one_exists_and_all_match
+      states:
+      - directory:
+          require: at_least_one_exists_and_all_match
+          equals:
+            variable: this-constant-variable-represents-string-values-c-support-txt-c-variable
+          datatype: string
+          value_match: one
+    set-object-supported-set-operator-equal-intersection-test:
+      test_title: Test that the set object is supported with the set_operator equal
+        to 'INTERSECTION'.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-b-c-intersection-object
+      require: only_one_exists_and_matches
+      states:
+      - directory:
+          require: at_least_one_exists_and_all_match
+          equals: /opt/support/txt
+          datatype: string
+    set-object-supported-three-levels-set-elements-test:
+      test_title: Test that the set object is supported with three levels of set elements.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-union-complement-b-variant-2-object
+      require: none_exist
+    set-object-supported-two-levels-set-elements-test:
+      test_title: Test that the set object is supported with two levels of set elements.
+      reported_elements: all
+      capability: unix.file
+      object: this-object-represents-file-object-that-set-union-complement-b-object
+      require: at_least_one_exists_and_all_match
+      states:
+      - directory:
+          require: at_least_one_exists_and_all_match
+          equals: /opt/support/txt
+          datatype: string
+  evaluate:
+    all:
+    - test: set-construct-supported-complement-operation-test
+    - test: set-object-supported-set-operator-equal-intersection-test
+    - test: set-construct-supported-union-operation-test
+    - test: set-object-supported-filter-element-test
+    - test: set-object-supported-one-level-set-elements-test
+    - test: set-object-supported-two-levels-set-elements-test
+    - test: set-object-supported-three-levels-set-elements-test
