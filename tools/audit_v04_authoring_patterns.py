@@ -45,6 +45,7 @@ def _canonical(value):
 def scan(documents):
     counts = Counter()
     examples = defaultdict(list)
+    pattern_sites = defaultdict(set)
     per_benchmark = defaultdict(Counter)
     docs = tests = 0
 
@@ -53,6 +54,14 @@ def scan(documents):
         parts = path.split("/")
         benchmark = parts[1] if len(parts) > 1 else "unknown"
         per_benchmark[benchmark][code] += 1
+        if code in HIGH_CONFIDENCE:
+            # Audit ALL affected sites, not merely the first displayed samples.
+            # Site identity and operator are part of the change detection:
+            # moving an anomaly elsewhere must fail even if the total falls.
+            pattern_sites[code].add(_canonical({
+                "path": _short(path), "assessment": assessment,
+                "test": test_id, "site": list(route), "details": extra,
+            }))
         if len(examples[code]) < MAX_EXAMPLES:
             row = {"path": _short(path), "assessment": assessment,
                    "test": test_id, "site": list(route)}
@@ -178,6 +187,8 @@ def scan(documents):
         "by_benchmark": {name: dict(sorted(rows.items()))
                          for name, rows in sorted(per_benchmark.items())},
         "examples": {name: rows for name, rows in sorted(examples.items())},
+        "pattern_sites": {name: sorted(rows)
+                          for name, rows in sorted(pattern_sites.items())},
         "high_confidence_non_growth": sorted(HIGH_CONFIDENCE),
         "review_only_no_automatic_rewrite": sorted(REVIEW_ONLY),
         "original_oval_identity_checked": False,
@@ -193,9 +204,12 @@ def compare(baseline, candidate):
     for name in sorted(HIGH_CONFIDENCE):
         before = baseline["counts"].get(name, 0)
         after = candidate["counts"].get(name, 0)
-        if after > before:
+        new_sites = sorted(set(candidate["pattern_sites"].get(name, [])) -
+                           set(baseline["pattern_sites"].get(name, [])))
+        if after > before or new_sites:
             regressions.append({"pattern": name, "baseline": before,
                                 "candidate": after,
+                                "new_sites": new_sites[:15],
                                 "sample": candidate["examples"].get(name, [])[:4]})
     return {"status": "PASS" if not regressions else "FAIL",
             "baseline_counts": baseline["counts"],
