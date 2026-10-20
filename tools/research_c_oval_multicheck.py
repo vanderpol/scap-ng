@@ -403,7 +403,11 @@ def descriptive_distinct_alias(title,fields,existing,*,selectors=None,capability
                                   "case_insensitive_equals",
                                   "case_insensitive_not_equal") or type(value) is not str:
                         break
-                    slug=ID.sub("_",value.lower()).strip("_")
+                    # A pattern such as ".*" is meaningful (any text)
+                    # but has no alphabetic slug. Preserve the predicate in
+                    # C and give only the authored ID its lexical meaning.
+                    slug=("any_text" if op=="matches_regex" and value==".*"
+                          else ID.sub("_",value.lower()).strip("_"))
                     if not slug:
                         break
                     pieces.append((field,slug,{
@@ -414,6 +418,9 @@ def descriptive_distinct_alias(title,fields,existing,*,selectors=None,capability
                 if len(pieces)==2:
                     candidate=("_".join((pieces[0][0],pieces[0][1],pieces[0][2],
                                           pieces[1][0],pieces[1][1],pieces[1][2])))
+                    if len(candidate)>63:
+                        candidate=("u_"+pieces[0][1]+"_"+pieces[0][2]+
+                                   "_p_"+pieces[1][1]+"_"+pieces[1][2])
                     if (candidate not in existing and len(candidate)<=63 and
                         re.fullmatch(r"[a-z][a-z0-9_]*",candidate)):
                         return candidate
