@@ -63,6 +63,20 @@ def main():
             else:
                 totals[kind+"_schema_fail"]+=1
                 for error in sorted(errors,key=lambda e:(len(e.path),str(e.path)))[:5]:
+                    # anyOf/oneOf wrappers hide the real rejected field path.
+                    # Preserve leaf contexts separately without claiming each
+                    # candidate branch is an independent validation failure.
+                    frontier=[(error,0)]
+                    while frontier:
+                        node,depth=frontier.pop()
+                        if node.context and depth<5:
+                            frontier.extend((child,depth+1) for child in node.context[:60])
+                        else:
+                            leaf=(node.validator or "unknown")+":"+("/".join(map(str,node.absolute_path)) or "$root")
+                            nested_groups[leaf]+=1
+                            if len(nested_examples[leaf])<3:
+                                nested_examples[leaf].append({"path":path,"message":node.message[:180]})
+
                     key=kind+":"+error.validator+":"+("/".join(map(str,error.absolute_path)) or "$root")
                     totals[key]+=1
                     group=kind+":"+error.validator+":"+(str(next(iter(error.absolute_path),"root")))
@@ -74,13 +88,17 @@ def main():
     report={"status":"diagnostic_only","archive":str(args.archive),
             "checked_documents":len(names),"counts":dict(totals),
             "examples":dict(examples),"grouped_failure_counts":dict(grouped.most_common()),
-            "group_examples":dict(group_examples),"schema_release_conformant":False,
+            "group_examples":dict(group_examples),
+            "nested_leaf_counts":dict(nested_groups.most_common()),
+            "nested_leaf_examples":dict(nested_examples),
+            "schema_release_conformant":False,
             "warning":"This audit does not prove native semantic checks, compiler support or scanner equivalence."}
     args.out.parent.mkdir(parents=True,exist_ok=True)
     args.out.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n")
     print(json.dumps({"checked_documents":len(names),
         "schema_passes":{k:v for k,v in totals.items() if k.endswith("_schema_pass")},
         "schema_failures":{k:v for k,v in totals.items() if k.endswith("_schema_fail")},
-        "error_classes":len(examples),"top_failure_groups":grouped.most_common(12)},indent=2))
+        "error_classes":len(examples),"top_failure_groups":grouped.most_common(12),
+        "top_nested_leaves":nested_groups.most_common(12)},indent=2))
     assert len(names)==4001 if not args.limit else len(names)<=args.limit
 if __name__=="__main__":main()
