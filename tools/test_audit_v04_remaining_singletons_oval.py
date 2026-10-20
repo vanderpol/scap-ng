@@ -51,6 +51,21 @@ class RemainingSingletonTests(unittest.TestCase):
         self.assertEqual(r["classifications"],{"MULTIPLE_SOURCE_MATCHES":1})
         self.assertEqual(len(r["items"][0]["source_matches"]),2)
 
+    def test_shared_duplicate_source_ids_are_not_false_ambiguity(self):
+        d=doc()
+        src=xml("Registry keys",True)
+        sources={"ms_windows_11":[src,xml("Registry keys",True)]}
+        r=audit(d,sources,pins())
+        self.assertEqual(r["classifications"],{"REPEATED_IDENTICAL_SOURCE_OBJECT":1})
+        self.assertEqual(len(r["items"][0]["source_matches"]),2)
+
+    def test_distinct_source_ids_remain_ambiguous(self):
+        one=xml("Registry keys",False)
+        two=xml("Registry keys",True)
+        two.set("id","oval:obj:another")
+        r=audit(doc(),{"ms_windows_11":[one,two]},pins())
+        self.assertEqual(r["classifications"],{"MULTIPLE_DISTINCT_SOURCE_OBJECTS":1})
+
     def test_no_title_is_not_assumed_oval_identity(self):
         d=doc()
         ob=d[P]["assessment"]["tests"]["check-test"]["object"]
