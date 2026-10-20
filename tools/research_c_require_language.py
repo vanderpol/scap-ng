@@ -78,7 +78,7 @@ MATCH={
     "none":"none_match",
 }
 SCALAR=(str,int,float,bool)
-OPS={"equals","not_equal","matches_regex"}
+OPS={"equals","not_equal","case_insensitive_equals","case_insensitive_not_equal","matches_regex"}
 MAX_FIELDS=100
 
 def _catalog():
@@ -122,7 +122,7 @@ def _typed_fields(fields, native, capability):
         if type(raw) in SCALAR:
             op,value="equals",raw
         elif isinstance(raw,dict) and len(raw)==1 and next(iter(raw)) in (
-            "equals","not_equal","matches_regex",
+            "equals","not_equal","case_insensitive_equals","case_insensitive_not_equal","matches_regex",
             "greater_than","greater_than_or_equal",
             "less_than","less_than_or_equal"
         ):
@@ -131,7 +131,7 @@ def _typed_fields(fields, native, capability):
               "datatype" in raw and
               len(set(raw)-{"datatype"})==1 and
               next(iter(set(raw)-{"datatype"})) in (
-                  "equals","not_equal","matches_regex",
+                  "equals","not_equal","case_insensitive_equals","case_insensitive_not_equal","matches_regex",
                   "greater_than","greater_than_or_equal",
                   "less_than","less_than_or_equal")):
             op=next(iter(set(raw)-{"datatype"}))
@@ -163,6 +163,8 @@ def _typed_fields(fields, native, capability):
         if op in ("greater_than","greater_than_or_equal",
                   "less_than","less_than_or_equal") and type(value) is not int:
             raise ValueError("integer comparison requires an explicit integer literal")
+        if op in ("case_insensitive_equals","case_insensitive_not_equal") and type(value) is not str:
+            raise ValueError("case-insensitive comparison requires a string literal")
         if op=="matches_regex" and type(value) is not str:
             raise ValueError("regular expression requires a string pattern")
         expected_types=native["field_datatypes"].get(field,[])
@@ -209,7 +211,7 @@ def _selectors(selector, native):
             raise ValueError("unsupported Object selector")
         if type(value) in (str,int):
             converted[field]={"equals":value}
-        elif isinstance(value,dict) and set(value) in ({"equals"},{"matches_regex"}):
+        elif isinstance(value,dict) and set(value) in ({"equals"},{"matches_regex"},{"case_insensitive_equals"},{"case_insensitive_not_equal"}):
             converted[field]=deepcopy(value)
         else:
             raise ValueError("unsupported/implicit Object predicate")
@@ -217,6 +219,11 @@ def _selectors(selector, native):
             type(converted[field]["matches_regex"]) is not str
         ):
             raise ValueError("selector regex requires a string pattern")
+        if any(op in converted[field] for op in ("case_insensitive_equals",
+                "case_insensitive_not_equal")) and (
+            type(next(iter(converted[field].values()))) is not str
+        ):
+            raise ValueError("case-insensitive selector requires a string literal")
         enumerated=native.get("selector_value_enums",{}).get(field)
         if enumerated and converted[field].get("equals") not in enumerated:
             raise ValueError(f"{field} selector must use native enum")
