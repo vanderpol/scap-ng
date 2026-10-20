@@ -21,6 +21,15 @@ import yaml
 PAIRS={"at_least_one_exists_and_all_match":"one_or_more",
        "may_be_absent_and_all_match":"may_be_absent"}
 INVERSE={v:k for k,v in PAIRS.items()}
+PRESENCE={
+    "at_least_one_exists":"one_or_more",
+    "none_exist":"none",
+    "only_one_exists":"exactly_one",
+    "all_exist":"all",
+    "may_be_absent":"may_be_absent",
+}
+PRESENCE_INVERSE={v:k for k,v in PRESENCE.items()}
+
 
 def promote(doc):
     new=deepcopy(doc)
@@ -46,6 +55,11 @@ def promote(doc):
             test.pop("states")
             test["require"]={"items":PAIRS[old],"all_items_must":states}
             audit["all_items_must"]+=1
+        elif old in PRESENCE and not states and "states_match" not in test:
+            source_key="collected_items_require" if "collected_items_require" in test else "require"
+            test.pop(source_key)
+            test["require"]={"items":PRESENCE[old]}
+            audit["presence_only_structured"]+=1
         elif "collected_items_require" in test:
             test["require"]=test.pop("collected_items_require")
             audit["explicit_fallback"]+=1
@@ -66,7 +80,12 @@ def recover(candidate,original):
             test["object"]["capability"]=orig["object"]["capability"]
         source_key="collected_items_require" if "collected_items_require" in orig else "require"
         req=test.get("require")
-        if isinstance(req,dict):
+        if isinstance(req,dict) and set(req)=={"items"}:
+            if req["items"] not in PRESENCE_INVERSE or "states" in test:
+                raise ValueError("Invalid presence-only structured requirement")
+            test.pop("require")
+            test[source_key]=PRESENCE_INVERSE[req["items"]]
+        elif isinstance(req,dict):
             if set(req)!={"items","all_items_must"} or req["items"] not in INVERSE:
                 raise ValueError("Unsupported new requirement structure")
             states=req["all_items_must"]
