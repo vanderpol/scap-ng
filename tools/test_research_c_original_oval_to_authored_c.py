@@ -257,12 +257,27 @@ class OriginalOVALNativeCCompilationTests(unittest.TestCase):
         self.assertEqual(result["native_c_compiled_test"]["require"],"all_exist")
         self.assertNotIn("states",result["native_c_compiled_test"])
 
-    def test_not_equal_selector_is_not_guessed_as_equal(self):
+    def test_not_equal_selector_preserves_exact_existing_A_predicate(self):
         source=original_plist()
         obj=next(iter(source["objects"].values()))
         obj["select"]["filepath"]["operation"]="not equal"
+        before=deepcopy(source)
+        result=compile_one_original_definition(source)
+        self.assertEqual(source,before)
+        value="/Library/Preferences/com.apple.PowerManagement.plist"
+        self.assertEqual(result["authored_c"]["from"]["macos.plist511"]["filepath"],
+                         {"not_equal":value})
+        self.assertEqual(result["native_c_compiled_test"]["object"]["select"][
+                         "filepath"],{"not_equal":value})
+        self.assertTrue(result["A_source_semantic_projection_passed"])
+        self.assertFalse(result["OVAL_actual_scanner_parity_proven"])
+
+    def test_not_equal_registry_hive_enum_is_not_accepted_as_equality(self):
+        source=original_windows_registry_1020_test()
+        obj=next(iter(source["objects"].values()))
+        obj["select"]["hive"]["operation"]="not equal"
         with self.assertRaisesRegex(NotNativeCConvertible,
-                                    "SELECTOR_OPERATOR_OR_TYPE_UNSUPPORTED"):
+                                    "C_COMPILER_NOT_SUPPORTED"):
             compile_one_original_definition(source)
 
     def test_original_expectation_changed_from_bool_to_string_cannot_pass(self):
