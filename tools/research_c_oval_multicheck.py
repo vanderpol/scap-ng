@@ -8,6 +8,7 @@ No source Test may be omitted or silently rewritten. All other shapes fail.
 """
 from __future__ import annotations
 from copy import deepcopy
+from collections import Counter
 import re
 
 from research_c_original_oval_to_authored_c import (
@@ -379,6 +380,13 @@ def convert_distinct_selected_many(a):
     used_objects=set()
     used_states=set()
     comparisons={}
+    if any(not isinstance(t,dict) or type(t.get("object")) is not str
+           for t in tests.values()):
+        reject("MULTI_DISTINCT_TEST_OBJECT_ID_REQUIRED")
+    usage=Counter(t["object"] for t in tests.values())
+    reused={oid:"reused_collection_"+str(i+1)
+            for i,oid in enumerate(sorted(o for o,n in usage.items() if n>1))}
+    observations={}
     for tid,t in sorted(tests.items()):
         if (not isinstance(t,dict) or set(t)-{
             "capability","check","check_existence","object","states",
@@ -386,7 +394,7 @@ def convert_distinct_selected_many(a):
             t.get("reported_elements")!="all"):
             reject("MULTI_DISTINCT_TEST_QUANTIFIER_OR_ATTRS_UNSUPPORTED")
         oid=t.get("object")
-        if oid not in objects or oid in used_objects:
+        if oid not in objects:
             reject("MULTI_DISTINCT_OBJECT_MISSING_OR_SHARED")
         used_objects.add(oid)
         obj=objects[oid]
@@ -422,9 +430,19 @@ def convert_distinct_selected_many(a):
             must=PRESENCE[t["check_existence"]]
             original_entities=[]
         alias=descriptive_distinct_alias(t.get("test_title"),fields,checks)
-        checks[alias]={"source_test":tid,
-                       "from":{t["capability"]:selectors},
-                       "must":must}
+        source={"from":{t["capability"]:selectors}}
+        if oid in reused:
+            collection_alias=reused[oid]
+            if collection_alias not in observations:
+                observations[collection_alias]={
+                    "source_object":oid,"from":deepcopy(source["from"])}
+            elif observations[collection_alias]["from"]!=source["from"]:
+                reject("MULTI_DISTINCT_REUSED_OBJECT_SELECTOR_DRIFT")
+            checks[alias]={"source_test":tid,
+                           "observation":collection_alias,
+                           "must":must}
+        else:
+            checks[alias]={"source_test":tid,**source,"must":must}
         source_to_alias[tid]=alias
         comparisons[tid]=(obj,original_entities)
     if used_objects!=set(objects) or used_states!=set(states):
@@ -434,16 +452,26 @@ def convert_distinct_selected_many(a):
         inventory_error="MULTI_DISTINCT_SOURCE_TEST_COVERAGE_DRIFT")
     c={"id":a["id"],"checks":checks,
        "require":c_logic}
+    if observations:
+        c["observations"]=observations
     try:
         compiled=compile_c_unified(c)
     except (ValueError,TypeError,KeyError) as exc:
         reject("MULTI_DISTINCT_UNIFIED_COMPILER_REJECTED: "+str(exc))
     verify_compiled_source_boolean_tree(compiled,original_logic,source_to_alias)
     if (set(compiled["tests"])!=set(checks) or
-        compiled.get("shared_objects") or compiled.get("shared_singletons")):
+        set(compiled.get("shared_objects",{}))!=set(reused) or
+        compiled.get("shared_singletons")):
         reject("MULTI_DISTINCT_COMPILER_CONFLATED_SOURCE_OBJECTS")
     for tid,alias in source_to_alias.items():
-        out=compiled["tests"][alias]
+        out=deepcopy(compiled["tests"][alias])
+        oid=tests[tid]["object"]
+        if oid in reused:
+            if out.get("object")!=oid:
+                reject("MULTI_DISTINCT_REUSED_OBJECT_REFERENCE_DRIFT")
+            out["object"]=deepcopy(compiled["shared_objects"][oid])
+        elif not isinstance(out.get("object"),dict):
+            reject("MULTI_DISTINCT_UNSHARED_OBJECT_REFERENCE_DRIFT")
         obj,original_entities=comparisons[tid]
         _same_source_semantics(tests[tid],out,obj,original_entities)
     return {
@@ -455,7 +483,8 @@ def convert_distinct_selected_many(a):
             alias:tests[tid]["test_title"]
             for tid,alias in source_to_alias.items()},
         "native_c_compiled_tests":deepcopy(compiled["tests"]),
-        "C_uses_independent_selected_objects":True,
+        "C_uses_independent_selected_objects":not bool(reused),
+        "C_preserves_mixed_original_object_reuse":bool(reused),
         "A_source_semantic_projection_passed":True,
         "OVAL_actual_scanner_parity_proven":False,
     }
