@@ -11,7 +11,7 @@ from copy import deepcopy
 import re
 
 from research_c_original_oval_to_authored_c import (
-    NotNativeCConvertible, reject, project_selection, project_fields, _entities, _same_source_semantics, OPS)
+    NotNativeCConvertible, reject, project_selection, project_fields, _entities, _same_source_semantics, OPS, PAIR_CHECK)
 from research_c_require_language import _mapping
 from research_c_unified_compiler import compile_c_unified
 
@@ -36,6 +36,22 @@ def alias_of(title, fields):
     if not result or not result[0].isalpha() or len(result)>90:
         reject("SOURCE_TEST_TITLE_UNSUITABLE_FOR_MEANINGFUL_ALIAS")
     return result
+
+def source_test_field_must(test, fields):
+    """Keep OVAL check=all/at least one/only one/none satisfy per source Test.
+
+    Existence is a distinct axis. No advanced check_existence is inferred from
+    the matching operation; unsupported pairs must remain compatibility data.
+    """
+    if test.get("check_existence")!="at_least_one_exists":
+        reject("SOURCE_TEST_ADVANCED_EXISTENCE_UNSUPPORTED")
+    token=PAIR_CHECK.get(test.get("check"))
+    modes={"all_match":"every_item","some_match":"any_item",
+           "only_one_matches":"one_matching_item","none_match":"no_matching_item"}
+    if token not in modes:
+        reject("SOURCE_TEST_MATCHING_QUANTIFIER_UNSUPPORTED")
+    return {modes[token]:fields}
+
 
 def source_boolean_tree_to_c(tree, source_to_alias, *, inventory_error):
     """Faithfully map original A/OVAL AND/OR, including nested groups.
@@ -124,7 +140,7 @@ def convert_objectless_many(a):
                 or t.get("reported_elements")!="all"):
             reject("TEST_SINGLETON_COLLECTION_IDENTITY_MISMATCH")
         if (t.get("check_existence")!="at_least_one_exists"
-                or t.get("check")!="all"):
+                or t.get("check") not in PAIR_CHECK):
             reject("SOURCE_TEST_UNSUPPORTED_QUANTIFIER")
         refs=t.get("states") or []
         if len(refs)!=1 or refs[0] not in states:
@@ -146,7 +162,7 @@ def convert_objectless_many(a):
         checks[alias]={
             "observation":"system_status",
             "source_test":tid,
-            "must":{"every_item":fields},
+            "must":source_test_field_must(t,fields),
         }
     if used_states!=set(states):
         reject("UNUSED_SOURCE_STATE")
@@ -231,7 +247,7 @@ def convert_selected_shared_many(a):
             reject("SHARED_SELECTED_TEST_HAS_EXTRA_SOURCE_FIELDS")
         if (t.get("object")!=oid or t.get("capability")!=cap or
             t.get("reported_elements")!="all" or
-            t.get("check")!="all" or
+            t.get("check") not in PAIR_CHECK or
             t.get("check_existence")!="at_least_one_exists"):
             reject("SHARED_SELECTED_TEST_HAS_DIFFERENT_SOURCE_SCOPE")
         refs=t.get("states")
@@ -257,7 +273,7 @@ def convert_selected_shared_many(a):
             reject("SHARED_SELECTED_TEST_ALIAS_COLLISION_OR_TOO_LONG")
         checks[alias]={"observation":"original_collection",
                        "source_test":tid,
-                       "must":{"every_item":fields}}
+                       "must":source_test_field_must(t,fields)}
         reverse[tid]=alias
         entities[tid]=_entities(st["state"])
     if used_states!=set(states):
@@ -366,7 +382,7 @@ def convert_distinct_selected_many(a):
         if (not isinstance(t,dict) or set(t)-{
             "capability","check","check_existence","object","states",
             "reported_elements","test_title"} or
-            t.get("check")!="all" or
+            t.get("check") not in PAIR_CHECK or
             t.get("check_existence")!="at_least_one_exists" or
             t.get("reported_elements")!="all"):
             reject("MULTI_DISTINCT_TEST_QUANTIFIER_OR_ATTRS_UNSUPPORTED")
@@ -395,7 +411,7 @@ def convert_distinct_selected_many(a):
         alias=descriptive_distinct_alias(t.get("test_title"),fields,checks)
         checks[alias]={"source_test":tid,
                        "from":{t["capability"]:selectors},
-                       "must":{"every_item":fields}}
+                       "must":source_test_field_must(t,fields)}
         source_to_alias[tid]=alias
         comparisons[tid]=(obj,_entities(state["state"]))
     if used_objects!=set(objects) or used_states!=set(states):
