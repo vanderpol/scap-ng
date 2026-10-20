@@ -48,7 +48,7 @@ class RemainingSingletonTests(unittest.TestCase):
 
     def test_ambiguous_source_titles_not_guessed(self):
         r=audit(doc(),{"ms_windows_11":[xml("Registry keys"),xml("Registry keys",True)]},pins())
-        self.assertEqual(r["classifications"],{"MULTIPLE_SOURCE_MATCHES":1})
+        self.assertEqual(r["classifications"],{"SAME_ID_DIVERGENT_SOURCE_XML":1})
         self.assertEqual(len(r["items"][0]["source_matches"]),2)
 
     def test_shared_duplicate_source_ids_are_not_false_ambiguity(self):
