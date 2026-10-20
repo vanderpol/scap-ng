@@ -305,7 +305,8 @@ jobs:
           PYTHONPATH=scap-ng/tools python -m unittest -v scap-ng/tools/test_research_c_constant_state_source.py
           PYTHONPATH=scap-ng/tools python scap-ng/tools/research_c_constant_state_source.py \
             --review c-review --manifest c-native/conversion-manifest.json \
-            --out c-native/fixed-state-constant-hybrid-census.json
+            --out c-native/fixed-state-constant-hybrid-census.json \
+            --examples-dir c-native/fixed-state-authoring
           python - <<'PY'
           import json
           from pathlib import Path
@@ -313,6 +314,9 @@ jobs:
           assert r["variable_blocked_definitions"]==68
           assert r["hybrid_source_graph_proven_definitions"]>=8
           assert r["moved_constant_variables"]>=14
+          idx=json.loads(Path("c-native/fixed-state-authoring/index.json").read_text())
+          assert len(idx["source_definitions"])==r["hybrid_source_graph_proven_definitions"]
+          assert idx["full_native_C_compilation_proven"] is False
           assert r["still_native_C_converted_definitions"]>=36
           assert r["scanner_parity_proven"] is False
           assert r["full_native_C_compilation_proven"] is False
