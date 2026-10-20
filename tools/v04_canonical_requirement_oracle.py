@@ -11,6 +11,10 @@ legacy matching families are inventoried, NOT asserted equivalent.
 from __future__ import annotations
 
 import argparse
+from migrate_v04_oval_proven_direct_filters import (
+    index_provenance, migrate as migrate_source_proven_filter,
+)
+
 from collections import Counter
 from itertools import product
 import json
@@ -96,12 +100,17 @@ def comparison_matrix(axis):
     return {"compared": tested, "unresolved_empty_aggregate": unresolved}
 
 
-def compare_original_to_canonical(original, canonical):
+def compare_original_to_canonical(original, canonical, *, filter_proof=None):
     if set(original) != set(canonical):
         raise ValueError("different original/canonical document path sets")
     # The reviewed Benchmark 0.3 -> 0.4 declaration update is the only
     # intentional source difference outside lossless Test/Object promotion.
-    promoted = {path: promote(doc)[0] for path, doc in original.items()}
+    promoted = {}
+    for path, doc in original.items():
+        proposed, _ = promote(doc)
+        if filter_proof is not None:
+            proposed, _ = migrate_source_proven_filter(proposed, path, filter_proof)
+        promoted[path] = proposed
     if any("benchmark" in doc for doc in original.values()):
         promoted, _ = reconcile_benchmark_specifications(promoted)
     counts = Counter()
@@ -154,10 +163,14 @@ def main():
     p.add_argument("--canonical-json", type=Path, required=True)
     p.add_argument("--report", type=Path, required=True)
     p.add_argument("--assert-six", action="store_true")
+    p.add_argument("--filter-proof", type=Path, default=None,
+                   help="Original-OVAL source Filter classification; required for migrated 0.4 sources")
     a = p.parse_args()
     original = read_authoring_archive(a.original_json, "json")
     canonical = read_authoring_archive(a.canonical_json, "json")
-    result = compare_original_to_canonical(original, canonical)
+    proof = (index_provenance(json.loads(a.filter_proof.read_text()), assert_six=True)
+             if a.filter_proof else None)
+    result = compare_original_to_canonical(original, canonical, filter_proof=proof)
     if a.assert_six and (
         result["documents"],
         result["test_population"].get("converted_presence"),
