@@ -16,7 +16,8 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 import yaml
 
-from research_c_original_oval_to_authored_c import compile_one_original_definition
+from research_c_original_oval_to_authored_c import (
+    compile_one_original_definition, NotNativeCConvertible)
 
 PIN="e3538595c5083b9c34d937a81d319234df9bbfaa"
 WIN_REG="windows/win-def_registry_test.xml"
@@ -104,7 +105,105 @@ def verify_complete_platform_definitions(corpus,review,native):
         }
     return report
 
-def registry_from_original_A(corpus,review,published):
+def family_census(native):
+    """Actual source-compatible C Definition coverage, not a Linux STIG score."""
+    m=json.loads((native/"conversion-manifest.json").read_text(encoding="utf-8"))
+    result={}
+    for family in ("linux","unix","windows"):
+        converted=[x for x in m["native_C_converted"] if
+                   x["file"].startswith(family+"/")]
+        unsupported=[x for x in m["unsupported"] if
+                     x["file"].startswith(family+"/")]
+        reasons={}
+        for row in unsupported:
+            reason=row["reason"].split(":")[0]
+            reasons[reason]=reasons.get(reason,0)+1
+        result[family]={
+            "source_compatible_definitions":len(converted)+len(unsupported),
+            "full_native_C_definitions":len(converted),
+            "unconverted_definitions":len(unsupported),
+            "first_rejection_categories":dict(sorted(reasons.items())),
+        }
+    return result
+
+
+def _has_variable_dependency(node):
+    if isinstance(node,dict):
+        if "variable" in node or "var_ref" in node:
+            return True
+        return any(_has_variable_dependency(value) for value in node.values())
+    if isinstance(node,list):
+        return any(_has_variable_dependency(value) for value in node)
+    return False
+
+
+def independent_registry_test_slices(a,outdir):
+    """One isolated A Test at a time. Never imply the Definition compiled.
+
+    Variables, collection filters, set operations, missing State references
+    and unsupported source semantics retain explicit rejection reasons.
+    """
+    require(len(a["tests"])==15,"source A Registry Test inventory changed")
+    outdir.mkdir(parents=True,exist_ok=True)
+    passed=[];blocked=[]
+    for tid,test in sorted(a["tests"].items()):
+        try:
+            require(test["capability"]=="windows.registry",
+                    "other capability in Registry source inventory")
+            oid=test["object"]
+            state_ids=test.get("states",[])
+            require(isinstance(state_ids,list),
+                    "source Test State references malformed")
+            obj=deepcopy(a["objects"][oid])
+            states={sid:deepcopy(a["states"][sid]) for sid in state_ids}
+            if _has_variable_dependency([test,obj,states]):
+                raise NotNativeCConvertible("SOURCE_VARIABLE_COLLECTION_OR_STATE_DEPENDENCY")
+            # Normalize only source OVAL hive labels that the A mapping
+            # already knows. Leave every other selector/predicate untouched.
+            selector=obj.get("select",{}).get("hive")
+            if isinstance(selector,dict) and selector.get("datatype")=="string":
+                value=selector.get("value")
+                if value in HIVE_CROSSWALK:
+                    selector["value"]=HIVE_CROSSWALK[value]
+            for state in states.values():
+                predicates=state.get("state")
+                values=(predicates.get("all",[]) if
+                        isinstance(predicates,dict) and
+                        set(predicates)=={"all"} else [predicates])
+                for predicate in values:
+                    if isinstance(predicate,dict) and predicate.get("field")=="hive":
+                        value=predicate.get("value")
+                        if value in HIVE_CROSSWALK:
+                            predicate["value"]=HIVE_CROSSWALK[value]
+            isolated={"id":a["id"]+".isolated-source-test",
+                      "mode":"automated","evaluate":{"test":tid},
+                      "objects":{oid:obj},"states":states,
+                      "tests":{tid:deepcopy(test)}}
+            proof=compile_one_original_definition(isolated)
+            require(proof["A_source_semantic_projection_passed"] is True,
+                    "source A Test not independently reproduced")
+            outfile="registry-test-"+str(len(passed)+1).zfill(2)+".research.yaml"
+            (outdir/outfile).write_text(
+                "# C single-Test import; NOT the original full Registry Definition.\n"
+                "# Source A Test: "+tid+"\n"
+                "# Original OVAL XML: windows/win-def_registry_test.xml\n"
+                +yaml.safe_dump(proof["authored_c"],sort_keys=False),
+                encoding="utf-8")
+            passed.append({"A_source_test_id":tid,"authored_C_file":outfile})
+        except (NotNativeCConvertible,ValueError,KeyError,TypeError) as exc:
+            # The source A model may need a capability that this narrow C
+            # Test adapter lacks; that is a recorded blocker, not success.
+            blocked.append({"A_source_test_id":tid,"reason":str(exc)})
+    require(len(passed)+len(blocked)==15,
+            "missing original A Registry Test source disposition")
+    return {"source_A_tests":15,"independent_C_single_tests":len(passed),
+            "other_Tests_not_C_compiled":len(blocked),
+            "compiled":passed,"unsupported":blocked,
+            "all_15_Tests_compiled_as_one_Definition":False,
+            "source_test_ids_are_A_import_ids_not_invented_OVAL_ids":True}
+
+
+def registry_from_original_A(corpus,review,published,outdir):
     root=original_xml(corpus,WIN_REG)
     definitions=root.find("{*}definitions")
     defined=one((d for d in definitions if d.get("id")==REG_DEF),
@@ -201,6 +300,7 @@ def registry_from_original_A(corpus,review,published):
         "A_native_hive_crosswalk":"HKEY_LOCAL_MACHINE -> local_machine",
         "State_key_case_insensitive":True,"registry_value_not_checked":True,
         "A_source_projection_equivalence_checked":True,
+        "per_Test_inventory":independent_registry_test_slices(a,outdir),
     }
 
 def main():
@@ -212,10 +312,11 @@ def main():
     parser.add_argument("--out",type=Path,required=True)
     args=parser.parse_args()
     full=verify_complete_platform_definitions(args.corpus,args.review,args.native)
-    registry=registry_from_original_A(args.corpus,args.review,args.published)
+    registry=registry_from_original_A(args.corpus,args.review,args.published,args.native/"windows-registry-single-tests")
     report={"stage":"PINNED_OVAL_C_BASIC_PLATFORM_GATE_NOT_SCANNER_PARITY",
             "pinned_source_commit":PIN,
             "full_definition_cases":full,
+            "family_corpus_census":family_census(args.native),
             "partial_definition_single_test":registry,
             "source_import_and_C_compiler_proven":True,
             "live_linux_or_windows_collector_executed":False,
