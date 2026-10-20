@@ -264,6 +264,42 @@ def convert_selected_shared_many(a):
             "OVAL_actual_scanner_parity_proven":False}
 
 
+def descriptive_distinct_alias(title,fields,existing):
+    """Keep source-purpose names, including long distinct-Object Test titles.
+
+    The repeated OVAL Self-Assertion boilerplate can be removed only if its
+    recognized selector/operation words remain explicit. Never truncate text
+    and risk merging two independently assessed source Tests.
+    """
+    try:
+        candidate=alias_of(title,fields)
+    except NotNativeCConvertible as exc:
+        if str(exc)!="SOURCE_TEST_TITLE_UNSUITABLE_FOR_MEANINGFUL_ALIAS":
+            raise
+        candidate=None
+    if (candidate and len(candidate)<=63 and candidate not in existing and
+        re.fullmatch(r"[a-z][a-z0-9_]*",candidate)):
+        return candidate
+    if type(title) is not str:
+        reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
+    match=re.fullmatch(
+        r"Test that the ([a-z][a-z0-9_]*)_object is supported with the "
+        r"([a-z][a-z0-9_]*) entity "
+        r"(equal to some value|not equal to some value|matching some regular expression)\\.",
+        title.strip(),re.I)
+    if match is None:
+        reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
+    _,selected_field,operation=match.groups()
+    operation={"equal to some value":"equals",
+               "not equal to some value":"not_equals",
+               "matching some regular expression":"matches_regex"}[operation.lower()]
+    compact=f"{selected_field}_{operation}"
+    if (len(compact)>63 or compact in existing or
+        not re.fullmatch(r"[a-z][a-z0-9_]*",compact)):
+        reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
+    return compact
+
+
 def convert_distinct_selected_many(a):
     """Original OVAL AND with 2+ independent, explicitly selected Objects.
 
@@ -316,14 +352,7 @@ def convert_distinct_selected_many(a):
             state["capability"]!=t["capability"]):
             reject("MULTI_DISTINCT_STATE_METADATA_UNSUPPORTED")
         fields=project_fields(state["state"],state["capability"])
-        alias=alias_of(t.get("test_title"),fields)
-        if alias in checks:
-            # Same State field with a different source Test condition:
-            # use the full source Test purpose, not an ambiguous field ID.
-            alias=ID.sub("_",t["test_title"].lower()).strip("_")
-        if (alias in checks or len(alias)>63 or
-            not re.fullmatch(r"[a-z][a-z0-9_]*",alias)):
-            reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
+        alias=descriptive_distinct_alias(t.get("test_title"),fields,checks)
         checks[alias]={"source_test":tid,
                        "from":{t["capability"]:selectors},
                        "must":{"every_item":fields}}
