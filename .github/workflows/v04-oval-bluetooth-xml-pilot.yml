@@ -66,6 +66,15 @@ jobs:
           assert 'set' not in test['object'] and 'filters' in test['object']
           Path('work/compare/bluetooth-native-v04.json').write_bytes(raw)
           print('Verified actual 0.4.0 source-generated Bluetooth file', name)
+          with zipfile.ZipFile(archive) as z:
+              camera='authoring/ms_windows_11/assessments/applicability/condition.camera-installation.json'
+              camera_raw=z.read(camera)
+          actual=json.loads(camera_raw)['assessment']
+          assert actual['specification']['version']=='0.4.0'
+          camera_test=next(iter(actual['tests'].values()))
+          assert 'set' not in camera_test['object'] and 'filters' in camera_test['object']
+          Path('work/compare/camera-native-v04.json').write_bytes(camera_raw)
+          print('Verified actual 0.4.0 source-generated Camera file',camera)
           PY
       - name: Independently export actual 0.4.0 Bluetooth Assessment to OVAL 5.12.3 XML
         env:
@@ -79,6 +88,14 @@ jobs:
             --native work/compare/bluetooth-native-v04.json \
             --output work/compare/exported-oval.xml \
             --definition-id-output work/compare/exported-def-id.txt
+          python tools/extract_v04_win11_bluetooth_oval.py \
+            --source-zip work/source/windows11-stig.zip --device camera \
+            --output work/compare/camera-source-oval.xml \
+            --proof work/compare/camera-source-proof.json
+          python tools/export_v04_oval_shellcommand_pilot.py \
+            --native work/compare/camera-native-v04.json \
+            --output work/compare/camera-exported-oval.xml \
+            --definition-id-output work/compare/camera-exported-def-id.txt
       - name: Compare real original and independently regenerated OVAL Definition graphs
         env:
           PYTHONPATH: tools
@@ -88,25 +105,31 @@ jobs:
           from pathlib import Path
           root=Path('work/compare')
           src=json.loads((root/'source-proof.json').read_text())
-          row={'case_id':'Windows 11 original Bluetooth source',
-              'status':'converted','forward_profile':'0.4.0',
-              'reverse_profile':'0.4.0',
-              'source_definition':src['source_definition'],
-              'regenerated_definition':(root/'exported-def-id.txt').read_text().strip()}
-          for key,name in [('original','source-oval.xml'),
-                           ('native_assessment','bluetooth-native-v04.json'),
-                           ('regenerated','exported-oval.xml')]:
-              p=root/name
-              row[key]=name
-              row[key+'_sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+          cases=[]
+          for device in ('bluetooth','camera'):
+              prefix='' if device=='bluetooth' else 'camera-'
+              proof=json.loads((root/(prefix+'source-proof.json')).read_text())
+              row={'case_id':'Windows 11 original '+device+' source',
+                  'status':'converted','forward_profile':'0.4.0',
+                  'reverse_profile':'0.4.0',
+                  'source_definition':proof['source_definition'],
+                  'regenerated_definition':(
+                      root/(prefix+'exported-def-id.txt')).read_text().strip()}
+              for key,name in [('original',prefix+'source-oval.xml'),
+                               ('native_assessment',device+'-native-v04.json'),
+                               ('regenerated',prefix+'exported-oval.xml')]:
+                  file=root/name
+                  row[key]=name
+                  row[key+'_sha256']=hashlib.sha256(file.read_bytes()).hexdigest()
+              cases.append(row)
           (root/'roundtrip-manifest.json').write_text(json.dumps({
               'format':'scap-ng-v04-oval-xml-roundtrip-1',
-              'profile':'0.4.0','cases':[row]},indent=2)+'\n')
+              'profile':'0.4.0','cases':cases},indent=2)+'\n')
           PY
           python tools/audit_v04_oval_xml_roundtrip.py \
             --root work/compare \
             --manifest work/compare/roundtrip-manifest.json \
-            --expected-cases 1 \
+            --expected-cases 2 \
             --report work/compare/semantic-roundtrip-result.json
       - name: Validate independently exported OVAL against pinned 5.12.3 XSD
         run: |
@@ -114,6 +137,10 @@ jobs:
             --schema-dir work/oval-5123/oval-schemas \
             --xml work/compare/exported-oval.xml \
             --report work/compare/oval-export-xsd.json
+          python tools/validate_v04_oval_5123.py \
+            --schema-dir work/oval-5123/oval-schemas \
+            --xml work/compare/camera-exported-oval.xml \
+            --report work/compare/camera-export-xsd.json
       - name: Publish proof and mismatch diagnostics even on failure
         if: always()
         uses: actions/upload-artifact@v4
