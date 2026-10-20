@@ -371,7 +371,7 @@ def descriptive_distinct_alias(title,fields,existing,*,selectors=None,capability
             m=re.fullmatch(
                 r"Test that the sysctl test is supported with the name entity "
                 r"with operation of '(equals|not equal|pattern match|"
-                r"case insensitive equals|case insensitive not equal)'\\.",
+                r"case insensitive equals|case insensitive not equal)'\.",
                 title.strip(),re.I)
             if m:
                 op={"equals":"equals","not equal":"not_equal",
