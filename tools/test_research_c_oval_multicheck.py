@@ -277,6 +277,31 @@ class OriginalOVALDistinctSelectedMultiC(unittest.TestCase):
         with self.assertRaisesRegex(NotNativeCConvertible,"EXTRA_SOURCE"):
             convert_distinct_selected_many(doc)
 
+    def test_actual_state_free_presence_is_distinct_from_state_matching(self):
+        doc=two_test_distinct_source()
+        tid=next(iter(doc["tests"]))
+        old_state=doc["tests"][tid]["states"].pop()
+        del doc["states"][old_state]
+        doc["tests"][tid]["check"]="all"
+        doc["tests"][tid]["check_existence"]="none_exist"
+        before=deepcopy(doc)
+        out=convert_distinct_selected_many(doc)
+        self.assertEqual(doc,before)
+        alias=next(alias for alias,src in out["source_test_crosswalk"].items()
+                   if src==tid)
+        self.assertEqual(out["authored_c"]["checks"][alias]["must"],"absent")
+        self.assertEqual(out["native_c_compiled_tests"][alias]["require"],
+                         "none_exist")
+        self.assertNotIn("states",out["native_c_compiled_tests"][alias])
+        self.assertEqual(sum("states" in test for test in
+                             out["native_c_compiled_tests"].values()),1)
+
+        # No State is present to justify an Item-matching quantifier.
+        doc["tests"][tid]["check"]="at least one"
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "STATE_FREE_PRESENCE_UNSUPPORTED"):
+            convert_distinct_selected_many(doc)
+
     def test_source_or_is_not_rewritten_as_and_or_dropped(self):
         doc=two_test_distinct_source()
         doc["evaluate"]={"any":deepcopy(doc["evaluate"]["all"])}
