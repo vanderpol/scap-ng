@@ -58,11 +58,24 @@ def value_is_type(value,datatype):
 def project_selection(obj):
     if not isinstance(obj,dict) or set(obj)!={"capability","object_title","select"}:
         reject("OBJECT_ADVANCED_OR_UNREVIEWED_METADATA")
+    try:
+        native=_mapping(obj["capability"])
+    except (ValueError,KeyError,TypeError) as exc:
+        reject("OBJECT_CAPABILITY_MAPPING_UNSUPPORTED: "+str(exc))
     select=obj["select"]
     if not isinstance(select,dict) or not 1<=len(select)<=MAX_FIELDS:
         reject("SELECTOR_EMPTY_OR_COMPLEX")
     out={}
     for field,entity in select.items():
+        if (isinstance(entity,dict) and entity.get("nil") is True):
+            if (set(entity)!={"datatype","operation","value","nil"} or
+                entity["datatype"]!="string" or
+                entity["operation"]!="equals" or
+                entity["value"] not in ("",None) or
+                field not in native.get("nullable_selectors",[])):
+                reject("SELECTOR_NIL_SOURCE_SHAPE_UNSUPPORTED")
+            out[field]=None
+            continue
         if not isinstance(entity,dict) or set(entity)!={"datatype","operation","value"}:
             reject("SELECTOR_ENTITY_EXPLICIT_TYPE_OR_NIL_REQUIRED")
         if (entity["operation"] not in ("equals","pattern match","case insensitive equals","case insensitive not equal")
@@ -159,11 +172,14 @@ def _same_source_semantics(original,compiled,obj,states, *, source_singleton_obj
         if not isinstance(emitted_select,dict) or set(emitted_select)!=set(original_select):
             reject("SOURCE_COMPILER_SELECTOR_DRIFT")
         for field,ent in original_select.items():
-            operation=OPS.get(ent["operation"])
-            if operation is None:
-                reject("SOURCE_COMPILER_SELECTOR_OPERATOR_UNSUPPORTED")
-            expected={"equals":ent["value"]} if operation=="equals" else {
-                operation:ent["value"]}
+            if isinstance(ent,dict) and ent.get("nil") is True:
+                expected=None
+            else:
+                operation=OPS.get(ent["operation"])
+                if operation is None:
+                    reject("SOURCE_COMPILER_SELECTOR_OPERATOR_UNSUPPORTED")
+                expected={"equals":ent["value"]} if operation=="equals" else {
+                    operation:ent["value"]}
             if emitted_select[field]!=expected:
                 reject("SOURCE_COMPILER_SELECTOR_VALUE_DRIFT")
     if not states:
