@@ -100,8 +100,11 @@ def emit(doc):
     ET.SubElement(criteria,q(OD,"criterion"),{"test_ref":ids["tst"]})
 
     all_tests=ET.SubElement(root,q(OD,"tests"))
+    required(isinstance(test.get("test_title"),str) and test["test_title"].strip(),
+             "OVAL 5.12.3 requires a nonempty Test comment from original Test title")
     oval_test=ET.SubElement(all_tests,q(IND,"shellcommand_test"),{
         "id":ids["tst"],"version":str(a["version"]),
+        "comment":test["test_title"],
         "check_existence":"at_least_one_exists","check":"all"})
     ET.SubElement(oval_test,q(IND,"object"),{"object_ref":ids["obj"]})
 
