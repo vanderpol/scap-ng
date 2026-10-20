@@ -8,6 +8,7 @@ on:
       - 'tools/build_v04_residual_review_ledger.py'
       - 'tools/audit_v04_full_schema.py'
       - 'tools/test_v04_all_items_schema.py'
+      - 'tools/test_v04_canonical_authoring_guard.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
       - 'schema/v0.4.0/assessment.schema.json'
       - 'schema/v0.4.0/capability-common.schema.json'
@@ -49,6 +50,10 @@ jobs:
         run: |
           python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip --report work/yaml-blocker-audit.json
           python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --report work/json-blocker-audit.json
+      - name: Enforce canonical 0.4 source-only rejection guards
+        run: |
+          python tools/test_v04_canonical_authoring_guard.py --archive work/scap-ng-0.4.0-six-stigs.json.zip
+          python tools/test_v04_canonical_authoring_guard.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip
       - name: Preserve full exceptional Test source for semantic differential review
         run: |
           python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-172-review-ledger.json

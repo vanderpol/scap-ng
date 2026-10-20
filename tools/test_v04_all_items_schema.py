@@ -76,30 +76,3 @@ legacy_scope["state_fields_require"]="at_least_one_exists_and_all_match"
 assert list(test_validator.iter_errors(legacy)), "Missing field scope must not silently pass"
 assert not list(test_validator.iter_errors(legacy_scope)), "Explicit legacy State scope rejected"
 print("PASS: legacy State field scope requires explicit declaration")
-
-
-# A single 0.4 authoring dialect: the old collected_items_require spelling
-# cannot coexist with, or stand in place of, canonical Test require.
-canonical_presence={"require":{"items":"one_or_more"}}
-assert not list(test_validator.iter_errors(canonical_presence)), "Canonical Test presence requirement rejected"
-legacy_alias=dict(canonical_presence,collected_items_require="at_least_one_exists")
-assert list(test_validator.iter_errors(legacy_alias)), "Mixed requirement dialect incorrectly accepted"
-legacy_alias_only={"require":"at_least_one_exists","collected_items_require":"at_least_one_exists"}
-assert list(test_validator.iter_errors(legacy_alias_only)), "Obsolete requirement alias incorrectly accepted"
-print("PASS: canonical Test requirement rejects obsolete/mixed authoring dialect")
-
-# A local Object inherits its enclosing Test capability. Even a duplicate
-# identical capability is redundant and is prohibited in canonical 0.4 source;
-# shared/standalone Objects are a distinct form with their own declarations.
-common=json.loads((root/"capability-common.schema.json").read_text())
-object_resolver=RefResolver.from_schema(common,store={common["$id"]:common})
-inline_validator=Draft202012Validator(
-    {"$ref":"#/$defs/inline_object","$defs":common["$defs"]},
-    resolver=object_resolver
-)
-assert not list(inline_validator.iter_errors({})), "Capability-inheriting inline Object rejected"
-for declared in ("windows.registry","unix.file"):
-    assert list(inline_validator.iter_errors({"capability":declared})), (
-        f"Inline Object incorrectly accepts duplicate capability: {declared}"
-    )
-print("PASS: inline Object capability must be inherited; duplicated source rejected")
