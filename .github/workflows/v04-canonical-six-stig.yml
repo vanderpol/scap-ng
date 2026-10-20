@@ -15,6 +15,8 @@ on:
       - 'tools/test_v04_canonical_version_preview.py'
       - 'tools/v04_canonical_unsigned_package.py'
       - 'tools/test_v04_canonical_unsigned_package.py'
+      - 'tools/v04_exception_source_oracle.py'
+      - 'tools/test_v04_exception_source_oracle.py'
       - 'tools/v04_canonical_requirement_oracle.py'
       - 'tools/test_v04_canonical_requirement_oracle.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
@@ -40,6 +42,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/test_v04_canonical_unsigned_package.py
+      - name: Validate exceptional source-family truth model fixtures
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_v04_exception_source_oracle.py
       - name: Obtain immutable source YAML and JSON packages
         env:
           GH_TOKEN: ${{ github.token }}
@@ -69,6 +75,14 @@ jobs:
       - name: Preserve full exceptional Test source for semantic differential review
         run: |
           python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-172-review-ledger.json
+      - name: Verify nine exceptional source requirement families against OVAL generic results
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/v04_exception_source_oracle.py \
+            --ledger work/residual-172-review-ledger.json \
+            --report work/v04-exception-source-oracle.json \
+            --assert-six
       - name: Diagnose native schema validity across all source documents
         run: |
           python tools/audit_v04_full_schema.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/full-native-schema-audit.json --strict
@@ -141,6 +155,7 @@ jobs:
             work/input-native-report.json
             work/*blocker-audit.json
             work/residual-172-review-ledger.json
+            work/v04-exception-source-oracle.json
             work/full-native-schema-audit.json
             work/full-native-yaml-schema-audit.json
             work/canonical-typed-source-ir.json
