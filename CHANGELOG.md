@@ -15,6 +15,15 @@ proposals are not listed as delivered features.
   prior authored graph, and matching ordered Filter predicates. This is not
   a scanner-execution or six-state conformance claim.
   [#248](https://github.com/vanderpol/scap-ng/issues/248)
+- Extended the source-gated Filter cleanup to **19 additional Test-local
+  wrappers across 14 Assessment documents**, identifying their original OVAL
+  Test `object_ref` rather than relying on title equality. Together with the
+  first 28, this removes **47** converter-induced singleton wrappers from
+  the canonical six-STIG authoring candidate. The remaining 31 Set instances
+  are retained for genuine source Set semantics or further reference proof.
+  An independent whole-corpus YAML/JSON inverse guard rejects any change
+  outside the proven 19 sites. This is source reconstruction, not scanner
+  execution parity. [#248](https://github.com/vanderpol/scap-ng/issues/248)
 - Added version-local Filter validation and canonical YAML/JSON generation
   regression checks to reject disappearing/altered Filters and newly
   introduced synthetic one-operand Sets. Earlier published authoring archives
