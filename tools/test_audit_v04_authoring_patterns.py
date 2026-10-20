@@ -116,6 +116,25 @@ class AuthoringPatternsTests(unittest.TestCase):
         self.assertEqual(r["counts"]["redundant_inline_capability"], 1)
         self.assertEqual(r["counts"]["identical_consecutive_filters"], 1)
 
+    def test_same_count_moved_to_new_test_is_still_a_regression(self):
+        baseline = docs()
+        baseline[PATH]["assessment"]["tests"]["check-test"]["object"] = set_object()
+        candidate = deepcopy(baseline)
+        a = candidate[PATH]["assessment"]
+        old = a["tests"]["check-test"]["object"]
+        a["tests"]["check-test"]["object"] = {
+            "collect": {"command": "Write-Output Bluetooth"}}
+        a["tests"]["another-test"] = deepcopy(a["tests"]["check-test"])
+        a["tests"]["another-test"]["object"] = deepcopy(old)
+        # Compare a stable Test population rather than adding/removing Tests.
+        baseline[PATH]["assessment"]["tests"]["another-test"] = deepcopy(
+            a["tests"]["check-test"])
+        report = compare(scan(baseline), scan(candidate))
+        self.assertEqual(report["status"], "FAIL")
+        self.assertEqual(report["new_structural_regressions"][0]["baseline"], 1)
+        self.assertEqual(report["new_structural_regressions"][0]["candidate"], 1)
+        self.assertTrue(report["new_structural_regressions"][0]["new_sites"])
+
     def test_unrelated_scope_change_requires_review(self):
         before = scan(docs())
         after = scan(docs())
