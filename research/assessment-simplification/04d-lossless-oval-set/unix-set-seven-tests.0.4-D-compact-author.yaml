@@ -1,0 +1,226 @@
+# 0.4-D source-preserving compact authoring, original OVAL Set #276.
+# Immutable conversion metadata is kept separately from editable logic.
+stage: D_RESEARCH_SOURCE_COMPAT_COMPACT_UNIX_SET_COLLECTIONS
+assessment:
+  id: roundtrip.oval-org-mitre-oval-test-def-276
+  title: Evaluate to true if the oval-def:set construct is properly supported
+collections:
+  files_opt_support_down:
+    behaviors:
+      max_depth: '-1'
+      recurse_direction: down
+      recurse_file_system: local
+    capability: unix.file
+    select:
+      path: /opt/support
+      filename:
+        nil: true
+  files_opt_support_txt_none:
+    behaviors:
+      max_depth: '-1'
+      recurse_direction: none
+      recurse_file_system: local
+    capability: unix.file
+    select:
+      path: /opt/support/txt
+      filename:
+        nil: true
+  files_opt_support_xml_down:
+    behaviors:
+      max_depth: '-1'
+      recurse_direction: down
+      recurse_file_system: local
+    capability: unix.file
+    select:
+      path: /opt/support/xml
+      filename:
+        nil: true
+  files_opt_support_xml_none:
+    behaviors:
+      max_depth: '-1'
+      recurse_direction: none
+      recurse_file_system: local
+    capability: unix.file
+    select:
+      path: /opt/support/xml
+      filename:
+        nil: true
+  observation_complement:
+    capability: unix.file
+    set:
+      members:
+      - object: files_opt_support_txt_none
+      - object: files_opt_support_xml_down
+      operator: complement
+  observation_one_level_sets:
+    capability: unix.file
+    set:
+      members:
+      - reuse_set: observation_complement
+      - set:
+          members:
+          - object: files_opt_support_down
+          - object: files_opt_support_xml_down
+          operator: union
+      operator: intersection
+  observation_exclude_filter:
+    capability: unix.file
+    set:
+      filters:
+      - action: exclude
+        state: state-this-file-state-represents-a-file-object-with-a-path-tha-3
+      members:
+      - object: files_opt_support_txt_none
+      operator: union
+  observation_intersection:
+    capability: unix.file
+    set:
+      members:
+      - object: files_opt_support_txt_none
+      - object: files_opt_support_down
+      operator: intersection
+  observation_union:
+    capability: unix.file
+    set:
+      members:
+      - object: files_opt_support_txt_none
+      - object: files_opt_support_xml_none
+      operator: union
+  observation_two_level_sets:
+    capability: unix.file
+    set:
+      members:
+      - set:
+          members:
+          - set:
+              members:
+              - object: files_opt_support_txt_none
+              operator: union
+          - set:
+              members:
+              - object: files_opt_support_xml_none
+              - object: files_opt_support_xml_down
+              operator: intersection
+          operator: complement
+      - set:
+          members:
+          - set:
+              members:
+              - object: files_opt_support_xml_none
+              - object: files_opt_support_xml_down
+              operator: complement
+          - reuse_set: observation_union
+          operator: union
+      operator: intersection
+  observation_three_level_sets:
+    capability: unix.file
+    set:
+      members:
+      - set:
+          members:
+          - set:
+              members:
+              - object: files_opt_support_down
+              operator: union
+          - set:
+              members:
+              - reuse_set: observation_complement
+              - set:
+                  filters:
+                  - action: exclude
+                    state: state-this-file-state-represents-a-file-object-with-a-path-tha-3
+                  members:
+                  - object: files_opt_support_down
+                  - object: files_opt_support_txt_none
+                  operator: union
+              operator: union
+          operator: complement
+      operator: intersection
+expected_values:
+  expected_txt:
+    description: This file_state represents a file_object with a path equal to 'C:\support\txt'.
+    field: path
+    equals: /opt/support/txt
+  expected_txt_or_xml:
+    description: This file_state represents a file_object with a path that equals
+      'C:\support\txt', 'C:\support\txt\txtfile', or 'C:\support\txt\txtfile\subtxtfile'.
+    field: path
+    equals:
+    - /opt/support/txt
+    - /opt/support/xml
+    value_match: one
+  expected_txt_or_subtxtfile:
+    description: This file_state represents a file_object with a path that equals
+      'C:\support\txt', 'C:\support\txt\txtfile', or 'C:\support\txt\txtfile\subtxtfile'.
+    field: path
+    equals:
+    - /opt/support/txt
+    - /opt/support/txt/txtfile
+    - /opt/support/txt/txtfile/subtxtfile
+    value_match: one
+  expected_txtfile_or_subtxtfile:
+    description: This file_state represents a file_object with a path that equals
+      'C:\support\txt\txtfile' or 'C:\support\txt\txtfile\subtxtfile'.
+    field: path
+    equals:
+    - /opt/support/txt/txtfile
+    - /opt/support/txt/txtfile/subtxtfile
+    value_match: one
+tests:
+  complement:
+    description: Test that the set construct is supported with the COMPLEMENT operation.
+    collection: observation_complement
+    capability: unix.file
+    require: only_one_exists_and_matches
+    states:
+    - expected_txt
+  union:
+    description: Test that the set construct is supported with the UNION operation.
+    collection: observation_union
+    capability: unix.file
+    require: at_least_one_exists_and_all_match
+    states:
+    - expected_txt_or_xml
+  exclude_filter:
+    description: Test that the set object is supported with the filter element.
+    collection: observation_exclude_filter
+    capability: unix.file
+    require: only_one_exists_and_matches
+    states:
+    - expected_txt
+  one_level_sets:
+    description: Test that the set object is supported with one level of set elements.
+    collection: observation_one_level_sets
+    capability: unix.file
+    require: at_least_one_exists_and_all_match
+    states:
+    - expected_txt_or_subtxtfile
+  intersection:
+    description: Test that the set object is supported with the set_operator equal
+      to 'INTERSECTION'.
+    collection: observation_intersection
+    capability: unix.file
+    require: only_one_exists_and_matches
+    states:
+    - expected_txt
+  three_level_sets:
+    description: Test that the set object is supported with three levels of set elements.
+    collection: observation_three_level_sets
+    capability: unix.file
+    require: none_exist
+  two_level_sets:
+    description: Test that the set object is supported with two levels of set elements.
+    collection: observation_two_level_sets
+    capability: unix.file
+    require: at_least_one_exists_and_all_match
+    states:
+    - expected_txt
+evaluate:
+  all:
+  - test: complement
+  - test: intersection
+  - test: union
+  - test: exclude_filter
+  - test: one_level_sets
+  - test: two_level_sets
+  - test: three_level_sets
