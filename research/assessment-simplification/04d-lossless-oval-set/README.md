@@ -4,6 +4,25 @@
 
 This is a real **OVAL 5.12.3 Self-Assertion Definition**, NOT a DISA STIG Rule: original [unix/oval-def_set-unix.xml, Definition 276](https://github.com/OVAL-Community/SCAP-Self-Assertion/blob/e3538595c5083b9c34d937a81d319234df9bbfaa/SCAP_1.4/OVAL_Test_Content/unix/oval-def_set-unix.xml), source revision e3538595c5083b9c34d937a81d319234df9bbfaa. It has **7 Tests, 11 Objects, 7 nested Set Objects, 4 States, 3 multi-valued constant Variables, an exclude Filter and explicit union/intersection/complement operators**.
 
+## Exact native 0.4-A vs D — same OVAL Definition 276
+
+The **[actual v0.4.0-A native Assessment](unix-set-seven-tests.native-0.4-A-comparison.yaml)** was generated from the same pinned OVAL source as the **[complete 0.4-D compact authoring](unix-set-seven-tests.0.4-D-compact-author.yaml)**. Its [native versioned validation report](a-validation-proof.json) confirms the full 0.4-A Assessment schema, all seven Test schemas, and all eleven shared Object bodies pass. D's [managed provenance](unix-set-seven-tests.0.4-D-compact-provenance.yaml) is required to reconstruct the original source graph.
+
+| Source-backed comparison | A | D |
+| --- | ---: | ---: |
+| Editable authored YAML lines (comment headers excluded) | 336 | 224 |
+| Required separate provenance lines | 0 | 78 |
+| Tests | 7 | 7 |
+| Source collections / Objects | 11 | 11 |
+| Authored constant Variables | 3 | 0 |
+| Runtime equivalence independently proven | No | No |
+
+D is 112 lines (~33%) shorter **to edit**; including the 78-line D provenance its material totals ~302 lines, about 10% less than A's 336. This is a *fairer comparison than earlier C-to-D counts*: A is self-contained and schema-valid; D has a separate compiler/sidecar and is only source-graph validated. Unlike D, A uses the native `directory/name` collector fields and `traversal/filesystem` rather than the older OVAL path/behaviors naming. The A source compiler preserves the OVAL 5.12.3 default `recurse="symlinks and directories"`, and whole-Set filter position without distributing filters. That is supported by XML/schema review, **not independent runtime outcome testing**.
+
+[Focused native 0.4-A validation CI](https://github.com/vanderpol/scap-ng/actions/runs/39427816436) · [Source-backed original D Set/Filter test CI (28 tests)](https://github.com/vanderpol/scap-ng/actions/runs/39424863621).
+
+---
+
 ## Permanent direct GitHub YAML for human review
 
 - [Best current complete D compact authoring YAML — 224 editable lines](unix-set-seven-tests.0.4-D-compact-author.yaml)
