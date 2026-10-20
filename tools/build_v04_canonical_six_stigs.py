@@ -99,28 +99,91 @@ def recover(candidate,original):
     if restored!=original:
         raise ValueError("Original authoring source differs after exact reverse translation")
 
+def reconcile_benchmark_specifications(documents):
+    """Owner-approved 0.4 source migration; never edit pinned source input.
+
+    Use *actual reachable automated Rule choices per Benchmark* rather than
+    blindly changing all 0.3 declarations. This exact-reachable policy was
+    approved for the 0.4.0 samples on 2026-10-20; retain original source and
+    per-Benchmark hashes in the generation manifest (Refs #232 #239).
+    """
+    from v04_a_benchmark_spec_migration_preview import build_preview
+    report, staged = build_preview(documents)
+    changes = report["benchmark_changes"]
+    if (len(changes) != 6 or report["candidate_incompatible_edges"] != 0
+            or report["source_incompatible_edges"] != 1391):
+        raise ValueError("six-STIG Benchmark version-migration source baseline changed")
+    for item in changes:
+        before = item["existing_specs"]
+        after = item["reachable_automated_specs"]
+        if (len(before) != 1 or before[0].get("version") != "0.3.0"
+                or len(after) != 1 or after[0].get("version") != "0.4.0"
+                or before[0]["id"] != after[0]["id"]):
+            raise ValueError("unreviewed Benchmark specification migration: " + item["path"])
+        path = item["path"]
+        original = documents[path]
+        proposed = staged[path]
+        if set(original) != {"benchmark"} or set(proposed) != {"benchmark"}:
+            raise ValueError("Benchmark root changed")
+        restored = deepcopy(proposed)
+        restored["benchmark"]["assessment_specifications"] = deepcopy(
+            original["benchmark"]["assessment_specifications"])
+        if restored != original:
+            raise ValueError("Benchmark version reconciliation changed unrelated source")
+    return staged, changes
+
+
 def run(src,dest,manifest_path):
     if src.suffix!=".zip": raise ValueError("ZIP input required")
     is_yaml="six-stig-yaml" in src.name
     ext=".yaml" if is_yaml else ".json"
     counts=Counter()
     path_stats={}
-    with zipfile.ZipFile(src) as z,zipfile.ZipFile(dest,"w",zipfile.ZIP_DEFLATED) as output:
+    with zipfile.ZipFile(src) as z:
         names=[x for x in z.namelist() if x.startswith("authoring/") and x.endswith(ext)]
-        if len(names)!=4001: raise ValueError(f"Unexpected source count: {len(names)}")
+        if len(names)!=4001 or len(names)!=len(set(names)):
+            raise ValueError(f"Unexpected source count/duplicates: {len(names)}")
+        source={}
+        promoted={}
         for name in sorted(names):
             old=yaml.safe_load(z.read(name)) if is_yaml else json.loads(z.read(name))
+            source[name]=old
             new,stats=promote(old)
             recover(new,old)
+            promoted[name]=new
             counts.update(stats)
-            if stats: path_stats[name]=dict(stats)
-            rendered=yaml.safe_dump(new,sort_keys=False,allow_unicode=True,width=110) if is_yaml else json.dumps(new,indent=2,ensure_ascii=False)+"\n"
+            if stats:
+                path_stats[name]=dict(stats)
+    # This explicit, user-approved version migration is performed *after*
+    # all Test/Object exact inversions and independently verified edge closure.
+    # It changes only six Benchmark declaration lists, not Assessment logic.
+    versioned, version_changes=reconcile_benchmark_specifications(promoted)
+    for row in version_changes:
+        name=row["path"]
+        path_stats.setdefault(name,{})["benchmark_version_declarations_updated"]=1
+    counts["benchmark_version_declarations_updated"]=len(version_changes)
+    with zipfile.ZipFile(dest,"w",zipfile.ZIP_DEFLATED) as output:
+        for name in sorted(names):
+            new=versioned[name]
+            if "benchmark" in new:
+                restored=deepcopy(new)
+                restored["benchmark"]["assessment_specifications"]=deepcopy(
+                    source[name]["benchmark"]["assessment_specifications"])
+                if restored!=source[name]:
+                    raise ValueError("Benchmark migration changed non-version content")
+            else:
+                recover(new,source[name])
+            rendered=(yaml.safe_dump(new,sort_keys=False,allow_unicode=True,width=110)
+                      if is_yaml else json.dumps(new,indent=2,ensure_ascii=False)+"\\n")
             output.writestr(name,rendered)
         output.writestr("READ-ME-FIRST.txt",
-            "SCAP-NG 0.4.0 six-benchmark authoring candidate. Source-exact inversion verified.\n"
-            "Object capability inherits from Test; common all-match predicates live inside require.\n"
-            "Remaining explicit require strings are original uncommon semantics, not inferred defaults.\n"
-            "Do not interpret this authoring ZIP as a signed scanner bundle or runtime parity result.\n")
+            "SCAP-NG 0.4.0 six-benchmark authoring candidate. Source-exact inversion verified.\\n"
+            "Six Benchmark 0.3 Assessment specification declarations were replaced by exact\\n"
+            "reachable 0.4 declarations with owner approval; original source is preserved\\n"
+            "in the immutable pinned Oct 15 r3 release and SHA-256 migration manifest.\\n"
+            "Object capability inherits from Test; common all-match predicates live inside require.\\n"
+            "Remaining explicit require strings are original uncommon semantics, not inferred defaults.\\n"
+            "Do not interpret this authoring ZIP as a signed scanner bundle or runtime parity result.\\n")
     if counts["all_items_must"]<1 or counts["inline_capabilities_removed"]<1:
         raise ValueError("Expected real migration did not happen")
     report={"source_sha256":hashlib.sha256(src.read_bytes()).hexdigest(),
@@ -129,6 +192,10 @@ def run(src,dest,manifest_path):
             "documents":len(names),"counts":dict(counts),
             "changed_documents":len(path_stats),
             "changed_paths":path_stats,
+            "benchmark_version_policy":"owner_approved_exact_reachable_0.4_only",
+            "benchmark_version_changes":[
+                {**row,"path":row["path"].removesuffix(".json").removesuffix(".yaml")}
+                for row in version_changes],
             "source_ast_recovered":True,
             "schema_validated":False,
             "scanner_equivalence_proven":False}
