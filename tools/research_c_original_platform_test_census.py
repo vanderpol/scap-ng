@@ -60,6 +60,7 @@ def census(review,manifest):
     bykey={(x["file"],x["definition_id"]) for x in m["native_C_converted"]}
     blocked={(x["file"],x["definition_id"]) for x in m["unsupported"]}
     allkey=bykey|blocked
+    full_rejections={(x["file"],x["definition_id"]):x["reason"] for x in m["unsupported"]}
     check(len(allkey)==m["A_compatible_Definitions_seen"],
           "native C manifest identity accounting incomplete")
     families={}
@@ -105,6 +106,7 @@ def census(review,manifest):
                   "complete native Definition contains failed isolated Test")
         detail.append({"source":rel,"definition_id":key[1],
                        "full_native_C_Definition":full,
+                       "full_definition_rejection":full_rejections.get(key),
                        "original_imported_Tests":len(rows),"tests":rows})
     expected={x for x in allkey if x[0].split("/",1)[0] in FAMILIES}
     check(seen==expected,"source-compatible platform Definitions missing in review")
@@ -160,6 +162,7 @@ def main():
                     for x in row["tests"] if not x["C_native_single_Test_compilation"]]
             selected.append({"source":row["source"],
                              "full_native_C_Definition":row["full_native_C_Definition"],
+                             "full_definition_rejection":row["full_definition_rejection"],
                              "source_Tests":row["original_imported_Tests"],
                              "single_C_Tests_passed":row["original_imported_Tests"]-len(failed),
                              "first_Test_rejections":failed})
