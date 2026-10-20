@@ -80,11 +80,11 @@ def _leaf_object(raw):
             "filesystem":"local",
             "traversal":{
                 "max_depth":None if old["recurse_direction"]=="down" else 0,
-                "recurse":"directories",
+                "recurse":"symlinks_and_directories",
             }}
-    # Source native v003 imported neither the original recurse value nor
-    # the XML default: selecting "directories" here is a proposed source
-    # interpretation, NOT a scanner-proven identical collector.
+    # Source XML omits recurse; unix-definitions-schema.xsd OVAL 5.12.3
+    # FileBehaviors defines default "symlinks and directories". Preserve
+    # that declared default instead of guessing a directory-only traversal.
     return result
 
 
@@ -250,7 +250,7 @@ def audit(original):
       "compiled_04a_shared_objects":len(doc["assessment"]["shared_objects"]),
       "original_v003_source_graph_deep_equal_to_04a":False,
       "runtime_oracle_equivalence_proven":False,
-      "traversal_recurse_default_needs_original_oval_verification":True,
+      "traversal_recurse_default_verified_against_oval_5_12_3_xsd":True,
       "source_id_crosswalk":ids,
       "basis":"Pinned v003 original OVAL source re-authored against actual v0.4.0 schemas",
     }
