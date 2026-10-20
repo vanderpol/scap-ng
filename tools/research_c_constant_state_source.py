@@ -16,6 +16,7 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import re
+from hashlib import sha256
 
 from research_c_source_identity_contract import source_digest
 
@@ -208,7 +209,7 @@ def prove_fixed_state_source(original, author, sidecar):
             "full_native_C_compilation_proven": False}
 
 
-def census(review_dir, manifest):
+def census(review_dir, manifest, *, examples_dir=None):
     m = manifest
     if m.get("stage") != "SOURCE_BACKED_NATIVE_C_SUBSET_NOT_SCANNER_PARITY":
         raise ValueError("expected verified native C disposition manifest")
@@ -226,6 +227,9 @@ def census(review_dir, manifest):
     if set(sources) != target:
         raise ValueError("original Variable-blocked source review incomplete")
     proof_rows = []
+    if examples_dir is not None:
+        examples_dir = Path(examples_dir)
+        examples_dir.mkdir(parents=True, exist_ok=True)
     for key, source in sorted(sources.items()):
         try:
             author, sidecar = present_fixed_state_expectations(source)
@@ -234,8 +238,40 @@ def census(review_dir, manifest):
                 raise
             continue
         proof = prove_fixed_state_source(source, author, sidecar)
-        proof_rows.append({"source_file": key[0], "definition_id": key[1],
-                           "inlined_constants": proof["inlined_source_constants"]})
+        row={"source_file": key[0], "definition_id": key[1],
+             "inlined_constants": proof["inlined_source_constants"]}
+        if examples_dir is not None:
+            import yaml
+            basename=sha256((key[0]+"|"+key[1]).encode("utf-8")).hexdigest()[:24]
+            author_file=basename+".author.research.yaml"
+            sidecar_file=basename+".source-provenance.research.json"
+            # Authoring is purpose-oriented; source IDs and complete A graph
+            # reside in the mandatory provenance file, never in the editable
+            # expected-value declarations.
+            note=("# 0.4-C research only; NOT a full native C Assessment or scanner result.\\n"
+                  +"# Original OVAL: "+key[0]+"\\n"
+                  +"# Definition: "+key[1]+"\\n")
+            (examples_dir/author_file).write_text(
+                note+yaml.safe_dump(author,sort_keys=False,allow_unicode=True),
+                encoding="utf-8")
+            (examples_dir/sidecar_file).write_text(
+                json.dumps(sidecar,sort_keys=True,indent=2)+"\\n",encoding="utf-8")
+            # Actually reload the emitted files, not just in-memory copies.
+            loaded_author=yaml.safe_load((examples_dir/author_file).read_text(
+                encoding="utf-8"))
+            loaded_sidecar=json.loads((examples_dir/sidecar_file).read_text(
+                encoding="utf-8"))
+            if compile_fixed_state_expectations(loaded_author,loaded_sidecar)!=source:
+                raise ValueError("serialized C/provenance source graph drift")
+            row.update({"author_file":author_file,"sidecar_file":sidecar_file,
+                        "source_sha256":sidecar["source_sha256"]})
+        proof_rows.append(row)
+    if examples_dir is not None:
+        (examples_dir/"index.json").write_text(
+            json.dumps({"stage":STAGE,"source_definitions":proof_rows,
+                        "scanner_parity_proven":False,
+                        "full_native_C_compilation_proven":False},
+                       sort_keys=True,indent=2)+"\\n",encoding="utf-8")
     return {
         "variable_blocked_definitions": len(target),
         "hybrid_source_graph_proven_definitions": len(proof_rows),
@@ -251,9 +287,11 @@ def main():
     p.add_argument("--review", type=Path, required=True)
     p.add_argument("--manifest", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--examples-dir", type=Path)
     args = p.parse_args()
     summary = census(args.review,
-                     json.loads(args.manifest.read_text(encoding="utf-8")))
+                     json.loads(args.manifest.read_text(encoding="utf-8")),
+                     examples_dir=args.examples_dir)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(summary, indent=2, sort_keys=True)+"\n",
                         encoding="utf-8")
