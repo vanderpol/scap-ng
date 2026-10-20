@@ -6,12 +6,12 @@
 
 | Surface | Status for authors | How to use |
 | --- | --- | --- |
-| [Draft specification](../../specification/README.md) and [0.3 schema](../../schema/v0.3.0/) | 0.3 is the active development baseline, **not a released/ratified final standard** | Consult the coherent 0.3 source for 0.3 material |
-| [0.4 schema directory](../../schema/v0.4.0/README.md) | **Working pre-alpha 0.4 draft**, not Board approved | Use for controlled experiments, never silently assume it is accepted standard |
-| [October 15 r3 six-STIG preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) | **Source-backed 0.4 research candidate**, including separate scoped State/Item-requirement vocabulary | Explicitly label **r3 research overlay**; it is not interchangeable with the 0.4 base schema |
+| [Owner-approved 0.4.0 six-STIG samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and [0.4.0 schema](../../schema/v0.4.0/README.md) | **Current pre-alpha authoring profile**, not Board-ratified or scanner-conformant | Use one pinned 0.4 release/schema; preserve source provenance and explicit exceptional requirements |
+| [0.3.0 archive](../../archive/0.3.0/README.md) and [0.3 schema](../../schema/v0.3.0/) | **Historical and reproducible** | Use only for reproducing legacy authoring, compiled demo bundles or synthetic results |
+| [October 15 r3 six-STIG preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) | Historical source-backed **research input** | Do not use `collected_items_require` as if it were the current output grammar |
 | Proposed English-first/B/other research syntax | **Non-normative research** until separately approved | Do not generate it as if it were the selected supported grammar |
 
-**Critical example of version drift:** In the 0.4 base working draft, a Test's Item requirement uses `require`; the r3 scoped research candidate may use `collected_items_require` and allow `state_fields_require`. An agent or editor **must not mix them** or report base-schema validation from preview syntax. See [0.4 status and limitations](../../schema/v0.4.0/README.md).
+**Critical version drift:** Current canonical 0.4 output uses `require`, including source-proven structured `items`/`all_items_must`. The older r3 source includes `collected_items_require` and separate State-field forms. An agent/editor **must not mix dialects or assume the research form is current**; unusual source matching requirements are preserved explicitly. See [current 0.4 schema](../../schema/v0.4.0/README.md).
 
 ## Minimal profile to pin
 

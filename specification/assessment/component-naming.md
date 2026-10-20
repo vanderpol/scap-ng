@@ -1,6 +1,6 @@
 # Named component IDs
 
-**Status:** accepted SCAP-NG 0.3 authoring convention. This does not change the frozen 0.2 baseline.
+**Status:** preserved 0.3 authoring convention and historic reference. New 0.4.0 demonstrations should use purpose-based names without inventing alternate collection capabilities or breaking converted IDs.
 
 Named internal Assessment components use meaningful lowercase kebab-case IDs ending in the component type.
 
@@ -62,3 +62,11 @@ SCAP 1.4 conversion SHALL preserve source identity in migration evidence while e
 A 0.3 normalizer MAY convert older Test IDs such as `test-example` to `example-test` when references can be rewritten deterministically and collision-free. Historical State IDs SHALL be retained only in migration provenance, not renamed into new native State IDs.
 
 The frozen 0.2 review content is not renamed by this convention.
+
+## 0.4.0 examples: purpose-based naming and visual separation
+
+Use meaningful identifiers such as `domain-membership-query`, `remote-logon-deny-right` or `windows-time-service-query` rather than a capability/version-only name such as `windows-wmi57-object`. The ID should tell reviewers **what data is collected**; `capability: windows.wmi.query` tells the scanner *how* it is collected. The old `wmi57` name is an OVAL provenance detail, not a new 0.4 capability.
+
+Existing logical IDs in source-backed converted files **must not be renamed purely for presentation**. Renaming requires a separate complete reference and source-mapping audit. When formatting YAML demonstrations, put **one blank line between Tests** and **one blank line before `evaluate`**, with ordinary LF line endings. Do not add redundant comments restating each `test_title`. These are nonsemantic readability conventions.
+
+[Current Assessment examples](../examples/assessments.md) · [Historical 0.3 samples](../../archive/0.3.0/README.md)
