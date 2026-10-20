@@ -8,7 +8,8 @@ Independent [pinned original OVAL Self-Assertion source CI](https://github.com/v
 
 | Actual role of original Variable | Variables | Definitions containing at least one |
 | --- | ---: | ---: |
-| Derived at assessment runtime (local expressions) | **126** | 26 |
+| Runtime-derived local expression (nonliteral computation) | **102** | 17 |
+| Source `local` Variable with typed literal-only expression | **24** | 9 |
 | Constant used in Object/collection selection | **84** | 40 |
 | Constant used as one State expectation | **17** | 10 |
 | Constant used by more than one State expectation | **4** | 4 |
@@ -33,7 +34,7 @@ There is more than one kind of OVAL Variable work:
 2. **Collection or acquisition inputs** may look like constants but **select data**. A Variable used by a source Object's `var_ref` or collector is not automatically replaceable by a normal State literal. Preserve request identity, multiplicity, parent/host scope, and provenance.
 3. **Computed runtime values** are the genuinely complex part: a typed DAG of transforms, selectors, and downstream collection arguments. Avoid pretending these are static inputs or merely different `must` syntax.
 
-One original Variable can feed multiple roles: these are **authoring/use-site concepts**, not mutually exclusive declarations or a requirement for three separate execution engines. Keep one A-compatible typed execution graph.
+One original Variable can feed multiple roles: these are **authoring/use-site concepts**, not mutually exclusive declarations or a requirement for three separate execution engines. Keep one A-compatible typed execution graph. The **24 typed literal-only local Variables** are an important negative result for the historical assumption that every OVAL local Variable requires runtime computation. They still may be collection inputs and are **not automatically safe to inline** without preserving acquisition identity.
 
 ## Next genuinely valuable gates
 
