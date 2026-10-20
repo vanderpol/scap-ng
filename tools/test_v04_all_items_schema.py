@@ -10,14 +10,14 @@ url=d["$id"]
 resolver=RefResolver.from_schema(d,store={url:d})
 validator=Draft202012Validator({"$ref":"#/$defs/all_items_requirement","$defs":d["$defs"]},resolver=resolver)
 good=[
- {"items":"one_or_more","all_items_must":[{"and":[{"type":{"equals":"dword"}},{"value":{"equals":0}}]}]},
- {"items":"may_be_absent","all_items_must":[{"or":[{"value":{"equals":"Enterprise"}},{"value":{"equals":"EnterpriseS"}}]}]}
+ {"items":"one_or_more","all_items_must":[{"and":[{"type":{"require":"at_least_one_exists_and_all_match","equals":"dword"}},{"value":{"require":"at_least_one_exists_and_all_match","equals":0}}]}]},
+ {"items":"may_be_absent","all_items_must":[{"or":[{"value":{"require":"at_least_one_exists_and_all_match","equals":"Enterprise"}},{"value":{"require":"at_least_one_exists_and_all_match","equals":"EnterpriseS"}}]}]}
 ]
 bad=[
  {"items":"one_or_more","all_items_must":[]},
  {"items":"one_or_more"},
- {"all_items_must":[{"value":{"equals":0}}]},
- {"items":"sometimes","all_items_must":[{"value":{"equals":0}}]},
+ {"all_items_must":[{"value":{"require":"at_least_one_exists_and_all_match","equals":0}}]},
+ {"items":"sometimes","all_items_must":[{"value":{"require":"at_least_one_exists_and_all_match","equals":0}}]},
  {"items":"one_or_more","all_items_must":[{"and":[]}]},
 ]
 for x in good:
