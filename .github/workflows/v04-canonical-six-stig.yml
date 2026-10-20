@@ -15,6 +15,8 @@ on:
       - 'tools/audit_v04_filtered_union_oval_provenance.py'
       - 'tools/test_audit_v04_filtered_union_oval_provenance.py'
       - 'tools/test_guard_v04_filtered_union_migration.py'
+      - 'tools/audit_v04_authoring_patterns.py'
+      - 'tools/test_audit_v04_authoring_patterns.py'
       - 'tools/audit_v04_synthetic_filter_unions.py'
       - 'tools/v04_canonical_source_ir.py'
       - 'tools/test_v04_canonical_source_ir.py'
@@ -48,6 +50,10 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/test_guard_v04_filtered_union_migration.py
+      - name: Test additional 0.4.0 structural anomaly classifications
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_authoring_patterns.py
       - name: Check canonical all-items schema positive and negative fixtures
         run: python tools/test_v04_all_items_schema.py
       - name: Validate unsigned native-package format and tamper rejection fixtures
@@ -126,6 +132,25 @@ jobs:
             --archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
             --expected-baseline-candidates 36 \
             --report work/v04-filter-guard-yaml.json
+      - name: Census other odd authoring structures and reject new redundancies
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/audit_v04_authoring_patterns.py \
+            --baseline-archive work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip \
+            --archive work/scap-ng-0.4.0-six-stigs.json.zip \
+            --report work/v04-other-authoring-patterns-json.json --assert-six
+          python tools/audit_v04_authoring_patterns.py \
+            --baseline-archive work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip \
+            --archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --report work/v04-other-authoring-patterns-yaml.json --assert-six
+      - name: Preserve other-structure audit even on failed regression
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 0.4-authoring-structure-audit
+          path: work/v04-other-authoring-patterns-*.json
+          if-no-files-found: ignore
       - name: Preserve Filter regression report even if checks fail
         if: always()
         uses: actions/upload-artifact@v4
@@ -228,6 +253,7 @@ jobs:
             work/input-native-report.json
             work/*blocker-audit.json
             work/v04-filter-guard-*.json
+            work/v04-other-authoring-patterns-*.json
             work/v04-filter-source-census.json
             work/v04-filter-original-oval-proof.json
             work/residual-172-review-ledger.json
