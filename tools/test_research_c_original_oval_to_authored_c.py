@@ -334,6 +334,31 @@ class OriginalOVALNativeCCompilationTests(unittest.TestCase):
                 self.assertEqual(proof["authored_c"]["must"]["items_match"],word)
                 self.assertEqual(proof["native_c_compiled_test"]["require"],token)
 
+    def test_original_only_one_exists_and_all_match_is_exact_A_one_item_requirement(self):
+        src=original_plist()
+        test=next(iter(src["tests"].values()))
+        test["check_existence"]="only_one_exists"
+        original=deepcopy(src)
+        proof=compile_one_original_definition(src)
+        self.assertEqual(src,original)
+        self.assertEqual(proof["authored_c"]["must"],{
+            "exactly_one_item":{"value_of":True}})
+        self.assertEqual(proof["native_c_compiled_test"]["require"],
+                         "only_one_exists_and_matches")
+        self.assertTrue(proof["A_source_semantic_projection_passed"])
+        self.assertFalse(proof["OVAL_actual_scanner_parity_proven"])
+
+    def test_original_only_one_exists_other_matching_modes_stay_fail_closed(self):
+        for check in ("at least one","only one","none satisfy"):
+            with self.subTest(check=check):
+                src=original_plist()
+                test=next(iter(src["tests"].values()))
+                test["check_existence"]="only_one_exists"
+                test["check"]=check
+                with self.assertRaisesRegex(NotNativeCConvertible,
+                    "TEST_ONLY_ONE_EXISTENCE_CHECK_NOT_REVIEWED"):
+                    compile_one_original_definition(src)
+
     def test_source_six_state_quantifier_scope_not_guessed(self):
         source=original_plist()
         tid=next(iter(source["tests"]))
