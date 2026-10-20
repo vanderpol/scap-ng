@@ -12,6 +12,7 @@ from copy import deepcopy
 from pathlib import Path
 import argparse
 import json
+import re
 import yaml
 
 from research_04_native_deep_content_census import (
@@ -137,14 +138,10 @@ def convert(original):
     # original source IDs in a reversible crosswalk rather than weakening
     # the A grammar or pretending original OVAL suffices as native A.
     object_names={
-        ident:(ident.rsplit("-object-",1)[0]+"-variant-"+
-               ident.rsplit("-object-",1)[1]+"-object")
-        if "-object-" in ident else ident
+        ident:re.sub(r"-object-(\d+)$",r"-variant-\1-object",ident)
         for ident in original["objects"]}
     var_names={
-        ident:(ident.rsplit("-variable-",1)[0]+"-variant-"+
-               ident.rsplit("-variable-",1)[1]+"-variable")
-        if "-variable-" in ident else ident
+        ident:re.sub(r"-variable-(\d+)$",r"-variant-\1-variable",ident)
         for ident in original["variables"]}
     renames={**object_names,**var_names}
     def rename(node):
