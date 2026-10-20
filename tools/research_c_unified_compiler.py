@@ -103,6 +103,8 @@ def compile_c_unified(document, *, source_documents=None):
     checks={}
     native_tests={}
     singleton_observations={}
+    state_identity={}
+    source_state_provenance={}
     for check in normalized["checks"]:
         alias=check["id"]
         cap=check["from"]["capability"]
@@ -122,6 +124,22 @@ def compile_c_unified(document, *, source_documents=None):
             raise ValueError("unexpected legacy source document for native check")
         compiled=compile_c_requirement(requirement)
         test=deepcopy(compiled["test"])
+        # The same OVAL source State is immutable and may be reused by
+        # distinct Tests/Objects. Keep its identity across separately
+        # compiled Test requirements; reject conflicting C predicates.
+        source_state=check.get("source_state")
+        if source_state is not None:
+            if "states" not in test:
+                raise ValueError("source State reference cannot be State-free")
+            signature={"capability":test["capability"],
+                       "states":test["states"],
+                       "states_match":test.get("states_match")}
+            if source_state in state_identity and (
+                state_identity[source_state]!=signature
+            ):
+                raise ValueError("same source State identity has contradictory predicates")
+            state_identity.setdefault(source_state,deepcopy(signature))
+            source_state_provenance[alias]=source_state
         ref=check["observation"]
         if ref is not None:
             identifier=by_alias[ref]
@@ -172,6 +190,7 @@ def compile_c_unified(document, *, source_documents=None):
         "checks":checks,"expression":lowered,
         "authored_check_ids":sorted(expected),
         "source_compatibility_inputs":sorted(source_documents),
+        "source_state_provenance":deepcopy(source_state_provenance),
         "scanner_executed":False,
         "source_parity_verified":False,
         "runtime_acquisition_sharing_verified":False,
