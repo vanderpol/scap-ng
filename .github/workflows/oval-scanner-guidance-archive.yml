@@ -1,0 +1,39 @@
+name: Preserve OVAL 5.12.3 scanner documentation
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/archive_oval_xsd_annotations.py'
+      - '.github/workflows/oval-scanner-guidance-archive.yml'
+permissions:
+  contents: read
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-upstream
+          persist-credentials: false
+      - name: Preserve full upstream XSD annotation text and provenance
+        run: |
+          python tools/archive_oval_xsd_annotations.py --oval-xsd-dir oval-upstream/oval-schemas --output-dir work/oval-5.12.3-scanner-guide-sources
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path('work/oval-5.12.3-scanner-guide-sources/manifest.json').read_text())
+          assert data['source_files'] >= 10, data
+          assert data['total_annotations'] >= 100, data
+          assert any('windows-system-characteristics-schema.xsd' in x['source'] for x in data['files'])
+          print(data['source_files'],data['total_annotations'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: oval-5-12-3-scanner-annotations-complete
+          path: work/oval-5.12.3-scanner-guide-sources/
+          if-no-files-found: error
+          retention-days: 90
