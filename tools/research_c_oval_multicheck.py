@@ -346,6 +346,15 @@ def descriptive_distinct_alias(title,fields,existing):
     if (full_purpose not in existing and len(full_purpose)<=63 and
         re.fullmatch(r"[a-z][a-z0-9_]*",full_purpose)):
         return full_purpose
+    # A long original OVAL Test title may begin with an imperative
+    # "Ensure ". Drop only that non-technical command word to form a
+    # bounded, complete descriptive ID. Do not truncate the technical
+    # subject, expected state, negation, or original provenance title.
+    if full_purpose.startswith("ensure_"):
+        concise=full_purpose[len("ensure_"):]
+        if (concise not in existing and len(concise)<=63 and
+            re.fullmatch(r"[a-z][a-z0-9_]*",concise)):
+            return concise
     match=re.fullmatch(
         r"Test that the ([a-z][a-z0-9_]*)_object is supported with the "
         r"([a-z][a-z0-9_]*) entity "
