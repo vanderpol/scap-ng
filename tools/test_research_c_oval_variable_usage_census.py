@@ -22,6 +22,10 @@ class SourceOVALUsageCensusTests(unittest.TestCase):
         const={"kind":"constant","datatype":"string","expression":{"literal":"x"}}
         self.assertEqual(classify(local,[("objects","foo","select","x")]),
                          "runtime_derived")
+        literal_local={"kind":"local","datatype":"string",
+                       "expression":{"literal":{"datatype":"string","value":"x"}}}
+        self.assertEqual(classify(literal_local,[("objects","foo","select","x")]),
+                         "local_fixed_literal")
         self.assertEqual(classify(const,[("variables","child","expression")]),
                          "constant_derived_dependency")
         self.assertEqual(classify(const,[]),"constant_other")
