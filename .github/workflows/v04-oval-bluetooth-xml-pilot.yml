@@ -1,0 +1,107 @@
+name: 0.4.0 Windows 11 original OVAL XML semantic pilot
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/export_v04_oval_shellcommand_pilot.py'
+      - 'tools/extract_v04_win11_bluetooth_oval.py'
+      - 'tools/audit_v04_oval_xml_roundtrip.py'
+      - 'tools/test_audit_v04_oval_xml_roundtrip.py'
+      - '.github/workflows/v04-oval-bluetooth-xml-pilot.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  actual-v04-xml-roundtrip:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3
+      - name: Negative Filter and source integrity fixture tests
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_oval_xml_roundtrip.py -v
+      - name: Obtain pinned original OVAL source XML and verified 0.4.0 authored output
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/source work/candidate work/compare
+          curl --fail --silent --show-error --location --retry 3 \
+            https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip \
+            --output work/source/windows11-stig.zip
+          gh run download 39503111241 --repo "$GH_REPO" \
+            --name scap-ng-040-six-stig-board-authoring \
+            --dir work/candidate
+          PYTHONPATH=tools python - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          folder=Path('work/candidate')
+          manifest=json.loads((folder/'json-manifest.json').read_text())
+          archive=folder/'scap-ng-0.4.0-six-stigs.json.zip'
+          assert hashlib.sha256(archive.read_bytes()).hexdigest()==manifest['output_sha256']
+          assert manifest['counts']['source_proven_direct_filters']==28
+          assert manifest['counts']['source_linked_additional_direct_filters']==19
+          with zipfile.ZipFile(archive) as z:
+              name='authoring/ms_windows_11/assessments/applicability/condition.bluetooth-installation.json'
+              raw=z.read(name)
+          native=json.loads(raw)['assessment']
+          assert native['specification']['version']=='0.4.0'
+          test=next(iter(native['tests'].values()))
+          assert 'set' not in test['object'] and 'filters' in test['object']
+          Path('work/compare/bluetooth-native-v04.json').write_bytes(raw)
+          print('Verified actual 0.4.0 source-generated Bluetooth file', name)
+          PY
+      - name: Independently export actual 0.4.0 Bluetooth Assessment to OVAL 5.12.3 XML
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/extract_v04_win11_bluetooth_oval.py \
+            --source-zip work/source/windows11-stig.zip \
+            --output work/compare/source-oval.xml \
+            --proof work/compare/source-proof.json
+          python tools/export_v04_oval_shellcommand_pilot.py \
+            --native work/compare/bluetooth-native-v04.json \
+            --output work/compare/exported-oval.xml \
+            --definition-id-output work/compare/exported-def-id.txt
+      - name: Compare real original and independently regenerated OVAL Definition graphs
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path('work/compare')
+          src=json.loads((root/'source-proof.json').read_text())
+          row={'case_id':'Windows 11 original Bluetooth source',
+              'status':'converted','forward_profile':'0.4.0',
+              'reverse_profile':'0.4.0',
+              'source_definition':src['source_definition'],
+              'regenerated_definition':(root/'exported-def-id.txt').read_text().strip()}
+          for key,name in [('original','source-oval.xml'),
+                           ('native_assessment','bluetooth-native-v04.json'),
+                           ('regenerated','exported-oval.xml')]:
+              p=root/name
+              row[key]=name
+              row[key+'_sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+          (root/'roundtrip-manifest.json').write_text(json.dumps({
+              'format':'scap-ng-v04-oval-xml-roundtrip-1',
+              'profile':'0.4.0','cases':[row]},indent=2)+'\n')
+          PY
+          python tools/audit_v04_oval_xml_roundtrip.py \
+            --root work/compare \
+            --manifest work/compare/roundtrip-manifest.json \
+            --expected-cases 1 \
+            --report work/compare/semantic-roundtrip-result.json
+      - name: Publish proof and mismatch diagnostics even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-oval-xml-bluetooth-differential
+          path: work/compare/
+          if-no-files-found: ignore
