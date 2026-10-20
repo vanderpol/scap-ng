@@ -10,6 +10,7 @@ on:
       - 'tools/test_export_v04_shellcommand_pilot.py'
       - 'tools/export_v04_oval_registry_pilot.py'
       - 'tools/test_export_v04_registry_pilot.py'
+      - 'tools/check_v04_oval_xml_mutation_regressions.py'
       - 'tools/combine_v04_oval_xml_proofs.py'
       - 'tools/test_combine_v04_oval_xml_proofs.py'
       - 'tools/validate_v04_oval_5123.py'
@@ -210,6 +211,14 @@ jobs:
             --xsd work/compare/SV-253291-export-xsd.json \
             --xsd work/compare/SV-253350-export-xsd.json \
             --report work/compare/final-roundtrip-evidence.json
+      - name: Verify real exported OVAL semantic mutations are detected
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/check_v04_oval_xml_mutation_regressions.py \
+            --root work/compare \
+            --manifest work/compare/roundtrip-manifest.json \
+            --report work/compare/real-oval-mutation-regressions.json
       - name: Publish proof and mismatch diagnostics even on failure
         if: always()
         uses: actions/upload-artifact@v4
