@@ -50,3 +50,12 @@ if __name__=="__main__":
     assert r["documents"]==4001,"Unexpected six-STIG archive closure"
     assert not r["counts"].get("inline_capability_still_declared"),"Inline object capability was not normalized"
     assert not r["counts"].get("stale_collected_items_require"),"Stale Test requirement key"
+    # Explicitly track the unresolved migration scope; green source roundtrips
+    # must not be mistaken for full canonical-schema conformance.
+    actual=r["counts"]
+    assert actual.get("native_all_items_must_tests")==816, "Source population or conversion changed"
+    assert actual.get("legacy_string_require_tests")==559, "Remaining legacy requirement population changed; review migration"
+    assert actual.get("legacy_states")==172, "Unconverted State population changed; review migration"
+    assert actual.get("legacy_top_level_field_require")==108, "Unconverted field-level requirement count changed"
+    assert actual.get("legacy_states_match")==128, "Unconverted State aggregate population changed"
+
