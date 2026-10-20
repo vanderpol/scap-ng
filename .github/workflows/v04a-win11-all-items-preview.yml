@@ -1,0 +1,57 @@
+name: 0.4-A Windows 11 all-items review freeze gate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/build_windows11_all_items_preview.py'
+      - '.github/workflows/v04a-win11-all-items-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows11-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install research schema dependencies
+        run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Download version-pinned r3 six-STIG JSON source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-joval-meeting-preview-20261015-r3 --pattern scap-ng-v0.4-joval-six-stig-json.zip --dir work
+          echo "a1837c03133021f4d13814516a91b372f83b03771519f8361398ff1663056fea  work/scap-ng-v0.4-joval-six-stig-json.zip" | sha256sum -c -
+      - name: Existing 0.4-A scoped authoring and reference regression
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_json_authoring_readiness.py --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip --report work/source-schema-report.json
+      - name: Build reversible complete Windows 11 research authoring preview
+        run: |
+          python tools/build_windows11_all_items_preview.py --source work/scap-ng-v0.4-joval-six-stig-json.zip --out work/windows11-v04a-all-items-review.zip
+      - name: Guard against silent structural drift
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path('work/windows11-v04a-all-items-review.manifest.json').read_text())
+          assert m['document_count']==4001
+          assert m['counts']['changed_tests']>0
+          assert not m['candidate_is_native_0_4a']
+          assert not m['scanner_equivalence_tested']
+          print(m['counts'])
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: win11-v04a-all-items-unratified-review
+          path: |
+            work/windows11-v04a-all-items-review.zip
+            work/windows11-v04a-all-items-review.manifest.json
+            work/source-schema-report.json
+          if-no-files-found: error
