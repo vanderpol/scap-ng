@@ -68,6 +68,34 @@ class CapabilityV04Tests(unittest.TestCase):
                 self.assertNotIn("match",generated["$defs"]["test"]["properties"])
                 self.assertEqual(generated["x-specification-version"],"0.4.0")
 
+    def test_leaf_object_filters_do_not_require_synthetic_sets(self):
+        schema = materialize("linux.partition")
+        selector = {"mount_point": {"equals": "/home", "datatype": "string"}}
+        include = {"include": {
+            "mount_point": {"equals": "/home",
+                            "require": "at_least_one_exists_and_all_match"}}}
+        leaf = test_object("linux.partition", selector, filters=[include])
+        self.assertFalse(validate(schema, "object", leaf),
+                         "A filtered leaf Object must validate without a Set")
+
+        for bad in (
+            test_object("linux.partition", selector, filters=[]),
+            test_object("linux.partition", selector,
+                        filters=[{"not_an_action": include["include"]}]),
+        ):
+            with self.subTest(bad=bad):
+                self.assertTrue(validate(schema, "object", bad))
+
+        # A Filter applied to a whole Set would have a different semantic
+        # boundary than operand Filters. Reject the ambiguous placement.
+        set_only = {"capability": "linux.partition", "set": {
+            "operator": "union", "operands": [
+                {"object": "partition-object", "filters": [include]}]}}
+        self.assertFalse(validate(schema, "object", set_only))
+        combined = deepcopy(set_only)
+        combined["filters"] = [include]
+        self.assertTrue(validate(schema, "object", combined))
+
     def test_linux_partition_object_selector_known_field(self):
         schema=materialize("linux.partition")
         valid=test_object("linux.partition",{
