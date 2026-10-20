@@ -285,7 +285,7 @@ def descriptive_distinct_alias(title,fields,existing):
     match=re.fullmatch(
         r"Test that the ([a-z][a-z0-9_]*)_object is supported with the "
         r"([a-z][a-z0-9_]*) entity "
-        r"(equal to some value|not equal to some value|matching some regular expression)\\.",
+        r"(equal to some value|not equal to some value|matching some regular expression)\.",
         title.strip(),re.I)
     if match is None:
         reject("MULTI_DISTINCT_SOURCE_ALIAS_UNSAFE")
