@@ -63,3 +63,16 @@ group_scope=json.loads(json.dumps(no_field_scope))
 group_scope["require"]["all_items_must"][0]["state_fields_require"]="at_least_one_exists_and_all_match"
 assert not list(test_validator.iter_errors(group_scope)), "Scoped Boolean group rejected"
 print("PASS: explicit Test/group State-field cardinality guards")
+
+# Legacy State-bearing imported checks are permitted only with an explicitly
+# declared Test-level State-field requirement, preserving OVAL cardinality.
+legacy={
+ "states":[{"subexpression":{"matches_regex":"type=omfwd"}},{"subexpression":{"matches_regex":"action=gtls"}}],
+ "states_match":"all",
+ "require":"at_least_one_exists_and_some_match"
+}
+legacy_scope=json.loads(json.dumps(legacy))
+legacy_scope["state_fields_require"]="at_least_one_exists_and_all_match"
+assert list(test_validator.iter_errors(legacy)), "Missing field scope must not silently pass"
+assert not list(test_validator.iter_errors(legacy_scope)), "Explicit legacy State scope rejected"
+print("PASS: legacy State field scope requires explicit declaration")
