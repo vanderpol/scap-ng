@@ -52,13 +52,20 @@ def local_set_sites(documents):
         if not isinstance(assessment,dict) or assessment.get("mode")!="automated":
             continue
         base={"path":path,"assessment":assessment.get("id"),"test":None,
-              "test_capability":None}
+              "test_capability":None, "test_title":None}
         for ident,test in sorted((assessment.get("tests") or {}).items()):
             walk(test,["assessment","tests",ident],
-                 {**base,"test":ident,"test_capability":test.get("capability")})
+                 {**base,"test":ident,"test_capability":test.get("capability"),
+                  "test_title":test.get("test_title")})
         for kind in ("variables","objects","shared_objects"):
             walk(assessment.get(kind) or {},["assessment",kind],base)
     return rows
+
+
+def source_tests(xml):
+    root=ET.fromstring(xml)
+    return [t for t in root.iter()
+            if local(t).endswith("_test") and t.get("id")]
 
 
 def normalized_xml_structure(element):
@@ -86,7 +93,11 @@ def originals(source_dir):
             xml=[name for name in z.namelist() if name.endswith(".xml")]
             if len(xml)!=1:
                 raise ValueError("ambiguous OVAL source "+filename)
-            sources[benchmark]=source_objects(z.read(xml[0]))
+            xml_data=z.read(xml[0])
+            sources[benchmark]={
+                "objects":source_objects(xml_data),
+                "tests":source_tests(xml_data),
+            }
         checksums[benchmark]=hashlib.sha256(contents).hexdigest()
     return sources,checksums
 
@@ -98,13 +109,33 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         parts=item["path"].split("/")
         benchmark=parts[1] if len(parts)>1 else None
         if benchmark=="shared":
-            source_candidates=[s for objs in sources.values() for s in objs]
+            original_collections=list(sources.values())
         elif benchmark in sources:
-            source_candidates=sources[benchmark]
+            original_collections=[sources[benchmark]]
         else:
             raise ValueError("No pinned OVAL source for "+item["path"])
+        # Fixtures may pass only source Object arrays. Production supplies
+        # original Tests too, for an independent Test-comment -> object_ref
+        # check when the converter did not retain an Object title.
+        source_candidates=[obj for source in original_collections
+                           for obj in (source["objects"] if isinstance(source,dict) else source)]
+        original_tests=[test for source in original_collections
+                        for test in (source["tests"] if isinstance(source,dict) else [])]
         title=item["outer_title"] or item["leaf_title"]
         matches=[obj for obj in source_candidates if title is not None and obj.get("comment")==title]
+        linked=[]
+        if item.get("test_title"):
+            for original_test in original_tests:
+                if original_test.get("comment")==item["test_title"]:
+                    refs=sorted({child.get("object_ref")
+                                 for child in original_test.iter()
+                                 if child.get("object_ref")})
+                    linked.append({"test_id":original_test.get("id"),
+                                   "object_refs":refs})
+        unique_linked_refs=sorted({ref for t in linked for ref in t["object_refs"]})
+        linkage=( "UNIQUE_OVAL_TEST_OBJECT_REF" if len(unique_linked_refs)==1 else
+                  "MULTIPLE_OVAL_TEST_OBJECT_REFS" if unique_linked_refs else
+                  "NO_MATCHED_OVAL_TEST_COMMENT")
         graph=[]
         for obj in matches:
             direct_filters=[node for node in obj if local(node)=="filter"]
@@ -148,8 +179,14 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         else:
             classifications=["SOURCE_FILTER_MISMATCH"]
         records.append({**item, "source_title_checked":title,
-                        "source_matches":graph, "classification":classifications[0]})
+                        "source_matches":graph, "classification":classifications[0],
+                        "source_test_linkage":linkage,
+                        "source_test_object_refs":unique_linked_refs,
+                        "source_test_candidates":linked})
     counts=Counter(r["classification"] for r in records)
+    links=Counter(r["source_test_linkage"] for r in records)
+    missing_title_links=Counter(r["source_test_linkage"]
+                                for r in records if r["classification"]=="NO_SOURCE_TITLE")
     if assert_six and (len(ng_docs)!=4001 or len(singletons)!=50):
         raise ValueError("Pinned 0.4.0 singleton-Set baseline changed")
     return {
@@ -157,6 +194,8 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
         "documents":len(ng_docs),
         "singleton_set_occurrences":len(singletons),
         "classifications":dict(sorted(counts.items())),
+        "test_linkage":dict(sorted(links.items())),
+        "missing_title_test_linkage":dict(sorted(missing_title_links.items())),
         "by_parent_area":dict(Counter(
             ("test" if r["test"] else r["site"][1])
             for r in records)),
@@ -183,6 +222,8 @@ def main():
         "status":report["status"],
         "singleton_set_occurrences":report["singleton_set_occurrences"],
         "classifications":report["classifications"],
+        "test_linkage":report["test_linkage"],
+        "missing_title_test_linkage":report["missing_title_test_linkage"],
         "by_parent_area":report["by_parent_area"],
         "sample_needing_review": [
             {"path":r["path"], "test":r["test"],
