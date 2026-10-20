@@ -8,6 +8,8 @@ on:
       - 'tools/audit_v04_oval_xml_roundtrip.py'
       - 'tools/test_audit_v04_oval_xml_roundtrip.py'
       - 'tools/test_export_v04_shellcommand_pilot.py'
+      - 'tools/export_v04_oval_registry_pilot.py'
+      - 'tools/test_export_v04_registry_pilot.py'
       - 'tools/combine_v04_oval_xml_proofs.py'
       - 'tools/test_combine_v04_oval_xml_proofs.py'
       - 'tools/validate_v04_oval_5123.py'
@@ -38,6 +40,7 @@ jobs:
         run: |
           python tools/test_audit_v04_oval_xml_roundtrip.py -v
           python tools/test_export_v04_shellcommand_pilot.py -v
+          python tools/test_export_v04_registry_pilot.py -v
           python tools/test_combine_v04_oval_xml_proofs.py -v
       - name: Obtain pinned original OVAL source XML and verified 0.4.0 authored output
         env:
@@ -78,6 +81,17 @@ jobs:
           assert 'set' not in camera_test['object'] and 'filters' in camera_test['object']
           Path('work/compare/camera-native-v04.json').write_bytes(camera_raw)
           print('Verified actual 0.4.0 source-generated Camera file',camera)
+          for rule in ('SV-253291','SV-253350'):
+              registry=f'authoring/ms_windows_11/assessments/automated/{rule}.automated.json'
+              with zipfile.ZipFile(archive) as z:
+                  registry_raw=z.read(registry)
+              assessment=json.loads(registry_raw)['assessment']
+              assert assessment['specification']['version']=='0.4.0'
+              assert len(assessment['tests'])==1
+              t=next(iter(assessment['tests'].values()))
+              assert t['capability']=='windows.registry'
+              Path(f'work/compare/{rule}-native-v04.json').write_bytes(registry_raw)
+              print('Verified source-generated native registry Test',registry)
           PY
       - name: Independently export actual 0.4.0 Bluetooth Assessment to OVAL 5.12.3 XML
         env:
@@ -99,6 +113,12 @@ jobs:
             --native work/compare/camera-native-v04.json \
             --output work/compare/camera-exported-oval.xml \
             --definition-id-output work/compare/camera-exported-def-id.txt
+          for rule in SV-253291 SV-253350; do
+            python tools/export_v04_oval_registry_pilot.py \
+              --native "work/compare/$rule-native-v04.json" \
+              --output "work/compare/$rule-exported-oval.xml" \
+              --definition-id-output "work/compare/$rule-exported-def-id.txt"
+          done
       - name: Compare real original and independently regenerated OVAL Definition graphs
         env:
           PYTHONPATH: tools
@@ -125,6 +145,37 @@ jobs:
                   row[key]=name
                   row[key+'_sha256']=hashlib.sha256(file.read_bytes()).hexdigest()
               cases.append(row)
+          # The two other originals are distinct registry Definitions
+          # inside the same pinned Windows 11 OVAL component.
+          import xml.etree.ElementTree as ET
+          oval=ET.parse(root/'source-oval.xml').getroot()
+          ns='http://oval.mitre.org/XMLSchema/oval-definitions-5'
+          by_id={e.get('id'):e for e in oval.iter() if e.get('id')}
+          for rule in ('SV-253291','SV-253350'):
+              suffix=rule.split('-')[1]
+              srcdef=f'oval:navy.navwar.niwcatlantic.scc.windows:def:{suffix}'
+              assert srcdef in by_id
+              crit=[e for e in by_id[srcdef].iter()
+                    if e.tag=='{'+ns+'}criterion']
+              assert len(crit)==1
+              src_test=by_id[crit[0].get('test_ref')]
+              native=json.loads((root/(rule+'-native-v04.json')).read_text())['assessment']
+              assert src_test.get('comment')==next(iter(native['tests'].values()))['test_title']
+              assert src_test.get('check')=='only one'
+              assert src_test.get('check_existence')=='at_least_one_exists'
+              row={'case_id':'Windows 11 original '+rule+' registry',
+                  'status':'converted','forward_profile':'0.4.0',
+                  'reverse_profile':'0.4.0',
+                  'source_definition':srcdef,
+                  'regenerated_definition':(
+                      root/(rule+'-exported-def-id.txt')).read_text().strip()}
+              for key,name in [('original','source-oval.xml'),
+                               ('native_assessment',rule+'-native-v04.json'),
+                               ('regenerated',rule+'-exported-oval.xml')]:
+                  file=root/name
+                  row[key]=name
+                  row[key+'_sha256']=hashlib.sha256(file.read_bytes()).hexdigest()
+              cases.append(row)
           (root/'roundtrip-manifest.json').write_text(json.dumps({
               'format':'scap-ng-v04-oval-xml-roundtrip-1',
               'profile':'0.4.0','cases':cases},indent=2)+'\n')
@@ -132,7 +183,7 @@ jobs:
           python tools/audit_v04_oval_xml_roundtrip.py \
             --root work/compare \
             --manifest work/compare/roundtrip-manifest.json \
-            --expected-cases 2 \
+            --expected-cases 4 \
             --report work/compare/semantic-roundtrip-result.json
       - name: Validate independently exported OVAL against pinned 5.12.3 XSD
         run: |
@@ -144,12 +195,20 @@ jobs:
             --schema-dir work/oval-5123/oval-schemas \
             --xml work/compare/camera-exported-oval.xml \
             --report work/compare/camera-export-xsd.json
+          for rule in SV-253291 SV-253350; do
+            python tools/validate_v04_oval_5123.py \
+              --schema-dir work/oval-5123/oval-schemas --platform windows \
+              --xml "work/compare/$rule-exported-oval.xml" \
+              --report "work/compare/$rule-export-xsd.json"
+          done
       - name: SHA-bind independent semantic and schema reports per Definition
         run: |
           python tools/combine_v04_oval_xml_proofs.py \
             --semantic work/compare/semantic-roundtrip-result.json \
             --xsd work/compare/oval-export-xsd.json \
             --xsd work/compare/camera-export-xsd.json \
+            --xsd work/compare/SV-253291-export-xsd.json \
+            --xsd work/compare/SV-253350-export-xsd.json \
             --report work/compare/final-roundtrip-evidence.json
       - name: Publish proof and mismatch diagnostics even on failure
         if: always()
