@@ -44,13 +44,18 @@ def source_test_field_must(test, fields):
     Existence is a distinct axis. No advanced check_existence is inferred from
     the matching operation; unsupported pairs must remain compatibility data.
     """
-    if test.get("check_existence")!="at_least_one_exists":
+    if test.get("check_existence") not in ("at_least_one_exists","all_exist"):
         reject("SOURCE_TEST_ADVANCED_EXISTENCE_UNSUPPORTED")
     token=PAIR_CHECK.get(test.get("check"))
     modes={"all_match":"every_item","some_match":"any_item",
            "only_one_matches":"one_matching_item","none_match":"no_matching_item"}
     if token not in modes:
         reject("SOURCE_TEST_MATCHING_QUANTIFIER_UNSUPPORTED")
+    if test["check_existence"]=="all_exist":
+        return {"items_exist":"all","items_match":{
+            "all_match":"every","some_match":"some",
+            "only_one_matches":"one","none_match":"none"}[token],
+            "fields":fields}
     return {modes[token]:fields}
 
 
@@ -140,7 +145,7 @@ def convert_objectless_many(a):
         if (t.get("capability")!=capability or t.get("object")!=oid
                 or t.get("reported_elements")!="all"):
             reject("TEST_SINGLETON_COLLECTION_IDENTITY_MISMATCH")
-        if (t.get("check_existence")!="at_least_one_exists"
+        if (t.get("check_existence") not in ("at_least_one_exists","all_exist")
                 or t.get("check") not in PAIR_CHECK):
             reject("SOURCE_TEST_UNSUPPORTED_QUANTIFIER")
         refs=t.get("states") or []
@@ -194,7 +199,8 @@ def convert_objectless_many(a):
         generated=compiled["tests"][alias]
         if generated.get("object") is not None:
             reject("OBJECTLESS_PROVIDER_INCORRECTLY_RECOLLECTED")
-        expected_requirement="at_least_one_exists_and_"+PAIR_CHECK[tests[tid]["check"]]
+        expected_requirement=(tests[tid]["check_existence"]+
+            "_and_"+PAIR_CHECK[tests[tid]["check"]])
         if generated["capability"]!=capability or (
             generated.get("require")!=expected_requirement):
             reject("C_TEST_SEMANTIC_DRIFT")
@@ -250,7 +256,7 @@ def convert_selected_shared_many(a):
         if (t.get("object")!=oid or t.get("capability")!=cap or
             t.get("reported_elements")!="all" or
             t.get("check") not in PAIR_CHECK or
-            t.get("check_existence")!="at_least_one_exists"):
+            t.get("check_existence") not in ("at_least_one_exists","all_exist")):
             reject("SHARED_SELECTED_TEST_HAS_DIFFERENT_SOURCE_SCOPE")
         refs=t.get("states")
         if not isinstance(refs,list) or len(refs)!=1 or refs[0] not in states:
