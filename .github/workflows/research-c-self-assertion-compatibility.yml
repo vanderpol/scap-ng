@@ -12,6 +12,7 @@ on:
       - 'tools/test_research_c_require_language.py'
       - 'tools/verify_c_linux_windows_basic_source.py'
       - 'tools/research_c_original_platform_test_census.py'
+      - 'tools/research_c_original_a_vs_c_review.py'
       - 'research/assessment-simplification/compact-authoring-04/c-original-windows-registry-test-1020-native.research.yaml'
       - 'tools/research_c_oval_native_gap_report.py'
       - 'tools/test_research_c_oval_native_gap_report.py'
@@ -323,6 +324,12 @@ jobs:
             > c-native/linux-unix-windows-test-summary.json
           cat c-native/linux-unix-windows-test-summary.json
           echo "Full native-C Definition counts and isolated C Test counts are deliberately separate." >> "$GITHUB_STEP_SUMMARY"
+      - name: Produce original OVAL A-vs-C unabridged moderate complexity review packet
+        run: |
+          PYTHONPATH=scap-ng/tools python scap-ng/tools/research_c_original_a_vs_c_review.py \
+            --review c-review --native c-native --out c-native/a-vs-c \
+            | tee c-native/a-vs-c-summary.md
+          cat c-native/a-vs-c-summary.md >> "$GITHUB_STEP_SUMMARY"
       - name: Source-backed C fixed State constant reconstruction census
         run: |
           PYTHONPATH=scap-ng/tools python -m unittest -v scap-ng/tools/test_research_c_constant_state_source.py
