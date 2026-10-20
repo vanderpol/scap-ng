@@ -91,6 +91,18 @@ class RemainingSingletonTests(unittest.TestCase):
         self.assertEqual(row["classification"],"NO_SOURCE_TITLE")
         self.assertEqual(row["source_test_linkage"],"UNIQUE_OVAL_TEST_OBJECT_REF")
         self.assertEqual(row["source_test_object_refs"],["oval:obj:1"])
+        self.assertEqual(row["source_test_linked_object_status"],
+                         "TEST_REFERENCES_ORIGINAL_SET")
+
+    def test_source_test_object_ref_with_no_set_exposes_remaining_wrappers(self):
+        d=doc()
+        d[P]["assessment"]["tests"]["check-test"]["test_title"]="Source registry check"
+        src=xml("Registry keys",False)
+        test=ET.fromstring('<registry_test id="oval:test:4" comment="Source registry check">'
+                           '<object object_ref="oval:obj:1"/></registry_test>')
+        r=audit(d,{"ms_windows_11":{"objects":[src],"tests":[test]}},pins())
+        self.assertEqual(r["source_test_linked_object_shapes"],
+                         {"TEST_REFERENCES_ORIGINAL_DIRECT_FILTER":1})
 
     def test_mixed_test_and_variable_sites_preserve_provenance_path(self):
         d=doc()
