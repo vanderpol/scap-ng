@@ -38,6 +38,100 @@ def original_plist():
           "states":[ste],
           "test_title":"Test plist511_obj filepath selector"}}}
 
+
+def original_windows_registry_1020_test():
+    """One literal Test from pinned Windows OVAL Definition 38 (15 Tests).
+
+    The source OVAL hive HKEY_LOCAL_MACHINE is normalized to the pinned
+    A native enum local_machine. This intentionally checks no Registry value.
+    """
+    path=r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+    obj="retrieve-registry-current-version-object"
+    state="confirm-registry-identity-state"
+    tid="test-registry-current-version-name"
+    def predicate(field,value,op="equals"):
+        return {"datatype":"string","entity_check":"all",
+                "entity_existence":"at_least_one_exists",
+                "field":field,"operation":op,"value":value}
+    return {
+        "id":"original.oval.windows.registry-test-1020",
+        "mode":"automated","evaluate":{"test":tid},
+        "objects":{obj:{
+            "capability":"windows.registry",
+            "object_title":"Collect Windows CurrentVersion registry entry",
+            "select":{
+                "hive":{"datatype":"string","operation":"equals",
+                        "value":"local_machine"},
+                "key":{"datatype":"string","operation":"equals","value":path},
+                "name":{"datatype":"string","operation":"equals",
+                        "value":"CurrentVersion"}}}},
+        "states":{state:{"capability":"windows.registry",
+            "state_title":"Check registry identity without testing its value",
+            "state":{"all":[
+                predicate("hive","local_machine"),
+                predicate("key",path,"case insensitive equals"),
+                predicate("name","CurrentVersion")]}}},
+        "tests":{tid:{"capability":"windows.registry",
+            "object":obj,"states":[state],
+            "check_existence":"at_least_one_exists",
+            "check":"only one",
+            "reported_elements":"all",
+            "test_title":"Original Windows Registry hive, key and name Test 1020"}}
+    }
+
+
+class BasicOriginalWindowsRegistryCTest(unittest.TestCase):
+    def test_registry_1020_preserves_three_selectors_and_case_insensitive_state(self):
+        original=original_windows_registry_1020_test()
+        before=deepcopy(original)
+        out=compile_one_original_definition(original)
+        self.assertEqual(original,before)
+        c=out["authored_c"]
+        self.assertEqual(list(c["from"]["windows.registry"]),["hive","key","name"])
+        self.assertEqual(set(c["must"]),{"one_matching_item"})
+        predicates=c["must"]["one_matching_item"]
+        self.assertEqual(list(predicates),["hive","key","name"])
+        path=r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+        self.assertEqual(predicates["key"],{"case_insensitive_equals":path})
+        self.assertNotIn("value",predicates)
+        compiled=out["native_c_compiled_test"]
+        self.assertEqual(compiled["require"],
+                         "at_least_one_exists_and_only_one_matches")
+        self.assertEqual(compiled["object"]["select"]["hive"],
+                         {"equals":"local_machine"})
+        self.assertEqual(compiled["states"][1]["key"],
+                         {"require":"at_least_one_exists_and_all_match",
+                          "case_insensitive_equals":path})
+        self.assertEqual(compiled["states_match"],"all")
+        self.assertTrue(out["A_source_semantic_projection_passed"])
+        self.assertFalse(out["OVAL_actual_scanner_parity_proven"])
+
+    def test_registry_source_type_and_scope_fail_closed(self):
+        original=original_windows_registry_1020_test()
+        old=next(iter(original["states"].values()))["state"]["all"][1]
+        old["datatype"]="integer"
+        old["value"]=99
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "STATE_CASE_INSENSITIVE_REQUIRES_STRING"):
+            compile_one_original_definition(original)
+        original=original_windows_registry_1020_test()
+        sel=next(iter(original["objects"].values()))["select"]
+        sel["hive"]["value"]="HKEY_LOCAL_MACHINE"  # Not A's native enum.
+        with self.assertRaisesRegex(NotNativeCConvertible,
+                                    "C_COMPILER_NOT_SUPPORTED"):
+            compile_one_original_definition(original)
+
+    def test_case_insensitive_selector_also_reprojects_unchanged(self):
+        original=original_windows_registry_1020_test()
+        sel=next(iter(original["objects"].values()))["select"]["key"]
+        sel["operation"]="case insensitive equals"
+        out=compile_one_original_definition(original)
+        path=r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"
+        self.assertEqual(out["native_c_compiled_test"]["object"]["select"]["key"],
+                         {"case_insensitive_equals":path})
+        self.assertEqual(out["authored_c"]["from"]["windows.registry"]["key"],
+                         {"case_insensitive_equals":path})
+
 class OriginalOVALNativeCCompilationTests(unittest.TestCase):
     def test_real_macos_plist_case_lowers_into_one_existing_C_grammar(self):
         source=original_plist()
