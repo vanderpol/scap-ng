@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'tools/build_v04_canonical_six_stigs.py'
+      - 'tools/audit_v04_authoring_blockers.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
       - 'schema/v0.4.0/assessment.schema.json'
       - 'schema/v0.4.0/capability-common.schema.json'
@@ -39,6 +40,10 @@ jobs:
         run: |
           python tools/build_v04_canonical_six_stigs.py --source work/scap-ng-v0.4-joval-six-stig-json.zip --out work/scap-ng-0.4.0-six-stigs.json.zip --manifest work/json-manifest.json
           python tools/build_v04_canonical_six_stigs.py --source work/scap-ng-v0.4-joval-six-stig-yaml.zip --out work/scap-ng-0.4.0-six-stigs.yaml.zip --manifest work/yaml-manifest.json
+      - name: Inventory remaining canonical 0.4.0 authoring blockers
+        run: |
+          python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip --report work/yaml-blocker-audit.json
+          python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --report work/json-blocker-audit.json
       - name: Confirm equivalent YAML/JSON sources and exact scope
         run: |
           python - <<'PY'
@@ -61,6 +66,7 @@ jobs:
             work/scap-ng-0.4.0-six-stigs.yaml.zip
             work/*manifest.json
             work/input-native-report.json
+            work/*blocker-audit.json
           if-no-files-found: error
       - name: Publish durable six-STIG authoring candidate
         if: github.ref == 'refs/heads/main'
