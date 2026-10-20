@@ -34,6 +34,8 @@ class NativeCOriginalGapTests(unittest.TestCase):
                                           "MULTI_TEST":1})
         self.assertEqual(r["selected_multi_test_categories"],
                          {"SELECTED_ROUTE_NOT_ATTEMPTED":1})
+        self.assertEqual(r["distinct_multi_test_categories"],
+                         {"DISTINCT_ROUTE_NOT_ATTEMPTED":1})
         self.assertEqual(r["native_stages"],
                          {"NATIVE_C_FROM_MUST_SOURCE_COMPATIBILITY_PROVED":2})
         self.assertIn("original-oval",r["markdown"].lower().replace(" ","-"))
@@ -51,6 +53,23 @@ class NativeCOriginalGapTests(unittest.TestCase):
         self.assertEqual(report["selected_multi_test_categories"],{
             "SHARED_SELECTED_SOURCE_INVENTORY_UNSUPPORTED":1})
         self.assertIn("Selected multi-Test blocker",report["markdown"])
+        self.assertEqual(report["distinct_multi_test_categories"],{
+            "DISTINCT_ROUTE_NOT_ATTEMPTED":1})
+
+    def test_specific_distinct_blockers_not_double_counted(self):
+        m=fixture()
+        m["unsupported"][1]["reason"]=(
+            "MULTI_TEST: SOURCE_OBJECTS_NOT_SINGLETON; "
+            "SELECTED: SHARED_SELECTED_SOURCE_INVENTORY_UNSUPPORTED; "
+            "DISTINCT: STATE_FIELD_CARDINALITY_COMPLEX")
+        r=gap_report(m,min_expected_total=4)
+        self.assertEqual(r["categories"]["MULTI_TEST"],1)
+        self.assertEqual(r["distinct_multi_test_categories"],{
+            "STATE_FIELD_CARDINALITY_COMPLEX":1})
+        self.assertIn("linux/linux-def_d.xml",r["markdown"])
+        self.assertIn("Multi-Test distinct-collection final blocker",r["markdown"])
+        self.assertEqual(sum(r["distinct_multi_test_categories"].values()),
+                         r["categories"]["MULTI_TEST"])
 
     def test_missing_source_definition_and_double_count_fail(self):
         m=fixture()
