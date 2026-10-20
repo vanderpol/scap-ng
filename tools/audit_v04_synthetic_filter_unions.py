@@ -73,14 +73,15 @@ def inventory(documents, *, assert_bluetooth=False):
         or bluetooth[0]["filters"] != ["include"]
         or not bluetooth[0]["has_collect"]
     ):
-        raise ValueError("Windows 11 source-proven synthetic Filter wrapper changed")
+        raise ValueError("Windows 11 filtered-Union structural reference changed; consult source XML")
     return {
         "status": "SYNTHETIC_SHAPE_CANDIDATES_NOT_PROVEN_SOURCE_FOR_OTHERS",
         "documents": len(documents),
         "candidate_count": len(entries),
         "by_capability": dict(sorted(by_capability.items())),
-        "bluetooth_original_oval_set_present": False if assert_bluetooth else None,
-        "bluetooth_case_source_proven": bool(assert_bluetooth),
+        "bluetooth_original_oval_set_present": None,
+        "bluetooth_case_source_proven": False,
+        "source_provenance_required": True,
         "candidate_entries": entries,
         "requires_source_oval_provenance_before_bulk_rewrite": True,
         "scanner_semantics_verified": False,
