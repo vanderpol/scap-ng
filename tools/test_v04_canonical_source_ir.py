@@ -87,6 +87,45 @@ class CanonicalIRTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 normalize_documents(src)
 
+    def test_unresolved_truth_dependency_fails(self):
+        src = sample()
+        a = src["authoring/demo/assessments/a1.json"]["assessment"]
+        a["dependencies"] = {"foreign": {
+            "assessment": "missing-assessment", "expected_version": 1,
+            "purpose": "assessment"}}
+        with self.assertRaisesRegex(ValueError, "unresolved Assessment dependency"):
+            normalize_documents(src)
+
+    def test_truth_dependency_version_and_cycle_fail(self):
+        src = sample()
+        a = src["authoring/demo/assessments/a1.json"]["assessment"]
+        a["version"] = 1
+        a["purpose"] = "assessment"
+        a["dependencies"] = {"self": {
+            "assessment": a["id"], "expected_version": 2, "purpose": "assessment"}}
+        with self.assertRaisesRegex(ValueError, "version mismatch"):
+            normalize_documents(src)
+        a["dependencies"]["self"]["expected_version"] = 1
+        with self.assertRaisesRegex(ValueError, "cyclic Assessment dependency"):
+            normalize_documents(src)
+
+    def test_unresolved_dataflow_reference_fails(self):
+        src = sample()
+        a = src["authoring/demo/assessments/a1.json"]["assessment"]
+        a["tests"]["t1"]["object"] = "no-such-object"
+        with self.assertRaisesRegex(ValueError, "unresolved"):
+            normalize_documents(src)
+
+    def test_static_source_dataflow_reconstructed(self):
+        src = sample()
+        ir = normalize_documents(src)
+        record = next(row for row in ir["records"] if row["kind"] == "assessment")
+        self.assertEqual(record["source_dataflow"]["status"],
+                         "SOURCE_DATAFLOW_ONLY_NOT_EXECUTABLE")
+        self.assertEqual(ir["source_dataflow"]["objects_variables_tests"], 1)
+        self.assertEqual(ir["assessment_truth_dependencies"], 0)
+        self.assertEqual(decode_and_verify(ir), src)
+
     def test_typed_index_tamper_fails_reconstruction(self):
         ir = normalize_documents(sample())
         ir["records"][0]["typed_tests"][0]["requirement"]["items"] = "none"

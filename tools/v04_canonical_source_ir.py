@@ -21,6 +21,8 @@ from v04_a_authoring_graph_index import (
     canonical_json, graph_index, read_authoring_archive,
 )
 from v04_a_benchmark_choice_version_closure import inspect_edges
+from v04_a_lossless_ir import _check_assessment_dependency_targets
+from v04_a_dataflow_index import index_assessment_dataflow
 
 
 FORMAT = "scap-ng-0.4.0-canonical-typed-source-ir/0.1"
@@ -45,6 +47,8 @@ def normalize_documents(documents):
         source[logical] = doc
     graph = graph_index(source)  # IDs, Rule choices, Test/Object/Variable refs.
     edges = inspect_edges(source)  # Benchmark-local specifications and choices.
+    truth_dependency_count = _check_assessment_dependency_targets(source)
+    dataflow_counts = Counter()
     records = []
     totals = Counter()
     for path, doc in sorted(source.items()):
@@ -98,10 +102,19 @@ def normalize_documents(documents):
                     "states_match": test.get("states_match"),
                 })
                 totals[shape] += 1
+        dataflow = None
+        if kind == "assessment" and body.get("mode") == "automated":
+            # Static dependency index only; never schedule collection or evaluate
+            # a result while constructing a source IR.
+            dataflow = index_assessment_dataflow(body)
+            dataflow_counts["objects_variables_tests"] += len(dataflow["nodes"])
+            dataflow_counts["edges"] += dataflow["edge_count"]
+            dataflow_counts["source_sites"] += len(dataflow["sites"])
         record = {
             "path": path, "kind": kind, "id": body["id"],
             "source_sha256": sha256(canonical_json(doc)).hexdigest(),
             "source_ast": doc, "typed_tests": indexed,
+            "source_dataflow": dataflow,
         }
         records.append(record)
         totals["documents"] += 1
@@ -113,6 +126,8 @@ def normalize_documents(documents):
         "benchmark_version_conflicts": edges["incompatible_edge_count"],
         "benchmark_version_conflict_samples": edges["incompatible_edge_samples"],
         "rule_choice_links": edges["counts"]["choice_links"],
+        "assessment_truth_dependencies": truth_dependency_count,
+        "source_dataflow": dict(sorted(dataflow_counts.items())),
         "totals": dict(sorted(totals.items())),
         "records": records,
         "executable_compiler_complete": False,
@@ -204,6 +219,8 @@ def compile_pair(json_archive, yaml_archive, *, validate_schema=True):
         "requirement_shapes": {key: j_ir["totals"].get(key, 0) for key in
                                ("presence", "all_items", "source_exact_fallback")},
         "rule_choice_links": j_ir["rule_choice_links"],
+        "assessment_truth_dependencies": j_ir["assessment_truth_dependencies"],
+        "source_dataflow": j_ir["source_dataflow"],
         "version_conflicting_choice_links": j_ir["benchmark_version_conflicts"],
         "version_policy_status": "BLOCKED_UNAPPROVED_SOURCE_MIGRATION"
                                  if j_ir["benchmark_version_conflicts"] else "DECLARED_COMPATIBLE",
