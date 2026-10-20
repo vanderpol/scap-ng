@@ -1,0 +1,30 @@
+name: 0.4.0 OVAL XML roundtrip differential harness
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_oval_xml_roundtrip.py'
+      - 'tools/test_audit_v04_oval_xml_roundtrip.py'
+      - '.github/workflows/v04-oval-xml-roundtrip-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  xml-roundtrip-auditor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3
+      - name: Prove OVAL semantic diff rejects lost and changed Filters
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_oval_xml_roundtrip.py -v
+      - name: Confirm real 0.4.0 roundtrip is still a separate release gate
+        run: |
+          echo "This CI validates the XML semantic comparison harness only."
+          echo "It does not execute the pending native 0.4.0 OVAL importer/exporter."
+          echo "Full Self-Assertion and six-STIG roundtrip evidence remains OPEN (#248, #229)."
