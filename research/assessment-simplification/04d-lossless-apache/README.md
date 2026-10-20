@@ -7,8 +7,8 @@
 - [Complete 0.4-D author-edited YAML](apache-sv214268.0.4-D-author.yaml)
 - [Required but non-author-edited source provenance](apache-sv214268.0.4-D-provenance.yaml)
 - [Machine-readable count and reconstruction proof](proof.json)
-- [Original converted Apache Assessment (0.3-derived source, NOT a validated 0.4-A authoring file)](../../samples/apache_server_2-4_unix_server/assessments/automated/niwc.apache_server_2-4_unix_server.SV-214268.automated.assessment.yaml)
-- [Exact source OVAL for SV-214268](../../evidence/apache_server_2-4_unix_server/SV-214268/source-oval.xml)
+- [Original converted Apache Assessment (0.3-derived source, NOT a validated 0.4-A authoring file)](../samples/apache_server_2-4_unix_server/assessments/automated/niwc.apache_server_2-4_unix_server.SV-214268.automated.assessment.yaml)
+- [Exact source OVAL for SV-214268](../evidence/apache_server_2-4_unix_server/SV-214268/source-oval.xml)
 - [0.4-C full Apache experiment and measured sidecar split](../compact-authoring-04/C-APACHE-FULL-HYBRID-2026-10-19.md)
 
 The complete source includes **five Tests, nineteen chained computed Variables, one named shared Object and four private acquisitions**. Two distinct populations of Apache configuration files must remain distinct. The generated 0.4-D editor-facing Assessment uses C's proven explicit observation/derived-value model and source provenance separation, but its Test/State syntax deliberately returns to A-style paired `require` with explicit `states_match: all`.
@@ -41,7 +41,7 @@ C used an extra `must.items_exist` / `must.items_match` split, repeated `field: 
 | Complete C hybrid, provenance still inline | 428 | Verified 0.3 source reconstruction |
 | C author-edited only, required separate provenance | 354 | Verified 0.3 source reconstruction |
 | **D author-edited only, required separate provenance** | **335** | **Verified 0.3 source reconstruction** |
-| D required provenance sidecar | 98 | Must accompany D authoring; total serialized D content increases |
+| D required provenance sidecar | 98 | Must accompany authoring; combined D is 433 lines versus 428 full C lines |
 
 The metrics are **not** evidence that execution operations are reduced: D still authors **nineteen derived computations**. Compared with the already-proven C split, the direct syntax saving is just 19 author-edited lines (~5.4%). D has **not** proven independent 0.4-A typed native-schema validation, scanner runtime parity, cross-platform converter coverage, or blinded auditor readability. Avoid calling 0.3 deep equality an OVAL scanner conformance result.
 
