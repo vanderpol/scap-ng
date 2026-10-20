@@ -5,6 +5,7 @@ on:
     paths:
       - 'tools/build_v04_canonical_six_stigs.py'
       - 'tools/audit_v04_authoring_blockers.py'
+      - 'tools/build_v04_residual_review_ledger.py'
       - 'tools/test_v04_all_items_schema.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
       - 'schema/v0.4.0/assessment.schema.json'
@@ -47,6 +48,9 @@ jobs:
         run: |
           python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip --report work/yaml-blocker-audit.json
           python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --report work/json-blocker-audit.json
+      - name: Preserve full exceptional Test source for semantic differential review
+        run: |
+          python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-172-review-ledger.json
       - name: Confirm equivalent YAML/JSON sources and exact scope
         run: |
           python - <<'PY'
@@ -70,6 +74,7 @@ jobs:
             work/*manifest.json
             work/input-native-report.json
             work/*blocker-audit.json
+            work/residual-172-review-ledger.json
           if-no-files-found: error
       - name: Publish durable six-STIG authoring candidate
         if: github.ref == 'refs/heads/main'
