@@ -5,11 +5,15 @@ on:
     paths:
       - '**/*.md'
       - tools/audit_markdown_links.py
+      - tools/audit_current_markdown_samples.py
+      - tools/test_audit_current_markdown_samples.py
       - .github/workflows/documentation-cross-reference-audit.yml
   pull_request:
     paths:
       - '**/*.md'
       - tools/audit_markdown_links.py
+      - tools/audit_current_markdown_samples.py
+      - tools/test_audit_current_markdown_samples.py
       - .github/workflows/documentation-cross-reference-audit.yml
   workflow_dispatch:
 
@@ -30,6 +34,12 @@ jobs:
           python tools/audit_markdown_links.py . \
             --output documentation-audit.json \
             --summary documentation-audit.md
+      - name: Reject obsolete 0.3 sample entry points while preserving archived history
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_audit_current_markdown_samples.py
+          python tools/audit_current_markdown_samples.py
       - name: Publish concise summary
         if: always()
         run: |
