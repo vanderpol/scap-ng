@@ -36,6 +36,8 @@ on:
       - 'tools/test_v04_flat_object_authoring.py'
       - 'schema/v0.4.0/capability-mappings/supported/**'
       - 'tools/test_v04_canonical_unsigned_package.py'
+      - 'tools/v04_canonical_signed_source_package.py'
+      - 'tools/test_v04_canonical_signed_source_package.py'
       - 'tools/v04_exception_source_oracle.py'
       - 'tools/test_v04_exception_source_oracle.py'
       - 'tools/v04_canonical_requirement_oracle.py'
@@ -56,7 +58,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 cryptography
       - name: Test 0.4 source Filter-preservation and synthetic-Set guards
         env:
           PYTHONPATH: tools
@@ -71,6 +73,12 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/test_v04_canonical_unsigned_package.py
+      - name: Test explicit-trust detached CMS signatures on 0.4 source-only packages
+        env:
+          PYTHONPATH: tools
+        run: |
+          command -v openssl
+          python tools/test_v04_canonical_signed_source_package.py -v
       - name: Validate exceptional source-family truth model fixtures
         env:
           PYTHONPATH: tools
