@@ -38,6 +38,9 @@ on:
       - 'tools/test_v04_canonical_unsigned_package.py'
       - 'tools/v04_canonical_signed_source_package.py'
       - 'tools/test_v04_canonical_signed_source_package.py'
+      - 'tools/v04_canonical_result_plan.py'
+      - 'tools/test_v04_canonical_result_plan.py'
+      - 'tools/audit_v04_canonical_result_plans.py'
       - 'tools/verify_v04_signed_source_corpus.py'
       - 'tools/v04_exception_source_oracle.py'
       - 'tools/test_v04_exception_source_oracle.py'
@@ -290,6 +293,14 @@ jobs:
             --out-ir work/canonical-typed-source-ir.json \
             --report work/canonical-typed-source-ir-report.json \
             --assert-six
+      - name: Compile all canonical 0.4 six-state result expressions without scanner claims
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_canonical_result_plan.py -v
+          python tools/audit_v04_canonical_result_plans.py \
+            --json-archive work/scap-ng-0.4.0-six-stigs.json.zip \
+            --report work/v04-canonical-result-plan-census.json --assert-six-stigs
       - name: Independently verify source-exact six-Benchmark version reconciliation preview
         env:
           PYTHONPATH: tools
@@ -376,6 +387,7 @@ jobs:
             work/v04-native-source-packages/*.source-preview.zip
             work/v04-native-source-package-report.json
             work/v04-cms-real-source-proof.json
+            work/v04-canonical-result-plan-census.json
             work/canonical-benchmark-version-preview.json
             work/canonical-requirement-oval-oracle.json
           if-no-files-found: error
