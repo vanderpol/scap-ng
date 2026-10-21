@@ -110,6 +110,23 @@ class FlatObjectSchemaTests(unittest.TestCase):
             {"capability": CAP, "set": {}}],
             [{"capability": CAP, "mount_point": {"equals": "/home"}}])
 
+    def test_acquisition_only_foreach_without_selectors_is_rejected(self):
+        native = {"collection_parameters": {"command": {}}}
+        original = sample_object(
+            select=False, collect=True,
+            parameters={"command": {"type": "string"}})
+        # In the legacy schema for_each required generic select. Where a
+        # capability has no selectors, keep that branch impossible.
+        original["allOf"] = [
+            {"if": {"required": ["for_each"]},
+             "then": {"required": ["select"]}}]
+        flattened = flatten_schema(
+            original, native, capability="independent.shellcommand")
+        self._assert(flattened,
+            [{"capability": "linux.partition", "command": "echo ok"}],
+            [{"capability": "linux.partition", "command": "echo ok",
+              "for_each": {"item": "x", "in": "y"}}])
+
     def test_collisions_fail_closed(self):
         for mapping in (
             {"selector_map": {"mount_point": "filters"}},
