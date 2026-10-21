@@ -38,6 +38,7 @@ on:
       - 'tools/test_v04_canonical_unsigned_package.py'
       - 'tools/v04_canonical_signed_source_package.py'
       - 'tools/test_v04_canonical_signed_source_package.py'
+      - 'tools/verify_v04_signed_source_corpus.py'
       - 'tools/v04_exception_source_oracle.py'
       - 'tools/test_v04_exception_source_oracle.py'
       - 'tools/v04_canonical_requirement_oracle.py'
@@ -309,6 +310,13 @@ jobs:
             --out-dir work/v04-native-source-packages \
             --report work/v04-native-source-package-report.json \
             --assert-six
+      - name: Independently CMS-sign and verify real Windows/Linux 0.4 source packages
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/verify_v04_signed_source_corpus.py \
+            --source-package-dir work/v04-native-source-packages \
+            --report work/v04-cms-real-source-proof.json
       - name: Prove source-exact canonical Test axes against pinned OVAL six-state results
         env:
           PYTHONPATH: tools
@@ -367,6 +375,7 @@ jobs:
             work/canonical-typed-source-ir-report.json
             work/v04-native-source-packages/*.source-preview.zip
             work/v04-native-source-package-report.json
+            work/v04-cms-real-source-proof.json
             work/canonical-benchmark-version-preview.json
             work/canonical-requirement-oval-oracle.json
           if-no-files-found: error
