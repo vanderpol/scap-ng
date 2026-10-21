@@ -282,8 +282,14 @@ def build(source_root, original_root, catalog_root, output_root):
                         "proof_file":"authoring/"+tag+".proof.json",
                         "source_tests":proof["source_test_count"]})
         accepted+=1
+    reasons=Counter(x.get("reason","") for x in records if x["status"].startswith("UNSUPPORTED"))
+    print("Source-checked multi-Test conversion diagnostics:",
+          json.dumps({"accepted":accepted,"reasons":dict(sorted(reasons.items())),
+                      "first_rejections":[x for x in records
+                                          if x["status"].startswith("UNSUPPORTED")][:12]},
+                     indent=2),flush=True)
     ensure(len(records)==EXPECTED_PREVIOUS_MULTITEST and accepted>=2,
-           "NO_MEANINGFUL_NATIVE_040_SOURCE_PROGRESS")
+           "NO_MEANINGFUL_NATIVE_040_SOURCE_PROGRESS: "+repr(dict(reasons)))
     status={"pin":PIN,"source_multitest_denominator":len(old),
             "native_040_source_matched_pending_schema":accepted,
             "not_yet_covered":len(old)-accepted,
