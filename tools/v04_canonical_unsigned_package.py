@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 from hashlib import sha256
+from functools import lru_cache
 import io
 import json
 from pathlib import Path, PurePosixPath
@@ -71,6 +72,16 @@ def _verify_exact_rule_inventory(documents, benchmark):
         raise ValueError("Benchmark Rule list/inventory differs from packaged Rules")
 
 
+@lru_cache(maxsize=1)
+def _package_validators():
+    """Reuse immutable version-local validators across scoped package checks.
+
+    The authoring-schema generator and temporary candidate validators remain
+    uncached; this function loads only checked-in v0.4.0 native schemas.
+    """
+    return _schema_validators(Path(__file__).resolve().parents[1] / "schema/v0.4.0")
+
+
 def partition_documents(documents):
     """Include local documents and complete shared library; omit other private STIGs.
 
@@ -120,7 +131,7 @@ def build_package(documents, *, validate_schema=True):
     if len(edges["benchmarks"]) != 1:
         raise ValueError("package requires exactly one complete Benchmark")
     if validate_schema:
-        validate_docs(documents, _schema_validators(Path(__file__).resolve().parents[1] / "schema/v0.4.0"))
+        validate_docs(documents, _package_validators())
     rows, contents = {}, {}
     kinds = {"benchmark": "benchmark", "rule": "rule", "assessment": "assessment", "applicability": "applicability_catalog"}
     benchmark = next(d["benchmark"] for d in documents.values() if "benchmark" in d)
@@ -250,7 +261,7 @@ def verify_package(raw, *, validate_schema=True):
             or edges["counts"]["choice_links"] != prov["rule_choice_links"]):
         raise ValueError("manifest graph/count mismatches")
     if validate_schema:
-        validate_docs(docs, _schema_validators(Path(__file__).resolve().parents[1] / "schema/v0.4.0"))
+        validate_docs(docs, _package_validators())
     return {"status": "VALIDATED_UNSIGNED_SOURCE_PACKAGE_NOT_EXECUTABLE",
             "benchmark": bench["id"], "documents": len(docs),
             "rule_choice_links": edges["counts"]["choice_links"],
@@ -266,7 +277,10 @@ def package_pair(json_zip, yaml_zip, *, validate_schema=True):
     folders = partition_documents(docs)
     packages, reports = {}, {}
     for folder, subset in sorted(folders.items()):
-        packed, _ = build_package(subset, validate_schema=validate_schema)
+        # compile_pair validated both independently parsed full-source graphs.
+        # Do not validate identical bytes a third time in the writer; the
+        # independent decoder below still schema-checks every packaged member.
+        packed, _ = build_package(subset, validate_schema=False)
         independently_verified = verify_package(packed, validate_schema=validate_schema)
         packages[folder] = packed
         reports[folder] = {**independently_verified, "sha256": sha256(packed).hexdigest(),
