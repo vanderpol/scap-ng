@@ -19,6 +19,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 from zipfile import ZipFile,ZIP_DEFLATED
+import yaml
 
 
 def fingerprint(obj):
@@ -100,10 +101,11 @@ def migrate_document(source):
     return dest,changed
 
 
-def rewrite_archive(original_zip,candidate_zip,report_path):
+def rewrite_archive(original_zip,candidate_zip,candidate_yaml,report_path):
     totals=Counter()
     changed=[]
-    with ZipFile(original_zip) as source, ZipFile(candidate_zip,"w",ZIP_DEFLATED) as output:
+    with ZipFile(original_zip) as source, ZipFile(candidate_zip,"w",ZIP_DEFLATED) as output, \
+         ZipFile(candidate_yaml,"w",ZIP_DEFLATED) as yaml_output:
         for name in source.namelist():
             if not name.startswith("authoring/") or not name.endswith(".json"):
                 raise ValueError("Unexpected non-authoring ZIP member in candidate")
@@ -120,6 +122,10 @@ def rewrite_archive(original_zip,candidate_zip,report_path):
             else:
                 payload=raw
             output.writestr(name,payload)
+            authored=yaml.safe_dump(new,sort_keys=False,allow_unicode=True).encode()
+            if yaml.safe_load(authored)!=new:
+                raise ValueError("YAML serialization changed group scope at "+name)
+            yaml_output.writestr(name.removesuffix(".json")+".yaml",authored)
     expected={"documents":4001,"affected_documents":15,
               "tests":16,"fields_children":44}
     # One shared file contains two independently hoisted Tests.
@@ -131,6 +137,7 @@ def rewrite_archive(original_zip,candidate_zip,report_path):
       "changed":changed,
       "source_sha256":sha256(original_zip.read_bytes()).hexdigest(),
       "candidate_sha256":sha256(candidate_zip.read_bytes()).hexdigest(),
+      "candidate_yaml_sha256":sha256(candidate_yaml.read_bytes()).hexdigest(),
       "schema_promoted":False,
       "scanner_semantics_proven":False,
     }
@@ -142,10 +149,12 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--source-json",type=Path,required=True)
     p.add_argument("--candidate-json",type=Path,required=True)
+    p.add_argument("--candidate-yaml",type=Path,required=True)
     p.add_argument("--proof",type=Path,required=True)
     a=p.parse_args()
     a.candidate_json.parent.mkdir(parents=True,exist_ok=True)
-    report=rewrite_archive(a.source_json,a.candidate_json,a.proof)
+    a.candidate_yaml.parent.mkdir(parents=True,exist_ok=True)
+    report=rewrite_archive(a.source_json,a.candidate_json,a.candidate_yaml,a.proof)
     print(json.dumps({k:v for k,v in report.items() if k!="changed"},indent=2))
 
 
