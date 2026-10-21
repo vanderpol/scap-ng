@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/migrate_v04_evaluate_and_or.py'
       - 'tools/test_migrate_v04_evaluate_and_or.py'
+      - 'tools/audit_v04_evaluate_six_state.py'
+      - 'tools/test_audit_v04_evaluate_six_state.py'
       - 'tools/build_v04_complete_boolean_preview.py'
       - '.github/workflows/v04-complete-boolean-preview.yml'
   workflow_dispatch:
@@ -24,7 +26,9 @@ jobs:
       - name: Prove Test-result AND/OR conversion does not touch State or Item matching
         env:
           PYTHONPATH: tools
-        run: python tools/test_migrate_v04_evaluate_and_or.py -v
+        run: |
+          python tools/test_migrate_v04_evaluate_and_or.py -v
+          python tools/test_audit_v04_evaluate_six_state.py -v
       - name: Retrieve prior source-verified 123-State AND/OR candidate
         env:
           GH_TOKEN: ${{ github.token }}
@@ -52,6 +56,14 @@ jobs:
             --first-pass-json work/source/scap-ng-0.4.0-six-stigs.and-or.json.zip \
             --first-pass-yaml work/source/scap-ng-0.4.0-six-stigs.and-or.yaml.zip \
             --out-dir work/preview
+      - name: Independently compare old/new evaluation outcomes across six OVAL statuses
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/audit_v04_evaluate_six_state.py \
+            --source-zip work/source/scap-ng-0.4.0-six-stigs.and-or.json.zip \
+            --candidate-zip work/preview/scap-ng-0.4.0-six-stigs.complete-boolean.json.zip \
+            --report work/preview/original-vs-renamed-evaluate-six-state.json
       - name: Assert full six-STIG Test-result operator and Item boundary census
         run: |
           python - <<'PY'
@@ -68,6 +80,12 @@ jobs:
           assert p['maintained_compiler_source_view_ir']['yaml_json_byte_parity']=='PASS'
           assert p['candidate_new_grammar_test_references']['json'] == p['candidate_new_grammar_test_references']['yaml']
           assert p['candidate_executable_compiler_support'] == 'OPEN_NEW_AND_OR_GRAMMAR'
+          audit=json.loads(Path('work/preview/original-vs-renamed-evaluate-six-state.json').read_text())
+          assert audit['status']=='SIX_STATE_EVALUATE_OPERATOR_PARITY_PASS_SCANNER_OPEN'
+          assert audit['documents']==4001
+          assert audit['changed_documents']>0
+          assert audit['total_deterministic_six_state_vectors']>=audit['changed_documents']*6
+          assert audit['no_changes_outside_evaluate'] and audit['state_and_item_cardinalities_unchanged']
           print('PASS: all 4001 candidate docs schema-valid and Test refs closed; exact-inverse source compiler passes')
           print('New AND/OR executable compiler remains a separate OPEN gate')
           PY
