@@ -48,7 +48,10 @@ def collect(doc,path,counter,examples,original_and_tests):
                 single=[next(iter(x)) for x in logical
                         if isinstance(x,dict) and len(x)==1]
                 if len(single)==len(logical) and len(set(single))!=len(single):
-                    counter["whole_state_and_duplicate_fields"]+=1
+                    if any(k in ("and","or","one","odd","xor","all","any") for k in single):
+                        counter["whole_state_and_repeated_nested_group_keys"]+=1
+                    else:
+                        counter["whole_state_and_duplicate_fields"]+=1
                 if len(examples)<16:
                     examples.append({"path":path,"test_id":testid,
                         "context":location,"scope_class":"whole_state_and_must_keep",
