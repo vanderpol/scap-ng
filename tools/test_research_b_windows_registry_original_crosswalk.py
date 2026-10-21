@@ -18,8 +18,12 @@ class WindowsRegistryOriginalCrosswalkTests(unittest.TestCase):
 
     def test_real_windows_server_2025_registry_objects_have_source_casefold(self):
         result=compare(self.xml,self.source)
-        self.assertEqual(result["source_registries"],2)
-        self.assertEqual(result["converted_registries_checked"],2)
+        self.assertEqual(result["source_registries"],3)
+        self.assertEqual(result["converted_registries_checked"],3)
+        self.assertEqual(
+            {x["original_value_name_selector"]["value"] for x in result["registry_objects"]},
+            {"Database log files path", "DSA Database file", "DSA Working Directory"},
+        )
         self.assertFalse(result["source_registry_view_default_verified"])
         self.assertFalse(result["scanner_execution_verified"])
         for obj in result["registry_objects"]:
