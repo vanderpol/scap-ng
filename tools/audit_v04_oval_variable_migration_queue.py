@@ -157,7 +157,8 @@ def audit(base):
             counts["locally_derived_or_mixed_definitions"]==26 and
             counts["constant_only_missing_native_mapping_definitions"]==29 and
             counts["constant_only_supported_capability_definitions"]==13):
-        raise ValueError("Source Variable graph corpus count changed")
+        raise ValueError("Source Variable graph corpus count changed: "+
+                         json.dumps(dict(sorted(counts.items())),sort_keys=True))
     return {
         "status":"SOURCE_VARIABLE_GRAPHS_CLOSED_040_CONVERSION_NOT_PROVEN",
         "pinned_source_revision":PIN,"definitions":68,
