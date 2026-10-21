@@ -67,7 +67,7 @@ def inspect(row,document):
         expression=var.get("expression")
         if not isinstance(expression,dict) or len(expression)!=1:
             raise ValueError("Unsupported original Variable expression shape")
-        ops.update(expression)
+        ops.update(expression.keys())
     deps,order=variable_dependencies(variables)
     consumers={}
     for section in ("objects","shared_objects","tests","states","variables"):
