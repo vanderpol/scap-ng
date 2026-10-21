@@ -221,7 +221,7 @@ def _validate_capability_identities(documents):
                     continue  # Native structural schema reports this defect.
                 cap = node.get("capability")
                 if section == "tests" or cap is not None:
-                    if cap not in supported:
+                    if not isinstance(cap, str) or cap not in supported:
                         raise ValueError(
                             f"{path}: unknown native 0.4 capability {cap!r} "
                             f"in {section}.{ident}")
