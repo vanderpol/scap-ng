@@ -52,7 +52,7 @@ def validate(schema,definition,value):
 
 
 def test_object(capability,select,**extra):
-    return {"capability":capability,"select":select,**extra}
+    return {"capability":capability,**select,**extra}
 
 
 class CapabilityV04Tests(unittest.TestCase):
@@ -102,6 +102,12 @@ class CapabilityV04Tests(unittest.TestCase):
             "mount_point":{"equals":"/home","datatype":"string"}
         })
         self.assertFalse(validate(schema,"object",valid))
+        # The 0.4 canonical authoring grammar no longer recognizes generic
+        # selector/collection wrappers, even if the underlying predicate works.
+        self.assertTrue(validate(schema, "object", {
+            "capability": "linux.partition",
+            "select": {"mount_point": {"equals": "/home"}}}))
+
         for selector in (
             {"mount_point":{"value":"/home","operation":"equals"}},
             {"made_up_field":{"equals":"/home"}},
@@ -162,13 +168,11 @@ class CapabilityV04Tests(unittest.TestCase):
         nested={
             "capability":"unix.file",
             "object_title":"Directories",
-            "select":{
-                "directory":{
-                    "equals":["/lib","/lib64"],
-                    "datatype":"string","value_match":"one"
-                },
-                "name":None,
+            "directory":{
+                "equals":["/lib","/lib64"],
+                "datatype":"string","value_match":"one"
             },
+            "name":None,
             "filesystem":"all",
             "traversal":{"max_depth":None,"recurse":"symlinks_and_directories"},
         }
@@ -180,7 +184,7 @@ class CapabilityV04Tests(unittest.TestCase):
         }
         self.assertFalse(validate(schema,"object",top))
         bad=deepcopy(top)
-        bad["set"]["operands"][0]["object"]["select"]["made_up"]={"equals":"x"}
+        bad["set"]["operands"][0]["object"]["made_up"]={"equals":"x"}
         self.assertTrue(validate(schema,"object",bad))
 
     def test_registry_literal_value_field_keeps_its_name(self):
@@ -215,7 +219,7 @@ class CapabilityV04Tests(unittest.TestCase):
         legacy["existence"]="one_or_more"
         self.assertTrue(validate(schema,"test",legacy))
         legacy_object=deepcopy(valid)
-        legacy_object["object"]["select"]["mount_point"]={
+        legacy_object["object"]["mount_point"]={
             "value":"/home","operation":"equals"
         }
         self.assertTrue(validate(schema,"test",legacy_object))
