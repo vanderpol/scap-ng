@@ -1,0 +1,61 @@
+name: 0.4-C reversible AND-OR fields authoring candidate
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/build_v04_and_or_fields_candidate.py'
+      - 'tools/test_build_v04_and_or_fields_candidate.py'
+      - '.github/workflows/v04-and-or-fields-candidate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-reversible-040-operator-fields:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install YAML roundtrip library
+        run: python -m pip install PyYAML==6.0.3
+      - name: Check adversarial Test-State-Item and field scope cases
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_build_v04_and_or_fields_candidate.py -v
+      - name: Retrieve SHA-pinned original six-STIG authoring baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/040-original work/040-fields-preview
+          gh run download 39503111241 --repo "$GH_REPO" \
+            --name scap-ng-040-six-stig-board-authoring \
+            --dir work/040-original
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          f = Path('work/040-original/scap-ng-0.4.0-six-stigs.json.zip')
+          observed = hashlib.sha256(f.read_bytes()).hexdigest()
+          expected = '46bcb6cdf3a0d5c3eda06bbf827389eed2942afb477d65d97348f5b8aaa3a7d8'
+          assert observed == expected, (observed, expected)
+          print('PASS original six-STIG authoring archive pin')
+          PY
+      - name: Build source-invertible full six-STIG JSON and YAML fields candidates
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/build_v04_and_or_fields_candidate.py \
+            --canonical-zip work/040-original/scap-ng-0.4.0-six-stigs.json.zip \
+            --json-zip work/040-fields-preview/and-or-fields-preview.json.zip \
+            --yaml-zip work/040-fields-preview/and-or-fields-preview.yaml.zip \
+            --ledger work/040-fields-preview/field-layout-inverse-ledger.json
+      - name: Archive field naming candidate without promoting schema or release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-and-or-fields-six-stig-candidate-research
+          path: work/040-fields-preview/
+          if-no-files-found: ignore
