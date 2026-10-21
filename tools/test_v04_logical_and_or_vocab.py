@@ -41,6 +41,21 @@ class LogicalVocabTests(unittest.TestCase):
                 self.assertFalse(preferred["properties"][new].get("deprecated",False))
                 self.assertIn("Prefer '"+new+"'",legacy["properties"][old]["description"])
 
+    def test_xor_preferred_to_legacy_odd_at_both_condition_scopes(self):
+        for name in ("state_entry","scoped_state_entry"):
+            branches=self.schema["$defs"][name]["oneOf"]
+            old=next(x for x in branches if x.get("required")==["odd"])
+            new=next(x for x in branches if x.get("required")==["xor"])
+            self.assertTrue(old["properties"]["odd"]["deprecated"])
+            self.assertIn("xor",old["properties"]["odd"]["description"])
+            self.assertFalse(new["properties"]["xor"].get("deprecated",False))
+            field={"value":{"require":"at_least_one_exists_and_all_match",
+                            "equals":0}}
+            self.assertFalse(self.validate_part(name,{"xor":[field,field]}))
+            self.assertFalse(self.validate_part(name,{"odd":[field,field]}))
+            self.assertTrue(self.validate_part(name,{
+                "odd":[field],"xor":[field]}))
+
     def test_explicit_logic_and_old_aliases_validate_only_at_logical_scope(self):
         field={"type":{"require":"at_least_one_exists_and_all_match","equals":"dword"}}
         for op in ("all","any","and","or"):
