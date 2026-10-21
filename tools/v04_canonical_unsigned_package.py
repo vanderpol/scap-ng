@@ -85,7 +85,7 @@ def _verify_exact_rule_inventory(documents, benchmark):
             len(declared) != len(set(declared)) or
             len(rules) != len(set(rules)) or
             set(declared) != set(rules)):
-        raise ValueError("Benchmark Rule inventory differs from packaged Rules")
+        raise ValueError("Benchmark Rule list/inventory differs from packaged Rules")
 
 
     if not benchmarks:
