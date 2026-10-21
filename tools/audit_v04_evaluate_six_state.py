@@ -128,12 +128,14 @@ def vector_matrix(keys):
     # distinct leaves, then bounded but deterministic coverage for more.
     for i,left in enumerate(keys[:6]):
         for right in keys[i+1:6]:
-            for a,b in (("true","false"),("false","true"),
-                        ("true","error"),("false","unknown"),
-                        ("not evaluated","error"),("unknown","not applicable")):
-                values={k:"false" for k in keys}
-                values[left],values[right]=a,b
-                add(values)
+            # Enumerate every ordered six-state pair, rather than using
+            # only convenient Boolean pairs. This catches propagation
+            # differences involving error/unknown/not-evaluated/NA.
+            for a in statuses:
+                for b in statuses:
+                    values={k:"false" for k in keys}
+                    values[left],values[right]=a,b
+                    add(values)
     return cases
 
 
