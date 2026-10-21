@@ -117,7 +117,14 @@ def convert_one(review, original_file, catalog):
     # one-to-one rewrite and preserve each original source name in provenance.
     canonical_names={}
     for old_name in original:
-        new_name=old_name if old_name.endswith("-test") else old_name+"-test"
+        # The archived converter added a mechanical test- prefix to many
+        # source Test comments. Remove that noise rather than authoring
+        # canonical Test IDs like test-test-...-test.
+        new_name=old_name
+        while new_name.startswith("test-"):
+            new_name=new_name[len("test-"):]
+        if not new_name.endswith("-test"):
+            new_name+="-test"
         ensure(new_name not in canonical_names.values() and
                all(x.islower() or x.isdigit() or x=="-" for x in new_name) and
                not new_name.startswith("-") and "--" not in new_name,
