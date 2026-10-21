@@ -1,6 +1,6 @@
 # SCAP-NG 0.4.0 examples — Assessments
 
-**Current source-backed YAML/JSON authoring samples:** [October 21 passing six-STIG workflow artifact](https://github.com/vanderpol/scap-ng/actions/runs/39677900589#artifacts). The [October 20 pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) is immutable and uses the preceding authoring revision. Begin with [Benchmarks and Rules](README.md) for the policy context.
+**Current source-backed YAML/JSON authoring samples:** [immutable October 21 canonical source-only release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261021). The [October 20 pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) is immutable and uses the preceding authoring revision. Begin with [Benchmarks and Rules](README.md) for the policy context.
 
 A **Test** states what information to collect using `capability` and `object`, then what must be true using `require`. `evaluate` combines Test results. SCAP-NG retains these familiar OVAL concepts while reducing indirection in ordinary checks.
 
@@ -8,7 +8,7 @@ A **Test** states what information to collect using `capability` and `object`, t
 
 **0.4.0 flat-Object grammar update (2026-10-21):** Native selectors and acquisition parameters live directly in `object`, without generic `select` or `collect` wrappers. Short complete comparisons may use one-line flow mappings; longer or complex Objects may be multiline. The current October 21 regenerated six-STIG candidate has passed strict native schema, exact source inverse, and independent package CI; the October 20 tagged pre-release remains the older baseline. No compiled or signed scanner bundle is claimed.
 
-This small **syntax illustration** is deliberately shortened. It is *not a verbatim STIG Assessment*. For source-backed rule logic, use the complete, source-verified files in the current workflow artifact.
+This small **syntax illustration** is deliberately shortened. It is *not a verbatim STIG Assessment*. For source-backed rule logic, use the complete, source-verified files in the current immutable authoring release.
 
 ```yaml
 tests:
