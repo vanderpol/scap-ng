@@ -43,8 +43,11 @@ class FlatObjectAuthoringTests(unittest.TestCase):
                   "name": {"equals": "CurrentVersion"}}
         value, proof = migrated(case("windows.registry", {"select": fields}))
         self.assertEqual(value["assessment"]["tests"]["a"]["object"], fields)
-        self.assertIn("hive: {equals: local_machine}", dump_hybrid(value))
-        self.assertIn("name: {equals: CurrentVersion}", dump_hybrid(value))
+        rendered = dump_hybrid(value)
+        self.assertIn("object: {hive: {equals: local_machine}, key:", rendered)
+        self.assertIn("name: {equals: CurrentVersion}}", rendered)
+        self.assertEqual(len([line for line in rendered.splitlines()
+                              if "object:" in line]), 1)
 
     def test_command_acquisition_fields_flatten_without_selector(self):
         parameters = {"shell": "powershell", "command": "Get-PnpDevice -Class Bluetooth",
