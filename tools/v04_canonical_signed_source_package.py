@@ -71,13 +71,13 @@ def _validate_signing_certificate(key, cert):
         raise ValueError("certificate does not permit digital signatures")
 
 
-def sign_source_package(unsigned, private_key_pem, signer_certificate_pem):
+def sign_source_package(unsigned, private_key_pem, signer_certificate_pem, *, validate_schema=True):
     """Convert independently validated unsigned SOURCE ZIP to signed SOURCE ZIP.
 
     Signing DOES NOT assert a trusted publisher until an external caller checks
     the detached CMS signature against an independently trusted certificate.
     """
-    verify_package(unsigned, validate_schema=True)
+    verify_package(unsigned, validate_schema=validate_schema)
     members = _read_members(unsigned)
     manifest = _strict_json(members[MANIFEST_MEMBER])
     key = serialization.load_pem_private_key(private_key_pem, password=None)
