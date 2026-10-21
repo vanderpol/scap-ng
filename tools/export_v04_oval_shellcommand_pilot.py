@@ -49,13 +49,13 @@ def emit(doc):
     req=test.get("require")
     required(req=={"items":"one_or_more"},"Test existence or States outside pilot")
     obj=test.get("object")
-    required(isinstance(obj,dict) and set(obj) <= {"object_title","collect","filters"}
-             and "set" not in obj and "filters" in obj,
-             "requires a direct-filtered leaf Object, not any Set")
-    collect=obj.get("collect")
-    required(isinstance(collect,dict) and set(collect) ==
-             {"shell","command","error_if_exit_status_not_0","error_if_stderr_exists"},
-             "unexpected shellcommand collector")
+    acquisition={"shell","command","error_if_exit_status_not_0",
+                 "error_if_stderr_exists"}
+    required(isinstance(obj,dict) and set(obj) in (
+                 acquisition|{"filters"}, acquisition|{"filters","object_title"})
+             and "set" not in obj,
+             "requires a flat direct-filtered leaf Object, not collect or Set")
+    collect={key:obj[key] for key in acquisition}
     required(collect.get("shell")=="powershell" and
              isinstance(collect.get("command"),str) and collect["command"],
              "unexpected shell or command")
