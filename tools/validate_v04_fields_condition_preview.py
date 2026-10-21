@@ -34,24 +34,30 @@ def candidate_schema(path):
     shutil.copytree(root,path)
     dest=path/"assessment-language.schema.json"
     d=json.loads(dest.read_text())
-    scoped=d["$defs"]["scoped_state_entry"]
-    if any(choice.get("required")==["fields"] for choice in scoped["oneOf"]):
-        raise ValueError("Proposed generic fields scope already in normative schema")
-    branch={
-      "type":"object",
-      "required":["fields"],
-      "properties":{
-        "require":{"$ref":"#/$defs/paired_requirement",
-                   "description":"Explicit local field existence/matching rule; overrides declared Test scope."},
-        "fields":{"type":"object","minProperties":2,
-                  "propertyNames":{"type":"string","minLength":1},
-                  "additionalProperties":{"$ref":"#/$defs/inherited_field_predicate"},
-                  "description":"One complete expected condition, AND of ordinary field predicates."},
-      },
-      "additionalProperties":False,
-      "title":"Proposed complete expected condition (NOT accepted schema)"
-    }
-    scoped["oneOf"].append(branch)
+    # A Test with a shared State-field requirement uses scoped_state_entry;
+    # a Test whose individual conditions/fields explicitly supply their own
+    # requirement uses state_entry. The proposed group must work under BOTH
+    # branches or it would reject valid source-backed converted Assessments.
+    for shape,predicate in (("scoped_state_entry","inherited_field_predicate"),
+                            ("state_entry","inherited_field_predicate")):
+        entries=d["$defs"][shape]["oneOf"]
+        if any(choice.get("required")==["fields"] for choice in entries):
+            raise ValueError("Proposed generic fields scope already in normative "+shape)
+        branch={
+          "type":"object",
+          "required":["fields"],
+          "properties":{
+            "require":{"$ref":"#/$defs/paired_requirement",
+                       "description":"Explicit local field existence/matching rule; overrides declared Test scope."},
+            "fields":{"type":"object","minProperties":2,
+                      "propertyNames":{"type":"string","minLength":1},
+                      "additionalProperties":{"$ref":"#/$defs/"+predicate},
+                      "description":"One complete expected condition, AND of ordinary field predicates."},
+          },
+          "additionalProperties":False,
+          "title":"Proposed complete expected condition (NOT accepted schema)"
+        }
+        entries.append(branch)
     d["x-last-modified"]="2026-10-21"
     dest.write_text(json.dumps(d,indent=2)+"\n")
     return path
