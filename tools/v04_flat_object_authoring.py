@@ -98,7 +98,7 @@ def flatten_document(document, catalog):
                 if key == "object" and isinstance(value, dict):
                     effective = resolve_object(value, cap, catalog, route + (key,), changes)
                     walk(value, effective, route + (key,))
-                elif key == "objects" and isinstance(value, dict):
+                elif key in ("objects", "shared_objects") and isinstance(value, dict):
                     for obj_name, obj in value.items():
                         if isinstance(obj, dict):
                             effective = resolve_object(obj, obj.get("capability"), catalog,
@@ -157,7 +157,10 @@ def hybridize(node, key=None):
         return [hybridize(v) for v in node]
     if not isinstance(node, dict):
         return node
-    mapped = {k: hybridize(v, k) for k, v in node.items()}
+    items = list(node.items())
+    if "fields" in node and "field_requirement" in node:
+        items.sort(key=lambda entry: 0 if entry[0] == "field_requirement" else 1)
+    mapped = {k: hybridize(v, k) for k, v in items}
     comparator = (len(node) == 1 and next(iter(node), "") in {
         "equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal",
         "matches_regex", "pattern_match", "version_equals", "version_greater_than",
