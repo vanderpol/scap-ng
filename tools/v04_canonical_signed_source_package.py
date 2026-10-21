@@ -63,8 +63,11 @@ def _validate_signing_certificate(key, cert):
                 serialization.Encoding.DER,
                 serialization.PublicFormat.SubjectPublicKeyInfo)):
         raise ValueError("signing key does not match certificate")
-    if not cert.key_usage.digital_signature if cert.extensions.get_extension_for_class(
-            x509.KeyUsage).value is not None else False:
+    try:
+        usage = cert.extensions.get_extension_for_class(x509.KeyUsage).value
+    except x509.ExtensionNotFound:
+        usage = None
+    if usage is not None and not usage.digital_signature:
         raise ValueError("certificate does not permit digital signatures")
 
 
@@ -184,9 +187,8 @@ def verify_signed_source_package(raw, *, trusted_certificate_pem, validate_schem
         "status": "VALIDATED_CMS_SIGNED_SOURCE_PACKAGE_NOT_EXECUTABLE",
         "signature_verified": True,
         "trust_source": "explicit-caller-provided-certificate",
-        "certificate_sha256": sha256(members_cert).hexdigest()
-            if False else sha256(
-                x509.load_pem_x509_certificate(trusted_certificate_pem).public_bytes(
-                    serialization.Encoding.DER)).hexdigest(),
+        "certificate_sha256": sha256(
+            x509.load_pem_x509_certificate(trusted_certificate_pem).public_bytes(
+                serialization.Encoding.DER)).hexdigest(),
         "scanner_evaluated": False,
     }
