@@ -133,6 +133,52 @@ class ReversibleFieldRequirementTests(unittest.TestCase):
             self.assertEqual(output, source)
             self.assertIsNone(proof)
 
+    def test_no_inherited_field_policy_refuses_to_invent_default(self):
+        source = source_fixture()
+        source.pop("state_fields_require")
+        # Second condition has a local requirement, but the first has none:
+        # replacing only the easy branch would create a hidden default.
+        converted, ledger = migrate_test(source)
+        self.assertEqual(converted, source)
+        self.assertIsNone(ledger)
+
+    def test_condition_level_policy_without_test_default_is_sufficient(self):
+        source = source_fixture()
+        source.pop("state_fields_require")
+        first = source["require"]["all_items_must"][0]["or"][0]
+        first["require"] = "at_least_one_exists_and_all_match"
+        converted, ledger = migrate_test(source)
+        self.assertIsNotNone(ledger)
+        self.assertNotIn("field_requirement", converted["require"])
+        first_new = converted["require"]["all_items_must"][0]["or"][0]
+        self.assertEqual(first_new["field_requirement"],
+                         "at_least_one_exists_and_all_match")
+        self.assertEqual(restore_test(converted, ledger), source)
+
+    def test_single_ungoverned_field_blocks_test_conversion(self):
+        source = source_fixture()
+        source.pop("state_fields_require")
+        first = source["require"]["all_items_must"][0]["or"][0]
+        first["fields"]["type"]["require"] = "at_least_one_exists_and_all_match"
+        # First condition's 'value' has neither local nor inherited policy.
+        converted, ledger = migrate_test(source)
+        self.assertEqual(converted, source)
+        self.assertIsNone(ledger)
+
+    def test_logical_group_requirement_inherits_both_complete_conditions(self):
+        source = source_fixture()
+        source.pop("state_fields_require")
+        source["require"]["all_items_must"][0]["require"] = (
+            "at_least_one_exists_and_all_match"
+        )
+        converted, ledger = migrate_test(source)
+        self.assertIsNotNone(ledger)
+        group = converted["require"]["all_items_must"][0]
+        self.assertEqual(group["field_requirement"],
+                         "at_least_one_exists_and_all_match")
+        self.assertEqual(len(group["or"]), 2)
+        self.assertEqual(restore_test(converted, ledger), source)
+
     def test_unrelated_tests_and_object_evaluate_are_not_rewritten(self):
         original = {"assessment": {"mode": "automated",
                     "tests": {"edition-test": source_fixture(),
