@@ -5,7 +5,7 @@ from itertools import product
 import unittest
 
 from migrate_v04_states_match_to_logic import migrate,restore,validate_exact_inverse
-from oval_result_truth_tables import aggregate_operator
+from oval_result_truth_tables import aggregate_operator, evaluate_collected_object_test
 
 
 def fixture(scope="any",n=2):
@@ -59,6 +59,42 @@ class StateScopeMigrationTests(unittest.TestCase):
                 rewritten=aggregate_operator(op.upper(),values)
                 self.assertEqual(original,rewritten,(label,values))
             self.assertTrue(validate_exact_inverse(before,after,ledger))
+
+    def test_independent_test_item_existence_and_incomplete_population_preserved(self):
+        # Both syntax variants must preserve source OVAL state_operator
+        # INSIDE each Item and original OVAL check='all' ACROSS Items.
+        # This explicitly does not equate logical OR to one-or-more Items.
+        six=("true","false","error","unknown","not evaluated","not applicable")
+        count=0
+        for mode,original_op in (("any","OR"),("all","AND")):
+            before=fixture(mode)
+            after,proof=migrate(before)
+            test=after["assessment"]["tests"]["editionid-enterprise-or-enterprises-test"]
+            new_op=next(iter(test["require"]["all_items_must"][0]))
+            self.assertEqual(test["require"]["items"],"one_or_more")
+            for bits in product(six,repeat=4):
+                per_item=(bits[:2],bits[2:])
+                old=[aggregate_operator(original_op,parts) for parts in per_item]
+                new=[aggregate_operator(new_op.upper(),parts) for parts in per_item]
+                self.assertEqual(old,new)
+                for flag in ("complete","incomplete"):
+                    # A single known Item and two known Items, including
+                    # collection error/unknown/partial status propagation.
+                    for n in (1,2):
+                        expected=evaluate_collected_object_test(
+                            flag,existence="at_least_one_exists",check="all",
+                            item_results=old[:n],exists=n)
+                        actual=evaluate_collected_object_test(
+                            flag,existence="at_least_one_exists",check="all",
+                            item_results=new[:n],exists=n)
+                        self.assertEqual(expected,actual,(mode,bits,flag,n))
+                        count+=1
+            # No collected Items remains false regardless of logical operator.
+            self.assertEqual(evaluate_collected_object_test(
+                "complete",existence="at_least_one_exists",
+                check="all",item_results=[],exists=0),"false")
+            self.assertTrue(validate_exact_inverse(before,after,proof))
+        self.assertEqual(count,10368)
 
     def test_rejects_unsafe_or_unknown_scope_shapes(self):
         for mutate in (
