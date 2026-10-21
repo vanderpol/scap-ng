@@ -7,6 +7,8 @@ on:
       - 'tools/test_validate_v04_fields_condition_preview.py'
       - 'tools/build_v04_and_or_fields_candidate.py'
       - 'tools/test_build_v04_and_or_fields_candidate.py'
+      - 'tools/rename_v04_field_requirement_preview.py'
+      - 'tools/test_rename_v04_field_requirement_preview.py'
       - 'tools/hoist_v04_inherited_fields_requirement_preview.py'
       - 'tools/test_hoist_v04_inherited_fields_requirement_preview.py'
       - '.github/workflows/v04-fields-condition-preview.yml'
@@ -30,6 +32,7 @@ jobs:
         run: |
           python tools/test_validate_v04_fields_condition_preview.py -v
           python tools/test_build_v04_and_or_fields_candidate.py -v
+          python tools/test_rename_v04_field_requirement_preview.py -v
       - name: Retrieve original-source-reversible field-group preview
         env:
           GH_TOKEN: ${{ github.token }}
@@ -87,6 +90,27 @@ jobs:
           assert not a["schema_promoted"] and not a["scanner_semantics_proven"]
           print("PASS: all 44 inherited groups explicitly scoped by 16 shared AND/OR parent requirements")
           PY
+      - name: Build reversible owner-approved field_requirement naming preview
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/rename_v04_field_requirement_preview.py \
+            --source-json work/fields/and-or-fields-preview.json.zip \
+            --candidate-json work/fields/field-requirement-preview.json.zip \
+            --candidate-yaml work/fields/field-requirement-preview.yaml.zip \
+            --proof work/fields/field-requirement-rename-proof.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('work/fields/field-requirement-rename-proof.json').read_text())
+          counts=p['counts']
+          assert p['status']=='RESEARCH_ONLY_EXACT_TEST_SOURCE_INVERSE'
+          assert counts['documents']==4001,counts
+          assert counts.get('changed_tests',0)>0,counts
+          assert counts.get('field_groups',0)>0,counts
+          assert not p['native_schema_promoted'] and not p['scanner_semantics_proven']
+          print('Source-invertible 0.4 field_requirement naming candidate:',counts)
+          PY
       - name: Preserve reviewer-only condition naming evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -96,4 +120,5 @@ jobs:
             work/fields/fields-group-schema-and-inheritance-proof.json
             work/fields/hoisted-requirements-source-inverse.json
             work/fields/hoisted-fields-proposed-schema-proof.json
+            work/fields/field-requirement-rename-proof.json
           if-no-files-found: ignore
