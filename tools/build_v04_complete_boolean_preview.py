@@ -38,17 +38,27 @@ def candidate_schema(root):
     file=root/"expression.schema.json"
     doc=json.loads(file.read_text())
     seen=Counter()
-    for choice in doc["$defs"]["expression"]["oneOf"]:
+    branches=doc["$defs"]["expression"]["oneOf"]
+    # Active 0.4.0 now accepts preferred logical names alongside
+    # deprecated historical source aliases. This *temporary* candidate
+    # validator is deliberately stricter: reject the old names entirely,
+    # without altering the maintained versioned schema.
+    names=[next(iter(x.get("required") or ()),None) for x in branches]
+    for old,modern in (("all","and"),("any","or"),("odd","xor")):
+        if names.count(old)!=1 or names.count(modern)!=1:
+            raise ValueError("Versioned expression aliases drifted: "+old+"/"+modern)
+    strict=[]
+    for choice in branches:
         old=next(iter(choice.get("required") or ()),None)
-        replacement={"all":"and","any":"or","odd":"xor"}.get(old)
-        if replacement:
-            if set(choice["properties"])!={old}:
-                raise ValueError("Unexpected original versioned expression schema choice")
-            choice["required"]=[replacement]
-            choice["properties"][replacement]=choice["properties"].pop(old)
+        if old in ("all","any","odd"):
+            if set(choice.get("properties",{}))!={old}:
+                raise ValueError("Malformed deprecated Test operator alias: "+old)
             seen[old]+=1
+            continue
+        strict.append(choice)
     if seen!={"all":1,"any":1,"odd":1}:
-        raise ValueError("Original expression schema names unexpectedly changed")
+        raise ValueError("Missing deprecated source-alias proof")
+    doc["$defs"]["expression"]["oneOf"]=strict
     file.write_text(json.dumps(doc,indent=2)+"\n")
     return root,doc
 
