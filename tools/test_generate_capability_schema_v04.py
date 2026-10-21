@@ -187,6 +187,39 @@ class CapabilityV04Tests(unittest.TestCase):
         bad["set"]["operands"][0]["object"]["made_up"]={"equals":"x"}
         self.assertTrue(validate(schema,"object",bad))
 
+    def test_variable_selector_nested_set_filter_and_missing_quantifier(self):
+        # Schema-only proof that the 0.4 flat Object keeps Variable
+        # cardinality separate from ordered Filter Item predicates and the
+        # enclosing Set operation. This does not establish scanner parity.
+        schema = materialize("linux.partition")
+        selected = {"mount_point": {
+            "equals": {"variable": "home-mount-variable"},
+            "datatype": "string", "value_match": "one"}}
+        filter_entry = {"include": {"mount_point": {
+            "equals": "/home",
+            "require": "at_least_one_exists_and_all_match"}}}
+        leaf = test_object("linux.partition", selected)
+        composed = {
+            "capability": "linux.partition",
+            "set": {"operator": "intersection", "operands": [
+                {"object": leaf, "filters": [deepcopy(filter_entry)]},
+                {"object": "other-mount-object", "filters": []},
+            ]},
+        }
+        self.assertFalse(validate(schema, "object", leaf))
+        self.assertFalse(validate(schema, "object", composed))
+        malformed = deepcopy(composed)
+        del malformed["set"]["operands"][0]["object"]["mount_point"]["value_match"]
+        self.assertTrue(validate(schema, "object", malformed),
+                        "Missing Variable match cardinality cannot inherit silently")
+        direct_filtered = deepcopy(leaf)
+        direct_filtered["filters"] = [filter_entry]
+        self.assertFalse(validate(schema, "object", direct_filtered))
+        bad_set_and_leaf = deepcopy(composed)
+        bad_set_and_leaf["filters"] = [filter_entry]
+        self.assertTrue(validate(schema, "object", bad_set_and_leaf),
+                        "Filtering an entire Set must not be conflated with operand Filters")
+
     def test_registry_literal_value_field_keeps_its_name(self):
         schema=materialize("windows.registry")
         state={"value":{"equals":"4",
