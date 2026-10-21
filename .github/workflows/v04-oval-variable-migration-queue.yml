@@ -1,0 +1,88 @@
+name: 0.4 original OVAL Variable migration queue
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_oval_variable_migration_queue.py'
+      - '.github/workflows/v04-oval-variable-migration-queue.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-variable-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Retrieve pinned original OVAL source-compatible graphs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/oval-source
+          gh run download 39344457603 --repo "$GH_REPO" \
+            --name c-original-oval-compatibility-review-not-native-conversion \
+            --dir work/oval-source
+          test -f work/oval-source/c-review/manifest.json
+          test -f work/oval-source/c-native/conversion-manifest.json
+      - name: Audit 68 original OVAL Variable dependency graphs
+        run: |
+          python tools/audit_v04_oval_variable_migration_queue.py \
+            --source-review work/oval-source \
+            --report work/results/variable-migration-queue.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('work/results/variable-migration-queue.json').read_text())
+          assert len(report['records'])==68
+          assert report['counts']['variables']==245
+          assert report['counts']['constant_only_definitions']==42
+          assert report['counts']['locally_derived_or_mixed_definitions']==26
+          assert report['current_040_validated_conversions_from_this_audit']==0
+          print('PASS: pinned original OVAL source Variable dependency census')
+          PY
+      - name: Negative tests reject unknown refs and cycles
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from pathlib import Path
+          from audit_v04_oval_variable_migration_queue import inspect
+          root=Path('work/oval-source')
+          index=json.loads((root/'c-review/manifest.json').read_text())
+          source=json.loads((root/'c-native/conversion-manifest.json').read_text())
+          entries={(r['file'],r['definition_id']):r for r in index['exported_views']}
+          blocker=next(r for r in source['unsupported']
+                       if r['reason'].startswith('VARIABLE_SOURCE_GRAPH_NEEDS_COMPATIBILITY'))
+          path=root/'c-review'/entries[(blocker['file'],blocker['definition_id'])]['review_file']
+          base=json.loads(path.read_text())
+          inspect(blocker,base)
+          broken=deepcopy(base)
+          variables=broken['A_source_compatibility_fallback']['variables']
+          name=next(iter(variables))
+          variables[name.replace('-variable','-altered-variable')]=variables.pop(name)
+          try: inspect(blocker,broken)
+          except ValueError as err: assert 'Dangling' in str(err),str(err)
+          else: raise AssertionError('Source Variable missing reference not rejected')
+          broken=deepcopy(base)
+          variables=broken['A_source_compatibility_fallback']['variables']
+          name=next(iter(variables))
+          variables[name]['expression']={'variable':name}
+          try: inspect(blocker,broken)
+          except ValueError as err: assert 'Cyclic' in str(err),str(err)
+          else: raise AssertionError('Source Variable cycle not rejected')
+          print('PASS: missing references and cycles are fail-closed')
+          PY
+      - name: Upload original-OVAL Variable conversion queue
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-original-oval-68-variable-graph-source-audit-not-conversion
+          path: work/results/variable-migration-queue.json
+          if-no-files-found: ignore
