@@ -78,7 +78,11 @@ def inspect(row,document):
     if set(consumers)!=set(variables):
         raise ValueError("Orphan declared source Variables: "+
                          str(sorted(set(variables)-set(consumers))))
+    capabilities=sorted({test["capability"] for test in a.get("tests",{}).values()})
     return {
+        "test_capabilities":capabilities,
+        "test_count":len(a.get("tests",{})),
+        "state_count":len(a.get("states",{})),
         "source_file":row["file"],"source_definition_id":row["definition_id"],
         "source_xml_sha256":src["source_file_sha256"],"assessment_id":a["id"],
         "variable_count":len(variables),"origins":dict(sorted(kinds.items())),
@@ -119,18 +123,31 @@ def audit(base):
         if not file.is_relative_to((base/"c-review").resolve()):
             raise ValueError("Review file escapes pinned evidence")
         records.append(inspect(row,json.loads(file.read_text())))
+    catalog_dir=Path(__file__).resolve().parents[1]/"schema/v0.4.0/capability-mappings/supported"
+    available={p.stem for p in catalog_dir.glob("*.json")}
+    if len(available)!=100:raise ValueError("Unsupported current 0.4 capability catalog census")
     counts=Counter();operations=Counter()
     for row in records:
+        missing=sorted(set(row["test_capabilities"])-available)
+        row["unsupported_current_040_capabilities"]=missing
+        row["native_mapping_status"]=(
+            "UNSUPPORTED_NATIVE_CAPABILITY" if missing
+            else "MAPPED_NOT_SOURCE_OR_SEMANTICALLY_VALIDATED")
         counts["definitions"]+=1
         counts["variables"]+=row["variable_count"]
         counts["constant_variables"]+=row["origins"].get("constant",0)
         counts["local_variables"]+=row["origins"].get("local",0)
         counts["one_variable_definitions"]+=row["variable_count"]==1
         counts[row["migration_group"]+"_definitions"]+=1
+        if row["migration_group"]=="constant_only":
+            counts["constant_only_missing_native_mapping_definitions"]+=bool(missing)
+            counts["constant_only_supported_capability_definitions"]+=not bool(missing)
         operations.update(row["operators"])
     if not (counts["definitions"]==68 and counts["variables"]==245 and
             counts["constant_only_definitions"]==42 and
-            counts["locally_derived_or_mixed_definitions"]==26):
+            counts["locally_derived_or_mixed_definitions"]==26 and
+            counts["constant_only_missing_native_mapping_definitions"]==29 and
+            counts["constant_only_supported_capability_definitions"]==13):
         raise ValueError("Source Variable graph corpus count changed")
     return {
         "status":"SOURCE_VARIABLE_GRAPHS_CLOSED_040_CONVERSION_NOT_PROVEN",
