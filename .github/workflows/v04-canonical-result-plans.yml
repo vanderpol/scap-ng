@@ -1,0 +1,58 @@
+name: 0.4.0 canonical six-state result-plan coverage
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-canonical-result-plans.yml'
+      - 'tools/v04_canonical_result_plan.py'
+      - 'tools/test_v04_canonical_result_plan.py'
+      - 'tools/audit_v04_canonical_result_plans.py'
+      - 'tools/v04_a_truth_plan.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  canonical-six-state:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate original-OVAL six-state result-plan regression fixtures
+        run: python tools/test_v04_canonical_result_plan.py -v
+      - name: Download pinned immutable 0.4 canonical JSON-only authoring
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/authoring
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261021 \
+            --pattern scap-ng-0.4.0-six-stigs.json.zip --dir work/authoring
+          echo '684e17df697163b460a5b3071fcba193b8528cbde4a68bec5a9a4ea0f14e856d  work/authoring/scap-ng-0.4.0-six-stigs.json.zip' | sha256sum -c -
+      - name: Check all 872 canonical Assessments for result-plan coverage
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/audit_v04_canonical_result_plans.py \
+            --json-archive work/authoring/scap-ng-0.4.0-six-stigs.json.zip \
+            --report work/result-plan-census.json --assert-six-stigs
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('work/result-plan-census.json').read_text())
+          c=report['counts']
+          assert c['automated_assessments']==872
+          assert c.get('compiled_supplied_result_plans',0) + c.get('unsupported_result_expressions',0)==872
+          assert report['scanner_executed'] is False
+          assert report['tests_evaluated'] is False
+          assert report['conditional_semantics_implemented'] is False
+          print('PASS: exact six-STIG 0.4 result-only expression coverage ledger')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-canonical-boolean-result-plan-coverage-not-scanner
+          path: work/result-plan-census.json
+          if-no-files-found: ignore
