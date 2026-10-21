@@ -53,7 +53,9 @@ jobs:
           import json
           from copy import deepcopy
           from pathlib import Path
-          from audit_v04_oval_variable_migration_queue import inspect
+          from audit_v04_oval_variable_migration_queue import (
+              inspect, references, variable_dependencies
+          )
           root=Path('work/oval-source')
           index=json.loads((root/'c-review/manifest.json').read_text())
           source=json.loads((root/'c-native/conversion-manifest.json').read_text())
@@ -77,6 +79,33 @@ jobs:
           try: inspect(blocker,broken)
           except ValueError as err: assert 'Cyclic' in str(err),str(err)
           else: raise AssertionError('Source Variable cycle not rejected')
+          # Typed/cardinality annotations on a Variable operand do not
+          # change its reference identity or make it invisible to closure.
+          typed={'select': {'equals': {'variable': 'source-variable',
+                                       'datatype': 'string',
+                                       'value_match': 'all'}}}
+          assert list(references(typed)) == [
+              (('select','equals'),'source-variable')
+          ]
+          assert not list(references({'variable': 99, 'datatype': 'string'}))
+          declared={
+              'source-variable': {'expression': {'literal': 'original'}},
+              'derived-variable': {'expression': {
+                  'variable': 'source-variable', 'datatype': 'string',
+                  'value_match': 'all'
+              }},
+          }
+          edges,order=variable_dependencies(declared)
+          assert edges == {'derived-variable': ['source-variable'],
+                           'source-variable': []}
+          assert order == ['source-variable','derived-variable']
+          declared['source-variable']['expression']={
+              'variable': 'derived-variable', 'datatype': 'string',
+              'value_match': 'one'
+          }
+          try: variable_dependencies(declared)
+          except ValueError as err: assert 'Cyclic' in str(err),str(err)
+          else: raise AssertionError('Annotated Variable cycle not rejected')
           print('PASS: missing references and cycles are fail-closed')
           PY
       - name: Upload original-OVAL Variable conversion queue
