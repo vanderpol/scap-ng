@@ -8,9 +8,10 @@ independent of Test/State require; Organizational Input is not Object selector.
 from copy import deepcopy
 import unittest
 from test_v04_schema_draft import (
-    SCHEMAS, VALIDATOR, fixture, errors,
+    SCHEMAS, VALIDATOR, fixture, errors as _general_schema_errors,
     Draft202012Validator, RefResolver,
 )
+from test_generate_capability_schema_v04 import materialize, validate as native_validate
 
 COMMON = SCHEMAS["capability-common.schema.json"]
 LANGUAGE = SCHEMAS["assessment-language.schema.json"]
@@ -19,13 +20,30 @@ SELECTOR = Draft202012Validator(
     {"$ref": COMMON["$id"] + "#/$defs/object_entity_base"},
     resolver=RefResolver.from_schema(COMMON, store=STORE),
 )
+# Generic Assessment validation intentionally does not know every native
+# capability's Object properties. Enforce the generated native 0.4 Object
+# schema as well, or direct selector tests would silently pass invalid fields
+# after removing the old wrapper.
+UNIX_FILE_SCHEMA = materialize("unix.file")
+
+
+def errors(doc):
+    generic = list(_general_schema_errors(doc))
+    obj = doc["assessment"]["tests"]["demo-test"].get("object")
+    if isinstance(obj, dict):
+        generic += native_validate(UNIX_FILE_SCHEMA, "object", obj)
+    return generic
+
 
 
 def assessment_with_directory(predicate):
     doc = fixture(requirement="at_least_one_exists")
     doc["assessment"]["tests"]["demo-test"]["object"] = {
         "capability": "unix.file",
-        "select": {"directory": predicate},
+        "directory": predicate,
+        "name": None,
+        "filesystem": "all",
+        "traversal": {"max_depth": None, "recurse": "symlinks_and_directories"},
     }
     return doc
 
@@ -141,13 +159,13 @@ class V04ObjectSelectorTests(unittest.TestCase):
     def test_nullable_named_selector_and_correlated_binding_have_explicit_shapes(self):
         named=assessment_with_directory({"equals":"/etc/audit"})
         obj=named["assessment"]["tests"]["demo-test"]["object"]
-        obj["select"]["name"]=None
+        obj["name"]=None
         self.assertFalse(errors(named))
 
         foreach=assessment_with_directory({"from":"item.directory"})
         obj=foreach["assessment"]["tests"]["demo-test"]["object"]
         obj["for_each"]={"item":"item","in":"directories-object"}
-        obj["select"]["name"]={"matches_regex":".*"}
+        obj["name"]={"matches_regex":".*"}
         self.assertFalse(errors(foreach))
 
         for bad in (
@@ -158,7 +176,10 @@ class V04ObjectSelectorTests(unittest.TestCase):
         ):
             with self.subTest(bad=bad):
                 doc=assessment_with_directory({"equals":"/etc"})
-                doc["assessment"]["tests"]["demo-test"]["object"]["select"]=bad
+                object_node = doc["assessment"]["tests"]["demo-test"]["object"]
+                object_node.pop("directory", None)
+                object_node.pop("name", None)
+                object_node.update(bad)
                 self.assertTrue(errors(doc))
 
     def test_native_object_without_select_remains_possible(self):
@@ -167,7 +188,10 @@ class V04ObjectSelectorTests(unittest.TestCase):
         # separate generated capability schemas must close those alternatives.
         doc = fixture(requirement="at_least_one_exists")
         doc["assessment"]["tests"]["demo-test"]["object"] = {"capability": "unix.file"}
-        self.assertFalse(errors(doc))
+        self.assertFalse(_general_schema_errors(doc))
+        # The native unix.file schema must reject an Object missing the
+        # collection selectors. The general structural schema stays generic.
+        self.assertTrue(errors(doc))
 
 
 if __name__ == "__main__":
