@@ -5,7 +5,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from collections import Counter
 
-from oval_result_truth_tables import aggregate_operator,aggregate_check
+from oval_result_truth_tables import (aggregate_operator,aggregate_check,\n    evaluate_state_entity_existence,evaluate_collected_object_test)
 from audit_v04_oval_boolean_scopes import examine_oval,OD
 from research_v04_oval_logic_scopes import (
     RESULTS,OPERATORS,ITEM_QUANTIFIERS,candidate_logic,
@@ -85,6 +85,58 @@ class SixStateScopeTests(unittest.TestCase):
             candidate_logic("or",[])
         with self.assertRaises(ValueError):
             candidate_item_quantifier("one_or_more",[])
+
+    def test_field_existence_applies_independently_to_every_state_entity(self):
+        # Original OVAL StateEntity.check_existence is per corresponding
+        # Item entity, NOT per whole State. This checks only the existence
+        # stage; it does not assume what entity_check='all' does when no
+        # value-comparison outcomes exist.
+        expected_exist = evaluate_state_entity_existence(
+            "at_least_one_exists", exists=1)
+        missing_required = evaluate_state_entity_existence(
+            "at_least_one_exists", exists=0)
+        missing_optional = evaluate_state_entity_existence(
+            "any_exist", exists=0)
+        self.assertEqual((expected_exist,missing_required,missing_optional),
+                         ("true","false","true"))
+        self.assertEqual(aggregate_operator("AND",
+                         [expected_exist,missing_required]),"false")
+        # An optional absence passes the existence stage, but whether
+        # the *complete entity comparison* passes is a separate proof.
+        self.assertEqual(aggregate_operator("AND",
+                         [expected_exist,missing_optional]),"true")
+        self.assertEqual(evaluate_state_entity_existence(
+                         "at_least_one_exists",not_collected=1),"unknown")
+        self.assertEqual(evaluate_state_entity_existence(
+                         "any_exist",error=1),"error")
+
+    def test_missing_optional_value_must_not_silently_reclassify_empty_value(self):
+        # A present-but-empty string is present; entity comparison with
+        # expected nonempty EnterpriseS is false. This is NOT an absence.
+        present_empty = evaluate_state_entity_existence(
+            "any_exist",exists=1)
+        self.assertEqual(present_empty,"true")
+        self.assertNotEqual("","EnterpriseS")
+        state_result = candidate_logic("and",["true","false"])
+        self.assertEqual(state_result,"false")
+        self.assertEqual(candidate_logic("or",["false",state_result]),"false")
+
+    def test_complete_and_incomplete_item_population_remains_separate(self):
+        # Same matching Item, different collected-object completeness:
+        # passing an Item on an incomplete 'all Items' stream is not
+        # sufficient to conclude every Item passes.
+        self.assertEqual(evaluate_collected_object_test(
+            "complete",existence="at_least_one_exists",exists=1,
+            check="all",item_results=["true"]),"true")
+        self.assertEqual(evaluate_collected_object_test(
+            "incomplete",existence="at_least_one_exists",exists=1,
+            check="all",item_results=["true"]),"unknown")
+        self.assertEqual(evaluate_collected_object_test(
+            "incomplete",existence="at_least_one_exists",exists=2,
+            check="all",item_results=["true","false"]),"false")
+        self.assertEqual(evaluate_collected_object_test(
+            "complete",existence="at_least_one_exists",exists=0,
+            check="all",item_results=[]),"false")
 
     def test_repeated_same_entity_names_in_real_oval_state_are_counted(self):
         source=f'''<oval_definitions xmlns="{OD}" xmlns:ind="{OD}#independent">
