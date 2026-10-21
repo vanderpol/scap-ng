@@ -12,6 +12,7 @@ from v04_canonical_result_plan import (
     census_authoring, _legacy_result_tree,
 )
 from v04_a_truth_plan import combine, SIX, UnsupportedExpression
+from audit_v04_canonical_result_plans import export_plans, verify_export
 
 
 def authored(expression, tests=("left-test", "right-test", "third-test")):
@@ -90,6 +91,32 @@ class CanonicalResultPlanTests(unittest.TestCase):
         self.assertEqual(report["counts"]["compiled_supplied_result_plans"], 1)
         self.assertEqual(report["counts"]["unsupported_result_expressions"], 1)
         self.assertFalse(report["conditional_semantics_implemented"])
+
+    def test_serialized_source_pinned_result_plan_manifest_rejects_changes(self):
+        docs = {
+            "authoring/demo/assessment-a.json": {"assessment": authored(paired("and"))},
+            "authoring/demo/assessment-b.json": {
+                "assessment": authored({"xor": [
+                    {"test": "left-test"}, {"test": "right-test"}]})},
+            "authoring/demo/manual.json": {"assessment": {
+                "id": "manual", "mode": "manual"}},
+        }
+        manifest = export_plans(docs, source_archive_sha256="a" * 64)
+        self.assertEqual(manifest["compiled_plan_count"], 2)
+        self.assertEqual(manifest["compiled_instruction_count"], 6)
+        self.assertFalse(manifest["native_executable_bundle"])
+        self.assertFalse(manifest["test_collectors_compiled"])
+        self.assertTrue(verify_export(docs, manifest))
+        self.assertEqual(manifest, export_plans(
+            dict(reversed(list(docs.items()))), source_archive_sha256="a" * 64))
+        damaged = deepcopy(manifest)
+        damaged["entries"][0]["plan"]["instructions"][-1]["op"] = "or"
+        with self.assertRaisesRegex(ValueError, "differs from canonical source"):
+            verify_export(docs, damaged)
+        damaged = deepcopy(manifest)
+        damaged["entries"].pop()
+        with self.assertRaisesRegex(ValueError, "differs from canonical source"):
+            verify_export(docs, damaged)
 
     def test_fail_closed_unsupported_and_malformed_source(self):
         base = authored(paired("and"))
