@@ -51,6 +51,18 @@ class PlanCensusTests(unittest.TestCase):
         self.assertNotIn("fixture_ir_compiled",markdown(r))
         self.assertIn("Plan failures",markdown(r))
 
+    def test_publisher_logical_id_and_duplicate_collision_fail_closed(self):
+        source=yaml.safe_load(SIMPLE.read_text())["assessment"]
+        first=cap(source,"authoring/apache_server_2-4_unix_server/a.yaml")
+        report=coverage({"transport-key-not-logical-id":first})
+        self.assertEqual(
+            report["assessments"][0]["assessment_id"], source["id"]
+        )
+        with self.assertRaisesRegex(ValueError,"Duplicate Variable Assessment"):
+            coverage({"a":first,"b":cap(
+                copy.deepcopy(source),"authoring/apache_server_2-4_unix_server/b.yaml"
+            )})
+
     def test_zero_source_variable_checks_not_a_compiled_assessment(self):
         report=coverage({"simple":{"source_document":{"assessment":{
             "id":"x","mode":"automated","tests":{},
