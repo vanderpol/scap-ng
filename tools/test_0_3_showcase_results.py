@@ -96,78 +96,68 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         redacted_leak["benchmark_result"]["rule_results"][0]["findings"][0]["observed"]["redacted"] = True
         self.assertTrue(list(validator.iter_errors(redacted_leak)))
 
-    def test_assessment_intro_contains_real_inline_rule_and_local_object(self):
-        example_page = (ROOT / "specification" / "examples" / "assessments.md").read_text(
+    def test_current_assessment_intro_uses_explicit_04_flat_object(self):
+        """Current 0.4 documentation must not masquerade as 0.3 source."""
+        page = (ROOT / "specification" / "examples" / "assessments.md").read_text(
             encoding="utf-8"
         )
         main_page = (ROOT / "specification" / "examples" / "README.md").read_text(
             encoding="utf-8"
         )
-        intro = example_page.split("## The alternative: a manual Assessment", 1)[0]
-        blocks = re.findall(r"```yaml\n([\s\S]*?)\n```", intro)
-        self.assertEqual(len(blocks), 2, "Start with Rule linkage and the real Assessment YAML")
-        rule = yaml.safe_load(blocks[0])["rule"]
-        assessment = yaml.safe_load(blocks[1])
-        self.assertEqual(rule["id"], "SV-257851")
-        choices = rule["assessment_choices"]
-        self.assertIn("automated", choices)
-        self.assertIn("manual", choices)
-        self.assertEqual(rule["default_assessment_choice"], "automated")
-        self.assertNotIn("default", choices,
-                         "Publisher default is a selector, not a duplicate Assessment")
+        self.assertIn("# SCAP-NG 0.4.0 examples", page)
+        self.assertIn("not a verbatim STIG Assessment", page)
+        intro = page.split("## 2. Multiple Tests and Boolean logic", 1)[0]
+        blocks = re.findall(r"```yaml\\n([\\s\\S]*?)\\n```", intro)
+        self.assertGreaterEqual(len(blocks), 1)
+        snippet = yaml.safe_load(blocks[0])
+        test = snippet["tests"]["home-mount-requires-nosuid-test"]
+        self.assertEqual(test["capability"], "linux.partition")
+        self.assertEqual(test["object"], {"mount_point": {"equals": "/home"}})
+        self.assertNotIn("select", test["object"])
+        self.assertNotIn("collect", test["object"])
+        self.assertNotIn("capability", test["object"])
+        self.assertEqual(test["require"]["items"], "one_or_more")
+        matching = test["require"]["all_items_must"]
+        self.assertEqual(len(matching), 1)
+        self.assertEqual(matching[0]["mount_options"]["equals"], "nosuid")
         self.assertEqual(
-            choices["automated"]["assessment"],
-            "home-is-mounted-with-the-nosuid-option",
+            matching[0]["mount_options"]["require"],
+            "at_least_one_exists_and_all_match",
         )
-        self.assertEqual(choices["manual"]["assessment"], "SV-257851.manual")
-        for selection in choices.values():
-            reference = selection["assessment"]
-            self.assertNotIn("/", reference, "Authors use IDs, not file paths")
-            self.assertNotIn("\\", reference, "Authors use IDs, not file paths")
-            self.assertFalse(reference.endswith(".yaml"))
-        self.assertIn("compiler now resolves these logical IDs", intro)
-        test = assessment["tests"]["home-mounted-nosuid-option-test"]
-        self.assertEqual(test["object"]["capability"], "linux.partition")
-        self.assertIn("mount_point", test["object"]["select"])
-        self.assertEqual(test["states"][0]["field"], "mount_options")
-        self.assertEqual(test["states"][0]["value"], "nosuid")
-        self.assertEqual(assessment["evaluate"]["test"], "home-mounted-nosuid-option-test")
-        self.assertIn("assessments.md#start-here-the-rule-and-its-automated-assessment", main_page)
+        self.assertEqual(
+            snippet["evaluate"]["test"], "home-mount-requires-nosuid-test"
+        )
+        self.assertIn("[Assessment examples](assessments.md)", main_page)
 
-    def test_applicability_example_uses_logical_assessment_id(self):
-        example_page = (
-            ROOT / "specification" / "examples" / "assessments.md"
-        ).read_text(encoding="utf-8")
-        applicability = example_page.split(
-            "## Applicability: first check whether a rule applies", 1
-        )[1].split("## Practical authoring improvements", 1)[0]
-        blocks = re.findall(r"```yaml\n([\s\S]*?)\n```", applicability)
-        self.assertEqual(len(blocks), 1)
-        entry = yaml.safe_load(blocks[0])["applicability"]
-        ref = next(iter(entry["conditions"].values()))["assessment"]
-        self.assertEqual(ref, "condition.gnome-shell-package")
-        self.assertNotIn("/", ref)
-        self.assertFalse(ref.endswith(".yaml"))
+    def test_current_docs_identify_logical_rule_assessment_links(self):
+        main_page = (ROOT / "specification" / "examples" / "README.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("A Benchmark's `rules` list refers to logical Rule IDs", main_page)
+        self.assertIn(
+            "a Rule's `assessment_choices` refers to logical Assessment IDs",
+            main_page,
+        )
+        self.assertIn("0.4.0", main_page)
+        self.assertIn("0.3.0 archive", main_page)
+        self.assertIn("not executable signed", main_page)
 
-    def test_assessment_page_reads_simple_to_advanced(self):
+    def test_current_assessment_page_reads_simple_to_advanced(self):
         page = (ROOT / "specification" / "examples" / "assessments.md").read_text(
             encoding="utf-8"
         )
         headings = [
-            "## Start here: the Rule and its automated Assessment",
-            "## The alternative: a manual Assessment",
-            "## After scanning: Assessment Results that explain why",
-            "## Applicability: first check whether a rule applies",
-            "## Practical authoring improvements",
-            "## Advanced or not-yet-automated features",
-            "## Evidence and further reading (optional)",
+            "## 1. A simple automated Test",
+            "## 2. Multiple Tests and Boolean logic",
+            "## 3. Manual alternatives and exceptional Assessments",
+            "## 4. What validation proves",
         ]
         positions = [page.index(heading) for heading in headings]
         self.assertEqual(positions, sorted(positions))
-        self.assertEqual(page.count("### Organizational Input"), 1)
-        self.assertNotIn('"maximum": 20', page, "Example must match current cap")
-        self.assertNotIn('"stop_reason": "evidence_maximum_reached"', page)
-        self.assertNotIn("## Additional authoring details", page)
+        self.assertIn("0.3.0 archive", page)
+        self.assertIn("scanner execution", page)
+        self.assertIn("do *not* prove", page)
+        self.assertNotIn('"maximum": 20', page)
 
     def test_inline_collected_items_and_comparisons(self):
         for name in (
