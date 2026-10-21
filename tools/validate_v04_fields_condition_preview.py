@@ -23,9 +23,28 @@ import shutil
 
 from v04_canonical_source_ir import _schema_validators,validate_docs,compile_pair
 from v04_a_authoring_graph_index import read_authoring_archive
+from v04_flat_object_authoring import load_catalog, flatten_document, restore_document
 
 
 LOGICAL=frozenset(("and","or","one","xor","all","any","odd"))
+
+
+def native_schema_projection(documents):
+    """Versioned projection used ONLY for validation of legacy review inputs.
+
+    The field research ZIPs predate the owner-approved flat Object grammar.
+    Validate their new-schema equivalent, while exact-inverting each Object
+    back to the original before any separate source/field proof.
+    """
+    catalog=load_catalog(Path(__file__).resolve().parents[1] /
+                         "schema/v0.4.0/capability-mappings/supported")
+    projected={}
+    for path,doc in documents.items():
+        current,proof=flatten_document(doc,catalog)
+        if restore_document(current,proof)!=doc:
+            raise ValueError("Legacy Object source inverse failed: "+path)
+        projected[path]=current
+    return projected
 
 
 def candidate_schema(path):
@@ -212,8 +231,8 @@ def audit(jsonzip,yamlzip):
                          repr(dict(counts)))
     with TemporaryDirectory(prefix="v04-fields-condition-") as td:
         validators=_schema_validators(candidate_schema(Path(td)/"v0.4.0"))
-        validate_docs(json_docs,validators)
-        validate_docs(yaml_docs,validators)
+        validate_docs(native_schema_projection(json_docs),validators)
+        validate_docs(native_schema_projection(yaml_docs),validators)
     # A source-IR compiler pass does not imply executable evaluation. It
     # checks references and exact source graph reconstruction independently.
     _,ir=compile_pair(jsonzip,yamlzip,validate_schema=False)
