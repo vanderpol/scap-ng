@@ -118,6 +118,23 @@ class ProposedFieldsScopeTests(unittest.TestCase):
         self.assertEqual(active,(root/"schema/v0.4.0/assessment-language.schema.json").read_bytes())
 
 
+    def test_legacy_source_exact_scalar_require_not_rejected_by_scoped_guard(self):
+        # JSON Schema 'required' is vacuously true for a scalar unless the
+        # guarded property is explicitly constrained to an Object. Preserve
+        # original unusual State-bearing Tests until their semantics convert.
+        with TemporaryDirectory() as td:
+            path=candidate_schema(Path(td)/"v0.4.0")
+            lang=json.loads((path/"assessment-language.schema.json").read_text())
+            rule=lang["$defs"]["test"]["allOf"][-1]
+            validator=Draft202012Validator(rule)
+            good={"state_fields_require":"at_least_one_exists_and_all_match",
+                  "require":"at_least_one_exists_and_some_match"}
+            self.assertFalse(list(validator.iter_errors(good)))
+            bad=deepcopy(good)
+            bad["require"]={"items":"one_or_more",
+                            "field_requirement":"at_least_one_exists_and_all_match"}
+            self.assertTrue(list(validator.iter_errors(bad)))
+
     def test_uniform_field_requirement_has_explicit_test_local_and_leaf_scope(self):
         shared=fixture(scope="none")
         shared["require"]["field_requirement"]="at_least_one_exists_and_all_match"
