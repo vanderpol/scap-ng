@@ -1,0 +1,159 @@
+name: 0.4.0 original OVAL constant family Variable XML roundtrip
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-constant-family-roundtrip.yml'
+      - 'tools/convert_v04_oval_constant_family.py'
+      - 'tools/export_v04_oval_constant_family.py'
+      - 'schema/v0.4.0/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  independent-original-oval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source pins and dependencies
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = "e3538595c5083b9c34d937a81d319234df9bbfaa"
+          python -m pip install PyYAML==6.0.3 jsonschema==4.25.1 lxml==6.0.2
+      - name: Retrieve independent original XML source-compatibility view
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/source
+          gh run download 39344457603 --repo "$GH_REPO" \
+            --name c-original-oval-compatibility-review-not-native-conversion \
+            --dir work/source
+      - name: Import pinned OVAL family Test and constant Variable to canonical 0.4
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          manifest=json.loads(Path('work/source/c-review/manifest.json').read_text())
+          key=('agnostic/ind-def_family_test.xml','oval:org.mitre.oval.test:def:95')
+          matches=[r for r in manifest['exported_views']
+                   if (r['file'],r['definition_id'])==key]
+          assert len(matches)==1
+          source=Path('work/source/c-review')/matches[0]['review_file']
+          Path('work/family-source-review.json').write_bytes(source.read_bytes())
+          PY
+          python scap-ng/tools/convert_v04_oval_constant_family.py \
+            --source-xml original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml \
+            --source-review work/family-source-review.json \
+            --output-dir work/family-pilot
+      - name: Validate native 0.4 schema and JSON/YAML equality
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,yaml
+          from v04_canonical_source_ir import _schema_validators,validate_docs
+          base=Path('work/family-pilot')
+          doc=json.loads((base/'family-assessment.json').read_text())
+          assert yaml.safe_load((base/'family-assessment.yaml').read_text())==doc
+          assert doc['assessment']['specification']['version']=='0.4.0'
+          assert 'object' not in next(iter(doc['assessment']['tests'].values()))
+          assert next(iter(doc['assessment']['variables'].values()))['kind']=='constant'
+          validators=_schema_validators(Path('scap-ng/schema/v0.4.0'))
+          validate_docs({'authoring/original-family.json':doc},validators)
+          p=base/'source-import-proof.json'
+          proof=json.loads(p.read_text())
+          proof['native_schema_validation']='PASS'
+          p.write_text(json.dumps(proof,indent=2)+'\n')
+          print('PASS: canonical 0.4 Assessment JSON Schema + paired YAML')
+          PY
+      - name: Independently export NG family back to OVAL 5.12.3 XML
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/export_v04_oval_constant_family.py \
+            --native work/family-pilot/family-assessment.json \
+            --oval-xml work/family-pilot/regenerated-oval.xml
+      - name: Validate original OVAL semantics, platform XSD and mutation rejection
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          from pathlib import Path
+          from hashlib import sha256
+          import json
+          from export_v04_oval_constant_family import export
+          from validate_v04_oval_5123 import check
+          from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+          base=Path('work/family-pilot')
+          native=json.loads((base/'family-assessment.json').read_text())
+          original=Path('original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml')
+          regenerated=base/'regenerated-oval.xml'
+          xsd=check(Path('oval-language/oval-schemas'),regenerated,'independent')
+          (base/'xsd-proof.json').write_text(json.dumps(xsd,indent=2)+'\n')
+          assert xsd['status']=='PASS',xsd
+          regenerated_root=export(native)[1]
+          result=compare(original,regenerated,
+              source_root='oval:org.mitre.oval.test:def:95',
+              regenerated_root=regenerated_root,root_only=True)
+          (base/'semantic-proof.json').write_text(json.dumps(result,indent=2,default=str)+'\n')
+          assert result['equal'],result
+          changed=deepcopy(native)
+          variable=next(iter(changed['assessment']['variables'].values()))
+          variable['expression']['literal']='changed-original-family-constant'
+          altered,_=export(changed)
+          target=base/'negative-changed-variable.xml'
+          altered.write(target,encoding='utf-8',xml_declaration=True)
+          diff=compare(original,target,
+              source_root='oval:org.mitre.oval.test:def:95',
+              regenerated_root=regenerated_root,root_only=True)
+          assert not diff['equal'],'Changed Variable escaped semantic graph comparison'
+          # Wrong OVAL cardinality cannot pass through the strict native exporter.
+          bad=deepcopy(native)
+          test=next(iter(bad['assessment']['tests'].values()))
+          test['require']='at_least_one_exists_and_all_match'
+          try: export(bad)
+          except ValueError as e: assert 'Test Item/matching semantics' in str(e),str(e)
+          else:raise AssertionError('Changed Test matching accepted')
+          proof=json.loads((base/'source-import-proof.json').read_text())
+          proof['independent_reverse_oval_xml']='PASS_INDEPENDENT_OVAL_5123_XSD_AND_SEMANTIC_GRAPH'
+          proof['source_oval_definition_count']=1
+          proof['scanner_execution_equivalence']='NOT_PROVEN'
+          proof['regenerated_oval_xml_sha256']=sha256(regenerated.read_bytes()).hexdigest()
+          (base/'source-import-proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          (base/'START-HERE.md').write_text(
+              '# Canonical 0.4.0 original OVAL constant family Variable pilot\n\n'
+              'One exact pinned source Definition, one full native 0.4 Assessment, '
+              'independent 5.12.3 XML export, XSD/semantic proof and mutation. '
+              'No full-corpus or scanner result parity claim.\n')
+          print('PASS: original family XML -> native 0.4 -> independent OVAL 5.12.3 XSD/semantic graph')
+          PY
+      - name: Publish proven constant Variable authoring/OVAL XML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-original-oval-constant-family-independent-xml-roundtrip
+          path: work/family-pilot/
+          if-no-files-found: ignore
