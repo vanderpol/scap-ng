@@ -108,7 +108,7 @@ def restore(doc,ledger):
             raise ValueError("Source-recoverable fields mapping missing")
         original.append({"and":[{key:deepcopy(value)}
                                 for key,value in entry["fields"].items()]})
-    req["all_items_must"]=original if False else [{"or":original}]
+    req["all_items_must"]=[{"or":original}]
     test["state_fields_require"]=ledger["field_requirement"]
     if sha(test)!=ledger["old_test_sha256"]:
         raise ValueError("Condition/fields reformat lost original State fields")
