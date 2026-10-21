@@ -71,6 +71,23 @@ def partition_documents(documents):
             if folder in benchmarks:
                 raise ValueError("duplicate Benchmark namespace: " + folder)
             benchmarks[folder] = path
+def _verify_exact_rule_inventory(documents, benchmark):
+    """Exclude unlisted Rule documents and incomplete Benchmark rule lists.
+
+    The same invariant applies when building and independently decoding an
+    unsigned source package; a valid reference graph alone does not establish
+    that the Benchmark lists *every* packaged Rule.
+    """
+    rules = [doc["rule"]["id"] for doc in documents.values() if "rule" in doc]
+    declared = benchmark.get("rules")
+    if (not isinstance(declared, list) or
+            any(not isinstance(name, str) or not name for name in declared) or
+            len(declared) != len(set(declared)) or
+            len(rules) != len(set(rules)) or
+            set(declared) != set(rules)):
+        raise ValueError("Benchmark Rule inventory differs from packaged Rules")
+
+
     if not benchmarks:
         raise ValueError("no Benchmark source files")
     result = {}
@@ -85,10 +102,7 @@ def partition_documents(documents):
         bench = documents[benchmark_path]["benchmark"]
         if bench["assessment_specifications"] != [EXPECTED_SPEC]:
             raise ValueError("unexpected Benchmark specification: " + folder)
-        rule_ids = {doc["rule"]["id"] for doc in subset.values() if "rule" in doc}
-        benchmark_rules = bench.get("rules")
-        if not isinstance(benchmark_rules, list) or set(benchmark_rules) != rule_ids or len(benchmark_rules) != len(rule_ids):
-            raise ValueError("Benchmark Rule list does not equal packaged Rules: " + folder)
+        _verify_exact_rule_inventory(subset, bench)
         graph_index(subset)
         result[folder] = subset
     if all_graph["counts"]["documents"] != len(documents):
@@ -112,6 +126,7 @@ def build_package(documents, *, validate_schema=True):
     benchmark = next(d["benchmark"] for d in documents.values() if "benchmark" in d)
     if benchmark.get("assessment_specifications") != [EXPECTED_SPEC]:
         raise ValueError("package expects canonical 0.4.0 Assessment declaration")
+    _verify_exact_rule_inventory(documents, benchmark)
     for path, doc in sorted(documents.items()):
         kind, body = next(iter(doc.items()))
         ident = body["id"]
@@ -182,10 +197,13 @@ def verify_package(raw, *, validate_schema=True):
         if canonical_json(manifest) != manifest_raw:
             raise ValueError("noncanonical manifest serialization")
         _manifest_schema().validate(manifest)
+        if manifest["format_version"] != "0.4.0":
+            raise ValueError("source package must declare format_version 0.4.0")
         prov = manifest["build_provenance"]
         if not isinstance(prov, dict) or set(prov) != PROVENANCE_KEYS:
             raise ValueError("unknown or falsely executable source package provenance")
         if (prov.get("stage") != STAGE or prov.get("source_format") != SOURCE_FORMAT
+                or prov.get("scope") != "complete-benchmark-plus-all-shared-assessments"
                 or prov.get("executable_compiler_complete") is not False
                 or prov.get("scanner_evaluation_verified") is not False
                 or prov.get("publisher_signature_verified") is not False):
@@ -220,6 +238,9 @@ def verify_package(raw, *, validate_schema=True):
         raise ValueError("incorrect Benchmark entrypoint")
     if bench["version"] != manifest["benchmark_version"]:
         raise ValueError("wrong Benchmark version")
+    if bench.get("assessment_specifications") != [EXPECTED_SPEC]:
+        raise ValueError("decoded Benchmark Assessment specification is not 0.4.0")
+    _verify_exact_rule_inventory(docs, bench)
     graph = graph_index(docs)
     edges = inspect_edges(docs)
     if edges["incompatible_edge_count"] or len(edges["benchmarks"]) != 1:
