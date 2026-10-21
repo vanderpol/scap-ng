@@ -6,6 +6,7 @@ on:
       - '.github/workflows/v04-oval-multitest-leaf.yml'
       - 'tools/convert_v04_oval_multitest_leaf.py'
       - 'tools/export_v04_oval_ios_global_multitest.py'
+      - 'tools/promote_v04_oval_test_content_xml_proofs.py'
       - 'tools/validate_v04_oval_5123.py'
       - 'tools/audit_v04_oval_xml_roundtrip.py'
       - 'tools/merge_v04_oval_test_content_coverage.py'
@@ -254,6 +255,51 @@ jobs:
           report['native_040_independent_oval_roundtrips']=2
           (work/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
           print('PASS: IOS and IOS-XE source XML -> canonical 0.4 -> independent OVAL XML 5.12.3 semantic graph and XSD; tampering rejected.')
+          PY
+      - name: Promote independent OVAL/XSD proof into complete 167-Definition readiness
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/promote_v04_oval_test_content_xml_proofs.py \
+            --cumulative-ledger work/native-040-multitest/cumulative-167-definition-readiness.json \
+            --roundtrip-root work/native-040-multitest \
+            --output work/native-040-multitest/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path("work/native-040-multitest/cumulative-167-definition-readiness.json")
+          d=json.loads(p.read_text())
+          assert len(d["records"])==167
+          assert d["current_040_schema_and_original_source_validated"]==2
+          assert d["current_040_original_xml_roundtrip_exported"]==2
+          assert d["scanner_result_parity_proven"]==0
+          assert sum(x["current_040_oval_xml_roundtrip"].startswith("PASS_")
+                     for x in d["records"])==2
+          print("PASS: two original-XML semantic/XSD-verified canonical 0.4 Definitions, 165 others unpromoted")
+          PY
+      - name: Reject missing or forged XML readiness proof
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          from pathlib import Path
+          import json
+          from promote_v04_oval_test_content_xml_proofs import upgrade
+          base=Path("work/native-040-multitest")
+          ledger=json.loads((base/"cumulative-167-definition-readiness.json").read_text())
+          manifest=json.loads((base/"independent-oval-roundtrip/manifest.json").read_text())
+          proof=json.loads((base/"independent-oval-roundtrip/complete-semantic-proof.json").read_text())
+          # The successfully promoted result may not be promoted again.
+          try: upgrade(ledger,manifest,proof,base)
+          except ValueError as e: assert "Unproven original source" in str(e),str(e)
+          else: raise AssertionError("Duplicate promotion not rejected")
+          bogus=deepcopy(proof)
+          bogus["outcome_counts"]={"EQUAL":1,"DIFFERENT":1}
+          try: upgrade(ledger,manifest,bogus,base)
+          except ValueError as e: assert "Incomplete" in str(e),str(e)
+          else: raise AssertionError("Forged semantic proof escaped validation")
+          print("PASS: missing/altered source semantic proof not accepted")
           PY
       - name: Reviewer overview
         run: |
