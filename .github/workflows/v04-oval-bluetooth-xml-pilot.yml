@@ -15,6 +15,8 @@ on:
       - 'tools/compare_v04_fresh_oval_import.py'
       - 'tools/test_import_v04_oval_leaf_pilot.py'
       - 'tools/run_v04_true_xml_native_xml_pilot.py'
+      - 'tools/v04_flat_object_authoring.py'
+      - 'tools/audit_v04_flat_object_names.py'
       - 'tools/test_audit_v04_original_oval_forward.py'
       - 'tools/check_v04_oval_xml_mutation_regressions.py'
       - 'tools/combine_v04_oval_xml_proofs.py'
@@ -110,6 +112,28 @@ jobs:
             --source-zip work/source/windows11-stig.zip \
             --output work/compare/source-oval.xml \
             --proof work/compare/source-proof.json
+          # The October-20 source-pinned six-STIG baseline predates the
+          # owner-approved flat Object syntax. Retain it unchanged for
+          # original-source oracle checking, and source-invertibly project
+          # only exporter inputs into the new 0.4 authoring grammar.
+          python - <<'PY'
+          from pathlib import Path
+          from v04_flat_object_authoring import (
+              load_catalog, flatten_document, restore_document)
+          import json
+          root=Path('work/compare')
+          catalog=load_catalog(Path('schema/v0.4.0/capability-mappings/supported'))
+          for name in ('bluetooth','camera','SV-253291','SV-253350'):
+              source=root/(name+'-native-v04.json')
+              prior=json.loads(source.read_text())
+              flat,proof=flatten_document(prior,catalog)
+              assert proof['edits'] and restore_document(flat,proof)==prior,name
+              (root/(name+'-native-v04.flat.json')).write_text(
+                  json.dumps(flat,indent=2)+'\\n')
+              (root/(name+'-native-v04.flat-proof.json')).write_text(
+                  json.dumps(proof,indent=2)+'\\n')
+          print("PASS: all four source-pinned OVAL Tests mapped to flat Objects")
+          PY
           python tools/export_v04_oval_shellcommand_pilot.py \
             --native work/compare/bluetooth-native-v04.json \
             --output work/compare/exported-oval.xml \
@@ -148,7 +172,7 @@ jobs:
                   'regenerated_definition':(
                       root/(prefix+'exported-def-id.txt')).read_text().strip()}
               for key,name in [('original',prefix+'source-oval.xml'),
-                               ('native_assessment',device+'-native-v04.json'),
+                               ('native_assessment',device+'-native-v04.flat.json'),
                                ('regenerated',prefix+'exported-oval.xml')]:
                   file=root/name
                   row[key]=name
@@ -179,7 +203,7 @@ jobs:
                   'regenerated_definition':(
                       root/(rule+'-exported-def-id.txt')).read_text().strip()}
               for key,name in [('original','source-oval.xml'),
-                               ('native_assessment',rule+'-native-v04.json'),
+                               ('native_assessment',rule+'-native-v04.flat.json'),
                                ('regenerated',rule+'-exported-oval.xml')]:
                   file=root/name
                   row[key]=name
