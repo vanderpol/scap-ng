@@ -128,6 +128,81 @@ class FlatObjectAuthoringTests(unittest.TestCase):
                          source["assessment"]["tests"]["a"]["object"]["set"]["operands"][0]["filters"])
         self.assertEqual(len(proof["edits"]), 2)
 
+    def test_variable_nested_set_and_filters_preserve_distinct_semantics(self):
+        # An OVAL-derived Variable may contain its own `object` record, which
+        # is NOT automatically an inline native collection Object. Its graph,
+        # links and provenance must survive flat-Object migration unchanged.
+        variables = {"target-paths-variable": {
+            "object": {"select": {"metadata": {"equals": "do-not-flatten"}}},
+            "value": ["/etc/passwd", "/etc/shadow"]}}
+        shared = {"system-path-object": {
+            "capability": "unix.file",
+            "select": {"full_path": {
+                "equals": {"variable": "target-paths-variable"},
+                "datatype": "string", "value_match": "all"}}}}
+        first = {"select": {"full_path": {
+            "equals": {"variable": "target-paths-variable"},
+            "datatype": "string", "value_match": "one"}}}
+        second = {"select": {"full_path": {"equals": "/etc/passwd"}}}
+        direct_filters = [{"include": {"owner_uid": {
+            "equals": 0, "require": "at_least_one_exists_and_all_match"}}}]
+        exclude_filters = [{"exclude": {"owner_uid": {
+            "equals": 1000, "require": "at_least_one_exists_and_all_match"}}}]
+        complex_set = {"operator": "difference", "operands": [
+            {"object": first, "filters": deepcopy(direct_filters)},
+            {"set": {"operator": "intersection", "operands": [
+                {"object": "system-path-object", "filters": []},
+                {"object": second, "filters": deepcopy(exclude_filters)},
+            ]}},
+        ]}
+        source = {"assessment": {
+            "mode": "automated", "variables": deepcopy(variables),
+            "shared_objects": deepcopy(shared),
+            "tests": {"compound-set-test": {
+                "capability": "unix.file",
+                "object": {"set": complex_set},
+                "require": {"items": "none"}}}}}
+        value, proof = migrated(source)
+        assessment = value["assessment"]
+        self.assertEqual(assessment["variables"], variables)
+        self.assertEqual(assessment["shared_objects"]["system-path-object"][
+            "full_path"]["equals"], {"variable": "target-paths-variable"})
+        set_body = assessment["tests"]["compound-set-test"]["object"]["set"]
+        self.assertEqual(set_body["operator"], "difference")
+        self.assertEqual(set_body["operands"][0]["filters"], direct_filters)
+        self.assertEqual(set_body["operands"][1]["set"]["operator"], "intersection")
+        self.assertEqual(set_body["operands"][1]["set"]["operands"][1]["filters"],
+                         exclude_filters)
+        self.assertEqual(set_body["operands"][0]["object"]["full_path"][
+            "value_match"], "one")
+        self.assertEqual(set_body["operands"][1]["set"]["operands"][1]["object"][
+            "full_path"], {"equals": "/etc/passwd"})
+        self.assertEqual(len(proof["edits"]), 3)
+        self.assertEqual(yaml.safe_load(dump_hybrid(value)), value)
+        altered = deepcopy(value)
+        altered["assessment"]["variables"]["target-paths-variable"]["value"][0] = "/tmp"
+        with self.assertRaisesRegex(ValueError, "modified"):
+            restore_document(altered, proof)
+        altered = deepcopy(value)
+        altered["assessment"]["tests"]["compound-set-test"]["object"]["set"][
+            "operands"][0]["filters"][0]["include"]["owner_uid"]["equals"] = 1
+        with self.assertRaisesRegex(ValueError, "modified"):
+            restore_document(altered, proof)
+
+    def test_object_key_inside_filter_is_not_a_collection_object(self):
+        raw = {"assessment": {"tests": {"a": {
+            "capability": "linux.partition",
+            "object": {"select": {"mount_point": {"equals": "/home"}},
+                       "filters": [{"include": {"object": {
+                           "select": {"meaning": "item field, not collector"}}}}]}
+        }}}}
+        transformed, proof = migrated(raw)
+        actual = transformed["assessment"]["tests"]["a"]["object"]
+        self.assertEqual(actual["filters"], raw["assessment"]["tests"]["a"][
+            "object"]["filters"])
+        self.assertNotIn("select", actual)
+        self.assertEqual(len(proof["edits"]), 1)
+
     def test_collision_and_unknown_fields_fail_closed(self):
         for ob in (
             {"select": {"mount_point": {"equals": "/home"}}, "mount_point": {"equals": "/"}},
