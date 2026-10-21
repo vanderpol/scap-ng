@@ -1,0 +1,83 @@
+name: 0.4.0 State alternatives AND/OR normalization proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/migrate_v04_states_match_to_logic.py'
+      - 'tools/test_migrate_v04_states_match_to_logic.py'
+      - '.github/workflows/v04-state-alternatives-and-or.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-state-boolean-normalization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install jsonschema==4.25.1 PyYAML==6.0.3
+      - name: Test reversibility and six-state AND/OR boundary behavior
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_migrate_v04_states_match_to_logic.py -v
+      - name: Retrieve canonical 0.4.0 source-verified six-STIG artifact only
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/source work/normalized
+          gh run download 39503111241 --repo "$GH_REPO" \
+            --name scap-ng-040-six-stig-board-authoring \
+            --dir work/source
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          source=Path('work/source')
+          manifest=json.loads((source/'json-manifest.json').read_text())
+          raw=(source/'scap-ng-0.4.0-six-stigs.json.zip').read_bytes()
+          assert hashlib.sha256(raw).hexdigest()==manifest['output_sha256']
+          assert manifest['counts']['all_items_must']==816
+          assert manifest['counts']['explicit_fallback']==172
+          assert manifest['counts']['source_proven_direct_filters']==28
+          assert manifest['counts']['source_linked_additional_direct_filters']==19
+          print('Pinned actual 0.4.0 six-STIG source verified',manifest['output_sha256'])
+          PY
+      - name: Preview exact inverse for every structured OR/AND Test
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/migrate_v04_states_match_to_logic.py \
+            --canonical-zip work/source/scap-ng-0.4.0-six-stigs.json.zip \
+            --candidate-changed-only work/normalized/changed-0.4-assessments.json.zip \
+            --report work/normalized/or-and-scope-corpus-ledger.json \
+            --expected-tests 123
+      - name: Strictly validate every candidate document under active 0.4.0 JSON Schema
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import json,zipfile
+          from pathlib import Path
+          from v04_canonical_source_ir import _schema_validators,validate_docs
+          bundle=Path('work/normalized/changed-0.4-assessments.json.zip')
+          with zipfile.ZipFile(bundle) as z:
+              docs={p:json.loads(z.read(p)) for p in z.namelist()}
+          validators=_schema_validators(Path('schema/v0.4.0'))
+          validate_docs(docs,validators)
+          print('PASS:',len(docs),'transformed Assessment documents pass 0.4.0 schema')
+          ledger=json.loads(Path('work/normalized/or-and-scope-corpus-ledger.json').read_text())
+          assert ledger['affected_tests']==123
+          assert ledger['counts']=={'all':30,'any':93},ledger['counts']
+          assert ledger['fields_naming_unchanged'] is True
+          PY
+      - name: Publish diff ledger and changed-only preview, NOT a promoted release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 0.4-and-or-state-alternatives-reversible-preview
+          path: work/normalized
+          if-no-files-found: ignore
