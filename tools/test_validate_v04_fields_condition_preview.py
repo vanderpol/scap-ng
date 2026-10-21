@@ -65,6 +65,20 @@ class ProposedFieldsScopeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Record cardinality"):
             field_scopes(test)
 
+    def test_shared_requirement_can_precede_or_alternatives_once(self):
+        doc=fixture(scope="inherited")
+        base=doc["require"]["all_items_must"][0]
+        alternate=deepcopy(base)
+        alternate["fields"]["value"]["equals"]=1
+        doc.pop("state_fields_require")
+        doc["require"]["all_items_must"]=[{
+            "require":"at_least_one_exists_and_all_match",
+            "or":[base,alternate]}]
+        scopes=field_scopes(doc)
+        self.assertEqual(len(scopes),2)
+        self.assertEqual([s["scope"] for s in scopes],["inherited","inherited"])
+        self.assertEqual(doc["require"]["items"],"one_or_more")
+
     def test_one_field_or_mixed_logical_operator_not_in_safe_subset(self):
         test=fixture()
         test["require"]["all_items_must"][0]["or"]=[{"type":{"equals":"dword"}}]
@@ -92,6 +106,15 @@ class ProposedFieldsScopeTests(unittest.TestCase):
                 bad["or"]=[{"value":{"equals":0}}]
                 self.assertTrue(list(v.iter_errors(bad)),scope)
                 self.assertTrue(list(v.iter_errors({"fields":{}})),scope)
+                shared={"require":"at_least_one_exists_and_all_match",
+                        "or":[{"fields":{"type":{"equals":"string"},
+                                          "value":{"equals":0}}},
+                              {"fields":{"type":{"equals":"dword"},
+                                          "value":{"equals":1}}}]}
+                self.assertFalse(list(v.iter_errors(shared)),scope)
+                mixed=deepcopy(shared)
+                mixed["state_fields_require"]="none_exist"
+                self.assertTrue(list(v.iter_errors(mixed)),scope)
         self.assertEqual(active,(root/"schema/v0.4.0/assessment-language.schema.json").read_bytes())
 
 
