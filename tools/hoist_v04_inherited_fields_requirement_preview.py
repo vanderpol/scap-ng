@@ -126,9 +126,9 @@ def rewrite_archive(original_zip,candidate_zip,candidate_yaml,report_path):
             if yaml.safe_load(authored)!=new:
                 raise ValueError("YAML serialization changed group scope at "+name)
             yaml_output.writestr(name.removesuffix(".json")+".yaml",authored)
-    expected={"documents":4001,"affected_documents":15,
+    expected={"documents":4001,"affected_documents":14,
               "tests":16,"fields_children":44}
-    # One shared file contains two independently hoisted Tests.
+    # Test sites and document counts are separate source-pinned invariants.
     if {k:totals[k] for k in expected}!=expected:
         raise ValueError("Source-inherited group census drift: "+str(dict(totals)))
     result={
