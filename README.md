@@ -4,7 +4,7 @@ SCAP-NG is a pre-alpha successor to SCAP 1.4 designed to preserve supported asse
 
 ## Start here — current 0.4.0 sample files
 
-**[Download the 0.4.0 six-STIG authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020)** — complete, version-pinned YAML and JSON ZIPs containing **4,001 source documents**, including reusable shared Assessments.
+**[Download the canonical 0.4.0 six-STIG authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261021)** — version-pinned YAML/JSON ZIPs containing **4,001 source documents**, six verified unsigned source-package previews, and independent evidence. These are **not executable or signed scanner bundles**. The [October 20 prior preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) remains unchanged.
 
 - **Learn the content model:** [Benchmark and Rule examples](specification/examples/README.md) · [Assessment examples](specification/examples/assessments.md)
 - **Review a real STIG:** [current six-STIG review](review/current/README.md) · [short review guide](review/current/REVIEW-GUIDE.md)
