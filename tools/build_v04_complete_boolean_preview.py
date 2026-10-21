@@ -53,6 +53,52 @@ def candidate_schema(root):
     return root,doc
 
 
+def validate_candidate_evaluate(a):
+    """Independent strict new-operator reference closure, without old scanner."""
+    e=a.get("evaluate")
+    tests=a.get("tests") or {}
+    dependencies=a.get("dependencies") or {}
+    count=0
+    def scan(node,location):
+        nonlocal count
+        if not isinstance(node,dict) or not node:
+            raise ValueError("Invalid candidate expression at "+location)
+        keys=set(node)
+        if keys=={"test"}:
+            if node["test"] not in tests:
+                raise ValueError("Unresolved Test in candidate new AND/OR: "+str(node["test"]))
+            count+=1
+            return
+        if keys=={"assessment"}:
+            if node["assessment"] not in dependencies:
+                raise ValueError("Unresolved Assessment dependency in candidate")
+            count+=1
+            return
+        if keys=={"not_applicable"}:
+            v=node["not_applicable"]
+            if not isinstance(v,dict) or not isinstance(v.get("reason"),str):
+                raise ValueError("Invalid not_applicable reason")
+            return
+        if keys=={"not"}:
+            scan(node["not"],location+".not")
+            return
+        if keys=={"if","then","else"}:
+            for k in ("if","then","else"):
+                scan(node[k],location+"."+k)
+            return
+        if len(keys)==1 and next(iter(keys)) in ("and","or","one","xor"):
+            op=next(iter(keys))
+            values=node[op]
+            if not isinstance(values,list) or not values:
+                raise ValueError("Empty Boolean operand in candidate "+location)
+            for i,value in enumerate(values):
+                scan(value,location+"."+op+"["+str(i)+"]")
+            return
+        raise ValueError("Mixed, unknown or legacy evaluate operator "+str(keys))
+    scan(e,"evaluate")
+    return count
+
+
 def build(source_json,source_yaml,destination):
     destination.mkdir(parents=True,exist_ok=True)
     originals={}
@@ -103,13 +149,28 @@ def build(source_json,source_yaml,destination):
                           validators)
         (destination/"expression.candidate-only.schema.json").write_text(
             json.dumps(schema,indent=2)+"\n")
-    # The maintained compiler validates exact full source graph, YAML/JSON
-    # and 2,958 links. Candidate schema was checked separately.
-    _,rep=compile_pair(generated["json"],generated["yaml"],validate_schema=False)
+    # Candidate AND/OR Test expression reference closure is checked under
+    # the NEW grammar directly. The frozen graph scanner still expects the
+    # OLD all/any tokens; it must not be misrepresented as accepting the
+    # new grammar. The exact inverse has already verified every Test
+    # expression against the original first-pass source.
+    ref_counts={}
+    for kind in ("json","yaml"):
+        ref_counts[kind]=sum(
+            validate_candidate_evaluate(node["data"]["assessment"])
+            for node in results[kind].values()
+            if isinstance(node["data"].get("assessment"),dict)
+            and node["data"]["assessment"].get("mode")=="automated")
+    if ref_counts["json"]!=ref_counts["yaml"] or not ref_counts["json"]:
+        raise ValueError("New-grammar candidate Test references diverge by format")
+    # Run the maintained v0.4 source graph compiler against the source
+    # authoring we can EXACTLY reconstruct, not the as-yet-unaccepted
+    # new-wire-grammar. Both old input source formats passed active schema.
+    _,rep=compile_pair(source_json,source_yaml,validate_schema=True)
     if (rep.get("source_reconstruction")!="PASS" or
         rep.get("yaml_json_byte_parity")!="PASS" or
         rep.get("documents")!=4001):
-        raise ValueError("Complete candidate failed maintained typed IR reconstruction")
+        raise ValueError("Exact-inverse source failed maintained typed IR compiler")
     status={
         "status":"FULL_SIX_STIG_AND_OR_XOR_REVIEW_CANDIDATE_NOT_ACCEPTED_SCHEMA",
         "changes_per_format":dict(changes),
@@ -125,7 +186,9 @@ def build(source_json,source_yaml,destination):
         "published_040_schema_changed":False,
         "source_assessment_field_requirements_changed":False,
         "source_item_cardinality_changed":False,
-        "maintained_compiler_ir":rep,
+        "maintained_compiler_source_view_ir":rep,
+        "candidate_new_grammar_test_references":ref_counts,
+        "candidate_executable_compiler_support":"OPEN_NEW_AND_OR_GRAMMAR",
         "scanner_equivalence_proven":False,
         "release_published":False
     }
