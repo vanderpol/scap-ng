@@ -6,6 +6,7 @@ on:
       - 'tools/migrate_v04_states_match_to_logic.py'
       - 'tools/test_migrate_v04_states_match_to_logic.py'
       - 'tools/audit_v04_original_state_or_proof.py'
+      - 'tools/build_v04_and_or_candidate.py'
       - '.github/workflows/v04-state-alternatives-and-or.yml'
   workflow_dispatch:
 permissions:
@@ -94,6 +95,27 @@ jobs:
           assert ledger['affected_tests']==123
           assert ledger['counts']=={'all':30,'any':93},ledger['counts']
           assert ledger['fields_naming_unchanged'] is True
+          PY
+      - name: Generate complete JSON/YAML candidate and validate all 4,001 files and typed reference graph
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/build_v04_and_or_candidate.py \
+            --canonical-json-zip work/source/scap-ng-0.4.0-six-stigs.json.zip \
+            --canonical-yaml-zip work/source/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --output-dir work/normalized
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          obj=json.loads(Path('work/normalized/and-or-candidate-manifest.json').read_text())
+          assert obj['documents']==4001,obj['documents']
+          assert obj['changes_per_format']=={'json':123,'yaml':123}
+          rep=obj['compiled_ir_checks']
+          assert rep['source_reconstruction']=='PASS'
+          assert rep['yaml_json_byte_parity']=='PASS'
+          assert rep['native_source_schema']=='PASS'
+          assert rep['documents']==4001
+          print('PASS: full canonical six-STIG 0.4 authored graph and both source formats')
           PY
       - name: Publish diff ledger and changed-only preview, NOT a promoted release
         if: always()
