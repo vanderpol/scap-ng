@@ -16,8 +16,8 @@ def native():
             "test_title":"Report true if bluetooth installed",
             "capability":"independent.shellcommand",
             "object":{"object_title":"Run command: Bluetooth",
-                "collect":{"shell":"powershell","command":"(Get-PnpDevice -class bluetooth -status OK).class",
-                           "error_if_exit_status_not_0":False,"error_if_stderr_exists":False},
+                "shell":"powershell","command":"(Get-PnpDevice -class bluetooth -status OK).class",
+                "error_if_exit_status_not_0":False,"error_if_stderr_exists":False,
                 "filters":[{"include":{"stdout_line":{
                     "require":"at_least_one_exists_and_all_match",
                     "case_insensitive_equals":"Bluetooth"}}}]},
@@ -47,7 +47,8 @@ class PilotExporterTests(unittest.TestCase):
         for mutant in (
             lambda d:d["assessment"]["tests"]["bluetooth-test"]["object"]["filters"][0].update(exclude=d["assessment"]["tests"]["bluetooth-test"]["object"]["filters"][0].pop("include")),
             lambda d:d["assessment"]["tests"]["bluetooth-test"]["object"].update(set={"operator":"union","operands":[]}),
-            lambda d:d["assessment"]["tests"]["bluetooth-test"]["object"]["collect"].update(error_if_stderr_exists=True),
+            lambda d:d["assessment"]["tests"]["bluetooth-test"]["object"].update(collect={"shell":"powershell"}),
+            lambda d:d["assessment"]["tests"]["bluetooth-test"]["object"].update(error_if_stderr_exists=True),
             lambda d:d["assessment"]["tests"]["bluetooth-test"].update(require={"items":"exactly_one"}),
             lambda d:d["assessment"]["tests"]["bluetooth-test"].update(test_title=""),
             lambda d:d["assessment"].update(evaluate={"all":[{"test":"bluetooth-test"}]}),
