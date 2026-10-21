@@ -6,6 +6,8 @@ A **Test** states what information to collect using `capability` and `object`, t
 
 ## 1. A simple automated Test
 
+**0.4.0 flat-Object grammar update (2026-10-21):** Native selectors and acquisition parameters live directly in `object`, without generic `select` or `collect` wrappers. Short complete comparisons may use one-line flow mappings; longer or complex Objects may be multiline. The published October 20 six-STIG authoring ZIP predates this decision; review the newer source-invertible six-STIG candidate separately until the full native schema/CI promotion is accepted.
+
 This small **syntax illustration** is deliberately shortened. It is *not a verbatim STIG Assessment*. For source-backed rule logic, use the full, version-pinned files in the release ZIP.
 
 ```yaml
@@ -13,10 +15,7 @@ tests:
   home-mount-requires-nosuid-test:
     test_title: The /home mount must use nosuid
     capability: linux.partition
-    object:
-      select:
-        mount_point:
-          equals: /home
+    object: {mount_point: {equals: /home}}
     require:
       items: one_or_more
       all_items_must:
