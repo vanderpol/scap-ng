@@ -31,6 +31,8 @@ def migrate_test(test):
     previous=out.get("state_fields_require")
     req=out.get("require")
     if (not isinstance(previous,str) or not isinstance(req,dict)
+        or set(req)!={"items","all_items_must"}
+        or req.get("items") not in ("one_or_more","may_be_absent")
         or len(req.get("all_items_must",[]))!=1):
         return out,None
     cond=req["all_items_must"][0]
@@ -44,6 +46,10 @@ def migrate_test(test):
     if (not isinstance(children,list) or len(children)<2
         or any(not isinstance(c,dict) or set(c)!={"fields"} or
                not isinstance(c["fields"],dict) or len(c["fields"])<2
+               or any(not isinstance(name,str) or not name
+                      or not isinstance(field,dict) or not field
+                      or "record" in field
+                      for name,field in c["fields"].items())
                for c in children)):
         return out,None
     # A group-level requirement has exactly the same inherited scope as
