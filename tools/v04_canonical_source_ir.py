@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 from hashlib import sha256
+from functools import lru_cache
 import json
 from pathlib import Path
 
@@ -180,7 +181,57 @@ def _schema_validators(schema_dir):
     }
 
 
+@lru_cache(maxsize=1)
+def _supported_capabilities():
+    """Accept only the version-pinned 0.4 native capability vocabulary.
+
+    This is a closed catalog identity check, not a claim that the scanner
+    implements a collector or that generated per-capability semantics passed.
+    """
+    root = Path(__file__).resolve().parents[1] / (
+        "schema/v0.4.0/capability-mappings/supported")
+    paths = sorted(root.glob("*.json"))
+    if len(paths) != 100:
+        raise ValueError("native 0.4 capability mapping census changed")
+    caps = set()
+    for path in paths:
+        mapping = json.loads(path.read_text(encoding="utf-8"))
+        cap = mapping.get("capability")
+        if (not isinstance(cap, str) or cap != path.stem or
+                mapping.get("specification_version") != "0.4.0" or
+                cap in caps):
+            raise ValueError(f"invalid or duplicated native 0.4 capability mapping: {path}")
+        caps.add(cap)
+    return frozenset(caps)
+
+
+def _validate_capability_identities(documents):
+    """Reject unknown Test and named Object capabilities before packaging."""
+    supported = _supported_capabilities()
+    for path, doc in sorted(documents.items()):
+        assessment = doc.get("assessment")
+        if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
+            continue
+        for section in ("tests", "objects", "shared_objects"):
+            entries = assessment.get(section) or {}
+            if not isinstance(entries, dict):
+                raise ValueError(f"{path}: invalid {section} declarations")
+            for ident, node in entries.items():
+                if not isinstance(node, dict):
+                    continue  # Native structural schema reports this defect.
+                cap = node.get("capability")
+                if section == "tests" or cap is not None:
+                    if cap not in supported:
+                        raise ValueError(
+                            f"{path}: unknown native 0.4 capability {cap!r} "
+                            f"in {section}.{ident}")
+
+
 def validate_docs(documents, validators):
+    # Generic Assessment Schema cannot select a generated capability contract
+    # from a string token. The native compiler must not silently accept Test
+    # capabilities that have no reviewed version-local mapping.
+    _validate_capability_identities(documents)
     for path, doc in sorted(documents.items()):
         kind = next(iter(doc))
         failures = list(validators[kind].iter_errors(doc))
