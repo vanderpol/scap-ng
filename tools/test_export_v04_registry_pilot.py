@@ -16,9 +16,9 @@ def fixture():
             "test_title":"Bluetooth radio must be turned off.",
             "capability":"windows.registry",
             "object":{"object_title":"Verify the Bluetooth radio is turned off",
-                      "select":{"hive":{"equals":"local_machine"},
-                                "key":{"equals":"SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Connectivity"},
-                                "name":{"equals":"AllowBluetooth"}}},
+                      "hive":{"equals":"local_machine"},
+                      "key":{"equals":"SOFTWARE\\Microsoft\\PolicyManager\\current\\device\\Connectivity"},
+                      "name":{"equals":"AllowBluetooth"}},
             "states":[{"value":{"require":"at_least_one_exists_and_all_match",
                                 "equals":"0"}}],
             "reported_elements":"all",
@@ -42,8 +42,9 @@ class RegistryPilotTests(unittest.TestCase):
 
     def test_data_loss_and_ambiguous_registry_sources_are_rejected(self):
         for change in (
-            lambda a:a["assessment"]["tests"]["bluetooth-registry-test"]["object"]["select"]["hive"].update(equals="current_user"),
+            lambda a:a["assessment"]["tests"]["bluetooth-registry-test"]["object"]["hive"].update(equals="current_user"),
             lambda a:a["assessment"]["tests"]["bluetooth-registry-test"]["object"].update(set={"operator":"union","operands":[]}),
+            lambda a:a["assessment"]["tests"]["bluetooth-registry-test"]["object"].update(select={"hive":{"equals":"local_machine"}}),
             lambda a:a["assessment"]["tests"]["bluetooth-registry-test"]["states"].append(
                 deepcopy(a["assessment"]["tests"]["bluetooth-registry-test"]["states"][0])),
             lambda a:a["assessment"]["tests"]["bluetooth-registry-test"].update(require="may_be_absent"),
