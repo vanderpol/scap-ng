@@ -44,7 +44,7 @@ class ConditionNamingTests(unittest.TestCase):
         for mutate in (
             lambda t:t["require"]["all_items_must"][0]["or"][0]["fields"]["value"].update(equals="Education"),
             lambda t:t["require"]["all_items_must"][0].update(require="none_exist"),
-            lambda t:t["require"]["all_items_must"][0].update(and=t["require"]["all_items_must"][0].pop("or")),
+            lambda t:t["require"]["all_items_must"][0].update({"and":t["require"]["all_items_must"][0].pop("or")}),
             lambda t:t["require"].update(items="may_be_absent"),
         ):
             corrupt=deepcopy(new)
