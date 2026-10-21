@@ -5,6 +5,7 @@ on:
     paths:
       - 'tools/migrate_v04_states_match_to_logic.py'
       - 'tools/test_migrate_v04_states_match_to_logic.py'
+      - 'tools/audit_v04_original_state_or_proof.py'
       - '.github/workflows/v04-state-alternatives-and-or.yml'
   workflow_dispatch:
 permissions:
@@ -46,6 +47,26 @@ jobs:
           assert manifest['counts']['source_linked_additional_direct_filters']==19
           print('Pinned actual 0.4.0 six-STIG source verified',manifest['output_sha256'])
           PY
+      - name: Check Win11 Enterprise original OVAL whole-State OR proof
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/oval
+          curl --fail --silent --show-error --location --retry 3 \
+            https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip \
+            --output work/oval/windows11-stig-original.zip
+          python - <<'PY'
+          import zipfile
+          from pathlib import Path
+          archive=Path('work/source/scap-ng-0.4.0-six-stigs.json.zip')
+          name='authoring/ms_windows_11/assessments/automated/SV-253254.automated.json'
+          with zipfile.ZipFile(archive) as z:
+              Path('work/oval/original-sv253254-v04.json').write_bytes(z.read(name))
+          PY
+          python tools/audit_v04_original_state_or_proof.py \
+            --original-win11-zip work/oval/windows11-stig-original.zip \
+            --native-assessment work/oval/original-sv253254-v04.json \
+            --report work/normalized/original-oval-win11-sv253254-state-or.json
       - name: Preview exact inverse for every structured OR/AND Test
         env:
           PYTHONPATH: tools
