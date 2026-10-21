@@ -7,6 +7,8 @@ on:
       - 'tools/test_validate_v04_fields_condition_preview.py'
       - 'tools/build_v04_and_or_fields_candidate.py'
       - 'tools/test_build_v04_and_or_fields_candidate.py'
+      - 'tools/hoist_v04_inherited_fields_requirement_preview.py'
+      - 'tools/test_hoist_v04_inherited_fields_requirement_preview.py'
       - '.github/workflows/v04-fields-condition-preview.yml'
   workflow_dispatch:
 permissions:
@@ -57,10 +59,41 @@ jobs:
             --json-zip work/fields/and-or-fields-preview.json.zip \
             --yaml-zip work/fields/and-or-fields-preview.yaml.zip \
             --report work/fields/fields-group-schema-and-inheritance-proof.json
+      - name: Prove lossless hoist of 44 inherited fields into 16 shared requirements
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_hoist_v04_inherited_fields_requirement_preview.py -v
+          python tools/hoist_v04_inherited_fields_requirement_preview.py \
+            --source-json work/fields/and-or-fields-preview.json.zip \
+            --candidate-json work/fields/hoisted-fields-0.4.json.zip \
+            --candidate-yaml work/fields/hoisted-fields-0.4.yaml.zip \
+            --proof work/fields/hoisted-requirements-source-inverse.json
+          python tools/validate_v04_fields_condition_preview.py \
+            --json-zip work/fields/hoisted-fields-0.4.json.zip \
+            --yaml-zip work/fields/hoisted-fields-0.4.yaml.zip \
+            --report work/fields/hoisted-fields-proposed-schema-proof.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("work/fields")
+          a=json.loads((p/"hoisted-requirements-source-inverse.json").read_text())
+          b=json.loads((p/"hoisted-fields-proposed-schema-proof.json").read_text())
+          assert a["counts"]=={"documents":4001,"affected_documents":15,
+                                "tests":16,"fields_children":44},a["counts"]
+          assert b["new_condition_scopes"]=={"groups":231,"local":184,
+                                                 "inherited":44,"each_field":3}
+          assert b["status"]=="PROPOSED_FIELDS_SCOPE_SCHEMA_AND_SOURCE_IR_PASS_NOT_NORMATIVE"
+          assert not a["schema_promoted"] and not a["scanner_semantics_proven"]
+          print("PASS: all 44 inherited groups explicitly scoped by 16 shared AND/OR parent requirements")
+          PY
       - name: Preserve reviewer-only condition naming evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v04-fields-condition-schema-preview
-          path: work/fields/fields-group-schema-and-inheritance-proof.json
+          path: |
+            work/fields/fields-group-schema-and-inheritance-proof.json
+            work/fields/hoisted-requirements-source-inverse.json
+            work/fields/hoisted-fields-proposed-schema-proof.json
           if-no-files-found: ignore
