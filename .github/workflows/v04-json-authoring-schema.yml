@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   json-candidate:
-    name: Validate direct JSON 0.4 candidate source
+    name: Audit immutable r3 JSON source and references (not current 0.4 schema)
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -39,11 +39,12 @@ jobs:
           mkdir -p work
           gh release download v0.4.0-joval-meeting-preview-20261015-r3 \
             --pattern scap-ng-v0.4-joval-six-stig-json.zip --dir work
-      - name: Check negative references and validate 872 unique native JSON Assessments
+      - name: Validate pinned historical r3 source closure (native schema checked after migration)
         env:
           PYTHONPATH: tools
         run: |
           python tools/test_v04_json_authoring_readiness.py \
+            --archived-source-only \
             --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip \
             --report work/json-source-schema-report.json
       - uses: actions/upload-artifact@v4
