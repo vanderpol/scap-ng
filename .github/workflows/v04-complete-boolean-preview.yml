@@ -1,0 +1,77 @@
+name: 0.4.0 complete AND-OR-XOR authoring candidate proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/migrate_v04_evaluate_and_or.py'
+      - 'tools/test_migrate_v04_evaluate_and_or.py'
+      - 'tools/build_v04_complete_boolean_preview.py'
+      - '.github/workflows/v04-complete-boolean-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  full-boolean-scope-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install jsonschema==4.25.1 PyYAML==6.0.3
+      - name: Prove Test-result AND/OR conversion does not touch State or Item matching
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_migrate_v04_evaluate_and_or.py -v
+      - name: Retrieve prior source-verified 123-State AND/OR candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/source work/preview
+          gh run download 39586631570 --repo "$GH_REPO" \
+            --name 0.4-and-or-state-alternatives-reversible-preview \
+            --dir work/source
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          man=json.loads((Path('work/source')/'and-or-candidate-manifest.json').read_text())
+          assert man['documents']==4001
+          assert man['changes_per_format']=={'json':123,'yaml':123}
+          assert man['oval_source_inv_verdict']=='PASS_ALL_CHANGED_TESTS'
+          assert man['native_040_schema_check']=='PASS_ALL_4001_EACH_FORMAT'
+          print('PASS: first 123 source-bound OR/AND rewrites are proven')
+          PY
+      - name: Construct complete Boolean spelling candidate with isolated strict schema
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/build_v04_complete_boolean_preview.py \
+            --first-pass-json work/source/scap-ng-0.4.0-six-stigs.and-or.json.zip \
+            --first-pass-yaml work/source/scap-ng-0.4.0-six-stigs.and-or.yaml.zip \
+            --out-dir work/preview
+      - name: Assert full six-STIG Test-result operator and Item boundary census
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('work/preview/complete-boolean-preview-manifest.json').read_text())
+          assert p['documents']==4001
+          assert p['original_evaluate_operators_replaced']==346
+          assert p['source_first_pass_state_rewrites']==123
+          assert p['changes_per_format']=={'json':346,'yaml':346}
+          assert p['candidate_expression_schema']=='STRICT_NEW_SPELLINGS_ONLY_PASS'
+          assert p['published_040_schema_changed'] is False
+          assert p['maintained_compiler_ir']['source_reconstruction']=='PASS'
+          assert p['maintained_compiler_ir']['yaml_json_byte_parity']=='PASS'
+          print('PASS: all 4001 sources strictly validated in candidate schema, exact inverse and compiler')
+          PY
+      - name: Preserve non-release preview and machine-readable source inverses
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-complete-logical-and-or-xor-review-candidate
+          path: work/preview/
+          if-no-files-found: ignore
