@@ -5,6 +5,7 @@ Research candidate syntax only. This does not compile a signed .scapng bundle,
 execute Assessments, or ratify the scoped requirement syntax.
 """
 from collections import Counter
+from hashlib import sha256
 from pathlib import Path
 import argparse
 import json
@@ -23,6 +24,8 @@ EXPECTED_NATIVE_TEST_NODES = 1375
 EXPECTED_RULES = 1567
 EXPECTED_ASSESSMENT_IDS = 2422
 EXPECTED_RULE_CHOICE_LINKS = 2958
+# Archived October 15 preview: NOT current normative flat-Object 0.4 syntax.
+PINNED_HISTORICAL_R3_JSON_SHA256 = "a1837c03133021f4d13814516a91b372f83b03771519f8361398ff1663056fea"
 
 
 def documents_from_json_archive(archive_path):
@@ -97,6 +100,24 @@ def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
     return dict(total)
 
 
+def audit_pinned_historical_source(archive_path):
+    """Only the exact pinned historical source graph; not 0.4 schema parity."""
+    raw_digest = sha256(Path(archive_path).read_bytes()).hexdigest()
+    if raw_digest != PINNED_HISTORICAL_R3_JSON_SHA256:
+        raise ValueError("historical r3 archive SHA-256 mismatch")
+    stats = audit_json_authoring(
+        documents_from_json_archive(archive_path),
+        validate_native=False, pinned_r3=True,
+    )
+    return {
+        "status": "PINNED_RESEARCH_SOURCE_GRAPH_VALID_NOT_NATIVE_SCHEMA",
+        "scope": "pinned r3 original JSON source and reference closure only; validate converted canonical 0.4 output separately",
+        "original_source_sha256": raw_digest,
+        "native_040_schema": "NOT_TESTED_HISTORICAL_SOURCE",
+        "counts": stats,
+    }
+
+
 class JsonOnlyPositiveNegativeTests(unittest.TestCase):
     def basic_docs(self):
         return {
@@ -129,6 +150,15 @@ class JsonOnlyPositiveNegativeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"not JSON"):
             audit_json_authoring(docs,validate_native=False,pinned_r3=False)
 
+    def test_unpinned_historical_source_cannot_skip_native_validation(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as folder:
+            source = Path(folder) / "r3-json.zip"
+            with zipfile.ZipFile(source, "w") as archive:
+                archive.writestr("authoring/fake.json", '{"assessment":{"id":"fake"}}')
+            with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+                audit_pinned_historical_source(source)
+
     def test_invalid_document_root_fails(self):
         docs=self.basic_docs()
         docs["authoring/r.json"]={"unknown":{"id":"r"}}
@@ -140,18 +170,25 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json-archive",type=Path)
     parser.add_argument("--report",type=Path)
+    parser.add_argument("--archived-source-only", action="store_true",
+                        help="Only exact SHA-pinned October 15 r3 source; native 0.4 schema is a separate converted-output gate")
     args=parser.parse_args()
     suite=unittest.defaultTestLoader.loadTestsFromTestCase(JsonOnlyPositiveNegativeTests)
     if not unittest.TextTestRunner(verbosity=2).run(suite).wasSuccessful():
         raise SystemExit(1)
+    if args.archived_source_only and not args.json_archive:
+        parser.error("--archived-source-only requires --json-archive")
     if args.json_archive:
-        stats=audit_json_authoring(documents_from_json_archive(args.json_archive))
-        report={"status":"PASS","source":"JSON authoring ZIP only",
-                "scope":"Candidate+native Assessment schema and static references; NOT JSON compilation or scanner result",
-                "counts":stats}
+        if args.archived_source_only:
+            report = audit_pinned_historical_source(args.json_archive)
+        else:
+            stats=audit_json_authoring(documents_from_json_archive(args.json_archive))
+            report={"status":"PASS","source":"JSON authoring ZIP only",
+                    "scope":"Candidate+native Assessment schema and static references; NOT JSON compilation or scanner result",
+                    "counts":stats}
         print(json.dumps(report,sort_keys=True,indent=2))
         if args.report:
-            args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
+            args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\\n",encoding="utf-8")
 
 
 if __name__=="__main__":
