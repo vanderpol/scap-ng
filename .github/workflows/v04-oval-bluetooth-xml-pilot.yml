@@ -129,13 +129,13 @@ jobs:
               flat,proof=flatten_document(prior,catalog)
               assert proof['edits'] and restore_document(flat,proof)==prior,name
               (root/(name+'-native-v04.flat.json')).write_text(
-                  json.dumps(flat,indent=2)+'\\n')
+                  json.dumps(flat,indent=2))
               (root/(name+'-native-v04.flat-proof.json')).write_text(
-                  json.dumps(proof,indent=2)+'\\n')
+                  json.dumps(proof,indent=2))
           print("PASS: all four source-pinned OVAL Tests mapped to flat Objects")
           PY
           python tools/export_v04_oval_shellcommand_pilot.py \
-            --native work/compare/bluetooth-native-v04.json \
+            --native work/compare/bluetooth-native-v04.flat.json \
             --output work/compare/exported-oval.xml \
             --definition-id-output work/compare/exported-def-id.txt
           python tools/extract_v04_win11_bluetooth_oval.py \
@@ -143,12 +143,12 @@ jobs:
             --output work/compare/camera-source-oval.xml \
             --proof work/compare/camera-source-proof.json
           python tools/export_v04_oval_shellcommand_pilot.py \
-            --native work/compare/camera-native-v04.json \
+            --native work/compare/camera-native-v04.flat.json \
             --output work/compare/camera-exported-oval.xml \
             --definition-id-output work/compare/camera-exported-def-id.txt
           for rule in SV-253291 SV-253350; do
             python tools/export_v04_oval_registry_pilot.py \
-              --native "work/compare/$rule-native-v04.json" \
+              --native "work/compare/$rule-native-v04.flat.json" \
               --output "work/compare/$rule-exported-oval.xml" \
               --definition-id-output "work/compare/$rule-exported-def-id.txt"
           done
