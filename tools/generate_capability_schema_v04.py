@@ -17,6 +17,8 @@ import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+from flatten_v04_object_schema import flatten_schema
+
 from generate_capability_schema import (
     generate as generate_v03, direct_global, immediate_payload_elements,
     source_datatypes,
@@ -237,6 +239,11 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         obj.setdefault("allOf",[]).append({
             "not":{"required":["set","filters"]}
         })
+        # Approved 0.4 canonical Object shape: capabilities supply flat
+        # selector and acquisition keys without generic select/collect
+        # containers. Preserve native validation and Set/Filter constraints.
+        defs["object"] = flatten_schema(
+            obj, mapping["native"], capability=mapping["capability"])
 
     state_fields, records = _generated_state_fields(mapping,repo_root)
     entries = []
