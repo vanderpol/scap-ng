@@ -119,8 +119,9 @@ def convert(source_xml,source_definition_id,*,assessment_id=None):
              and flt.get("action")=="include",
              "unsupported direct original OVAL Filter action")
         st=find_id(root,plain(flt).strip())
-        need(st.tag==q(IND,"shellcommand_state") and st.get("version")==str(version),
-             "original Filter State capability/version mismatch")
+        need(st.tag==q(IND,"shellcommand_state") and st.get("version")==str(version)
+             and set(st.attrib) <= {"id","version","comment"},
+             "original Filter State capability/version/attributes mismatch")
         statefield=only(st,"stdout_line")
         need(statefield.tag==q(IND,"stdout_line")
              and set(statefield.attrib) <= {"operation","datatype"}
@@ -149,8 +150,9 @@ def convert(source_xml,source_definition_id,*,assessment_id=None):
         need(hive=="HKEY_LOCAL_MACHINE" and bool(key and name),
              "unexpected original registry hive/key/name")
         st=find_id(root,refs[1].get("state_ref"))
-        need(st.tag==q(WIN,"registry_state") and st.get("version")==str(version),
-             "original registry State capability/version differs")
+        need(st.tag==q(WIN,"registry_state") and st.get("version")==str(version)
+             and set(st.attrib) <= {"id","version","comment"},
+             "original registry State capability/version/attributes differ")
         statefield=only(st,"value")
         need(statefield.tag==q(WIN,"value")
              and set(statefield.attrib) <= {"operation","datatype"}
