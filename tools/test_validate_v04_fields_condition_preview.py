@@ -213,5 +213,43 @@ class ProposedFieldsScopeTests(unittest.TestCase):
                                                "value":{"equals":0}}}]})))
 
 
+    def test_field_requirement_schema_descriptions_state_all_fields_and_override_precedence(self):
+        # Schema title/description content is used by both validators and the
+        # future schema-driven editor. Enforce the inherited-scope contract.
+        with TemporaryDirectory() as td:
+            proposal=candidate_schema(Path(td)/"v0.4.0")
+            d=json.loads((proposal/"assessment-language.schema.json").read_text())
+            defs=d["$defs"]
+            for kind in ("all_items_requirement","scoped_all_items_requirement"):
+                docs=defs[kind]["properties"]["field_requirement"]["description"]
+                self.assertIn("ALL field predicates",docs)
+                self.assertIn("unless",docs)
+                self.assertIn("closest explicit declaration wins",docs.lower())
+                self.assertIn("require.items",docs)
+            leaf=defs["inherited_field_predicate"]["properties"][
+                "field_requirement"]["description"]
+            self.assertIn("individual observed field only",leaf)
+            self.assertIn("sibling fields",leaf)
+            for kind in ("state_entry","scoped_state_entry"):
+                entries=defs[kind]["oneOf"]
+                fields_branch=next(b for b in entries if
+                                   b.get("required")==["fields"])
+                local=fields_branch["properties"]["field_requirement"]["description"]
+                self.assertIn("ALL fields",local)
+                self.assertIn("unless an individual field",local)
+                self.assertIn("Sibling conditions are unaffected",local)
+                self.assertIn("nearest explicit field_requirement",
+                              fields_branch["properties"]["fields"]["description"])
+                for op in ("and","or"):
+                    groups=[b for b in entries if b.get("required")==[op]]
+                    self.assertTrue(groups)
+                    for group in groups:
+                        group_desc=group["properties"]["field_requirement"][
+                            "description"]
+                        self.assertIn("ALL fields",group_desc)
+                        self.assertIn("nearer field_requirement",group_desc)
+                        self.assertIn("AND/OR logic",group_desc)
+
+
 if __name__=="__main__":
     unittest.main()
