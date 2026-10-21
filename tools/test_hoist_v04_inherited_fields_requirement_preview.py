@@ -79,6 +79,16 @@ class GroupHoistTests(unittest.TestCase):
             else:
                 self.assertEqual(candidate,src)
 
+    def test_source_legacy_states_or_other_matching_operator_are_not_hoisted(self):
+        for extra in ({"states":[{"value":{"equals":"legacy"}}]},
+                      {"states_match":"any"}):
+            source=fixture()
+            source.update(extra)
+            with self.subTest(extra=extra):
+                new,ledger=migrate_test(source)
+                self.assertEqual(new,source)
+                self.assertIsNone(ledger)
+
     def test_document_exact_inverse_and_identity(self):
         doc={"assessment":{"id":"example","mode":"automated",
                            "tests":{"enterprise-edition-test":fixture()},
