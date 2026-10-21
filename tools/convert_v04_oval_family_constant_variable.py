@@ -93,7 +93,7 @@ def convert(path):
            "OVAL source ID closure")
     assessment={
         "id":"oval-family-constant-variable-assessment",
-        "version":int(defn["version"]),
+        "version":int(defn.get("version")),
         "assessment_title":title,
         "mode":"automated",
         "class":"miscellaneous",
