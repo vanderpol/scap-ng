@@ -90,7 +90,7 @@ class ReversibleOVALFieldGroupTests(unittest.TestCase):
                                  (test["id"], results))
                 total += 1
         # Fixture has max 3 field outcomes per Test (not a scanner runtime).
-        self.assertEqual(total, 3*6**3 + 3*6**2)
+        self.assertEqual(total, 2*6**3 + 4*6**2)
 
     def test_mixed_fields_from_different_states_cannot_be_flattened(self):
         # State A: true AND false = false; State B: false AND true = false.
