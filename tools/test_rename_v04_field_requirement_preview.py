@@ -92,17 +92,18 @@ class ReversibleFieldRequirementTests(unittest.TestCase):
     def test_mutation_to_logic_field_value_or_requirement_breaks_inverse(self):
         source = source_fixture()
         output, proof = migrate_test(source)
+        def replace_or_with_and(test):
+            clause = test["require"]["all_items_must"][0]
+            clause["and"] = clause.pop("or")
+
         mutations = [
-            lambda t: t["require"]["all_items_must"][0].update(
-                and_=t["require"]["all_items_must"][0].pop("or")),
+            replace_or_with_and,
             lambda t: t["require"]["all_items_must"][0]["or"][0][
                 "fields"]["value"].update(equals="wrong"),
-            lambda t: t["require"]["field_requirement"].__class__ == str
-                      and t["require"].update(field_requirement="none_exist"),
+            lambda t: t["require"].update(field_requirement="none_exist"),
             lambda t: t["require"]["all_items_must"][0]["or"][1].update(
                 field_requirement="none_exist"),
-            lambda t: t["require"]["items"].__class__ == str
-                      and t["require"].update(items="may_be_absent"),
+            lambda t: t["require"].update(items="may_be_absent"),
         ]
         for change in mutations:
             tampered = deepcopy(output)
