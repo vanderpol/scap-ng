@@ -29,8 +29,11 @@ def compare(original_xml,converted):
     objects=a.get("objects")
     if not isinstance(objects,dict):raise ValueError("missing converted source Object table")
     original=root.findall(".//{"+NS+"}registry_object")
-    if len(original)!=2:
-        raise ValueError("expected exactly two original registry path discovery Objects")
+    # Two file-path sources plus the DSA Working Directory source: the
+    # pinned original XML contains three distinct registry collections.
+    # Preserve the complete source set rather than silently ignoring one.
+    if len(original)!=3:
+        raise ValueError("expected exactly three original registry path discovery Objects")
     checked=[]
     for obj in original:
         comment=obj.get("comment")
