@@ -27,6 +27,7 @@ from export_v04_oval_registry_pilot import emit as registry_export
 from audit_v04_oval_xml_roundtrip import audit as audit_xml, FORMAT
 from validate_v04_oval_5123 import check as xsd
 from combine_v04_oval_xml_proofs import combine
+from v04_flat_object_authoring import load_catalog, flatten_document, restore_document
 
 DEFS={
     "bluetooth":{
@@ -54,6 +55,8 @@ def run(folder,schema_dir):
     payload=source.read_bytes()
     records=[]
     xsd_reports=[]
+    catalog=load_catalog(Path(__file__).resolve().parents[1] /
+                         "schema/v0.4.0/capability-mappings/supported")
     for name,config in DEFS.items():
         imported=convert(payload,config["definition"],
                          assessment_id="v04-oval-forward-"+name.lower()+".assessment")
@@ -64,9 +67,18 @@ def run(folder,schema_dir):
         canonical_report=compare_native(imported,canonical)
         if canonical_report["status"]!="TRUE_FRESH_OVAL_IMPORT_MATCHES_CANONICAL_040_TEST":
             raise ValueError("Fresh importer diverges from six-STIG candidate: "+name)
+        # The pinned source importer and previous six-STIG baseline are
+        # independently verified in their historical input representation.
+        # Only then apply the owner-approved 0.4 flat Object mapping. The
+        # independent OVAL exporter now REQUIRES that canonical flat Object.
+        flat,proof=flatten_document(imported,catalog)
+        if not proof["edits"] or restore_document(flat,proof)!=imported:
+            raise ValueError("Original XML native Object flattening not invertible: "+name)
         native_path=folder/(name+"-fresh-native-v04.json")
-        native_path.write_text(json.dumps(imported,indent=2)+"\n")
-        tree,exported_def=config["exporter"](imported)
+        native_path.write_text(json.dumps(flat,indent=2)+"\n")
+        (folder/(name+"-flat-object-source-inverse.json")).write_text(
+            json.dumps(proof,indent=2)+"\n")
+        tree,exported_def=config["exporter"](flat)
         xml_path=folder/(name+"-fresh-exported-oval.xml")
         tree.write(xml_path,encoding="utf-8",xml_declaration=True)
         schema_report=xsd(schema_dir,xml_path,config["platform"])
