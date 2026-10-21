@@ -188,7 +188,7 @@ def main():
                     "counts":stats}
         print(json.dumps(report,sort_keys=True,indent=2))
         if args.report:
-            args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\\n",encoding="utf-8")
+            args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n",encoding="utf-8")
 
 
 if __name__=="__main__":
