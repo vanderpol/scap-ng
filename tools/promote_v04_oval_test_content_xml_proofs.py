@@ -53,8 +53,8 @@ def upgrade(original, manifest, audit, base):
     for row in manifest["cases"]:
         case_id=row["case_id"]
         key=(case_id,row["source_definition"])
-        if key in seen or key not in original_records or
-                case_id not in outcomes:
+        if (key in seen or key not in original_records or
+                case_id not in outcomes):
             raise ValueError("Duplicate/unknown source Definition in XML comparison")
         seen.add(key)
         source=index[key]
