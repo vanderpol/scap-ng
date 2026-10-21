@@ -1,0 +1,32 @@
+name: 0.4.0 scoped field existence and match contract
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_scoped_field_require.py'
+      - 'tools/test_audit_v04_scoped_field_require.py'
+      - 'tools/test_v04_all_items_schema.py'
+      - '.github/workflows/v04-scoped-field-require.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  scoped-field-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install jsonschema==4.25.1 referencing==0.36.2
+      - name: Check current 0.4 schema accepts explicit inherited scope and rejects absent scope
+        run: python tools/test_v04_all_items_schema.py
+      - name: Expand State-field scope explicitly without modifying Test Item cardinality
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_scoped_field_require.py -v
+      - name: Do not claim scanner parity from structural scope tests
+        run: |
+          echo "0.4 scope inheritance expansion tests PASS (if preceding steps passed)."
+          echo "OVAL six-state runtime equivalence and broad Set/record capability checks remain open #248."
