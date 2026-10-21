@@ -50,11 +50,11 @@ def candidate_schema(path):
             "require":{"$ref":"#/$defs/paired_requirement",
                        "description":"Legacy local field cardinality spelling retained for pinned source preview."},
             "field_requirement":{"$ref":"#/$defs/paired_requirement",
-                       "description":"Preferred field existence/matching rule at this complete condition."},
+                       "description":"Field existence and matching requirement for ALL fields in this complete condition. Overrides the inherited Test or enclosing logical-group field_requirement for these fields only, unless an individual field explicitly declares its own field_requirement. Sibling conditions are unaffected."},
             "fields":{"type":"object","minProperties":2,
                       "propertyNames":{"type":"string","minLength":1},
                       "additionalProperties":{"$ref":"#/$defs/"+predicate},
-                      "description":"One complete expected condition, AND of ordinary field predicates."},
+                      "description":"One complete expected condition (OVAL State boundary): all listed fields are ANDed. Every field inherits the nearest explicit field_requirement from this condition, its enclosing logical group, or the Test; a field's own field_requirement overrides inheritance for that field alone."},
           },
           "additionalProperties":False,
           "not":{"required":["require","field_requirement"]},
@@ -73,7 +73,7 @@ def candidate_schema(path):
                 }
                 choice["properties"]["field_requirement"]={
                     "$ref":"#/$defs/paired_requirement",
-                    "description":"Explicit inherited requirement for all child expected-field conditions."
+                    "description":"Applies to ALL fields in every descendant complete condition under this logical group, unless a nested group, condition or individual field explicitly declares a nearer field_requirement. Does not change the AND/OR logic or the collected-Item requirement."
                 }
                 choice["not"]={"anyOf":[
                     {"required":["require","state_fields_require"]},
@@ -85,13 +85,19 @@ def candidate_schema(path):
     for name in ("all_items_requirement","scoped_all_items_requirement"):
         d["$defs"][name]["properties"]["field_requirement"]={
             "$ref":"#/$defs/paired_requirement",
-            "description":"Explicit inherited field cardinality, independent of items."
+            "description":"Default field existence and matching requirement for ALL field predicates governed by this Test, including fields within every nested complete condition. Each field inherits this value unless its enclosing logical group, its complete condition, or the field itself explicitly declares a nearer field_requirement. The closest explicit declaration wins; no default is implied when none is declared. Independent of require.items, which governs collected-Item existence."
         }
     leaf=d["$defs"]["inherited_field_predicate"]
-    leaf["properties"]["field_requirement"]={"$ref":"#/$defs/paired_requirement"}
+    leaf["properties"]["field_requirement"]={
+        "$ref":"#/$defs/paired_requirement",
+        "description":"Requirement for this individual observed field only. Overrides any inherited Test, logical-group or complete-condition field_requirement for this field; all sibling fields retain their own effective requirements."
+    }
     leaf.setdefault("allOf",[]).append({
         "not":{"required":["require","field_requirement"]}
     })
+    # The source's Test-wide requirement governs every descendant field by
+    # explicit inheritance, NOT merely the first AND/OR child or first Item.
+    # Individual fields and closer condition/group declarations can override.
     # The Test accepts only one of the two old/new Test-wide spellings.
     test=d["$defs"]["test"]
     test.setdefault("allOf",[]).append({
