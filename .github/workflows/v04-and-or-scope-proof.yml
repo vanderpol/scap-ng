@@ -1,0 +1,64 @@
+name: 0.4.0 logical AND-OR source scope proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/audit_v04_and_or_scope_projection.py'
+      - 'tools/test_audit_v04_and_or_scope_projection.py'
+      - 'tools/audit_v04_and_or_corpus.py'
+      - '.github/workflows/v04-and-or-scope-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  canonical-040-and-or-quantifiers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Adversarial independent AND-OR-State-Item-scope tests
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_audit_v04_and_or_scope_projection.py -v
+      - name: Retrieve source-pinned six-STIG canonical 0.4 authoring candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/canonical work/proof
+          gh run download 39503111241 --repo "$GH_REPO" \
+            --name scap-ng-040-six-stig-board-authoring \
+            --dir work/canonical
+      - name: Check original six-STIG archive source SHA and 4,001-document inventory
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          files=Path("work/canonical")
+          manifest=json.loads((files/"json-manifest.json").read_text())
+          doc=(files/"scap-ng-0.4.0-six-stigs.json.zip").read_bytes()
+          actual=hashlib.sha256(doc).hexdigest()
+          assert actual=="46bcb6cdf3a0d5c3eda06bbf827389eed2942afb477d65d97348f5b8aaa3a7d8"
+          assert manifest["output_sha256"]==actual
+          assert manifest["documents"]==4001
+          print("Original six-STIG SHA and 4001-document source pin confirmed")
+          PY
+      - name: Prove native 0.4 Test/evaluate logical scopes and exact inversion
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/audit_v04_and_or_corpus.py \
+            --canonical-zip work/canonical/scap-ng-0.4.0-six-stigs.json.zip \
+            --sha256 46bcb6cdf3a0d5c3eda06bbf827389eed2942afb477d65d97348f5b8aaa3a7d8 \
+            --report work/proof/v04-and-or-corpus-projection.json
+      - name: Preserve scope and inverse proof without publishing a replacement release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-and-or-original-operator-scope-proof
+          path: work/proof/
+          if-no-files-found: ignore
