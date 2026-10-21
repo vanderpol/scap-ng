@@ -157,8 +157,13 @@ def audit(base):
             counts["locally_derived_or_mixed_definitions"]==26 and
             counts["constant_only_missing_native_mapping_definitions"]==29 and
             counts["constant_only_supported_capability_definitions"]==13):
+        missing_caps=Counter(cap for row in records
+                             if row["migration_group"]=="constant_only"
+                             for cap in row["unsupported_current_040_capabilities"])
         raise ValueError("Source Variable graph corpus count changed: "+
-                         json.dumps(dict(sorted(counts.items())),sort_keys=True))
+                         json.dumps(dict(sorted(counts.items())),sort_keys=True)+
+                         "; absent native capabilities="+
+                         json.dumps(dict(sorted(missing_caps.items())),sort_keys=True))
     return {
         "status":"SOURCE_VARIABLE_GRAPHS_CLOSED_040_CONVERSION_NOT_PROVEN",
         "pinned_source_revision":PIN,"definitions":68,
