@@ -175,7 +175,7 @@ def hybridize(node, key=None):
         isinstance(v, FlowMap) for v in mapped.values())
     if comparator or simple_fields or simple_object:
         approx = len(json.dumps(mapped, ensure_ascii=False))
-        limit = 140 if simple_fields else 110 if simple_object else 90
+        limit = 140 if simple_fields else 180 if simple_object else 90
         if approx <= limit:
             return FlowMap(mapped)
     return mapped
