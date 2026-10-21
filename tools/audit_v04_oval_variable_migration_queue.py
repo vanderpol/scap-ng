@@ -19,8 +19,17 @@ def fingerprint(value):
                              separators=(",",":")).encode()).hexdigest()
 
 def references(value,path=()):
+    """Walk source Variable refs, including annotated typed/cardinality uses.
+
+    Native authored operands may carry `datatype` and `value_match`
+    beside `variable`. Those are still one Variable reference, not an
+    opaque mapping. Never interpret a non-string or unknown compound
+    structure as a Variable reference merely because it has that key.
+    """
     if isinstance(value,dict):
-        if set(value)=={"variable"} and type(value["variable"]) is str:
+        ref_fields={"variable","datatype","value_match"}
+        if (type(value.get("variable")) is str
+                and set(value)<=ref_fields):
             yield (path,value["variable"])
         else:
             for key,child in value.items():
