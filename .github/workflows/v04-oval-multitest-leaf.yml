@@ -1,0 +1,171 @@
+name: 0.4.0 original OVAL multi-Test flat-Object pilot
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-multitest-leaf.yml'
+      - 'tools/convert_v04_oval_multitest_leaf.py'
+      - 'tools/v04_flat_object_authoring.py'
+      - 'schema/v0.4.0/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-oval-to-native-040:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify pinned original source and dependencies
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = "e3538595c5083b9c34d937a81d319234df9bbfaa"
+          python -m pip install PyYAML==6.0.3 jsonschema==4.25.1
+      - name: Retrieve verified 167-Definition source compatibility evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p source-review
+          gh run download 39344457603 --repo "$GH_REPO" \
+            --name c-original-oval-compatibility-review-not-native-conversion \
+            --dir source-review
+          test -f source-review/c-review/manifest.json
+          test -f source-review/c-native/conversion-manifest.json
+      - name: Convert pinned multi-Test no-State graphs to canonical 0.4
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/convert_v04_oval_multitest_leaf.py \
+            --source-review source-review \
+            --original-oval original-oval/SCAP_1.4/OVAL_Test_Content \
+            --catalog scap-ng/schema/v0.4.0/capability-mappings/supported \
+            --output work/native-040-multitest
+      - name: Validate current native 0.4 JSON Schema and paired YAML/JSON
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import yaml
+          from v04_canonical_source_ir import _schema_validators,validate_docs
+          base=Path('work/native-040-multitest')
+          report=json.loads((base/'manifest.json').read_text())
+          valid=[row for row in report['cases']
+                 if row['status']=='CURRENT_040_FLAT_OBJECT_SOURCE_MATCHED_SCHEMA_PENDING']
+          assert len(report['cases'])==44
+          assert len(valid)>=2
+          assert len(valid)+report['not_yet_covered']==44
+          validators=_schema_validators(Path('scap-ng/schema/v0.4.0'))
+          docs={}
+          for row in valid:
+              expected=json.loads((base/row['assessment_json']).read_text())
+              observed=yaml.safe_load((base/row['assessment_yaml']).read_text())
+              assert observed==expected,row['definition_id']
+              docs[row['assessment_json']]=expected
+              a=expected['assessment']
+              assert a['specification']['version']=='0.4.0'
+              assert all('select' not in test['object']
+                         and 'collect' not in test['object']
+                         for test in a['tests'].values())
+              p=json.loads((base/row['proof_file']).read_text())
+              assert p['source_definition_id']==row['definition_id']
+              assert p['source_test_count']==len(a['tests'])
+          validate_docs(docs,validators)
+          report['schema_status']='PASS_ALL_EMITTED_NATIVE_040'
+          report['native_040_schema_validated_definitions']=len(docs)
+          for row in valid:
+              row['status']='CURRENT_040_SOURCE_XML_AND_SCHEMA_VALIDATED_NOT_RUNTIME'
+              proof_file=base/row['proof_file']
+              proof=json.loads(proof_file.read_text())
+              proof['native_schema_validation']='PASS'
+              proof_file.write_text(json.dumps(proof,indent=2)+'\n')
+          (base/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
+          print('PASS:',len(docs),'flat-Object multi-Test NG Assessments')
+          PY
+      - name: Reject mutated original OVAL selectors and Test checks
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          import json
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          import xml.etree.ElementTree as ET
+          from hashlib import sha256
+          from convert_v04_oval_multitest_leaf import convert_one,load_catalog_renames,Unsupported
+          review=json.loads(Path('source-review/c-review/manifest.json').read_text())
+          rows={(r['file'],r['definition_id']):r for r in review['exported_views']}
+          target=('ios/ios-def_global_test.xml','oval:navy.navwar.niwcatlantic.scc.ios:def:1')
+          raw=json.loads((Path('source-review/c-review')/rows[target]['review_file']).read_text())
+          source=Path('original-oval/SCAP_1.4/OVAL_Test_Content')/target[0]
+          catalog=load_catalog_renames(Path('scap-ng/schema/v0.4.0/capability-mappings/supported'))
+          converted,proof=convert_one(raw,source,catalog)
+          assert len(converted['assessment']['tests'])==2
+          bad=deepcopy(raw)
+          test=next(iter(bad['A_source_compatibility_fallback']['tests'].values()))
+          test['check']='only one'
+          try: convert_one(bad,source,catalog)
+          except Unsupported as e: assert 'TEST_QUANTIFIER' in str(e),str(e)
+          else: raise AssertionError('Changed Test check passed')
+          with TemporaryDirectory() as temp:
+              copied=Path(temp)/'SCAP_1.4/OVAL_Test_Content'/target[0]
+              copied.parent.mkdir(parents=True)
+              root=ET.fromstring(source.read_bytes())
+              object_node=next(n for n in root.iter() if n.tag.endswith('}global_object'))
+              next(iter(object_node)).text='wrong-command'
+              altered=ET.tostring(root)
+              copied.write_bytes(altered)
+              bad=deepcopy(raw)
+              bad['source']['source_file_sha256']=sha256(altered).hexdigest()
+              try: convert_one(bad,copied,catalog)
+              except Unsupported as e: assert 'ORIGINAL_OVAL_SELECTOR' in str(e),str(e)
+              else: raise AssertionError('Changed original OVAL selector passed')
+          print('PASS: semantic mutations rejected')
+          PY
+      - name: Reviewer overview
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          root=Path('work/native-040-multitest')
+          report=json.loads((root/'manifest.json').read_text())
+          accepted=[r for r in report['cases'] if 'SCHEMA_VALIDATED' in r['status']]
+          lines=[
+            '# OVAL Self-Assertion → canonical 0.4.0 multi-Test pilot',
+            '',
+            '**Narrow source-checked subset, not the complete 167-Definition release.**',
+            '',
+            f"Pinned original source: {report['pin']}",
+            f"Previously unsupported multi-Test denominator: {report['source_multitest_denominator']}",
+            f"New source-matched/native-schema-validated 0.4 Assessments: {len(accepted)}",
+            f"Still unsupported in this pilot: {report['not_yet_covered']}",
+            '',
+            'Each success has a full JSON Assessment, hybrid YAML and source proof.',
+            'The manifest accounts for all 44 candidates with explicit failure reasons.',
+            'No independent XML re-export or scanner execution parity is yet claimed.',
+            '',
+            '## Converted original Definitions',''
+          ]
+          lines += [f"- {r['file']}: {r['assessment_yaml']}" for r in accepted]
+          (root/'START-HERE.md').write_text('\n'.join(lines)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-original-oval-multitest-source-and-schema-validated-pilot
+          path: work/native-040-multitest/
+          if-no-files-found: ignore
