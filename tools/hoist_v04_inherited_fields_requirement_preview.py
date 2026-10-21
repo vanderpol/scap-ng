@@ -32,6 +32,7 @@ def migrate_test(test):
     previous=out.get("state_fields_require")
     req=out.get("require")
     if (not isinstance(previous,str) or not isinstance(req,dict)
+        or "states" in test or "states_match" in test
         or set(req)!={"items","all_items_must"}
         or req.get("items") not in ("one_or_more","may_be_absent")
         or len(req.get("all_items_must",[]))!=1):
