@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Canonical 0.4.0 unsigned native-manifest package gates (not scanner parity)."""
 from copy import deepcopy
+from unittest.mock import patch
 import io
 import json
 from pathlib import Path
@@ -12,7 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from test_v04_canonical_source_ir import sample
 from v04_canonical_unsigned_package import (
     build_package, verify_package, partition_documents, MANIFEST_MEMBER,
-    _manifest_schema,
+    _manifest_schema, package_pair, _package_validators,
 )
 
 def mutate(raw, fn):
@@ -43,6 +44,28 @@ class PackageTests(unittest.TestCase):
         self.assertFalse(result["signature_verified"])
         self.assertIn("NOT_EXECUTABLE", result["status"])
         self.assertEqual(manifest["signature"]["format"], None)
+
+    def test_package_pair_keeps_independent_schema_verification(self):
+        """The writer does not repeat input schema checks; decoder still does."""
+        from v04_canonical_source_ir import normalize_documents
+        from v04_a_authoring_graph_index import canonical_json
+        source_ir = canonical_json(normalize_documents(self.docs))
+        with patch("v04_canonical_unsigned_package.compile_pair",
+                   return_value=(source_ir, {"version_conflicting_choice_links": 0})), \
+             patch("v04_canonical_unsigned_package.build_package",
+                   return_value=(b"fixture", {})) as writer, \
+             patch("v04_canonical_unsigned_package.verify_package",
+                   return_value={"status": "VALIDATED_UNSIGNED_SOURCE_PACKAGE_NOT_EXECUTABLE",
+                                 "signature_verified": False}) as decoder:
+            archives, report = package_pair(None, None, validate_schema=True)
+        self.assertEqual(list(archives), ["demo"])
+        self.assertFalse(report["native_compiler_complete"])
+        self.assertFalse(report["signed"])
+        self.assertEqual(writer.call_args.kwargs["validate_schema"], False)
+        self.assertEqual(decoder.call_args.kwargs["validate_schema"], True)
+
+    def test_checked_in_package_validators_reused(self):
+        self.assertIs(_package_validators(), _package_validators())
 
     def test_partition_scope_and_missing_rule_rejected(self):
         src = deepcopy(self.docs)
