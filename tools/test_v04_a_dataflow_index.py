@@ -131,6 +131,42 @@ class DataflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "shadows inherited"):
             index_assessment_dataflow(d)
 
+    def test_flat_040_foreach_projection_preserves_dependency_graph(self):
+        old = index_assessment_dataflow(source())
+        d = source()
+        obj = d["shared_objects"]["files-object"]
+        obj.update(obj.pop("select"))
+        current = index_assessment_dataflow(d)
+        self.assertEqual(current["edges"], old["edges"])
+        self.assertEqual(current["dependency_first_source_order"],
+                         old["dependency_first_source_order"])
+        projections = [s for s in current["sites"] if s["kind"] == "projection"]
+        self.assertEqual(len(projections), 1)
+        self.assertEqual(projections[0]["path"],
+                         ["shared_objects", "files-object", "directory", "from"])
+
+    def test_flat_040_foreach_rejects_bad_alias_and_shadowing(self):
+        d = source()
+        obj = d["shared_objects"]["files-object"]
+        obj.update(obj.pop("select"))
+        obj["directory"]["from"] = "other.home_dir"
+        with self.assertRaisesRegex(ValueError, "out-of-scope"):
+            index_assessment_dataflow(d)
+        obj["directory"]["from"] = "user.home_dir"
+        d["shared_objects"]["inner-object"] = {
+            "capability": "unix.file",
+            "for_each": {"item": "user", "in": "files-object"},
+            "directory": {"from": "user.home_dir"},
+        }
+        with self.assertRaisesRegex(ValueError, "shadows inherited"):
+            index_assessment_dataflow(d)
+
+    def test_mixed_flat_and_wrapped_projection_rejected(self):
+        d = source()
+        d["shared_objects"]["files-object"]["name"] = {"from": "user.username"}
+        with self.assertRaisesRegex(ValueError, "conflicting wrapped and flat"):
+            index_assessment_dataflow(d)
+
     def test_foreach_projection_requires_current_alias(self):
         d = source()
         d["shared_objects"]["inner-object"] = {
