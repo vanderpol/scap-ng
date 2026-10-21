@@ -274,8 +274,9 @@ class ProposedFieldsScopeTests(unittest.TestCase):
                 self.assertIn("ALL fields",local)
                 self.assertIn("unless an individual field",local)
                 self.assertIn("Sibling conditions are unaffected",local)
-                self.assertIn("nearest explicit field_requirement",
-                              fields_branch["properties"]["fields"]["description"])
+                field_docs=fields_branch["properties"]["fields"]["description"]
+                self.assertIn("all listed fields are ANDed",field_docs)
+                self.assertIn("nearest explicit field_requirement",field_docs)
                 for op in ("and","or"):
                     groups=[b for b in entries if b.get("required")==[op]]
                     self.assertTrue(groups)
