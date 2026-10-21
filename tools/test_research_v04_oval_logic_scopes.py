@@ -5,7 +5,8 @@ import unittest
 import xml.etree.ElementTree as ET
 from collections import Counter
 
-from oval_result_truth_tables import (aggregate_operator,aggregate_check,\n    evaluate_state_entity_existence,evaluate_collected_object_test)
+from oval_result_truth_tables import (aggregate_operator,aggregate_check,
+    evaluate_state_entity_existence,evaluate_collected_object_test)
 from audit_v04_oval_boolean_scopes import examine_oval,OD
 from research_v04_oval_logic_scopes import (
     RESULTS,OPERATORS,ITEM_QUANTIFIERS,candidate_logic,
