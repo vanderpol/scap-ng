@@ -11,7 +11,8 @@ import json
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from v04_canonical_source_ir import normalize_documents, decode_and_verify, compile_pair
+from v04_canonical_source_ir import (normalize_documents, decode_and_verify, compile_pair,
+                                     validate_docs, _supported_capabilities)
 
 
 def sample():
@@ -34,6 +35,37 @@ def sample():
 
 
 class CanonicalIRTests(unittest.TestCase):
+    def test_closed_native_040_capability_catalog_and_negative_inputs(self):
+        supported = _supported_capabilities()
+        self.assertEqual(len(supported), 100)
+        self.assertIn("unix.file", supported)
+        self.assertIn("windows.registry", supported)
+        self.assertNotIn("imaginary.collector", supported)
+
+        class AcceptSchema:
+            def iter_errors(self, _doc):
+                return iter(())
+
+        validators = {kind: AcceptSchema()
+                      for kind in ("assessment", "benchmark", "rule", "applicability")}
+        src = sample()
+        validate_docs(src, validators)
+        bad = deepcopy(src)
+        test = bad["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"]
+        test["capability"] = "imaginary.collector"
+        with self.assertRaisesRegex(ValueError, "unknown native 0.4 capability"):
+            validate_docs(bad, validators)
+        test["capability"] = {"variable": "fake"}
+        with self.assertRaisesRegex(ValueError, "unknown native 0.4 capability"):
+            validate_docs(bad, validators)
+        test["capability"] = "unix.file"
+        body = bad["authoring/demo/assessments/a1.json"]["assessment"]
+        body["shared_objects"] = {"bad-object": {
+            "capability": "imaginary.collector",
+            "full_path": {"equals": "/etc/example"}}}
+        with self.assertRaisesRegex(ValueError, "shared_objects.bad-object"):
+            validate_docs(bad, validators)
+
     def test_structured_requirement_preserved_and_redecoded(self):
         src = sample()
         ir = normalize_documents(src)
