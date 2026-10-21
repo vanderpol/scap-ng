@@ -1,0 +1,192 @@
+name: 0.4.0 OVAL family constant Variable original XML roundtrip
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-family-variable-roundtrip.yml'
+      - 'tools/convert_v04_oval_family_constant_variable.py'
+      - 'tools/export_v04_oval_family_constant_variable.py'
+      - 'schema/v0.4.0/**'
+      - 'tools/generate_capability_schema_v04.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  family-variable-original-oval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.25.1 lxml==6.0.2
+      - name: Check exact pinned original source
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = "e3538595c5083b9c34d937a81d319234df9bbfaa"
+          test -f original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml
+      - name: Convert original family constant Variable to canonical 0.4
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/family-variable
+          cp original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml work/family-variable/original-oval.xml
+          python scap-ng/tools/convert_v04_oval_family_constant_variable.py \
+            --source work/family-variable/original-oval.xml \
+            --output work/family-variable/family.assessment.yaml \
+            --report work/family-variable/forward-proof.json
+      - name: Validate current native 0.4 schema, Variable cardinality and YAML/JSON
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,yaml
+          from v04_canonical_source_ir import _schema_validators,validate_docs
+          from test_generate_capability_schema_v04 import materialize,validate
+          root=Path('work/family-variable')
+          doc=json.loads((root/'family.assessment.json').read_text())
+          authored=yaml.safe_load((root/'family.assessment.yaml').read_text())
+          assert doc==authored
+          validate_docs({'authoring/family.assessment.json':doc},
+                        _schema_validators(Path('scap-ng/schema/v0.4.0')))
+          a=doc['assessment']
+          t=next(iter(a['tests'].values()))
+          assert t['capability']=='independent.family' and 'object' not in t
+          errors=validate(materialize('independent.family'),'test',t)
+          assert not errors,[{'path':list(x.absolute_path),
+                              'error':x.message[:400]} for x in errors[:8]]
+          state=t['states'][0]['family']
+          assert state['matches_regex']=={'variable':'supported-platform-families-variable'}
+          assert state['value_match']=='all'
+          assert state['require']=='at_least_one_exists_and_all_match'
+          assert t['require']=='at_least_one_exists_and_some_match'
+          variables=a['variables']
+          assert len(variables)==1
+          assert variables['supported-platform-families-variable']['kind']=='constant'
+          proof=json.loads((root/'forward-proof.json').read_text())
+          assert proof['source_var_check']=='all'
+          assert proof['original_variable_id']=='oval:org.mitre.oval.test:var:403'
+          proof['native_040_schema']='PASS'
+          (root/'forward-proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print('PASS: source-pinned 0.4 family Variable schema/JSON/YAML and all distinct cardinalities')
+          PY
+      - name: Independently export to OVAL 5.12.3 and check semantic graph/XSD
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/export_v04_oval_family_constant_variable.py \
+            --native work/family-variable/family.assessment.json \
+            --output work/family-variable/regenerated-oval.xml
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from validate_v04_oval_5123 import check
+          from export_v04_oval_family_constant_variable import emit
+          from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+          root=Path('work/family-variable')
+          original=root/'original-oval.xml'
+          exported=root/'regenerated-oval.xml'
+          proof=json.loads((root/'forward-proof.json').read_text())
+          xsd=check(Path('oval-language/oval-schemas'),exported,'independent')
+          (root/'regenerated-xsd-report.json').write_text(json.dumps(xsd,indent=2)+'\n')
+          assert xsd['status']=='PASS',xsd['diagnostics']
+          doc=json.loads((root/'family.assessment.json').read_text())
+          _,regenerated_id=emit(doc)
+          result=compare(original,exported,source_root=proof['original_definition_id'],
+                         regenerated_root=regenerated_id,root_only=True)
+          (root/'semantic-roundtrip-report.json').write_text(json.dumps(
+              result,indent=2,default=str)+'\n')
+          assert result['equal'],result
+          proof['independent_oval_5123_xml_semantics']='PASS'
+          (root/'forward-proof.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print('PASS: original OVAL -> 0.4 family Variable -> independently exported OVAL 5.12.3 XSD/semantic equality')
+          PY
+      - name: Adversarial semantic mutations must fail
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from copy import deepcopy
+          import json
+          import xml.etree.ElementTree as ET
+          from export_v04_oval_family_constant_variable import emit
+          from convert_v04_oval_family_constant_variable import convert,q,BASE,INDEPENDENT
+          from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+          root=Path('work/family-variable')
+          doc=json.loads((root/'family.assessment.json').read_text())
+          proof=json.loads((root/'forward-proof.json').read_text())
+          variants=[]
+          alter=deepcopy(doc)
+          v=alter['assessment']['variables']['supported-platform-families-variable']
+          v['expression']['literal']='an-unrelated-family'
+          variants.append(alter)
+          for item in variants:
+              t,newid=emit(item)
+              out=root/'mutation-oval.xml'
+              t.write(out,encoding='utf-8',xml_declaration=True)
+              outcome=compare(root/'original-oval.xml',out,
+                              source_root=proof['original_definition_id'],
+                              regenerated_root=newid,root_only=True)
+              assert not outcome['equal'],'An altered Variable literal escaped XML graph comparison'
+          for variant in ('some','none'):
+              bad=deepcopy(doc)
+              bad['assessment']['tests']['system-family-matches-test'][
+                  'states'][0]['family']['value_match']=variant
+              try:emit(bad)
+              except ValueError as exc:assert 'state regex' in str(exc)
+              else:raise AssertionError('Altered source var_check accepted')
+          original=ET.parse(root/'original-oval.xml')
+          node=next(n for n in original.getroot().iter()
+                    if n.tag==q(INDEPENDENT,'family'))
+          node.attrib['var_check']='at least one'
+          path=root/'mutated-original.xml'
+          original.write(path,encoding='utf-8',xml_declaration=True)
+          try:convert(path)
+          except ValueError as exc:assert 'cardinality' in str(exc)
+          else:raise AssertionError('Original XML var_check mutation accepted')
+          (root/'negative-tests.json').write_text(json.dumps({
+            'altered_literal_rejected_by_semantic_diff':True,
+            'altered_ng_variable_match_rejected':True,
+            'altered_source_xml_var_check_rejected':True
+          },indent=2)+'\n')
+          print('PASS: XML source, 0.4 authored and independent export mutation guards')
+          PY
+      - name: Add review index and publish actual validated outputs
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          r=Path('work/family-variable')
+          (r/'START-HERE.md').write_text(
+          '# Original OVAL family Variable -> SCAP-NG 0.4.0\n\n'
+          'One original Self-Assertion Definition and Test, with an independent.family '
+          'singleton acquisition, original constant regex Variable, var_check=all, '
+          'Test check=at least one and check_existence=at_least_one_exists.\n\n'
+          'Files: original-oval.xml, family.assessment.yaml and .json, '
+          'regenerated-oval.xml, source forward-proof.json, '
+          'regenerated-xsd-report.json, semantic-roundtrip-report.json, '
+          'and adversarial negative-tests.json.\n\n'
+          '**Scope:** semantic XML graph/XSD roundtrip and canonical native-schema checks only; '
+          'no scanner evidence/result parity. Do not count as all 167 Definitions validated.\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-original-oval-family-constant-variable-current-schema-roundtrip
+          path: work/family-variable/
+          if-no-files-found: ignore
