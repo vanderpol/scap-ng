@@ -101,8 +101,9 @@ def candidate_schema(path):
     # The Test accepts only one of the two old/new Test-wide spellings.
     test=d["$defs"]["test"]
     test.setdefault("allOf",[]).append({
-        "not":{"required":["state_fields_require"],
-               "properties":{"require":{"required":["field_requirement"]}}}
+        "not":{"required":["state_fields_require","require"],
+               "properties":{"require":{"type":"object",
+                                        "required":["field_requirement"]}}}
     })
     d["x-last-modified"]="2026-10-21"
     dest.write_text(json.dumps(d,indent=2)+"\n")
