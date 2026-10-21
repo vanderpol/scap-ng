@@ -33,8 +33,13 @@ def scan(documents):
         variables=a.get("variables") or {}
         deps=a.get("dependencies") or {}
         def eval_refs(node,where):
-            if not isinstance(node,dict):
+            if not isinstance(node,dict) or not node:
                 problems.append((path,"invalid evaluation node",where));return
+            # Logical groups and leaves have exactly one key. The ONLY
+            # multi-key expression is IF/THEN/ELSE, whose branches must be
+            # complete. Avoid silently scanning two competing operators.
+            if len(node)!=1 and set(node)!={"if","then","else"}:
+                problems.append((path,"ambiguous evaluate operator scope",where,sorted(node)));return
             for key,val in node.items():
                 if key=="test":
                     counts["evaluate_test_leaves"]+=1
@@ -42,11 +47,16 @@ def scan(documents):
                 elif key=="assessment":
                     counts["evaluate_assessment_leaves"]+=1
                     if val not in deps:problems.append((path,"unresolved evaluate Assessment dependency",where,val))
-                elif key in ("all","any","one","odd"):
-                    if not isinstance(val,list):problems.append((path,"invalid evaluate group",where,key))
+                elif key in ("all","any","one","odd","and","or","xor"):
+                    if not isinstance(val,list) or not val:
+                        problems.append((path,"invalid evaluate group",where,key))
                     else:
                         for i,child in enumerate(val):eval_refs(child,where+"/"+key+"/"+str(i))
-                elif key in ("not","if","then","else"):eval_refs(val,where+"/"+key)
+                elif key=="not_applicable":
+                    if not isinstance(val,dict) or not isinstance(val.get("reason"),str) or not val["reason"].strip():
+                        problems.append((path,"invalid not_applicable reason",where))
+                elif key in ("not","if","then","else"):
+                    eval_refs(val,where+"/"+key)
                 else:problems.append((path,"unknown evaluate construct",where,key))
         if a.get("evaluate") is not None:eval_refs(a["evaluate"],"evaluate")
         for name,test in tests.items():
@@ -84,6 +94,28 @@ class GraphTests(unittest.TestCase):
     def test_missing_evaluate_test(self):
         self.d["a.json"]["assessment"]["evaluate"]={"test":"missing"}
         self.assertIn("unresolved evaluate Test",str(scan(self.d)[1]))
+    def test_new_evaluate_and_or_xor_with_legacy_source_compatibility(self):
+        self.d["a.json"]["assessment"]["evaluate"]={"and":[
+            {"test":"x"},{"or":[{"test":"x"},
+                {"xor":[{"test":"x"},{"test":"x"},{"test":"x"}]}]},
+            {"all":[{"test":"x"},{"odd":[{"test":"x"}]}]}]}
+        counts,bad=scan(self.d)
+        self.assertEqual(bad,[])
+        self.assertEqual(counts["evaluate_test_leaves"],7)
+
+    def test_mixed_evaluate_operators_and_empty_groups_fail_closed(self):
+        for invalid in (
+            {"and":[{"test":"x"}],"or":[{"test":"x"}]},
+            {"and":[]},
+            {"or":"one_or_more"},
+            {"xor":[]},
+            {"if":{"test":"x"},"then":{"test":"x"}},
+            {"not_applicable":{"reason":""}},
+        ):
+            with self.subTest(invalid=invalid):
+                self.d["a.json"]["assessment"]["evaluate"]=invalid
+                self.assertTrue(scan(self.d)[1])
+
     def test_missing_object(self):
         self.d["a.json"]["assessment"]["tests"]["x"]["object"]="missing"
         self.assertIn("unresolved Test Object",str(scan(self.d)[1]))
