@@ -181,6 +181,18 @@ def build(source_json,source_yaml,destination):
         rep.get("yaml_json_byte_parity")!="PASS" or
         rep.get("documents")!=4001):
         raise ValueError("Exact-inverse source failed maintained typed IR compiler")
+    # The versioned 0.4.0 schema now accepts AND/OR/XOR alongside
+    # deprecated all/any/odd spellings. Require the maintained full
+    # source-IR compiler to consume the NEW candidate archives directly,
+    # not only a reconstructed copy of the pre-migration files.
+    _,candidate_ir=compile_pair(generated["json"],generated["yaml"],validate_schema=True)
+    if (candidate_ir.get("source_reconstruction")!="PASS" or
+        candidate_ir.get("yaml_json_byte_parity")!="PASS" or
+        candidate_ir.get("native_source_schema")!="PASS" or
+        candidate_ir.get("documents")!=4001 or
+        candidate_ir.get("tests")!=1375 or
+        candidate_ir.get("rule_choice_links")!=rep.get("rule_choice_links")):
+        raise ValueError("Direct new-grammar candidate failed current typed-source compiler")
     status={
         "status":"FULL_SIX_STIG_AND_OR_XOR_REVIEW_CANDIDATE_NOT_ACCEPTED_SCHEMA",
         "changes_per_format":dict(changes),
@@ -197,8 +209,10 @@ def build(source_json,source_yaml,destination):
         "source_assessment_field_requirements_changed":False,
         "source_item_cardinality_changed":False,
         "maintained_compiler_source_view_ir":rep,
+        "maintained_compiler_candidate_ir":candidate_ir,
         "candidate_new_grammar_test_references":ref_counts,
-        "candidate_executable_compiler_support":"OPEN_NEW_AND_OR_GRAMMAR",
+        "candidate_executable_compiler_support":"OPEN_EXECUTABLE_BACKEND",
+        "candidate_typed_source_ir_compiler":"PASS_NEW_AND_OR_XOR_GRAMMAR",
         "scanner_equivalence_proven":False,
         "release_published":False
     }
