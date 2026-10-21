@@ -139,16 +139,26 @@ def field_scopes(test):
             if local is not None and not isinstance(local,str):
                 raise ValueError("Local field requirement must be explicit scalar token")
             effective=local if local is not None else inherited
-            for field in fields.values():
+            resolved={}
+            sources={}
+            for name,field in fields.items():
                 if "require" in field and "field_requirement" in field:
                     raise ValueError("Conflicting field-level requirements")
-            if effective is None and not all(
-                 isinstance(field.get("field_requirement",field.get("require")),str)
-                 for field in fields.values()):
-                raise ValueError("Field missing explicit or inherited existence+matching")
+                individual=field.get("field_requirement",field.get("require"))
+                if individual is not None and (
+                        not isinstance(individual,str) or not individual):
+                    raise ValueError("Malformed individual field requirement")
+                value=individual if individual is not None else effective
+                if not isinstance(value,str) or not value:
+                    raise ValueError("Field missing explicit or inherited existence+matching")
+                resolved[name]=value
+                sources[name]=("field" if individual is not None else
+                               "condition" if local is not None else "inherited")
             scope=("local" if local is not None else
                    "inherited" if effective is not None else "each_field")
-            result.append({"path":list(path),"scope":scope,"fields":list(fields)})
+            result.append({"path":list(path),"scope":scope,"fields":list(fields),
+                           "effective_field_requirements":resolved,
+                           "requirement_sources":sources})
             return
         logical=[name for name in LOGICAL if name in node and isinstance(node[name],list)]
         if logical:
