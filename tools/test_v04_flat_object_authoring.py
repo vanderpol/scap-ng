@@ -49,6 +49,21 @@ class FlatObjectAuthoringTests(unittest.TestCase):
         self.assertEqual(len([line for line in rendered.splitlines()
                               if "object:" in line]), 1)
 
+    def test_registry_with_title_remains_one_line_when_short(self):
+        fields = {"object_title": "EditionID",
+                  "hive": {"equals": "local_machine"},
+                  "key": {"equals": r"SOFTWARE\Microsoft\Windows NT\CurrentVersion"},
+                  "name": {"equals": "EditionId"}}
+        candidate, _ = migrated(case("windows.registry", {
+            "object_title": fields["object_title"],
+            "select": {k: v for k, v in fields.items() if k != "object_title"}}))
+        rendered = dump_hybrid(candidate)
+        self.assertIn("object: {", rendered)
+        self.assertIn("hive: {equals: local_machine}", rendered)
+        self.assertIn("key: {equals: SOFTWARE", rendered)
+        self.assertNotIn("\\n        hive:", rendered)
+        self.assertEqual(yaml.safe_load(rendered), candidate)
+
     def test_command_acquisition_fields_flatten_without_selector(self):
         parameters = {"shell": "powershell", "command": "Get-PnpDevice -Class Bluetooth",
                       "error_if_exit_status_not_0": False,
