@@ -13,6 +13,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED, ZipInfo
+from audit_v04_flat_object_names import inspect as audit_object_mapping
 import yaml
 
 RESERVED = frozenset({"filters", "set", "capability", "object", "object_title",
@@ -31,6 +32,7 @@ def load_catalog(directory: Path):
         raise ValueError(f"Expected 100 supported mappings, found {len(paths)}")
     for path in paths:
         mapping = json.loads(path.read_text(encoding="utf-8"))
+        audit_object_mapping(mapping)  # same strict 100-capability collision rules as CI
         cap, native = mapping["capability"], mapping["native"]
         selectors = set(native.get("selector_map", {}).values())
         parameters = set(native.get("collection_parameters", {}))
