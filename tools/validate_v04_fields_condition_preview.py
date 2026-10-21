@@ -58,6 +58,17 @@ def candidate_schema(path):
           "title":"Proposed complete expected condition (NOT accepted schema)"
         }
         entries.append(branch)
+        # A shared field requirement can also precede the AND/OR
+        # joining multiple complete conditions. This is exactly the
+        # original Test-wide inherited scope for the 16 simple source
+        # Tests, without repeating it on each of 44 child groups.
+        for choice in entries:
+            if choice.get("required") in (["and"],["or"]):
+                choice["properties"]["require"]={
+                    "$ref":"#/$defs/paired_requirement",
+                    "description":"Explicit inherited field rule for all complete child conditions; never an Item quantifier."
+                }
+                choice["not"]={"required":["require","state_fields_require"]}
     d["x-last-modified"]="2026-10-21"
     dest.write_text(json.dumps(d,indent=2)+"\n")
     return path
@@ -99,10 +110,12 @@ def field_scopes(test):
             return
         logical=[name for name in LOGICAL if name in node and isinstance(node[name],list)]
         if logical:
-            if len(logical)!=1 or set(node)-{logical[0],"state_fields_require"}:
+            if (len(logical)!=1 or
+                set(node)-{logical[0],"state_fields_require","require"} or
+                ("require" in node and "state_fields_require" in node)):
                 raise ValueError("Ambiguous nested State operators")
             op=logical[0]
-            child_scope=node.get("state_fields_require",inherited)
+            child_scope=node.get("require",node.get("state_fields_require",inherited))
             if not node[op]:
                 raise ValueError("Empty logical State aggregation")
             for i,child in enumerate(node[op]):
