@@ -362,24 +362,72 @@ jobs:
             work/canonical-benchmark-version-preview.json
             work/canonical-requirement-oval-oracle.json
           if-no-files-found: error
-      - name: Publish durable six-STIG authoring candidate
+      - name: Publish immutable canonical six-STIG source-only review release
         if: github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          cp docs/releases/0.4.0-six-stig-authoring.md work/RELEASE-NOTES.md
-          if gh release view v0.4.0-six-stig-authoring-approved-20261020 >/dev/null 2>&1; then
-            echo 'Existing immutable review release found; verification and workflow artifact are complete. No overwrite.'
+          set -euo pipefail
+          # The October 20 source preview predates normative flat Objects.
+          # Preserve it byte-for-byte; the current revision receives a
+          # separate clearly labeled snapshot only AFTER all CI gates pass.
+          tag='v0.4.0-six-stig-canonical-flat-authoring-20261021'
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Immutable canonical source preview already published: $tag"
             exit 0
           fi
-          gh release create v0.4.0-six-stig-authoring-approved-20261020 \
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('work')
+          ir=json.loads((root/'canonical-typed-source-ir-report.json').read_text())
+          packages=json.loads((root/'v04-native-source-package-report.json').read_text())
+          oracle=json.loads((root/'canonical-requirement-oval-oracle.json').read_text())
+          assert ir['documents']==4001 and ir['tests']==1375
+          assert ir['source_reconstruction']==ir['yaml_json_byte_parity']=='PASS'
+          assert ir['native_source_schema']=='PASS'
+          assert ir['native_executable_compiler_complete'] is False
+          assert packages['status']=='SIX_BENCHMARK_UNSIGNED_SOURCE_PACKAGES_NOT_EXECUTABLE'
+          assert len(packages['benchmarks'])==6
+          assert packages['native_compiler_complete'] is False
+          assert packages['signed'] is False and packages['scanner_parity'] is False
+          assert len(list((root/'v04-native-source-packages').glob('*.source-preview.zip')))==6
+          assert oracle['status']=='SOURCE_AXES_AND_PINNED_OVAL_RESULT_ORACLE_PASS'
+          assert oracle['scanner_parity'] is False
+          print('PASS: canonical six-STIG source-only review evidence is internally consistent')
+          PY
+          cat > work/RELEASE-NOTES-CANONICAL.md <<'EOF'
+          # SCAP-NG 0.4.0 — Canonical flat-Object six-STIG authoring review
+
+          **PRE-ALPHA SOURCE ONLY. Not executable, not signed, not scanner-validated.**
+
+          This immutable snapshot contains 4,001 independently parsed and
+          schema-checked YAML/JSON authoring documents for six STIG Benchmarks,
+          including 1,375 automated Tests and 2,958 Rule choice links.
+
+          The 0.4.0 flat-Object migration is source-invertible. Download the
+          JSON and YAML ZIPs with their manifests and inverse evidence.
+          The six `.source-preview.zip` archives have deterministic unsigned
+          native 0.4.0 manifests; they are NOT `.scapng` scanner bundles.
+
+          Original-OVAL generic result-axis checks passed, but full original
+          OVAL 5.12.3 interoperability, signed compilation, and scanner
+          semantics remain open. Historical October 20 authoring assets at
+          `v0.4.0-six-stig-authoring-approved-20261020` are unchanged.
+          EOF
+          gh release create "$tag" \
             work/scap-ng-0.4.0-six-stigs.json.zip \
             work/scap-ng-0.4.0-six-stigs.yaml.zip \
             work/json-manifest.json work/yaml-manifest.json \
             work/input-historical-source-report.json \
+            work/v04-flat-object-source-inverse.json \
+            work/canonical-typed-source-ir-report.json \
+            work/v04-native-source-packages/*.source-preview.zip \
+            work/v04-native-source-package-report.json \
+            work/full-native-schema-audit.json \
             work/canonical-benchmark-version-preview.json \
             work/canonical-requirement-oval-oracle.json \
             --prerelease --target "$GITHUB_SHA" \
-            --title 'SCAP-NG 0.4.0 - Six-STIG authoring samples' \
-            --notes-file work/RELEASE-NOTES.md
+            --title 'SCAP-NG 0.4.0 - Canonical six-STIG authoring (source-only)' \
+            --notes-file work/RELEASE-NOTES-CANONICAL.md
