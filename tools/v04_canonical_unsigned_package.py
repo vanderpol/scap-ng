@@ -118,6 +118,14 @@ def partition_documents(documents):
         result[folder] = subset
     if all_graph["counts"]["documents"] != len(documents):
         raise ValueError("graph lost source documents")
+    # Each original source file must reach at least one scoped package.
+    # Otherwise an extra STIG folder or unreferenced Assessment can silently
+    # disappear while every individual Benchmark still validates correctly.
+    covered = set().union(*(set(subset) for subset in result.values()))
+    missing = sorted(set(documents) - covered)
+    if missing:
+        raise ValueError("unassigned source documents outside six Benchmark/shared "
+                         "scope: " + ", ".join(missing[:8]))
     return result
 
 
