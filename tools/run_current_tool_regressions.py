@@ -14,6 +14,11 @@ from pathlib import Path
 ARCHIVED_CONTENT_MODULES = frozenset({
     "test_board_conversion_v02",
     "test_board_samples_v02",
+    # 0.4-A's preapproval draft-vs-research boundary is historical: its
+    # assumption that scoped field requirements and and/or are unapproved
+    # contradicts the 2026-10-21 canonical 0.4.0 owner decision.
+    # Keep the tests in repository as history, not current 0.4 CI.
+    "test_v04_a_grammar_boundary",
 })
 
 
@@ -32,7 +37,7 @@ def main():
     current = [item for item in all_tests
                if item.__class__.__module__ not in ARCHIVED_CONTENT_MODULES]
     archived = len(all_tests) - len(current)
-    print(f"Current regressions: {len(current)}; archived Board-pilot tests omitted: {archived}",
+    print(f"Current regressions: {len(current)}; historical dialect/Board-pilot tests omitted: {archived}",
           file=sys.stderr)
     result = unittest.TextTestRunner(verbosity=2).run(unittest.TestSuite(current))
     return 0 if result.wasSuccessful() else 1
