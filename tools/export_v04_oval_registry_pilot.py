@@ -50,11 +50,11 @@ def emit(document):
     need(isinstance(t.get("test_title"),str) and t["test_title"].strip(),
          "OVAL requires original human Test comment")
     ob=t["object"]
-    need(isinstance(ob,dict) and set(ob)=={"select","object_title"},
-         "only a direct registry Object selector (no Set/Filter)")
-    select=ob["select"]
-    need(isinstance(select,dict) and set(select)=={"hive","key","name"},
-         "original ordered hive/key/name selector required")
+    need(isinstance(ob,dict) and set(ob) in (
+             {"hive","key","name"},
+             {"hive","key","name","object_title"}),
+         "only flat hive/key/name registry selector (no select/Set/Filter)")
+    select={name:ob[name] for name in ("hive","key","name")}
     fields={}
     for name in ("hive","key","name"):
         field=select[name]
@@ -98,7 +98,7 @@ def emit(document):
     ET.SubElement(oval_test,q(WIN,"state"),{"state_ref":ids["ste"]})
 
     attrs={"id":ids["obj"],"version":str(a["version"])}
-    if ob["object_title"] is not None:
+    if ob.get("object_title") is not None:
         need(isinstance(ob["object_title"],str),"invalid Object title")
         attrs["comment"]=ob["object_title"]
     obj=ET.SubElement(ET.SubElement(root,q(OD,"objects")),q(WIN,"registry_object"),attrs)
