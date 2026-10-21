@@ -1,0 +1,102 @@
+name: 0.4.0 original OVAL independent.variable Test contract
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-variable-test-contract.yml'
+      - 'tools/audit_v04_original_oval_variable_test.py'
+      - 'tools/validate_v04_oval_5123.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  pin-original-variable-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Load exact original and install XSD validator
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = 'e3538595c5083b9c34d937a81d319234df9bbfaa'
+          python -m pip install lxml==6.0.2
+      - name: Audit original independent.variable cross-Variable structure
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/variable-test
+          cp original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml work/variable-test/pinned-original.xml
+          python scap-ng/tools/audit_v04_original_oval_variable_test.py \
+            --original work/variable-test/pinned-original.xml \
+            --report work/variable-test/source-contract.json
+          python scap-ng/tools/validate_v04_oval_5123.py \
+            --schema-dir oval-language/oval-schemas \
+            --xml work/variable-test/pinned-original.xml \
+            --platform independent \
+            --report work/variable-test/pinned-original-xsd.json
+      - name: Reject altered original var_check, Test, selector and values
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          import json
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          from audit_v04_original_oval_variable_test import audit_bytes, tag, BASE, IND
+          root=ET.fromstring(Path('work/variable-test/pinned-original.xml').read_bytes())
+          tests=[]
+          def variant(edit, code):
+              tree=deepcopy(root)
+              edit(tree)
+              try:audit_bytes(ET.tostring(tree))
+              except ValueError as exc:
+                  tests.append({"mutation":code,"status":"REJECTED","reason":str(exc)})
+              else:
+                  raise AssertionError(f"Unrejected source mutation: {code}")
+          variant(lambda x:next(n for n in x.iter(tag(IND,'value'))
+                                if n.get('var_ref')).set('var_check','all'),
+                  'var_check_changed')
+          variant(lambda x:next(x.iter(tag(IND,'variable_test'))).set('check','all'),
+                  'Test_check_changed')
+          variant(lambda x:next(x.iter(tag(IND,'var_ref'))).__setattr__('text','missing-var'),
+                  'Object_variable_ref_changed')
+          variant(lambda x:next(x.iter(tag(BASE,'criterion'))).set('test_ref','missing-tst'),
+                  'criteria_test_reference_changed')
+          variant(lambda x:next(n for n in x.iter(tag(BASE,'constant_variable')))[0].__setattr__('text','wrong-value'),
+                  'constant_variable_value_changed')
+          assert len(tests)==5
+          report=json.loads(Path('work/variable-test/source-contract.json').read_text())
+          xsd=json.loads(Path('work/variable-test/pinned-original-xsd.json').read_text())
+          assert xsd['status']=='PASS' and xsd['oval_schema_version']=='5.12.3'
+          assert report['test_count']==report['cross_variable_comparisons']==4
+          assert report['constant_variable_count']==2
+          assert report['scanner_parity'] is False
+          report['original_oval_5123_xsd']='PASS'
+          report['original_oval_xsd_sha256']=xsd['schema_sha256']
+          report['negative_source_mutations']=tests
+          Path('work/variable-test/source-contract.json').write_text(
+              json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('PASS: original OVAL independent.variable 4 comparisons + XSD, 5 mutation guards')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v04-pinned-original-oval-variable-test-contract-not-native-conversion
+          path: work/variable-test/
+          if-no-files-found: error
