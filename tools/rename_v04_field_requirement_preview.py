@@ -104,12 +104,8 @@ def migrate_test(test):
             visit(clause, ("require", "all_items_must", i))
         if not groups:
             return source, None
-        if "state_fields_require" in out:
-            rename(req, "state_fields_require", ("require",))
-            # Above rename is intentionally not used for Test source property:
-            # it belongs on the Test, not inside require. Move separately below.
         # An explicit top-level Test State-field requirement moves to the
-        # Test's own require mapping, without changing scope over the conditions.
+        # Test's require mapping, without changing its descendant scope.
     except UnsafeScope:
         return source, None
 
