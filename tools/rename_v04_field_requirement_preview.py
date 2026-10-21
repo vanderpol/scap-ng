@@ -48,6 +48,10 @@ def migrate_test(test):
     groups = 0
     local = 0
     leaves = 0
+    test_scope = out.get("state_fields_require")
+    if test_scope is not None and (not isinstance(test_scope, str)
+                                   or not test_scope):
+        return source, None
 
     def rename(node, old, path):
         if old in node:
@@ -60,7 +64,7 @@ def migrate_test(test):
             edits.append({"path": list(path), "old": old,
                           "value": value})
 
-    def visit(node, path):
+    def visit(node, path, inherited):
         nonlocal groups, local, leaves
         if not isinstance(node, dict) or not node:
             raise UnsafeScope("Empty or nonmapping condition")
@@ -74,12 +78,22 @@ def migrate_test(test):
                            or "record" in value or REQUIREMENT in value
                            for name, value in fields.items())):
                 raise UnsafeScope("Record/repeated/single-field case not proven")
+            local_policy = node.get("require", inherited)
+            if local_policy is not None and (not isinstance(local_policy, str)
+                                             or not local_policy):
+                raise UnsafeScope("Malformed field requirement in parent scope")
+            if any("require" not in field and local_policy is None
+                   for field in fields.values()):
+                raise UnsafeScope("Field has no explicit or inherited requirement")
             groups += 1
             if "require" in node:
                 rename(node, "require", path)
                 local += 1
             for name, value in fields.items():
                 if "require" in value:
+                    if (not isinstance(value["require"], str)
+                            or not value["require"]):
+                        raise UnsafeScope("Malformed individual field requirement")
                     rename(value, "require", path + ("fields", name))
                     leaves += 1
             return
@@ -92,8 +106,12 @@ def migrate_test(test):
             raise UnsafeScope("Missing logical operands")
         if "require" in node and "state_fields_require" in node:
             raise UnsafeScope("Conflicting old logical-group requirements")
+        parent_policy = node.get("require", node.get("state_fields_require", inherited))
+        if parent_policy is not None and (not isinstance(parent_policy, str)
+                                          or not parent_policy):
+            raise UnsafeScope("Malformed logical-group requirement")
         for index, child in enumerate(children):
-            visit(child, path + (op, index))
+            visit(child, path + (op, index), parent_policy)
         if "require" in node:
             rename(node, "require", path)
         if "state_fields_require" in node:
@@ -101,7 +119,7 @@ def migrate_test(test):
 
     try:
         for i, clause in enumerate(req["all_items_must"]):
-            visit(clause, ("require", "all_items_must", i))
+            visit(clause, ("require", "all_items_must", i), test_scope)
         if not groups:
             return source, None
         # An explicit top-level Test State-field requirement moves to the
