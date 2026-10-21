@@ -56,7 +56,10 @@ def inspect(row,document):
         raise ValueError("Automated source Variables not found")
     kinds=Counter();ops=Counter()
     for name,var in variables.items():
-        if not name.endswith("-variable") or not isinstance(var,dict):
+        # The historical lossless OVAL import preserves collision-resolved
+        # IDs such as '...-variable-2'. They must be inventoried as source,
+        # not silently renamed to satisfy a new authored-0.4 naming policy.
+        if not isinstance(name,str) or not name or not isinstance(var,dict):
             raise ValueError("Malformed named source Variable")
         if var.get("kind") not in {"local","constant","external"}:
             raise ValueError("Unrecognized OVAL Variable origin")
