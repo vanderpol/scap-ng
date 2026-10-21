@@ -14,6 +14,8 @@ Begin with the [short review guide](REVIEW-GUIDE.md), then [Benchmark/Rule examp
 
 The [OVAL Boolean-operator versus quantifier review](0.4.0-BOOLEAN-OPERATORS-VS-QUANTIFIERS.md) explains why `or` between complete conditions is different from `one_or_more` matching Items, with original XML examples and six-state/XSD test evidence. Its proposed syntax is **not yet accepted or generated as canonical 0.4.0**.
 
+For the unresolved field naming decision, see the concise [field requirement scope review](0.4.0-FIELD-REQUIREMENT-SCOPE.md). It compares the 184 locally-scoped, 44 Test-inherited and three per-field cases without treating a candidate spelling as approved 0.4.0 syntax.
+
 The [release gate tracker](0.4.0-FINALIZATION-GATES.md) distinguishes parsed source, semantic-model tests, native compilation, signing, and scanner equivalence. **4,001 files passing schema and static dependency checks do not prove scanner execution.** The 172 uncommon source-preserving requirements and independent native scanner/compiler work remain unresolved.
 
 Older 0.3 examples and historical compiled bundles are available from the [archived 0.3.0 index](../../archive/0.3.0/README.md). The old A/B/C/D comparison labels are historical research variants, not product versions.
