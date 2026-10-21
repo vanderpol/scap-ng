@@ -25,6 +25,7 @@ from pathlib import Path
 
 from build_v04_canonical_six_stigs import promote, PAIRS, PRESENCE, reconcile_benchmark_specifications
 from v04_a_authoring_graph_index import read_authoring_archive
+from v04_flat_object_authoring import load_catalog, flatten_document, restore_document
 from oval_result_truth_tables import evaluate_collected_object_test
 from research_english_first_04_six_state import (
     STATES, FLAGS, independent,
@@ -121,6 +122,17 @@ def compare_original_to_canonical(original, canonical, *, filter_proof=None,
         promoted[path] = proposed
     if any("benchmark" in doc for doc in original.values()):
         promoted, _ = reconcile_benchmark_specifications(promoted)
+    # The canonical six-STIG builder now applies the source-invertible,
+    # approved flat-Object pass *after* the Test/Filter/version promotions.
+    # Recreate it independently from the pinned input, rather than ignoring
+    # Object differences or weakening the whole-document equality gate.
+    catalog = load_catalog(Path(__file__).resolve().parents[1] /
+                           "schema/v0.4.0/capability-mappings/supported")
+    for path, staged in promoted.items():
+        flattened, inverse = flatten_document(staged, catalog)
+        if restore_document(flattened, inverse) != staged:
+            raise ValueError(f"{path}: flat Object source inverse failed")
+        promoted[path] = flattened
     counts = Counter()
     axes = set()
     by_capability = Counter()
