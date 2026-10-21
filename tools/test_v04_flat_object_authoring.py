@@ -95,7 +95,7 @@ class FlatObjectAuthoringTests(unittest.TestCase):
                     "collect": {"shell": "bash",
                                 "command": "printf ok",
                                 "error_if_exit_status_not_0": False,
-                                "error_if_stderr_exists": False}}}}
+                                "error_if_stderr_exists": False}}}}}
         value, proof = migrated(doc)
         obj = value["assessment"]["shared_objects"]["home-mount-object"]
         self.assertEqual(obj["mount_point"], {"equals": "/home"})
