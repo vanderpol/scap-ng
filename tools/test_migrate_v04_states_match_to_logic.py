@@ -91,7 +91,7 @@ class StateScopeMigrationTests(unittest.TestCase):
         self.assertEqual(after,before)
         self.assertEqual(ledger,[])
 
-    def test_inverse_proof_detects changed_operator_or_state_predicate(self):
+    def test_inverse_proof_detects_changed_operator_or_state_predicate(self):
         before=fixture()
         after,ledger=migrate(before)
         changed=copy.deepcopy(after)
