@@ -37,7 +37,8 @@ jobs:
         run: |
           python tools/audit_v04_canonical_result_plans.py \
             --json-archive work/authoring/scap-ng-0.4.0-six-stigs.json.zip \
-            --report work/result-plan-census.json --assert-six-stigs
+            --report work/result-plan-census.json \
+            --plans work/result-plans-canonical-040.json --assert-six-stigs
           python - <<'PY'
           import json
           from pathlib import Path
@@ -48,11 +49,19 @@ jobs:
           assert report['scanner_executed'] is False
           assert report['tests_evaluated'] is False
           assert report['conditional_semantics_implemented'] is False
+          manifest=json.loads(Path('work/result-plans-canonical-040.json').read_text())
+          assert manifest['compiled_plan_count']==872
+          assert manifest['compiled_instruction_count']==1764
+          assert len(manifest['entries'])==872
+          assert manifest['scanner_executed'] is False
+          assert manifest['native_executable_bundle'] is False
           print('PASS: exact six-STIG 0.4 result-only expression coverage ledger')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: v04-canonical-boolean-result-plan-coverage-not-scanner
-          path: work/result-plan-census.json
+          path: |
+            work/result-plan-census.json
+            work/result-plans-canonical-040.json
           if-no-files-found: ignore
