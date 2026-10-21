@@ -148,6 +148,42 @@ class ProposedFieldsScopeTests(unittest.TestCase):
         self.assertEqual([site["scope"] for site in field_scopes(doc)],
                          ["inherited","local"])
 
+    def test_effective_field_requirements_resolve_each_field_with_nearest_override(self):
+        doc=fixture(scope="none")
+        doc["require"]["field_requirement"]="at_least_one_exists_and_all_match"
+        branch_a=doc["require"]["all_items_must"][0]
+        branch_b=deepcopy(branch_a)
+        branch_b["field_requirement"]="may_be_absent_and_all_match"
+        branch_b["fields"]["value"]["field_requirement"]="none_exist"
+        doc["require"]["all_items_must"]=[{"or":[branch_a,branch_b]}]
+        sites=field_scopes(doc)
+        self.assertEqual(len(sites),2)
+        self.assertEqual(sites[0]["effective_field_requirements"],{
+            "type":"at_least_one_exists_and_all_match",
+            "value":"at_least_one_exists_and_all_match"})
+        self.assertEqual(sites[1]["effective_field_requirements"],{
+            "type":"may_be_absent_and_all_match",
+            "value":"none_exist"})
+        self.assertEqual(sites[0]["requirement_sources"],{
+            "type":"inherited","value":"inherited"})
+        self.assertEqual(sites[1]["requirement_sources"],{
+            "type":"condition","value":"field"})
+        self.assertEqual(doc["require"]["items"],"one_or_more")
+
+    def test_only_some_field_overrides_do_not_cover_missing_other_fields(self):
+        doc=fixture(scope="none")
+        group=doc["require"]["all_items_must"][0]["fields"]
+        group["type"]["field_requirement"]="at_least_one_exists_and_all_match"
+        with self.assertRaisesRegex(ValueError,"Field missing explicit or inherited"):
+            field_scopes(doc)
+        group["value"]["field_requirement"]="none_exist"
+        resolved=field_scopes(doc)[0]
+        self.assertEqual(resolved["requirement_sources"],{
+            "type":"field","value":"field"})
+        self.assertEqual(resolved["effective_field_requirements"],{
+            "type":"at_least_one_exists_and_all_match",
+            "value":"none_exist"})
+
     def test_uniform_scope_conflicts_and_missing_policy_fail_closed(self):
         missing=fixture(scope="none")
         with self.assertRaisesRegex(ValueError,"missing explicit or inherited"):
