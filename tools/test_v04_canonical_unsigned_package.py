@@ -77,6 +77,44 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unknown or falsely executable"):
             verify_package(mutate(archive, forge), validate_schema=False)
 
+    def test_manifest_cannot_claim_another_format_version(self):
+        archive, _ = build_package(self.docs, validate_schema=False)
+        def forge(files):
+            manifest = json.loads(files[MANIFEST_MEMBER])
+            manifest["format_version"] = "0.3.0"
+            files[MANIFEST_MEMBER] = json.dumps(
+                manifest, sort_keys=True, separators=(",", ":")
+            ).encode()
+        with self.assertRaisesRegex(ValueError, "format_version 0.4.0"):
+            verify_package(mutate(archive, forge), validate_schema=False)
+
+    def test_manifest_cannot_change_declared_source_scope(self):
+        archive, _ = build_package(self.docs, validate_schema=False)
+        def forge(files):
+            manifest = json.loads(files[MANIFEST_MEMBER])
+            manifest["build_provenance"]["scope"] = "partial-source-only"
+            files[MANIFEST_MEMBER] = json.dumps(
+                manifest, sort_keys=True, separators=(",", ":")
+            ).encode()
+        with self.assertRaisesRegex(ValueError, "falsely executable"):
+            verify_package(mutate(archive, forge), validate_schema=False)
+
+    def test_unlisted_and_duplicate_rules_rejected_at_package_boundary(self):
+        docs = deepcopy(self.docs)
+        extra = deepcopy(docs["authoring/demo/rules/r1.json"])
+        extra["rule"]["id"] = "r2"
+        docs["authoring/demo/rules/r2.json"] = extra
+        # An extra, separately valid Rule must not silently enter a bundle
+        # unless its Benchmark explicitly lists it.
+        with self.assertRaisesRegex(ValueError, "Rule list"):
+            build_package(docs, validate_schema=False)
+        with self.assertRaisesRegex(ValueError, "Rule list"):
+            partition_documents(docs)
+        docs = deepcopy(self.docs)
+        docs["authoring/demo/benchmark.demo.json"]["benchmark"]["rules"] = ["r1", "r1"]
+        with self.assertRaisesRegex(ValueError, "Rule list"):
+            build_package(docs, validate_schema=False)
+
     def test_missing_assessment_and_old_spec_fail(self):
         x = deepcopy(self.docs)
         x["authoring/demo/rules/r1.json"]["rule"]["assessment_choices"]["automated"]["assessment"] = "missing"
