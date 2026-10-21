@@ -111,6 +111,26 @@ jobs:
           assert not p['native_schema_promoted'] and not p['scanner_semantics_proven']
           print('Source-invertible 0.4 field_requirement naming candidate:',counts)
           PY
+      - name: Schema-check all renamed YAML and JSON under isolated proposed grammar
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from tempfile import TemporaryDirectory
+          from v04_a_authoring_graph_index import read_authoring_archive
+          from v04_canonical_source_ir import _schema_validators, validate_docs
+          from validate_v04_fields_condition_preview import candidate_schema
+          root=Path('work/fields')
+          json_docs=read_authoring_archive(root/'field-requirement-preview.json.zip','json')
+          yaml_docs=read_authoring_archive(root/'field-requirement-preview.yaml.zip','yaml')
+          assert len(json_docs)==len(yaml_docs)==4001
+          with TemporaryDirectory(prefix='field-requirement-approved-spelling-') as temp:
+              validate=_schema_validators(candidate_schema(Path(temp)/'v0.4.0'))
+              validate_docs(json_docs,validate)
+              validate_docs(yaml_docs,validate)
+          print('PASS: all 4,001 research naming preview JSON/YAML docs satisfy isolated schema')
+          PY
       - name: Preserve reviewer-only condition naming evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -121,4 +141,6 @@ jobs:
             work/fields/hoisted-requirements-source-inverse.json
             work/fields/hoisted-fields-proposed-schema-proof.json
             work/fields/field-requirement-rename-proof.json
+            work/fields/field-requirement-preview.json.zip
+            work/fields/field-requirement-preview.yaml.zip
           if-no-files-found: ignore
