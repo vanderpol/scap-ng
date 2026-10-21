@@ -5,8 +5,28 @@ import unittest
 import xml.etree.ElementTree as ET
 
 from audit_v04_original_oval_forward import compare,OD,IND,WIN
-from test_export_v04_shellcommand_pilot import native as shell_native
-from test_export_v04_registry_pilot import fixture as registry_native
+from test_export_v04_shellcommand_pilot import native as flat_shell_native
+from test_export_v04_registry_pilot import fixture as flat_registry_native
+
+
+def shell_native():
+    # This independent *historical baseline* comparator still validates
+    # pinned original OVAL against the October-20 pre-flat source graph.
+    # The new XML exporter consumes only the separately proven flat graph.
+    doc=flat_shell_native()
+    obj=doc["assessment"]["tests"]["bluetooth-test"]["object"]
+    collect_keys=("shell","command","error_if_exit_status_not_0",
+                  "error_if_stderr_exists")
+    obj["collect"]={name:obj.pop(name) for name in collect_keys}
+    return doc
+
+
+def registry_native():
+    doc=flat_registry_native()
+    obj=doc["assessment"]["tests"]["bluetooth-registry-test"]["object"]
+    obj["select"]={name:obj.pop(name) for name in ("hive","key","name")}
+    return doc
+
 
 
 def shell_source(*,with_set=False):
