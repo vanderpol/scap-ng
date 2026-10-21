@@ -130,6 +130,7 @@ jobs:
         run: |
           python tools/audit_v04_condition_fields_preview.py \
             --candidate-zip work/normalized/scap-ng-0.4.0-six-stigs.and-or.json.zip \
+            --canonical-source-zip work/source/scap-ng-0.4.0-six-stigs.json.zip \
             --report work/normalized/condition-fields-naming-census.json
           python - <<'PY'
           import json
@@ -137,10 +138,13 @@ jobs:
           report=json.loads(Path('work/normalized/condition-fields-naming-census.json').read_text())
           assert report['simple_fields_group_candidate_count']==231,report
           assert report['and_groups_by_requirement_source']=={
-              'explicit_leaf_scope_only':3,'group_scope':184,'test_scope':44
+              'explicit_leaf_scope_only':3,'group_scope':184,'test_scope':44,
+              'whole_state_and_groups_preserved':30,
+              'whole_state_and_duplicate_fields':23,
+              'migrated_whole_state_and_tests':30
           },report
           assert report['native_schema_changed'] is False
-          print('PASS: 231 real AND groups have safely grouped unique field keys; 3 explicit-leaf exceptions')
+          print('PASS: 231 structure-only one-State field candidates; 30 outer ANDs preserved, including 23 duplicate-field collisions')
           PY
       - name: Publish diff ledger and changed-only preview, NOT a promoted release
         if: always()
