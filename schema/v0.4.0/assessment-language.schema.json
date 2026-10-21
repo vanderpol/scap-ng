@@ -9891,6 +9891,53 @@
         {
           "type": "object",
           "required": [
+            "xor"
+          ],
+          "properties": {
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            },
+            "xor": {
+              "type": "array",
+              "minItems": 1,
+              "title": "Odd-parity (XOR) of conditions",
+              "description": "Logical XOR: odd number of condition results true under OVAL six-state semantics; distinct from ONE."
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "state_fields_require"
+                ]
+              },
+              "then": {
+                "properties": {
+                  "odd": {
+                    "items": {
+                      "$ref": "#/$defs/scoped_state_entry"
+                    }
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "odd": {
+                    "items": {
+                      "$ref": "#/$defs/state_entry"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "required": [
             "odd"
           ],
           "properties": {
@@ -9898,7 +9945,8 @@
               "type": "array",
               "minItems": 1,
               "title": "An odd number of conditions must hold",
-              "description": "The OVAL-style odd-count aggregation, preserving unknown and error outcomes."
+              "description": "Legacy OVAL odd-parity logical operator across complete condition outcomes; prefer 'xor' (not exactly-one).",
+              "deprecated": true
             },
             "state_fields_require": {
               "$ref": "#/$defs/paired_requirement",
@@ -26680,6 +26728,29 @@
         {
           "type": "object",
           "required": [
+            "xor"
+          ],
+          "properties": {
+            "state_fields_require": {
+              "$ref": "#/$defs/paired_requirement",
+              "title": "Requirements for fields within this State group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+            },
+            "xor": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/scoped_state_entry"
+              },
+              "title": "Odd-parity (XOR) of conditions",
+              "description": "Logical XOR: odd number of condition results true under OVAL six-state semantics; distinct from ONE."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
             "odd"
           ],
           "properties": {
@@ -26690,7 +26761,8 @@
                 "$ref": "#/$defs/scoped_state_entry"
               },
               "title": "An odd number of conditions must hold",
-              "description": "The OVAL-style odd-count aggregation, preserving unknown and error outcomes."
+              "description": "Legacy OVAL odd-parity logical operator across complete condition outcomes; prefer 'xor' (not exactly-one).",
+              "deprecated": true
             },
             "state_fields_require": {
               "$ref": "#/$defs/paired_requirement",
@@ -26784,5 +26856,5 @@
     }
   },
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-10-15"
+  "x-last-modified": "2026-10-21"
 }
