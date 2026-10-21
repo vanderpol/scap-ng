@@ -80,7 +80,28 @@ jobs:
               # Only the flattened graph conforms to the new native Object
               # schema. The original is historical pre-migration source,
               # checked exclusively by exact inverse (not new-schema validation).
-              validate_docs(target,validators)
+              try:
+                  validate_docs(target,validators)
+              except ValueError:
+                  # Fail closed but expose the *nested* schema reason, rather
+                  # than printing only a truncated Set or Test dictionary.
+                  for path,doc in sorted(target.items()):
+                      errs=list(validators[next(iter(doc))].iter_errors(doc))
+                      if not errs: continue
+                      root=errs[0]
+                      print("FIRST_UNVALIDATED",path, flush=True)
+                      def show(error, depth=0):
+                          print("  "*depth,
+                                "at", list(error.absolute_path),
+                                "validator",error.validator,
+                                "schema_path",list(error.absolute_schema_path),
+                                "reason",str(error.message)[:180],flush=True)
+                          if depth<5:
+                              for child in error.context[:12]:
+                                  show(child,depth+1)
+                      show(root)
+                      break
+                  raise
               for key,new in target.items():
                   assert new==yaml[key.removesuffix(".json")+".yaml"],key
                   reconstructed=restore_document(new,ledger["source_inverse"][key]) if key in ledger["source_inverse"] else new
