@@ -7,6 +7,8 @@ on:
       - 'tools/test_migrate_v04_evaluate_and_or.py'
       - 'tools/audit_v04_evaluate_six_state.py'
       - 'tools/test_audit_v04_evaluate_six_state.py'
+      - 'tools/test_v04_evaluate_operator_schema.py'
+      - 'schema/v0.4.0/expression.schema.json'
       - 'tools/build_v04_complete_boolean_preview.py'
       - '.github/workflows/v04-complete-boolean-preview.yml'
   workflow_dispatch:
@@ -29,6 +31,7 @@ jobs:
         run: |
           python tools/test_migrate_v04_evaluate_and_or.py -v
           python tools/test_audit_v04_evaluate_six_state.py -v
+          python tools/test_v04_evaluate_operator_schema.py -v
       - name: Retrieve prior source-verified 123-State AND/OR candidate
         env:
           GH_TOKEN: ${{ github.token }}
@@ -79,7 +82,13 @@ jobs:
           assert p['maintained_compiler_source_view_ir']['source_reconstruction']=='PASS'
           assert p['maintained_compiler_source_view_ir']['yaml_json_byte_parity']=='PASS'
           assert p['candidate_new_grammar_test_references']['json'] == p['candidate_new_grammar_test_references']['yaml']
-          assert p['candidate_executable_compiler_support'] == 'OPEN_NEW_AND_OR_GRAMMAR'
+          assert p['candidate_executable_compiler_support'] == 'OPEN_EXECUTABLE_BACKEND'
+          assert p['candidate_typed_source_ir_compiler'] == 'PASS_NEW_AND_OR_XOR_GRAMMAR'
+          assert p['maintained_compiler_candidate_ir']['source_reconstruction']=='PASS'
+          assert p['maintained_compiler_candidate_ir']['yaml_json_byte_parity']=='PASS'
+          assert p['maintained_compiler_candidate_ir']['native_source_schema']=='PASS'
+          assert p['maintained_compiler_candidate_ir']['tests']==1375
+          assert p['maintained_compiler_candidate_ir']['documents']==4001
           audit=json.loads(Path('work/preview/original-vs-renamed-evaluate-six-state.json').read_text())
           assert audit['status']=='SIX_STATE_EVALUATE_OPERATOR_PARITY_PASS_SCANNER_OPEN'
           assert audit['documents']==4001
@@ -87,7 +96,7 @@ jobs:
           assert audit['total_deterministic_six_state_vectors']>=audit['changed_documents']*6
           assert audit['no_changes_outside_evaluate'] and audit['state_and_item_cardinalities_unchanged']
           print('PASS: all 4001 candidate docs schema-valid and Test refs closed; exact-inverse source compiler passes')
-          print('New AND/OR executable compiler remains a separate OPEN gate')
+          print('New AND/OR input grammar compiles through maintained typed-source IR; executable backend still OPEN')
           PY
       - name: Preserve non-release preview and machine-readable source inverses
         if: always()
