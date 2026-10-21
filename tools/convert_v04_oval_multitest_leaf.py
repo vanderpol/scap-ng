@@ -102,10 +102,12 @@ def convert_one(review, original_file, catalog):
     ensure(not native.get("states") and not native.get("variables") and
            not native.get("shared_objects"),
            "STATE_VARIABLE_OR_SHARED_GRAPH_UNSUPPORTED")
-    ensure(native.get("evaluate") == {"all": [
-        {"test": name} for name in native["evaluate"].get("all", [])
-        for _ in [0]]} and
-           len(native["evaluate"].get("all", [])) == len(original),
+    tree=native.get("evaluate")
+    ensure(isinstance(tree,dict) and set(tree)=={"all"} and
+           isinstance(tree["all"],list) and
+           len(tree["all"])==len(original) and
+           all(isinstance(branch,dict) and set(branch)=={"test"} and
+               isinstance(branch["test"],str) for branch in tree["all"]),
            "AUTHORING_BOOLEAN_TREE_NOT_DIRECT_AND")
     test_names = [entry["test"] for entry in native["evaluate"]["all"]]
     ensure(len(test_names) == len(set(test_names)) and set(test_names) == set(original),
