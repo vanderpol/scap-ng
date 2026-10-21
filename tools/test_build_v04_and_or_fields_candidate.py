@@ -134,5 +134,76 @@ class SixStigFieldPreviewTests(unittest.TestCase):
                 restore_document(edited, ledger)
 
 
+    def test_test_inherited_field_cardinality_survives_both_item_existence_modes(self):
+        # These cases model the corpus's 44 Test-inherited field groups.
+        # The same explicit field default governs BOTH complete conditions,
+        # independently of the Item-existence requirement at Test scope.
+        for items in ("one_or_more", "may_be_absent"):
+            with self.subTest(items=items):
+                original = source_fixture("any")
+                source = original["assessment"]["tests"]["edition-test"]
+                source["state_fields_require"] = "may_be_absent_and_all_match"
+                source["require"]["items"] = items
+                source["require"]["all_items_must"][1].pop(
+                    "state_fields_require")
+                candidate, ledger = project_document(original)
+                self.assertEqual(restore_document(candidate, ledger), original)
+                converted = candidate["assessment"]["tests"]["edition-test"]
+                self.assertEqual(converted["require"]["items"], items)
+                self.assertEqual(converted["state_fields_require"],
+                                 "may_be_absent_and_all_match")
+                alternatives = converted["require"]["all_items_must"][0]["or"]
+                self.assertEqual(len(alternatives), 2)
+                for condition in alternatives:
+                    self.assertEqual(set(condition), {"fields"})
+                    self.assertEqual(set(condition["fields"]), {"type", "value"})
+                changed = ledger["fields"][0]["changed_field_groups"]
+                self.assertEqual(len(changed), 2)
+                self.assertTrue(all(x["uses_test_field_requirement"]
+                                    for x in changed))
+                self.assertTrue(all(
+                    not x["source_has_local_field_requirement"]
+                    for x in changed))
+
+    def test_local_and_leaf_field_requirements_override_test_scope_without_duplication(self):
+        original = source_fixture("any")
+        source = original["assessment"]["tests"]["edition-test"]
+        # First source State inherits the Test default, except its value.
+        source["require"]["all_items_must"][0]["and"][1]["value"][
+            "require"] = "none_exist"
+        # Second State declares its own group default, except its type.
+        source["require"]["all_items_must"][1]["and"][0]["type"][
+            "require"] = "at_least_one_exists_and_all_match"
+        candidate, ledger = project_document(original)
+        self.assertEqual(restore_document(candidate, ledger), original)
+        test = candidate["assessment"]["tests"]["edition-test"]
+        first, second = test["require"]["all_items_must"][0]["or"]
+        self.assertEqual(set(first), {"fields"})
+        self.assertEqual(first["fields"]["value"]["require"], "none_exist")
+        self.assertNotIn("require", first)
+        self.assertEqual(list(second), ["require", "fields"])
+        self.assertEqual(second["require"], "may_be_absent_and_all_match")
+        self.assertEqual(second["fields"]["type"]["require"],
+                         "at_least_one_exists_and_all_match")
+        self.assertEqual(test["state_fields_require"],
+                         "at_least_one_exists_and_all_match")
+
+    def test_field_group_projection_cannot_erase_a_test_wide_inheritance_scope(self):
+        original = source_fixture("any")
+        original["assessment"]["tests"]["edition-test"]["require"][
+            "all_items_must"][1].pop("state_fields_require")
+        candidate, ledger = project_document(original)
+        self.assertEqual(restore_document(candidate, ledger), original)
+        # Moving a shared policy into one branch silently changes the other.
+        # Even if its text value is identical, it is NOT source equivalent.
+        changed = deepcopy(candidate)
+        test = changed["assessment"]["tests"]["edition-test"]
+        policy = test.pop("state_fields_require")
+        alternatives = test["require"]["all_items_must"][0]["or"]
+        alternatives[0]["require"] = policy
+        with self.assertRaises(ValueError):
+            restore_document(changed, ledger)
+
+
 if __name__ == "__main__":
     unittest.main()
