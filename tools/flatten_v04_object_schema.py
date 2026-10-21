@@ -141,10 +141,18 @@ def flatten_schema(obj, native, *, capability):
             rule["if"] = {"anyOf": deepcopy(alternatives)}
         consequence = rule.get("then", {})
         if consequence.get("required") == ["select"]:
-            consequence["required"] = []
-            consequence["allOf"] = [
-                {"anyOf": [{"required": sorted(c)} for c in selector_alternatives]}
-            ]
+            if not selector_alternatives:
+                # Some acquisition-only capabilities have no selector
+                # alternative at all. Their legacy for_each => select
+                # precondition must stay impossible, not become an empty
+                # JSON Schema anyOf (which is itself schema-invalid).
+                rule["then"] = False
+            else:
+                consequence["required"] = []
+                consequence["allOf"] = [
+                    {"anyOf": [{"required": sorted(c)}
+                               for c in selector_alternatives]}
+                ]
     source["description"] = (
         f"{capability} native flat Object; legal selector and acquisition keys "
         "are capability-defined. Generic select/collect wrappers are invalid."
