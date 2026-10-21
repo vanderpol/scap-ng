@@ -77,7 +77,10 @@ jobs:
           assert ledger["catalog_size"]==100 and ledger["changed_objects"]>0
           with TemporaryDirectory() as temp:
               validators=_schema_validators(candidate_schema(Path(temp)/"v0.4.0"))
-              validate_docs(original,validators)
+              # Only the flattened graph conforms to the new native Object
+              # schema. The original is historical pre-migration source,
+              # checked exclusively by exact inverse (not new-schema validation).
+              validate_docs(target,validators)
               for key,new in target.items():
                   assert new==yaml[key.removesuffix(".json")+".yaml"],key
                   reconstructed=restore_document(new,ledger["source_inverse"][key]) if key in ledger["source_inverse"] else new
