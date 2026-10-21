@@ -112,6 +112,18 @@ def convert_one(review, original_file, catalog):
     test_names = [entry["test"] for entry in native["evaluate"]["all"]]
     ensure(len(test_names) == len(set(test_names)) and set(test_names) == set(original),
            "AUTHORING_TEST_REFERENCE_MISMATCH")
+    # Canonical 0.4 Test references end in '-test'. Historical 0.3
+    # conversion identifiers are source-derived but often do not. Build a
+    # one-to-one rewrite and preserve each original source name in provenance.
+    canonical_names={}
+    for old_name in original:
+        new_name=old_name if old_name.endswith("-test") else old_name+"-test"
+        ensure(new_name not in canonical_names.values() and
+               all(x.islower() or x.isdigit() or x=="-" for x in new_name) and
+               not new_name.startswith("-") and "--" not in new_name,
+               "TEST_ID_REWRITE_COLLISION_OR_INVALID")
+        canonical_names[old_name]=new_name
+
     original_by_comment = {}
     for ref in refs:
         src_test = ids[ref]
@@ -127,6 +139,10 @@ def convert_one(review, original_file, catalog):
         "id", "version", "assessment_title", "mode", "class", "purpose", "evaluate")})
     ensure(output["mode"] == "automated", "NOT_AUTOMATED")
     output["specification"] = {"id": SCHEMA, "version": "0.4.0"}
+    # Original OVAL criteria default AND. The explicitly preferred 0.4
+    # equivalent is 'and', not the legacy deprecated 'all' spelling.
+    output["evaluate"] = {"and": [{"test": canonical_names[x["test"]]}
+                                  for x in tree["all"]]}
     output["tests"] = {}
     ledger = []
     seen_obj_refs = set()
@@ -200,7 +216,7 @@ def convert_one(review, original_file, catalog):
                    set(field.attrib) <= {"operation", "datatype"} and
                    field.text == old_field["value"],
                    "ORIGINAL_OVAL_SELECTOR_MISMATCH")
-        output["tests"][name] = {
+        output["tests"][canonical_names[name]] = {
             "test_title": oldtest["test_title"],
             "capability": cap,
             "object": obj,
@@ -208,8 +224,9 @@ def convert_one(review, original_file, catalog):
             "require": {"items": "one_or_more"}
         }
         ledger.append({
-            "native_test_name": name, "oval_test_id": source_test["id"]
-            if isinstance(source_test, dict) else source_test.get("id"),
+            "previous_source_test_name": name,
+            "canonical_040_test_name": canonical_names[name],
+            "oval_test_id": source_test.get("id"),
             "oval_object_id": src_obj.get("id"),
             "source_object_name": ref,
             "capability": cap
