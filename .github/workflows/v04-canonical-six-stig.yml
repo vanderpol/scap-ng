@@ -30,6 +30,9 @@ on:
       - 'tools/v04_canonical_version_preview.py'
       - 'tools/test_v04_canonical_version_preview.py'
       - 'tools/v04_canonical_unsigned_package.py'
+      - 'tools/v04_flat_object_authoring.py'
+      - 'tools/test_v04_flat_object_authoring.py'
+      - 'schema/v0.4.0/capability-mappings/supported/**'
       - 'tools/test_v04_canonical_unsigned_package.py'
       - 'tools/v04_exception_source_oracle.py'
       - 'tools/test_v04_exception_source_oracle.py'
@@ -206,6 +209,41 @@ jobs:
           name: 0.4-filter-migration-gate
           path: work/v04-filter-guard-*.json
           if-no-files-found: ignore
+      - name: Apply approved flat-Object migration and prove source reconstruction
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_flat_object_authoring.py
+          python tools/v04_flat_object_authoring.py \
+            --source-json work/scap-ng-0.4.0-six-stigs.json.zip \
+            --candidate-json work/flat-0.4.0-six-stigs.json.zip \
+            --candidate-yaml work/flat-0.4.0-six-stigs.yaml.zip \
+            --proof work/v04-flat-object-source-inverse.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from v04_a_authoring_graph_index import read_authoring_archive
+          from v04_flat_object_authoring import restore_document
+          root=Path('work')
+          old_json=read_authoring_archive(root/'scap-ng-0.4.0-six-stigs.json.zip','json')
+          old_yaml=read_authoring_archive(root/'scap-ng-0.4.0-six-stigs.yaml.zip','yaml')
+          new_json=read_authoring_archive(root/'flat-0.4.0-six-stigs.json.zip','json')
+          new_yaml=read_authoring_archive(root/'flat-0.4.0-six-stigs.yaml.zip','yaml')
+          proof=json.loads((root/'v04-flat-object-source-inverse.json').read_text())
+          assert len(old_json)==len(old_yaml)==len(new_json)==len(new_yaml)==4001
+          assert proof['documents']==4001 and proof['catalog_size']==100
+          assert proof['changed_objects']>0 and not proof['native_schema_promoted']
+          for name,doc in old_json.items():
+              yaml_name=name.removesuffix('.json')+'.yaml'
+              assert old_yaml[yaml_name]==doc,('historical source YAML/JSON',name)
+              assert new_json[name]==new_yaml[yaml_name],('flat YAML/JSON',name)
+              restored=(restore_document(new_json[name],proof['source_inverse'][name])
+                        if name in proof['source_inverse'] else new_json[name])
+              assert restored==doc,('flat migration changed source',name)
+          print('PASS: 4,001 original YAML/JSON and flat YAML/JSON graphs with exact inverse')
+          PY
+          mv work/flat-0.4.0-six-stigs.json.zip work/scap-ng-0.4.0-six-stigs.json.zip
+          mv work/flat-0.4.0-six-stigs.yaml.zip work/scap-ng-0.4.0-six-stigs.yaml.zip
       - name: Inventory remaining canonical 0.4.0 authoring blockers
         run: |
           python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip --report work/yaml-blocker-audit.json
