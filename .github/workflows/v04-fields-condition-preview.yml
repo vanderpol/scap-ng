@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/validate_v04_fields_condition_preview.py'
       - 'tools/test_validate_v04_fields_condition_preview.py'
+      - 'tools/build_v04_and_or_fields_candidate.py'
+      - 'tools/test_build_v04_and_or_fields_candidate.py'
       - '.github/workflows/v04-fields-condition-preview.yml'
   workflow_dispatch:
 permissions:
@@ -23,7 +25,9 @@ jobs:
       - name: Reject hidden field defaults and mixed logical scope
         env:
           PYTHONPATH: tools
-        run: python tools/test_validate_v04_fields_condition_preview.py -v
+        run: |
+          python tools/test_validate_v04_fields_condition_preview.py -v
+          python tools/test_build_v04_and_or_fields_candidate.py -v
       - name: Retrieve original-source-reversible field-group preview
         env:
           GH_TOKEN: ${{ github.token }}
