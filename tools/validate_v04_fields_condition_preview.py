@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Validate proposal-only SCAP-NG 0.4 condition fields+require vocabulary.
 
-Human-facing proposal: `fields` is one original OVAL State-sized complete
-condition, with ordinary field AND defined by the grammar, and a preceding
-local `require` (or explicitly declared enclosing Test field requirement).
+Owner-approved naming direction: `field_requirement` at Test.require, complete
+condition, and individual field scope. Old `require`/`state_fields_require`
+are still accepted ONLY to validate unchanged source-pinned preview archives.
 The official versioned schema is NEVER modified by this script.
 
 Fail closed if a field lacks a local, explicit source-inherited, or own
@@ -48,13 +48,16 @@ def candidate_schema(path):
           "required":["fields"],
           "properties":{
             "require":{"$ref":"#/$defs/paired_requirement",
-                       "description":"Explicit local field existence/matching rule; overrides declared Test scope."},
+                       "description":"Legacy local field cardinality spelling retained for pinned source preview."},
+            "field_requirement":{"$ref":"#/$defs/paired_requirement",
+                       "description":"Preferred field existence/matching rule at this complete condition."},
             "fields":{"type":"object","minProperties":2,
                       "propertyNames":{"type":"string","minLength":1},
                       "additionalProperties":{"$ref":"#/$defs/"+predicate},
                       "description":"One complete expected condition, AND of ordinary field predicates."},
           },
           "additionalProperties":False,
+          "not":{"required":["require","field_requirement"]},
           "title":"Proposed complete expected condition (NOT accepted schema)"
         }
         entries.append(branch)
@@ -68,7 +71,33 @@ def candidate_schema(path):
                     "$ref":"#/$defs/paired_requirement",
                     "description":"Explicit inherited field rule for all complete child conditions; never an Item quantifier."
                 }
-                choice["not"]={"required":["require","state_fields_require"]}
+                choice["properties"]["field_requirement"]={
+                    "$ref":"#/$defs/paired_requirement",
+                    "description":"Explicit inherited requirement for all child expected-field conditions."
+                }
+                choice["not"]={"anyOf":[
+                    {"required":["require","state_fields_require"]},
+                    {"required":["field_requirement","state_fields_require"]},
+                    {"required":["require","field_requirement"]}
+                ]}
+    # Research-only accepted spelling at the distinct Test Item/field scope.
+    # Do not edit the official versioned source schemas here.
+    for name in ("all_items_requirement","scoped_all_items_requirement"):
+        d["$defs"][name]["properties"]["field_requirement"]={
+            "$ref":"#/$defs/paired_requirement",
+            "description":"Explicit inherited field cardinality, independent of items."
+        }
+    leaf=d["$defs"]["inherited_field_predicate"]
+    leaf["properties"]["field_requirement"]={"$ref":"#/$defs/paired_requirement"}
+    leaf.setdefault("allOf",[]).append({
+        "not":{"required":["require","field_requirement"]}
+    })
+    # The Test accepts only one of the two old/new Test-wide spellings.
+    test=d["$defs"]["test"]
+    test.setdefault("allOf",[]).append({
+        "not":{"required":["state_fields_require"],
+               "properties":{"require":{"required":["field_requirement"]}}}
+    })
     d["x-last-modified"]="2026-10-21"
     dest.write_text(json.dumps(d,indent=2)+"\n")
     return path
@@ -82,12 +111,15 @@ def field_scopes(test):
     if not isinstance(requirement,dict) or not isinstance(requirement.get("all_items_must"),list):
         return []
     result=[]
-    test_scope=test.get("state_fields_require")
+    if ("state_fields_require" in test and "field_requirement" in requirement):
+        raise ValueError("Conflicting legacy and new Test field requirement scopes")
+    test_scope=requirement.get("field_requirement",test.get("state_fields_require"))
     def visit(node,inherited,path):
         if not isinstance(node,dict) or not node:
             raise ValueError("Empty/malformed State condition at "+str(path))
         if "fields" in node:
-            if set(node)-{"fields","require"}:
+            if (set(node)-{"fields","require","field_requirement"} or
+                ("require" in node and "field_requirement" in node)):
                 raise ValueError("Ambiguous fields condition containing logical siblings")
             fields=node["fields"]
             if not isinstance(fields,dict) or len(fields)<2:
@@ -97,12 +129,16 @@ def field_scopes(test):
                 raise ValueError("Invalid field map in condition")
             if any("record" in field for field in fields.values()):
                 raise ValueError("Record cardinality must not inherit ordinary scalar scope")
-            local=node.get("require")
+            local=node.get("field_requirement",node.get("require"))
             if local is not None and not isinstance(local,str):
                 raise ValueError("Local field requirement must be explicit scalar token")
             effective=local if local is not None else inherited
+            for field in fields.values():
+                if "require" in field and "field_requirement" in field:
+                    raise ValueError("Conflicting field-level requirements")
             if effective is None and not all(
-                 isinstance(field.get("require"),str) for field in fields.values()):
+                 isinstance(field.get("field_requirement",field.get("require")),str)
+                 for field in fields.values()):
                 raise ValueError("Field missing explicit or inherited existence+matching")
             scope=("local" if local is not None else
                    "inherited" if effective is not None else "each_field")
@@ -111,11 +147,14 @@ def field_scopes(test):
         logical=[name for name in LOGICAL if name in node and isinstance(node[name],list)]
         if logical:
             if (len(logical)!=1 or
-                set(node)-{logical[0],"state_fields_require","require"} or
-                ("require" in node and "state_fields_require" in node)):
+                set(node)-{logical[0],"state_fields_require","require",
+                           "field_requirement"} or
+                sum(k in node for k in ("require","state_fields_require",
+                                         "field_requirement"))>1):
                 raise ValueError("Ambiguous nested State operators")
             op=logical[0]
-            child_scope=node.get("require",node.get("state_fields_require",inherited))
+            child_scope=node.get("field_requirement",
+                         node.get("require",node.get("state_fields_require",inherited)))
             if not node[op]:
                 raise ValueError("Empty logical State aggregation")
             for i,child in enumerate(node[op]):
