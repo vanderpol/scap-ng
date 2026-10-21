@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Source-invertible SCAP-NG 0.4 field_requirement naming regressions."""
 from copy import deepcopy
+from itertools import product
 import unittest
 
 from rename_v04_field_requirement_preview import (
     migrate_test, restore_test, migrate_document
 )
-from research_v04_oval_logic_scopes import candidate_logic
+from research_v04_oval_logic_scopes import candidate_logic, RESULTS
 from oval_result_truth_tables import aggregate_operator
 
 
@@ -88,6 +89,31 @@ class ReversibleFieldRequirementTests(unittest.TestCase):
                                      source["state_fields_require"])
                     self.assertEqual(list(output["require"]["all_items_must"][0]), [op])
                     self.assertEqual(restore_test(output, proof), source)
+
+    def test_complete_state_operator_is_six_state_equivalent_over_all_field_vectors(self):
+        # Exhaustive independent reference/candidate operator comparison.
+        # This does not claim that a zero-entity value comparison is resolved;
+        # it starts AFTER each field predicate already has a six-state result.
+        original=source_fixture()
+        for op in ("and","or","one","xor"):
+            modified=deepcopy(original)
+            clause=modified["require"]["all_items_must"][0]
+            clause[op]=clause.pop("or")
+            renamed,proof=migrate_test(modified)
+            self.assertIsNotNone(proof)
+            self.assertEqual(restore_test(renamed,proof),modified)
+            branch=renamed["require"]["all_items_must"][0][op]
+            self.assertEqual(len(branch),2)
+            self.assertTrue(all("fields_operator" not in b for b in branch))
+            for values in product(RESULTS,repeat=4):
+                left,right=values[:2],values[2:]
+                original_result=aggregate_operator(op.upper(),[
+                    aggregate_operator("AND",left),
+                    aggregate_operator("AND",right)])
+                candidate_result=candidate_logic(op,[
+                    candidate_logic("and",left),
+                    candidate_logic("and",right)])
+                self.assertEqual(original_result,candidate_result,(op,values))
 
     def test_mutation_to_logic_field_value_or_requirement_breaks_inverse(self):
         source = source_fixture()
