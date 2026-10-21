@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Focused source-backed canonical requirement and six-state oracle guards."""
 import unittest
+from copy import deepcopy
+from pathlib import Path
 
 from v04_canonical_requirement_oracle import (
     comparison_matrix, compare_original_to_canonical, describe, source_axes,
 )
 from build_v04_canonical_six_stigs import promote
+from v04_flat_object_authoring import flatten_document, load_catalog
 
 
 class SourceRequirementOracleTests(unittest.TestCase):
@@ -38,6 +41,30 @@ class SourceRequirementOracleTests(unittest.TestCase):
         self.assertEqual(canonical["require"]["items"], "one_or_more")
         self.assertEqual(canonical["require"]["all_items_must"], old["states"])
         self.assertNotIn("capability", canonical["object"])
+
+    def test_flat_object_promotion_must_be_source_exact(self):
+        source, prefixed = self._docs({
+            "capability": "unix.file",
+            "object": {"capability": "unix.file",
+                       "select": {"full_path": {"equals": "/etc/real.conf"}}},
+            "require": "none_exist",
+        })
+        catalog = load_catalog(Path(__file__).resolve().parents[1] /
+                               "schema/v0.4.0/capability-mappings/supported")
+        name = "authoring/demo/a.json"
+        flat, inverse = flatten_document(prefixed[name], catalog)
+        self.assertTrue(inverse["edits"])
+        canonical = {name: flat}
+        report = compare_original_to_canonical(source, canonical)
+        self.assertEqual(report["source_exact_promotion"], "PASS")
+        self.assertEqual(report["test_population"]["converted_presence"], 1)
+        mutated = deepcopy(canonical)
+        mutated[name]["assessment"]["tests"]["test"]["object"][
+            "full_path"]["equals"] = "/etc/altered.conf"
+        with self.assertRaisesRegex(ValueError, "differs from exact source"):
+            compare_original_to_canonical(source, mutated)
+        with self.assertRaisesRegex(ValueError, "differs from exact source"):
+            compare_original_to_canonical(source, prefixed)
 
     def test_unsupported_matching_remains_exception(self):
         source, newer = self._docs({
