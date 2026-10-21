@@ -58,7 +58,7 @@ class CanonicalResultPlanTests(unittest.TestCase):
             plan, {"left-test": "true", "right-test": "false"})["outcome"],
             "false")
         self.assertEqual(evaluate_supplied_results(
-            plan, {"left-test": "unknown", "right-test": "true"})["outcome"],
+            plan, {"left-test": "unknown", "right-test": "false"})["outcome"],
             "unknown")
         self.assertEqual(evaluate_supplied_results(
             plan, {"left-test": "false", "right-test": "error"})["outcome"],
