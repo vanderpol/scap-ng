@@ -54,23 +54,6 @@ def _manifest_schema():
     return Draft202012Validator(json.loads(path.read_text(encoding="utf-8")))
 
 
-def partition_documents(documents):
-    """Include local documents and complete shared library; omit other private STIGs.
-
-    Full shared library is intentionally retained, even if some contents are
-    unreferenced, until strict per-Benchmark dependency pruning is proven.
-    """
-    all_graph = graph_index(documents)
-    overall_edges = inspect_edges(documents)
-    if overall_edges["incompatible_edge_count"]:
-        raise ValueError("incompatible 0.4.0 Benchmark Assessment specifications")
-    benchmarks = {}
-    for path, doc in documents.items():
-        if "benchmark" in doc:
-            folder = _folder(path)
-            if folder in benchmarks:
-                raise ValueError("duplicate Benchmark namespace: " + folder)
-            benchmarks[folder] = path
 def _verify_exact_rule_inventory(documents, benchmark):
     """Exclude unlisted Rule documents and incomplete Benchmark rule lists.
 
@@ -88,6 +71,23 @@ def _verify_exact_rule_inventory(documents, benchmark):
         raise ValueError("Benchmark Rule list/inventory differs from packaged Rules")
 
 
+def partition_documents(documents):
+    """Include local documents and complete shared library; omit other private STIGs.
+
+    Full shared library is intentionally retained, even if some contents are
+    unreferenced, until strict per-Benchmark dependency pruning is proven.
+    """
+    all_graph = graph_index(documents)
+    overall_edges = inspect_edges(documents)
+    if overall_edges["incompatible_edge_count"]:
+        raise ValueError("incompatible 0.4.0 Benchmark Assessment specifications")
+    benchmarks = {}
+    for path, doc in documents.items():
+        if "benchmark" in doc:
+            folder = _folder(path)
+            if folder in benchmarks:
+                raise ValueError("duplicate Benchmark namespace: " + folder)
+            benchmarks[folder] = path
     if not benchmarks:
         raise ValueError("no Benchmark source files")
     result = {}
