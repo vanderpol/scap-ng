@@ -6,11 +6,13 @@ on:
       - '.github/workflows/v04-oval-family-variable-roundtrip.yml'
       - 'tools/convert_v04_oval_family_constant_variable.py'
       - 'tools/export_v04_oval_family_constant_variable.py'
+      - 'tools/promote_v04_family_variable_oval_proof.py'
       - 'schema/v0.4.0/**'
       - 'tools/generate_capability_schema_v04.py'
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
   family-variable-original-oval:
     runs-on: ubuntu-latest
@@ -166,6 +168,50 @@ jobs:
             'altered_source_xml_var_check_rejected':True
           },indent=2)+'\n')
           print('PASS: XML source, 0.4 authored and independent export mutation guards')
+          PY
+      - name: Promote exact family XML proof into the 167-Definition ledger
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/previous-validations
+          gh run download 39650446604 --repo "$GH_REPO" \
+            --name v04-original-oval-multitest-source-and-schema-validated-pilot \
+            --dir work/previous-validations
+          test -f work/previous-validations/cumulative-167-definition-readiness.json
+          python scap-ng/tools/promote_v04_family_variable_oval_proof.py \
+            --previous-ledger work/previous-validations/cumulative-167-definition-readiness.json \
+            --family-artifacts work/family-variable \
+            --output work/family-variable/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from copy import deepcopy
+          from promote_v04_family_variable_oval_proof import promote
+          root=Path('work/family-variable')
+          now=json.loads((root/'cumulative-167-definition-readiness.json').read_text())
+          assert len(now['records'])==167
+          assert now['current_040_schema_and_original_source_validated']==3
+          assert now['current_040_original_xml_roundtrip_exported']==3
+          assert now['remaining_v003_compatible_without_current_040_proof']==159
+          assert now['original_source_invalid_or_deprecated']==5
+          assert now['scanner_result_parity_proven']==0
+          try: promote(now,root)
+          except ValueError as error:
+              assert 'Previous complete' in str(error),str(error)
+          else: raise AssertionError('Previously promoted family source accepted twice')
+          earlier=json.loads(Path(
+              'work/previous-validations/cumulative-167-definition-readiness.json'
+          ).read_text())
+          bad=deepcopy(earlier)
+          row=next(x for x in bad['records'] if x['source_file']=='agnostic/ind-def_family_test.xml')
+          row['original_source_file_sha256']='0'*64
+          try: promote(bad,root)
+          except ValueError as error:
+              assert 'source hash' in str(error),str(error)
+          else: raise AssertionError('Falsified original XML hash promoted')
+          print('PASS: full 167-Definition ledger counts 3 source/native/XSD/semantic-proven cases')
           PY
       - name: Add review index and publish actual validated outputs
         run: |
