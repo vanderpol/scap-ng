@@ -72,19 +72,32 @@ def _verify_foreach_lineage(assessment, sites):
         if alias in inherited:
             raise ValueError(f"{where}: for_each alias shadows inherited {alias!r}")
         visible = set(inherited) | {alias}
-        selectors = obj.get("select") or {}
-        if not isinstance(selectors, dict):
+        # Earlier source placed projection selectors under object.select;
+        # approved canonical 0.4.0 flattens them onto the Object itself.
+        # Keep both read paths for source-IR conversion, but never guess an
+        # alias or treat an unrelated nested map as a projected selector.
+        legacy = obj.get("select")
+        if legacy is not None and not isinstance(legacy, dict):
             raise ValueError(f"{where}: for_each select must be a mapping")
+        wrapped = [
+            (field, selector) for field, selector in (legacy or {}).items()
+            if isinstance(selector, dict) and "from" in selector
+        ]
+        flat = [
+            (field, selector) for field, selector in obj.items()
+            if field != "select" and isinstance(selector, dict) and "from" in selector
+        ]
+        if wrapped and flat:
+            raise ValueError(f"{where}: conflicting wrapped and flat for_each projections")
         binding_aliases = []
-        for field, selector in sorted(selectors.items()):
-            if isinstance(selector, dict) and "from" in selector:
-                ref = selector["from"]
-                if not isinstance(ref, str) or "." not in ref:
-                    raise ValueError(f"{where}: malformed projected source at {field}")
-                source_alias, source_field = ref.split(".", 1)
-                if not source_field or source_alias not in visible:
-                    raise ValueError(f"{where}: out-of-scope projected alias {ref!r}")
-                binding_aliases.append(source_alias)
+        for field, selector in sorted(wrapped or flat):
+            ref = selector["from"]
+            if not isinstance(ref, str) or "." not in ref:
+                raise ValueError(f"{where}: malformed projected source at {field}")
+            source_alias, source_field = ref.split(".", 1)
+            if not source_field or source_alias not in visible:
+                raise ValueError(f"{where}: out-of-scope projected alias {ref!r}")
+            binding_aliases.append(source_alias)
         if alias not in binding_aliases:
             raise ValueError(f"{where}: for_each must project from current alias {alias!r}")
         return tuple(inherited) + (alias,)
@@ -203,6 +216,14 @@ def index_assessment_dataflow(assessment):
                     for field, selector in sorted(value["select"].items()):
                         if isinstance(selector, dict) and isinstance(selector.get("from"), str):
                             sites.append({"kind": "projection", "path": path + ["select", field, "from"],
+                                          "source_sha256": sha256(canonical_json(selector)).hexdigest()})
+                if "for_each" in value:
+                    # Canonical 0.4.0 Object selectors no longer have a
+                    # generic select wrapper. Retain their lexical sites.
+                    for field, selector in sorted(value.items()):
+                        if (field != "select" and isinstance(selector, dict)
+                                and isinstance(selector.get("from"), str)):
+                            sites.append({"kind": "projection", "path": path + [field, "from"],
                                           "source_sha256": sha256(canonical_json(selector)).hexdigest()})
 
     # Only named Objects and Variables participate in the source-dataflow DAG;
