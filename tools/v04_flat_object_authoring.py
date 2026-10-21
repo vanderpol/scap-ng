@@ -171,11 +171,16 @@ def hybridize(node, key=None):
     } and not isinstance(next(iter(node.values())), (list, dict)))
     simple_fields = key == "fields" and bool(mapped) and all(
         isinstance(v, FlowMap) for v in mapped.values())
-    simple_object = key == "object" and bool(mapped) and all(
-        isinstance(v, FlowMap) for v in mapped.values())
+    # object_title is descriptive metadata, not a reason to expand otherwise
+    # short Object selector comparisons into separate YAML lines.
+    simple_object = (key == "object" and
+        any(isinstance(v, FlowMap) for name, v in mapped.items()
+            if name != "object_title") and
+        all(name == "object_title" or isinstance(v, FlowMap)
+            for name, v in mapped.items()))
     if comparator or simple_fields or simple_object:
         approx = len(json.dumps(mapped, ensure_ascii=False))
-        limit = 140 if simple_fields else 180 if simple_object else 90
+        limit = 140 if simple_fields else 210 if simple_object else 90
         if approx <= limit:
             return FlowMap(mapped)
     return mapped
