@@ -81,16 +81,17 @@ class ProposedFieldsScopeTests(unittest.TestCase):
         with TemporaryDirectory() as td:
             proposal=candidate_schema(Path(td)/"v0.4.0")
             d=json.loads((proposal/"assessment-language.schema.json").read_text())
-            v=Draft202012Validator({
-                "$ref":"#/$defs/scoped_state_entry",
-                "$defs":d["$defs"],
-            })
             good=fixture()["require"]["all_items_must"][0]
-            self.assertEqual(list(v.iter_errors(good)),[])
-            bad=deepcopy(good)
-            bad["or"]=[{"value":{"equals":0}}]
-            self.assertTrue(list(v.iter_errors(bad)))
-            self.assertTrue(list(v.iter_errors({"fields":{}})))
+            for scope in ("scoped_state_entry","state_entry"):
+                v=Draft202012Validator({
+                    "$ref":"#/$defs/"+scope,
+                    "$defs":d["$defs"],
+                })
+                self.assertEqual(list(v.iter_errors(good)),[],scope)
+                bad=deepcopy(good)
+                bad["or"]=[{"value":{"equals":0}}]
+                self.assertTrue(list(v.iter_errors(bad)),scope)
+                self.assertTrue(list(v.iter_errors({"fields":{}})),scope)
         self.assertEqual(active,(root/"schema/v0.4.0/assessment-language.schema.json").read_bytes())
 
 
