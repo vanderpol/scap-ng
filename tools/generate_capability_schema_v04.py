@@ -341,9 +341,15 @@ def main():
     args.output.write_text(json.dumps(output,indent=2,sort_keys=True)+"\n")
     print(json.dumps({
         "capability":m["capability"],"version":VERSION,
-        "object_selector_fields":len(
-            output.get("$defs",{}).get("object",{}).get("properties",{}).
-            get("select",{}).get("properties",{})
+        # A flat native Object has no generic select/collect wrappers.
+        # Report source-declared selector/parameter counts, not the obsolete
+        # nested select.properties path (which now always returned zero).
+        "object_selector_fields":len(m["native"].get("selector_map",{})),
+        "object_acquisition_parameters":len(
+            m["native"].get("collection_parameters",{})),
+        "direct_object_filters_supported":(
+            "filters" in output.get("$defs",{}).get("object",{}).
+            get("properties",{})
         ),
         "state_predicates":len(
             output.get("$defs",{}).get("state_predicate",{}).get("oneOf",[])
