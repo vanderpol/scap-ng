@@ -2,7 +2,7 @@
 
 **Current authoring samples: 0.4.0 pre-alpha.** Start with the policy: a **Benchmark** identifies what is covered, a **Rule** says what is required, and an **Assessment** explains how to check it.
 
-**Current canonical six-STIG YAML/JSON review ZIPs:** [successful October 21 CI artifact](https://github.com/vanderpol/scap-ng/actions/runs/39677900589#artifacts) (includes independent validation reports and six unsigned source packages). The earlier [October 20 immutable YAML/JSON pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) predates the approved flat-Object regeneration. [Assessment examples](assessments.md).
+**Current canonical six-STIG YAML/JSON review ZIPs:** [immutable October 21 source-only release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261021) (includes independent validation reports and six unsigned source packages). The earlier [October 20 immutable YAML/JSON pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) predates the approved flat-Object regeneration. [Assessment examples](assessments.md).
 
 The packages contain **4,001 authoring documents** for RHEL 9, Oracle Linux 9, Windows 11, Windows Server 2025, Windows Server DNS, and Apache HTTP Server 2.4 UNIX. The directory structure separates Benchmarks, Rules, automated/manual Assessments and reusable shared Assessments. Both formats represent the same normalized source graph.
 
