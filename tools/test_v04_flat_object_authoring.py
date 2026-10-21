@@ -65,6 +65,36 @@ class FlatObjectAuthoringTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "ambiguous"):
             flatten_document(case("windows.cmdlet", {"select": native_select}), CATALOG)
 
+    def test_standalone_shared_objects_are_flattened_and_inverted(self):
+        doc = {"assessment": {
+            "tests": {"a": {"capability": "linux.partition",
+                            "object": "home-mount-object"}},
+            "shared_objects": {"home-mount-object": {
+                "capability": "linux.partition",
+                "select": {"mount_point": {"equals": "/home"}}},
+                "config-object": {
+                    "capability": "independent.shellcommand",
+                    "collect": {"shell": "bash",
+                                "command": "printf ok",
+                                "error_if_exit_status_not_0": False,
+                                "error_if_stderr_exists": False}}}}
+        value, proof = migrated(doc)
+        obj = value["assessment"]["shared_objects"]["home-mount-object"]
+        self.assertEqual(obj["mount_point"], {"equals": "/home"})
+        self.assertNotIn("select", obj)
+        self.assertNotIn("collect",
+                         value["assessment"]["shared_objects"]["config-object"])
+        self.assertEqual(len(proof["edits"]), 2)
+        self.assertEqual(restore_document(value, proof), doc)
+
+    def test_condition_override_precedes_compact_fields_when_printed(self):
+        expected = {"fields": {"type": {"equals": "string"},
+                               "value": {"equals": "Enterprise"}},
+                    "field_requirement": "at_least_one_exists_and_all_match"}
+        text = dump_hybrid(expected)
+        self.assertLess(text.index("field_requirement:"), text.index("fields:"))
+        self.assertIn("fields: {type: {equals: string}, value: {equals: Enterprise}}", text)
+
     def test_real_set_operand_and_filter_position_untouched(self):
         source = case("unix.file", {"set": {"operator": "intersection",
             "operands": [
