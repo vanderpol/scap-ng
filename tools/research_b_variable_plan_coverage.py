@@ -17,10 +17,19 @@ from research_b_variable_schedule import plan_source_variables
 
 def coverage(capsules):
     entries=[]
-    for aid,cap in sorted(capsules.items()):
+    seen_assessment_ids=set()
+    for capsule_key,cap in sorted(capsules.items()):
         a=cap["source_document"].get("assessment",{})
         if a.get("mode")!="automated" or not a.get("variables"):
             continue
+        # Corpus capsule dictionary keys are transport identifiers, not
+        # necessarily the publisher's stable Assessment logical identity.
+        aid=a.get("id")
+        if not isinstance(aid,str) or not aid.strip():
+            raise ValueError("Variable Assessment is missing its logical ID")
+        if aid in seen_assessment_ids:
+            raise ValueError("Duplicate Variable Assessment logical ID: "+aid)
+        seen_assessment_ids.add(aid)
         source=cap["source_path"]
         try:
             plan=plan_source_variables(a)
