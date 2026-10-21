@@ -77,6 +77,20 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Rule list"):
             partition_documents(src)
 
+    def test_partition_rejects_orphan_folder_without_benchmark(self):
+        # An otherwise valid, unreferenced Assessment in a seventh folder
+        # must not be dropped when six complete packages are produced.
+        docs = deepcopy(self.docs)
+        orphan = deepcopy(docs["authoring/demo/assessments/a1.json"])
+        orphan["assessment"]["id"] = "orphan-assessment"
+        docs["authoring/unassigned/assessments/extra.json"] = orphan
+        with self.assertRaisesRegex(ValueError, "unassigned source documents"):
+            partition_documents(docs)
+        docs.pop("authoring/unassigned/assessments/extra.json")
+        docs["authoring/shared/assessments/extra.json"] = orphan
+        scoped = partition_documents(docs)
+        self.assertIn("authoring/shared/assessments/extra.json", scoped["demo"])
+
     def test_unsigned_package_rejects_extra_member(self):
         archive, _ = build_package(self.docs, validate_schema=False)
         with self.assertRaisesRegex(ValueError, "extra unlisted"):
