@@ -5,6 +5,8 @@ on:
     paths:
       - '.github/workflows/v04-oval-multitest-leaf.yml'
       - 'tools/convert_v04_oval_multitest_leaf.py'
+      - 'tools/merge_v04_oval_test_content_coverage.py'
+      - 'tools/audit_v04_oval_test_content_readiness.py'
       - 'tools/v04_flat_object_authoring.py'
       - 'schema/v0.4.0/**'
   workflow_dispatch:
@@ -135,6 +137,29 @@ jobs:
               except Unsupported as e: assert 'ORIGINAL_OVAL_SELECTOR' in str(e),str(e)
               else: raise AssertionError('Changed original OVAL selector passed')
           print('PASS: semantic mutations rejected')
+          PY
+      - name: Merge proven 0.4 subset with complete original 167-Definition source ledger
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/audit_v04_oval_test_content_readiness.py \
+            --input source-review --output work/source-universe
+          python scap-ng/tools/merge_v04_oval_test_content_coverage.py \
+            --baseline work/source-universe/release-readiness.json \
+            --native-pilot work/native-040-multitest \
+            --output work/native-040-multitest/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data=json.loads(Path(
+              'work/native-040-multitest/cumulative-167-definition-readiness.json'
+          ).read_text())
+          assert len(data['records'])==167
+          assert data['current_040_schema_and_original_source_validated']==2
+          assert data['remaining_v003_compatible_without_current_040_proof']==160
+          assert data['original_source_invalid_or_deprecated']==5
+          assert data['scanner_result_parity_proven']==0
+          print('PASS: 167 original Definitions fully accounted, 2 new canonical 0.4.0 source+schema proofs')
           PY
       - name: Reviewer overview
         run: |
