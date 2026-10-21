@@ -99,8 +99,8 @@ def build(source_json,source_yaml,output_dir):
             raise ValueError("New JSON/YAML authoring differs: "+logical)
     # This compiler checks the entire generated authoring graph, not only
     # the sites modified in the narrow logical scope modernization.
-    report=compile_pair(Path(targets["json"]),Path(targets["yaml"]),
-                        validate_schema=True)
+    ir_bytes,report=compile_pair(Path(targets["json"]),Path(targets["yaml"]),
+                                 validate_schema=True)
     return {
         "status":"REVIEW_CANDIDATE_AND_OR_ONLY_SOURCE_INVERSE_PROVEN",
         "source_json_sha256":sha(source_json.read_bytes()),
@@ -111,6 +111,7 @@ def build(source_json,source_yaml,output_dir):
         "changes_per_format":dict(sorted(counts.items())),
         "changed_tests":changes,
         "compiled_ir_checks":report,
+        "compiled_ir_sha256":sha(ir_bytes),
         "native_040_schema_check":"PASS_ALL_4001_EACH_FORMAT",
         "oval_source_inv_verdict":"PASS_ALL_CHANGED_TESTS",
         "source_item_existence_untouched":True,
