@@ -122,15 +122,15 @@ jobs:
           from tempfile import TemporaryDirectory
           from v04_a_authoring_graph_index import read_authoring_archive
           from v04_canonical_source_ir import _schema_validators, validate_docs
-          from validate_v04_fields_condition_preview import candidate_schema
+          from validate_v04_fields_condition_preview import candidate_schema, native_schema_projection
           root=Path('work/fields')
           json_docs=read_authoring_archive(root/'field-requirement-preview.json.zip','json')
           yaml_docs=read_authoring_archive(root/'field-requirement-preview.yaml.zip','yaml')
           assert len(json_docs)==len(yaml_docs)==4001
           with TemporaryDirectory(prefix='field-requirement-approved-spelling-') as temp:
               validate=_schema_validators(candidate_schema(Path(temp)/'v0.4.0'))
-              validate_docs(json_docs,validate)
-              validate_docs(yaml_docs,validate)
+              validate_docs(native_schema_projection(json_docs),validate)
+              validate_docs(native_schema_projection(yaml_docs),validate)
           print('PASS: all 4,001 research naming preview JSON/YAML docs satisfy isolated schema')
           PY
       - name: Preserve reviewer-only condition naming evidence
