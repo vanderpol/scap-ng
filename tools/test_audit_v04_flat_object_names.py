@@ -10,7 +10,7 @@ class FlatObjectCatalogTests(unittest.TestCase):
             ("windows.registry", {"selector_map": {
                 "hive": "hive", "key": "key", "name": "name"}}),
             ("independent.shellcommand", {"collection_parameters": {
-                "command": {}, "shell": {}}),
+                "command": {}, "shell": {}}}),
         ):
             self.assertEqual(inspect({"capability": cap, "native": native})["capability"], cap)
 
