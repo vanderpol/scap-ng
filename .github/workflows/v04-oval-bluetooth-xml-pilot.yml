@@ -11,6 +11,10 @@ on:
       - 'tools/export_v04_oval_registry_pilot.py'
       - 'tools/test_export_v04_registry_pilot.py'
       - 'tools/audit_v04_original_oval_forward.py'
+      - 'tools/import_v04_oval_leaf_pilot.py'
+      - 'tools/compare_v04_fresh_oval_import.py'
+      - 'tools/test_import_v04_oval_leaf_pilot.py'
+      - 'tools/run_v04_true_xml_native_xml_pilot.py'
       - 'tools/test_audit_v04_original_oval_forward.py'
       - 'tools/check_v04_oval_xml_mutation_regressions.py'
       - 'tools/combine_v04_oval_xml_proofs.py'
@@ -45,6 +49,7 @@ jobs:
           python tools/test_export_v04_shellcommand_pilot.py -v
           python tools/test_export_v04_registry_pilot.py -v
           python tools/test_audit_v04_original_oval_forward.py -v
+          python tools/test_import_v04_oval_leaf_pilot.py -v
           python tools/test_combine_v04_oval_xml_proofs.py -v
       - name: Obtain pinned original OVAL source XML and verified 0.4.0 authored output
         env:
@@ -256,6 +261,17 @@ jobs:
             --root work/compare \
             --manifest work/compare/roundtrip-manifest.json \
             --report work/compare/real-oval-mutation-regressions.json
+      - name: Run original XML through a fresh, independent native 0.4 importer/exporter
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/run_v04_true_xml_native_xml_pilot.py \
+            --original-and-canonical-dir work/compare \
+            --oval-schemas work/oval-5123/oval-schemas
+          python tools/check_v04_oval_xml_mutation_regressions.py \
+            --root work/compare \
+            --manifest work/compare/fresh-oval-roundtrip-manifest.json \
+            --report work/compare/fresh-oval-mutation-regressions.json
       - name: Publish proof and mismatch diagnostics even on failure
         if: always()
         uses: actions/upload-artifact@v4
