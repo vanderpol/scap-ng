@@ -12,6 +12,8 @@ This covers RHEL 9, Oracle Linux 9, Windows 11, Windows Server 2025, Windows Ser
 
 Begin with the [short review guide](REVIEW-GUIDE.md), then [Benchmark/Rule examples](../../specification/examples/README.md) and [Assessment examples](../../specification/examples/assessments.md). [RHEL 9](examples/rhel9-full.md) and [Windows 11](examples/windows11-full.md) provide entry points to the complete version-pinned files.
 
+The [OVAL Boolean-operator versus quantifier review](0.4.0-BOOLEAN-OPERATORS-VS-QUANTIFIERS.md) explains why `or` between complete conditions is different from `one_or_more` matching Items, with original XML examples and six-state/XSD test evidence. Its proposed syntax is **not yet accepted or generated as canonical 0.4.0**.
+
 The [release gate tracker](0.4.0-FINALIZATION-GATES.md) distinguishes parsed source, semantic-model tests, native compilation, signing, and scanner equivalence. **4,001 files passing schema and static dependency checks do not prove scanner execution.** The 172 uncommon source-preserving requirements and independent native scanner/compiler work remain unresolved.
 
 Older 0.3 examples and historical compiled bundles are available from the [archived 0.3.0 index](../../archive/0.3.0/README.md). The old A/B/C/D comparison labels are historical research variants, not product versions.
