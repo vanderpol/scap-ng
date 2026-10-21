@@ -64,9 +64,12 @@ jobs:
           assert p['changes_per_format']=={'json':346,'yaml':346}
           assert p['candidate_expression_schema']=='STRICT_NEW_SPELLINGS_ONLY_PASS'
           assert p['published_040_schema_changed'] is False
-          assert p['maintained_compiler_ir']['source_reconstruction']=='PASS'
-          assert p['maintained_compiler_ir']['yaml_json_byte_parity']=='PASS'
-          print('PASS: all 4001 sources strictly validated in candidate schema, exact inverse and compiler')
+          assert p['maintained_compiler_source_view_ir']['source_reconstruction']=='PASS'
+          assert p['maintained_compiler_source_view_ir']['yaml_json_byte_parity']=='PASS'
+          assert p['candidate_new_grammar_test_references']['json'] == p['candidate_new_grammar_test_references']['yaml']
+          assert p['candidate_executable_compiler_support'] == 'OPEN_NEW_AND_OR_GRAMMAR'
+          print('PASS: all 4001 candidate docs schema-valid and Test refs closed; exact-inverse source compiler passes')
+          print('New AND/OR executable compiler remains a separate OPEN gate')
           PY
       - name: Preserve non-release preview and machine-readable source inverses
         if: always()
