@@ -1,0 +1,124 @@
+name: SCAP-NG 0.4 six-STIG flat Object preview
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/v04_flat_object_authoring.py'
+      - 'tools/test_v04_flat_object_authoring.py'
+      - '.github/workflows/v04-flat-object-six-stig.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  six-stig-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install jsonschema==4.25.1 PyYAML==6.0.3
+      - name: Verify flat Object and hybrid YAML syntax
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_v04_flat_object_authoring.py -v
+      - name: Acquire pinned six-STIG field-conditions source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/flat
+          gh run download 39593978798 --repo "$GH_REPO" --name v04-and-or-fields-six-stig-candidate-research --dir work/flat
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("work/flat/field-layout-inverse-ledger.json").read_text())
+          assert p["counts"]=={"documents":4001,"whole_state_tests":123,"field_groups":231,"affected_documents":264}
+          assert p["original_archive_sha256"]=="46bcb6cdf3a0d5c3eda06bbf827389eed2942afb477d65d97348f5b8aaa3a7d8"
+          PY
+      - name: Apply current field_requirement conversion
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/rename_v04_field_requirement_preview.py \
+            --source-json work/flat/and-or-fields-preview.json.zip \
+            --candidate-json work/flat/field-requirement-preview.json.zip \
+            --candidate-yaml work/flat/field-requirement-preview.yaml.zip \
+            --proof work/flat/field-rename-proof.json
+      - name: Build six-STIG flat Object YAML and JSON archives
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/v04_flat_object_authoring.py \
+            --source-json work/flat/field-requirement-preview.json.zip \
+            --candidate-json work/flat/six-stig-flat-objects.json.zip \
+            --candidate-yaml work/flat/six-stig-flat-objects.hybrid.yaml.zip \
+            --proof work/flat/flat-object-inverse-proof.json
+      - name: Validate exact source inverse and 4001 equal YAML and JSON graphs
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          from tempfile import TemporaryDirectory
+          from v04_a_authoring_graph_index import read_authoring_archive
+          from v04_canonical_source_ir import _schema_validators,validate_docs
+          from validate_v04_fields_condition_preview import candidate_schema
+          from v04_flat_object_authoring import restore_document,dump_hybrid
+          p=Path("work/flat")
+          original=read_authoring_archive(p/"field-requirement-preview.json.zip","json")
+          target=read_authoring_archive(p/"six-stig-flat-objects.json.zip","json")
+          yaml=read_authoring_archive(p/"six-stig-flat-objects.hybrid.yaml.zip","yaml")
+          ledger=json.loads((p/"flat-object-inverse-proof.json").read_text())
+          assert len(original)==len(target)==len(yaml)==ledger["documents"]==4001
+          assert ledger["catalog_size"]==100 and ledger["changed_objects"]>0
+          with TemporaryDirectory() as temp:
+              validators=_schema_validators(candidate_schema(Path(temp)/"v0.4.0"))
+              validate_docs(original,validators)
+              for key,new in target.items():
+                  assert new==yaml[key.removesuffix(".json")+".yaml"],key
+                  reconstructed=restore_document(new,ledger["source_inverse"][key]) if key in ledger["source_inverse"] else new
+                  assert original[key]==reconstructed,key
+          # Six representative real complete Assessments for the reviewer.
+          samples=p/"samples"
+          samples.mkdir(exist_ok=True)
+          capabilities=("linux.partition","unix.file","windows.registry",
+                        "independent.shellcommand","windows.wmi.query",
+                        "independent.textfilecontent54")
+          found={}
+          for name,doc in sorted(target.items()):
+              asm=doc.get("assessment",{})
+              if asm.get("mode")!="automated":continue
+              for test in asm.get("tests",{}).values():
+                  cap=test.get("capability")
+                  if cap in capabilities and cap not in found:
+                      found[cap]=name
+                      (samples/(cap+".yaml")).write_text(dump_hybrid(doc))
+          lines=["# Six-STIG flat Object + hybrid YAML review",
+                 "", "**Research archive only; official schema and executable scanner not yet proven.**",
+                 "", "4,001 parsed-JSON-equivalent YAML/JSON documents with exact",
+                 "pre-flat Object source reconstruction and 100-capability collision checking.",
+                 "", "## Full Assessment samples", ""]
+          lines += [f"- {cap}: samples/{cap}.yaml (source {name})" for cap,name in sorted(found.items())]
+          lines += ["",f"Changed Objects: {ledger['changed_objects']}",
+                    f"Changed files: {ledger['changed_documents']}",
+                    "","Source reconstruction: flat-object-inverse-proof.json",""]
+          (p/"START-HERE.md").write_text("\n".join(lines))
+          print("\n".join(lines))
+          PY
+      - name: Preserve six-STIG reviewer ZIPs and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-six-stig-flat-objects-hybrid-yaml-review
+          path: |
+            work/flat/START-HERE.md
+            work/flat/samples/
+            work/flat/six-stig-flat-objects.json.zip
+            work/flat/six-stig-flat-objects.hybrid.yaml.zip
+            work/flat/flat-object-inverse-proof.json
+            work/flat/field-rename-proof.json
+          if-no-files-found: ignore
