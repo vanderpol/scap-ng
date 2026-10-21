@@ -1,0 +1,68 @@
+name: 0.4.0 OVAL Test Content 167-Definition release gap ledger
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-test-content-readiness.yml'
+      - 'tools/audit_v04_oval_test_content_readiness.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  source-pinned-inventory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Obtain completed pinned 167-Definition OVAL source audit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/source
+          gh run download 39344457603 --repo "$GH_REPO" \
+            --name c-original-oval-compatibility-review-not-native-conversion \
+            --dir work/source
+          test -f work/source/c-review/manifest.json
+          test -f work/source/c-native/conversion-manifest.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate per-Definition original OVAL gap and release readiness ledger
+        run: |
+          python tools/audit_v04_oval_test_content_readiness.py \
+            --input work/source --output work/readiness
+      - name: Adversarial proof — a missing original Definition must fail
+        run: |
+          python - <<'PY'
+          import json, tempfile, shutil
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, 'tools')
+          from audit_v04_oval_test_content_readiness import build
+          with tempfile.TemporaryDirectory() as dirname:
+              root=Path(dirname)
+              (root/'c-review').mkdir()
+              (root/'c-native').mkdir()
+              for name in ['c-review/manifest.json',
+                           'c-native/conversion-manifest.json']:
+                  dest=root/name
+                  shutil.copyfile(Path('work/source')/name,dest)
+              doc=json.loads((root/'c-review/manifest.json').read_text())
+              doc['source_definition_count']=166
+              (root/'c-review/manifest.json').write_text(json.dumps(doc))
+              try:
+                  build(root)
+              except ValueError as err:
+                  assert 'source census changed' in str(err), str(err)
+              else:
+                  raise AssertionError('Dropped original OVAL source Definition escaped inventory')
+          print('PASS: manifest completeness regression')
+          PY
+      - name: Publish full 167-Definition disposition and blockers report
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-original-oval-test-content-167-release-readiness-not-native-validation
+          path: work/readiness/
+          if-no-files-found: error
