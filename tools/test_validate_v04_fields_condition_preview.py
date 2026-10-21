@@ -118,5 +118,100 @@ class ProposedFieldsScopeTests(unittest.TestCase):
         self.assertEqual(active,(root/"schema/v0.4.0/assessment-language.schema.json").read_bytes())
 
 
+    def test_uniform_field_requirement_has_explicit_test_local_and_leaf_scope(self):
+        shared=fixture(scope="none")
+        shared["require"]["field_requirement"]="at_least_one_exists_and_all_match"
+        condition=shared["require"]["all_items_must"][0]
+        self.assertEqual(field_scopes(shared)[0]["scope"],"inherited")
+        condition["field_requirement"]="may_be_absent_and_all_match"
+        self.assertEqual(field_scopes(shared)[0]["scope"],"local")
+        condition["fields"]["value"]["field_requirement"]="none_exist"
+        self.assertEqual(field_scopes(shared)[0]["scope"],"local")
+        self.assertEqual(condition["fields"]["value"]["field_requirement"],"none_exist")
+        self.assertEqual(shared["require"]["items"],"one_or_more")
+        self.assertNotIn("state_fields_require",shared)
+
+    def test_uniform_test_field_requirement_inherits_across_complete_or_branches(self):
+        doc=fixture(scope="none")
+        doc["require"]["field_requirement"]="at_least_one_exists_and_all_match"
+        first=doc["require"]["all_items_must"][0]
+        second=deepcopy(first)
+        second["fields"]["value"]["equals"]=1
+        second["field_requirement"]="may_be_absent_and_all_match"
+        doc["require"]["all_items_must"]=[{"or":[first,second]}]
+        sites=field_scopes(doc)
+        self.assertEqual([site["scope"] for site in sites],["inherited","local"])
+        self.assertEqual(doc["require"]["items"],"one_or_more")
+        # A policy on the nearest complete condition cannot change its sibling.
+        doc["require"]["all_items_must"][0]["or"][0]["fields"]["value"][
+            "field_requirement"]="none_exist"
+        self.assertEqual([site["scope"] for site in field_scopes(doc)],
+                         ["inherited","local"])
+
+    def test_uniform_scope_conflicts_and_missing_policy_fail_closed(self):
+        missing=fixture(scope="none")
+        with self.assertRaisesRegex(ValueError,"missing explicit or inherited"):
+            field_scopes(missing)
+        legacy=fixture(scope="inherited")
+        legacy["require"]["field_requirement"]="none_exist"
+        with self.assertRaisesRegex(ValueError,"Conflicting legacy"):
+            field_scopes(legacy)
+        mixed=fixture(scope="local")
+        mixed["require"]["all_items_must"][0]["field_requirement"]="none_exist"
+        with self.assertRaisesRegex(ValueError,"Ambiguous fields"):
+            field_scopes(mixed)
+        leaf=fixture(scope="own")
+        leaf["require"]["all_items_must"][0]["fields"]["type"][
+            "field_requirement"]="none_exist"
+        with self.assertRaisesRegex(ValueError,"Conflicting field-level"):
+            field_scopes(leaf)
+        nested=fixture(scope="none")
+        nested["require"]["all_items_must"]=[{
+            "field_requirement":"all_exist_and_all_match",
+            "require":"none_exist",
+            "or":[fixture(scope="none")["require"]["all_items_must"][0]]
+        }]
+        with self.assertRaisesRegex(ValueError,"Ambiguous nested"):
+            field_scopes(nested)
+
+    def test_isolated_uniform_schema_accepts_valid_scopes_and_rejects_alias_mix(self):
+        with TemporaryDirectory() as td:
+            proposal=candidate_schema(Path(td)/"v0.4.0")
+            d=json.loads((proposal/"assessment-language.schema.json").read_text())
+            leaf=d["$defs"]["inherited_field_predicate"]
+            self.assertIn("field_requirement",leaf["properties"])
+            for definition in ("all_items_requirement","scoped_all_items_requirement"):
+                self.assertIn("field_requirement",d["$defs"][definition]["properties"])
+            for shape in ("state_entry","scoped_state_entry"):
+                v=Draft202012Validator({"$ref":"#/$defs/"+shape,"$defs":d["$defs"]})
+                good={"field_requirement":"at_least_one_exists_and_all_match",
+                      "fields":{"type":{"equals":"string"},
+                                "value":{"equals":0,
+                                         "field_requirement":"none_exist"}}}
+                self.assertEqual(list(v.iter_errors(good)),[],shape)
+                for bad in (
+                    {**good,"require":"none_exist"},
+                    {**good,"or":[{"value":{"equals":0}}]},
+                    {"field_requirement":"none_exist",
+                     "fields":{"type":{"equals":"string"}}},
+                    {"fields":{"type":{"equals":"string","require":"none_exist",
+                                      "field_requirement":"none_exist"},
+                               "value":{"equals":0}}}
+                ):
+                    self.assertTrue(list(v.iter_errors(bad)),(shape,bad))
+            v=Draft202012Validator({"$ref":"#/$defs/all_items_requirement",
+                                    "$defs":d["$defs"]})
+            self.assertFalse(list(v.iter_errors(
+                {"items":"one_or_more",
+                 "field_requirement":"at_least_one_exists_and_all_match",
+                 "all_items_must":[{"field_requirement":"may_be_absent_and_all_match",
+                                    "fields":{"type":{"equals":"string"},
+                                              "value":{"equals":0}}}]})))
+            self.assertTrue(list(v.iter_errors(
+                {"items":"one_or_more","field_requirement":"typo",
+                 "all_items_must":[{"fields":{"type":{"equals":"string"},
+                                               "value":{"equals":0}}}]})))
+
+
 if __name__=="__main__":
     unittest.main()
