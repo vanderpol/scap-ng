@@ -107,7 +107,7 @@ class ShowcaseResultExamplesTest(unittest.TestCase):
         self.assertIn("# SCAP-NG 0.4.0 examples", page)
         self.assertIn("not a verbatim STIG Assessment", page)
         intro = page.split("## 2. Multiple Tests and Boolean logic", 1)[0]
-        blocks = re.findall(r"```yaml\\n([\\s\\S]*?)\\n```", intro)
+        blocks = re.findall(r"```yaml\n([\s\S]*?)\n```", intro)
         self.assertGreaterEqual(len(blocks), 1)
         snippet = yaml.safe_load(blocks[0])
         test = snippet["tests"]["home-mount-requires-nosuid-test"]
