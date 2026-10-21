@@ -79,11 +79,17 @@ jobs:
           gh release download v0.4.0-joval-meeting-preview-20261015-r3 --pattern 'scap-ng-v0.4-joval-six-stig-*.zip' --dir work
           echo 'a1837c03133021f4d13814516a91b372f83b03771519f8361398ff1663056fea  work/scap-ng-v0.4-joval-six-stig-json.zip' | sha256sum -c -
           echo '03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d  work/scap-ng-v0.4-joval-six-stig-yaml.zip' | sha256sum -c -
-      - name: Check source 0.4 requirement and reference invariants
+      - name: Audit pinned historical r3 JSON source and Rule/Assessment references
         env:
           PYTHONPATH: tools
         run: |
-          python tools/test_v04_json_authoring_readiness.py --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip --report work/input-native-report.json
+          # Archive is SHA-256 pinned above. Its old object.select/collect
+          # source is NOT normative flat-Object 0.4.0 syntax; current native
+          # schema is checked on regenerated output in the later strict gate.
+          python tools/test_v04_json_authoring_readiness.py \\
+            --archived-source-only \\
+            --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip \\
+            --report work/input-historical-source-report.json
       - name: Build original OVAL Filter provenance before any authoring rewrite
         env:
           GH_TOKEN: ${{ github.token }}
