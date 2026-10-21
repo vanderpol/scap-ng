@@ -95,13 +95,21 @@ def archive_scan(path, *, expected_sha=None):
                                 if local(e) in {"key","name"}:
                                     registry_selectors[local(e)+":"+
                                         e.get("operation","equals")]+=1
-                        if subtype=="merge":
-                            merge_sort["sort="+item.get("sort","document")+
-                                       ";order="+item.get("order","ascending")]+=1
-                        if subtype=="regex_capture":
-                            pattern=item.get("pattern")
-                            if pattern is not None:
-                                capture_patterns["literal_patterns"]+=1
+                        # These OVAL functions are descendants of a
+                        # declared local_variable, not top-level declarations.
+                        # Inspect the complete expression tree while counting
+                        # each function exactly once per original declaration.
+                        if kind=="variables":
+                            for operation in item.iter():
+                                if operation is item:
+                                    continue
+                                operation_name=local(operation)
+                                if operation_name=="merge":
+                                    merge_sort["sort="+operation.get("sort","document")+
+                                               ";order="+operation.get("order","ascending")]+=1
+                                elif (operation_name=="regex_capture" and
+                                      operation.get("pattern") is not None):
+                                    capture_patterns["literal_patterns"]+=1
     if not oval_documents or not tally["definitions"] or not tally["tests"]:
         raise ValueError("pinned original ZIP contains no OVAL definitions and Tests")
     return {
