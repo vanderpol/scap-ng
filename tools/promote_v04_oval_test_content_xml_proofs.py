@@ -74,7 +74,7 @@ def upgrade(original, manifest, audit, base):
         native_file=checked(base,row["native_assessment"],row["native_assessment_sha256"])
         emitted=checked(base,row["regenerated"],row["regenerated_sha256"])
         if (row["original_sha256"]!=source["original_source_file_sha256"] or
-                native_file.relative_to(base).as_posix()!=source["current_040_artifact_json"]):
+                native_file.relative_to(base.resolve()).as_posix()!=source["current_040_artifact_json"]):
             raise ValueError("OVAL original file/native identity drift")
         plat=case_id.split("/",1)[0]
         if plat not in ("ios","iosxe"):
@@ -93,8 +93,8 @@ def upgrade(original, manifest, audit, base):
                 mutated.get("source_consulted_by_exporter") is not False):
             raise ValueError("No adverse semantic selector mutation evidence")
         source["current_040_oval_xml_roundtrip"]="PASS_INDEPENDENT_OVAL_5123_SEMANTIC_AND_XSD"
-        source["current_040_oval_xml_proof"]=(emitted.parent/"oval-semantic-proof.json").relative_to(base).as_posix()
-        source["current_040_regenerated_oval"]=emitted.relative_to(base).as_posix()
+        source["current_040_oval_xml_proof"]=(emitted.parent/"oval-semantic-proof.json").relative_to(base.resolve()).as_posix()
+        source["current_040_regenerated_oval"]=emitted.relative_to(base.resolve()).as_posix()
     if len(seen)!=2:
         raise ValueError("Missing source-valid OVAL parity case")
     new["current_040_original_xml_roundtrip_exported"]=2
