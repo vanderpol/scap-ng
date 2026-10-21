@@ -64,12 +64,18 @@ def audit_all():
                     raise ValueError(f"Legacy Test cardinality still accepted: {legacy}")
             if "state" in defs:
                 raise ValueError("Legacy named State wrapper exposed by draft")
-            select=defs.get("object",{}).get("properties",{}).get("select",{}).get("properties",{})
+            object_props=defs.get("object",{}).get("properties",{})
             source_selected=set(mapping.get("native",{}).get("selector_map",{}).values())
-            if not set(select)<=source_selected:
-                raise ValueError("Generated Object selector not in reviewed native map")
+            source_parameters=set(mapping.get("native",{}).get("collection_parameters",{}))
+            if "object" in defs:
+                missing=(source_selected|source_parameters)-set(object_props)
+                if missing:
+                    raise ValueError(f"Native Object fields missing: {sorted(missing)}")
+                if "collect" in object_props or ("select" in object_props
+                        and "select" not in source_parameters):
+                    raise ValueError("Legacy generic Object select/collect still exposed")
             metrics["generated"]+=1
-            metrics["selectors"]+=len(select)
+            metrics["selectors"]+=len(source_selected)
             state=defs.get("state_predicate",{})
             if isinstance(state,dict):
                 metrics["named_state_predicates"]+=len(state.get("oneOf",[]))
@@ -77,7 +83,7 @@ def audit_all():
                 metrics["capabilities_with_records"]+=1
             individual.append({
                 "capability":mapping["capability"],
-                "selector_fields":sorted(select),
+                "selector_fields":sorted(source_selected),
                 "state_field_count":len(state.get("oneOf",[])) if isinstance(state,dict) else 0,
             })
         except Exception as exc:
