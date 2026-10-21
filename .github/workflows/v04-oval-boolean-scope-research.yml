@@ -7,6 +7,8 @@ on:
       - 'tools/research_v04_oval_logic_scopes.py'
       - 'tools/test_research_v04_oval_logic_scopes.py'
       - 'tools/test_v04_oval_logic_scope_xml_fixture.py'
+      - 'tools/preview_v04_oval_operator_field_groups.py'
+      - 'tools/test_preview_v04_oval_operator_field_groups.py'
       - 'tools/validate_v04_oval_5123.py'
       - 'tests/v04-oval-operator-scopes/oval-independent-operators.xml'
       - '.github/workflows/v04-oval-boolean-scope-research.yml'
@@ -50,6 +52,15 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/test_research_v04_oval_logic_scopes.py -v
+      - name: Independently prove six original Test/State field-group projections
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_preview_v04_oval_operator_field_groups.py -v
+          python tools/preview_v04_oval_operator_field_groups.py \
+            --oval-xml tests/v04-oval-operator-scopes/oval-independent-operators.xml \
+            --candidate work/oval-operator-field-groups-candidate.json \
+            --ledger work/oval-operator-field-groups-source-inverse.json
       - name: Retrieve pinned original NIWC Windows 11 OVAL XML
         run: |
           mkdir -p work
@@ -70,4 +81,6 @@ jobs:
           path: |
             work/oval-boolean-scope-original-census.json
             work/oval-operator-scope-xsd.json
+            work/oval-operator-field-groups-candidate.json
+            work/oval-operator-field-groups-source-inverse.json
           if-no-files-found: ignore
