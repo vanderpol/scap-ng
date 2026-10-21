@@ -160,6 +160,8 @@ def hybridize(node, key=None):
     items = list(node.items())
     if "fields" in node and "field_requirement" in node:
         items.sort(key=lambda entry: 0 if entry[0] == "field_requirement" else 1)
+    if key == "require" and "field_requirement" in node:
+        items.sort(key=lambda entry: 0 if entry[0] == "items" else 1 if entry[0] == "field_requirement" else 2)
     mapped = {k: hybridize(v, k) for k, v in items}
     comparator = (len(node) == 1 and next(iter(node), "") in {
         "equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal",
