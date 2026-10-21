@@ -56,6 +56,34 @@ def test_object(capability,select,**extra):
 
 
 class CapabilityV04Tests(unittest.TestCase):
+    def test_generator_cli_reports_real_flat_object_field_counts(self):
+        # After eliminating generic select/collect, CLI metadata must count
+        # the direct native fields rather than an obsolete Object.select map.
+        from contextlib import redirect_stdout
+        from io import StringIO
+        from tempfile import TemporaryDirectory
+        from unittest.mock import patch
+        from generate_capability_schema_v04 import main
+        cap = "windows.registry"
+        mapping = VERSION / "capability-mappings" / "supported" / (cap + ".json")
+        expected = json.loads(mapping.read_text(encoding="utf-8"))["native"]
+        with TemporaryDirectory(prefix="v04-generator-cli-") as td:
+            target = Path(td) / "windows.registry.schema.json"
+            out = StringIO()
+            with patch("sys.argv", ["generator", "--mapping", str(mapping),
+                                    "--repo-root", str(ROOT), "--output", str(target)]):
+                with redirect_stdout(out):
+                    main()
+            summary = json.loads(out.getvalue())
+            generated = json.loads(target.read_text(encoding="utf-8"))
+        self.assertEqual(summary["object_selector_fields"],
+                         len(expected["selector_map"]))
+        self.assertEqual(summary["object_acquisition_parameters"],
+                         len(expected.get("collection_parameters", {})))
+        self.assertTrue(summary["direct_object_filters_supported"])
+        self.assertIn("hive", generated["$defs"]["object"]["properties"])
+        self.assertNotIn("collect", generated["$defs"]["object"]["properties"])
+
     def test_capabilities_generate_natively(self):
         for cap in ("linux.partition","unix.file","windows.registry"):
             with self.subTest(cap=cap):
