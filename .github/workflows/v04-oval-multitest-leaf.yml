@@ -5,6 +5,9 @@ on:
     paths:
       - '.github/workflows/v04-oval-multitest-leaf.yml'
       - 'tools/convert_v04_oval_multitest_leaf.py'
+      - 'tools/export_v04_oval_ios_global_multitest.py'
+      - 'tools/validate_v04_oval_5123.py'
+      - 'tools/audit_v04_oval_xml_roundtrip.py'
       - 'tools/merge_v04_oval_test_content_coverage.py'
       - 'tools/audit_v04_oval_test_content_readiness.py'
       - 'tools/v04_flat_object_authoring.py'
@@ -26,6 +29,12 @@ jobs:
           repository: OVAL-Community/SCAP-Self-Assertion
           ref: e3538595c5083b9c34d937a81d319234df9bbfaa
           path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
@@ -160,6 +169,91 @@ jobs:
           assert data['original_source_invalid_or_deprecated']==5
           assert data['scanner_result_parity_proven']==0
           print('PASS: 167 original Definitions fully accounted, 2 new canonical 0.4.0 source+schema proofs')
+          PY
+      - name: Independent canonical 0.4 Assessment to OVAL XML and exact graph differential
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          from hashlib import sha256
+          import json,shutil
+          from pathlib import Path
+          from export_v04_oval_ios_global_multitest import emit
+          from validate_v04_oval_5123 import check
+          from audit_v04_oval_xml_roundtrip import audit,FORMAT
+          from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+          work=Path('work/native-040-multitest')
+          report=json.loads((work/'manifest.json').read_text())
+          valid=[r for r in report['cases']
+                 if r['status']=='CURRENT_040_SOURCE_XML_AND_SCHEMA_VALIDATED_NOT_RUNTIME']
+          assert len(valid)==2
+          cases=[]
+          for row in valid:
+              platform=row['file'].split('/')[0]
+              assert platform in {'ios','iosxe'}
+              native=work/row['assessment_json']
+              document=json.loads(native.read_text())
+              generated,did=emit(document)
+              folder=work/'independent-oval-roundtrip'/platform
+              folder.mkdir(parents=True,exist_ok=True)
+              target=folder/'regenerated.xml'
+              generated.write(target,encoding='utf-8',xml_declaration=True)
+              original=folder/'pinned-original.xml'
+              shutil.copyfile(
+                  Path('original-oval/SCAP_1.4/OVAL_Test_Content')/row['file'],
+                  original)
+              schema=check(Path('oval-language/oval-schemas'),target,platform)
+              (folder/'xsd-proof.json').write_text(json.dumps(schema,indent=2)+'\n')
+              assert schema['status']=='PASS',schema['diagnostics']
+              comparison=compare(original,target,
+                  source_root=row['definition_id'],
+                  regenerated_root=did,root_only=True)
+              (folder/'oval-semantic-proof.json').write_text(
+                  json.dumps(comparison,indent=2,default=str)+'\n')
+              assert comparison['equal'],(row['file'],comparison)
+              # A deliberately altered native selector MUST produce an unequal
+              # OVAL Definition closure even though the XML still parses.
+              bad=deepcopy(document)
+              first=next(iter(bad['assessment']['tests'].values()))
+              first['object']['global_command']={'equals':'intentionally-wrong-command'}
+              mutated,_=emit(bad)
+              bad_path=folder/'mutated-negative.xml'
+              mutated.write(bad_path,encoding='utf-8',xml_declaration=True)
+              result=compare(original,bad_path,
+                  source_root=row['definition_id'],
+                  regenerated_root=did,root_only=True)
+              assert not result['equal'],"A mutated selector escaped OVAL graph comparison"
+              (folder/'negative-mutation-proof.json').write_text(
+                  json.dumps({'mutated_differs':True,
+                              'native_expression_reused':True,
+                              'source_consulted_by_exporter':False},indent=2)+'\n')
+              digest=lambda p:sha256(p.read_bytes()).hexdigest()
+              cases.append({
+                  'case_id':row['file'],
+                  'status':'converted',
+                  'forward_profile':'0.4.0',
+                  'reverse_profile':'0.4.0',
+                  'original':str(original.relative_to(work)),
+                  'original_sha256':digest(original),
+                  'native_assessment':row['assessment_json'],
+                  'native_assessment_sha256':digest(native),
+                  'regenerated':str(target.relative_to(work)),
+                  'regenerated_sha256':digest(target),
+                  'source_definition':row['definition_id'],
+                  'regenerated_definition':did,
+              })
+          manifest={'format':FORMAT,'profile':'0.4.0','cases':cases}
+          root=work/'independent-oval-roundtrip'
+          (root/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          proof=audit(manifest,work,expected=2)
+          (root/'complete-semantic-proof.json').write_text(json.dumps(
+              proof,indent=2,default=str)+'\n')
+          assert proof['equal_cases']==2 and proof['unequal_cases']==0,proof
+          report['original_oval_xml_semantics']='PASS_INDEPENDENT_OVAL_5123_EXPORT_2_DEFINITIONS'
+          report['native_040_independent_oval_roundtrips']=2
+          (work/'manifest.json').write_text(json.dumps(report,indent=2)+'\n')
+          print('PASS: IOS and IOS-XE source XML -> canonical 0.4 -> independent OVAL XML 5.12.3 semantic graph and XSD; tampering rejected.')
           PY
       - name: Reviewer overview
         run: |
