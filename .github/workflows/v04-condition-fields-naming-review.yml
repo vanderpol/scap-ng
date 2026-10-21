@@ -1,0 +1,81 @@
+name: 0.4.0 condition fields naming source-backed review
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/preview_v04_condition_fields_sv253254.py'
+      - 'tools/test_preview_v04_condition_fields_sv253254.py'
+      - '.github/workflows/v04-condition-fields-naming-review.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-oval-condition-field-name:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3
+      - name: Reject grouping, cardinality and field corruption
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_preview_v04_condition_fields_sv253254.py -v
+      - name: Fetch verified original NIWC Windows 11 OVAL and canonical 0.4
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/source work/preview
+          curl --fail --silent --show-error --location --retry 3 \
+            https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/main/Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip \
+            --output work/source/win11-original.zip
+          gh run download 39503111241 --repo "$GH_REPO" \
+            --name scap-ng-040-six-stig-board-authoring \
+            --dir work/source
+      - name: Prove real original State AND, Test State OR, Item ALL survive condition-fields preview
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import json,zipfile,yaml
+          from pathlib import Path
+          from migrate_v04_states_match_to_logic import migrate,restore as restore_states
+          from preview_v04_condition_fields_sv253254 import preview,restore,exact_inverse
+          from audit_v04_original_state_or_proof import proof
+          base=Path('work/source')
+          name='authoring/ms_windows_11/assessments/automated/SV-253254.automated.json'
+          with zipfile.ZipFile(base/'scap-ng-0.4.0-six-stigs.json.zip') as z:
+              old=json.loads(z.read(name))
+          (base/'sv253254-original-native-v04.json').write_text(
+              json.dumps(old,indent=2)+'\n')
+          original=proof(base/'win11-original.zip',old)
+          assert original['source_test_state_operator']=='OR'
+          assert original['source_check']=='all'
+          assert original['source_check_existence']=='at_least_one_exists'
+          stage1,state_ledger=migrate(old)
+          assert len(state_ledger)==1
+          candidate,field_ledger=preview(stage1)
+          assert exact_inverse(stage1,candidate,field_ledger)
+          assert restore_states(restore(candidate,field_ledger),state_ledger)==old
+          output=Path('work/preview')
+          (output/'source-oval-state-proof.json').write_text(json.dumps(original,indent=2)+'\n')
+          (output/'exact-source-inversion.json').write_text(json.dumps({
+              'state_stage':state_ledger,'condition_stage':field_ledger,
+              'status':'PASS_TWO_STAGE_SOURCE_EXACT_INVERSE_NOT_AUTHORING_PROMOTION',
+              'published_schema_modified':False,'scanner_runtime_tested':False
+          },indent=2)+'\n')
+          (output/'proposed-one-condition-fields.yaml').write_text(
+              yaml.safe_dump(candidate,sort_keys=False,allow_unicode=True))
+          print((output/'proposed-one-condition-fields.yaml').read_text()[-1350:])
+          PY
+      - name: Archive narrowly tested naming alternative only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v04-original-oval-condition-require-fields-review
+          path: work/preview/
+          if-no-files-found: ignore
