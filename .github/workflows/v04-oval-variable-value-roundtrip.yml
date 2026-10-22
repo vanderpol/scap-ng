@@ -1,0 +1,168 @@
+name: 0.4.0 OVAL variable.value original XML roundtrip
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-variable-value-roundtrip.yml'
+      - 'tools/convert_v04_oval_independent_variable_test.py'
+      - 'tools/export_v04_oval_independent_variable_test.py'
+      - 'tools/audit_v04_original_oval_variable_test.py'
+      - 'schema/v0.4.0/capability-mappings/supported/variable.value.json'
+      - 'tools/generate_capability_schema_v04.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  native-variable-value:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.0.2
+      - name: Convert pinned original four-Test independent.variable to 0.4
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = 'e3538595c5083b9c34d937a81d319234df9bbfaa'
+          mkdir -p work/oval-variable
+          cp original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml work/oval-variable/original.xml
+          python scap-ng/tools/convert_v04_oval_independent_variable_test.py \
+            --original work/oval-variable/original.xml \
+            --json work/oval-variable/native-040.assessment.json \
+            --report work/oval-variable/source-and-mapping-proof.json
+      - name: Validate existing native 0.4 variable.value contract
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from v04_canonical_source_ir import _schema_validators,validate_docs
+          from test_generate_capability_schema_v04 import materialize,validate
+          base=Path('work/oval-variable')
+          doc=json.loads((base/'native-040.assessment.json').read_text())
+          validate_docs({'authoring/oval-variable.assessment.json':doc},
+                        _schema_validators(Path('scap-ng/schema/v0.4.0')))
+          a=doc['assessment']
+          assert len(a['variables'])==2 and len(a['tests'])==4
+          assert all(t['capability']=='variable.value' and
+                     'variable' in t and 'object' not in t
+                     for t in a['tests'].values())
+          for t in a['tests'].values():
+              errors=validate(materialize('variable.value'),'test',t)
+              assert not errors,[{'path':list(e.absolute_path),
+                                  'message':e.message[:300]} for e in errors[:5]]
+          proof=json.loads((base/'source-and-mapping-proof.json').read_text())
+          assert len(proof['test_pairs'])==4
+          proof['native_schema_validated']=True
+          (base/'source-and-mapping-proof.json').write_text(
+              json.dumps(proof,indent=2,sort_keys=True)+'\n')
+          print('PASS: native 0.4 variable.value four original Test pairs, no synthetic Objects')
+          PY
+      - name: Re-export independent OVAL XML and validate 5.12.3/XSD/semantic graph
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/export_v04_oval_independent_variable_test.py \
+            --native work/oval-variable/native-040.assessment.json \
+            --output work/oval-variable/roundtrip-oval.xml
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from validate_v04_oval_5123 import check
+          from export_v04_oval_independent_variable_test import emit
+          from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+          base=Path('work/oval-variable')
+          doc=json.loads((base/'native-040.assessment.json').read_text())
+          _,did=emit(doc)
+          xsd=check(Path('oval-language/oval-schemas'),base/'roundtrip-oval.xml',
+                    'independent')
+          (base/'roundtrip-xsd.json').write_text(json.dumps(xsd,indent=2)+'\n')
+          assert xsd['status']=='PASS',xsd['diagnostics']
+          proof=json.loads((base/'source-and-mapping-proof.json').read_text())
+          comparison=compare(
+              base/'original.xml',base/'roundtrip-oval.xml',
+              source_root=proof['original_definition_id'],
+              regenerated_root=did,root_only=True)
+          (base/'roundtrip-semantics.json').write_text(
+              json.dumps(comparison,indent=2,default=str)+'\n')
+          assert comparison['equal'],comparison
+          proof['roundtrip_oval_5123_validated']=True
+          (base/'source-and-mapping-proof.json').write_text(
+              json.dumps(proof,indent=2,sort_keys=True)+'\n')
+          print('PASS: original variable_test -> native variable.value -> independent 5.12.3 XML semantic/XSD roundtrip')
+          PY
+      - name: Fail closed on lost cross-pairing, cardinality, and Variable values
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from pathlib import Path
+          from export_v04_oval_independent_variable_test import emit
+          from convert_v04_oval_independent_variable_test import convert
+          from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+          root=Path('work/oval-variable')
+          source=json.loads((root/'native-040.assessment.json').read_text())
+          first='first-source-variable'
+          second='second-source-variable'
+          kinds=[]
+          def reject(kind,change):
+              modified=deepcopy(source)
+              change(modified['assessment'])
+              try:emit(modified)
+              except ValueError:
+                  kinds.append(kind)
+              else:raise AssertionError(f'unapproved native semantic mutation: {kind}')
+          reject('var_check',lambda a:a['tests']['first-to-second-variable-test'][
+              'states'][0]['value'].__setitem__('value_match','all'))
+          reject('test_check',lambda a:a['tests']['first-to-second-variable-test'][
+              '__setitem__'] if False else a['tests']['first-to-second-variable-test'].__setitem__(
+                  'require','none_exist'))
+          reject('missing_pair',lambda a:a['tests'].pop('second-to-second-variable-test'))
+          reject('swapped_state_ref',lambda a:a['tests']['first-to-second-variable-test'][
+              'states'][0]['value']['equals'].__setitem__('variable',first))
+          reject('lost_constant_value',lambda a:a['variables'][first][
+              'expression']['literal'].pop())
+          assert len(kinds)==5
+          changed=deepcopy(source)
+          changed['assessment']['variables'][first]['expression']['literal'][0]='changed'
+          regenerated,did=emit(changed)
+          mutant=root/'mutated-valid-oval.xml'
+          regenerated.write(mutant,encoding='utf-8',xml_declaration=True)
+          proof=json.loads((root/'source-and-mapping-proof.json').read_text())
+          comparison=compare(root/'original.xml',mutant,
+              source_root=proof['original_definition_id'],
+              regenerated_root=did,root_only=True)
+          assert not comparison['equal'],'changed native constant escaped independent OVAL semantic comparator'
+          (root/'negative-tests.json').write_text(json.dumps({
+              'rejected_structural_mutations':kinds,
+              'changed_literal_semantic_graph_rejected':True,
+              'not_scanner_parity':True
+          },indent=2)+'\n')
+          print('PASS: five structural rejections and independent altered-value semantic mismatch')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-pinned-oval-variable-test-existing-native-capability-roundtrip
+          path: work/oval-variable/
+          if-no-files-found: ignore
