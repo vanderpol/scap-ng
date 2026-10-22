@@ -30,7 +30,8 @@ def sample():
             "tests": {"t1": {"capability": "unix.file",
                 "object": {"select": {"filepath": {"equals": "/etc/example"}}},
                 "require": {"items": "one_or_more",
-                            "all_items_must": [{"mode": {"equals": "0600"}}]}}}}},
+                            "field_requirement": "at_least_one_exists_and_all_match",
+                            "all_items_must": [{"fields": {"mode": {"equals": "0600"}}}]}}}}},
     }
 
 
@@ -80,7 +81,7 @@ class CanonicalIRTests(unittest.TestCase):
         ir = normalize_documents(src)
         self.assertEqual(ir["totals"]["presence"], 1)
         self.assertEqual(decode_and_verify(ir), src)
-        a["states"] = [{"mode": {"equals": "0600"}}]
+        a["states"] = [{"mode": {"equals": "0600", "require": "at_least_one_exists_and_all_match"}}]
         a["require"] = "at_least_one_exists_and_some_match"
         ir = normalize_documents(src)
         self.assertEqual(ir["totals"]["source_exact_fallback"], 1)

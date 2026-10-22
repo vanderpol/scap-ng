@@ -2,12 +2,13 @@
 """Generate six complete SCAP-NG 0.4.0 source-backed authoring sets.
 
 Source: October 15 r3 pre-alpha archive, pinned by SHA-256 in workflow.
-Only promote the two proven all-match requirement pairs to inline
-`require.items` / `require.all_items_must`; leave exceptional pairs explicit.
+Promote proven scalar all-match States to canonical field_requirement and
+complete conditions. Preserve Item population separately and retain explicit
+source-exact uncommon, record and non-AND State fallbacks with diagnostics.
 Inherit inline Object capability only for identical Test/Object capability.
 Preserve all other graph content and prove parsed-source exact recovery.
 
-Refs #227 #232 #239 #246.
+Refs #251 #227 #232 #239 #246.
 """
 from collections import Counter
 from copy import deepcopy
@@ -26,26 +27,16 @@ from migrate_v04_additional_source_filters import (
     recover_migration as recover_additional_filter,
 )
 
-PAIRS={"at_least_one_exists_and_all_match":"one_or_more",
-       "may_be_absent_and_all_match":"may_be_absent"}
-INVERSE={v:k for k,v in PAIRS.items()}
-PRESENCE={
-    "at_least_one_exists":"one_or_more",
-    "none_exist":"none",
-    "only_one_exists":"exactly_one",
-    "all_exist":"all",
-    "may_be_absent":"may_be_absent",
-}
-PRESENCE_INVERSE={v:k for k,v in PRESENCE.items()}
+from v04_field_requirement import PAIRS, PRESENCE, promote_test, restore_test
 
 
-def promote(doc):
+def promote(doc, *, provenance=None):
     new=deepcopy(doc)
     audit=Counter()
     a=new.get("assessment")
     if not isinstance(a,dict) or a.get("mode")!="automated":
         return new,audit
-    for test in (a.get("tests") or {}).values():
+    for tid,test in (a.get("tests") or {}).items():
         cap=test.get("capability")
         obj=test.get("object")
         if isinstance(obj,dict) and "capability" in obj:
@@ -53,59 +44,28 @@ def promote(doc):
                 raise ValueError("Inline Object capability conflicts with Test")
             del obj["capability"]
             audit["inline_capabilities_removed"]+=1
-        old=test.get("collected_items_require",test.get("require"))
-        if "collected_items_require" in test and "require" in test:
-            raise ValueError("Mixed Test requirement dialect")
-        states=test.get("states")
-        if old in PAIRS and isinstance(states,list) and states:
-            source_key="collected_items_require" if "collected_items_require" in test else "require"
-            test.pop(source_key)
-            test.pop("states")
-            test["require"]={"items":PAIRS[old],"all_items_must":states}
-            audit["all_items_must"]+=1
-        elif old in PRESENCE and not states and "states_match" not in test:
-            source_key="collected_items_require" if "collected_items_require" in test else "require"
-            test.pop(source_key)
-            test["require"]={"items":PRESENCE[old]}
-            audit["presence_only_structured"]+=1
-        elif "collected_items_require" in test:
-            test["require"]=test.pop("collected_items_require")
-            audit["explicit_fallback"]+=1
+        updated, proof = promote_test(test)
+        test.clear()
+        test.update(updated)
+        if proof["shape"] != "unchanged":
+            audit[proof["shape"]] += 1
+        if proof["diagnostic"]:
+            audit["fallback:" + proof["diagnostic"]] += 1
+        if provenance is not None:
+            provenance[tid] = proof
     return new,audit
 
 def recover(candidate,original):
-    restored=deepcopy(candidate)
-    oa=original.get("assessment")
-    if not isinstance(oa,dict) or oa.get("mode")!="automated":
-        if restored!=original:
-            raise ValueError("Non-automated source changed")
-        return
-    for id,test in restored["assessment"].get("tests",{}).items():
-        orig=oa["tests"][id]
-        if isinstance(test.get("object"),dict) and "capability" in orig.get("object",{}):
-            if "capability" in test["object"]:
-                raise ValueError("Redundant inline capability survived promotion")
-            test["object"]["capability"]=orig["object"]["capability"]
-        source_key="collected_items_require" if "collected_items_require" in orig else "require"
-        req=test.get("require")
-        if isinstance(req,dict) and set(req)=={"items"}:
-            if req["items"] not in PRESENCE_INVERSE or "states" in test:
-                raise ValueError("Invalid presence-only structured requirement")
-            test.pop("require")
-            test[source_key]=PRESENCE_INVERSE[req["items"]]
-        elif isinstance(req,dict):
-            if set(req)!={"items","all_items_must"} or req["items"] not in INVERSE:
-                raise ValueError("Unsupported new requirement structure")
-            states=req["all_items_must"]
-            if not isinstance(states,list) or not states:
-                raise ValueError("Missing inline States")
-            test.pop("require")
-            test["states"]=states
-            test[source_key]=INVERSE[req["items"]]
-        elif source_key=="collected_items_require":
-            test["collected_items_require"]=test.pop("require")
-    if restored!=original:
+    """Verify deterministic promotion and restore each checked source Test ledger."""
+    proofs = {}
+    expected, _ = promote(original, provenance=proofs)
+    if candidate != expected:
         raise ValueError("Original authoring source differs after exact reverse translation")
+    for tid, proof in proofs.items():
+        test = candidate["assessment"]["tests"][tid]
+        if restore_test(test, proof) != proof["source_test"]:
+            raise ValueError("Test source reconstruction mismatch: " + tid)
+
 
 def reconcile_benchmark_specifications(documents, *, expected_benchmarks=6,
                                       expected_conflicts=1391):
@@ -154,6 +114,7 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
     ext=".yaml" if is_yaml else ".json"
     counts=Counter()
     path_stats={}
+    field_provenance={}
     with zipfile.ZipFile(src) as z:
         names=[x for x in z.namelist() if x.startswith("authoring/") and x.endswith(ext)]
         if len(names)!=4001 or len(names)!=len(set(names)):
@@ -163,7 +124,10 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
         for name in sorted(names):
             old=yaml.safe_load(z.read(name)) if is_yaml else json.loads(z.read(name))
             source[name]=old
-            new,stats=promote(old)
+            proofs={}
+            new,stats=promote(old, provenance=proofs)
+            if proofs:
+                field_provenance[name]=proofs
             recover(new,old)
             if filter_proof is not None:
                 canonical_before_filter=deepcopy(new)
@@ -242,6 +206,7 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
                 {**row,"path":row["path"].removesuffix(".json").removesuffix(".yaml")}
                 for row in version_changes],
             "source_ast_recovered":True,
+            "field_requirement_provenance":field_provenance,
             "source_filter_proof_sha256": (hashlib.sha256(filter_proof_path.read_bytes()).hexdigest()
                                            if filter_proof_path else None),
             "source_filter_migration":"source_verified_direct_only" if filter_proof else "not_requested",
@@ -252,7 +217,7 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
             "schema_validated":False,
             "scanner_equivalence_proven":False}
     manifest_path.write_text(json.dumps(report,indent=2)+"\n")
-    print(json.dumps({k:v for k,v in report.items() if k!="changed_paths"},indent=2))
+    print(json.dumps({k:v for k,v in report.items() if k not in {"changed_paths", "field_requirement_provenance"}},indent=2))
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()

@@ -45,7 +45,7 @@ def describe(requirement):
         raise ValueError("expected structured canonical Test requirement")
     if set(requirement) == {"items"}:
         return EXISTENCE[requirement["items"]], "all", False
-    if set(requirement) == {"items", "all_items_must"}:
+    if {"items", "all_items_must"} <= set(requirement) <= {"items", "all_items_must", "field_requirement"}:
         if requirement["items"] not in PAIRS.values() or not requirement["all_items_must"]:
             raise ValueError("invalid structured all-match requirement")
         return EXISTENCE[requirement["items"]], "all", True

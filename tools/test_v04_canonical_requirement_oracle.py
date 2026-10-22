@@ -39,7 +39,8 @@ class SourceRequirementOracleTests(unittest.TestCase):
         self.assertEqual(result["test_population"]["converted_all_items"], 1)
         canonical = newer["authoring/demo/a.json"]["assessment"]["tests"]["test"]
         self.assertEqual(canonical["require"]["items"], "one_or_more")
-        self.assertEqual(canonical["require"]["all_items_must"], old["states"])
+        self.assertEqual(canonical["require"]["all_items_must"], [{"fields": {
+            "value": {"equals": 0, "field_requirement": "at_least_one_exists_and_all_match"}}}])
         self.assertNotIn("capability", canonical["object"])
 
     def test_flat_object_promotion_must_be_source_exact(self):
@@ -69,7 +70,7 @@ class SourceRequirementOracleTests(unittest.TestCase):
     def test_unsupported_matching_remains_exception(self):
         source, newer = self._docs({
             "capability": "unix.file", "require": "at_least_one_exists_and_some_match",
-            "states": [{"mode": {"equals": "0700"}}]})
+            "states": [{"mode": {"equals": "0700", "require": "at_least_one_exists_and_all_match"}}]})
         # No supported structured axes exists; old Test is preserved verbatim.
         with self.assertRaisesRegex(ValueError, "exceptional"):
             source_axes(source["authoring/demo/a.json"]["assessment"]["tests"]["test"])

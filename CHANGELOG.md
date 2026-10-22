@@ -8,6 +8,14 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Updated the 0.4 authoring converter and typed source compiler for canonical
+  `field_requirement` scopes and complete conditions. The compiler indexes
+  nearest explicit field declarations; source-exact records, repeated fields,
+  uncommon Test requirements and non-AND State operators retain diagnostics
+  and inverse evidence. Added an original published RHEL9 OVAL → YAML/JSON →
+  compiler trace. This does not establish executable scanner parity or finish
+  six-STIG promotion. [#251](https://github.com/vanderpol/scap-ng/issues/251)
+
 - Integrated the approved `field_requirement` grammar into the version-local
   Assessment schemas, with explicit Test/group/condition/field inheritance,
   complete-condition AND/OR/ONE/XOR, and implicit AND within `fields` maps.
