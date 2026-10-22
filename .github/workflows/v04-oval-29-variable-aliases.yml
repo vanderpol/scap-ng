@@ -56,6 +56,30 @@ jobs:
           assert c['original_variable_test_nodes']==c['direct_variable_shape_tests']+c['complex_variable_shape_tests']
           assert all(x['original_source_file_sha256'] if False else x['source_sha256']
                      for x in r['records'])
+          assert c['direct_variable_shape_definitions']==1
+          assert c['complex_variable_shape_definitions']==28
+          assert c['definitions_with_extended_sources']==3
+          assert c['reused_variable_test_leaf_occurrences']==85
+          assert c['distinct_original_variable_tests_per_definition_sum']==219
+          assert c['definition_reason:STATE_VALUE_HAS_LITERAL_TEXT']==26
+          assert c['definition_reason:STATE_VAR_CHECK_DIFFERS']==27
+          assert all(len(x['original_criteria_sha256'])==64 and
+                     x['original_criteria_expression']['kind']=='criteria'
+                     for x in r['records'])
+          import xml.etree.ElementTree as ET
+          from audit_v04_oval_29_variable_value_sources import (
+              original_criteria_tree, source_index)
+          extended=next(x for x in r['records'] if x['extended_definition_edges'])
+          xroot=ET.fromstring((Path('original-oval/SCAP_1.4/OVAL_Test_Content')/
+                                   extended['source_file']).read_bytes())
+          tree=original_criteria_tree(extended['original_definition_id'],
+                                       source_index(xroot))
+          assert 'referenced_expression' in json.dumps(tree)
+          mapping=json.loads(Path('scap-ng/schema/v0.4.0/capability-mappings/supported/variable.value.json').read_text())
+          assert mapping['migration_crosswalk']['state']['var_ref'].startswith(
+              'omittable_only_if_original_state_var_ref_is_proven_redundant')
+          assert any(rule['id']=='variable.value.state_var_ref_guard'
+                     for rule in mapping['semantic_validator_rules'])
           assert r['native_040_conversions_proven_from_this_audit']==0
           assert r['scanner_parity_proven'] is False
           print('PASS: 29 source-verified OVAL variable.value aliases classified, no conversion claims')
