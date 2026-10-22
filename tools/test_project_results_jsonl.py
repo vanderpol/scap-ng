@@ -108,6 +108,21 @@ class ProjectionTests(unittest.TestCase):
         self.assertNotIn("tests", rule)
         self.assertNotIn("items", rule)
 
+    def test_04_summary_projection_preserves_legacy_fields(self):
+        scan = scan_doc()
+        benchmark = benchmark_doc()
+        scan["scan_result"]["result_schema_version"] = "0.4.0"
+        benchmark["benchmark_result"]["result_schema_version"] = "0.4.0"
+        rule = benchmark["benchmark_result"]["rule_results"][0]
+        rule["summary"] = "File permissions differ: observed 0666; required 0644."
+        del rule["message"]
+        event = project_scan(scan, {"benchmark-results/example.json": benchmark})[1]
+        self.assertEqual(rule["summary"], event["summary"])
+        self.assertNotIn("message", event)
+        legacy = project_scan(scan_doc(), {"benchmark-results/example.json": benchmark_doc()})[1]
+        self.assertIn("message", legacy)
+        self.assertNotIn("summary", legacy)
+
     def test_jsonl_is_deterministic(self):
         events=project_scan(
             scan_doc(),
