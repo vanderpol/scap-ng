@@ -18,6 +18,7 @@ import json
 from pathlib import Path
 import zipfile
 import yaml
+from v04_flat_object_authoring import dump_hybrid
 
 from migrate_v04_oval_proven_direct_filters import (
     index_provenance, migrate as migrate_proven_filter, recover_migration,
@@ -65,6 +66,12 @@ def recover(candidate,original):
         test = candidate["assessment"]["tests"][tid]
         if restore_test(test, proof) != proof["source_test"]:
             raise ValueError("Test source reconstruction mismatch: " + tid)
+
+
+def render_authoring(document, *, is_yaml):
+    """Keep short canonical predicates inline without changing their data graph."""
+    return (dump_hybrid(document) if is_yaml
+            else json.dumps(document, indent=2, ensure_ascii=False) + "\n")
 
 
 def reconcile_benchmark_specifications(documents, *, expected_benchmarks=6,
@@ -176,8 +183,7 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
                     recover(before_filters,source[name])
                 else:
                     recover(new,source[name])
-            rendered=(yaml.safe_dump(new,sort_keys=False,allow_unicode=True,width=110)
-                      if is_yaml else json.dumps(new,indent=2,ensure_ascii=False)+"\n")
+            rendered=render_authoring(new, is_yaml=is_yaml)
             output.writestr(name,rendered)
         output.writestr("READ-ME-FIRST.txt",
             "SCAP-NG 0.4.0 six-benchmark authoring candidate. Source-exact inversion verified.\n"
