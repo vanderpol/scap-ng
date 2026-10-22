@@ -1,0 +1,102 @@
+name: 0.4.0 original OVAL fixed-unknown native and XSD roundtrip
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-unknown-source.yml'
+      - 'tools/prove_v04_oval_unknown_source.py'
+      - 'tools/promote_v04_oval_unknown_source_proof.py'
+      - 'tools/generate_capability_schema_v04.py'
+      - 'schema/v0.4.0/assessment-language.schema.json'
+      - 'schema/v0.4.0/assessment.schema.json'
+      - 'schema/v0.4.0/capability-mappings/supported/independent.unknown.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-oval-fixed-unknown:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.0.2
+      - name: Source-pinned original OVAL unknown native-only roundtrip and XSD
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = 'e3538595c5083b9c34d937a81d319234df9bbfaa'
+          python scap-ng/tools/prove_v04_oval_unknown_source.py \
+            --source original-oval/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_unknown_test.xml \
+            --schema-root scap-ng/schema/v0.4.0 \
+            --xsd-root oval-language/oval-schemas \
+            --output work/original-oval-unknown/fixed-unknown
+      - name: Independently promote 16 to 17 of 167 original Definitions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/previous-ledger
+          gh run download 39761524905 --repo "$GH_REPO" \
+            --name v04-oval-variable-datatype-entity-10-definitions-158-tests-16-of-167 \
+            --dir work/previous-ledger
+          test -f work/previous-ledger/cumulative-167-definition-readiness.json
+          python scap-ng/tools/promote_v04_oval_unknown_source_proof.py \
+            --previous-ledger work/previous-ledger/cumulative-167-definition-readiness.json \
+            --proof-root work/original-oval-unknown/fixed-unknown \
+            --output work/original-oval-unknown/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from pathlib import Path
+          from promote_v04_oval_unknown_source_proof import promote
+
+          now=json.loads(Path('work/original-oval-unknown/cumulative-167-definition-readiness.json').read_text())
+          prior=json.loads(Path('work/previous-ledger/cumulative-167-definition-readiness.json').read_text())
+          folder=Path('work/original-oval-unknown/fixed-unknown')
+          assert len(now['records']) == 167
+          assert now['current_040_schema_and_original_source_validated'] == 17
+          assert now['current_040_original_xml_roundtrip_exported'] == 17
+          assert now['remaining_v003_compatible_without_current_040_proof'] == 145
+          assert now['original_source_invalid_or_deprecated'] == 5
+          assert now['scanner_result_parity_proven'] == 0
+          try:
+              promote(now, folder)
+          except ValueError as exc:
+              assert 'complete pinned 16-of-167' in str(exc)
+          else:
+              raise AssertionError('accepted duplicate 17/167 promotion')
+          corrupt=deepcopy(prior)
+          next(r for r in corrupt['records'] if r['source_file'] == 'agnostic/ind-def_unknown_test.xml')['original_source_file_sha256']='0'*64
+          try:
+              promote(corrupt, folder)
+          except ValueError as exc:
+              assert 'not eligible' in str(exc)
+          else:
+              raise AssertionError('accepted falsified original fixed-unknown source SHA')
+          print('PASS: fixed-result unknown original OVAL 5.12.3 source + native/XSD/semantic proof; cumulative 17/167; scanner parity 0')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-oval-fixed-unknown-one-definition-one-test-17-of-167
+          path: work/original-oval-unknown/
+          if-no-files-found: ignore
