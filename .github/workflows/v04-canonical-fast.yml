@@ -1,0 +1,65 @@
+name: 0.4.0 canonical authoring fast checks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/*v04*.py'
+      - 'schema/v0.4.0/**'
+      - '.github/workflows/v04-canonical-fast.yml'
+      - '.github/workflows/v04-canonical-six-stig.yml'
+  pull_request:
+    paths:
+      - 'tools/*v04*.py'
+      - 'schema/v0.4.0/**'
+      - '.github/workflows/v04-canonical-fast.yml'
+      - '.github/workflows/v04-canonical-six-stig.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  focused:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.1.1 cryptography
+      - name: Test 0.4 authoring, conversion, and source-version guards
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_restore_missing_applicability.py
+          python tools/test_v04_all_items_schema.py
+          python tools/test_v04_source_schema_registry.py
+          python tools/test_v04_authoring_blocker_audit.py
+          python tools/test_v04_flat_object_authoring.py
+          python tools/test_v04_field_requirement_conversion.py
+          python tools/test_v04_canonical_source_ir.py
+          python tools/test_v04_a_dataflow_index.py
+          python tools/test_v04_canonical_version_preview.py
+      - name: Test original-OVAL and structural regression guards
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_guard_v04_filtered_union_migration.py
+          python tools/test_migrate_v04_oval_proven_direct_filters.py
+          python tools/test_migrate_v04_additional_source_filters.py
+          python tools/test_guard_v04_additional_source_filters.py
+          python tools/test_audit_v04_filtered_union_oval_provenance.py
+          python tools/test_audit_v04_remaining_singletons_oval.py
+          python tools/test_audit_v04_authoring_patterns.py
+      - name: Test native 0.4 source IR, result plans, and unsigned/signed source package guards
+        env:
+          PYTHONPATH: tools
+        run: |
+          command -v openssl
+          python tools/test_v04_canonical_result_plan.py
+          python tools/test_v04_exception_source_oracle.py
+          python tools/test_v04_canonical_requirement_oracle.py
+          python tools/test_v04_canonical_unsigned_package.py
+          python tools/test_v04_canonical_signed_source_package.py

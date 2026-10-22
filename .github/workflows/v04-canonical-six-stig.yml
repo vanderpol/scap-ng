@@ -1,62 +1,12 @@
 name: 0.4.0 canonical six-STIG Board authoring package
 on:
+  # Full independent YAML+JSON migration, OVAL provenance, package and release
+  # validation is a deliberate six-STIG checkpoint, not the edit/test loop.
+  # Bump the request file or dispatch manually when an artifact is required.
   push:
     branches: [main]
     paths:
-      - 'tools/build_v04_canonical_six_stigs.py'
-      - 'tools/audit_v04_authoring_blockers.py'
-      - 'tools/test_v04_authoring_blocker_audit.py'
-      - 'tools/test_v04_source_schema_registry.py'
-      - 'tools/v04_restore_missing_applicability.py'
-      - 'tools/test_v04_restore_missing_applicability.py'
-      - 'tools/build_v04_residual_review_ledger.py'
-      - 'tools/audit_v04_full_schema.py'
-      - 'tools/test_v04_all_items_schema.py'
-      - 'tools/test_v04_canonical_authoring_guard.py'
-      - 'tools/guard_v04_filtered_union_migration.py'
-      - 'tools/migrate_v04_oval_proven_direct_filters.py'
-      - 'tools/migrate_v04_additional_source_filters.py'
-      - 'tools/test_migrate_v04_additional_source_filters.py'
-      - 'tools/guard_v04_additional_source_filters.py'
-      - 'tools/test_guard_v04_additional_source_filters.py'
-      - 'tools/audit_v04_remaining_singletons_oval.py'
-      - 'tools/test_audit_v04_remaining_singletons_oval.py'
-      - 'tools/test_migrate_v04_oval_proven_direct_filters.py'
-      - 'tools/audit_v04_filtered_union_oval_provenance.py'
-      - 'tools/test_audit_v04_filtered_union_oval_provenance.py'
-      - 'tools/test_guard_v04_filtered_union_migration.py'
-      - 'tools/audit_v04_authoring_patterns.py'
-      - 'tools/test_audit_v04_authoring_patterns.py'
-      - 'tools/audit_v04_synthetic_filter_unions.py'
-      - 'tools/v04_canonical_source_ir.py'
-      - 'tools/v04_field_requirement.py'
-      - 'tools/v04_a_dataflow_index.py'
-      - 'tools/test_v04_a_dataflow_index.py'
-      - 'tools/test_v04_canonical_source_ir.py'
-      - 'tools/test_v04_field_requirement_conversion.py'
-      - 'tools/test_v04_source_schema_registry.py'
-      - 'tools/v04_canonical_requirement_oracle.py'
-      - 'tools/v04_canonical_version_preview.py'
-      - 'tools/test_v04_canonical_version_preview.py'
-      - 'tools/v04_canonical_unsigned_package.py'
-      - 'tools/v04_flat_object_authoring.py'
-      - 'tools/test_v04_flat_object_authoring.py'
-      - 'schema/v0.4.0/capability-mappings/supported/**'
-      - 'tools/test_v04_canonical_unsigned_package.py'
-      - 'tools/v04_canonical_signed_source_package.py'
-      - 'tools/test_v04_canonical_signed_source_package.py'
-      - 'tools/v04_canonical_result_plan.py'
-      - 'tools/test_v04_canonical_result_plan.py'
-      - 'tools/audit_v04_canonical_result_plans.py'
-      - 'tools/verify_v04_signed_source_corpus.py'
-      - 'tools/v04_exception_source_oracle.py'
-      - 'tools/test_v04_exception_source_oracle.py'
-      - 'tools/v04_canonical_requirement_oracle.py'
-      - 'tools/test_v04_canonical_requirement_oracle.py'
-      - 'schema/v0.4.0/assessment-language.schema.json'
-      - 'schema/v0.4.0/assessment.schema.json'
-      - 'schema/v0.4.0/capability-common.schema.json'
-      - '.github/workflows/v04-canonical-six-stig.yml'
+      - '.github/trigger-v04-six-stig-release.txt'
   workflow_dispatch:
 permissions:
   contents: write
@@ -69,7 +19,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 cryptography
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.1.1 cryptography
       - name: Test 0.4 source Filter-preservation and synthetic-Set guards
         env:
           PYTHONPATH: tools
