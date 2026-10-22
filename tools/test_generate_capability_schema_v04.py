@@ -133,12 +133,16 @@ class CapabilityV04Tests(unittest.TestCase):
             with self.subTest(bad=bad):
                 self.assertTrue(validate(schema, "object", bad))
 
-        # A Filter applied to a whole Set would have a different semantic
-        # boundary than operand Filters. Reject the ambiguous placement.
+        # OVAL applies every Set-level Filter to each referenced Object
+        # BEFORE the set_operator; native filters belong on each operand.
         set_only = {"capability": "linux.partition", "set": {
             "operator": "union", "operands": [
                 {"object": "partition-object", "filters": [include]}]}}
         self.assertFalse(validate(schema, "object", set_only))
+        set_filtered = deepcopy(set_only)
+        set_filtered["set"]["filters"] = [include]
+        self.assertTrue(validate(schema, "object", set_filtered),
+                        "No post-operation Set Filter exists in OVAL 5.12.3")
         combined = deepcopy(set_only)
         combined["filters"] = [include]
         self.assertTrue(validate(schema, "object", combined))
