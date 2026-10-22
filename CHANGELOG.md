@@ -6,6 +6,21 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+### Native content compilation
+
+- Restored `.scapng` compilation for the native 0.4.0 authoring model,
+  extending the earlier manifest-authoritative compiler architecture. Every
+  automated Assessment now carries a separately compiled Test dispatch and
+  six-state result-expression program, with canonical member hashes and
+  independent program/source verification. Native source-exact Test shapes
+  are preserved rather than guessed into simplified checks. The maintained
+  three-STIG fast gate compiles RHEL 9, Windows 11 and Apache 2.4 UNIX;
+  a deliberate six-STIG checkpoint reuses immutable JSON/YAML source inputs
+  without rerunning their expensive original OVAL conversion. These are
+  **content compilation** results, not live collector/scanner conformance or
+  publisher signing evidence. [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#229](https://github.com/vanderpol/scap-ng/issues/229)
+
 ### Canonical authoring checkpoint
 
 - Published source-invertible, native-schema-validated 0.4.0 JSON/YAML
@@ -13,8 +28,9 @@ proposals are not listed as delivered features.
   restoring 11 omitted shared applicability Assessments from immutable 0.3
   source. Both formats, six deterministic source-only package manifests,
   original-OVAL requirement axes, and isolated CMS test signatures passed
-  the full checkpoint. Executable `.scapng` compilation and scanner parity
-  remain open. [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  the full checkpoint. This historical source-only release predates the
+  distinct native compiled-bundle checkpoint; scanner parity remains open.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
   [#251](https://github.com/vanderpol/scap-ng/issues/251)
 - Split rapid 0.4 development regressions from deliberately triggered full
   six-STIG release builds. The routine integration sample validates pinned

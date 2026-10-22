@@ -63,6 +63,7 @@ jobs:
           python tools/test_v04_canonical_requirement_oracle.py
           python tools/test_v04_canonical_unsigned_package.py
           python tools/test_v04_canonical_signed_source_package.py
+          python tools/test_v04_native_bundle_compiler.py
       - name: Download three pinned 0.4 source-only integration anchors
         env:
           GH_TOKEN: ${{ github.token }}
@@ -103,3 +104,34 @@ jobs:
                   raise ValueError(f'source package status was misrepresented: {name}')
               print(f'PASS source-only: {name}, {documents} documents, {links} choices')
           PY
+      - name: Compile and independently verify three native 0.4 .scapng bundles
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/native-three
+          for name in rhel_9 ms_windows_11 apache_server_2-4_unix_server; do
+            python tools/v04_native_bundle_compiler.py \
+              --source-package "work/three-anchors/${name}.source-preview.zip" \
+              --output-dir work/native-three \
+              --report "work/native-three/${name}-report.json"
+          done
+          python - <<'PY'
+          from pathlib import Path
+          import json
+          root = Path('work/native-three')
+          bundles = list(root.glob('*.scapng'))
+          assert len(bundles) == 3, bundles
+          for path in bundles:
+              result = json.loads((root / (path.stem + '-report.json')).read_text())[path.stem]
+              assert result['programs'] > 0 and result['tests'] > 0
+              assert result['status'] == 'NATIVE_040_COMPILED_CONTENT_BUNDLE_NOT_SCANNER_TESTED'
+              assert result['scanner_evaluated'] is False
+              print(f'PASS compiled: {path.name}; {result["programs"]} programs / {result["tests"]} tests')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-040-compiled-three-STIG-smoke
+          path: |
+            work/native-three/*.scapng
+            work/native-three/*-report.json
+          if-no-files-found: error

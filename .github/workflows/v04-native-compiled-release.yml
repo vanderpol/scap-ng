@@ -1,0 +1,125 @@
+name: 0.4.0 native compiled six-STIG .scapng checkpoint
+
+on:
+  # Consume six immutable canonical source packages already checked against
+  # independently parsed YAML/JSON in the earlier source release. Do not
+  # repeat the 20+ minute original OVAL conversion for compiler changes.
+  push:
+    branches: [main]
+    paths:
+      - '.github/trigger-v04-native-compile.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  compile-native:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.1.1 cryptography
+      - name: Focused native compiler semantics, determinism and tamper tests
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_native_bundle_compiler.py -v
+          python tools/test_v04_canonical_result_plan.py
+          python tools/test_v04_canonical_unsigned_package.py
+      - name: Download six immutable YAML/JSON-proven source packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/canonical-source
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261022-restored \
+            --pattern '*.source-preview.zip' --dir work/canonical-source
+          echo 'be6a80f784b0ae24ba647ad6cd149fd2dcd4614d13188aa346c33459adc271d8  work/canonical-source/apache_server_2-4_unix_server.source-preview.zip' | sha256sum -c -
+          echo '86f0a2fbf570e7ee14a59265c336367b356dca31827444e212c966e547e30c6b  work/canonical-source/ms_windows_11.source-preview.zip' | sha256sum -c -
+          echo '5413c0512b989c8f25fc48b4b973226ef265872c27b4d372b5ac87958eadc63e  work/canonical-source/ms_windows_server_2025.source-preview.zip' | sha256sum -c -
+          echo '664de151cc2ec28425edac541c2c21c7f783485e78a4326e9a8454dae6a81491  work/canonical-source/ms_windows_server_dns.source-preview.zip' | sha256sum -c -
+          echo '718d77a5936ceb70241fbed9ec7f364cb81bfbd17a190ecca01c74c7d96936e8  work/canonical-source/oracle_linux_9.source-preview.zip' | sha256sum -c -
+          echo '5115f90d12aafb2e66ca11c8102fb094dcd5d20d509e0251ecb8c33895bee227  work/canonical-source/rhel_9.source-preview.zip' | sha256sum -c -
+          test "$(find work/canonical-source -name '*.source-preview.zip' | wc -l)" -eq 6
+      - name: Compile six native 0.4 .scapng packages from pinned canonical source
+        env:
+          PYTHONPATH: tools
+        run: |
+          mkdir -p work/native-bundles
+          for name in rhel_9 oracle_linux_9 ms_windows_11 ms_windows_server_2025 ms_windows_server_dns apache_server_2-4_unix_server; do
+            python tools/v04_native_bundle_compiler.py \
+              --source-package "work/canonical-source/${name}.source-preview.zip" \
+              --output-dir work/native-bundles \
+              --report "work/native-bundles/${name}-report.json"
+          done
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('work/native-bundles')
+          reports={}
+          for source in sorted(root.glob('*-report.json')):
+            reports.update(json.loads(source.read_text()))
+          (root/'compiled-report.json').write_text(json.dumps(reports,indent=2,sort_keys=True)+'\n')
+          PY
+      - name: Independently verify every compiled manifest and Test program
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from v04_native_bundle_compiler import verify_bundle
+          import json
+          import zipfile
+          root=Path('work/native-bundles')
+          packages=sorted(root.glob('*.scapng'))
+          assert len(packages)==6,packages
+          names={p.stem for p in packages}
+          assert names=={
+            'rhel_9','oracle_linux_9','ms_windows_11',
+            'ms_windows_server_2025','ms_windows_server_dns',
+            'apache_server_2-4_unix_server'},names
+          report=json.loads((root/'compiled-report.json').read_text())
+          assert set(report)==names
+          for package in packages:
+            check=verify_bundle(package.read_bytes())
+            assert check==report[package.stem],package.name
+            assert check['programs']>0 and check['tests']>0
+            assert check['scanner_evaluated'] is False
+            with zipfile.ZipFile(package) as zf:
+              manifest=json.loads(zf.read('META-INF/manifest.json'))
+              assert manifest['format_version']=='0.4.0'
+              assert manifest['entrypoint']==check['benchmark']
+              assert manifest['build_provenance']['compiled_programs']
+            print('COMPILED',package.name,check['documents'],check['programs'],check['tests'])
+          PY
+          cd work/native-bundles
+          sha256sum *.scapng > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-040-native-compiled-six-STIGs
+          path: |
+            work/native-bundles/*.scapng
+            work/native-bundles/compiled-report.json
+            work/native-bundles/SHA256SUMS.txt
+          if-no-files-found: error
+      - name: Publish immutable native content compilation checkpoint
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          tag='v0.4.0-six-stig-native-compiled-20261022'
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Already published $tag; never replace immutable artifacts"
+            exit 0
+          fi
+          gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
+            --title 'SCAP-NG 0.4.0 — six native compiled .scapng Benchmarks' \
+            --notes 'Six deterministic native 0.4.0 .scapng content packages compiled from pinned canonical source ZIPs, which were already verified against independently parsed YAML/JSON authoring at the preceding release checkpoint. Each includes canonical JSON content with a manifest-resolved graph and separately compiled Test dispatch and six-state result programs. Package hashes, references and program/source equivalence are checked. PRE-ALPHA: unsigned; scanner acquisition, live evaluation, runtime semantic conformance, publisher signing and Board ratification are NOT established. Source: v0.4.0-six-stig-canonical-flat-authoring-20261022-restored.' \
+            work/native-bundles/*.scapng \
+            work/native-bundles/compiled-report.json \
+            work/native-bundles/SHA256SUMS.txt

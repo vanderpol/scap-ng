@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""Focused native 0.4 .scapng compiler, inverse and tamper regressions."""
+from copy import deepcopy
+import io
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+import zipfile
+
+import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from test_v04_canonical_source_ir import sample
+from v04_a_authoring_graph_index import canonical_json
+from v04_canonical_unsigned_package import build_package as source_package
+from v04_native_bundle_compiler import (
+    build_bundle, compile_from_pair, compile_from_source_package,
+    compile_test_instruction, verify_bundle, MANIFEST_MEMBER,
+)
+
+
+def fixture():
+    docs = sample()
+    docs["authoring/demo/benchmark.demo.json"]["benchmark"].update(
+        rules=["r1"], version={"value": "1"})
+    return docs
+
+
+def rewrite(raw, mutate):
+    with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+        members = {name: zf.read(name) for name in zf.namelist()}
+    mutate(members)
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as zf:
+        for name, content in members.items():
+            zf.writestr(name, content)
+    return buffer.getvalue()
+
+
+class NativeBundleCompilerTests(unittest.TestCase):
+    def test_real_native_program_and_deterministic_bundle(self):
+        docs = fixture()
+        raw, manifest = build_bundle(docs, validate_schema=False)
+        other, _ = build_bundle(dict(reversed(list(docs.items()))), validate_schema=False)
+        self.assertEqual(raw, other)
+        result = verify_bundle(raw, validate_schema=False)
+        self.assertEqual(result["status"],
+                         "NATIVE_040_COMPILED_CONTENT_BUNDLE_NOT_SCANNER_TESTED")
+        self.assertEqual((result["documents"], result["programs"], result["tests"]),
+                         (3, 1, 1))
+        self.assertFalse(result["scanner_evaluated"])
+        self.assertEqual(manifest["entrypoint"], "demo")
+        self.assertIn("assessment-1", manifest["objects"])
+        self.assertIn("assessment-1", manifest["build_provenance"]["compiled_programs"])
+        path = manifest["build_provenance"]["compiled_programs"]["assessment-1"]["path"]
+        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+            program = json.loads(zf.read(path))
+        self.assertEqual(program["test_instructions"][0]["opcode"],
+                         "CHECK_EACH_ITEM_REQUIREMENT")
+        self.assertEqual(program["test_instructions"][0]["operands"]["require"],
+                         docs["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"]["require"])
+        self.assertEqual(len(program["result_instructions"]), 1)
+
+    def test_independent_yaml_json_compile_parity(self):
+        docs = fixture()
+        with tempfile.TemporaryDirectory() as td:
+            paths = [Path(td) / name for name in ("json.zip", "yaml.zip")]
+            for target, ext in zip(paths, ("json", "yaml")):
+                with zipfile.ZipFile(target, "w") as zf:
+                    for name, doc in sorted(docs.items()):
+                        content = (canonical_json(doc) if ext == "json" else
+                                   yaml.safe_dump(doc).encode())
+                        zf.writestr(name[:-5] + "." + ext, content)
+            packages, results = compile_from_pair(*paths, validate_schema=False)
+        self.assertEqual(set(packages), {"demo"})
+        self.assertEqual(results["demo"]["programs"], 1)
+
+    def test_source_package_is_input_not_mislabeled_bundle(self):
+        source, _ = source_package(fixture(), validate_schema=False)
+        with self.assertRaisesRegex(ValueError, "supported compiled"):
+            verify_bundle(source, validate_schema=False)
+        compiled, report = compile_from_source_package(source, validate_schema=False)
+        self.assertNotEqual(compiled, source)
+        self.assertEqual(report["programs"], 1)
+
+    def test_preserve_source_exact_fallback_without_reinterpretation(self):
+        test = deepcopy(fixture()["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"])
+        test["require"] = "at_least_one_exists_and_some_match"
+        test["states"] = [{"mode": {"equals": "0600",
+                                      "require": "at_least_one_exists_and_all_match"}}]
+        instruction = compile_test_instruction("t1", test)
+        self.assertEqual(instruction["opcode"], "CHECK_SOURCE_EXACT_STATES")
+        self.assertEqual(instruction["operands"], test)
+
+    def test_reject_missing_or_damaged_program(self):
+        raw, manifest = build_bundle(fixture(), validate_schema=False)
+        program_path = manifest["build_provenance"]["compiled_programs"]["assessment-1"]["path"]
+        with self.assertRaisesRegex(ValueError, "missing or duplicate compiled program"):
+            verify_bundle(rewrite(raw, lambda files: files.pop(program_path)),
+                          validate_schema=False)
+        with self.assertRaisesRegex(ValueError, "compiled program digest mismatch"):
+            verify_bundle(rewrite(raw, lambda files: files.__setitem__(program_path,
+                                                                       files[program_path] + b" ")),
+                          validate_schema=False)
+
+    def test_reject_stale_plan_even_with_rehashed_manifest(self):
+        raw, manifest = build_bundle(fixture(), validate_schema=False)
+        program_path = manifest["build_provenance"]["compiled_programs"]["assessment-1"]["path"]
+
+        def forge(files):
+            from hashlib import sha256
+            program = json.loads(files[program_path])
+            program["test_instructions"][0]["operands"]["require"]["items"] = "none"
+            altered = canonical_json(program)
+            files[program_path] = altered
+            revised = json.loads(files[MANIFEST_MEMBER])
+            row = revised["build_provenance"]["compiled_programs"]["assessment-1"]
+            row.update(size=len(altered), sha256=sha256(altered).hexdigest())
+            files[MANIFEST_MEMBER] = canonical_json(revised)
+
+        with self.assertRaisesRegex(ValueError, "stale or has altered Test semantics"):
+            verify_bundle(rewrite(raw, forge), validate_schema=False)
+
+    def test_reject_unlisted_member_and_incomplete_rule_inventory(self):
+        raw, _ = build_bundle(fixture(), validate_schema=False)
+        with self.assertRaisesRegex(ValueError, "extra or unlisted"):
+            verify_bundle(rewrite(raw, lambda files: files.update({"extra": b"payload"})),
+                          validate_schema=False)
+        docs = fixture()
+        docs["authoring/demo/benchmark.demo.json"]["benchmark"]["rules"] = []
+        with self.assertRaisesRegex(ValueError, "Rule list"):
+            build_bundle(docs, validate_schema=False)
+
+
+if __name__ == "__main__":
+    unittest.main()
