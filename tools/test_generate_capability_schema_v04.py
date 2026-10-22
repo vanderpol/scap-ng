@@ -56,6 +56,45 @@ def test_object(capability,select,**extra):
 
 
 class CapabilityV04Tests(unittest.TestCase):
+    def test_published_bluetooth_flat_object_inherits_capability_and_item_requirement(self):
+        # The published 0.4 six-STIG Assessment uses canonical Test-scoped
+        # capability and `{items: one_or_more}`. Every generated native
+        # capability contract must accept this same approved authoring grammar.
+        schema = materialize("independent.shellcommand")
+        valid = {
+            "test_title": "Report true if bluetooth installed",
+            "capability": "independent.shellcommand",
+            "object": {
+                "shell": "powershell",
+                "command": "(Get-PnpDevice -class bluetooth -status OK).class",
+                "error_if_exit_status_not_0": False,
+                "error_if_stderr_exists": False,
+                "filters": [{"include": {"stdout_line": {
+                    "case_insensitive_equals": "Bluetooth",
+                    "require": "at_least_one_exists_and_all_match",
+                }}}],
+            },
+            "reported_elements": "all",
+            "require": {"items": "one_or_more"},
+        }
+        self.assertFalse(validate(schema, "test", valid))
+        explicit = deepcopy(valid)
+        explicit["object"]["capability"] = "independent.shellcommand"
+        self.assertFalse(validate(schema, "test", explicit),
+                         "An explicit matching Object capability is still legal")
+        for name, edit in (
+            ("wrong capability", lambda t: t["object"].update(capability="windows.registry")),
+            ("mixed Set", lambda t: t["object"].update(set={"operator":"union","operands":[]})),
+            ("bad items", lambda t: t.update(require={"items":"invented"})),
+            ("legacy collect", lambda t: t["object"].update(collect={"shell":"powershell"})),
+            ("empty filters", lambda t: t["object"]["filters"].clear()),
+        ):
+            with self.subTest(mutation=name):
+                invalid = deepcopy(valid)
+                edit(invalid)
+                self.assertTrue(validate(schema, "test", invalid),
+                                "A malformed direct-Filter source Test must fail closed")
+
     def test_generated_states_use_canonical_and_or_xor_with_legacy_aliases(self):
         # OVAL lockoutpolicy_state has four distinct fields whose conditions
         # are combined. The capability-specific schema must not reject the

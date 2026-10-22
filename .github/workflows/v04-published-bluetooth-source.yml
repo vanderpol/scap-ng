@@ -1,0 +1,72 @@
+name: 0.4.0 published Windows 11 Bluetooth source XSD and native schema proof
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-published-bluetooth-source.yml'
+      - 'tools/prove_v04_published_bluetooth_source.py'
+      - 'tools/export_v04_oval_shellcommand_pilot.py'
+      - 'tools/test_export_v04_shellcommand_pilot.py'
+      - 'tools/test_generate_capability_schema_v04.py'
+      - 'tools/test_generate_capability_schema_v04_corpus.py'
+      - 'tools/generate_capability_schema_v04.py'
+      - 'schema/v0.4.0/assessment.schema.json'
+      - 'schema/v0.4.0/assessment-language.schema.json'
+      - 'schema/v0.4.0/capability-common.schema.json'
+      - 'schema/v0.4.0/capability-mappings/supported/independent.shellcommand.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  published-windows11-bluetooth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.0.2
+      - name: Download immutable published Windows 11 source-only package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/release
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261021 \
+            --repo "$GH_REPO" \
+            --pattern 'ms_windows_11.source-preview.zip' \
+            --dir work/release
+      - name: Validate canonical generated schema, pilot and 100 capability catalog
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/test_generate_capability_schema_v04.py
+          python scap-ng/tools/test_export_v04_shellcommand_pilot.py
+          python scap-ng/tools/test_generate_capability_schema_v04_corpus.py \
+            --output work/capability-schema-audit.json
+      - name: Prove actual published Bluetooth Assessment and exported OVAL XSD
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/prove_v04_published_bluetooth_source.py \
+            --source-package work/release/ms_windows_11.source-preview.zip \
+            --schema-root scap-ng/schema/v0.4.0 \
+            --xsd-root oval-language/oval-schemas \
+            --output work/published-bluetooth-proof
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-published-win11-bluetooth-flat-direct-filter-native-oval-xsd
+          path: |
+            work/published-bluetooth-proof/
+            work/capability-schema-audit.json
+          if-no-files-found: ignore

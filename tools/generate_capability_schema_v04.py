@@ -233,6 +233,12 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     }
     if "object" in defs:
         obj = defs["object"]
+        # An inline Object inherits the Test capability. The generated
+        # capability-specific contract already fixes the optional explicit
+        # Object capability via `const`; requiring it duplicated the Test
+        # declaration and rejected canonical flat six-STIG authoring.
+        obj["required"] = [field for field in obj.get("required", [])
+                           if field != "capability"]
         obj["properties"]["set"]={"$ref":"#/$defs/native_set_expression"}
         # 0.4.0: a filtered leaf Object is not a Set. Permit the same
         # ordered, observed-Item include/exclude predicates already supported
@@ -292,14 +298,11 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     test["required"] = sorted(required)
     test["properties"].pop("existence",None)
     test["properties"].pop("match",None)
+    # Reuse the complete canonical Test requirement grammar, including
+    # `{items: one_or_more}` and structured all-Items conditions. The older
+    # string-only adapter was narrower than the published Assessment schema.
     test["properties"]["require"] = {
-        # `none_exist` legitimately occurs in both the presence-only
-        # and State-bearing vocabularies. oneOf would reject that overlap;
-        # the central 0.4 Test schema independently enforces Test scope.
-        "anyOf": [
-            {"$ref": LANG + "#/$defs/presence_requirement"},
-            {"$ref": LANG + "#/$defs/paired_requirement"},
-        ],
+        "$ref": LANG + "#/$defs/test/properties/require"
     }
     test["properties"]["states"] = {
         "type":"array", "items":{"$ref":"#/$defs/state_expression"}
