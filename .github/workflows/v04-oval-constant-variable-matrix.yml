@@ -7,6 +7,7 @@ on:
       - 'tools/convert_v04_oval_constant_variable_matrix.py'
       - 'tools/export_v04_oval_constant_variable_matrix.py'
       - 'tools/check_v04_oval_constant_variable_matrix.py'
+      - 'tools/promote_v04_oval_constant_variable_matrix_proof.py'
       - 'tools/oval_result_truth_tables.py'
       - 'schema/v0.4.0/assessment-language.schema.json'
       - 'schema/v0.4.0/capability-mappings/supported/variable.value.json'
@@ -14,6 +15,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 jobs:
   original-constant-variable-roundtrip:
     runs-on: ubuntu-latest
@@ -48,6 +50,56 @@ jobs:
             --schema-root scap-ng/schema/v0.4.0 \
             --xsd-root oval-language/oval-schemas \
             --output work/oval-constant-variable-matrix
+      - name: Independently promote two Definitions into complete cumulative 167 ledger
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/previous-ledger
+          gh run download 39698272625 --repo "$GH_REPO" \
+            --name v04-pinned-oval-variable-test-existing-native-capability-roundtrip \
+            --dir work/previous-ledger
+          test -f work/previous-ledger/cumulative-167-definition-readiness.json
+          python scap-ng/tools/promote_v04_oval_constant_variable_matrix_proof.py \
+            --previous-ledger work/previous-ledger/cumulative-167-definition-readiness.json \
+            --proof-root work/oval-constant-variable-matrix \
+            --output work/oval-constant-variable-matrix/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from pathlib import Path
+          from promote_v04_oval_constant_variable_matrix_proof import promote
+
+          base=Path('work/oval-constant-variable-matrix')
+          previous=json.loads(Path(
+              'work/previous-ledger/cumulative-167-definition-readiness.json'
+          ).read_text())
+          result=json.loads((base/'cumulative-167-definition-readiness.json').read_text())
+          assert len(result['records']) == 167
+          assert result['current_040_schema_and_original_source_validated'] == 6
+          assert result['current_040_original_xml_roundtrip_exported'] == 6
+          assert result['remaining_v003_compatible_without_current_040_proof'] == 156
+          assert result['original_source_invalid_or_deprecated'] == 5
+          assert result['scanner_result_parity_proven'] == 0
+          try:
+              promote(result, base)
+          except ValueError as exc:
+              assert 'certified complete 4/167' in str(exc)
+          else:
+              raise AssertionError('double-promotion of the same source passed')
+          corrupted=deepcopy(previous)
+          row=next(r for r in corrupted['records'] if
+                   r['source_file']=='agnostic/oval-def_constant_variable.xml')
+          row['original_source_file_sha256']='0'*64
+          try:
+              promote(corrupted, base)
+          except ValueError as exc:
+              assert 'unproven/changed source' in str(exc)
+          else:
+              raise AssertionError('tampered pinned source ledger was accepted')
+          print('PASS: six of 167 complete current 0.4 native/XSD/original semantic proofs; scanner parity 0')
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
