@@ -1,0 +1,103 @@
+name: 0.4.0 original OVAL variable datatype suites native roundtrip
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-variable-datatype-suite.yml'
+      - 'tools/convert_v04_oval_variable_datatype_suite.py'
+      - 'tools/export_v04_oval_variable_datatype_suite.py'
+      - 'tools/check_v04_oval_variable_datatype_suite.py'
+      - 'tools/promote_v04_oval_variable_datatype_suite_proof.py'
+      - 'schema/v0.4.0/assessment-language.schema.json'
+      - 'schema/v0.4.0/assessment.schema.json'
+      - 'schema/v0.4.0/capability-mappings/supported/variable.value.json'
+      - 'tools/generate_capability_schema_v04.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  seven-original-oval-datatype-definitions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.0.2
+      - name: Source-pinned seven datatype Definition native/schema/OVAL proof
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = 'e3538595c5083b9c34d937a81d319234df9bbfaa'
+          python scap-ng/tools/check_v04_oval_variable_datatype_suite.py \
+            --original-root original-oval/SCAP_1.4/OVAL_Test_Content \
+            --schema-root scap-ng/schema/v0.4.0 \
+            --xsd-root oval-language/oval-schemas \
+            --output work/original-oval-datatype-suite
+      - name: Independently promote cumulative original Definition ledger from six to thirteen
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/previous-ledger
+          gh run download 39705310601 --repo "$GH_REPO" \
+            --name v04-oval-constant-variable-varcheck-two-definition-proof \
+            --dir work/previous-ledger
+          test -f work/previous-ledger/cumulative-167-definition-readiness.json
+          python scap-ng/tools/promote_v04_oval_variable_datatype_suite_proof.py \
+            --previous-ledger work/previous-ledger/cumulative-167-definition-readiness.json \
+            --proof-root work/original-oval-datatype-suite \
+            --output work/original-oval-datatype-suite/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from pathlib import Path
+          from promote_v04_oval_variable_datatype_suite_proof import promote
+          base=Path('work/original-oval-datatype-suite')
+          now=json.loads((base/'cumulative-167-definition-readiness.json').read_text())
+          prior=json.loads(Path('work/previous-ledger/cumulative-167-definition-readiness.json').read_text())
+          assert len(now['records'])==167
+          assert now['current_040_schema_and_original_source_validated']==13
+          assert now['current_040_original_xml_roundtrip_exported']==13
+          assert now['remaining_v003_compatible_without_current_040_proof']==149
+          assert now['original_source_invalid_or_deprecated']==5
+          assert now['scanner_result_parity_proven']==0
+          try:
+              promote(now,base)
+          except ValueError as exc:
+              assert 'complete pinned 6-of-167' in str(exc)
+          else:
+              raise AssertionError('accepted duplicate 13/167 promotion')
+          corrupt=deepcopy(prior)
+          next(r for r in corrupt['records'] if r['source_file']=='agnostic/oval_version_datatype.xml')['original_source_file_sha256']='0'*64
+          try:
+              promote(corrupt,base)
+          except ValueError as exc:
+              assert 'unproven/changed original Definition' in str(exc)
+          else:
+              raise AssertionError('accepted mismatched original OVAL source digest')
+          print('PASS: 13/167 original OVAL Definitions; 122 new datatype Tests; source/schema/XSD/Boolean graph evidence; scanner parity 0')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-oval-variable-datatype-7-definitions-122-tests-13-of-167
+          path: work/original-oval-datatype-suite/
+          if-no-files-found: ignore
