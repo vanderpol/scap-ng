@@ -18,8 +18,6 @@ from functools import lru_cache
 import json
 from pathlib import Path
 
-from v04_field_requirement import field_scopes, promote_test, validate_test
-
 from v04_a_authoring_graph_index import (
     canonical_json, graph_index, read_authoring_archive,
 )
@@ -73,7 +71,6 @@ def normalize_documents(documents):
                 cap = test.get("capability")
                 if not isinstance(cap, str) or not cap:
                     raise ValueError(f"{path}: missing Test capability {test_id}")
-                validate_test(test)
                 requirement = test.get("require")
                 if isinstance(requirement, dict):
                     if set(requirement) == {"items"}:
@@ -82,7 +79,7 @@ def normalize_documents(documents):
                         ):
                             raise ValueError(f"{path}: invalid presence-only Test {test_id}")
                         shape = "presence"
-                    elif {"items", "all_items_must"} <= set(requirement) <= {"items", "all_items_must", "field_requirement"}:
+                    elif set(requirement) == {"items", "all_items_must"}:
                         if (requirement["items"] not in {"one_or_more", "may_be_absent"}
                                 or not isinstance(requirement["all_items_must"], list)
                                 or not requirement["all_items_must"]
@@ -102,9 +99,8 @@ def normalize_documents(documents):
                 indexed.append({
                     "id": test_id, "capability": cap, "requirement_shape": shape,
                     "requirement": requirement, "test_sha256": sha256(canonical_json(test)).hexdigest(),
-                    "field_requirements": field_scopes(requirement),
-                    "fallback_diagnostic": (promote_test(test)[1]["diagnostic"]
-                                            if shape == "source_exact_fallback" else None),
+                    "state_fields_require": test.get("state_fields_require"),
+                    "states_match": test.get("states_match"),
                 })
                 totals[shape] += 1
         dataflow = None
@@ -179,9 +175,13 @@ def _schema_validators(schema_dir):
         if "$id" in schema:
             store[schema["$id"]] = schema
         store["https://scap-ng.dev/schema/v0.4.0/" + path.relative_to(schema_dir).as_posix()] = schema
+    # The deprecated RefResolver can incorrectly resolve a nested local $ref
+    # in assessment-language.schema.json against assessment.schema.json.
+    # Preserve the referenced document's own $id/scope with a modern registry.
     registry = Registry().with_resources(
-        (uri, Resource.from_contents(schema)) for uri, schema in store.items()
-        if uri.startswith("https://"))
+        (uri, Resource.from_contents(schema))
+        for uri, schema in store.items() if uri.startswith("https://")
+    )
     return {
         kind: Draft202012Validator(store[kind + ".schema.json"], registry=registry)
         for kind in ("assessment", "rule", "benchmark", "applicability")
