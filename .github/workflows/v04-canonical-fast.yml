@@ -63,3 +63,43 @@ jobs:
           python tools/test_v04_canonical_requirement_oracle.py
           python tools/test_v04_canonical_unsigned_package.py
           python tools/test_v04_canonical_signed_source_package.py
+      - name: Download three pinned 0.4 source-only integration anchors
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/three-anchors
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261022-restored --pattern 'rhel_9.source-preview.zip' --pattern 'ms_windows_11.source-preview.zip' --pattern 'apache_server_2-4_unix_server.source-preview.zip' --dir work/three-anchors
+      - name: Independently verify RHEL 9, Windows 11, and Apache 2.4 source graphs
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from v04_canonical_unsigned_package import verify_package
+
+          root = Path('work/three-anchors')
+          anchors = {
+              'rhel_9': ('benchmark.rhel_9', 1498, 862,
+                         '008c94ae1caa0d91bca064fa98a844e300688a22d7523f926735baa783fa79d3'),
+              'ms_windows_11': ('benchmark.ms_windows_11', 1151, 502,
+                                '1afb7d593e1c5497c4779d146e3274888bebd578123c7f539d66ac0b8be7eda8'),
+              'apache_server_2-4_unix_server': (
+                  'benchmark.apache_server_2-4_unix_server', 665, 67,
+                  '6fac769fe37ab93f18dcca288820da1e3ae067db0e1ac4d8e32e8506d527e4ee'),
+          }
+          expected = {f'{name}.source-preview.zip' for name in anchors}
+          actual = {p.name for p in root.glob('*.source-preview.zip')}
+          if actual != expected:
+              raise ValueError(f'three-anchor inventory mismatch: {actual ^ expected}')
+          for name, (benchmark_id, documents, links, graph_sha) in anchors.items():
+              checked = verify_package((root / (name + '.source-preview.zip')).read_bytes())
+              if (checked['benchmark'], checked['documents'],
+                      checked['rule_choice_links'], checked['source_graph_sha256']) != (
+                      benchmark_id, documents, links, graph_sha):
+                  raise ValueError(f'pinned canonical 0.4 source graph changed: {name}')
+              if (checked['status'] != 'VALIDATED_UNSIGNED_SOURCE_PACKAGE_NOT_EXECUTABLE'
+                      or checked['scanner_evaluated'] or checked['signature_verified']):
+                  raise ValueError(f'source package status was misrepresented: {name}')
+              print(f'PASS source-only: {name}, {documents} documents, {links} choices')
+          PY
