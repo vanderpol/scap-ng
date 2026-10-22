@@ -6,6 +6,7 @@ on:
       - '.github/workflows/v04-oval-variable-value-roundtrip.yml'
       - 'tools/convert_v04_oval_independent_variable_test.py'
       - 'tools/export_v04_oval_independent_variable_test.py'
+      - 'tools/promote_v04_oval_variable_test_proof.py'
       - 'tools/audit_v04_original_oval_variable_test.py'
       - 'schema/v0.4.0/capability-mappings/supported/variable.value.json'
       - 'tools/generate_capability_schema_v04.py'
@@ -71,6 +72,11 @@ jobs:
                                   'message':e.message[:300]} for e in errors[:5]]
           proof=json.loads((base/'source-and-mapping-proof.json').read_text())
           assert len(proof['test_pairs'])==4
+          import yaml
+          from v04_flat_object_authoring import dump_hybrid
+          native_yaml=dump_hybrid(doc)
+          (base/'native-040.assessment.yaml').write_text(native_yaml)
+          assert yaml.safe_load(native_yaml)==doc
           proof['native_schema_validated']=True
           (base/'source-and-mapping-proof.json').write_text(
               json.dumps(proof,indent=2,sort_keys=True)+'\n')
@@ -158,6 +164,49 @@ jobs:
               'not_scanner_parity':True
           },indent=2)+'\n')
           print('PASS: five structural rejections and independent altered-value semantic mismatch')
+          PY
+      - name: Promote original variable Test into complete 167-Definition readiness ledger
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/previous-ledger
+          gh run download 39679961764 --repo "$GH_REPO" \
+            --name v04-original-oval-family-constant-variable-current-schema-roundtrip \
+            --dir work/previous-ledger
+          test -f work/previous-ledger/cumulative-167-definition-readiness.json
+          python scap-ng/tools/promote_v04_oval_variable_test_proof.py \
+            --previous-ledger work/previous-ledger/cumulative-167-definition-readiness.json \
+            --variable-artifacts work/oval-variable \
+            --output work/oval-variable/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from copy import deepcopy
+          from promote_v04_oval_variable_test_proof import promote
+          directory=Path('work/oval-variable')
+          now=json.loads((directory/'cumulative-167-definition-readiness.json').read_text())
+          assert len(now['records'])==167
+          assert now['current_040_schema_and_original_source_validated']==4
+          assert now['current_040_original_xml_roundtrip_exported']==4
+          assert now['remaining_v003_compatible_without_current_040_proof']==158
+          assert now['original_source_invalid_or_deprecated']==5
+          assert now['scanner_result_parity_proven']==0
+          original=json.loads(Path(
+              'work/previous-ledger/cumulative-167-definition-readiness.json'
+          ).read_text())
+          try:promote(now,directory)
+          except ValueError as e:assert 'previous complete' in str(e)
+          else:raise AssertionError('accepted duplicate 4th Definition promotion')
+          bad=deepcopy(original)
+          row=next(r for r in bad['records']
+                   if r['source_file']=='agnostic/ind-def_variable_test.xml')
+          row['original_source_file_sha256']='0'*64
+          try:promote(bad,directory)
+          except ValueError as e:assert 'source identity' in str(e)
+          else:raise AssertionError('accepted wrong original OVAL source digest')
+          print('PASS: fourth of 167 OVAL Definitions source/XSD/native/roundtrip proven, scanner parity still zero')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
