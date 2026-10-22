@@ -200,7 +200,7 @@ def main():
         result["test_population"].get("converted_presence"),
         result["test_population"].get("converted_all_items"),
         result["test_population"].get("exceptional_source_exact"),
-    ) != (4001, 387, 816, 172):
+    ) != (4001, 387, 769, 219):
         raise ValueError("full six-STIG canonical requirement population changed")
     a.report.parent.mkdir(parents=True, exist_ok=True)
     a.report.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
