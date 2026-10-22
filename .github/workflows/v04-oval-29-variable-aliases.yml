@@ -1,0 +1,104 @@
+name: 0.4.0 OVAL 29 native variable.value source-shape audit
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-29-variable-aliases.yml'
+      - 'tools/audit_v04_oval_29_variable_value_sources.py'
+      - 'tools/audit_v04_oval_variable_migration_queue.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original-oval-aliases:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download pinned 68-definition original OVAL Variable queue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/queue work/reports
+          gh run download 39698778370 --repo "$GH_REPO" \
+            --name v04-original-oval-68-variable-graph-source-audit-not-conversion \
+            --dir work/queue
+          test -f work/queue/variable-migration-queue.json
+          test "$(git -C original-oval rev-parse HEAD)" = 'e3538595c5083b9c34d937a81d319234df9bbfaa'
+      - name: Independently classify 29 original constant-only variable.value source graphs
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python scap-ng/tools/audit_v04_oval_29_variable_value_sources.py \
+            --variable-queue work/queue/variable-migration-queue.json \
+            --source-root original-oval/SCAP_1.4/OVAL_Test_Content \
+            --report work/reports/variable-value-original-shapes.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('work/reports/variable-value-original-shapes.json').read_text())
+          c=r['counts']
+          assert c['definitions']==r['queue_denominator']==29
+          assert c['direct_variable_shape_definitions'] + c['complex_variable_shape_definitions']==29
+          assert c['original_variable_test_nodes']==c['direct_variable_shape_tests']+c['complex_variable_shape_tests']
+          assert all(x['original_source_file_sha256'] if False else x['source_sha256']
+                     for x in r['records'])
+          assert r['native_040_conversions_proven_from_this_audit']==0
+          assert r['scanner_parity_proven'] is False
+          print('PASS: 29 source-verified OVAL variable.value aliases classified, no conversion claims')
+          PY
+      - name: Reject source-sha drift and duplicate Definition identities
+        env:
+          PYTHONPATH: scap-ng/tools
+        run: |
+          python - <<'PY'
+          from copy import deepcopy
+          import json
+          from pathlib import Path
+          from audit_v04_oval_29_variable_value_sources import audit
+          original=json.loads(Path('work/queue/variable-migration-queue.json').read_text())
+          root=Path('original-oval/SCAP_1.4/OVAL_Test_Content')
+          selected=next(x for x in original['records'] if
+              x['migration_group']=='constant_only' and
+              x.get('native_source_capability_aliases')=={'independent.variable':'variable.value'})
+          candidate=deepcopy(original)
+          row=next(x for x in candidate['records'] if x['source_file']==selected['source_file']
+                   and x['source_definition_id']==selected['source_definition_id'])
+          row['source_xml_sha256']='0'*64
+          try: audit(candidate,root)
+          except ValueError as error: assert 'digest changed' in str(error),str(error)
+          else: raise AssertionError('altered source digest was accepted')
+          candidate=deepcopy(original)
+          row=next(x for x in candidate['records'] if x['source_file']==selected['source_file']
+                   and x['source_definition_id']==selected['source_definition_id'])
+          duplicate=deepcopy(row)
+          replaced=next(x for x in candidate['records'] if
+              x['migration_group']=='constant_only' and
+              x.get('native_source_capability_aliases')=={'independent.variable':'variable.value'}
+              and x['source_definition_id']!=row['source_definition_id'])
+          replaced.clear()
+          replaced.update(duplicate)
+          try: audit(candidate,root)
+          except ValueError as error: assert 'duplicate selected' in str(error),str(error)
+          else: raise AssertionError('duplicate original Definition was accepted')
+          print('PASS: source digest and distinct OVAL Definition identity fail closed')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-pinned-29-original-variable-value-source-shapes-not-converted
+          path: work/reports/variable-value-original-shapes.json
+          if-no-files-found: ignore
