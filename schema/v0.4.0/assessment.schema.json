@@ -84,9 +84,7 @@
             "type": "object",
             "required": [
               "test_title",
-              "reported_elements",
-              "capability",
-              "require"
+              "capability"
             ],
             "properties": {
               "test_title": {
@@ -148,6 +146,26 @@
             },
             "additionalProperties": true,
             "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "capability": {
+                      "not": {
+                        "const": "independent.unknown"
+                      }
+                    }
+                  },
+                  "required": [
+                    "capability"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "reported_elements",
+                    "require"
+                  ]
+                }
+              },
               {
                 "if": {
                   "properties": {

@@ -115,8 +115,14 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     if mapping.get("native",{}).get("fixed_result") is not None:
         old_test = defs["test"]
         old_test["required"] = sorted(
-            (set(old_test["required"]) - {"existence", "match"}) | {"require"}
+            set(old_test["required"]) - {
+                "existence", "match", "require", "reported_elements"
+            }
         )
+        # OVAL independent.unknown has a fixed outcome regardless of the
+        # original check/check_existence boilerplate. Accept old explicit
+        # fields for published-source compatibility, but do not require
+        # meaningless authoring controls on a native fixed-result Test.
         old_test["properties"]["require"] = {
             "$ref": LANG + "#/$defs/presence_requirement"
         }

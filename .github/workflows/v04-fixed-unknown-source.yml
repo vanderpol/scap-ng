@@ -1,0 +1,42 @@
+name: 0.4.0 fixed unknown Test minimal authoring and six-STIG compatibility
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-fixed-unknown-source.yml'
+      - 'tools/test_v04_fixed_unknown_minimal.py'
+      - 'tools/generate_capability_schema_v04.py'
+      - 'schema/v0.4.0/assessment.schema.json'
+      - 'schema/v0.4.0/assessment-language.schema.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  fixed-result-unknown-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0
+      - name: Source-compatible fixed-result schema boundary and negative tests
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_v04_fixed_unknown_minimal.py
+      - name: Fetch pinned published 4,001-document YAML authoring release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261021 \
+            --pattern scap-ng-0.4.0-six-stigs.yaml.zip --dir work
+          echo '8922a818c388aa88a40329aee678ad078a0abf4d5475742ad96e0352fd175ef4  work/scap-ng-0.4.0-six-stigs.yaml.zip' | sha256sum -c -
+      - name: Validate all 4,001 unchanged published YAML documents under updated native schema
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_fixed_unknown_minimal.py \
+            --published-yaml-zip work/scap-ng-0.4.0-six-stigs.yaml.zip
