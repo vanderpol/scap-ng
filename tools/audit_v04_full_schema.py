@@ -140,7 +140,7 @@ def main():
     assert len(names)==4012 if not args.limit else len(names)<=args.limit
     if args.strict:
         if args.limit:raise ValueError("Strict corpus gate cannot use --limit")
-        expected={"assessment_documents":2422,"assessment_schema_pass":2422,
+        expected={"assessment_documents":2433,"assessment_schema_pass":2433,
                   "rule_documents":1567,"rule_schema_pass":1567,
                   "benchmark_documents":6,"benchmark_schema_pass":6,
                   "applicability_documents":6,"applicability_schema_pass":6}
@@ -148,6 +148,6 @@ def main():
             if totals.get(k)!=v:raise ValueError(f"Strict schema gate: {k} is {totals.get(k)} not {v}")
         failures={k:v for k,v in totals.items() if k.endswith("_schema_fail") or k.startswith("resolver_or_validator")}
         if failures:raise ValueError(f"Strict schema gate failed: {failures}")
-        print("PASS strict six-STIG source authoring: 2,422 Assessments, 1,567 Rules, 6 Benchmarks, 6 Applicability documents")
+        print("PASS strict six-STIG source authoring: 2,433 Assessments, 1,567 Rules, 6 Benchmarks, 6 Applicability documents")
 
 if __name__=="__main__":main()
