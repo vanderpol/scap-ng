@@ -6,7 +6,8 @@ publish blockers for review. This is deliberately not a release conformance
 gate until zero failures and semantic validation are established.
 """
 import argparse, collections, json, pathlib, zipfile
-from jsonschema import Draft202012Validator, RefResolver
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 import yaml
 
 def main():
@@ -44,11 +45,14 @@ def main():
     with zipfile.ZipFile(args.archive) as z:
         names=sorted(n for n in z.namelist() if n.startswith("authoring/") and n.endswith((".yaml",".json")))
         if args.limit:names=names[:args.limit]
+        registry = Registry().with_resources(
+            (uri, Resource.from_contents(schema))
+            for uri, schema in schemas.items() if uri.startswith("https://")
+        )
         validators={}
         for kind in ("assessment","rule","benchmark","applicability"):
             d=schemas[kind+".schema.json"]
-            resolver=RefResolver.from_schema(d,store=schemas)
-            validators[kind]=Draft202012Validator(d,resolver=resolver)
+            validators[kind]=Draft202012Validator(d,registry=registry)
         for path in names:
             doc=yaml.safe_load(z.read(path)) if path.endswith(".yaml") else json.loads(z.read(path))
             kind=next((k for k in ("assessment","rule","benchmark","applicability") if k in doc),None)
