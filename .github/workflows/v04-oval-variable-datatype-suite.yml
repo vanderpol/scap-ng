@@ -1,4 +1,4 @@
-name: 0.4.0 original OVAL variable datatype suites native roundtrip
+name: 0.4.0 original OVAL variable datatype suites native roundtrip (nine)
 on:
   push:
     branches: [main]
@@ -17,7 +17,7 @@ permissions:
   contents: read
   actions: read
 jobs:
-  seven-original-oval-datatype-definitions:
+  nine-original-oval-datatype-definitions:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -40,7 +40,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.0.2
-      - name: Source-pinned seven datatype Definition native/schema/OVAL proof
+      - name: Source-pinned nine datatype Definition native/schema/OVAL proof
         env:
           PYTHONPATH: scap-ng/tools
         run: |
@@ -50,7 +50,7 @@ jobs:
             --schema-root scap-ng/schema/v0.4.0 \
             --xsd-root oval-language/oval-schemas \
             --output work/original-oval-datatype-suite
-      - name: Independently promote cumulative original Definition ledger from six to thirteen
+      - name: Independently promote cumulative original Definition ledger from six to fifteen
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -74,9 +74,9 @@ jobs:
           now=json.loads((base/'cumulative-167-definition-readiness.json').read_text())
           prior=json.loads(Path('work/previous-ledger/cumulative-167-definition-readiness.json').read_text())
           assert len(now['records'])==167
-          assert now['current_040_schema_and_original_source_validated']==13
-          assert now['current_040_original_xml_roundtrip_exported']==13
-          assert now['remaining_v003_compatible_without_current_040_proof']==149
+          assert now['current_040_schema_and_original_source_validated']==15
+          assert now['current_040_original_xml_roundtrip_exported']==15
+          assert now['remaining_v003_compatible_without_current_040_proof']==147
           assert now['original_source_invalid_or_deprecated']==5
           assert now['scanner_result_parity_proven']==0
           try:
@@ -84,7 +84,7 @@ jobs:
           except ValueError as exc:
               assert 'complete pinned 6-of-167' in str(exc)
           else:
-              raise AssertionError('accepted duplicate 13/167 promotion')
+              raise AssertionError('accepted duplicate 15/167 promotion')
           corrupt=deepcopy(prior)
           next(r for r in corrupt['records'] if r['source_file']=='agnostic/oval_version_datatype.xml')['original_source_file_sha256']='0'*64
           try:
@@ -93,11 +93,11 @@ jobs:
               assert 'unproven/changed original Definition' in str(exc)
           else:
               raise AssertionError('accepted mismatched original OVAL source digest')
-          print('PASS: 13/167 original OVAL Definitions; 122 new datatype Tests; source/schema/XSD/Boolean graph evidence; scanner parity 0')
+          print('PASS: 15/167 original OVAL Definitions; 148 datatype Tests; source/schema/XSD/Boolean graph evidence; scanner parity 0')
           PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v04-oval-variable-datatype-7-definitions-122-tests-13-of-167
+          name: v04-oval-variable-datatype-9-definitions-148-tests-15-of-167
           path: work/original-oval-datatype-suite/
           if-no-files-found: ignore

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Original source -> 0.4 native -> independent OVAL 5.12.3 datatype proof.
 
-All seven source-pinned datatype suites must pass schema, XSD, original-root
+All nine source-pinned datatype suites must pass schema, XSD, original-root
 semantic graph and adversarial literal/criteria mutations. No scanner parity.
 Refs #248 #229 #232.
 """
@@ -66,7 +66,11 @@ def prove(source, validators, capability_schema, xsd_root, output):
         json.dumps(sem, indent=2, default=str) + "\n")
     must(sem["equal"], "OVAL original-root semantic graph " + filename)
 
-    tampered = raw.replace(b'check="at least one"', b'check="all"', 1)
+    old_check = (b'check="all"' if provenance["source_datatype"] in
+                 {"ipv4_address", "ipv6_address"} else b'check="at least one"')
+    new_check = (b'check="at least one"' if old_check == b'check="all"'
+                 else b'check="all"')
+    tampered = raw.replace(old_check, new_check, 1)
     must(raw != tampered, "construct source Test adversary")
     try:
         convert(tampered, filename)
@@ -103,6 +107,27 @@ def prove(source, validators, capability_schema, xsd_root, output):
     must(not compare(source, altered, source_root=CASES[filename][0],
                      regenerated_root=altered_id, root_only=True)["equal"],
          "modified Criterion negation must change original meaning")
+    if provenance["source_datatype"] in {"ipv4_address", "ipv6_address"}:
+        prefix = "ipv4_" if provenance["source_datatype"] == "ipv4_address" else "ipv6_"
+        changed = deepcopy(native)
+        subset = next(t["states"][0]["value"] for t in changed["assessment"]["tests"].values()
+                      if prefix + "subset_of" in t["states"][0]["value"])
+        subset[prefix + "superset_of"] = subset.pop(prefix + "subset_of")
+        xml, altered_id = emit(changed)
+        altered = target / "mutated-ip-subnet-operation.xml"
+        xml.write(altered, encoding="utf-8", xml_declaration=True)
+        must(not compare(source, altered, source_root=CASES[filename][0],
+                         regenerated_root=altered_id, root_only=True)["equal"],
+             "IP subset/superset direction must change original meaning")
+        changed = deepcopy(native)
+        changed["assessment"]["tests"]["source-1-test"]["require"] = (
+            "at_least_one_exists_and_some_match")
+        try:
+            emit(changed)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError("IP original all-check lowered as some-match")
     provenance.update({
         "native_assessment_schema": "PASS",
         "native_capability_schema": "PASS",
@@ -113,6 +138,9 @@ def prove(source, validators, capability_schema, xsd_root, output):
         "native_test_requirement_mutation": "REJECTED",
         "original_variable_mutation": "DETECTED",
         "original_criterion_mutation": "DETECTED",
+        "ip_subset_direction_mutation": (
+            "DETECTED" if provenance["source_datatype"] in
+            {"ipv4_address", "ipv6_address"} else "NOT_APPLICABLE"),
     })
     (target / "source-and-mapping-proof.json").write_text(
         json.dumps(provenance, indent=2, sort_keys=True) + "\n")
@@ -134,12 +162,12 @@ def main():
         must(source.is_file(), "pinned Self-Assertion source " + filename)
         reports.append(prove(source, validators, capability_schema,
                              args.xsd_root, args.output))
-    must(len(reports) == 7 and sum(r["native_test_count"] for r in reports) == 122,
-         "7 original datatype Definitions and 122 original Tests")
+    must(len(reports) == 9 and sum(r["native_test_count"] for r in reports) == 148,
+         "9 original datatype Definitions and 148 original Tests")
     summary = {
-        "status": "SEVEN_ORIGINAL_OVAL_DATATYPE_DEFINITIONS_NATIVE_SCHEMA_XSD_GRAPH_PASS",
+        "status": "NINE_ORIGINAL_OVAL_DATATYPE_DEFINITIONS_NATIVE_SCHEMA_XSD_GRAPH_PASS",
         "source_revision": PIN,
-        "definition_count": 7, "test_count": 122,
+        "definition_count": 9, "test_count": 148,
         "original_ids": [r["original_definition_id"] for r in reports],
         "scanner_result_parity_proven": 0,
         "cumulative_167_promotion": "PENDING_INDEPENDENT_LEDGER_GATE",

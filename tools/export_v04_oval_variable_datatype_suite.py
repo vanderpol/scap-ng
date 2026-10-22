@@ -11,13 +11,15 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from convert_v04_oval_variable_datatype_suite import (
-    CASES, FIELD_REQUIRE, NATIVE_DTYPE, OP, PREFIX, TEST_REQUIRE, OD, IND, must,
+    CASES, FIELD_REQUIRE, IP_DATATYPES, NATIVE_DTYPE, OP, PREFIX,
+    TEST_REQUIRE, OD, IND, must,
 )
 
 OC = "http://oval.mitre.org/XMLSchema/oval-common-5"
 SPEC = {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"}
 VARS = {"binary": 2, "boolean": 4, "string": 6, "float": 3,
-        "evr_string": 5, "int": 5, "version": 12}
+        "evr_string": 5, "int": 5, "version": 12,
+        "ipv4_address": 2, "ipv6_address": 2}
 
 
 def tag(ns, name):
@@ -55,6 +57,7 @@ def emit(document):
          "native Assessment source identity/type")
     filename = id_to_name[assessment["id"]]
     original_did, _, dtype, ntests = CASES[filename]
+    expected_require = FIELD_REQUIRE if dtype in IP_DATATYPES else TEST_REQUIRE
     variables, tests = assessment["variables"], assessment["tests"]
     must(type(variables) is dict and type(tests) is dict and
          list(variables) == [f"source-{i}-variable" for i in range(1, VARS[dtype]+1)] and
@@ -123,7 +126,7 @@ def emit(document):
              test["capability"] == "variable.value" and
              test["variable"] in variables and
              test["reported_elements"] == "all" and
-             test["require"] == TEST_REQUIRE and
+             test["require"] == expected_require and
              type(test["states"]) is list and len(test["states"]) == 1 and
              type(test["states"][0]) is dict and
              set(test["states"][0]) == {"value"},
@@ -151,7 +154,8 @@ def emit(document):
         test_ids[name] = tid
         native = ET.SubElement(out_tests, tag(IND, "variable_test"), {
             "id": tid, "version": str(assessment["version"]),
-            "comment": test["test_title"], "check": "at least one",
+            "comment": test["test_title"], "check": (
+                "all" if dtype in IP_DATATYPES else "at least one"),
             "check_existence": "at_least_one_exists",
         })
         ET.SubElement(native, tag(IND, "object"), {

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Fail-closed original OVAL datatype proof promotion from 6/167 to 13/167.
+"""Fail-closed original OVAL datatype proof promotion from 6/167 to 15/167.
 
-Requires all seven pinned original XML files, native YAML/JSON, fresh native
+Requires all nine pinned original XML files, native YAML/JSON, fresh native
 conversion, independent OVAL 5.12.3 XSD, re-export and semantic equivalence.
 No scanner parity is asserted. Refs #248 #229 #232.
 """
@@ -94,6 +94,9 @@ def promote(previous, evidence_root):
                 proof.get("original_variable_mutation") == "DETECTED" and
                 proof.get("original_criterion_mutation") == "DETECTED",
                 "adversarial proof or source identity changed " + filename)
+        if dtype in {"ipv4_address", "ipv6_address"}:
+            require(proof.get("ip_subset_direction_mutation") == "DETECTED",
+                    "typed IP subset/superset adversarial proof missing " + filename)
         xsd = json.loads(files["roundtrip-xsd.json"].read_text())
         require(xsd.get("status") == "PASS" and
                 xsd.get("oval_schema_version") == "5.12.3" and
@@ -127,13 +130,13 @@ def promote(previous, evidence_root):
             row[key] = filename.removesuffix(".xml") + "/" + target
         row["current_040_artifact_source"] = (
             "pinned native-only 0.4 OVAL datatype suite XSD/semantic CI proof")
-    updated["current_040_schema_and_original_source_validated"] = 13
-    updated["current_040_original_xml_roundtrip_exported"] = 13
-    updated["remaining_v003_compatible_without_current_040_proof"] = 149
+    updated["current_040_schema_and_original_source_validated"] = 15
+    updated["current_040_original_xml_roundtrip_exported"] = 15
+    updated["remaining_v003_compatible_without_current_040_proof"] = 147
     updated["scanner_result_parity_proven"] = 0
     require(sum(str(r.get("current_040_oval_xml_roundtrip", "")).startswith("PASS_")
-                for r in updated["records"]) == 13,
-            "exactly thirteen current original 0.4 native/XML proofs")
+                for r in updated["records"]) == 15,
+            "exactly fifteen current original 0.4 native/XML proofs")
     return updated
 
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seven pinned original OVAL independent.variable datatype suites -> native 0.4.
+"""Nine pinned original OVAL independent.variable datatype suites -> native 0.4.
 
 This deliberately narrow reusable importer preserves the original literal
 lexemes, multi-valued Variables, typed operations, Test quantifiers, nested
@@ -22,6 +22,8 @@ CASES = {
     "oval_evr_string_datatype.xml": ("oval:org.mitre.oval.test:def:392", "d47f8b10868e052481aa9cfbe67f616d683f244a93c7810ee40c20b62c21d179", "evr_string", 16),
     "oval_int_datatype.xml": ("oval:org.mitre.oval.test:def:356", "bf3ae1b0f7dbbe4dde8bae9e30b16202ffd6101bfc42f053110eefaa97fa5965", "int", 20),
     "oval_version_datatype.xml": ("oval:org.mitre.oval.test:def:291", "c20249735d1900285a293b958f03a94b359eb00b1023b87e22d8c2a9776737df", "version", 48),
+    "oval_ipv4address_datatype.xml": ("oval:org.mitre.oval.test:def:884", "cb45247269fcb983047c4f06d1aa3dfcf7fb9f5ed690f3c0358f87f308115d2b", "ipv4_address", 13),
+    "oval_ipv6address_datatype.xml": ("oval:org.mitre.oval.test:def:231", "7eb8fd0c02a044435981684cf02650e49b3c87247b3da45050a38dbe51c376b7", "ipv6_address", 13),
 }
 OP = {
     "equals": "equals", "not equal": "not_equal",
@@ -31,11 +33,15 @@ OP = {
     "greater than": "greater_than", "greater than or equal": "greater_than_or_equal",
     "less than": "less_than", "less than or equal": "less_than_or_equal",
     "bitwise and": "bitwise_and", "bitwise or": "bitwise_or",
+    "subset of": "subset_of", "superset of": "superset_of",
 }
-PREFIX = {"float": "float_", "version": "version_", "evr_string": "rpm_evr_"}
-NATIVE_DTYPE = {"int": "integer", "evr_string": "rpm_evr"}
+PREFIX = {"float": "float_", "version": "version_", "evr_string": "rpm_evr_",
+          "ipv4_address": "ipv4_", "ipv6_address": "ipv6_"}
+NATIVE_DTYPE = {"int": "integer", "evr_string": "rpm_evr",
+                "ipv4_address": "ipv4", "ipv6_address": "ipv6"}
 TEST_REQUIRE = "at_least_one_exists_and_some_match"
 FIELD_REQUIRE = "at_least_one_exists_and_all_match"
+IP_DATATYPES = frozenset({"ipv4_address", "ipv6_address"})
 
 
 def must(ok, reason):
@@ -129,8 +135,9 @@ def convert(raw: bytes, filename: str):
     test_names = {sid: f"source-{i}-test" for i, sid in enumerate(source_tests, 1)}
     tests = {}
     for tid, test in source_tests.items():
+        expected_check = "all" if dtype in IP_DATATYPES else "at least one"
         must(test.tag == tag(IND, "variable_test") and len(test) == 2 and
-             test.get("check") == "at least one" and
+             test.get("check") == expected_check and
              test.get("check_existence") == "at_least_one_exists" and
              test.get("state_operator", "AND") == "AND" and
              set(test.attrib) <= {"id", "version", "comment", "check", "check_existence", "state_operator"},
@@ -146,7 +153,8 @@ def convert(raw: bytes, filename: str):
             "capability": "variable.value",
             "variable": objects[object_child.get("object_ref")],
             "states": [states[state_child.get("state_ref")]],
-            "reported_elements": "all", "require": TEST_REQUIRE,
+            "reported_elements": "all", "require": (
+                FIELD_REQUIRE if dtype in IP_DATATYPES else TEST_REQUIRE),
         }
 
     referenced = []
