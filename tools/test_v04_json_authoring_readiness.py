@@ -12,7 +12,6 @@ import json
 import unittest
 import zipfile
 
-from research_04_scoped_schema import validate
 from test_v04_review_reference_graph import scan
 
 EXPECTED_DOCUMENTS = 4001
@@ -48,6 +47,11 @@ def documents_from_json_archive(archive_path):
 
 def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
     """Source-independent JSON validation, without reading the YAML archive."""
+    # The immutable October 15 research archive is audited for source graph
+    # integrity only. Its old scoped-State validator must not be imported when
+    # the current production 0.4 schema has evolved beyond that research form.
+    if validate_native:
+        from research_04_scoped_schema import validate
     if not documents:
         raise ValueError("Empty JSON authoring archive")
     total = Counter()
