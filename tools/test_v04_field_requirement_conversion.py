@@ -15,7 +15,7 @@ import zipfile
 
 import yaml
 
-from build_v04_canonical_six_stigs import promote, recover
+from build_v04_canonical_six_stigs import promote, recover, render_authoring
 from v04_field_requirement import promote_test, restore_test
 from v04_canonical_source_ir import compile_pair, decode_and_verify, normalize_documents
 from test_v04_field_requirement_schema import document, REQUIRED, OPTIONAL
@@ -64,6 +64,19 @@ def compile_documents(docs):
 
 
 class FieldRequirementConversionTests(unittest.TestCase):
+    def test_generated_yaml_defaults_to_inline_object_and_field_predicates(self):
+        source = document(REQUIRED)
+        test = source['assessment']['tests']['edition-test'] = source_test()
+        test['object'] = {'hive': {'equals': 'local_machine'},
+                          'name': {'equals': 'EditionID'}}
+        converted, _ = promote(source)
+        emitted = render_authoring(converted, is_yaml=True)
+        self.assertIn('object: {hive: {equals: local_machine}, name: {equals: EditionID}}', emitted)
+        self.assertIn('fields: {type: {equals: string}, value: {equals: Enterprise}}', emitted)
+        self.assertNotIn('states_match:', emitted)
+        self.assertNotIn('state_fields_require:', emitted)
+        self.assertEqual(yaml.safe_load(emitted), converted)
+
     def test_enterprise_states_stay_whole_and_compile_in_both_formats(self):
         old = document(REQUIRED)
         old['assessment']['tests']['edition-test'] = source_test()
