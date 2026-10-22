@@ -90,7 +90,7 @@ def project_scan(
                 "parameters": rule.get("parameters", effective_policy.get("parameters", {})),
                 "applicability": rule.get("applicability"),
                 "outcome": rule["outcome"],
-                "message": rule.get("message"),
+                "summary": rule["summary"] if scan["result_schema_version"] == "0.4.0" else rule.get("message"),
                 "reason": rule.get("reason"),
                 "assessment": rule.get("assessment"),
                 "instances": rule.get("instances", []),
