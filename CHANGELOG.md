@@ -8,6 +8,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Integrated the approved `field_requirement` grammar into the version-local
+  Assessment schemas, with explicit Test/group/condition/field inheritance,
+  complete-condition AND/OR/ONE/XOR, and implicit AND within `fields` maps.
+  Rejects missing field scope and mixed legacy names on the canonical path;
+  retains source-exact uncommon requirement and record fallbacks. Converter,
+  compiler, editor and six-STIG promotion remain separate integration work.
+  [#240](https://github.com/vanderpol/scap-ng/issues/240)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+  [#239](https://github.com/vanderpol/scap-ng/issues/239)
+
 - Added source-verified Object-local Filters for the 28 unambiguous
   single-operand synthetic Set cases in the six-STIG authoring corpus,
   retaining eight provenance-ambiguous cases unchanged. Conversion requires
