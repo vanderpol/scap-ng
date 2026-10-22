@@ -5,6 +5,8 @@ on:
     paths:
       - 'tools/build_v04_canonical_six_stigs.py'
       - 'tools/audit_v04_authoring_blockers.py'
+      - 'tools/test_v04_authoring_blocker_audit.py'
+      - 'tools/test_v04_source_schema_registry.py'
       - 'tools/build_v04_residual_review_ledger.py'
       - 'tools/audit_v04_full_schema.py'
       - 'tools/test_v04_all_items_schema.py'
@@ -73,6 +75,12 @@ jobs:
         run: python tools/test_audit_v04_authoring_patterns.py
       - name: Check canonical all-items schema positive and negative fixtures
         run: python tools/test_v04_all_items_schema.py
+      - name: Check cross-schema field reference scopes and canonical audit fixtures
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_source_schema_registry.py
+          python tools/test_v04_authoring_blocker_audit.py
       - name: Validate unsigned native-package format and tamper rejection fixtures
         env:
           PYTHONPATH: tools
@@ -258,6 +266,19 @@ jobs:
           PY
           mv work/flat-0.4.0-six-stigs.json.zip work/scap-ng-0.4.0-six-stigs.json.zip
           mv work/flat-0.4.0-six-stigs.yaml.zip work/scap-ng-0.4.0-six-stigs.yaml.zip
+      # Keep source-proven output recoverable even when a downstream validator
+      # fails; subsequent diagnostics should not repeat the long conversion.
+      - name: Preserve source-proven authoring for failed-run diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-040-six-stig-diagnostic-source
+          retention-days: 2
+          path: |
+            work/scap-ng-0.4.0-six-stigs.json.zip
+            work/scap-ng-0.4.0-six-stigs.yaml.zip
+            work/json-manifest.json
+            work/yaml-manifest.json
+          if-no-files-found: error
       - name: Inventory remaining canonical 0.4.0 authoring blockers
         run: |
           python tools/audit_v04_authoring_blockers.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip --report work/yaml-blocker-audit.json
