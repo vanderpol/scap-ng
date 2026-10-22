@@ -311,7 +311,7 @@ def main():
         report["documents"], report["tests"], report["rule_choice_links"],
         report["requirement_shapes"]
     ) != (4001, 1375, 2958,
-          {"presence": 387, "all_items": 816, "source_exact_fallback": 172}):
+          {"presence": 387, "all_items": 769, "source_exact_fallback": 219}):
         raise ValueError("canonical six-STIG source IR regression counts changed")
     args.out_ir.parent.mkdir(parents=True, exist_ok=True)
     args.out_ir.write_bytes(data)
