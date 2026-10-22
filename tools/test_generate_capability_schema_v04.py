@@ -56,6 +56,25 @@ def test_object(capability,select,**extra):
 
 
 class CapabilityV04Tests(unittest.TestCase):
+    def test_generated_states_use_canonical_and_or_xor_with_legacy_aliases(self):
+        # OVAL lockoutpolicy_state has four distinct fields whose conditions
+        # are combined. The capability-specific schema must not reject the
+        # canonical operators already allowed by the 0.4 language schema.
+        schema = materialize("windows.lockoutpolicy")
+        fields = [{name: {
+            "greater_than_or_equal": -1 if name == "force_logoff" else 0,
+            "datatype": "integer", "require": "at_least_one_exists_and_all_match",
+        }} for name in ("force_logoff", "lockout_duration",
+                        "lockout_observation_window", "lockout_threshold")]
+        for operator in ("and", "or", "one", "xor", "all", "any", "odd"):
+            with self.subTest(operator=operator):
+                self.assertFalse(validate(schema, "state_expression",
+                                          {operator: fields}))
+        # This version requires an explicit operator for a group, rather
+        # than silently defaulting the matching semantics of four fields.
+        self.assertTrue(validate(schema, "state_expression", {
+            name: leaf for field in fields for name, leaf in field.items()}))
+
     def test_generator_cli_reports_real_flat_object_field_counts(self):
         # After eliminating generic select/collect, CLI metadata must count
         # the direct native fields rather than an obsolete Object.select map.

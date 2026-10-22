@@ -28,7 +28,9 @@ VERSION = "0.4.0"
 ROOT_ID = f"https://scap-ng.dev/schema/v{VERSION}/"
 LANG = ROOT_ID + "assessment-language.schema.json"
 COMMON = ROOT_ID + "capability-common.schema.json"
-LOGIC = ("all", "any", "one", "odd")
+# Use the same explicit 0.4 Boolean spellings as assessment-language.schema:
+# AND/OR and odd parity XOR; retain the parseable older aliases for migration.
+LOGIC = ("and", "or", "one", "xor", "all", "any", "odd")
 
 
 def _field_expression(name: str, child: dict) -> dict:
