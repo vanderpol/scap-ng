@@ -200,14 +200,14 @@ def audit(queue, original_dir):
         detailed = [direct_variable_test(tid, indexed) for tid in test_ids]
         variable_tests = [x for x in detailed if x is not None]
         must(variable_tests, "original Definition has no independent.variable_test " + str(key))
-        direct = (not extended and not nonvariable and
-                  all(t["direct_value_test_candidate"] for t in variable_tests))
         # A Definition can contain other Test capabilities; these are
         # intentionally not discarded when classifying a possible importer.
         nonvariable = [
             {"test_id": tid, "source_type": loc(indexed[tid].tag)}
             for tid, t in zip(test_ids, detailed) if t is None
         ]
+        direct = (not extended and not nonvariable and
+                  all(t["direct_value_test_candidate"] for t in variable_tests))
         counters["definitions"] += 1
         counters["original_variable_test_nodes"] += len(variable_tests)
         counters["extended_definition_edges"] += len(extended)
