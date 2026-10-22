@@ -20,6 +20,14 @@ proposals are not listed as delivered features.
   **content compilation** results, not live collector/scanner conformance or
   publisher signing evidence. [#232](https://github.com/vanderpol/scap-ng/issues/232)
   [#229](https://github.com/vanderpol/scap-ng/issues/229)
+- Added optional detached-CMS signing and **externally anchored** verification
+  for already-compiled native 0.4 `.scapng` bundles. Verification checks the
+  signer, detached signature, manifest, exact compiled Test/Result programs,
+  hashes and entire logical graph; no embedded certificate is implicitly
+  trusted. Published six-STIG preview bundles remain unsigned until a real
+  publisher signing identity and trust policy are supplied. This proves
+  package authenticity only, not live scanner correctness.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
 
 ### Canonical authoring checkpoint
 

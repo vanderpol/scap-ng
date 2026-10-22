@@ -218,6 +218,45 @@ Optional research signing:
 
 A self-signed test certificate demonstrates mechanics only; it does not establish publisher trust.
 
+## Compile and optionally sign native 0.4.0 content
+
+**Scripts:** `tools/v04_native_bundle_compiler.py`,
+`tools/v04_native_bundle_signing.py`
+
+Use a separately verified canonical 0.4 source-preview ZIP from the pinned
+six-STIG authoring checkpoint. The output is a native compiled `.scapng`
+package with separately checked Test dispatch and result programs.
+
+```powershell
+python tools/v04_native_bundle_compiler.py ^
+  --source-package work/rhel_9.source-preview.zip ^
+  --output-dir work/native ^
+  --report work/native/compiled-report.json
+```
+
+Signing is a separate optional publisher action. Supply the publisher's private
+key and certificate from appropriately protected local locations; **never**
+commit private keys, issue/sign releases with throwaway test certificates, or
+treat the certificate embedded in the `.scapng` archive as a trust anchor.
+
+```powershell
+python tools/v04_native_bundle_signing.py sign ^
+  --input work/native/rhel_9.scapng ^
+  --private-key PRIVATE_KEY_PATH ^
+  --signer-certificate PUBLISHER_CERT_PATH ^
+  --output work/native/rhel_9.signed.scapng
+
+python tools/v04_native_bundle_signing.py verify ^
+  --input work/native/rhel_9.signed.scapng ^
+  --trusted-certificate APPROVED_TRUST_ANCHOR_PATH
+```
+
+Verification requires an externally supplied certificate anchor and OpenSSL.
+It checks the actual CMS signer and independently recompiles every Assessment
+program from the package's signed logical graph. The verifier does not claim
+revocation policy, automated publisher key management, live scanner execution,
+or OVAL semantic parity. Do not call test-key verification publisher trust.
+
 ## Run opt-in 0.3.0 modernization during selected-Rule conversion
 
 **Script:** `tools/scap_upconvert_v003/convert_collection_review.py`
