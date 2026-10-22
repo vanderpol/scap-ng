@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Fail-closed original OVAL datatype proof promotion from 6/167 to 15/167.
+"""Fail-closed original OVAL datatype/entity proof promotion from 6/167 to 16/167.
 
-Requires all nine pinned original XML files, native YAML/JSON, fresh native
+Requires all ten pinned original XML files, native YAML/JSON, fresh native
 conversion, independent OVAL 5.12.3 XSD, re-export and semantic equivalence.
 No scanner parity is asserted. Refs #248 #229 #232.
 """
@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ET
 from lxml import etree
 import yaml
 
-from convert_v04_oval_variable_datatype_suite import CASES, PIN, convert
+from convert_v04_oval_variable_datatype_suite import CASES, ENTITY_CASE, PIN, convert
 from export_v04_oval_variable_datatype_suite import emit
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from v04_a_authoring_graph_index import canonical_json
@@ -97,6 +97,9 @@ def promote(previous, evidence_root):
         if dtype in {"ipv4_address", "ipv6_address"}:
             require(proof.get("ip_subset_direction_mutation") == "DETECTED",
                     "typed IP subset/superset adversarial proof missing " + filename)
+        if filename == ENTITY_CASE:
+            require(proof.get("entity_check_mutation") == "DETECTED",
+                    "OVAL entity_check mutation proof missing " + filename)
         xsd = json.loads(files["roundtrip-xsd.json"].read_text())
         require(xsd.get("status") == "PASS" and
                 xsd.get("oval_schema_version") == "5.12.3" and
@@ -130,13 +133,13 @@ def promote(previous, evidence_root):
             row[key] = filename.removesuffix(".xml") + "/" + target
         row["current_040_artifact_source"] = (
             "pinned native-only 0.4 OVAL datatype suite XSD/semantic CI proof")
-    updated["current_040_schema_and_original_source_validated"] = 15
-    updated["current_040_original_xml_roundtrip_exported"] = 15
-    updated["remaining_v003_compatible_without_current_040_proof"] = 147
+    updated["current_040_schema_and_original_source_validated"] = 16
+    updated["current_040_original_xml_roundtrip_exported"] = 16
+    updated["remaining_v003_compatible_without_current_040_proof"] = 146
     updated["scanner_result_parity_proven"] = 0
     require(sum(str(r.get("current_040_oval_xml_roundtrip", "")).startswith("PASS_")
-                for r in updated["records"]) == 15,
-            "exactly fifteen current original 0.4 native/XML proofs")
+                for r in updated["records"]) == 16,
+            "exactly sixteen current original 0.4 native/XML proofs")
     return updated
 
 

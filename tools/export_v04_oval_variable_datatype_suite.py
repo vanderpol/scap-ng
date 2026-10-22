@@ -11,8 +11,8 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from convert_v04_oval_variable_datatype_suite import (
-    CASES, FIELD_REQUIRE, IP_DATATYPES, NATIVE_DTYPE, OP, PREFIX,
-    TEST_REQUIRE, OD, IND, must,
+    CASES, ENTITY_CASE, ENTITY_CHECK_REQUIRE, FIELD_REQUIRE, IP_DATATYPES,
+    NATIVE_DTYPE, OP, PREFIX, TEST_REQUIRE, OD, IND, must,
 )
 
 OC = "http://oval.mitre.org/XMLSchema/oval-common-5"
@@ -57,10 +57,12 @@ def emit(document):
          "native Assessment source identity/type")
     filename = id_to_name[assessment["id"]]
     original_did, _, dtype, ntests = CASES[filename]
-    expected_require = FIELD_REQUIRE if dtype in IP_DATATYPES else TEST_REQUIRE
+    all_check = dtype in IP_DATATYPES or filename == ENTITY_CASE
+    expected_require = FIELD_REQUIRE if all_check else TEST_REQUIRE
     variables, tests = assessment["variables"], assessment["tests"]
     must(type(variables) is dict and type(tests) is dict and
-         list(variables) == [f"source-{i}-variable" for i in range(1, VARS[dtype]+1)] and
+         list(variables) == [f"source-{i}-variable" for i in range(
+             1, (1 if filename == ENTITY_CASE else VARS[dtype])+1)] and
          list(tests) == [f"source-{i}-test" for i in range(1, ntests+1)],
          "Variable/Test identity and count")
     for name, var in variables.items():
@@ -132,8 +134,10 @@ def emit(document):
              set(test["states"][0]) == {"value"},
              "Test contract " + name)
         predicate = test["states"][0]["value"]
+        field_require = predicate.get("require")
         must(type(predicate) is dict and
-             predicate.get("require") == FIELD_REQUIRE and
+             (field_require in ENTITY_CHECK_REQUIRE.values()
+              if filename == ENTITY_CASE else field_require == FIELD_REQUIRE) and
              predicate.get("datatype") == NATIVE_DTYPE.get(dtype, dtype) and
              len(predicate) == 3, "exact typed State field")
         ops = [k for k in predicate if k not in {"require", "datatype"}]
@@ -149,13 +153,18 @@ def emit(document):
             attrs["datatype"] = dtype
         if operation != "equals":
             attrs["operation"] = operation
+        if filename == ENTITY_CASE:
+            checks = [check for check, requirement in ENTITY_CHECK_REQUIRE.items()
+                      if field_require == requirement]
+            must(len(checks) == 1, "unambiguous OVAL entity_check")
+            attrs["entity_check"] = checks[0]
         ET.SubElement(state, tag(IND, "value"), attrs).text = predicate[ops[0]]
         tid = prefix + f"tst:{i}"
         test_ids[name] = tid
         native = ET.SubElement(out_tests, tag(IND, "variable_test"), {
             "id": tid, "version": str(assessment["version"]),
             "comment": test["test_title"], "check": (
-                "all" if dtype in IP_DATATYPES else "at least one"),
+                "all" if all_check else "at least one"),
             "check_existence": "at_least_one_exists",
         })
         ET.SubElement(native, tag(IND, "object"), {

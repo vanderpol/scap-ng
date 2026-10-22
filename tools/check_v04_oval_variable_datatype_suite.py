@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Original source -> 0.4 native -> independent OVAL 5.12.3 datatype proof.
 
-All nine source-pinned datatype suites must pass schema, XSD, original-root
+All ten source-pinned datatype suites must pass schema, XSD, original-root
 semantic graph and adversarial literal/criteria mutations. No scanner parity.
 Refs #248 #229 #232.
 """
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import yaml
 
-from convert_v04_oval_variable_datatype_suite import CASES, PIN, convert
+from convert_v04_oval_variable_datatype_suite import CASES, ENTITY_CASE, PIN, convert
 from export_v04_oval_variable_datatype_suite import emit
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from test_generate_capability_schema_v04 import materialize, validate
@@ -67,7 +67,8 @@ def prove(source, validators, capability_schema, xsd_root, output):
     must(sem["equal"], "OVAL original-root semantic graph " + filename)
 
     old_check = (b'check="all"' if provenance["source_datatype"] in
-                 {"ipv4_address", "ipv6_address"} else b'check="at least one"')
+                 {"ipv4_address", "ipv6_address"} or filename == ENTITY_CASE
+                 else b'check="at least one"')
     new_check = (b'check="at least one"' if old_check == b'check="all"'
                  else b'check="all"')
     tampered = raw.replace(old_check, new_check, 1)
@@ -128,6 +129,18 @@ def prove(source, validators, capability_schema, xsd_root, output):
             pass
         else:
             raise AssertionError("IP original all-check lowered as some-match")
+    if filename == ENTITY_CASE:
+        changed = deepcopy(native)
+        first = changed["assessment"]["tests"]["source-1-test"]["states"][0]["value"]
+        must(first["require"] == "at_least_one_exists_and_all_match",
+             "entity_check first original all")
+        first["require"] = "at_least_one_exists_and_some_match"
+        xml, altered_id = emit(changed)
+        altered = target / "mutated-entity-check.xml"
+        xml.write(altered, encoding="utf-8", xml_declaration=True)
+        must(not compare(source, altered, source_root=CASES[filename][0],
+                         regenerated_root=altered_id, root_only=True)["equal"],
+             "entity_check all-to-at-least-one must change OVAL source meaning")
     provenance.update({
         "native_assessment_schema": "PASS",
         "native_capability_schema": "PASS",
@@ -141,6 +154,8 @@ def prove(source, validators, capability_schema, xsd_root, output):
         "ip_subset_direction_mutation": (
             "DETECTED" if provenance["source_datatype"] in
             {"ipv4_address", "ipv6_address"} else "NOT_APPLICABLE"),
+        "entity_check_mutation": "DETECTED" if filename == ENTITY_CASE
+                                 else "NOT_APPLICABLE",
     })
     (target / "source-and-mapping-proof.json").write_text(
         json.dumps(provenance, indent=2, sort_keys=True) + "\n")
@@ -162,12 +177,12 @@ def main():
         must(source.is_file(), "pinned Self-Assertion source " + filename)
         reports.append(prove(source, validators, capability_schema,
                              args.xsd_root, args.output))
-    must(len(reports) == 9 and sum(r["native_test_count"] for r in reports) == 148,
-         "9 original datatype Definitions and 148 original Tests")
+    must(len(reports) == 10 and sum(r["native_test_count"] for r in reports) == 158,
+         "10 original datatype/field-enumeration Definitions and 158 original Tests")
     summary = {
-        "status": "NINE_ORIGINAL_OVAL_DATATYPE_DEFINITIONS_NATIVE_SCHEMA_XSD_GRAPH_PASS",
+        "status": "TEN_ORIGINAL_OVAL_DATATYPE_AND_ENTITY_CHECK_DEFINITIONS_PASS",
         "source_revision": PIN,
-        "definition_count": 9, "test_count": 148,
+        "definition_count": 10, "test_count": 158,
         "original_ids": [r["original_definition_id"] for r in reports],
         "scanner_result_parity_proven": 0,
         "cumulative_167_promotion": "PENDING_INDEPENDENT_LEDGER_GATE",

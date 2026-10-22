@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Nine pinned original OVAL independent.variable datatype suites -> native 0.4.
+"""Ten pinned original OVAL independent.variable datatype suites -> native 0.4.
 
 This deliberately narrow reusable importer preserves the original literal
 lexemes, multi-valued Variables, typed operations, Test quantifiers, nested
@@ -24,6 +24,7 @@ CASES = {
     "oval_version_datatype.xml": ("oval:org.mitre.oval.test:def:291", "c20249735d1900285a293b958f03a94b359eb00b1023b87e22d8c2a9776737df", "version", 48),
     "oval_ipv4address_datatype.xml": ("oval:org.mitre.oval.test:def:884", "cb45247269fcb983047c4f06d1aa3dfcf7fb9f5ed690f3c0358f87f308115d2b", "ipv4_address", 13),
     "oval_ipv6address_datatype.xml": ("oval:org.mitre.oval.test:def:231", "7eb8fd0c02a044435981684cf02650e49b3c87247b3da45050a38dbe51c376b7", "ipv6_address", 13),
+    "oval_check_enumeration_entity.xml": ("oval:org.mitre.oval.test:def:687", "f9e0c3706ecbe282f2e0ece9a833cfa419510557356bc0dfc3edd0d2a29ca19a", "int", 10),
 }
 OP = {
     "equals": "equals", "not equal": "not_equal",
@@ -42,6 +43,13 @@ NATIVE_DTYPE = {"int": "integer", "evr_string": "rpm_evr",
 TEST_REQUIRE = "at_least_one_exists_and_some_match"
 FIELD_REQUIRE = "at_least_one_exists_and_all_match"
 IP_DATATYPES = frozenset({"ipv4_address", "ipv6_address"})
+ENTITY_CASE = "oval_check_enumeration_entity.xml"
+ENTITY_CHECK_REQUIRE = {
+    "all": FIELD_REQUIRE,
+    "at least one": "at_least_one_exists_and_some_match",
+    "none satisfy": "at_least_one_exists_and_none_match",
+    "only one": "at_least_one_exists_and_only_one_matches",
+}
 
 
 def must(ok, reason):
@@ -121,21 +129,29 @@ def convert(raw: bytes, filename: str):
              set(state.attrib) <= {"id", "version", "comment", "operator"},
              "single-field State " + sid)
         value = single(state, IND, "value")
-        must(set(value.attrib) <= {"datatype", "operation"} and
+        allowed_attrs = ({"datatype", "operation", "entity_check"}
+                         if filename == ENTITY_CASE else {"datatype", "operation"})
+        must(set(value.attrib) <= allowed_attrs and
              value.get("datatype", "string") == dtype and value.text is not None,
              "State typed literal " + sid)
         op = native_op(dtype, value.get("operation", "equals"))
+        if filename == ENTITY_CASE:
+            must(value.get("entity_check") in ENTITY_CHECK_REQUIRE,
+                 "reviewed OVAL entity_check " + sid)
+        field_require = (ENTITY_CHECK_REQUIRE[value.get("entity_check")]
+                         if filename == ENTITY_CASE else FIELD_REQUIRE)
         # No Variable reference on the State side in this source group.
         states[sid] = {"value": {
             op: value.text, "datatype": NATIVE_DTYPE.get(dtype, dtype),
-            "require": FIELD_REQUIRE,
+            "require": field_require,
         }}
     source_tests = indexed(single(root, OD, "tests"), "Test")
     must(len(source_tests) == ntests, "source Test census")
     test_names = {sid: f"source-{i}-test" for i, sid in enumerate(source_tests, 1)}
     tests = {}
     for tid, test in source_tests.items():
-        expected_check = "all" if dtype in IP_DATATYPES else "at least one"
+        expected_check = ("all" if dtype in IP_DATATYPES or filename == ENTITY_CASE
+                          else "at least one")
         must(test.tag == tag(IND, "variable_test") and len(test) == 2 and
              test.get("check") == expected_check and
              test.get("check_existence") == "at_least_one_exists" and
@@ -154,7 +170,8 @@ def convert(raw: bytes, filename: str):
             "variable": objects[object_child.get("object_ref")],
             "states": [states[state_child.get("state_ref")]],
             "reported_elements": "all", "require": (
-                FIELD_REQUIRE if dtype in IP_DATATYPES else TEST_REQUIRE),
+                FIELD_REQUIRE if dtype in IP_DATATYPES or filename == ENTITY_CASE
+                else TEST_REQUIRE),
         }
 
     referenced = []
