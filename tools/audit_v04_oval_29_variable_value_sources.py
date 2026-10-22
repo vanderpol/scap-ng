@@ -133,19 +133,35 @@ def direct_variable_test(tid, indexed):
                              for n in values],
             "source_field_count": len(state),
         })
-    direct = (
-        is_simple_object and len(states) == 1 and len(state_rows) == 1
-        and state_rows[0]["source_field_count"] == 1
-        and not state_rows[0]["identity_var_ref"]
-        and len(state_rows[0]["value_fields"]) == 1
-        and state_rows[0]["value_fields"][0]["text"] in (None, "")
-        and set(state_rows[0]["value_fields"][0]["attributes"])
-            == {"var_ref", "var_check"}
-        and state_rows[0]["value_fields"][0]["attributes"]["var_check"]
-            == "at least one"
-        and node.get("check") == "at least one"
-        and node.get("check_existence") == "at_least_one_exists"
-    )
+    # Enumerate the exact extra semantics before attempting any further
+    # lowering; these are SOURCE features, not speculative native defaults.
+    reasons = []
+    if not is_simple_object:
+        reasons.append("OBJECT_SET_OR_NON_DIRECT_VARIABLE_REF")
+    if len(states) != 1:
+        reasons.append("ZERO_OR_MULTIPLE_REFERENCED_STATES")
+    for state in state_rows:
+        if state["source_field_count"] != 1:
+            reasons.append("STATE_HAS_MULTIPLE_OR_ZERO_FIELDS")
+        if state["identity_var_ref"]:
+            reasons.append("STATE_HAS_SEPARATE_VARIABLE_IDENTITY_CHECK")
+        if len(state["value_fields"]) != 1:
+            reasons.append("STATE_VALUE_FIELD_MISSING_OR_MULTIPLE")
+        for value in state["value_fields"]:
+            if value["text"] not in (None, ""):
+                reasons.append("STATE_VALUE_HAS_LITERAL_TEXT")
+            if set(value["attributes"]) != {"var_ref", "var_check"}:
+                reasons.append("STATE_VALUE_HAS_ADDITIONAL_OR_DIFFERENT_ATTRIBUTES")
+            if value["attributes"].get("var_check") != "at least one":
+                reasons.append("STATE_VAR_CHECK_DIFFERS")
+        if state["state_operator"] not in (None, "AND"):
+            reasons.append("STATE_OPERATOR_DIFFERS")
+    if node.get("check") != "at least one":
+        reasons.append("TEST_CHECK_DIFFERS")
+    if node.get("check_existence") != "at_least_one_exists":
+        reasons.append("TEST_EXISTENCE_DIFFERS")
+    reasons = sorted(set(reasons))
+    direct = not reasons
     return {
         "source_test": tid,
         "source_test_attributes": dict(node.attrib),
@@ -154,6 +170,7 @@ def direct_variable_test(tid, indexed):
         "source_object_var_refs": objrefs,
         "source_object_children": [loc(n.tag) for n in obj],
         "states": state_rows,
+        "source_semantic_axes_requiring_review": reasons,
         "direct_value_test_candidate": direct,
         "candidate_status": (
             "NARROW_SOURCE_SHAPE_ONLY_NOT_NATIVE_VALIDATED"
@@ -210,6 +227,26 @@ def audit(queue, original_dir):
                   all(t["direct_value_test_candidate"] for t in variable_tests))
         counters["definitions"] += 1
         counters["original_variable_test_nodes"] += len(variable_tests)
+        counters["distinct_original_variable_tests_per_definition_sum"] += len({
+            t["source_test"] for t in variable_tests})
+        counters["reused_variable_test_leaf_occurrences"] += (
+            len(variable_tests) - len({t["source_test"] for t in variable_tests}))
+        reasons = sorted({reason for t in variable_tests
+                          for reason in t["source_semantic_axes_requiring_review"]})
+        if extended:
+            reasons.append("DEFINITION_EXTENDS_OTHER_DEFINITIONS")
+        if nonvariable:
+            reasons.append("DEFINITION_HAS_OTHER_CAPABILITY_TESTS")
+        if any(n.get("operator", "AND") != "AND" or
+               n.get("negate", "false") != "false"
+               for n in definition.iter() if loc(n.tag) == "criteria"):
+            reasons.append("DEFINITION_NONTRIVIAL_BOOLEAN_OPERATORS_OR_NEGATION")
+        if any(n.get("negate", "false") != "false" for n in definition.iter()
+               if loc(n.tag) in ("criterion", "extend_definition")):
+            reasons.append("DEFINITION_NEGATED_LEAF_OR_EXTENSION")
+        reasons = sorted(set(reasons))
+        for reason in reasons:
+            counters["definition_reason:" + reason] += 1
         counters["extended_definition_edges"] += len(extended)
         counters["definitions_with_extended_sources"] += bool(extended)
         counters["original_nonvariable_test_nodes"] += len(nonvariable)
@@ -230,6 +267,8 @@ def audit(queue, original_dir):
             "extended_definition_edges": extended,
             "variable_tests": variable_tests,
             "other_source_tests": nonvariable,
+            "source_semantic_axes_requiring_review": reasons,
+            "distinct_variable_test_count": len({t["source_test"] for t in variable_tests}),
             "all_variable_tests_narrow_value_shape": direct,
             "native_040_schema_conversion": "NOT_TESTED",
             "original_oval_semantic_roundtrip": "NOT_TESTED",
@@ -240,6 +279,19 @@ def audit(queue, original_dir):
         "pinned_revision": PIN,
         "queue_denominator": 29,
         "counts": dict(sorted(counters.items())),
+        "review_queue": [
+            {
+                "source_file": row["source_file"],
+                "definition_id": row["original_definition_id"],
+                "semantic_axis_count": len(row["source_semantic_axes_requiring_review"]),
+                "semantic_axes": row["source_semantic_axes_requiring_review"],
+                "distinct_variable_tests": row["distinct_variable_test_count"],
+                "native_conversion": "NOT_VALIDATED_BY_THIS_AUDIT",
+            }
+            for row in sorted(output, key=lambda row: (
+                len(row["source_semantic_axes_requiring_review"]),
+                row["source_file"], row["original_definition_id"]))
+        ],
         "records": output,
         "native_040_conversions_proven_from_this_audit": 0,
         "scanner_parity_proven": False,
