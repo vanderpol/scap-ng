@@ -23,17 +23,26 @@ from validate_v04_oval_5123 import check as validate_original
 
 ROOT = Path(__file__).resolve().parents[1]
 OVAL = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
-SOURCE_SHA = "352a0b99e0df90cc3ddf9f7e410f3d9a8b44659a6a12c38c938ab861be595262"
+SOURCE_SHAS = {
+    "windows": "352a0b99e0df90cc3ddf9f7e410f3d9a8b44659a6a12c38c938ab861be595262",
+    "unix": "ca472ba6709eb0290284287897bd7a976c8634f9107de7e29fd1eae21001e808",
+}
 XSD_SHA = "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc"
 OPERATORS = {"UNION": "union", "INTERSECTION": "intersection", "COMPLEMENT": "difference"}
 
 # Distinct synthetic observed Items exercise the source Set algebra and the
 # filter's original two string values without claiming to have scanned Windows.
-ITEMS = {
+ITEMS_WINDOWS = {
     "a": r"C:\support\txt",
     "b": r"C:\support\txt\txtfile",
     "c": r"C:\support\txt\txtfile\subtxtfile",
     "d": r"C:\support\xml",
+}
+ITEMS_UNIX = {
+    "a": "/opt/support/txt",
+    "b": "/opt/support/txt/txtfile",
+    "c": "/opt/support/txt/txtfile/subtxtfile",
+    "d": "/opt/support/xml",
 }
 LEAVES = {
     "189": {"a", "b", "c"}, "262": {"b", "c"},
@@ -124,12 +133,12 @@ def translate_source_set(source_set, states, variables, names):
     return {"operator": op, "operands": operands}
 
 
-def source_item_set(source_set, states, variables):
+def source_item_set(source_set, states, variables, items):
     """Independent synthetic Item interpretation directly over source XML."""
     op = source_set.get("set_operator", "UNION")
     nested = [n for n in source_set if local(n) == "set"]
     if nested:
-        parts = [source_item_set(n, states, variables) for n in nested]
+        parts = [source_item_set(n, states, variables, items) for n in nested]
     else:
         refs = [n for n in source_set if local(n) == "object_reference"]
         filters = [n for n in source_set if local(n) == "filter"]
@@ -139,7 +148,7 @@ def source_item_set(source_set, states, variables):
             for filt in filters:
                 native, named = source_filter_filter_state(filt, states, variables)
                 action = next(iter(native))
-                matching = {key for key in part if ITEMS[key] in named[1]}
+                matching = {key for key in part if items[key] in named[1]}
                 part = part & matching if action == "include" else part - matching
             parts.append(part)
     if op == "UNION":
@@ -152,11 +161,11 @@ def source_item_set(source_set, states, variables):
     raise AssertionError("Invalid original Set operator: " + op)
 
 
-def native_item_set(native_set, names):
+def native_item_set(native_set, names, items):
     parts = []
     for operand in native_set["operands"]:
         if "set" in operand:
-            parts.append(native_item_set(operand["set"], names))
+            parts.append(native_item_set(operand["set"], names, items))
         else:
             part = set(LEAVES[operand["object"].split("-obj-")[1].split("-")[0]])
             for filt in operand["filters"]:
@@ -165,7 +174,7 @@ def native_item_set(native_set, names):
                 require(selector["value_match"] == "one",
                         "Source only-one var_check was lost")
                 values = names[selector["equals"]["variable"]]
-                match = {key for key in part if ITEMS[key] in values}
+                match = {key for key in part if items[key] in values}
                 part = part & match if action == "include" else part - match
             parts.append(part)
     op = native_set["operator"]
@@ -183,9 +192,12 @@ def source_set_depth(element):
     return 1 + max([source_set_depth(n) for n in children], default=0)
 
 
-def prove(source, xsd_root):
-    require(hashlib.sha256(source.read_bytes()).hexdigest() == SOURCE_SHA,
-            "Original pinned SCAP Self-Assertion Set source changed")
+def prove(source, xsd_root, platform="windows"):
+    require(platform in SOURCE_SHAS, "Unsupported Set source platform")
+    source_sha = SOURCE_SHAS[platform]
+    items = ITEMS_WINDOWS if platform == "windows" else ITEMS_UNIX
+    require(hashlib.sha256(source.read_bytes()).hexdigest() == source_sha,
+            "Original pinned SCAP Self-Assertion " + platform + " Set source changed")
     xsd = xsd_root / "oval-definitions-schema.xsd"
     require(hashlib.sha256(xsd.read_bytes()).hexdigest() == XSD_SHA,
             "OVAL 5.12.3 base Definitions XSD changed")
@@ -194,10 +206,10 @@ def prove(source, xsd_root):
             "Lost authoritative OVAL pre-operator Set Filter semantics")
     require('name="action" type="oval-def:FilterActionEnumeration" use="optional" default="exclude"' in doc_text,
             "Lost OVAL Filter default-exclude contract")
-    xsd_result = validate_original(xsd_root, source, "windows")
+    xsd_result = validate_original(xsd_root, source, platform)
     require(xsd_result["status"] == "PASS", str(xsd_result["diagnostics"]))
     xml, objects, states, variables = load_source(source)
-    schema = materialize("windows.file")
+    schema = materialize(platform + ".file")
     require(len({object_name(name) for name in objects}) == len(objects),
             "Native Object name collision")
     tests = xml.findall(f".//{{{OVAL}}}tests/*")
@@ -211,11 +223,11 @@ def prove(source, xsd_root):
         source_set = next(c for c in obj if local(c) == "set")
         names = {}
         translated = translate_source_set(source_set, states, variables, names)
-        candidate = {"capability": "windows.file", "set": translated}
+        candidate = {"capability": platform + ".file", "set": translated}
         errors = validate(schema, "object", candidate)
         require(not errors, "Invalid native Set: " + str(errors[0] if errors else ""))
-        before = source_item_set(source_set, states, variables)
-        after = native_item_set(translated, names)
+        before = source_item_set(source_set, states, variables, items)
+        after = native_item_set(translated, names, items)
         require(before == after, "Native Set Item result differs: " + obj.get("id"))
         seen[translated["operator"]] += 1
         depths.append(source_set_depth(source_set))
@@ -241,16 +253,17 @@ def prove(source, xsd_root):
             "OVAL default exclude was not materialized")
     unfiltered = deepcopy(converted)
     unfiltered["operands"][0]["filters"] = []
-    require(native_item_set(converted, names) != native_item_set(unfiltered, names),
+    require(native_item_set(converted, names, items) != native_item_set(unfiltered, names, items),
             "Synthetic Item fixture did not detect a lost filter")
     included = deepcopy(converted)
     original_filter = included["operands"][0]["filters"][0]
     original_filter["include"] = original_filter.pop("exclude")
-    require(native_item_set(converted, names) != native_item_set(included, names),
+    require(native_item_set(converted, names, items) != native_item_set(included, names, items),
             "Synthetic Item fixture did not detect reversed include/exclude")
     return {
         "status": "PASS", "original_xsd_5123_valid": True,
-        "source_file_sha256": SOURCE_SHA, "base_schema_sha256": XSD_SHA,
+        "source_file_sha256": source_sha, "base_schema_sha256": XSD_SHA,
+        "original_platform": platform,
         "original_set_tests": len(tests), "native_set_objects_valid": len(defined),
         "operators": dict(seen), "maximum_nesting": max(depths),
         "filters_evaluated_before_set_operator": True,
@@ -266,9 +279,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", required=True, type=Path)
     parser.add_argument("--xsd-root", required=True, type=Path)
+    parser.add_argument("--platform", choices=("windows", "unix"),
+                        default="windows")
     parser.add_argument("--report", type=Path)
     args = parser.parse_args()
-    result = prove(args.source, args.xsd_root)
+    result = prove(args.source, args.xsd_root, args.platform)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
