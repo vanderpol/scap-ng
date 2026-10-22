@@ -34,6 +34,7 @@ def prove(original, schema_root, xsd_root, output, validators, capability_schema
     native, proof = convert(raw, name)
     target = output / name.removesuffix(".xml")
     target.mkdir(parents=True, exist_ok=True)
+    (target / "original.xml").write_bytes(raw)
     native_path = target / "native-040.assessment.json"
     native_path.write_text(json.dumps(native, indent=2) + "\n")
     yaml_text = dump_hybrid(native)
