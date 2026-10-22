@@ -13,7 +13,6 @@ import research_04_rhel9_compact_preview as corpus
 from research_04_native_deep_content_census import SIX_ANCHORS,resolve_benchmark_dir,SUPPORTED_MAPPING_DATA
 from research_04_one_grammar_proof import make_single,lower_single,normalize_inert_source_checks,check_no_parallel_comparison_or_cardinality_grammar
 from research_04_scoped_state_require import compact,expand
-from research_04_scoped_schema import validate,CANDIDATE_LANGUAGE
 from migrate_v04_enum_selectors import migrate,restore
 
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -30,7 +29,11 @@ def benchmark_content(z,benchmark):
     try:return corpus.archive_contents(z)
     finally:corpus.SOURCE_PREFIX=old
 def include_shared_rule_choices(source_zip, docs, raw, benchmark):
-    """Resolve ALL Rule Assessment choices, including shared manual choices."""
+    """Include shared Assessments used by Rules *and* Applicability catalogs.
+
+    The name is retained for callers of the original six-STIG exporter, but
+    Rule choices are not the only way an Assessment becomes reachable.
+    """
     local = {}
     for path, doc in docs.items():
         assessment = (doc or {}).get("assessment") if isinstance(doc, dict) else None
@@ -44,19 +47,29 @@ def include_shared_rule_choices(source_zip, docs, raw, benchmark):
         local[ident] = path
     required = {}
     for path, doc in docs.items():
-        if "/rules/" not in path:
-            continue
-        rule = (doc or {}).get("rule") or {}
-        choices = rule.get("assessment_choices") or {}
-        default = rule.get("default_assessment_choice")
-        if default not in choices:
-            raise ValueError(f"Rule {path} default Assessment choice {default!r} is not declared")
-        for name, choice in choices.items():
-            ident = choice.get("assessment") if isinstance(choice, dict) else None
-            if not isinstance(ident, str) or not ident:
-                raise ValueError(f"Rule {path} choice {name} has no Assessment ID")
-            if ident not in local:
-                required.setdefault(ident, []).append((path, name))
+        if "/rules/" in path:
+            rule = (doc or {}).get("rule") or {}
+            choices = rule.get("assessment_choices") or {}
+            default = rule.get("default_assessment_choice")
+            if default not in choices:
+                raise ValueError(f"Rule {path} default Assessment choice {default!r} is not declared")
+            for name, choice in choices.items():
+                ident = choice.get("assessment") if isinstance(choice, dict) else None
+                if not isinstance(ident, str) or not ident:
+                    raise ValueError(f"Rule {path} choice {name} has no Assessment ID")
+                if ident not in local:
+                    required.setdefault(ident, []).append((path, name))
+        catalog = (doc or {}).get("applicability")
+        if isinstance(catalog, dict):
+            conditions = catalog.get("conditions") or {}
+            if not isinstance(conditions, dict):
+                raise ValueError(f"Applicability {path} conditions must be a map")
+            for name, condition in conditions.items():
+                ident = condition.get("assessment") if isinstance(condition, dict) else None
+                if not isinstance(ident, str) or not ident:
+                    raise ValueError(f"Applicability {path} condition {name} has no Assessment ID")
+                if ident not in local:
+                    required.setdefault(ident, []).append((path, name))
     found = {}
     for name in source_zip.namelist():
         if not name.startswith("authoring/shared/") or not name.endswith((".yaml", ".yml")):
@@ -76,15 +89,16 @@ def include_shared_rule_choices(source_zip, docs, raw, benchmark):
         raw[name] = body
     missing = set(required) - set(found)
     if missing:
-        raise ValueError(f"{benchmark}: unresolved source Rule Assessment choice IDs: "
+        raise ValueError(f"{benchmark}: unresolved source Rule/Applicability Assessment IDs: "
                          + repr([(ident, required[ident]) for ident in sorted(missing)][:10]))
     return len(found)
 
 
 def audit_rule_assessment_choices(docs):
-    """Fail closed when a packaged Rule choice lacks a packaged Assessment."""
+    """Fail closed on unresolved Rule choices or Applicability conditions."""
     by_id = {}
     rules = []
+    catalogs = []
     for path, doc in docs.items():
         if not isinstance(doc, dict):
             continue
@@ -98,6 +112,8 @@ def audit_rule_assessment_choices(docs):
             by_id[ident] = path
         if isinstance(doc.get("rule"), dict):
             rules.append((path, doc["rule"]))
+        if isinstance(doc.get("applicability"), dict):
+            catalogs.append((path, doc["applicability"]))
     bad = []
     links = 0
     for path, rule in rules:
@@ -110,13 +126,24 @@ def audit_rule_assessment_choices(docs):
             links += 1
             if ident not in by_id:
                 bad.append((path, name, ident))
+    applicability_links = 0
+    for path, catalog in catalogs:
+        for name, condition in (catalog.get("conditions") or {}).items():
+            ident = condition.get("assessment") if isinstance(condition, dict) else None
+            applicability_links += 1
+            if ident not in by_id:
+                bad.append((path, name, ident))
     if bad:
-        raise ValueError(f"Unresolved packaged Rule Assessment choices ({len(bad)}): {bad[:15]!r}")
-    return {"rules": len(rules), "choice_links": links, "unique_assessments": len(by_id),
+        raise ValueError(f"Unresolved packaged Rule/Applicability Assessment links ({len(bad)}): {bad[:15]!r}")
+    return {"rules": len(rules), "choice_links": links,
+            "applicability_links": applicability_links, "unique_assessments": len(by_id),
             "unresolved_choices": 0, "duplicate_assessment_ids": 0}
 
 
 def migrate_assessment(doc,path,cache):
+    # Historical r3 research schema is only needed to rebuild that archive;
+    # source-reference closure tests must not depend on today's native schema.
+    from research_04_scoped_schema import validate
     source,_,notes=make_single(doc)
     check_no_parallel_comparison_or_cardinality_grammar(source)
     if lower_single(source)!=normalize_inert_source_checks(doc,notes):
@@ -139,6 +166,7 @@ def migrate_assessment(doc,path,cache):
     return scoped,notes,migrations,stats
 
 def create(source_zip,out_dir):
+    from research_04_scoped_schema import CANDIDATE_LANGUAGE
     raws={};ydocs={};jdocs={};prior_sha={}
     by_stig={};provenance=[];cache={};examples={};package_docs={}
     with zipfile.ZipFile(source_zip) as z:
