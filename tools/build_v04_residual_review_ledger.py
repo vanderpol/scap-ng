@@ -38,7 +38,9 @@ def main():
                     "state_fields_require":t.get("state_fields_require"),
                     "reasons":reasons,"source_test":t})
     n=len(entries)
-    if n!=172:raise ValueError(f"Review baseline changed: {n} residual Tests instead of 172")
+    # The canonical field-requirement migration intentionally leaves 219
+    # source-exact exceptions, including 47 all-match/record-sensitive cases.
+    if n!=219:raise ValueError(f"Review baseline changed: {n} residual Tests instead of 219")
     a.out.parent.mkdir(parents=True,exist_ok=True)
     counts=dict(sorted(collections.Counter(x["require"] for x in entries).items()))
     reasons=dict(sorted(collections.Counter(reason for x in entries for reason in x["reasons"]).items()))
