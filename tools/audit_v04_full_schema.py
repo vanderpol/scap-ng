@@ -128,6 +128,8 @@ def main():
     print(json.dumps({"checked_documents":len(names),
         "schema_passes":{k:v for k,v in totals.items() if k.endswith("_schema_pass")},
         "schema_failures":{k:v for k,v in totals.items() if k.endswith("_schema_fail")},
+        "validator_exceptions":{k:v for k,v in totals.items() if k.startswith("resolver_or_validator:")},
+        "validator_exception_examples":{k:v for k,v in examples.items() if k.startswith("resolver_or_validator:")},
         "error_classes":len(examples),"top_failure_groups":grouped.most_common(12),
         "top_nested_leaves":nested_groups.most_common(12),
         "failure_test_features":failure_features.most_common(12)},indent=2))
