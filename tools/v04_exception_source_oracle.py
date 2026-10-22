@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Source-backed six-state *generic* oracle for the 172 0.4 source exceptions.
+"""Source-backed six-state *generic* oracle for the 219 0.4 source exceptions.
 
 This checks the existence and check-aggregation axes of the legacy source
 requirements *without rewriting any Test*. It does NOT compare or interpret
@@ -20,9 +20,11 @@ from v04_canonical_requirement_oracle import comparison_matrix
 AXES = {
     "all_exist_and_all_match": ("all_exist", "all", True),
     "all_exist_and_none_match": ("all_exist", "none satisfy", True),
+    "at_least_one_exists_and_all_match": ("at_least_one_exists", "all", True),
     "at_least_one_exists_and_only_one_matches": ("at_least_one_exists", "only one", True),
     "at_least_one_exists_and_some_match": ("at_least_one_exists", "at least one", True),
     "may_be_absent_and_none_match": ("any_exist", "none satisfy", True),
+    "may_be_absent_and_all_match": ("any_exist", "all", True),
     "may_be_absent_and_some_match": ("any_exist", "at least one", True),
     "none_exist": ("none_exist", "all", True),
     "only_one_exists_and_matches": ("only_one_exists", "all", True),
@@ -31,9 +33,11 @@ AXES = {
 BASELINE = {
     "all_exist_and_all_match": 73,
     "all_exist_and_none_match": 1,
+    "at_least_one_exists_and_all_match": 42,
     "at_least_one_exists_and_only_one_matches": 21,
     "at_least_one_exists_and_some_match": 67,
     "may_be_absent_and_none_match": 3,
+    "may_be_absent_and_all_match": 5,
     "may_be_absent_and_some_match": 1,
     "none_exist": 1,
     "only_one_exists_and_matches": 3,
@@ -67,7 +71,7 @@ def audit(ledger, *, assert_six=False):
             counts["tests_with_field_cardinality_unverified"] += 1
     if labels != Counter(ledger.get("by_requirement") or {}):
         raise ValueError("ledger family inventory does not match actual source Tests")
-    if assert_six and (len(entries) != 172 or labels != Counter(BASELINE)):
+    if assert_six and (len(entries) != 219 or labels != Counter(BASELINE)):
         raise ValueError("six-STIG source exception distribution changed; review required")
     distinct = {AXES[label] for label in labels}
     matrix = {"/".join([axis[0], axis[1]]): comparison_matrix(axis)
@@ -81,6 +85,9 @@ def audit(ledger, *, assert_six=False):
         "undefined_empty_reference_scenarios": sum(
             x["unresolved_empty_aggregate"] for x in matrix.values()),
         "source_specific_unverified": dict(sorted(counts.items())),
+        "all_match_source_exceptions_needing_state_record_review": (
+            labels["at_least_one_exists_and_all_match"]
+            + labels["may_be_absent_and_all_match"]),
         "mode_matrix": matrix,
         "native_compact_lowering_proved": False,
         "alternative_state_or_field_semantics_proved": False,
