@@ -89,6 +89,39 @@ def referenced_tests(root_definition_id, indexed):
     return ids, seen_edges
 
 
+def original_criteria_tree(definition_id, indexed):
+    """Preserve the complete original OVAL Boolean/extend_definition tree.
+
+    This is source data, not a native execution expression: even apparently
+    identical operator spellings have six-state, negation and dependency
+    semantics that must be proven separately before conversion.
+    """
+    def follow(did, active):
+        must(did in indexed and indexed[did].tag == "{" + OD + "}definition",
+             "unresolved original Definition " + did)
+        must(did not in active, "extended Definition cycle " + did)
+        roots = [c for c in indexed[did] if loc(c.tag) == "criteria"]
+        must(len(roots) == 1, "Definition must have one criteria " + did)
+        def serialize(node):
+            kind = loc(node.tag)
+            must(kind in ("criteria", "criterion", "extend_definition"),
+                 "unreviewed Boolean expression node " + kind)
+            output = {"kind": kind, "source_attributes": dict(sorted(node.attrib.items()))}
+            if kind == "criteria":
+                output["children"] = [serialize(c) for c in node]
+                must(output["children"], "empty source criteria")
+            elif kind == "criterion":
+                must(node.get("test_ref") in indexed, "unresolved criterion Test")
+            else:
+                ref = node.get("definition_ref")
+                must(ref, "extended Definition with no target")
+                output["referenced_definition"] = ref
+                output["referenced_expression"] = follow(ref, active + (did,))
+            return output
+        return serialize(roots[0])
+    return follow(definition_id, ())
+
+
 def direct_variable_test(tid, indexed):
     node = indexed[tid]
     if node.tag != "{" + IND + "}variable_test":
@@ -212,6 +245,7 @@ def audit(queue, original_dir):
         must(did in indexed and indexed[did].tag == "{" + OD + "}definition",
              "pinned source Definition id missing " + str(key))
         definition = indexed[did]
+        exact_criteria = original_criteria_tree(did, indexed)
         test_ids, extended = referenced_tests(did, indexed)
         must(test_ids, "original Definition has no reachable Test leaves " + str(key))
         detailed = [direct_variable_test(tid, indexed) for tid in test_ids]
@@ -261,6 +295,9 @@ def audit(queue, original_dir):
             "source_sha256": digest,
             "original_definition_id": did,
             "original_definition_class": definition.get("class"),
+            "original_criteria_expression": exact_criteria,
+            "original_criteria_sha256": sha256(json.dumps(
+                exact_criteria, sort_keys=True, separators=(",", ":")).encode()).hexdigest(),
             "source_criterion_operator_nodes": [
                 {"operator": n.get("operator"), "child_count": len(n)}
                 for n in definition.iter() if loc(n.tag) == "criteria"],
