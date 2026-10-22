@@ -47,6 +47,48 @@ def source_index(root):
     return indexed
 
 
+def referenced_tests(root_definition_id, indexed):
+    """Follow extend_definition and nested criteria; retain repeated leaves.
+
+    OVAL Definition composition is not a flat list of Tests. This traversal
+    collects closure for the *shape census* while preserving every source
+    cross-Definition edge, operator, negation and duplicate Test occurrence.
+    It does NOT claim flattening these trees preserves Boolean outcomes.
+    """
+    seen_edges = []
+    def visit(did, active):
+        must(did in indexed and indexed[did].tag == "{" + OD + "}definition",
+             "referenced OVAL Definition missing " + did)
+        must(did not in active, "cyclic extended Definition " + did)
+        definition = indexed[did]
+        roots = [x for x in definition if loc(x.tag) == "criteria"]
+        must(len(roots) == 1, "missing or duplicate Definition criteria " + did)
+        refs = []
+        def walk(element):
+            for element_child in element:
+                kind = loc(element_child.tag)
+                if kind == "criterion":
+                    tid = element_child.get("test_ref")
+                    must(tid in indexed, "original Test reference missing " + str(tid))
+                    refs.append(tid)
+                elif kind == "extend_definition":
+                    ref = element_child.get("definition_ref")
+                    must(ref, "missing extended Definition reference")
+                    seen_edges.append({
+                        "from_definition": did, "to_definition": ref,
+                        "negate": element_child.get("negate", "false"),
+                    })
+                    refs.extend(visit(ref, active + (did,)))
+                elif kind == "criteria":
+                    walk(element_child)
+                else:
+                    must(False, "unexpected OVAL criteria element " + kind)
+        walk(roots[0])
+        return refs
+    ids = visit(root_definition_id, ())
+    return ids, seen_edges
+
+
 def direct_variable_test(tid, indexed):
     node = indexed[tid]
     if node.tag != "{" + IND + "}variable_test":
@@ -153,14 +195,13 @@ def audit(queue, original_dir):
         must(did in indexed and indexed[did].tag == "{" + OD + "}definition",
              "pinned source Definition id missing " + str(key))
         definition = indexed[did]
-        criteria = [n for n in definition.iter() if loc(n.tag) == "criterion"]
-        test_ids = [n.get("test_ref") for n in criteria]
-        must(test_ids and all(x in indexed for x in test_ids),
-             "original Definition Test criteria not closed " + str(key))
+        test_ids, extended = referenced_tests(did, indexed)
+        must(test_ids, "original Definition has no reachable Test leaves " + str(key))
         detailed = [direct_variable_test(tid, indexed) for tid in test_ids]
         variable_tests = [x for x in detailed if x is not None]
         must(variable_tests, "original Definition has no independent.variable_test " + str(key))
-        direct = all(t["direct_value_test_candidate"] for t in variable_tests)
+        direct = (not extended and not nonvariable and
+                  all(t["direct_value_test_candidate"] for t in variable_tests))
         # A Definition can contain other Test capabilities; these are
         # intentionally not discarded when classifying a possible importer.
         nonvariable = [
@@ -169,6 +210,8 @@ def audit(queue, original_dir):
         ]
         counters["definitions"] += 1
         counters["original_variable_test_nodes"] += len(variable_tests)
+        counters["extended_definition_edges"] += len(extended)
+        counters["definitions_with_extended_sources"] += bool(extended)
         counters["original_nonvariable_test_nodes"] += len(nonvariable)
         counters["direct_variable_shape_definitions"] += direct
         counters["complex_variable_shape_definitions"] += not direct
@@ -184,6 +227,7 @@ def audit(queue, original_dir):
             "source_criterion_operator_nodes": [
                 {"operator": n.get("operator"), "child_count": len(n)}
                 for n in definition.iter() if loc(n.tag) == "criteria"],
+            "extended_definition_edges": extended,
             "variable_tests": variable_tests,
             "other_source_tests": nonvariable,
             "all_variable_tests_narrow_value_shape": direct,
