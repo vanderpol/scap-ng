@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Generate six complete SCAP-NG 0.4.0 source-backed authoring sets.
 
-Source: October 15 r3 pre-alpha archive, pinned by SHA-256 in workflow.
+Source: October 15 r3 pre-alpha archive plus 11 source-proven shared
+Applicability Assessments omitted by the historical exporter (#239).
 Promote proven scalar all-match States to canonical field_requirement and
 complete conditions. Preserve Item population separately and retain explicit
 source-exact uncommon, record and non-AND State fallbacks with diagnostics.
@@ -124,7 +125,7 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
     field_provenance={}
     with zipfile.ZipFile(src) as z:
         names=[x for x in z.namelist() if x.startswith("authoring/") and x.endswith(ext)]
-        if len(names)!=4001 or len(names)!=len(set(names)):
+        if len(names)!=4012 or len(names)!=len(set(names)):
             raise ValueError(f"Unexpected source count/duplicates: {len(names)}")
         source={}
         promoted={}

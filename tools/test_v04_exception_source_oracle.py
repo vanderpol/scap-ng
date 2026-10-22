@@ -22,7 +22,7 @@ def ledger():
 class SourceExceptionTests(unittest.TestCase):
     def test_all_real_requirement_families_have_independent_generic_result_axes(self):
         result = audit(ledger(), assert_six=True)
-        self.assertEqual(result["source_exceptions"], 219)
+        self.assertEqual(result["source_exceptions"], 221)
         self.assertEqual(len(AXES), 11)
         self.assertEqual(result["all_match_source_exceptions_needing_state_record_review"], 47)
         self.assertGreater(result["generic_oval_scenarios_compared"], 0)

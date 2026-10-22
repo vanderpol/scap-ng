@@ -84,9 +84,9 @@ def main():
     report = audit(args.json_archive)
     totals = report["counts"]
     if args.assert_six_stigs:
-        if report["total_canonical_documents"] != 4001:
+        if report["total_canonical_documents"] != 4012:
             raise ValueError("unexpected original canonical authoring population")
-        if totals.get("automated_assessments") != 872:
+        if totals.get("automated_assessments") != 883:
             raise ValueError("unexpected automated Assessment population")
         if (totals.get("compiled_supplied_result_plans", 0) +
                 totals.get("unsupported_result_expressions", 0)

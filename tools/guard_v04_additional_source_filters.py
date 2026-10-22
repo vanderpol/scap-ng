@@ -73,7 +73,7 @@ def main():
         return read_authoring_archive(path,fmt)
     proof=index_source_proof(json.loads(args.source_proof.read_text()),assert_six=True)
     report=compare(read(args.prior),read(args.current),proof)
-    if report["documents"]!=4001:
+    if report["documents"]!=4012:
         raise ValueError("Incomplete canonical six-STIG source corpus")
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")

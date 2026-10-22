@@ -137,7 +137,7 @@ def main():
         "error_classes":len(examples),"top_failure_groups":grouped.most_common(12),
         "top_nested_leaves":nested_groups.most_common(12),
         "failure_test_features":failure_features.most_common(12)},indent=2))
-    assert len(names)==4001 if not args.limit else len(names)<=args.limit
+    assert len(names)==4012 if not args.limit else len(names)<=args.limit
     if args.strict:
         if args.limit:raise ValueError("Strict corpus gate cannot use --limit")
         expected={"assessment_documents":2422,"assessment_schema_pass":2422,

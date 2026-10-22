@@ -210,9 +210,16 @@ def scan(documents):
     }
 
 
-def compare(baseline, candidate):
-    if baseline.get("documents") != candidate.get("documents") or baseline.get(
-            "automated_tests") != candidate.get("automated_tests"):
+def compare(baseline, candidate, *, restored_applicability_source=False):
+    before_scope = (baseline.get("documents"), baseline.get("automated_tests"))
+    after_scope = (candidate.get("documents"), candidate.get("automated_tests"))
+    # The immutable October 20 baseline omits 11 source-backed Applicability
+    # Assessments (15 Tests) whose 22 dangling links were fixed with the
+    # SHA-pinned 0.3 source. Keep strict pattern regression checks for every
+    # existing and restored path; only this reviewed scope delta is allowed.
+    accepted_scope = ((4001, 1375), (4012, 1390))
+    if before_scope != after_scope and not (
+            restored_applicability_source and (before_scope, after_scope) == accepted_scope):
         raise ValueError("Six-STIG corpus scope changed; new baseline needs review")
     regressions = []
     for name in sorted(HIGH_CONFIDENCE):
@@ -226,6 +233,7 @@ def compare(baseline, candidate):
                                 "new_sites": new_sites[:15],
                                 "sample": candidate["examples"].get(name, [])[:4]})
     return {"status": "PASS" if not regressions else "FAIL",
+            "restored_applicability_source": (before_scope, after_scope) == accepted_scope,
             "baseline_counts": baseline["counts"],
             "candidate_counts": candidate["counts"],
             "new_structural_regressions": regressions,
@@ -238,6 +246,8 @@ def main():
     p.add_argument("--baseline-archive", type=Path)
     p.add_argument("--report", type=Path, required=True)
     p.add_argument("--assert-six", action="store_true")
+    p.add_argument("--restored-applicability-source", action="store_true",
+                   help="Allow only the pinned 11-Assessment/15-Test restoration scope delta")
     args = p.parse_args()
     fmt = "yaml" if args.archive.name.endswith(".yaml.zip") else "json"
     candidate = scan(read_authoring_archive(args.archive, fmt))
@@ -245,9 +255,10 @@ def main():
     if args.baseline_archive is not None:
         base_fmt = "yaml" if args.baseline_archive.name.endswith(".yaml.zip") else "json"
         baseline = scan(read_authoring_archive(args.baseline_archive, base_fmt))
-    if args.assert_six and (candidate["documents"], candidate["automated_tests"]) != (4001, 1375):
+    if args.assert_six and (candidate["documents"], candidate["automated_tests"]) != (4012, 1390):
         raise ValueError("Unexpected canonical 0.4.0 six-STIG authoring population")
-    gate = compare(baseline, candidate) if baseline is not None else None
+    gate = compare(baseline, candidate,
+                   restored_applicability_source=args.restored_applicability_source) if baseline is not None else None
     report = {"candidate": candidate, "comparison": gate}
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n",

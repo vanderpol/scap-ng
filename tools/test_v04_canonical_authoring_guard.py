@@ -50,9 +50,9 @@ def check_archive(archive_path):
             for test_id, test in (a.get("tests") or {}).items():
                 check_test(test, f"{path} / {test_id}")
                 tests += 1
-    if documents != 4001:
+    if documents != 4012:
         raise ValueError(f"Expected 4,001 documents, got {documents}")
-    if tests != 1375:
+    if tests != 1390:
         raise ValueError(f"Expected 1,375 distinct Tests, got {tests}")
     print(f"PASS canonical 0.4 source guards: {documents} documents; {tests} Tests; {archive_path}")
 

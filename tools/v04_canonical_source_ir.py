@@ -310,8 +310,8 @@ def main():
     if args.assert_six and (
         report["documents"], report["tests"], report["rule_choice_links"],
         report["requirement_shapes"]
-    ) != (4001, 1375, 2958,
-          {"presence": 387, "all_items": 769, "source_exact_fallback": 219}):
+    ) != (4012, 1390, 2958,
+          {"presence": 399, "all_items": 770, "source_exact_fallback": 221}):
         raise ValueError("canonical six-STIG source IR regression counts changed")
     args.out_ir.parent.mkdir(parents=True, exist_ok=True)
     args.out_ir.write_bytes(data)

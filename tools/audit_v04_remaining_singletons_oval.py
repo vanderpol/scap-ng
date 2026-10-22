@@ -226,7 +226,7 @@ def audit(ng_docs, sources,checksums,*,assert_six=False):
     linked_source_shapes=Counter(r["source_test_linked_object_status"] for r in records)
     missing_title_linked_shapes=Counter(r["source_test_linked_object_status"]
                                        for r in records if r["classification"]=="NO_SOURCE_TITLE")
-    if assert_six and (len(ng_docs)!=4001 or len(singletons)!=50):
+    if assert_six and (len(ng_docs)!=4012 or len(singletons)!=50):
         raise ValueError("Pinned 0.4.0 singleton-Set baseline changed")
     return {
         "status":"SOURCE_COMMENT_TRIAGE_NOT_SOURCE_IDENTITY_OR_SCANNER_PARITY",

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Source-backed six-state *generic* oracle for the 219 0.4 source exceptions.
+"""Source-backed six-state *generic* oracle for the 221 0.4 source exceptions.
 
 This checks the existence and check-aggregation axes of the legacy source
 requirements *without rewriting any Test*. It does NOT compare or interpret
@@ -31,7 +31,7 @@ AXES = {
     "only_one_exists_and_only_one_matches": ("only_one_exists", "only one", True),
 }
 BASELINE = {
-    "all_exist_and_all_match": 73,
+    "all_exist_and_all_match": 75,
     "all_exist_and_none_match": 1,
     "at_least_one_exists_and_all_match": 42,
     "at_least_one_exists_and_only_one_matches": 21,
@@ -71,7 +71,7 @@ def audit(ledger, *, assert_six=False):
             counts["tests_with_field_cardinality_unverified"] += 1
     if labels != Counter(ledger.get("by_requirement") or {}):
         raise ValueError("ledger family inventory does not match actual source Tests")
-    if assert_six and (len(entries) != 219 or labels != Counter(BASELINE)):
+    if assert_six and (len(entries) != 221 or labels != Counter(BASELINE)):
         raise ValueError("six-STIG source exception distribution changed; review required")
     distinct = {AXES[label] for label in labels}
     matrix = {"/".join([axis[0], axis[1]]): comparison_matrix(axis)

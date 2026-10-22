@@ -7,6 +7,8 @@ on:
       - 'tools/audit_v04_authoring_blockers.py'
       - 'tools/test_v04_authoring_blocker_audit.py'
       - 'tools/test_v04_source_schema_registry.py'
+      - 'tools/v04_restore_missing_applicability.py'
+      - 'tools/test_v04_restore_missing_applicability.py'
       - 'tools/build_v04_residual_review_ledger.py'
       - 'tools/audit_v04_full_schema.py'
       - 'tools/test_v04_all_items_schema.py'
@@ -107,6 +109,9 @@ jobs:
           gh release download v0.4.0-joval-meeting-preview-20261015-r3 --pattern 'scap-ng-v0.4-joval-six-stig-*.zip' --dir work
           echo 'a1837c03133021f4d13814516a91b372f83b03771519f8361398ff1663056fea  work/scap-ng-v0.4-joval-six-stig-json.zip' | sha256sum -c -
           echo '03d64157ee295b81defe6f96cf7a3123410010ef4422d76bf5b7bb3ddbf30c9d  work/scap-ng-v0.4-joval-six-stig-yaml.zip' | sha256sum -c -
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern 'scap-ng-0.3-six-stig-authoring.zip' --dir work
+          echo '9b8d6e3528d52a7babc9d3fd0bdcad03664edfa9a754c65d49df5765f2b7473f  work/scap-ng-0.3-six-stig-authoring.zip' | sha256sum -c -
       - name: Audit pinned historical r3 JSON source and Rule/Assessment references
         env:
           PYTHONPATH: tools
@@ -118,6 +123,18 @@ jobs:
             --archived-source-only \
             --json-archive work/scap-ng-v0.4-joval-six-stig-json.zip \
             --report work/input-historical-source-report.json
+      - name: Restore 11 omitted shared Applicability Assessments from original 0.3 source
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_restore_missing_applicability.py
+          python tools/v04_restore_missing_applicability.py \
+            --historical-json work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --historical-yaml work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --original-03 work/scap-ng-0.3-six-stig-authoring.zip \
+            --out-json work/scap-ng-v0.4-joval-six-stig-json-complete.zip \
+            --out-yaml work/scap-ng-v0.4-joval-six-stig-yaml-complete.zip \
+            --report work/input-source-restoration.json
       - name: Build original OVAL Filter provenance before any authoring rewrite
         env:
           GH_TOKEN: ${{ github.token }}
@@ -157,7 +174,7 @@ jobs:
         run: |
           python tools/test_audit_v04_remaining_singletons_oval.py
           python tools/build_v04_canonical_six_stigs.py \
-            --source work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --source work/scap-ng-v0.4-joval-six-stig-json-complete.zip \
             --out work/stage-one.json.zip --manifest work/stage-one-manifest.json \
             --filter-proof work/v04-filter-original-oval-proof.json
           python tools/audit_v04_remaining_singletons_oval.py \
@@ -168,12 +185,12 @@ jobs:
           PYTHONPATH: tools
         run: |
           python tools/build_v04_canonical_six_stigs.py \
-            --source work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --source work/scap-ng-v0.4-joval-six-stig-json-complete.zip \
             --out work/scap-ng-0.4.0-six-stigs.json.zip --manifest work/json-manifest.json \
             --filter-proof work/v04-filter-original-oval-proof.json \
             --additional-filter-proof work/v04-remaining-original-oval-proof.json
           python tools/build_v04_canonical_six_stigs.py \
-            --source work/scap-ng-v0.4-joval-six-stig-yaml.zip \
+            --source work/scap-ng-v0.4-joval-six-stig-yaml-complete.zip \
             --out work/scap-ng-0.4.0-six-stigs.yaml.zip --manifest work/yaml-manifest.json \
             --filter-proof work/v04-filter-original-oval-proof.json \
             --additional-filter-proof work/v04-remaining-original-oval-proof.json
@@ -215,11 +232,11 @@ jobs:
           python tools/audit_v04_authoring_patterns.py \
             --baseline-archive work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip \
             --archive work/scap-ng-0.4.0-six-stigs.json.zip \
-            --report work/v04-other-authoring-patterns-json.json --assert-six
+            --report work/v04-other-authoring-patterns-json.json --assert-six --restored-applicability-source
           python tools/audit_v04_authoring_patterns.py \
             --baseline-archive work/filter-baseline/scap-ng-0.4.0-six-stigs.json.zip \
             --archive work/scap-ng-0.4.0-six-stigs.yaml.zip \
-            --report work/v04-other-authoring-patterns-yaml.json --assert-six
+            --report work/v04-other-authoring-patterns-yaml.json --assert-six --restored-applicability-source
       - name: Preserve other-structure audit even on failed regression
         if: always()
         uses: actions/upload-artifact@v4
@@ -255,8 +272,8 @@ jobs:
           new_json=read_authoring_archive(root/'flat-0.4.0-six-stigs.json.zip','json')
           new_yaml=read_authoring_archive(root/'flat-0.4.0-six-stigs.yaml.zip','yaml')
           proof=json.loads((root/'v04-flat-object-source-inverse.json').read_text())
-          assert len(old_json)==len(old_yaml)==len(new_json)==len(new_yaml)==4001
-          assert proof['documents']==4001 and proof['catalog_size']==100
+          assert len(old_json)==len(old_yaml)==len(new_json)==len(new_yaml)==4012
+          assert proof['documents']==4012 and proof['catalog_size']==100
           assert proof['changed_objects']>0 and not proof['native_schema_promoted']
           for name,doc in old_json.items():
               yaml_name=name.removesuffix('.json')+'.yaml'
@@ -265,7 +282,7 @@ jobs:
               restored=(restore_document(new_json[name],proof['source_inverse'][name])
                         if name in proof['source_inverse'] else new_json[name])
               assert restored==doc,('flat migration changed source',name)
-          print('PASS: 4,001 original YAML/JSON and flat YAML/JSON graphs with exact inverse')
+          print('PASS: 4,012 restored YAML/JSON and flat YAML/JSON graphs with exact inverse')
           PY
           mv work/flat-0.4.0-six-stigs.json.zip work/scap-ng-0.4.0-six-stigs.json.zip
           mv work/flat-0.4.0-six-stigs.yaml.zip work/scap-ng-0.4.0-six-stigs.yaml.zip
@@ -292,13 +309,13 @@ jobs:
           python tools/test_v04_canonical_authoring_guard.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip
       - name: Preserve full exceptional Test source for semantic differential review
         run: |
-          python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-219-review-ledger.json
+          python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-221-review-ledger.json
       - name: Verify nine exceptional source requirement families against OVAL generic results
         env:
           PYTHONPATH: tools
         run: |
           python tools/v04_exception_source_oracle.py \
-            --ledger work/residual-219-review-ledger.json \
+            --ledger work/residual-221-review-ledger.json \
             --report work/v04-exception-source-oracle.json \
             --assert-six
       - name: Diagnose native schema validity across all source documents
@@ -361,7 +378,7 @@ jobs:
         run: |
           python tools/test_v04_canonical_requirement_oracle.py
           python tools/v04_canonical_requirement_oracle.py \
-            --original-json work/scap-ng-v0.4-joval-six-stig-json.zip \
+            --original-json work/scap-ng-v0.4-joval-six-stig-json-complete.zip \
             --canonical-json work/scap-ng-0.4.0-six-stigs.json.zip \
             --report work/canonical-requirement-oval-oracle.json \
             --filter-proof work/v04-filter-original-oval-proof.json \
@@ -374,7 +391,7 @@ jobs:
           from pathlib import Path
           a=json.loads(Path('work/json-manifest.json').read_text())
           b=json.loads(Path('work/yaml-manifest.json').read_text())
-          assert a['documents']==b['documents']==4001
+          assert a['documents']==b['documents']==4012
           assert a['counts']==b['counts']
           assert {p.removesuffix('.json') for p in a['changed_paths']}=={p.removesuffix('.yaml') for p in b['changed_paths']}
           assert a['counts']['all_items_must']>0
@@ -398,6 +415,7 @@ jobs:
             work/*manifest.json
             work/v04-flat-object-source-inverse.json
             work/input-historical-source-report.json
+            work/input-source-restoration.json
             work/*blocker-audit.json
             work/v04-filter-guard-*.json
             work/v04-other-authoring-patterns-*.json
@@ -405,7 +423,7 @@ jobs:
             work/v04-filter-original-oval-proof.json
             work/v04-remaining-original-oval-proof.json
             work/v04-additional-filter-inverse-*.json
-            work/residual-219-review-ledger.json
+            work/residual-221-review-ledger.json
             work/v04-exception-source-oracle.json
             work/full-native-schema-audit.json
             work/full-native-yaml-schema-audit.json
@@ -429,7 +447,7 @@ jobs:
           # The October 20 source preview predates normative flat Objects.
           # Preserve it byte-for-byte; the current revision receives a
           # separate clearly labeled snapshot only AFTER all CI gates pass.
-          tag='v0.4.0-six-stig-canonical-flat-authoring-20261021'
+          tag='v0.4.0-six-stig-canonical-flat-authoring-20261022-restored'
           if gh release view "$tag" >/dev/null 2>&1; then
             echo "Immutable canonical source preview already published: $tag"
             exit 0
@@ -441,7 +459,7 @@ jobs:
           ir=json.loads((root/'canonical-typed-source-ir-report.json').read_text())
           packages=json.loads((root/'v04-native-source-package-report.json').read_text())
           oracle=json.loads((root/'canonical-requirement-oval-oracle.json').read_text())
-          assert ir['documents']==4001 and ir['tests']==1375
+          assert ir['documents']==4012 and ir['tests']==1390
           assert ir['source_reconstruction']==ir['yaml_json_byte_parity']=='PASS'
           assert ir['native_source_schema']=='PASS'
           assert ir['native_executable_compiler_complete'] is False
@@ -459,9 +477,16 @@ jobs:
 
           **PRE-ALPHA SOURCE ONLY. Not executable, not signed, not scanner-validated.**
 
-          This immutable snapshot contains 4,001 independently parsed and
+          This immutable snapshot contains 4,012 independently parsed and
           schema-checked YAML/JSON authoring documents for six STIG Benchmarks,
-          including 1,375 automated Tests and 2,958 Rule choice links.
+          including 1,390 automated Tests and 2,958 Rule choice links.
+
+          The original October 15 research exporter omitted 11 shared
+          Applicability Assessments used by RHEL 9 and Oracle Linux 9.
+          They were recovered with exact-inverse source checks from the
+          immutable 0.3 authoring archive; all 22 dangling links now resolve.
+          The original archives remain unchanged, and a restoration evidence
+          manifest records the provenance of every recovered Assessment.
 
           The 0.4.0 flat-Object migration is source-invertible. Download the
           JSON and YAML ZIPs with their manifests and inverse evidence.
@@ -478,6 +503,7 @@ jobs:
             work/scap-ng-0.4.0-six-stigs.yaml.zip \
             work/json-manifest.json work/yaml-manifest.json \
             work/input-historical-source-report.json \
+            work/input-source-restoration.json \
             work/v04-flat-object-source-inverse.json \
             work/canonical-typed-source-ir-report.json \
             work/v04-native-source-packages/*.source-preview.zip \

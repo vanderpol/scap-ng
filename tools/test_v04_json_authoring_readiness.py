@@ -45,7 +45,8 @@ def documents_from_json_archive(archive_path):
     return documents
 
 
-def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
+def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True,
+                         known_historical_applicability_omissions=False):
     """Source-independent JSON validation, without reading the YAML archive."""
     # The immutable October 15 research archive is audited for source graph
     # integrity only. Its old scoped-State validator must not be imported when
@@ -83,7 +84,21 @@ def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
         parsed[path] = doc
 
     references,errors=scan(parsed)
-    if errors:
+    if known_historical_applicability_omissions:
+        # Only the SHA-pinned r3 audit invokes this mode. The research exporter
+        # omitted 11 shared source Assessments, each used by two Linux STIGs.
+        # Record the 22 dangling links as a *defect*, not a passed closure.
+        if (len(errors)!=22 or len({item[3] for item in errors})!=11
+                or any(len(item)!=4 or item[1]!="unresolved Applicability Assessment"
+                       for item in errors)
+                or {item[0] for item in errors}!={
+                    "authoring/oracle_linux_9/applicability.json",
+                    "authoring/rhel_9/applicability.json",
+                }):
+            raise ValueError("Unexpected historical r3 source-reference defects: "
+                             + repr(errors[:15]))
+        total["known_historical_applicability_omissions"]=len(errors)
+    elif errors:
         raise ValueError("Unresolved JSON authoring references: "+repr(errors[:15]))
     total["documents"]=len(parsed)
     total.update({k:references.get(k,0) for k in
@@ -97,7 +112,7 @@ def audit_json_authoring(documents, *, validate_native=True, pinned_r3=True):
             ("rule_choice_links",EXPECTED_RULE_CHOICE_LINKS),
             ("automated_assessments",EXPECTED_AUTO_ASSESSMENTS),
             ("native_test_nodes",EXPECTED_NATIVE_TEST_NODES),
-            ("unresolved",0),
+            ("unresolved",22 if known_historical_applicability_omissions else 0),
         ):
             if total[key] != expected:
                 raise ValueError(f"Pinned r3 {key} changed: {total[key]} != {expected}")
@@ -112,10 +127,11 @@ def audit_pinned_historical_source(archive_path):
     stats = audit_json_authoring(
         documents_from_json_archive(archive_path),
         validate_native=False, pinned_r3=True,
+        known_historical_applicability_omissions=True,
     )
     return {
-        "status": "PINNED_RESEARCH_SOURCE_GRAPH_VALID_NOT_NATIVE_SCHEMA",
-        "scope": "pinned r3 original JSON source and reference closure only; validate converted canonical 0.4 output separately",
+        "status": "PINNED_RESEARCH_SOURCE_HAS_22_KNOWN_APPLICABILITY_OMISSIONS",
+        "scope": "pinned r3 JSON source with 22 missing Applicability links; restore 11 source-backed Assessments from immutable 0.3 before compiler graph validation",
         "original_source_sha256": raw_digest,
         "native_040_schema": "NOT_TESTED_HISTORICAL_SOURCE",
         "counts": stats,

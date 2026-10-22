@@ -142,6 +142,20 @@ class AuthoringPatternsTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "scope changed"):
             compare(before, after)
 
+    def test_exact_source_restoration_scope_must_be_explicit(self):
+        before = scan(docs())
+        after = scan(docs())
+        before["documents"], before["automated_tests"] = 4001, 1375
+        after["documents"], after["automated_tests"] = 4012, 1390
+        with self.assertRaisesRegex(ValueError, "scope changed"):
+            compare(before, after)
+        restored = compare(before, after, restored_applicability_source=True)
+        self.assertEqual(restored["status"], "PASS")
+        self.assertTrue(restored["restored_applicability_source"])
+        after["documents"] += 1
+        with self.assertRaisesRegex(ValueError, "scope changed"):
+            compare(before, after, restored_applicability_source=True)
+
 
 if __name__ == "__main__":
     unittest.main()

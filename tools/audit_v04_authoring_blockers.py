@@ -52,7 +52,7 @@ if __name__=="__main__":
     r=check(a.archive);a.report.parent.mkdir(parents=True,exist_ok=True)
     a.report.write_text(json.dumps(r,indent=2)+"\n")
     print(json.dumps({"documents":r["documents"],"counts":r["counts"]},indent=2))
-    assert r["documents"]==4001,"Unexpected six-STIG archive closure"
+    assert r["documents"]==4012,"Unexpected six-STIG archive closure"
     assert not r["counts"].get("inline_capability_still_declared"),"Inline object capability was not normalized"
     assert not r["counts"].get("stale_collected_items_require"),"Stale Test requirement key"
     # Explicitly track the unresolved migration scope; green source roundtrips
@@ -60,16 +60,16 @@ if __name__=="__main__":
     actual=r["counts"]
     # 0.4 canonical inheritance adds a Test-wide field_requirement alongside
     # items/all_items_must. These are legitimate native Tests, not failures.
-    assert actual.get("native_all_items_must_tests")==769, "Source population or conversion changed"
+    assert actual.get("native_all_items_must_tests")==770, "Source population or conversion changed"
     assert actual.get("native_test_inherited_field_requirement")==103, "Test-wide inheritance population changed"
-    assert actual.get("native_presence_only_tests")==387, "Source-derived presence-only migration changed"
-    assert actual.get("legacy_string_require_tests")==219, "Explicit OVAL fallback population changed; review migration"
-    assert actual.get("legacy_states")==219, "Explicit OVAL fallback States changed; review migration"
+    assert actual.get("native_presence_only_tests")==399, "Source-derived presence-only migration changed"
+    assert actual.get("legacy_string_require_tests")==221, "Explicit OVAL fallback population changed; review migration"
+    assert actual.get("legacy_states")==221, "Explicit OVAL fallback States changed; review migration"
     assert actual.get("legacy_top_level_field_require")==5, "Explicit fallback field requirements changed"
     assert actual.get("legacy_states_match")==25, "Explicit fallback State aggregates changed"
     assert not actual.get("unrecognized_structured_requirement"), "Unhandled canonical requirement shape"
     assert not actual.get("invalid_all_items_must_shape"), "Invalid all_items_must collection"
     assert not actual.get("both_states_and_all_items_must"), "Mixed native and legacy State requirements"
     assert (actual.get("native_all_items_must_tests",0)+actual.get("native_presence_only_tests",0)
-            +actual.get("legacy_string_require_tests",0))==1375, "Automated Test coverage changed"
+            +actual.get("legacy_string_require_tests",0))==1390, "Automated Test coverage changed"
 

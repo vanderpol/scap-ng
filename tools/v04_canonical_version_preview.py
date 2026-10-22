@@ -173,7 +173,7 @@ def main():
         if (
             result["source_document_count"], result["benchmarks_changed"],
             result["conflicts_before"], result["conflicts_after"], result["rule_choice_links"]
-        ) != (4001, 0, 0, 0, 2958):
+        ) != (4012, 0, 0, 0, 2958):
             raise ValueError("approved six-STIG version closure baseline changed")
         # The reviewed 0.4 declaration was applied by source generation.
         documents = read_authoring_archive(args.json_archive, "json")
