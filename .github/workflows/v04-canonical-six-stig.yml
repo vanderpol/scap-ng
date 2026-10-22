@@ -4,7 +4,6 @@ on:
     branches: [main]
     paths:
       - 'tools/build_v04_canonical_six_stigs.py'
-      - 'tools/test_v04_json_authoring_readiness.py'
       - 'tools/audit_v04_authoring_blockers.py'
       - 'tools/build_v04_residual_review_ledger.py'
       - 'tools/audit_v04_full_schema.py'
@@ -269,13 +268,13 @@ jobs:
           python tools/test_v04_canonical_authoring_guard.py --archive work/scap-ng-0.4.0-six-stigs.yaml.zip
       - name: Preserve full exceptional Test source for semantic differential review
         run: |
-          python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-172-review-ledger.json
+          python tools/build_v04_residual_review_ledger.py --archive work/scap-ng-0.4.0-six-stigs.json.zip --out work/residual-219-review-ledger.json
       - name: Verify nine exceptional source requirement families against OVAL generic results
         env:
           PYTHONPATH: tools
         run: |
           python tools/v04_exception_source_oracle.py \
-            --ledger work/residual-172-review-ledger.json \
+            --ledger work/residual-219-review-ledger.json \
             --report work/v04-exception-source-oracle.json \
             --assert-six
       - name: Diagnose native schema validity across all source documents
@@ -380,7 +379,7 @@ jobs:
             work/v04-filter-original-oval-proof.json
             work/v04-remaining-original-oval-proof.json
             work/v04-additional-filter-inverse-*.json
-            work/residual-172-review-ledger.json
+            work/residual-219-review-ledger.json
             work/v04-exception-source-oracle.json
             work/full-native-schema-audit.json
             work/full-native-yaml-schema-audit.json
