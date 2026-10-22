@@ -6,6 +6,22 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+### Canonical authoring checkpoint
+
+- Published source-invertible, native-schema-validated 0.4.0 JSON/YAML
+  authoring for six STIGs (4,012 documents, 1,390 automated Tests), after
+  restoring 11 omitted shared applicability Assessments from immutable 0.3
+  source. Both formats, six deterministic source-only package manifests,
+  original-OVAL requirement axes, and isolated CMS test signatures passed
+  the full checkpoint. Executable `.scapng` compilation and scanner parity
+  remain open. [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+- Split rapid 0.4 development regressions from deliberately triggered full
+  six-STIG release builds. The routine integration sample validates pinned
+  RHEL 9, Windows 11 and Apache 2.4 UNIX source packages without rerunning
+  the complete YAML/JSON conversion for every edit.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
 ### Converter and authoring safeguards
 
 - Updated the 0.4 authoring converter and typed source compiler for canonical
