@@ -48,12 +48,38 @@ class ChoiceClosureTests(unittest.TestCase):
             self.assertEqual(include_shared_rule_choices(src, docs, original, "rhel_9"), 1)
             self.assertEqual(original[self.shared_path], src.read(self.shared_path))
             self.assertEqual(audit_rule_assessment_choices(docs),
-                             {"rules": 1, "choice_links": 2, "unique_assessments": 2,
+                             {"rules": 1, "choice_links": 2, "applicability_links": 0,
+                              "unique_assessments": 2,
                               "unresolved_choices": 0, "duplicate_assessment_ids": 0})
+
+    def test_shared_applicability_included_and_all_links_resolve(self):
+        applicability_path = "authoring/rhel_9/applicability.yaml"
+        shared = "authoring/shared/assessments/linux/other/autofs.assessment.yaml"
+        catalog = {"applicability": {"id": "rhel.applicability", "conditions": {
+            "rhel.condition.autofs": {"assessment": "ng.shared.autofs"}}}}
+        entries = [(applicability_path, catalog),
+                   (shared, assessment("ng.shared.autofs", "automated"))]
+        with archive(*entries) as src:
+            docs = {applicability_path: catalog}
+            raw = {applicability_path: src.read(applicability_path)}
+            self.assertEqual(include_shared_rule_choices(src, docs, raw, "rhel_9"), 1)
+            self.assertEqual(raw[shared], src.read(shared))
+            self.assertEqual(audit_rule_assessment_choices(docs)["applicability_links"], 1)
+
+    def test_missing_shared_applicability_fails_closed(self):
+        applicability_path = "authoring/rhel_9/applicability.yaml"
+        catalog = {"applicability": {"conditions": {
+            "rhel.condition.autofs": {"assessment": "ng.shared.autofs"}}}}
+        with archive((applicability_path, catalog)) as src:
+            with self.assertRaisesRegex(ValueError, "unresolved source Rule/Applicability Assessment"):
+                include_shared_rule_choices(src, {applicability_path: catalog},
+                                            {applicability_path: src.read(applicability_path)}, "rhel_9")
+            with self.assertRaisesRegex(ValueError, "Unresolved packaged Rule/Applicability Assessment"):
+                audit_rule_assessment_choices({applicability_path: catalog})
 
     def test_missing_shared_manual_fails_closed(self):
         with archive((self.rule_path, rule())) as src:
-            with self.assertRaisesRegex(ValueError, "unresolved source Rule Assessment choice"):
+            with self.assertRaisesRegex(ValueError, "unresolved source Rule/Applicability Assessment"):
                 include_shared_rule_choices(src, {self.rule_path: rule()},
                                             {self.rule_path: src.read(self.rule_path)}, "rhel_9")
 
@@ -75,7 +101,7 @@ class ChoiceClosureTests(unittest.TestCase):
                                             {self.rule_path: src.read(self.rule_path)}, "rhel_9")
 
     def test_final_archive_detects_dangling_id(self):
-        with self.assertRaisesRegex(ValueError, "Unresolved packaged Rule Assessment choices"):
+        with self.assertRaisesRegex(ValueError, "Unresolved packaged Rule/Applicability Assessment"):
             audit_rule_assessment_choices({self.rule_path: rule()})
 
     def test_final_archive_detects_duplicate_ids(self):
