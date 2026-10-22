@@ -1,0 +1,107 @@
+name: 0.4.0 original OVAL macOS Gatekeeper field none-exist source roundtrip
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/v04-oval-macos-gatekeeper-source.yml'
+      - 'tools/prove_v04_oval_macos_gatekeeper_source.py'
+      - 'tools/promote_v04_oval_macos_gatekeeper_source_proof.py'
+      - 'tools/test_v04_scalar_none_exist_source.py'
+      - 'tools/validate_v04_oval_5123.py'
+      - 'tools/generate_capability_schema_v04.py'
+      - 'schema/v0.4.0/assessment.schema.json'
+      - 'schema/v0.4.0/assessment-language.schema.json'
+      - 'schema/v0.4.0/capability-common.schema.json'
+      - 'schema/v0.4.0/capability-mappings/supported/macos.gatekeeper.json'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  one-original-macos-gatekeeper-source-definition:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: scap-ng
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: original-oval
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/OVAL
+          ref: v5.12.3
+          path: oval-language
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.0.2
+      - name: Pinned original macOS Gatekeeper singleton and State absence-only fidelity
+        env:
+          PYTHONPATH: scap-ng/tools
+          OVAL_GATEKEEPER_SOURCE: original-oval/SCAP_1.4/OVAL_Test_Content/macos/macos-def_gatekeeper_test.xml
+        run: |
+          test "$(git -C original-oval rev-parse HEAD)" = 'e3538595c5083b9c34d937a81d319234df9bbfaa'
+          python scap-ng/tools/test_v04_scalar_none_exist_source.py
+          python scap-ng/tools/prove_v04_oval_macos_gatekeeper_source.py \
+            --source original-oval/SCAP_1.4/OVAL_Test_Content/macos/macos-def_gatekeeper_test.xml \
+            --schema-root scap-ng/schema/v0.4.0 \
+            --xsd-root oval-language/oval-schemas \
+            --output work/original-oval-gatekeeper/macos-gatekeeper-one
+      - name: Independently promote pinned original source ledger 39 to 40
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PYTHONPATH: scap-ng/tools
+        run: |
+          mkdir -p work/previous-ledger
+          gh run download 39770827117 --repo "$GH_REPO" \
+            --name v04-oval-windows-wmi57-five-definitions-typed-record-39-of-167 \
+            --dir work/previous-ledger
+          test -f work/previous-ledger/cumulative-167-definition-readiness.json
+          python scap-ng/tools/promote_v04_oval_macos_gatekeeper_source_proof.py \
+            --previous-ledger work/previous-ledger/cumulative-167-definition-readiness.json \
+            --proof-root work/original-oval-gatekeeper/macos-gatekeeper-one \
+            --output work/original-oval-gatekeeper/cumulative-167-definition-readiness.json
+          python - <<'PY'
+          import json
+          from copy import deepcopy
+          from pathlib import Path
+          from promote_v04_oval_macos_gatekeeper_source_proof import promote
+
+          current=json.loads(Path('work/original-oval-gatekeeper/cumulative-167-definition-readiness.json').read_text())
+          previous=json.loads(Path('work/previous-ledger/cumulative-167-definition-readiness.json').read_text())
+          folder=Path('work/original-oval-gatekeeper/macos-gatekeeper-one')
+          assert len(current['records']) == 167
+          assert current['current_040_schema_and_original_source_validated'] == 40
+          assert current['current_040_original_xml_roundtrip_exported'] == 40
+          assert current['remaining_v003_compatible_without_current_040_proof'] == 122
+          assert current['original_source_invalid_or_deprecated'] == 5
+          assert current['scanner_result_parity_proven'] == 0
+          try:
+              promote(current, folder)
+          except ValueError as exc:
+              assert 'complete certified 39-of-167' in str(exc)
+          else:
+              raise AssertionError('accepted duplicate 40/167 promotion')
+          corrupt=deepcopy(previous)
+          next(r for r in corrupt['records'] if r['source_file']=='macos/macos-def_gatekeeper_test.xml')['original_source_file_sha256']='0'*64
+          try:
+              promote(corrupt, folder)
+          except ValueError as exc:
+              assert 'unproved original macOS source' in str(exc)
+          else:
+              raise AssertionError('accepted forged original Gatekeeper SHA')
+          print('PASS: original macOS Gatekeeper singleton and none_exist State field, 40/167; scanner parity 0')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-oval-macos-gatekeeper-singleton-state-none-exist-40-of-167
+          path: work/original-oval-gatekeeper/
+          if-no-files-found: ignore

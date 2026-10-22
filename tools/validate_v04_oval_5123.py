@@ -16,7 +16,7 @@ def check(schema_dir, xml_file, platform="independent"):
     if not schema.is_file() or not xml_file.is_file():
         raise ValueError("Missing OVAL 5.12.3 Definitions schema or XML artifact")
     parser=etree.XMLParser(resolve_entities=False,no_network=True)
-    if platform not in ("independent","windows","ios","iosxe","linux"):
+    if platform not in ("independent","windows","ios","iosxe","linux","macos"):
         raise ValueError("Unsupported platform schema for current focused 0.4.0 XML gate")
     platform_schema=schema_dir/(platform+"-definitions-schema.xsd")
     if not platform_schema.is_file():
@@ -50,7 +50,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--schema-dir",type=Path,required=True)
     p.add_argument("--xml",type=Path,required=True)
-    p.add_argument("--platform",choices=("independent","windows","ios","iosxe","linux"),default="independent")
+    p.add_argument("--platform",choices=("independent","windows","ios","iosxe","linux","macos"),default="independent")
     p.add_argument("--report",type=Path,required=True)
     a=p.parse_args()
     result=check(a.schema_dir,a.xml,a.platform)
