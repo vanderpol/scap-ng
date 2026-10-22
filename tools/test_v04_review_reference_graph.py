@@ -7,7 +7,7 @@ import unittest
 import zipfile
 
 def scan(documents):
-    ids, rules, problems, counts = {}, [], [], Counter()
+    ids, rules, catalogs, problems, counts = {}, [], [], [], Counter()
     for path,doc in documents.items():
         a=doc.get("assessment")
         if isinstance(a,dict):
@@ -16,6 +16,8 @@ def scan(documents):
             elif ident in ids: problems.append((path,"duplicate Assessment ID",ident,ids[ident]))
             else: ids[ident]=path
         if isinstance(doc.get("rule"),dict): rules.append((path,doc["rule"]))
+        if isinstance(doc.get("applicability"),dict):
+            catalogs.append((path,doc["applicability"]))
     counts.update(documents=len(documents),assessments=len(ids),rules=len(rules))
     for path,rule in rules:
         choices=rule.get("assessment_choices") or {}
@@ -25,6 +27,12 @@ def scan(documents):
             counts["rule_choice_links"]+=1
             ident=choice.get("assessment") if isinstance(choice,dict) else None
             if ident not in ids:problems.append((path,"unresolved Rule choice",label,ident))
+    for path,catalog in catalogs:
+        for label,condition in (catalog.get("conditions") or {}).items():
+            counts["applicability_assessment_links"]+=1
+            ident=condition.get("assessment") if isinstance(condition,dict) else None
+            if ident not in ids:
+                problems.append((path,"unresolved Applicability Assessment",label,ident))
     for path,doc in documents.items():
         a=doc.get("assessment")
         if not isinstance(a,dict):continue
@@ -91,6 +99,18 @@ class GraphTests(unittest.TestCase):
     def test_missing_rule_choice(self):
         self.d["rule.json"]["rule"]["assessment_choices"]["automated"]["assessment"]="missing"
         self.assertIn("unresolved Rule choice",str(scan(self.d)[1]))
+    def test_applicability_assessment_closure(self):
+        self.d["applicability.json"]={"applicability":{"id":"catalog", "conditions":{
+            "condition.valid":{"assessment":"a"}}}}
+        counts,bad=scan(self.d)
+        self.assertEqual(bad,[])
+        self.assertEqual(counts["applicability_assessment_links"],1)
+        self.d["applicability.json"]["applicability"]["conditions"]["condition.missing"]={
+            "assessment":"ng.shared.absent"}
+        counts,bad=scan(self.d)
+        self.assertEqual(counts["applicability_assessment_links"],2)
+        self.assertTrue(any("unresolved Applicability Assessment" in str(item) and
+                            "ng.shared.absent" in str(item) for item in bad))
     def test_missing_evaluate_test(self):
         self.d["a.json"]["assessment"]["evaluate"]={"test":"missing"}
         self.assertIn("unresolved evaluate Test",str(scan(self.d)[1]))
