@@ -30,10 +30,11 @@ def check(archive):
                     if set(req)=={"items"}:
                         hit("native_presence_only_tests")
                         if "states" in t or "states_match" in t:hit("presence_only_with_legacy_states")
-                    elif set(req)=={"items","all_items_must"}:
+                    elif set(req) in ({"items","all_items_must"}, {"items","all_items_must","field_requirement"}):
                         if not isinstance(req.get("all_items_must"),list):hit("invalid_all_items_must_shape")
                         else:
                             hit("native_all_items_must_tests")
+                            if "field_requirement" in req:hit("native_test_inherited_field_requirement")
                             if t.get("states") is not None:hit("both_states_and_all_items_must")
                     else:hit("unrecognized_structured_requirement")
                 elif isinstance(req,str):
@@ -57,10 +58,18 @@ if __name__=="__main__":
     # Explicitly track the unresolved migration scope; green source roundtrips
     # must not be mistaken for full canonical-schema conformance.
     actual=r["counts"]
-    assert actual.get("native_all_items_must_tests")==816, "Source population or conversion changed"
+    # 0.4 canonical inheritance adds a Test-wide field_requirement alongside
+    # items/all_items_must. These are legitimate native Tests, not failures.
+    assert actual.get("native_all_items_must_tests")==769, "Source population or conversion changed"
+    assert actual.get("native_test_inherited_field_requirement")==103, "Test-wide inheritance population changed"
     assert actual.get("native_presence_only_tests")==387, "Source-derived presence-only migration changed"
-    assert actual.get("legacy_string_require_tests")==172, "Remaining legacy requirement population changed; review migration"
-    assert actual.get("legacy_states")==172, "Unconverted State population changed; review migration"
-    assert actual.get("legacy_top_level_field_require")==108, "Unconverted field-level requirement count changed"
-    assert actual.get("legacy_states_match")==128, "Unconverted State aggregate population changed"
+    assert actual.get("legacy_string_require_tests")==219, "Explicit OVAL fallback population changed; review migration"
+    assert actual.get("legacy_states")==219, "Explicit OVAL fallback States changed; review migration"
+    assert actual.get("legacy_top_level_field_require")==5, "Explicit fallback field requirements changed"
+    assert actual.get("legacy_states_match")==25, "Explicit fallback State aggregates changed"
+    assert not actual.get("unrecognized_structured_requirement"), "Unhandled canonical requirement shape"
+    assert not actual.get("invalid_all_items_must_shape"), "Invalid all_items_must collection"
+    assert not actual.get("both_states_and_all_items_must"), "Mixed native and legacy State requirements"
+    assert (actual.get("native_all_items_must_tests",0)+actual.get("native_presence_only_tests",0)
+            +actual.get("legacy_string_require_tests",0))==1375, "Automated Test coverage changed"
 
