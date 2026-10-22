@@ -13,6 +13,24 @@ from pathlib import Path
 
 PIN="e3538595c5083b9c34d937a81d319234df9bbfaa"
 FIRST="VARIABLE_SOURCE_GRAPH_NEEDS_COMPATIBILITY"
+# Source OVAL independent.variable_test already has an intentional, reviewed
+# native 0.4 mapping to variable.value. This is *mapping presence*, not
+# automatic proof of per-Definition conversion or Item/State result parity.
+SOURCE_CAPABILITY_ALIASES={"independent.variable":"variable.value"}
+
+def native_identity(cap, catalog_dir, available):
+    target=SOURCE_CAPABILITY_ALIASES.get(cap,cap)
+    if target not in available:
+        return None
+    if cap in SOURCE_CAPABILITY_ALIASES:
+        mapping=json.loads((catalog_dir/(target+".json")).read_text())
+        if (mapping.get("specification_version")!="0.4.0" or
+            mapping.get("capability")!=target or
+            mapping.get("source",{}).get("test")!="variable_test" or
+            mapping.get("native",{}).get("test_source")!={"kind":"variable","field":"variable"} or
+            mapping.get("migration_crosswalk",{}).get("object",{}).get("var_ref")!="test.variable"):
+            raise ValueError("independent.variable -> variable.value reviewed native mapping changed")
+    return target
 
 def fingerprint(value):
     return sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,
@@ -137,10 +155,18 @@ def audit(base):
     if len(available)!=100:raise ValueError("Unsupported current 0.4 capability catalog census")
     counts=Counter();operations=Counter()
     for row in records:
-        missing=sorted(set(row["test_capabilities"])-available)
+        identities={cap:native_identity(cap,catalog_dir,available)
+                    for cap in row["test_capabilities"]}
+        missing=sorted(cap for cap,target in identities.items() if target is None)
+        aliases={cap:target for cap,target in identities.items()
+                 if target is not None and target!=cap}
+        row["mapped_current_040_capabilities"]=sorted({
+            target for target in identities.values() if target is not None})
+        row["native_source_capability_aliases"]=aliases
         row["unsupported_current_040_capabilities"]=missing
         row["native_mapping_status"]=(
             "UNSUPPORTED_NATIVE_CAPABILITY" if missing
+            else "MAPPED_VIA_SOURCE_TEST_ALIAS_UNVALIDATED" if aliases
             else "MAPPED_NOT_SOURCE_OR_SEMANTICALLY_VALIDATED")
         counts["definitions"]+=1
         counts["variables"]+=row["variable_count"]
@@ -150,20 +176,22 @@ def audit(base):
         counts[row["migration_group"]+"_definitions"]+=1
         if row["migration_group"]=="constant_only":
             counts["constant_only_missing_native_mapping_definitions"]+=bool(missing)
-            counts["constant_only_supported_capability_definitions"]+=not bool(missing)
+            counts["constant_only_existing_native_mapping_definitions"]+=not bool(missing)
+            counts["constant_only_alias_mapped_unvalidated_definitions"]+=bool(aliases) and not bool(missing)
         operations.update(row["operators"])
     missing_caps=Counter(cap for row in records
                          if row["migration_group"]=="constant_only"
                          for cap in row["unsupported_current_040_capabilities"])
-    # Source-pinned unsupported capability families are not secretly
-    # native-converted. 29 independent.variable and 2 independent.filehash58
-    # originals are excluded from this first, constant-only queue.
+    # 29 original independent.variable Tests have a reviewed identity alias
+    # to native variable.value. They still require semantic lowering and
+    # individual proofs; two filehash58 Definitions truly lack a native map.
     if not (counts["definitions"]==68 and counts["variables"]==245 and
             counts["constant_only_definitions"]==42 and
             counts["locally_derived_or_mixed_definitions"]==26 and
-            counts["constant_only_missing_native_mapping_definitions"]==31 and
-            counts["constant_only_supported_capability_definitions"]==11 and
-            missing_caps=={"independent.variable":29,"independent.filehash58":2}):
+            counts["constant_only_missing_native_mapping_definitions"]==2 and
+            counts["constant_only_existing_native_mapping_definitions"]==40 and
+            counts["constant_only_alias_mapped_unvalidated_definitions"]==29 and
+            missing_caps=={"independent.filehash58":2}):
         raise ValueError("Source Variable graph corpus count changed: "+
                          json.dumps(dict(sorted(counts.items())),sort_keys=True)+
                          "; absent native capabilities="+
