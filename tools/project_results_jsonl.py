@@ -90,12 +90,15 @@ def project_scan(
                 "parameters": rule.get("parameters", effective_policy.get("parameters", {})),
                 "applicability": rule.get("applicability"),
                 "outcome": rule["outcome"],
-                "summary": rule["summary"] if scan["result_schema_version"] == "0.4.0" else rule.get("message"),
                 "reason": rule.get("reason"),
                 "assessment": rule.get("assessment"),
                 "instances": rule.get("instances", []),
                 "evidence_refs": rule.get("evidence_refs", []),
             }
+            if scan["result_schema_version"] == "0.4.0":
+                event["summary"] = rule["summary"]
+            else:
+                event["message"] = rule.get("message")
             # Preserve 0.1/0.2 frozen projections; new 0.3 fields are
             # copied only when present in the authoritative Benchmark Result.
             if "findings" in rule:
