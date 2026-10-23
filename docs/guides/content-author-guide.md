@@ -54,7 +54,7 @@ A **Parameter** is policy data, not an Assessment Variable. When a publisher exp
 
 ## 5. Interpret results without losing meaning
 
-A Rule Result communicates a policy-facing outcome, while Assessment details and evidence explain the technical evaluation. Scoring disposition is separate from technical truth. **Draft — Needs Review:** final serialized `summary` wording and canonical-result projection behavior remain unresolved in the current [Results specification](../../specification/results/results.md). Do not fabricate scanner outcomes or assume proposed result fields are normative.
+A Rule Result communicates a policy-facing outcome, while Assessment details and evidence explain the technical evaluation. Scoring disposition is separate from technical truth. The current 0.4.0 draft [Rule Result schema](../../schema/v0.4.0/rule-result.schema.json) and [Assessment Result schema](../../schema/v0.4.0/assessment-result.schema.json) require a nonblank `summary` explaining the outcome; this is a **pre-alpha schema contract**, not proof of scanner execution. **Draft — Needs Review:** reconcile older `message` prose and settle canonical-result projection behavior in the [Results specification](../../specification/results/results.md).
 
 ## 6. Validate, compile, then distribute
 
