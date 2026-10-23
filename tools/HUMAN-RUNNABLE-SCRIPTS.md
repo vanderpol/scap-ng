@@ -68,6 +68,8 @@ immutable ASA line and IOS BGP-neighbor/section regression examples. A direct
 one-State scalar comparison (pinned AIX fileset example) also preserves OVAL
 Test/State item quantifiers in the compiler's source-exact fallback. Other
 cases remain explicitly blocked when no source-exact adapter is implemented.
+An explicit singleton-source mapping permits a truly empty original Object
+to be omitted while preserving a scalar version State (pinned ASA version).
 This is **not** general Variable or OVAL coverage. For broader source research, use
 the established 0.3 full-review converter below for broader source research.
 

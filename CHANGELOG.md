@@ -99,6 +99,15 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Added source-attested singleton capability conversion to the maintained
+  direct-Test bridge: a real empty original OVAL Object can be omitted when
+  the 0.4 capability mapping explicitly declares that singleton and its
+  original-object crosswalk. The pinned ASA version Test keeps its native
+  version comparator, Test/State quantifiers and compiled source-exact check.
+  Unexpected Object children and source lowering mutations fail closed.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Extended the original-OVAL-attested direct-Test adapter to a singleton
   literal scalar State, preserving Test item quantifiers and State field
   existence/check boundaries in the native 0.4 compiler's source-exact Test

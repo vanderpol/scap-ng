@@ -71,6 +71,12 @@ Self-Assertion source exercises this case. Variables, multiple State fields,
 nondefault field checks, Sets and Filters still fail closed. No live scanner
 evaluation or full six-state equivalence is claimed.
 
+An explicitly mapped singleton capability may omit its otherwise empty
+source Object in native 0.4; it must declare `test_source.kind=none` and the
+original OVAL singleton-object migration crosswalk. The immutable ASA version
+case verifies this optimization, including a `version` comparison and a
+negative test that rejects nonempty singleton Objects.
+
 Previously admitted are one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`
 Filter, or one direct `windows.registry` value-equality Test with its
@@ -91,6 +97,7 @@ For source regressions, retrieve only the immutable
 at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus
 `aix/aix-def_fileset_test.xml`, `asa/asa-def_line_test.xml`,
+`asa/asa-def_version_test.xml`,
 `ios/ios-def_bgpneighbor_test.xml`, and
 `ios/ios-def_section_test.xml` files
 under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family

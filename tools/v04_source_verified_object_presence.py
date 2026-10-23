@@ -30,6 +30,13 @@ SOURCE_EXISTENCE = {
 SOURCE_OPERATIONS = {"equals": ("equals", "equals"),
                      "pattern match": ("pattern_match", "matches_regex")}
 SOURCE_ITEM_CHECK = {"all": "all", "at least one": "one_or_more"}
+VERSION_OPERATIONS = {"greater than": ("greater_than", "version_greater_than"),
+                      "greater than or equal": ("greater_than_or_equal",
+                                                "version_greater_than_or_equal"),
+                      "less than": ("less_than", "version_less_than"),
+                      "less than or equal": ("less_than_or_equal",
+                                             "version_less_than_or_equal"),
+                      "equals": ("equals", "version_equals")}
 
 
 def ensure(condition, reason):
@@ -74,10 +81,16 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
         expected_test_keys = {"test_title", "capability", "object",
                               "reported_elements", "existence", "match"}
     test_id, old_test = one(a.get("tests"), "mapped Test")
-    object_id, old_object = one(a.get("objects"), "mapped Object")
+    singleton = not a.get("objects")
+    if singleton:
+        object_id, old_object = None, None
+        expected_test_keys.discard("object")
+        ensure(with_state, "objectless direct Test requires a State")
+    else:
+        object_id, old_object = one(a.get("objects"), "mapped Object")
     ensure(a.get("evaluate") == {"test": test_id} and
            set(old_test) == expected_test_keys
-           and old_test["object"] == object_id
+           and (singleton or old_test["object"] == object_id)
            and old_test["reported_elements"] == "all"
            and old_test["match"] in SOURCE_ITEM_CHECK.values(),
            "unsupported Test graph/check")
@@ -87,18 +100,24 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
                and set(old_state) == {"state_title", "capability", "state"}
                and old_state["capability"] == old_test["capability"],
                "unsupported State reference/existence")
-    ensure(set(old_object) == {"capability", "object_title", "select"}
-           and old_object["capability"] == old_test["capability"]
-           and (old_object["object_title"] is None or
-                isinstance(old_object["object_title"], str)),
-           "unsupported Object graph")
+    if not singleton:
+        ensure(set(old_object) == {"capability", "object_title", "select"}
+               and old_object["capability"] == old_test["capability"]
+               and (old_object["object_title"] is None or
+                    isinstance(old_object["object_title"], str)),
+               "unsupported Object graph")
     capability = old_test["capability"]
     catalog_path = catalog_dir / (capability + ".json")
     ensure(catalog_path.is_file() and capability in catalog,
            "unmapped source capability")
     mapping = json.loads(catalog_path.read_text(encoding="utf-8"))
     source = mapping["source"]
-    renames = mapping["native"]["selector_map"]
+    renames = mapping["native"].get("selector_map", {})
+    if singleton:
+        ensure(mapping["native"].get("test_source", {}).get("kind") == "none"
+               and mapping.get("migration_crosswalk", {}).get("object", {}).get(
+                   source["object"]) == "omitted_native_singleton_system_source",
+               "source Object is not an explicitly declared singleton capability")
 
     root = ET.fromstring(source_xml)
     ensure(root.tag == "{" + OD + "}oval_definitions", "not OVAL Definitions")
@@ -154,17 +173,18 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
     original_object = source_by_id(root, original_object_id)
     ensure(original_object.tag == "{" + namespace + "}" + source["object"]
            and set(original_object.attrib) <= {"id", "version", "comment"}
-           and original_object.get("comment") == old_object["object_title"]
+           and (singleton or original_object.get("comment") == old_object["object_title"])
            and original_object.get("version") is not None,
            "source Object type/title/attributes changed")
-    source_selectors = old_object["select"]
-    ensure(isinstance(source_selectors, dict) and bool(source_selectors)
-           and len(source_selectors) == len(original_object)
-           and len(source_selectors) == len(set(source_selectors))
-           and set(source_selectors) <= set(renames),
-           "source Object not direct mapped scalar selectors")
+    source_selectors = {} if singleton else old_object["select"]
+    ensure((singleton and len(original_object) == 0) or
+           (isinstance(source_selectors, dict) and bool(source_selectors)
+            and len(source_selectors) == len(original_object)
+            and len(source_selectors) == len(set(source_selectors))
+            and set(source_selectors) <= set(renames)),
+           "source Object not an empty singleton or direct scalar selectors")
     obj = {}
-    if old_object["object_title"] is not None:
+    if not singleton and old_object["object_title"] is not None:
         obj["object_title"] = old_object["object_title"]
     for node in original_object:
         field = node.tag.rsplit("}", 1)[-1]
@@ -204,36 +224,40 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
                "mapped State must be one literal scalar comparison")
         field = element.tag.rsplit("}", 1)[-1]
         rename = mapping["native"].get("state_field_map", {})
-        ensure(element.tag == "{" + namespace + "}" + field
+        datatype = element.get("datatype", "string")
+        ensure(datatype in {"string", "version"} and
+               element.tag == "{" + namespace + "}" + field
                and field in rename and rename[field] == old_field["field"]
                and not list(element)
                and set(element.attrib) <= {"operation", "datatype", "entity_check",
                                           "entity_existence"}
-               and element.get("datatype", "string") == "string"
                and element.get("entity_check", "all") == "all"
                and element.get("entity_existence", "at_least_one_exists") ==
                    "at_least_one_exists"
-               and old_field["datatype"] == "string"
+               and old_field["datatype"] == datatype
                and old_field["match"] == "all"
                and old_field["existence"] == "one_or_more"
                and (element.text or "") == old_field["value"],
                "source State field/existence/check/value mismatch")
         operation = element.get("operation", "equals")
-        ensure(operation in SOURCE_OPERATIONS
-               and old_field["operation"] == SOURCE_OPERATIONS[operation][0],
+        operation_map = SOURCE_OPERATIONS if datatype == "string" else VERSION_OPERATIONS
+        ensure(operation in operation_map
+               and old_field["operation"] == operation_map[operation][0],
                "source State operation lost by mature 0.3 lowering")
         native_states = [{rename[field]: {
             "require": "at_least_one_exists_and_all_match",
-            SOURCE_OPERATIONS[operation][1]: old_field["value"]}}]
+            operation_map[operation][1]: old_field["value"]}}]
 
     native_id = slug(old_test["test_title"])
     native_test = {
         "test_title": old_test["test_title"], "capability": capability,
-        "object": obj, "reported_elements": "all",
+        "reported_elements": "all",
         "require": ({"items": native_existence} if not with_state else
                     "at_least_one_exists_and_" +
                     ("all_match" if old_test["match"] == "all" else "some_match")),
     }
+    if not singleton:
+        native_test["object"] = obj
     if native_states is not None:
         native_test["states"] = native_states
     candidate = {"assessment": {

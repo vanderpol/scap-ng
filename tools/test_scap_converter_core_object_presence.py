@@ -19,8 +19,10 @@ from v04_native_bundle_compiler import compile_assessment_program
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 IOS = OD + "#ios"
 AIX = OD + "#aix"
+ASA = OD + "#asa"
 ID = "oval:sample.ios:def:1"
 AIX_ID = "oval:sample.aix:def:1"
+ASA_ID = "oval:sample.asa:def:1"
 
 
 def source():
@@ -59,6 +61,27 @@ def scalar_state_source():
   <states><aix:fileset_state id="oval:sample.aix:ste:1" version="1"
       comment="Fileset name equals bos.rte"><aix:flstinst>bos.rte</aix:flstinst>
   </aix:fileset_state></states>
+</oval_definitions>'''.encode()
+
+
+def singleton_version_source():
+    return f'''<oval_definitions xmlns="{OD}" xmlns:asa="{ASA}">
+  <definitions><definition id="{ASA_ID}" class="miscellaneous" version="1">
+    <metadata><title>Check example ASA version</title>
+      <description>Check a native singleton source</description></metadata>
+    <criteria><criterion test_ref="oval:sample.asa:tst:1"/></criteria>
+  </definition></definitions>
+  <tests><asa:version_test id="oval:sample.asa:tst:1" version="1"
+      comment="Compare ASA release" check="at least one"
+      check_existence="at_least_one_exists">
+    <asa:object object_ref="oval:sample.asa:obj:1"/>
+    <asa:state state_ref="oval:sample.asa:ste:1"/>
+  </asa:version_test></tests>
+  <objects><asa:version_object id="oval:sample.asa:obj:1" version="1"/></objects>
+  <states><asa:version_state id="oval:sample.asa:ste:1" version="1">
+    <asa:asa_major_release operation="greater than or equal"
+      datatype="version">9.0</asa:asa_major_release>
+  </asa:version_state></states>
 </oval_definitions>'''.encode()
 
 
@@ -128,6 +151,26 @@ class ObjectPresenceTests(unittest.TestCase):
         self.assertTrue(evidence["original_oval_direct_scalar_state_attested"])
         self.assertFalse(evidence["original_oval_object_presence_attested"])
         self.assertFalse(evidence["scanner_parity"])
+
+    def test_objectless_singleton_version_comparison_preserves_datatype(self):
+        native, evidence = self.conversion(singleton_version_source(), ASA_ID)
+        test = next(iter(native["assessment"]["tests"].values()))
+        self.assertNotIn("object", test)
+        self.assertEqual(test["states"], [{"asa_major_release": {
+            "require": "at_least_one_exists_and_all_match",
+            "version_greater_than_or_equal": "9.0"}}])
+        self.assertEqual(test["require"], "at_least_one_exists_and_some_match")
+        self.assertTrue(evidence["original_oval_direct_scalar_state_attested"])
+        self.assertEqual(compile_assessment_program(native["assessment"])[
+            "test_instructions"][0]["opcode"], "CHECK_SOURCE_EXACT_STATES")
+        self.assertFalse(evidence["scanner_parity"])
+
+    def test_singleton_with_real_selector_is_not_silently_dropped(self):
+        root = ET.fromstring(singleton_version_source())
+        obj = next(n for n in root.iter() if n.get("id") == "oval:sample.asa:obj:1")
+        ET.SubElement(obj, "{" + ASA + "}unsupported").text = "bad"
+        with self.assertRaises(ValueError):
+            self.conversion(ET.tostring(root), ASA_ID)
 
     def test_direct_scalar_state_mutations_fail_closed(self):
         def mutate(source_name, value):
@@ -206,6 +249,7 @@ class ObjectPresenceTests(unittest.TestCase):
         for env_name, definition, cap in (
             ("SCAP_NG_AIX_FILESET_SOURCE_XML", "oval:org.mitre.oval.test:def:241", "aix.fileset"),
             ("SCAP_NG_ASA_LINE_SOURCE_XML", "oval:org.joval.asa.test:def:6", "asa.line"),
+            ("SCAP_NG_ASA_VERSION_SOURCE_XML", "oval:org.joval.asa.test:def:1", "asa.version"),
             ("SCAP_NG_IOS_BGP_SOURCE_XML", "oval:org.joval.ios.test:def:1", "ios.bgpneighbor"),
             ("SCAP_NG_IOS_SECTION_SOURCE_XML", "oval:org.joval.ios.test:def:1", "ios.section"),
         ):
@@ -214,10 +258,10 @@ class ObjectPresenceTests(unittest.TestCase):
                 with self.subTest(source=env_name):
                     native, evidence = convert(Path(value), definition)
                     self.assertEqual(evidence["capability"], cap)
-                    expected = ("at_least_one_exists_and_some_match" if cap == "aix.fileset"
+                    expected = ("at_least_one_exists_and_some_match" if cap in {"aix.fileset", "asa.version"}
                                 else "one_or_more" if cap == "asa.line" else "may_be_absent")
                     self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
-                                     expected if cap == "aix.fileset" else {"items": expected})
+                                     expected if cap in {"aix.fileset", "asa.version"} else {"items": expected})
 
 
 if __name__ == "__main__":
