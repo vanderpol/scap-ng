@@ -38,6 +38,9 @@ python tools/build_versioned_toolchain.py --verify work/toolchain/PATH_TO_TOOLCH
 The first command creates a **candidate snapshot**, not a frozen release.
 A final version requires an immutable `vX.Y.Z` tag (`--require-tag`) plus
 independent clean-install, converter, compiler, signing and conformance gates.
+Older 0.3 snapshots have descriptive `v0.3.0-*` tags. Use
+`--historical --require-tag --ref ACTUAL_V0.3.0_TAG` to reconstruct their
+original source trees without adding newer 0.4 guides or scripts.
 See [the toolchain release policy](../docs/releases/TOOLCHAIN-RELEASES.md)
 and [developer guide index](../docs/developer/README.md). The older `v003`
 converter module is retained as input/semantic infrastructure during 0.4
@@ -46,6 +49,31 @@ consolidation; its existence does not make 0.3 the current output target.
 # 1. Normal human workflows
 
 These are the preferred entry points for routine conversion, normalization, validation, packaging, and review work.
+
+## Convert a verified original OVAL leaf to current 0.4.0 authoring
+
+**Script:** `tools/scap_converter_core.py`
+
+This is the new single-tree converter entry point: it reuses mature 0.3 OVAL
+semantic lowering and mappings, then applies checked native 0.4 promotion and
+compares its result with the independent source importer. The first version
+supports only two proven direct leaf patterns (PowerShell `shellcommand`
+with a direct include Filter, and Windows `registry` string equality with
+the original `only one` Test check). All other inputs error explicitly; use
+the established 0.3 full-review converter below for broader source research.
+
+```powershell
+python tools/scap_converter_core.py ^
+  --source-xml "PATH_TO_ORIGINAL_OVAL.xml" ^
+  --definition-id "oval:example:def:1" ^
+  --output work/assessment-0.4.json ^
+  --evidence work/assessment-0.4-evidence.json
+```
+
+Run from a full checkout with both the 0.3 and 0.4 capability mapping
+directories. The generated file contains one canonical 0.4 Assessment, **not**
+an entire Benchmark, a compiled bundle or scanner proof. See the
+[developer runbook](../docs/developer/CONVERTER-COMPILER-RUNBOOK.md).
 
 ## Convert a pinned SCAP 1.4 package for current full review
 
