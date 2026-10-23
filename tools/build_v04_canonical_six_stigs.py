@@ -34,7 +34,7 @@ from migrate_v04_additional_source_filters import (
 from v04_field_requirement import PAIRS, PRESENCE, promote_test, restore_test
 
 
-def promote(doc, *, provenance=None):
+def promote(doc, *, provenance=None, legacy_review=False):
     new=deepcopy(doc)
     audit=Counter()
     a=new.get("assessment")
@@ -59,7 +59,7 @@ def promote(doc, *, provenance=None):
                 raise ValueError("Inline Object capability conflicts with Test")
             del obj["capability"]
             audit["inline_capabilities_removed"]+=1
-        updated, proof = promote_test(test)
+        updated, proof = promote_test(test, legacy_review=legacy_review)
         test.clear()
         test.update(updated)
         if proof["shape"] != "unchanged":
@@ -70,10 +70,10 @@ def promote(doc, *, provenance=None):
             provenance[tid] = proof
     return new,audit
 
-def recover(candidate,original):
+def recover(candidate,original, *, legacy_review=False):
     """Verify promotion and reconstruct Tests, evaluate spelling and Object metadata."""
     proofs = {}
-    expected, _ = promote(original, provenance=proofs)
+    expected, _ = promote(original, provenance=proofs, legacy_review=legacy_review)
     if candidate != expected:
         raise ValueError("Original authoring source differs after exact reverse translation")
     restored = deepcopy(candidate)

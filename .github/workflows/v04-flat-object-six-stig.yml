@@ -3,9 +3,14 @@ on:
   push:
     branches: [main]
     paths:
+      - 'tools/test_v04_apache_preview_compatibility.py'
+      - 'tests/fixtures/v04-apache-preview/**'
+      - 'tools/v04_field_requirement.py'
+      - 'tools/build_v04_canonical_six_stigs.py'
+      - 'tools/v04_canonical_source_ir.py'
+      - 'tools/validate_v04_fields_condition_preview.py'
       - 'tools/v04_flat_object_authoring.py'
       - 'tools/test_v04_flat_object_authoring.py'
-      - 'tools/validate_v04_fields_condition_preview.py'
       - 'tools/rename_v04_field_requirement_preview.py'
       - 'tools/flatten_v04_object_schema.py'
       - 'tools/generate_capability_schema_v04.py'
@@ -28,7 +33,9 @@ jobs:
       - name: Verify flat Object and hybrid YAML syntax
         env:
           PYTHONPATH: tools
-        run: python tools/test_v04_flat_object_authoring.py -v
+        run: |
+          python tools/test_v04_apache_preview_compatibility.py -v
+          python tools/test_v04_flat_object_authoring.py -v
       - name: Acquire pinned six-STIG field-conditions source
         env:
           GH_TOKEN: ${{ github.token }}
@@ -68,10 +75,9 @@ jobs:
           python - <<'PY'
           from pathlib import Path
           import json
-          from tempfile import TemporaryDirectory
           from v04_a_authoring_graph_index import read_authoring_archive
           from v04_canonical_source_ir import _schema_validators,validate_docs
-          from validate_v04_fields_condition_preview import candidate_schema
+          from validate_v04_fields_condition_preview import native_schema_projection
           from v04_flat_object_authoring import restore_document,dump_hybrid
           p=Path("work/flat")
           original=read_authoring_archive(p/"field-requirement-preview.json.zip","json")
@@ -80,37 +86,37 @@ jobs:
           ledger=json.loads((p/"flat-object-inverse-proof.json").read_text())
           assert len(original)==len(target)==len(yaml)==ledger["documents"]==4001
           assert ledger["catalog_size"]==100 and ledger["changed_objects"]>0
-          with TemporaryDirectory() as temp:
-              validators=_schema_validators(candidate_schema(Path(temp)/"v0.4.0"))
-              # Only the flattened graph conforms to the new native Object
-              # schema. The original is historical pre-migration source,
-              # checked exclusively by exact inverse (not new-schema validation).
-              try:
-                  validate_docs(target,validators)
-              except ValueError:
-                  # Fail closed but expose the *nested* schema reason, rather
-                  # than printing only a truncated Set or Test dictionary.
-                  for path,doc in sorted(target.items()):
-                      errs=list(validators[next(iter(doc))].iter_errors(doc))
-                      if not errs: continue
-                      root=errs[0]
-                      print("FIRST_UNVALIDATED",path, flush=True)
-                      def show(error, depth=0):
-                          print("  "*depth,
-                                "at", list(error.absolute_path),
-                                "validator",error.validator,
-                                "schema_path",list(error.absolute_schema_path),
-                                "reason",str(error.message)[:180],flush=True)
-                          if depth<5:
-                              for child in error.context[:12]:
-                                  show(child,depth+1)
-                      show(root)
-                      break
-                  raise
-              for key,new in target.items():
-                  assert new==yaml[key.removesuffix(".json")+".yaml"],key
-                  reconstructed=restore_document(new,ledger["source_inverse"][key]) if key in ledger["source_inverse"] else new
-                  assert original[key]==reconstructed,key
+          validators=_schema_validators(Path("schema/v0.4.0"))
+          # Historical review output retains its original conditions.
+          # Validate the source-invertible canonical generator view,
+          # while proving exact recovery of the raw preview separately.
+          current_view=native_schema_projection(target)
+          try:
+              validate_docs(current_view,validators)
+          except ValueError:
+              # Fail closed but expose the *nested* schema reason, rather
+              # than printing only a truncated Set or Test dictionary.
+              for path,doc in sorted(current_view.items()):
+                  errs=list(validators[next(iter(doc))].iter_errors(doc))
+                  if not errs: continue
+                  root=errs[0]
+                  print("FIRST_UNVALIDATED",path, flush=True)
+                  def show(error, depth=0):
+                      print("  "*depth,
+                            "at", list(error.absolute_path),
+                            "validator",error.validator,
+                            "schema_path",list(error.absolute_schema_path),
+                            "reason",str(error.message)[:180],flush=True)
+                      if depth<5:
+                          for child in error.context[:12]:
+                              show(child,depth+1)
+                  show(root)
+                  break
+              raise
+          for key,new in target.items():
+              assert new==yaml[key.removesuffix(".json")+".yaml"],key
+              reconstructed=restore_document(new,ledger["source_inverse"][key]) if key in ledger["source_inverse"] else new
+              assert original[key]==reconstructed,key
           # Six representative real complete Assessments for the reviewer.
           samples=p/"samples"
           samples.mkdir(exist_ok=True)

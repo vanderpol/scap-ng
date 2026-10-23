@@ -100,7 +100,7 @@ def build(source_json,source_yaml,output_dir):
     # This compiler checks the entire generated authoring graph, not only
     # the sites modified in the narrow logical scope modernization.
     ir_bytes,report=compile_pair(Path(targets["json"]),Path(targets["yaml"]),
-                                 validate_schema=True)
+                                 validate_schema=True, legacy_review=True)
     return {
         "status":"REVIEW_CANDIDATE_AND_OR_ONLY_SOURCE_INVERSE_PROVEN",
         "source_json_sha256":sha(source_json.read_bytes()),
@@ -111,6 +111,8 @@ def build(source_json,source_yaml,output_dir):
         "changes_per_format":dict(sorted(counts.items())),
         "changed_tests":changes,
         "compiled_ir_checks":report,
+        "schema_validation_view": report["schema_validation_view"],
+        "legacy_source_inverse": report["legacy_source_inverse"],
         "compiled_ir_sha256":sha(ir_bytes),
         "native_040_schema_check":"PASS_ALL_4001_EACH_FORMAT",
         "oval_source_inv_verdict":"PASS_ALL_CHANGED_TESTS",

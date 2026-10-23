@@ -252,9 +252,19 @@ def validate_docs(documents, validators):
                              f"{list(first.absolute_path)}: {first.message[:280]}")
 
 
-def compile_pair(json_archive, yaml_archive, *, validate_schema=True):
+def compile_pair(json_archive, yaml_archive, *, validate_schema=True, legacy_review=False):
     json_docs = read_authoring_archive(json_archive, "json")
     yaml_docs = read_authoring_archive(yaml_archive, "yaml")
+    if legacy_review:
+        # Explicitly selected historical review inputs retain their original
+        # archives/inverse ledgers. Validate and compile the canonical view,
+        # using the same source-invertible generator as current authoring.
+        from validate_v04_fields_condition_preview import native_schema_projection
+        if ({_logical_source(path): doc for path, doc in json_docs.items()} !=
+                {_logical_source(path): doc for path, doc in yaml_docs.items()}):
+            raise ValueError("legacy review JSON/YAML source mismatch")
+        json_docs = native_schema_projection(json_docs)
+        yaml_docs = native_schema_projection(yaml_docs)
     if validate_schema:
         schema_dir = Path(__file__).resolve().parents[1] / "schema/v0.4.0"
         validators = _schema_validators(schema_dir)
@@ -291,6 +301,8 @@ def compile_pair(json_archive, yaml_archive, *, validate_schema=True):
         "source_reconstruction": "PASS",
         "yaml_json_byte_parity": "PASS",
         "native_source_schema": "PASS" if validate_schema else "NOT_TESTED_FIXTURE",
+        **({"schema_validation_view": "CANONICAL_PROJECTION_OF_LEGACY_REVIEW_INPUT",
+            "legacy_source_inverse": "PASS"} if legacy_review else {}),
         "native_executable_compiler_complete": False,
         "signed_bundle": False,
         "scanner_parity": False,

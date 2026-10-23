@@ -83,7 +83,68 @@ def complete_condition(state):
     return condition
 
 
-def promote_test(original):
+def legacy_review_source(test):
+    """Rehydrate the pinned preview's structured Test as source State nodes.
+
+    This is an explicit compatibility boundary, never implicit canonical input
+    repair. Reuse normal source promotion for fields, grouping and fallbacks.
+    No predicate, Item requirement or State/field cardinality is inferred.
+    """
+    source = deepcopy(test)
+    req = source['require']
+    if (set(req) - {'items', 'all_items_must', 'field_requirement'}
+            or req.get('items') not in PAIRS.values()
+            or not isinstance(req.get('all_items_must'), list)
+            or not req['all_items_must'] or 'states' in source):
+        raise ValueError('unsupported legacy review Test requirement')
+
+    def field(predicate):
+        if not isinstance(predicate, dict) or not predicate:
+            raise ValueError('invalid legacy review field predicate')
+        out = deepcopy(predicate)
+        if 'field_requirement' in out:
+            if 'require' in out:
+                raise ValueError('mixed legacy review field requirements')
+            out['require'] = out.pop('field_requirement')
+        return out
+
+    def state(node):
+        if not isinstance(node, dict) or not node:
+            raise ValueError('invalid legacy review condition')
+        scopes = set(node) & {'require', 'state_fields_require', 'field_requirement'}
+        if len(scopes) > 1:
+            raise ValueError('mixed legacy review condition requirements')
+        keys = set(node) - scopes
+        if len(keys) != 1:
+            raise ValueError('ambiguous legacy review condition')
+        key = next(iter(keys))
+        value = node[key]
+        if key in LOGIC:
+            if not isinstance(value, list) or not value:
+                raise ValueError('empty legacy review logical operands')
+            out = {key: [state(child) for child in value]}
+        elif key == 'fields':
+            if not isinstance(value, dict) or not value:
+                raise ValueError('empty legacy review fields')
+            out = {'and': [{name: field(predicate)} for name, predicate in value.items()]}
+        else:
+            out = {key: field(value)}
+        if scopes:
+            out['state_fields_require'] = node[next(iter(scopes))]
+        return out
+
+    source['states'] = [state(node) for node in req['all_items_must']]
+    if len(source['states']) > 1 and 'states_match' not in source:
+        source['states_match'] = 'all'  # all_items_must is a conjunction.
+    if 'field_requirement' in req:
+        if 'state_fields_require' in source:
+            raise ValueError('mixed legacy review Test field requirements')
+        source['state_fields_require'] = req['field_requirement']
+    source['require'] = next(key for key, value in PAIRS.items() if value == req['items'])
+    return source
+
+
+def promote_test(original, *, legacy_review=False):
     """Return canonical/fallback Test and a separate checked inverse ledger."""
     test = deepcopy(original)
     if 'collected_items_require' in test:
@@ -93,6 +154,11 @@ def promote_test(original):
     requirement = test.get('require')
     diagnostic = None
     shape = 'unchanged'
+    if (isinstance(requirement, dict) and legacy_review
+            and not test_validator().is_valid(test)):
+        candidate, proof = promote_test(legacy_review_source(test))
+        return candidate, {**proof, 'source_test': deepcopy(original),
+                           'source_sha256': digest(original), 'legacy_review': True}
     if isinstance(requirement, dict):
         validate_test(test)  # Never guess an import dialect from its nesting.
     elif isinstance(requirement, str):
@@ -144,7 +210,7 @@ def restore_test(candidate, ledger):
     source = ledger['source_test']
     if digest(source) != ledger['source_sha256']:
         raise ValueError('source Test ledger checksum mismatch')
-    projected, proof = promote_test(source)
+    projected, proof = promote_test(source, legacy_review=ledger.get("legacy_review", False))
     if projected != candidate or proof != ledger:
         raise ValueError('source Test inverse/provenance mismatch')
     return deepcopy(source)

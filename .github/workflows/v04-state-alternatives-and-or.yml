@@ -3,6 +3,12 @@ on:
   push:
     branches: [main]
     paths:
+      - 'tools/test_v04_apache_preview_compatibility.py'
+      - 'tests/fixtures/v04-apache-preview/**'
+      - 'tools/v04_field_requirement.py'
+      - 'tools/build_v04_canonical_six_stigs.py'
+      - 'tools/v04_canonical_source_ir.py'
+      - 'tools/validate_v04_fields_condition_preview.py'
       - 'tools/migrate_v04_states_match_to_logic.py'
       - 'tools/test_migrate_v04_states_match_to_logic.py'
       - 'tools/audit_v04_original_state_or_proof.py'
@@ -28,7 +34,9 @@ jobs:
       - name: Test logical AND/OR vocabulary and separate Item cardinalities
         env:
           PYTHONPATH: tools
-        run: python tools/test_v04_logical_and_or_vocab.py -v
+        run: |
+          python tools/test_v04_apache_preview_compatibility.py -v
+          python tools/test_v04_logical_and_or_vocab.py -v
       - name: Test reversibility and six-state AND/OR boundary behavior
         env:
           PYTHONPATH: tools
@@ -92,12 +100,13 @@ jobs:
           import json,zipfile
           from pathlib import Path
           from v04_canonical_source_ir import _schema_validators,validate_docs
+          from validate_v04_fields_condition_preview import native_schema_projection
           bundle=Path('work/normalized/changed-0.4-assessments.json.zip')
           with zipfile.ZipFile(bundle) as z:
               docs={p:json.loads(z.read(p)) for p in z.namelist()}
           validators=_schema_validators(Path('schema/v0.4.0'))
-          validate_docs(docs,validators)
-          print('PASS:',len(docs),'transformed Assessment documents pass 0.4.0 schema')
+          validate_docs(native_schema_projection(docs),validators)
+          print('PASS:',len(docs),'source-invertible canonical Assessment views pass active 0.4.0 schema')
           ledger=json.loads(Path('work/normalized/or-and-scope-corpus-ledger.json').read_text())
           assert ledger['affected_tests']==123
           assert ledger['counts']=={'all':30,'any':93},ledger['counts']

@@ -24,6 +24,7 @@ import shutil
 from v04_canonical_source_ir import _schema_validators,validate_docs,compile_pair
 from v04_a_authoring_graph_index import read_authoring_archive
 from v04_flat_object_authoring import load_catalog, flatten_document, restore_document
+from build_v04_canonical_six_stigs import promote, recover
 
 
 LOGICAL=frozenset(("and","or","one","xor","all","any","odd"))
@@ -32,16 +33,19 @@ LOGICAL=frozenset(("and","or","one","xor","all","any","odd"))
 def native_schema_projection(documents):
     """Versioned projection used ONLY for validation of legacy review inputs.
 
-    The field research ZIPs predate the owner-approved flat Object grammar.
-    Validate their new-schema equivalent, while exact-inverting each Object
-    back to the original before any separate source/field proof.
+    Pinned review ZIPs predate flat Objects and canonical field conditions.
+    Reuse canonical Test generation and Object flattening, verifying their
+    exact source inverses. Never relax active schemas or mutate the input
+    archives and their independent State/field/evaluate migration ledgers.
     """
     catalog=load_catalog(Path(__file__).resolve().parents[1] /
                          "schema/v0.4.0/capability-mappings/supported")
     projected={}
     for path,doc in documents.items():
-        current,proof=flatten_document(doc,catalog)
-        if restore_document(current,proof)!=doc:
+        canonical,_=promote(doc,legacy_review=True)
+        recover(canonical,doc,legacy_review=True)
+        current,proof=flatten_document(canonical,catalog)
+        if restore_document(current,proof)!=canonical:
             raise ValueError("Legacy Object source inverse failed: "+path)
         projected[path]=current
     return projected

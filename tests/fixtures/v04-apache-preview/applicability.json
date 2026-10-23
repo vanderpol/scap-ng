@@ -1,0 +1,45 @@
+{
+  "assessment": {
+    "id": "platform.cpe-apache-http-server-2-4.assessment",
+    "version": 3,
+    "assessment_title": "Apache 2.4 UNIX",
+    "mode": "automated",
+    "class": "inventory",
+    "purpose": "applicability",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "gather-all-installation-directories-from-running-apache-httpd-processes-test": {
+        "test_title": "Gather all installation directories from running apache httpd processes",
+        "capability": "independent.shellcommand",
+        "object": {
+          "object_title": "Gather unique apache http installation paths",
+          "collect": {
+            "shell": "bash",
+            "command": "ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq",
+            "pattern": "^\\/\\S+(\\/httpd|\\/apache2)\\s*",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "items": "one_or_more",
+          "all_items_must": [
+            {
+              "stdout_line": {
+                "require": "at_least_one_exists_and_all_match",
+                "matches_regex": "^/"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "evaluate": {
+      "test": "gather-all-installation-directories-from-running-apache-httpd-processes-test"
+    }
+  }
+}

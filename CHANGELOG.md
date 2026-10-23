@@ -8,6 +8,14 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- Repaired historical six-STIG preview validation/compilation by explicitly
+  projecting legacy structured conditions and Object wrappers through the
+  canonical generator. The pinned Apache `stdout_line` condition and named
+  shell Object examples now validate under the active schema; original
+  archives and source-inverse ledgers remain unchanged. Validators stay strict.
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+  [#239](https://github.com/vanderpol/scap-ng/issues/239)
+
 - Canonical six-STIG generation now emits `evaluate.and/or/xor`, using the
   existing reversible migration while retaining legacy input compatibility.
   Private inline/local Objects omit null `object_title`, including nested Set

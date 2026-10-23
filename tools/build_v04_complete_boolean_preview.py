@@ -26,6 +26,7 @@ from hashlib import sha256
 from migrate_v04_evaluate_and_or import migrate,assert_inverse
 from build_v04_and_or_candidate import _archive_raw,_writestr,canonical
 from v04_canonical_source_ir import _schema_validators,validate_docs,compile_pair
+from validate_v04_fields_condition_preview import native_schema_projection
 
 
 def digest(path):
@@ -155,7 +156,7 @@ def build(source_json,source_yaml,destination):
         _,schema=candidate_schema(Path(td)/"v0.4.0")
         validators=_schema_validators(Path(td)/"v0.4.0")
         for kind in ("json","yaml"):
-            validate_docs({path:d["data"] for path,d in results[kind].items()},
+            validate_docs(native_schema_projection({path:d["data"] for path,d in results[kind].items()}),
                           validators)
         (destination/"expression.candidate-only.schema.json").write_text(
             json.dumps(schema,indent=2)+"\n")
@@ -176,7 +177,7 @@ def build(source_json,source_yaml,destination):
     # Run the maintained v0.4 source graph compiler against the source
     # authoring we can EXACTLY reconstruct, not the as-yet-unaccepted
     # new-wire-grammar. Both old input source formats passed active schema.
-    _,rep=compile_pair(source_json,source_yaml,validate_schema=True)
+    _,rep=compile_pair(source_json,source_yaml,validate_schema=True,legacy_review=True)
     if (rep.get("source_reconstruction")!="PASS" or
         rep.get("yaml_json_byte_parity")!="PASS" or
         rep.get("documents")!=4001):
@@ -185,7 +186,7 @@ def build(source_json,source_yaml,destination):
     # deprecated all/any/odd spellings. Require the maintained full
     # source-IR compiler to consume the NEW candidate archives directly,
     # not only a reconstructed copy of the pre-migration files.
-    _,candidate_ir=compile_pair(generated["json"],generated["yaml"],validate_schema=True)
+    _,candidate_ir=compile_pair(generated["json"],generated["yaml"],validate_schema=True,legacy_review=True)
     if (candidate_ir.get("source_reconstruction")!="PASS" or
         candidate_ir.get("yaml_json_byte_parity")!="PASS" or
         candidate_ir.get("native_source_schema")!="PASS" or
@@ -205,6 +206,8 @@ def build(source_json,source_yaml,destination):
         "documents":4001,
         "reversible_evaluate_sites":ledgers,
         "candidate_expression_schema":"STRICT_NEW_SPELLINGS_ONLY_PASS",
+        "schema_validation_view": candidate_ir["schema_validation_view"],
+        "legacy_source_inverse": candidate_ir["legacy_source_inverse"],
         "published_040_schema_changed":False,
         "source_assessment_field_requirements_changed":False,
         "source_item_cardinality_changed":False,
