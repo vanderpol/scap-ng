@@ -99,6 +99,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Reused previously audited 0.4 Boolean, string and integer OVAL datatype
+  importers as independent lockstep oracles for the mature 0.3-backed core.
+  Three pinned original Self-Assertion Definitions spanning **38 OVAL Tests**
+  retain source literal lexemes, nested AND/NOT, typed State comparisons and
+  per-Test quantifiers. Immutable source checksum and deliberately corrupted
+  0.3 semantic graphs fail closed; other datatype suites remain outside the
+  admitted source subset.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Added a reproducible public native compiler CLI smoke gate using one
   schema-valid Benchmark/Rule/Assessment source package and independently
   serialized JSON/YAML authoring archives. Both CLI paths produce byte-for-byte

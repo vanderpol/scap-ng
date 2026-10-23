@@ -32,6 +32,9 @@ from convert_v04_oval_independent_variable_test import (
 from convert_v04_oval_constant_variable_matrix import (
     convert as independent_constant_matrix_import, CASES as CONSTANT_MATRIX_CASES,
 )
+from convert_v04_oval_variable_datatype_suite import (
+    convert as independent_datatype_suite_import, CASES as DATATYPE_SUITE_CASES,
+)
 from import_v04_oval_leaf_pilot import convert as independent_leaf_import
 from oval_semantic_ir import parse as parse_oval_semantic_ir
 from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
@@ -42,7 +45,10 @@ from v04_native_bundle_compiler import compile_test_instruction
 from v04_source_verified_object_presence import convert as project_object_presence
 from v04_source_verified_multitest_presence import convert as project_direct_multitest
 from v04_source_verified_multitest_states import convert as project_direct_multistate
-from v04_source_verified_constant_variable_matrix import project as project_constant_matrix
+from v04_source_verified_constant_variable_matrix import (
+    project as project_constant_matrix, project_datatype_suite,
+    DATATYPE_REUSE_CASES,
+)
 
 
 def require(ok, reason):
@@ -398,6 +404,9 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     family_source = definition_id == "oval:org.mitre.oval.test:def:95"
     constant_matrix_source = definition_id in {
         source_id for source_id, _ in CONSTANT_MATRIX_CASES.values()}
+    datatype_suite_name = next(
+        (name for name in DATATYPE_REUSE_CASES
+         if DATATYPE_SUITE_CASES[name][0] == definition_id), None)
     if variable_source:
         # A separately source-audited and source-roundtrip-proved 0.4 adapter.
         independent, independent_proof = independent_variable_import(original)
@@ -419,6 +428,13 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
             original, pinned_filename)
         require(independent_proof["original_definition_id"] == definition_id,
                 "pinned integer constant Variable Definition identity mismatch")
+        if assessment_id:
+            independent["assessment"]["id"] = assessment_id
+    elif datatype_suite_name:
+        independent, independent_proof = independent_datatype_suite_import(
+            original, datatype_suite_name)
+        require(independent_proof["original_definition_id"] == definition_id,
+                "pinned datatype suite Definition identity mismatch")
         if assessment_id:
             independent["assessment"]["id"] = assessment_id
     else:
@@ -448,7 +464,9 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
               if variable_source else project_v003_family_to_v04(aligned, provenance)
               if family_source else project_constant_matrix(aligned, provenance, original,
                                                              independent_proof)
-              if constant_matrix_source else project_object_presence(
+              if constant_matrix_source else project_datatype_suite(
+                  aligned, provenance, original, datatype_suite_name)
+              if datatype_suite_name else project_object_presence(
                   aligned, original, definition_id, provenance,
                   Path(__file__).resolve().parents[1] /
                   "schema/v0.4.0/capability-mappings/supported", flat_catalog())
@@ -464,14 +482,14 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     # The independent original-OVAL importer predates the final flat Object
     # syntax. Normalize it using the *same invertible* approved 0.4 pass;
     # compare executable fields only after both are in canonical 0.4 grammar.
-    if (variable_source or family_source or constant_matrix_source
+    if (variable_source or family_source or constant_matrix_source or datatype_suite_name
             or object_presence or multi_direct_presence):
         independent_flat = independent
     else:
         independent_flat, flat_proof = flatten_document(independent, flat_catalog())
         require(restore_document(independent_flat, flat_proof) == independent,
                 "independent OVAL leaf normalization not invertible")
-    if variable_source or family_source or constant_matrix_source:
+    if variable_source or family_source or constant_matrix_source or datatype_suite_name:
         # The two-leaf comparator intentionally rejects these distinct source
         # shapes; compare the complete independently generated Assessment.
         require(native == independent_flat,
@@ -479,7 +497,9 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     elif not object_presence and not multi_direct_presence:
         compare_independent(native, independent_flat)  # Author identities only ignored.
     evidence = {
-        "status": ("V003_SHARED_LOWERING_TO_CANONICAL_V04_CONSTANT_VARIABLE_MATRIX_LOCKSTEP"
+        "status": ("V003_SHARED_LOWERING_TO_CANONICAL_V04_TYPED_CONSTANT_VARIABLE_LOCKSTEP"
+                   if datatype_suite_name else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_CONSTANT_VARIABLE_MATRIX_LOCKSTEP"
                    if constant_matrix_source else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_VARIABLE_FOUR_WAY_LOCKSTEP"
                    if variable_source else
@@ -498,11 +518,11 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
         "v004_flat_and_requirement_inverse_checked": not(
-            variable_source or family_source or constant_matrix_source
+            variable_source or family_source or constant_matrix_source or datatype_suite_name
             or object_presence or multi_direct_presence),
         "v004_flat_object_inverse_checked": object_presence or multi_direct_presence,
         "independent_leaf_import_agreement": not(
-            variable_source or family_source or constant_matrix_source
+            variable_source or family_source or constant_matrix_source or datatype_suite_name
             or object_presence or multi_direct_presence),
         "original_oval_object_presence_attested": object_presence and not direct_scalar_state,
         "original_oval_direct_scalar_state_attested": direct_scalar_state,
@@ -511,6 +531,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         "independent_variable_import_agreement": variable_source,
         "independent_family_import_agreement": family_source,
         "independent_constant_variable_matrix_agreement": constant_matrix_source,
+        "independent_datatype_suite_agreement": bool(datatype_suite_name),
         "full_oval_coverage": False, "scanner_parity": False,
     }
     return native, evidence

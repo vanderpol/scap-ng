@@ -18,11 +18,11 @@ from v04_native_bundle_compiler import compile_assessment_program
 
 PINNED = (
     ("SCAP_NG_FILEVAULT_SOURCE_XML", "oval:org.joval.test:def:120002",
-     "macos.filevault", "ac0bafaa035cc59b2ce28298138053403e50d7eeb7ec19df8764e406a2cf4036"),
+     "macos.filevault", "83a66de7e3f997cfad206ff33335e28b939717738003329d5c4be0c630e3d22d"),
     ("SCAP_NG_FIRMWAREPASSWORD_SOURCE_XML", "oval:org.joval.test:def:220002",
-     "macos.firmwarepassword", "4618f74e895c25e92d77d962699d9e808c6223d2d8feabe019d6119e265eaf13"),
+     "macos.firmwarepassword", "200c768c7add252fb437f3d38b2bcdb839a12b119d1c7af36c82b316d6c01bd2"),
     ("SCAP_NG_PROFILES_SOURCE_XML", "oval:org.joval.test:def:320002",
-     "macos.profiles", "ec796bbee784abdde34338a99c39fd0479c61021571803ca2521dcac6af65bc6"),
+     "macos.profiles", "21c845bb2076a939d216ca9ea8fa37c1dc783ded7d04a881e274b70df8c6abce"),
 )
 
 

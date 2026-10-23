@@ -42,6 +42,10 @@ python tools/test_v04_public_cli_smoke.py -v
 SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML=/path/to/oval-def_constant_variable.xml \
 SCAP_NG_CHECK_ENUMERATION_SOURCE_XML=/path/to/oval_check_enumeration_variable_values.xml \
   python tools/test_scap_converter_core_constant_matrix.py -v
+SCAP_NG_BOOLEAN_DATATYPE_SOURCE_XML=/path/to/oval_boolean_datatype.xml \
+SCAP_NG_STRING_DATATYPE_SOURCE_XML=/path/to/oval_string_datatype.xml \
+SCAP_NG_INT_DATATYPE_SOURCE_XML=/path/to/oval_int_datatype.xml \
+  python tools/test_v04_source_verified_constant_datatypes.py -v
 python tools/test_oval_semantic_core_preservation.py -v
 # With the pinned source available (see below):
 SCAP_NG_VARIABLE_SOURCE_XML=/path/to/ind-def_variable_test.xml \
@@ -137,12 +141,23 @@ source-pinned OVAL importer supplies a whole-Assessment differential oracle.
 Original SHA drift, lost source references and changed 0.3 predicates cause
 hard errors. This is two reviewed source files, not general Variable coverage.
 
+The already implemented source-pinned OVAL datatype importer supplies an
+independent comparator for **three more 0.3-backed typed constant-Variable
+suites** (Boolean, string and integer; 8, 10 and 20 original Tests).
+The mature 0.3 graph retains Test quantifiers, nested AND/NOT branches and
+typed comparisons, while the source attestations check literal lexemes and
+every original Variable, Test and State binding. The shared core emits the
+native version only if its complete Assessment matches that prior importer.
+Other typed suites remain separately reviewed, not yet core-integrated.
+
 For source regressions, retrieve only the immutable
 [`e3538595` Self-Assertion source](https://github.com/OVAL-Community/SCAP-Self-Assertion/commit/e3538595c5083b9c34d937a81d319234df9bbfaa)
 at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus
 `agnostic/oval-def_constant_variable.xml`,
 `agnostic/oval_check_enumeration_variable_values.xml`,
+`agnostic/oval_boolean_datatype.xml`, `agnostic/oval_string_datatype.xml`,
+`agnostic/oval_int_datatype.xml`,
 `aix/aix-def_fileset_test.xml`, `asa/asa-def_line_test.xml`,
 `asa/asa-def_version_test.xml`,
 `ios/ios-def_global_test.xml`,
