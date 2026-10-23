@@ -38,6 +38,12 @@ alignment. A distinct 0.4 projection reuses the verified flat-Object and
 requirement transformations, validates the Test through the native 0.4
 compiler, and checks source-exact agreement with the independently developed
 original-OVAL importer (normalized to final flat-Object syntax).
+The checkout must contain both `schema/v0.3.0/capability-mappings/supported/`
+and `schema/v0.4.0/capability-mappings/supported/`. In particular the mature
+0.3 mapper represents a direct shell Filter using an intermediate single
+UNION Set operand; the 0.4 adapter admits that exact source-proven shape,
+while real original OVAL Sets remain unsupported. Missing 0.3 mappings are
+an error, never an implied conversion fallback.
 
 **Supported in this checkpoint:** one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`

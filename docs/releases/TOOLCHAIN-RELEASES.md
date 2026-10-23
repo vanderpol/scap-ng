@@ -73,6 +73,24 @@ python tools/build_versioned_toolchain.py --repo . --version 0.4.0 \
   --ref v0.4.0 --require-tag --output-dir work/toolchain
 ```
 
+The existing 0.3.0 checkpoints use **descriptive version tags**, not a plain
+`v0.3.0` final release tag. For example, the actual tag
+`v0.3.0-verified-authoring-and-bundles-38422154466` identifies a preserved
+historical source tree. To reconstruct a complete, unchanged source snapshot
+from that tag using the current archival packager:
+
+```bash
+python tools/build_versioned_toolchain.py --repo . --version 0.3.0 \
+  --ref v0.3.0-verified-authoring-and-bundles-38422154466 \
+  --historical --require-tag --output-dir work/historical-toolchain
+```
+
+The `--historical` mode requires a real, version-matched descriptive Git tag
+and preserves only what existed at the time. It deliberately does **not**
+inject modern implementation guides or 0.4 tools into old source. This
+reconstructs historical *source*, not necessarily the exact previously
+published 0.3 ZIP, its dependency environment or executable behavior.
+
 Any downloaded ZIP can be independently checked without a Git checkout using
 `python tools/build_versioned_toolchain.py --verify PATH_TO_TOOLCHAIN.zip`.
 Its companion `SHA256SUMS.txt` verifies the complete archive bytes.

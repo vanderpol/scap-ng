@@ -8,6 +8,11 @@ proposals are not listed as delivered features.
 
 ### Developer toolchain release infrastructure
 
+- Added explicit historical version-tag source reconstruction for older 0.3
+  snapshots that predate the 0.4 developer-guide layout; source archives stay
+  version-accurate and do not silently mix new scripts with old schemas.
+  [#27](https://github.com/vanderpol/scap-ng/issues/27)
+
 - Added an integrity-checked, deterministic source-toolchain archive builder,
   a read-only standalone verifier and focused tamper/missing-doc regression
   tests. A manual GitHub workflow can checkpoint the complete committed source,

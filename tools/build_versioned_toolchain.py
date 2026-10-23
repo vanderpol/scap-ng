@@ -80,7 +80,10 @@ def _check_required(entries: dict[str, tuple[bytes, int]], version: str, *, curr
     missing = [path for path in required if path not in entries]
     if missing:
         raise ValueError("source snapshot lacks required release inputs: " + ", ".join(missing))
-    for prefix in ("tools/", "tests/", "schema/", "specification/", "docs/"):
+    prefixes = ("tools/", "tests/", "schema/", "specification/")
+    if current:
+        prefixes += ("docs/",)
+    for prefix in prefixes:
         if not any(path.startswith(prefix) for path in entries):
             raise ValueError(f"source snapshot lacks {prefix}")
 
@@ -89,8 +92,13 @@ def build(repo: Path, out: Path, version: str, *, ref: str = "HEAD", current: bo
           require_tag: bool = False) -> tuple[Path, dict]:
     if not VERSION_RE.fullmatch(version):
         raise ValueError(f"invalid SCAP-NG version: {version!r}")
-    if require_tag and ref != "v" + version:
-        raise ValueError("release toolchains must use the exact vX.Y.Z tag")
+    if require_tag:
+        if current and ref != "v" + version:
+            raise ValueError("release toolchains must use the exact vX.Y.Z tag")
+        if not current and not ref.startswith("v" + version + "-"):
+            raise ValueError("historical snapshots require a vX.Y.Z-* tag")
+        # An identically named branch is not an immutable release tag.
+        _git(repo, "show-ref", "--verify", "--quiet", "refs/tags/" + ref)
     commit, entries = _archive_entries(repo, ref)
     _check_required(entries, version, current=current)
     root = f"scap-ng-{version}-toolchain/"
@@ -108,19 +116,25 @@ def build(repo: Path, out: Path, version: str, *, ref: str = "HEAD", current: bo
         "validation_level": "source_snapshot_only; no scanner or OVAL semantic parity claim",
         "normative_specification": "specification/",
         "schema": f"schema/v{version}/",
-        "developer_guides": "docs/developer/",
+        "developer_guides": "docs/developer/" if current else None,
         "operator_guide": "tools/HUMAN-RUNNABLE-SCRIPTS.md",
+        "snapshot_kind": "current_release_candidate" if current else "historical_tag_source_reconstruction",
         "entrypoints": {
-            "current_0_4_oval_converter_proven_leaf_subset": "tools/scap_converter_core.py",
-            "current_native_0_4_compiler": "tools/v04_native_bundle_compiler.py",
+            **({"current_0_4_oval_converter_proven_leaf_subset": "tools/scap_converter_core.py",
+                "current_native_0_4_compiler": "tools/v04_native_bundle_compiler.py"}
+               if current else {}),
             "historical_0_3_conversion_engine": "tools/scap_upconvert_v003/convert_full_review.py",
             "version_independent_oval_ir": "tools/oval_semantic_ir.py",
         },
-        "known_gaps": [
+        "known_gaps": ([
             "The shared 0.3-derived 0.4 importer currently proves only two leaf shapes, not full OVAL conversion.",
             "This source snapshot is not an approved interoperable release or a conformance result.",
             "Publisher identity/trust, runtime semantic parity and dependency locking require separate gates.",
-        ],
+        ] if current else [
+            "Historical tag source is preserved unchanged; modern developer guides were not present at this tag.",
+            "This is a reconstructed source archive, not a replacement for historical published assets.",
+            "Historical runtime dependencies, authoring/build outputs and scanner parity require separate verification.",
+        ]),
         "files": records,
     }
     out.mkdir(parents=True, exist_ok=True)
@@ -179,10 +193,12 @@ def main() -> None:
     ap.add_argument("--ref", default="HEAD")
     ap.add_argument("--output-dir", type=Path)
     ap.add_argument("--require-tag", action="store_true")
+    ap.add_argument("--historical", action="store_true",
+                    help="Reconstruct exact source from an older descriptive vX.Y.Z-* tag; do not require modern 0.4 guides")
     ap.add_argument("--verify", type=Path, help="Verify an existing toolchain ZIP without a Git checkout")
     args = ap.parse_args()
     if args.verify:
-        if args.version or args.output_dir or args.require_tag:
+        if args.version or args.output_dir or args.require_tag or args.historical:
             ap.error("--verify is independent of build options")
         checked = verify(args.verify)
         print(json.dumps({"archive": str(args.verify), "source_commit": checked["source_commit"],
@@ -191,7 +207,8 @@ def main() -> None:
     if not args.version or not args.output_dir:
         ap.error("--version and --output-dir are required for building")
     target, manifest = build(args.repo, args.output_dir, args.version,
-                             ref=args.ref, require_tag=args.require_tag)
+                             ref=args.ref, current=not args.historical,
+                             require_tag=args.require_tag)
     print(json.dumps({"archive": str(target), "source_commit": manifest["source_commit"],
                       "files": len(manifest["files"]), "validation": manifest["validation_level"]}))
 

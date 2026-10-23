@@ -76,6 +76,37 @@ class ToolchainTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "digest mismatch"):
             tool.verify(bad)
 
+    def test_historical_descriptive_tag_reconstructs_old_tree_without_new_guides(self):
+        legacy = self.root / "historical-source"
+        legacy.mkdir()
+        git(legacy, "init", "-q")
+        git(legacy, "config", "user.email", "test@example.invalid")
+        git(legacy, "config", "user.name", "Test")
+        for name in [*tool.COMMON_REQUIRED, "schema/v0.3.0/README.md",
+                     "tests/old-oval-coverage.xml"]:
+            target = legacy / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text("old-source " + name + "\n", encoding="utf-8")
+        git(legacy, "add", ".")
+        git(legacy, "commit", "-qm", "old schema converter and specification")
+        tag = "v0.3.0-verified-authoring-and-bundles-fixture"
+        git(legacy, "tag", tag)
+        a, manifest = tool.build(legacy, self.root / "archive", "0.3.0",
+                                 ref=tag, current=False, require_tag=True)
+        self.assertEqual(tool.verify(a), manifest)
+        self.assertEqual(manifest["snapshot_kind"], "historical_tag_source_reconstruction")
+        self.assertIsNone(manifest["developer_guides"])
+        self.assertNotIn("current_native_0_4_compiler", manifest["entrypoints"])
+        with ZipFile(a) as zf:
+            self.assertIn("scap-ng-0.3.0-toolchain/tests/old-oval-coverage.xml", zf.namelist())
+            self.assertNotIn("scap-ng-0.3.0-toolchain/docs/developer/README.md", zf.namelist())
+        with self.assertRaisesRegex(ValueError, "historical snapshots require"):
+            tool.build(legacy, self.root / "wrong", "0.3.0", ref="HEAD",
+                       current=False, require_tag=True)
+        with self.assertRaisesRegex(ValueError, "source snapshot lacks required"):
+            tool.build(legacy, self.root / "wrong2", "0.3.0", ref=tag,
+                       current=True)
+
 
 if __name__ == "__main__":
     unittest.main()

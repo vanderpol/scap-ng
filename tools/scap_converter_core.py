@@ -50,11 +50,13 @@ def literal_selector(value, field):
 
 
 def scalar_state(entry, field, operation):
+    # Mature 0.3 capability mappings canonicalize OVAL entity_check and
+    # check_existence into match/existence, and operation into snake_case.
     exact_keys(entry, {"field", "value", "operation", "datatype",
-                       "entity_check", "entity_existence"}, "State predicate")
+                       "match", "existence"}, "mapped 0.3 State predicate")
     require(entry["field"] == field and entry["operation"] == operation
-            and entry["datatype"] == "string" and entry["entity_check"] == "all"
-            and entry["entity_existence"] == "at_least_one_exists"
+            and entry["datatype"] == "string" and entry["match"] == "all"
+            and entry["existence"] == "one_or_more"
             and isinstance(entry["value"], str),
             "State predicate falls outside proven string/quantifier mapping")
     return entry["value"]
@@ -76,10 +78,10 @@ def project_v003_to_v04(v003):
     require(obj_id == object_id, "Test must reference its unique source Object")
     cap = old_test.get("capability")
     require(source_obj.get("capability") == cap, "Object/Test capability mismatch")
-    require(set(old_test) in ({"test_title", "capability", "object", "check_existence", "check", "reported_elements"},
-                              {"test_title", "capability", "object", "check_existence", "check", "states", "reported_elements"}),
+    require(set(old_test) in ({"test_title", "capability", "object", "existence", "match", "reported_elements"},
+                              {"test_title", "capability", "object", "existence", "match", "states", "reported_elements"}),
             "unsupported Test source attributes")
-    require(old_test.get("check_existence") == "at_least_one_exists"
+    require(old_test.get("existence") == "one_or_more"
             and old_test.get("reported_elements") == "all", "unproven Test existence/report policy")
     require(not a.get("variables"), "Variables require their own 0.4 semantic proof")
     require(a.get("mode") == "automated" and a.get("class") in {"inventory", "compliance"},
@@ -88,22 +90,39 @@ def project_v003_to_v04(v003):
     require(isinstance(source_obj.get("object_title"), str), "Object title missing")
 
     if cap == "independent.shellcommand":
-        require(old_test.get("check") == "all" and "states" not in old_test,
+        require(old_test.get("match") == "all" and "states" not in old_test,
                 "shell Test supports presence only; Filter predicates are separate")
-        exact_keys(source_obj, {"capability", "select", "filters", "object_title"}, "shell Object")
-        selectors = source_obj["select"]
-        exact_keys(selectors, {"shell", "command"}, "shell selectors")
-        shell = literal_selector(selectors["shell"], "shell")
-        command = literal_selector(selectors["command"], "command")
+        # The *0.3 mapper*, not the original OVAL, wraps a direct-filtered
+        # shell Object in a single-operand UNION Set. Verify that synthetic
+        # wrapper precisely before rendering the original direct Filter.
+        exact_keys(source_obj, {"capability", "set", "object_title"}, "mapped shell Object")
+        set_expr = source_obj["set"]
+        exact_keys(set_expr, {"operator", "operands"}, "mapped shell Set")
+        require(set_expr["operator"] == "union"
+                and isinstance(set_expr["operands"], list)
+                and len(set_expr["operands"]) == 1, "unproven Set/Filter lowering")
+        operand = set_expr["operands"][0]
+        exact_keys(operand, {"object", "filters"}, "mapped direct Filter operand")
+        inner = operand["object"]
+        exact_keys(inner, {"capability", "object_title", "collect"}, "mapped shell leaf")
+        require(inner["capability"] == cap and inner["object_title"] == source_obj["object_title"],
+                "mapped shell Set/Object identity mismatch")
+        selectors = inner["collect"]
+        exact_keys(selectors, {"shell", "command", "error_if_exit_status_not_0",
+                               "error_if_stderr_exists"}, "mapped shell acquisition")
+        shell, command = selectors["shell"], selectors["command"]
         require(shell == "powershell" and bool(command), "unsupported shell command source")
-        require(len(source_obj["filters"]) == 1, "shell leaf requires one direct Filter")
-        fil = source_obj["filters"][0]
+        require(selectors["error_if_exit_status_not_0"] is False
+                and selectors["error_if_stderr_exists"] is False,
+                "non-default shell error policy")
+        require(len(operand["filters"]) == 1, "shell leaf requires one direct Filter")
+        fil = operand["filters"][0]
         exact_keys(fil, {"action", "state"}, "shell Filter")
         require(fil["action"] == "include", "unproven Filter action")
         state_id, state = only_entry(a.get("states"), "Filter State")
         require(fil["state"] == state_id and state.get("capability") == cap,
                 "source Filter State binding mismatch")
-        value = scalar_state(state.get("state"), "stdout_line", "case insensitive equals")
+        value = scalar_state(state.get("state"), "stdout_line", "case_insensitive_equals")
         test = {"test_title": old_test["test_title"], "capability": cap,
                 "object": {"object_title": source_obj["object_title"],
                            "collect": {"shell": shell, "command": command,
@@ -114,14 +133,14 @@ def project_v003_to_v04(v003):
                                "case_insensitive_equals": value}}}]},
                 "reported_elements": "all", "require": {"items": "one_or_more"}}
     elif cap == "windows.registry":
-        require(old_test.get("check") == "only one" and len(old_test.get("states", [])) == 1,
+        require(old_test.get("match") == "one" and len(old_test.get("states", [])) == 1,
                 "unsupported registry Test check or State count")
         exact_keys(source_obj, {"capability", "select", "object_title"}, "registry Object")
         selectors = source_obj["select"]
         exact_keys(selectors, {"hive", "key", "name"}, "registry selectors")
         values = {key: literal_selector(selectors[key], key)
-                  for key in ("hive", "key", "name")}
-        require(values["hive"] == "HKEY_LOCAL_MACHINE"
+                  for key in ("key", "name")}
+        require(selectors["hive"] == "local_machine"
                 and bool(values["key"] and values["name"]), "unproven registry selectors")
         state_id, state = only_entry(a.get("states"), "registry State")
         require(old_test["states"] == [state_id] and state.get("capability") == cap,
@@ -161,6 +180,10 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     """Use existing semantic IR + v003 lowering, then fail-closed v04 projection."""
     source_path = Path(source_path)
     original = source_path.read_bytes()
+    mappings = Path(__file__).resolve().parents[1] / "schema/v0.3.0/capability-mappings/supported"
+    require((mappings / "independent.shellcommand.json").is_file()
+            and (mappings / "windows.registry.json").is_file(),
+            "complete 0.3 capability mapping files required (no unmapped fallback)")
     ir = parse_oval_semantic_ir(source_path)
     require(not ir["unresolved_references"], "unresolved OVAL references")
     definitions = [d for d in ir["definitions"] if d["id"] == definition_id]

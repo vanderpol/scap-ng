@@ -108,7 +108,7 @@ class SharedConverterIntegrationTests(unittest.TestCase):
             aligned, report = postprocess_automated_assessment(*args, **kwargs)
             aligned = deepcopy(aligned)
             obj = next(iter(aligned["assessment"]["objects"].values()))
-            obj["select"]["command"]["value"] = "Get-PnpDevice -class camera"
+            obj["set"]["operands"][0]["object"]["collect"]["command"] = "Get-PnpDevice -class camera"
             return aligned, report
 
         path = fixture_path(self.directory, "input.xml", shell_source())
