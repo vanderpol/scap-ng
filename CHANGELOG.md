@@ -19,6 +19,14 @@ proposals are not listed as delivered features.
 
 ### Developer toolchain release infrastructure
 
+- Added a bounded Python 3.12 clean-extract smoke gate for the HEAD 0.4.0
+  source toolchain. It verifies the ZIP/checksums, converts one pinned original
+  OVAL family Definition using extracted tools, compiles and verifies its
+  schema-valid Benchmark graph, and runs the extracted public CLI smoke test.
+  Evidence is retained as CI artifacts; no release or scanner claim is made.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#27](https://github.com/vanderpol/scap-ng/issues/27)
+
 - Added explicit historical version-tag source reconstruction for older 0.3
   snapshots that predate the 0.4 developer-guide layout; source archives stay
   version-accurate and do not silently mix new scripts with old schemas.
