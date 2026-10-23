@@ -99,6 +99,22 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Added a reproducible public native compiler CLI smoke gate using one
+  schema-valid Benchmark/Rule/Assessment source package and independently
+  serialized JSON/YAML authoring archives. Both CLI paths produce byte-for-byte
+  identical verified `.scapng` bundles. The separate OVAL-to-Assessment
+  converter still requires a Benchmark/Rule packaging handoff; no one-command
+  raw OVAL-to-bundle workflow is claimed.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
+- Extended source-attested empty singleton OVAL Object conversion to no-State
+  presence-only Tests, reusing the single maintained 0.3-backed projector.
+  Three pinned real macOS checks (FileVault, firmware password, profiles)
+  receive explicit original-object migration crosswalks; original-source,
+  existence-quantifier, missing-crosswalk and 0.3-drift regressions fail closed.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Extended the established single-Test source-attested scalar-State adapter
   across flat multi-Test AND criteria without a parallel importer. Each
   original OVAL Test/Object/State pair is checked independently, including

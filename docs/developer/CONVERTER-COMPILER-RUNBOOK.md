@@ -34,6 +34,11 @@ python tools/test_scap_converter_core_multitest.py -v
 SCAP_NG_IOS_LINE_SOURCE_XML=/path/to/ios-def_line_test.xml \
 SCAP_NG_IOSXE_LINE_SOURCE_XML=/path/to/iosxe-def_line_test.xml \
   python tools/test_scap_converter_core_multistate.py -v
+SCAP_NG_FILEVAULT_SOURCE_XML=/path/to/macos-def_filevault_test.xml \
+SCAP_NG_FIRMWAREPASSWORD_SOURCE_XML=/path/to/macos-def_firmwarepassword_test.xml \
+SCAP_NG_PROFILES_SOURCE_XML=/path/to/macos-def_profiles_test.xml \
+  python tools/test_scap_converter_core_singleton_presence.py -v
+python tools/test_v04_public_cli_smoke.py -v
 SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML=/path/to/oval-def_constant_variable.xml \
 SCAP_NG_CHECK_ENUMERATION_SOURCE_XML=/path/to/oval_check_enumeration_variable_values.xml \
   python tools/test_scap_converter_core_constant_matrix.py -v
@@ -83,6 +88,12 @@ source Object in native 0.4; it must declare `test_source.kind=none` and the
 original OVAL singleton-object migration crosswalk. The immutable ASA version
 case verifies this optimization, including a `version` comparison and a
 negative test that rejects nonempty singleton Objects.
+
+This same source-attested singleton path admits *absence of a State* when the
+original OVAL Test uses only an existence requirement. Pinned macOS FileVault,
+firmware-password and profiles checks verify the genuinely empty OVAL Objects,
+explicit capability crosswalks and compiled 0.4 presence checks. An unlisted
+singleton capability or extra original Object field still fails closed.
 
 A flat original OVAL `AND` over 2–15 distinct direct no-State Object Tests
 also reuses the mature 0.3 lowering. Each Test's capability, source reference,
@@ -136,6 +147,9 @@ at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `asa/asa-def_version_test.xml`,
 `ios/ios-def_global_test.xml`,
 `ios/ios-def_line_test.xml`, `iosxe/iosxe-def_line_test.xml`,
+`macos/macos-def_filevault_test.xml`,
+`macos/macos-def_firmwarepassword_test.xml`,
+`macos/macos-def_profiles_test.xml`,
 `ios/ios-def_bgpneighbor_test.xml`, and
 `ios/ios-def_section_test.xml` files
 under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family
@@ -153,6 +167,12 @@ remains available to avoid destroying existing source support while verified
 
 The CLI writes a single standalone Assessment authoring document. It **does
 not** create a full Benchmark/Rule graph or an executable `.scapng` bundle.
+The public compiler independently accepts a complete Benchmark/Rule/Assessment
+authoring source package or JSON/YAML archives. The public CLI smoke regression
+uses a schema-valid minimal graph to verify both compilation forms yield
+identical native `.scapng` bytes. A converter output Assessment must be
+combined with its originating Benchmark/Rule and any dependent content before
+bundle compilation; there is **not yet** one public raw OVAL-to-bundle command.
 Run source-to-native differential tests and versioned compiler checks before
 raising coverage claims. The evidence JSON explicitly marks `scanner_parity`
 and `full_oval_coverage` false.

@@ -104,7 +104,7 @@ def direct_selectors(original_object, old_object, namespace, capability, mapping
 
 def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
             *, source_criterion_ref=None):
-    """Reconcile one source Test/Object/State against the original OVAL.
+    """Reconcile one source Test/Object and optional scalar State with OVAL.
 
     A selected criterion of a verified flat AND allows the multi-Test adapter
     to reuse this complete leaf proof without synthesizing altered source XML.
@@ -132,7 +132,6 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     if singleton:
         object_id, old_object = None, None
         expected_test_keys.discard("object")
-        ensure(with_state, "objectless direct Test requires a State")
     else:
         object_id, old_object = one(a.get("objects"), "mapped Object")
     ensure(a.get("evaluate") == {"test": test_id} and

@@ -49,6 +49,8 @@ CURRENT_REQUIRED = (
     "tools/test_scap_converter_core_object_presence.py",
     "tools/test_scap_converter_core_multitest.py",
     "tools/test_scap_converter_core_multistate.py",
+    "tools/test_scap_converter_core_singleton_presence.py",
+    "tools/test_v04_public_cli_smoke.py",
     "tools/test_scap_converter_core_constant_matrix.py",
     "tools/test_scap_converter_core_variable.py",
     "tools/test_scap_converter_core_family.py",

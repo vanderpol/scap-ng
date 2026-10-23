@@ -48,8 +48,12 @@ For the current 0.4 source snapshot, the required entry points include the
 [shared OVAL converter](../../tools/scap_converter_core.py),
 [native bundle compiler](../../tools/v04_native_bundle_compiler.py) and
 [developer runbook](../developer/CONVERTER-COMPILER-RUNBOOK.md). The converter
-currently accepts only two verified leaf patterns; packaging it cannot
-upgrade that limited coverage into a full migration claim.
+currently accepts a **source-proven subset** of OVAL through mature 0.3
+lowering and native 0.4 projection. See the current
+[converter coverage audit](../developer/CONVERTER-COMPILER-RUNBOOK.md) for
+exact accepted constructs and blocked definitions. Packaging a source
+snapshot cannot upgrade partial conversion coverage into a full migration
+claim.
 
 ## Archive builder and gates
 
