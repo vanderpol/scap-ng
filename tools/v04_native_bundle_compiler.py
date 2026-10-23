@@ -6,8 +6,9 @@ deterministic, manifest-authoritative content graph with separately compiled
 Test dispatch and six-state result programs. The Test programs preserve exact
 0.4 source operands; collection and live scanner execution are NOT claimed.
 
-Inputs may be a previously verified 0.4 source-preview ZIP (fast development)
-or independently parsed YAML and JSON canonical authoring archives (release).
+Inputs may be a previously verified 0.4 source-preview ZIP (fast development),
+an independently parsed YAML-only or JSON-only canonical authoring archive,
+or both formats with byte-identical compiled-bundle parity (release).
 Refs #232 #229.
 """
 from __future__ import annotations
@@ -21,11 +22,13 @@ from pathlib import Path
 import re
 import zipfile
 
-from v04_a_authoring_graph_index import canonical_json, graph_index
+from v04_a_authoring_graph_index import (
+    canonical_json, graph_index, read_authoring_archive,
+)
 from v04_a_benchmark_choice_version_closure import inspect_edges
 from v04_canonical_result_plan import compile_canonical_result_plan
 from v04_canonical_source_ir import (
-    compile_pair, decode_and_verify, validate_docs,
+    compile_pair, decode_and_verify, normalize_documents, validate_docs,
 )
 from v04_canonical_unsigned_package import (
     _manifest_schema, _package_validators, _strict_json,
@@ -306,40 +309,78 @@ def compile_from_source_package(raw, *, validate_schema=True):
     return compiled, verify_bundle(compiled, validate_schema=validate_schema)
 
 
+def _build_partitioned_bundles(documents):
+    """Compile each closed Benchmark graph without depending on file suffixes."""
+    partitions = partition_documents(documents)
+    bundles = {}
+    for folder, subset in sorted(partitions.items()):
+        bundles[folder], _ = build_bundle(subset, validate_schema=False)
+    return bundles
+
+
+def _verify_partitioned_bundles(bundles, *, validate_schema):
+    return {name: verify_bundle(raw, validate_schema=validate_schema)
+            for name, raw in sorted(bundles.items())}
+
+
+def compile_from_archive(archive, source_format, *, validate_schema=True):
+    """Compile a JSON-only or YAML-only authoring archive independently.
+
+    A single source format remains subject to the same full typed-source,
+    graph, version-closure, capability and bundle-verification gates. No
+    alternate parser or sibling serialization is used as a fallback.
+    """
+    documents = read_authoring_archive(archive, source_format)
+    if validate_schema:
+        validate_docs(documents, _package_validators())
+    ir = normalize_documents(documents)
+    if ir["benchmark_version_conflicts"]:
+        raise ValueError("native authoring versions are incompatible")
+    recovered = decode_and_verify(ir)
+    bundles = _build_partitioned_bundles(recovered)
+    return bundles, _verify_partitioned_bundles(
+        bundles, validate_schema=validate_schema)
+
+
 def compile_from_pair(json_zip, yaml_zip, *, validate_schema=True):
-    """Release path: independently parse both serializations before emission."""
-    ir_bytes, validation = compile_pair(json_zip, yaml_zip, validate_schema=validate_schema)
+    """Release path: independently parse AND compile both serializations."""
+    _, validation = compile_pair(json_zip, yaml_zip, validate_schema=validate_schema)
     if validation["version_conflicting_choice_links"]:
         raise ValueError("native authoring versions are incompatible")
-    docs = decode_and_verify(_strict_json(ir_bytes))
-    partitions = partition_documents(docs)
-    bundles, results = {}, {}
-    for folder, subset in sorted(partitions.items()):
-        archive, _ = build_bundle(subset, validate_schema=False)
-        bundles[folder] = archive
-        results[folder] = verify_bundle(archive, validate_schema=validate_schema)
-    return bundles, results
+    json_docs = read_authoring_archive(json_zip, "json")
+    yaml_docs = read_authoring_archive(yaml_zip, "yaml")
+    json_bundles = _build_partitioned_bundles(json_docs)
+    yaml_bundles = _build_partitioned_bundles(yaml_docs)
+    if json_bundles != yaml_bundles:
+        raise ValueError("independent YAML/JSON compiled bundle mismatch")
+    # The paired front end already proved typed source-IR reconstruction and
+    # exact YAML/JSON source parity. Verify the identical compiled bytes once.
+    return json_bundles, _verify_partitioned_bundles(
+        json_bundles, validate_schema=validate_schema)
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--source-package", type=Path)
-    group.add_argument("--json-archive", type=Path)
+    parser.add_argument("--source-package", type=Path)
+    parser.add_argument("--json-archive", type=Path)
     parser.add_argument("--yaml-archive", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
     args = parser.parse_args()
+    if args.source_package and (args.json_archive or args.yaml_archive):
+        parser.error("--source-package cannot accompany authoring archives")
+    if not (args.source_package or args.json_archive or args.yaml_archive):
+        parser.error("provide a source package or at least one authoring archive")
     if args.source_package:
-        if args.yaml_archive:
-            parser.error("--yaml-archive cannot accompany --source-package")
         name = args.source_package.name.removesuffix(".source-preview.zip")
         bundle, check = compile_from_source_package(args.source_package.read_bytes())
         bundles, results = {name: bundle}, {name: check}
-    else:
-        if not args.yaml_archive:
-            parser.error("--json-archive requires --yaml-archive")
+    elif args.json_archive and args.yaml_archive:
         bundles, results = compile_from_pair(args.json_archive, args.yaml_archive)
+    else:
+        archive = args.json_archive or args.yaml_archive
+        source_format = "json" if args.json_archive else "yaml"
+        bundles, results = compile_from_archive(archive, source_format)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for name, data in sorted(bundles.items()):
         (args.output_dir / f"{name}.scapng").write_bytes(data)

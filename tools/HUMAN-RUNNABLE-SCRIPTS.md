@@ -234,6 +234,23 @@ python tools/v04_native_bundle_compiler.py ^
   --report work/native/compiled-report.json
 ```
 
+Alternatively, compile a canonical authoring ZIP directly from **one** source
+format. The JSON-only path uses the strict JSON parser; neither format relies
+on its sibling archive. Both apply the 0.4.0 schema, reference, version and
+compiled-program verification gates.
+
+```powershell
+python tools/v04_native_bundle_compiler.py ^
+  --json-archive work/canonical-json.zip ^
+  --output-dir work/native ^
+  --report work/native/json-report.json
+```
+
+Use `--yaml-archive` instead for YAML-only input. Supply **both**
+`--json-archive` and `--yaml-archive` for the release parity check: each is
+independently parsed and compiled, then the deterministic `.scapng` bytes must
+agree. None of these operations establishes live scanner conformance.
+
 Signing is a separate optional publisher action. Supply the publisher's private
 key and certificate from appropriately protected local locations; **never**
 commit private keys, issue/sign releases with throwaway test certificates, or

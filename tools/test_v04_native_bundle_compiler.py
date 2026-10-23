@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 import yaml
@@ -17,7 +18,7 @@ from test_v04_canonical_source_ir import sample
 from v04_a_authoring_graph_index import canonical_json
 from v04_canonical_unsigned_package import build_package as source_package
 from v04_native_bundle_compiler import (
-    build_bundle, compile_from_pair, compile_from_source_package,
+    build_bundle, compile_from_archive, compile_from_pair, compile_from_source_package,
     compile_test_instruction, verify_bundle, MANIFEST_MEMBER,
 )
 
@@ -38,6 +39,17 @@ def rewrite(raw, mutate):
         for name, content in members.items():
             zf.writestr(name, content)
     return buffer.getvalue()
+
+
+def authoring_archives(docs, folder):
+    paths = [folder / name for name in ("json.zip", "yaml.zip")]
+    for target, ext in zip(paths, ("json", "yaml")):
+        with zipfile.ZipFile(target, "w") as zf:
+            for name, doc in sorted(docs.items()):
+                content = (canonical_json(doc) if ext == "json" else
+                           yaml.safe_dump(doc).encode())
+                zf.writestr(name[:-5] + "." + ext, content)
+    return paths
 
 
 class NativeBundleCompilerTests(unittest.TestCase):
@@ -67,16 +79,68 @@ class NativeBundleCompilerTests(unittest.TestCase):
     def test_independent_yaml_json_compile_parity(self):
         docs = fixture()
         with tempfile.TemporaryDirectory() as td:
-            paths = [Path(td) / name for name in ("json.zip", "yaml.zip")]
-            for target, ext in zip(paths, ("json", "yaml")):
-                with zipfile.ZipFile(target, "w") as zf:
-                    for name, doc in sorted(docs.items()):
-                        content = (canonical_json(doc) if ext == "json" else
-                                   yaml.safe_dump(doc).encode())
-                        zf.writestr(name[:-5] + "." + ext, content)
+            paths = authoring_archives(docs, Path(td))
+            json_bundles, json_report = compile_from_archive(
+                paths[0], "json", validate_schema=False)
+            yaml_bundles, yaml_report = compile_from_archive(
+                paths[1], "yaml", validate_schema=False)
             packages, results = compile_from_pair(*paths, validate_schema=False)
         self.assertEqual(set(packages), {"demo"})
         self.assertEqual(results["demo"]["programs"], 1)
+        self.assertEqual(json_bundles, yaml_bundles)
+        self.assertEqual(packages, json_bundles)
+        self.assertEqual(results, json_report)
+        self.assertEqual(results, yaml_report)
+
+    def test_single_format_fails_closed_on_versions_and_bad_source(self):
+        docs = fixture()
+        docs["authoring/demo/benchmark.demo.json"]["benchmark"][
+            "assessment_specifications"][0]["version"] = "0.3.0"
+        with tempfile.TemporaryDirectory() as td:
+            paths = authoring_archives(docs, Path(td))
+            for source_format, path in zip(("json", "yaml"), paths):
+                with self.subTest(source_format=source_format):
+                    with self.assertRaisesRegex(ValueError, "versions are incompatible"):
+                        compile_from_archive(path, source_format, validate_schema=False)
+
+            with zipfile.ZipFile(paths[0], "w") as zf:
+                zf.writestr("authoring/demo/assessment.json",
+                            b'{"assessment":{"id":"first","id":"second"}}')
+            with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
+                compile_from_archive(paths[0], "json", validate_schema=False)
+
+            with zipfile.ZipFile(paths[1], "w") as zf:
+                zf.writestr("authoring/demo/assessment.yaml", b"assessment: [")
+            with self.assertRaises(ValueError):
+                compile_from_archive(paths[1], "yaml", validate_schema=False)
+
+    def test_single_format_rejects_missing_and_duplicate_references(self):
+        docs = fixture()
+        docs["authoring/demo/rules/r1.json"]["rule"]["assessment_choices"][
+            "automated"]["assessment"] = "nonexistent"
+        with tempfile.TemporaryDirectory() as td:
+            paths = authoring_archives(docs, Path(td))
+            for source_format, path in zip(("json", "yaml"), paths):
+                with self.subTest(source_format=source_format):
+                    with self.assertRaisesRegex(ValueError, "unresolved"):
+                        compile_from_archive(path, source_format, validate_schema=False)
+        docs = fixture()
+        docs["authoring/demo/assessments/duplicate.json"] = deepcopy(
+            docs["authoring/demo/assessments/a1.json"])
+        with tempfile.TemporaryDirectory() as td:
+            paths = authoring_archives(docs, Path(td))
+            for source_format, path in zip(("json", "yaml"), paths):
+                with self.subTest(source_format=source_format):
+                    with self.assertRaisesRegex(ValueError, "duplicate"):
+                        compile_from_archive(path, source_format, validate_schema=False)
+
+    def test_paired_compilation_rejects_divergent_bundle_bytes(self):
+        with tempfile.TemporaryDirectory() as td:
+            paths = authoring_archives(fixture(), Path(td))
+            with patch("v04_native_bundle_compiler._build_partitioned_bundles",
+                       side_effect=[{"demo": b"json"}, {"demo": b"yaml"}]):
+                with self.assertRaisesRegex(ValueError, "compiled bundle mismatch"):
+                    compile_from_pair(*paths, validate_schema=False)
 
     def test_source_package_is_input_not_mislabeled_bundle(self):
         source, _ = source_package(fixture(), validate_schema=False)

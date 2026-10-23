@@ -75,7 +75,10 @@ def read_authoring_archive(path, fmt):
                         return items
                     UniqueSafeLoader.add_constructor(
                         yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, unique_mapping)
-                    doc = yaml.load(raw, Loader=UniqueSafeLoader)
+                    try:
+                        doc = yaml.load(raw, Loader=UniqueSafeLoader)
+                    except yaml.YAMLError as error:
+                        raise ValueError(f"invalid YAML syntax: {error}") from error
                 # JSON canonicalization enforces the same JSON-compatible
                 # scalar model for both loaders; no silent datetime coercion.
                 canonical_json(doc)

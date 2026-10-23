@@ -8,6 +8,11 @@ proposals are not listed as delivered features.
 
 ### Native content compilation
 
+- Added independently verifiable YAML-only and JSON-only native 0.4 authoring
+  compilation, with a paired mode that compares independently compiled
+  `.scapng` bytes. Invalid source, ambiguous references and incompatible
+  version declarations fail closed. This is content compilation, not scanner
+  execution. [#232](https://github.com/vanderpol/scap-ng/issues/232)
 - Restored `.scapng` compilation for the native 0.4.0 authoring model,
   extending the earlier manifest-authoritative compiler architecture. Every
   automated Assessment now carries a separately compiled Test dispatch and
