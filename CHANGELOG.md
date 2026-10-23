@@ -52,6 +52,14 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring checkpoint
 
+- Added a documented, read-only public CLI for inspecting the released six-STIG
+  authoring set before human review. It verifies strict JSON/YAML inventory
+  parity and reference closure, reports per-STIG counts and source-preserving
+  review leads, and can pin the 4,012-document six-STIG baseline. Updated the
+  review download page to point to the current compiled and authoring releases
+  instead of the superseded October 20 source-only counts. Neither the tool
+  nor its tests assert scanner or OVAL semantic equivalence.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
 - Kept four superseded 0.4-A r3 research workflows available for explicit
   historical diagnostics but removed their automatic push triggers; their
   frozen source archive predates the 11 shared Applicability Assessment

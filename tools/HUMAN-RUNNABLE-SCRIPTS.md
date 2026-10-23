@@ -274,6 +274,33 @@ program from the package's signed logical graph. The verifier does not claim
 revocation policy, automated publisher key management, live scanner execution,
 or OVAL semantic parity. Do not call test-key verification publisher trust.
 
+## Inventory the 0.4.0 authoring files before human review
+
+**Script:** `tools/audit_v04_review_readiness.py`
+
+Download the matching immutable JSON and YAML six-STIG authoring ZIPs from
+[`v0.4.0-six-stig-canonical-flat-authoring-20261022-restored`](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261022-restored).
+Run the read-only inventory locally:
+
+```powershell
+python tools/audit_v04_review_readiness.py ^
+  --json-archive work/scap-ng-0.4.0-six-stigs.json.zip ^
+  --yaml-archive work/scap-ng-0.4.0-six-stigs.yaml.zip ^
+  --report work/review-readiness.json ^
+  --assert-six
+```
+
+The command checks strict ZIP parsing, logical graph integrity and cross-format
+content equivalence; produces counts by STIG and examples of unusual Tests,
+manual procedures, source-specific Sets and authoring path issues; and exits
+nonzero on mismatches. `--assert-six` pins the currently published six-STIG
+population; omit it for other collections. JSON input is required, YAML is
+optional. Output is a machine-readable JSON report, without altering the ZIPs.
+This is a **human-review inventory**, not a substitute for strict native schema
+checks (`tools/audit_v04_full_schema.py`), compilation, OVAL equivalence, or
+live scanner evaluation. In particular, unusual Set and Filter patterns are
+review leads and must not be mechanically rewritten.
+
 ## Run opt-in 0.3.0 modernization during selected-Rule conversion
 
 **Script:** `tools/scap_upconvert_v003/convert_collection_review.py`
