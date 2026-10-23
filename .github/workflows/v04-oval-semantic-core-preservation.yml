@@ -1,0 +1,32 @@
+name: Reuse OVAL semantic core across SCAP-NG versions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/oval_semantic_ir.py'
+      - 'tools/scap_upconvert_v003/**'
+      - 'tools/test_oval_semantic_core_preservation.py'
+      - 'tests/v04-oval-operator-scopes/oval-independent-operators.xml'
+      - 'board/review-content/0.2.0/sources/filter.xml'
+      - 'research/iterations/003/evidence/roundtrip-source-oval/cartesian-variable-chain.source.xml'
+      - '.github/workflows/v04-oval-semantic-core-preservation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  semantic-ir-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install lxml==6.1.1
+      - name: Preserve original Set/Filter, Variable and Boolean OVAL semantics
+        env:
+          PYTHONPATH: tools
+        run: python tools/test_oval_semantic_core_preservation.py -v

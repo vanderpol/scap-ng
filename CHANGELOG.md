@@ -94,6 +94,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Established a cross-version regression gate for the existing semantic OVAL
+  intermediate representation using real Set/Filter, Variable-function and
+  Boolean operator sources. It preserves previously supported parsing,
+  effective-default and dependency behavior while the 0.3 lowering is
+  consolidated into a native 0.4 renderer; it does not establish native
+  conversion or scanner parity.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
+
+
 - Updated the 0.4 authoring converter and typed source compiler for canonical
   `field_requirement` scopes and complete conditions. The compiler indexes
   nearest explicit field declarations; source-exact records, repeated fields,
