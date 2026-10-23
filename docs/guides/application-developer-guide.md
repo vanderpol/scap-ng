@@ -1,6 +1,6 @@
 # SCAP-NG Application Developer Guide
 
-**Status: Draft — Needs Review (SCAP-NG 0.4.0 pre-alpha).** The current language, schemas, and implementation evidence are not a completed scanner-conformance standard. This guide summarizes documented contracts without defining new ones. Open wording and behavior questions are tracked in [#49](https://github.com/vanderpol/scap-ng/issues/49) and [#252](https://github.com/vanderpol/scap-ng/issues/252).
+**Status: Draft — Needs Review (SCAP-NG 0.4.0 pre-alpha).** The current language, schemas, and implementation evidence are not a completed scanner-conformance standard. This guide is intended to become the version-pinned, testable requirements baseline for a future reference-implementation task; it does not authorize implementation or define new language behavior. Open wording and behavior questions are tracked in [#49](https://github.com/vanderpol/scap-ng/issues/49) and [#252](https://github.com/vanderpol/scap-ng/issues/252).
 
 ## 1. What an implementation consumes and produces
 
@@ -52,6 +52,22 @@ These items are **not** implementation mandates or conformance criteria until th
 - **Signing and trust:** The [package specification](../../specification/package/package-and-integrity.md) separates content and result signatures but leaves the final signature format and trust model under design.
 - **Input and policy precedence:** Reconcile [Benchmark Parameters](../../specification/policy/benchmark.md) and [Profiles/Tailoring](../../specification/policy/profiles-and-tailoring.md) before implementing an ambiguous override path.
 - **Unsupported/incomplete evaluation:** The [conformance specification](../../specification/core/conformance.md) requires unsupported capabilities to remain distinct from compliance failure; final standardized reason/result vocabulary remains under design.
+
+## 6. Reference implementation requirements — Draft — Needs Review
+
+A future implementation task should cite exact **RID**, SCAP-NG version/commit, governing clause/schema, independent positive and negative fixtures, and expected result. The table is an initial traceability index, **not** a declaration that tests or implementations already exist. Detailed test cases belong in the [conformance corpus #50](https://github.com/vanderpol/scap-ng/issues/50), not duplicated here.
+
+| RID | Source-grounded requirement to implement | Minimum acceptance evidence |
+| --- | --- | --- |
+| **DEV-001** | Validate serialization and version-local schema. [Conformance §3](../../specification/core/conformance.md) | Correct-version valid fixture accepted; invalid shape or mixed-version fixture rejected. |
+| **DEV-002** | Resolve required logical identities and reject missing/ambiguous references. [Benchmark §§4,16](../../specification/policy/benchmark.md) | Positive linkage, missing reference and duplicate-ID negative fixtures. |
+| **DEV-003** | Apply Benchmark membership, Profile and Tailoring resolution in specified order. [Benchmark §15](../../specification/policy/benchmark.md) | Selection and inheritance fixtures, including forbidden re-enablement; precedence ambiguity must be resolved before tasking. |
+| **DEV-004** | Preserve Test Item existence separately from State/field matching and all defined non-Boolean outcomes. [Assessment method](../../specification/assessment/assessment-method.md) | Independent six-state, zero-Item, incomplete and error fixtures; **not yet ready as a complete conformance claim**. |
+| **DEV-005** | Emit an integrity-bound compiled package and reject altered members. [Packaging §5](../../specification/package/package-and-integrity.md) | Manifest resolution test and digest-mismatch rejection; final signature format remains blocked. |
+| **DEV-006** | Produce independently interpretable policy and technical results. [Results](../../specification/results/results.md) | Versioned expected-result fixtures; **final `summary` field contract and projection policy require review**. |
+| **DEV-007** | Preserve claimed supported legacy semantics during conversion, with explicit blockers instead of approximation. [SCAP 1.4 migration](../../specification/migration/scap-1.4-migration.md) | Original source pinned; source-exact positive/negative comparisons and unsupported-case diagnostics. |
+
+**Tasking rule:** implement only the rows and subsets whose source semantics and expected fixtures are resolved. A requirement with an unresolved normative choice stays **blocked**, even if an engineering approach appears obvious. Maintain separate evidence for parser/schema, semantic validator, evaluator, collector, live scan, and migration layers.
 
 ## Appendix: source authority for SCAP 1.4 migration
 
