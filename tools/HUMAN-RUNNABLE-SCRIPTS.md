@@ -79,6 +79,22 @@ directories. The generated file contains one canonical 0.4 Assessment, **not**
 an entire Benchmark, a compiled bundle or scanner proof. See the
 [developer runbook](../docs/developer/CONVERTER-COMPILER-RUNBOOK.md).
 
+## Audit existing 0.3 source coverage against maintained 0.4 conversion
+
+**Script:** `tools/audit_scap_converter_core_coverage.py`
+
+```powershell
+python tools/audit_scap_converter_core_coverage.py ^
+  --source "PATH_TO_ORIGINAL_OVAL_CORPUS" ^
+  --report work/converter-core-coverage.json
+```
+
+The read-only report lists every OVAL Definition, showing whether mature 0.3
+source lowering succeeded, whether the current 0.4 entry point emitted a
+source-proven schema-valid, compilable Assessment, and where 0.3 succeeds but
+0.4 remains blocked. The corpus denominator also includes deprecated and
+malformed entries separately. No live scanner or results parity is claimed.
+
 ## Convert a pinned SCAP 1.4 package for current full review
 
 **Script:** `tools/scap_upconvert_v003/convert_full_review.py`

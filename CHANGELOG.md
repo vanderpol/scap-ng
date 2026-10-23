@@ -99,6 +99,14 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Added a read-only, publicly runnable original-OVAL coverage auditor for
+  the maintained converter. It counts mature 0.3 lowering and source-proven
+  0.4 output separately per Definition, retains source hashes/diagnostics,
+  and explicitly counts parse/deprecation blockers. Native acceptance also
+  requires current schema and compiled Assessment program validation. Focused
+  tests include both pinned Variable sources in CI. No scanner parity claim.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
 - Added a second pinned Variable reuse path to the single-tree converter:
   Self-Assertion `independent.family_test` with an empty singleton Object,
   one regex constant Variable, `var_check=all`, and Test `at least one`.

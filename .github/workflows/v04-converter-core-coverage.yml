@@ -1,0 +1,34 @@
+name: 0.4 original OVAL core conversion coverage (manual)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  source-coverage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout pinned original OVAL Self-Assertion test corpus
+        uses: actions/checkout@v4
+        with:
+          repository: OVAL-Community/SCAP-Self-Assertion
+          ref: e3538595c5083b9c34d937a81d319234df9bbfaa
+          path: pinned-self-assertion
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install version-pinned converter dependencies
+        run: python -m pip install lxml==6.1.1 PyYAML==6.0.3 jsonschema==4.25.1
+      - name: Account separately for preserved 0.3 and source-proven 0.4 cases
+        run: |
+          python tools/audit_scap_converter_core_coverage.py \
+            --source pinned-self-assertion/SCAP_1.4/OVAL_Test_Content \
+            --report work/converter-core-coverage.json
+      - name: Keep complete per-Definition source-denominator report
+        uses: actions/upload-artifact@v4
+        with:
+          name: original-oval-core-converter-coverage
+          path: work/converter-core-coverage.json
+          if-no-files-found: error
+          retention-days: 30

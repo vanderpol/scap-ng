@@ -86,6 +86,32 @@ Run source-to-native differential tests and versioned compiler checks before
 raising coverage claims. The evidence JSON explicitly marks `scanner_parity`
 and `full_oval_coverage` false.
 
+## Count source coverage before choosing the next construct
+
+Run the public read-only source audit against a pinned original OVAL corpus,
+or a single original XML file:
+
+```bash
+python tools/audit_scap_converter_core_coverage.py \
+  --source /path/to/original-oval-corpus \
+  --report /tmp/oval-core-coverage.json
+python tools/test_audit_scap_converter_core_coverage.py -v
+```
+
+The report contains every Definition's source hash and status, plus separate
+counts for mature **0.3 source lowering** and **current source-proven 0.4
+output**, including 0.3-lowerable cases blocked in the current core. Native
+0.4 acceptance also requires schema validation and compiler program acceptance.
+Malformed files and deprecated Definitions are counted separately; they are
+never removed silently from the denominator. This is a converter coverage
+inventory only, **not** a scanner parity or STIG benchmark completion report.
+The dedicated CI converter regression tests the two pinned external Variable
+Definitions through this reporting path as well as the direct conversion path.
+For the full 167-Definition Self-Assertion source audit, manually trigger
+`0.4 original OVAL core conversion coverage (manual)` in GitHub Actions. It
+checks out the original repository at its immutable revision and uploads the
+complete per-Definition report; this deliberately does not run on every push.
+
 ## Compiler: canonical 0.4 graph only
 
 For a complete, closed native 0.4 authoring archive, compile independently
