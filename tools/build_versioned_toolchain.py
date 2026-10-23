@@ -37,7 +37,10 @@ COMMON_REQUIRED = (
 )
 CURRENT_REQUIRED = (
     "docs/developer/README.md",
+    "docs/developer/CONVERTER-COMPILER-RUNBOOK.md",
     "docs/releases/TOOLCHAIN-RELEASES.md",
+    "tools/scap_converter_core.py",
+    "tools/test_scap_converter_core.py",
     "tools/v04_native_bundle_compiler.py",
 )
 
@@ -108,12 +111,13 @@ def build(repo: Path, out: Path, version: str, *, ref: str = "HEAD", current: bo
         "developer_guides": "docs/developer/",
         "operator_guide": "tools/HUMAN-RUNNABLE-SCRIPTS.md",
         "entrypoints": {
+            "current_0_4_oval_converter_proven_leaf_subset": "tools/scap_converter_core.py",
             "current_native_0_4_compiler": "tools/v04_native_bundle_compiler.py",
             "historical_0_3_conversion_engine": "tools/scap_upconvert_v003/convert_full_review.py",
             "version_independent_oval_ir": "tools/oval_semantic_ir.py",
         },
         "known_gaps": [
-            "The 0.3-derived converter has not yet been consolidated into a fully native 0.4 importer.",
+            "The shared 0.3-derived 0.4 importer currently proves only two leaf shapes, not full OVAL conversion.",
             "This source snapshot is not an approved interoperable release or a conformance result.",
             "Publisher identity/trust, runtime semantic parity and dependency locking require separate gates.",
         ],

@@ -44,6 +44,13 @@ to verify archive integrity. The machine-readable file inventory must identify
 every included file with SHA-256 and size. No dependency on expiring GitHub
 Actions artifacts, live mutable `main` URLs or implicit local working state.
 
+For the current 0.4 source snapshot, the required entry points include the
+[shared OVAL converter](../../tools/scap_converter_core.py),
+[native bundle compiler](../../tools/v04_native_bundle_compiler.py) and
+[developer runbook](../developer/CONVERTER-COMPILER-RUNBOOK.md). The converter
+currently accepts only two verified leaf patterns; packaging it cannot
+upgrade that limited coverage into a full migration claim.
+
 ## Archive builder and gates
 
 `tools/build_versioned_toolchain.py` creates a deterministic ZIP from the

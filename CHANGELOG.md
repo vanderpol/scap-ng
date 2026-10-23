@@ -94,6 +94,15 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Added the first single-tree conversion integration entry point: actual 0.3
+  semantic lowering and capability mapping feed final flat-Object 0.4 authoring,
+  the current native Test compiler, and an independent original-OVAL differential
+  gate. It proves two existing shellcommand/registry leaves and fails closed
+  on unproved shapes; broad OVAL coverage and scanner parity remain open.
+  Published a human-runnable developer runbook and fast regression workflow.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#229](https://github.com/vanderpol/scap-ng/issues/229)
+
 - Established a cross-version regression gate for the existing semantic OVAL
   intermediate representation using real Set/Filter, Variable-function and
   Boolean operator sources. It preserves previously supported parsing,

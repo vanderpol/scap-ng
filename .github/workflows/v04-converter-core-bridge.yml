@@ -1,0 +1,34 @@
+name: 0.4 shared converter core regression
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/scap_converter_core.py'
+      - 'tools/test_scap_converter_core.py'
+      - 'tools/oval_semantic_ir.py'
+      - 'tools/scap_upconvert_v003/**'
+      - 'tools/v04_flat_object_authoring.py'
+      - 'tools/v04_field_requirement.py'
+      - 'tools/v04_native_bundle_compiler.py'
+      - 'tools/import_v04_oval_leaf_pilot.py'
+      - 'schema/v0.4.0/**'
+      - '.github/workflows/v04-converter-core-bridge.yml'
+  workflow_dispatch:
+
+jobs:
+  converter-bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install exact converter regression dependencies
+        run: python -m pip install lxml==6.1.1 PyYAML==6.0.3 jsonschema==4.25.1
+      - name: Existing shared parser and new 0.4 lowering integration
+        run: |
+          python tools/test_oval_semantic_core_preservation.py -v
+          python tools/test_scap_converter_core.py -v
+          python tools/test_import_v04_oval_leaf_pilot.py -v
