@@ -40,7 +40,7 @@ jobs:
         run: python -m compileall -q tools
       - name: Verify repository rebaseline boundaries
         run: python tools/audit_repository_layout.py --check
-      - name: Check out pinned original OVAL Gatekeeper fixture
+      - name: Check out pinned original OVAL regression fixtures
         uses: actions/checkout@v4
         with:
           repository: OVAL-Community/SCAP-Self-Assertion
@@ -48,11 +48,17 @@ jobs:
           path: pinned-self-assertion
           sparse-checkout: |
             SCAP_1.4/OVAL_Test_Content/macos/macos-def_gatekeeper_test.xml
+            SCAP_1.4/OVAL_Test_Content/linux/linux-def_apparmorstatus_test.xml
+            SCAP_1.4/OVAL_Test_Content/linux/ind-def_environmentvariable58_test_linux.xml
+            SCAP_1.4/OVAL_Test_Content/unix/unix-def_uname_test.xml
           sparse-checkout-cone-mode: false
           persist-credentials: false
       - name: Run maintained tool regressions
         env:
           PYTHONPATH: .:tools:tools/scap_upconvert_v003:tools/scap_ng_roundtrip_v003
+          SCAP_NG_APPARMOR_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/linux/linux-def_apparmorstatus_test.xml
+          SCAP_NG_ENVIRONMENT58_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/linux/ind-def_environmentvariable58_test_linux.xml
+          SCAP_NG_UNAME_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/unix/unix-def_uname_test.xml
           OVAL_GATEKEEPER_SOURCE: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/macos/macos-def_gatekeeper_test.xml
         run: python tools/run_current_tool_regressions.py
       - name: Check promoted current data inputs

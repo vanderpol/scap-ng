@@ -213,7 +213,28 @@ def field_scopes(test):
     return result
 
 
-def audit(jsonzip,yamlzip):
+def compile_candidate_view(jsonzip, yamlzip, original_03):
+    """Use the established exact-inverse dependency repair only in typed IR.
+
+    Raw preview archives remain 4,001 documents / 1,375 Tests. The canonical
+    compilation view adds exactly 11 original source dependencies / 15 Tests.
+    Both source inverses, strict schemas and reference closure are mandatory.
+    """
+    _, ir = compile_pair(jsonzip, yamlzip, validate_schema=True,
+                         legacy_review=True, legacy_original_03=original_03)
+    closure = ir.get("legacy_dependency_restoration", {})
+    if (ir.get("source_reconstruction") != "PASS"
+        or ir.get("yaml_json_byte_parity") != "PASS"
+        or ir.get("native_source_schema") != "PASS"
+        or ir.get("legacy_source_inverse") != "PASS"
+        or ir.get("documents") != 4012 or ir.get("tests") != 1390
+        or closure.get("source_documents") != 4001
+        or closure.get("restored_dependency_documents") != 11):
+        raise ValueError("Field proposal failed closed canonical typed source IR")
+    return ir
+
+
+def audit(jsonzip,yamlzip,original_03):
     json_docs=read_authoring_archive(jsonzip,"json")
     yaml_docs=read_authoring_archive(yamlzip,"yaml")
     if len(json_docs)!=4001 or len(yaml_docs)!=4001:
@@ -244,14 +265,15 @@ def audit(jsonzip,yamlzip):
         validate_docs(native_schema_projection(yaml_docs),validators)
     # A source-IR compiler pass does not imply executable evaluation. It
     # checks references and exact source graph reconstruction independently.
-    _,ir=compile_pair(jsonzip,yamlzip,validate_schema=False)
-    if (ir.get("source_reconstruction")!="PASS"
-        or ir.get("yaml_json_byte_parity")!="PASS"
-        or ir.get("documents")!=4001 or ir.get("tests")!=1375):
-        raise ValueError("Field proposal failed current typed source IR")
+    ir=compile_candidate_view(jsonzip,yamlzip,original_03)
     return {
         "status":"PROPOSED_FIELDS_SCOPE_SCHEMA_AND_SOURCE_IR_PASS_NOT_NORMATIVE",
         "documents":4001,"automated_tests":1375,
+        "compilation_view_documents":ir["documents"],
+        "compilation_view_tests":ir["tests"],
+        "compilation_view_native_schema":ir["native_source_schema"],
+        "legacy_source_inverse":ir["legacy_source_inverse"],
+        "dependency_restoration":ir["legacy_dependency_restoration"],
         "new_condition_scopes":dict(sorted(counts.items())),
         "samples":examples,
         "candidate_json_yaml_parity":"PASS",
@@ -267,9 +289,11 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--json-zip",type=Path,required=True)
     p.add_argument("--yaml-zip",type=Path,required=True)
+    p.add_argument("--original-03",type=Path,required=True,
+                   help="Immutable original 0.3 source for compilation-view dependencies")
     p.add_argument("--report",type=Path,required=True)
     args=p.parse_args()
-    result=audit(args.json_zip,args.yaml_zip)
+    result=audit(args.json_zip,args.yaml_zip,args.original_03)
     args.report.parent.mkdir(exist_ok=True,parents=True)
     args.report.write_text(json.dumps(result,sort_keys=True,indent=2)+"\n")
     print(json.dumps({k:v for k,v in result.items() if k!="samples"},

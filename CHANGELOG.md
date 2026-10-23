@@ -8,6 +8,14 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- Repaired CI fixture wiring for pinned AppArmor, environmentvariable58 and
+  uname source tests. The condition-fields preview now reuses source-inverse
+  restoration of the 11 missing Applicability dependencies in its strict typed
+  compilation view, preserving all 4,001 raw documents and field-scope ledgers.
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+  [#239](https://github.com/vanderpol/scap-ng/issues/239)
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
 - Repaired historical six-STIG preview validation/compilation by explicitly
   projecting legacy structured conditions and Object wrappers through the
   canonical generator. The pinned Apache `stdout_line` condition and named
