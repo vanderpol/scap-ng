@@ -18,6 +18,7 @@ import yaml
 from build_v04_canonical_six_stigs import promote, recover, render_authoring
 from v04_field_requirement import promote_test, restore_test
 from v04_canonical_source_ir import compile_pair, decode_and_verify, normalize_documents
+from v04_native_bundle_compiler import build_bundle, verify_bundle
 from test_v04_field_requirement_schema import document, REQUIRED, OPTIONAL
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -102,6 +103,11 @@ class FieldRequirementConversionTests(unittest.TestCase):
         self.assertEqual(report['source_reconstruction'], 'PASS')
         self.assertFalse(report['scanner_parity'])
         self.assertEqual(decode_and_verify(json.loads(raw)), documents(new))
+        bundle, _ = build_bundle(documents(new))
+        native = verify_bundle(bundle)
+        self.assertEqual(native['status'], 'NATIVE_040_COMPILED_CONTENT_BUNDLE_NOT_SCANNER_TESTED')
+        self.assertEqual((native['documents'], native['programs'], native['tests']), (3, 1, 1))
+        self.assertFalse(native['scanner_evaluated'])
 
     def test_test_and_condition_and_individual_scope_preserve_overrides(self):
         old = source_test()
@@ -278,6 +284,16 @@ class FieldRequirementConversionTests(unittest.TestCase):
         self.assertEqual(report['native_source_schema'], 'PASS')
         decoded = decode_and_verify(json.loads(data))
         self.assertEqual(decoded, documents(flat))
+        # Full source-backed path: pinned original OVAL -> reversible 0.4
+        # conversion -> current schema/typed IR -> native bundle verifier.
+        # Compilation is not a live scanner-equivalence claim.
+        native_bundle, _ = build_bundle(decoded)
+        native_result = verify_bundle(native_bundle)
+        self.assertEqual(native_result['benchmark'], 'trace')
+        self.assertEqual((native_result['documents'], native_result['programs'],
+                          native_result['tests']), (3, 1, 2))
+        self.assertFalse(native_result['scanner_evaluated'])
+        self.assertFalse(native_result['signature_verified'])
         restored = restore_document(decoded['authoring/trace/assessments/trace.json'], flat_ledger)
         for tid, proof in proofs.items():
             restored['assessment']['tests'][tid] = restore_test(restored['assessment']['tests'][tid], proof)

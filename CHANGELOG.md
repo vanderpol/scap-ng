@@ -8,6 +8,12 @@ proposals are not listed as delivered features.
 
 ### Native content compilation
 
+- Extended the pinned real RHEL 9 OVAL-to-0.4 converter regression through
+  schema-checked native `.scapng` construction and independent verification,
+  including program/Test inventories and explicit non-scanner status. This
+  closes a test gap between the version upgrader, typed authoring IR, and
+  bundle compiler, without claiming semantic scanner parity.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
 - Added independently verifiable YAML-only and JSON-only native 0.4 authoring
   compilation, with a paired mode that compares independently compiled
   `.scapng` bytes. Invalid source, ambiguous references and incompatible
