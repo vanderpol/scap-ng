@@ -1,0 +1,95 @@
+name: 0.4.0 six-STIG independent YAML and JSON native compilation parity
+
+on:
+  # Deliberate release gate only: each input format compiles all six STIGs.
+  # Routine main updates use the three-STIG fast checks instead.
+  push:
+    branches: [main]
+    paths:
+      - '.github/trigger-v04-native-format-parity.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-format-parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install PyYAML==6.0.3 jsonschema==4.26.0 lxml==6.1.1 cryptography
+      - name: Test independent source loaders and native bundle semantics
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/test_v04_a_authoring_graph_index.py
+          python tools/test_v04_canonical_source_ir.py
+          python tools/test_v04_native_bundle_compiler.py
+      - name: Download immutable six-STIG native 0.4 authoring inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/native-parity/source
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261022-restored \
+            --pattern 'scap-ng-0.4.0-six-stigs.json.zip' \
+            --pattern 'scap-ng-0.4.0-six-stigs.yaml.zip' \
+            --dir work/native-parity/source
+          echo 'f481ff109b1f6abfda2d7f115e3140f4e82429517e4adc8cf9de00733180d8f5  work/native-parity/source/scap-ng-0.4.0-six-stigs.json.zip' | sha256sum -c -
+          echo 'd7a989c66f32c8ea7af4c6e3355847da2d39d23b82366ce3f323cd71d4a6c5c1  work/native-parity/source/scap-ng-0.4.0-six-stigs.yaml.zip' | sha256sum -c -
+      - name: Independently compile both authoring formats to identical six native bundles
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/v04_native_bundle_compiler.py \
+            --json-archive work/native-parity/source/scap-ng-0.4.0-six-stigs.json.zip \
+            --yaml-archive work/native-parity/source/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --output-dir work/native-parity/bundles \
+            --report work/native-parity/bundles/compiled-report.json
+      - name: Verify exact six-Benchmark inventory and previously published bundle hashes
+        env:
+          PYTHONPATH: tools
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from v04_native_bundle_compiler import verify_bundle
+
+          root = Path('work/native-parity/bundles')
+          expected = {
+              'apache_server_2-4_unix_server': '9a91e73085aecdb8b40d0c36f9376b7564662efb56a7263546d8971690429535',
+              'ms_windows_11': '788e1c3c7d1819cf6c9495205c67f99174a93c758394a1d39e080084d859839a',
+              'ms_windows_server_2025': '522934a420f8e10f48e3d652b73388fa83032faf0c9b7d014e6db817ebdc0719',
+              'ms_windows_server_dns': 'be28e634c4e7a213fb0cd907ee496ce18a74efd320fc49a1a64bfcd42d846feb',
+              'oracle_linux_9': '6c27ccc64026c0dc40419005ce14b1e1e2fd788f06fe586621af7f0f03a1b7ce',
+              'rhel_9': '81d9fca6784c80a078512a7bb1a48de31f4c9f67ec1d0023dcfe9833c58e2a3f',
+          }
+          bundles = {p.stem: p for p in root.glob('*.scapng')}
+          assert set(bundles) == set(expected), set(bundles) ^ set(expected)
+          reports = json.loads((root / 'compiled-report.json').read_text())
+          assert set(reports) == set(expected), set(reports) ^ set(expected)
+          from hashlib import sha256
+          for name, path in sorted(bundles.items()):
+              raw = path.read_bytes()
+              assert sha256(raw).hexdigest() == expected[name], f'published native bundle changed: {name}'
+              verified = verify_bundle(raw)
+              assert verified == reports[name]
+              assert verified['status'] == 'NATIVE_040_COMPILED_CONTENT_BUNDLE_NOT_SCANNER_TESTED'
+              assert verified['programs'] > 0 and verified['tests'] > 0
+              assert verified['scanner_evaluated'] is False and verified['signature_verified'] is False
+              print('PASS independent YAML/JSON/native release parity:', name)
+          PY
+          cd work/native-parity/bundles
+          sha256sum *.scapng > SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-040-six-STIG-independent-YAML-JSON-native-parity
+          path: |
+            work/native-parity/bundles/*.scapng
+            work/native-parity/bundles/compiled-report.json
+            work/native-parity/bundles/SHA256SUMS.txt
+          if-no-files-found: error

@@ -14,6 +14,11 @@ proposals are not listed as delivered features.
   closes a test gap between the version upgrader, typed authoring IR, and
   bundle compiler, without claiming semantic scanner parity.
   [#232](https://github.com/vanderpol/scap-ng/issues/232)
+- Added a manual six-STIG release gate that compiles canonical YAML and JSON
+  independently and rejects any difference in the resulting native `.scapng`
+  bytes or their previously published immutable release hashes. It is not a
+  routine push check, scanner conformance test, or new content release.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
 - Added independently verifiable YAML-only and JSON-only native 0.4 authoring
   compilation, with a paired mode that compares independently compiled
   `.scapng` bytes. Invalid source, ambiguous references and incompatible
