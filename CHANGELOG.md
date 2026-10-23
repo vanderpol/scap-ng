@@ -27,6 +27,17 @@ proposals are not listed as delivered features.
   [#248](https://github.com/vanderpol/scap-ng/issues/248)
   [#239](https://github.com/vanderpol/scap-ng/issues/239)
 
+### Source-verified converter coverage
+
+- Extended the shared mature 0.3-to-0.4 converter for the pinned original Linux
+  `independent.environmentvariable58` Definition 354 and `unix.uname` Definition
+  932. Preserve nil/integer selectors, comparisons, quantifiers, flat AND
+  criteria, and the uname singleton/six-field State; reject unproved source or
+  lowering changes. Focused differential, schema, bundle-integrity and coverage
+  audit tests do not assert scanner execution parity.
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
 ### Developer toolchain release infrastructure
 
 - Added a bounded Python 3.12 clean-extract smoke gate for the HEAD 0.4.0

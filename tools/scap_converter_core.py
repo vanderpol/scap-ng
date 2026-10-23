@@ -44,6 +44,7 @@ from v04_flat_object_authoring import flatten_document, load_catalog, restore_do
 from v04_native_bundle_compiler import compile_test_instruction
 from v04_source_verified_object_presence import (
     convert as project_object_presence, APPARMOR_DEFINITION, APPARMOR_SOURCE_SHA256,
+    PINNED_DIRECT_SOURCES,
 )
 from v04_source_verified_multitest_presence import convert as project_direct_multitest
 from v04_source_verified_multitest_states import convert as project_direct_multistate
@@ -56,6 +57,21 @@ from v04_source_verified_constant_variable_matrix import (
 # Exact mature 0.3 graph + source bindings for the pinned AppArmor singleton.
 # Assessment identity is caller-selected and excluded from this attestation.
 APPARMOR_LOWERING_SHA256 = "8caa8af94f4cc619fe78634b7daac8c5c94f851b5960e5b712e61d9eb7bed1f0"
+
+
+# Immutable original-source graph attestations; these hashes exclude only the
+# caller-selected Assessment ID. Both raw and aligned 0.3 graphs include source
+# bindings and every selector, State operand, datatype and quantifier.
+PINNED_DIRECT_LOWERINGS = {
+    "oval:org.mitre.oval.test:def:354": {
+        "raw": "eef945fe01d46db422daf57e1103c0c999126732923076b6e9aa9f3f93decd17",
+        "aligned": "90d884bd60d6ac2abc2ce86f40b626b1378e3afc86abb23a64107ad0455cbfa8"
+    },
+    "oval:navy.navwar.niwcatlantic.scc.test:def:932": {
+        "raw": "da5b83812b21ce6dd91ad77732a26564852bbc86e8071e6adde47aa89f14d644",
+        "aligned": "c809c98f75cc9dde47a85c48e160505bbc180bda1bb6f67311c63f921bcb44da"
+    }
+}
 
 
 def require(ok, reason):
@@ -396,6 +412,12 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     """Use existing semantic IR + v003 lowering, then fail-closed v04 projection."""
     source_path = Path(source_path)
     original = source_path.read_bytes()
+    pinned_direct = definition_id in PINNED_DIRECT_SOURCES
+    if pinned_direct:
+        require(hashlib.sha256(original).hexdigest() == PINNED_DIRECT_SOURCES[definition_id],
+                "pinned environmentvariable58/uname source SHA differs for " + definition_id
+                + "; expected " + PINNED_DIRECT_SOURCES[definition_id]
+                + ", got " + hashlib.sha256(original).hexdigest())
     apparmor_source = definition_id == APPARMOR_DEFINITION
     if apparmor_source:
         require(hashlib.sha256(original).hexdigest() == APPARMOR_SOURCE_SHA256,
@@ -418,7 +440,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     datatype_suite_name = next(
         (name for name in DATATYPE_REUSE_CASES
          if DATATYPE_SUITE_CASES[name][0] == definition_id), None)
-    if apparmor_source:
+    if apparmor_source or pinned_direct:
         # The native graph must be projected from mature 0.3 lowering.
         # The independent AppArmor oracle is used only in differential tests.
         independent = None
@@ -462,7 +484,10 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         except ValueError:
             independent = None
     ident = (independent["assessment"]["id"] if independent is not None else
-             assessment_id or re.sub(r"[^a-z0-9]+", "-", definition_id.lower()).strip("-")
+             assessment_id or ({
+                 "oval:org.mitre.oval.test:def:354": "environmentvariable58-self-assertion.assessment",
+                 "oval:navy.navwar.niwcatlantic.scc.test:def:932": "uname-self-assertion.assessment",
+             }.get(definition_id)) or re.sub(r"[^a-z0-9]+", "-", definition_id.lower()).strip("-")
              + ".assessment")
     provenance = {}
     lower, err = lower_definition(ET.fromstring(original), definition_id,
@@ -476,8 +501,20 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         require(lower["assessment"]["id"] == ident
                 and lowering_sha == APPARMOR_LOWERING_SHA256,
                 "pinned AppArmor mature 0.3 lowering graph differs")
+    def attest_pinned_graph(doc, stage):
+        if not pinned_direct:
+            return
+        graph = {**doc, "assessment": {k: v for k, v in doc["assessment"].items() if k != "id"}}
+        fingerprint = hashlib.sha256(json.dumps(
+            {"lowered": graph, "provenance": provenance}, sort_keys=True,
+            separators=(",", ":")).encode()).hexdigest()
+        require(doc["assessment"]["id"] == ident and
+                fingerprint == PINNED_DIRECT_LOWERINGS[definition_id][stage],
+                "pinned environmentvariable58/uname " + stage + " 0.3 lowering graph differs")
+    attest_pinned_graph(lower, "raw")
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
+    attest_pinned_graph(aligned, "aligned")
     multi_direct_presence = (independent is None and
                              len(aligned["assessment"].get("tests") or {}) >= 2)
     object_presence = independent is None and not multi_direct_presence
@@ -538,6 +575,9 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                    if multi_direct_presence else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
         **({"v003_pinned_lowering_sha256": lowering_sha} if apparmor_source else {}),
+        **({"pinned_direct_lowering_sha256": PINNED_DIRECT_LOWERINGS[definition_id],
+            "original_oval_pinned_direct_graph_attested": True,
+            "source_provenance": provenance} if pinned_direct else {}),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,

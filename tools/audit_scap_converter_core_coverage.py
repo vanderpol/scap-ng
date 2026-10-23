@@ -184,6 +184,9 @@ def inventory(source: Path):
                     raise ValueError("incorrect native coverage evidence")
                 item["maintained_v004_core"] = "SOURCE_PROVEN"
                 item["capability"] = evidence["capability"]
+                if evidence.get("original_oval_pinned_direct_graph_attested"):
+                    item["source_sha256"] = evidence["source_sha256"]
+                    item["pinned_direct_lowering_sha256"] = evidence["pinned_direct_lowering_sha256"]
                 counts["maintained_v004_core_source_proven"] += 1
             except (TypeError, KeyError, ValueError, IndexError, AttributeError) as exc:
                 item["v004_diagnostic"] = safe_error(exc)

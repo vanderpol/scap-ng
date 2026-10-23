@@ -27,6 +27,12 @@ APPARMOR_SOURCE_SHA256 = "1e9b6d6bab5a40226db960cebf08c8124282b86e8b0c52316027d4
 APPARMOR_TEST = "oval:com.jovalcm.test:tst:1766"
 APPARMOR_OBJECT = "oval:com.jovalcm.test:obj:1137"
 APPARMOR_STATE = "oval:com.jovalcm.test:ste:1660"
+# These additions attest only the immutable original graphs, not arbitrary
+# environmentvariable58/uname constructs. Reuse existing capability mappings.
+PINNED_DIRECT_SOURCES = {
+    "oval:org.mitre.oval.test:def:354": "c6ac03ec0d2745e3545d16cb3fba38e8b7486cbbbb39c03edf5fa27960d49c73",
+    "oval:navy.navwar.niwcatlantic.scc.test:def:932": "3c175c94a1a43a17049d39002f95d8e3ed9143eb943c76c47047f1f535c7c070",
+}
 SOURCE_EXISTENCE = {
     "any_exist": ("optional", "may_be_absent"),
     "at_least_one_exists": ("one_or_more", "one_or_more"),
@@ -86,6 +92,23 @@ def direct_selectors(original_object, old_object, namespace, capability, mapping
     if old_object["object_title"] is not None:
         obj["object_title"] = old_object["object_title"]
     for node in original_object:
+        if capability == "independent.environmentvariable58":
+            # Caller has attested the immutable Definition/source. Verify every
+            # operand against mature lowering before rendering existing grammar.
+            field = node.tag.rsplit("}", 1)[-1]
+            old = source_selectors.get(field)
+            if node.get("{http://www.w3.org/2001/XMLSchema-instance}nil") == "true":
+                ensure(field == "pid" and old is None and node.text is None,
+                       "nil PID differs from 0.3 selector")
+                obj[renames[field]] = None
+                continue
+            op = node.get("operation", "equals").replace(" ", "_")
+            dtype = "integer" if node.get("datatype") == "int" else "string"
+            value = int(node.text) if dtype == "integer" else node.text
+            ensure(old == {"operation": op, "datatype": dtype, "value": value},
+                   "environment selector differs from mature lowering")
+            obj[renames[field]] = {("matches_regex" if op == "pattern_match" else op): old["value"]}
+            continue
         field = node.tag.rsplit("}", 1)[-1]
         ensure(node.tag == "{" + namespace + "}" + field
                and field in source_selectors and field in renames
@@ -160,6 +183,12 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
                "unsupported Object graph")
     capability = old_test["capability"]
     apparmor = capability == "linux.apparmorstatus"
+    uname = capability == "unix.uname"
+    environment = capability == "independent.environmentvariable58"
+    if uname or environment:
+        ensure(definition_id in PINNED_DIRECT_SOURCES
+               and sha256(source_xml).hexdigest() == PINNED_DIRECT_SOURCES[definition_id],
+               "unproved environmentvariable58/uname source SHA/Definition")
     if apparmor:
         # Integer singleton support is attested for precisely this original
         # graph, not a general integer-State or singleton-shape expansion.
@@ -281,50 +310,59 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
                and set(original_state.attrib) <= {"id", "version", "comment"}
                and original_state.get("version") is not None
                and original_state.get("comment") == old_state["state_title"]
-               and len(original_state) == 1,
+               and len(original_state) == (6 if uname else 1),
                "source State title/type or scalar cardinality changed")
-        element = original_state[0]
-        old_field = old_state["state"]
-        ensure(isinstance(old_field, dict) and
-               set(old_field) == {"field", "value", "operation", "datatype", "match", "existence"}
-               and (type(old_field["value"]) is int if apparmor else
-                    isinstance(old_field["value"], str)),
-               "mapped State must be one literal scalar comparison")
-        field = element.tag.rsplit("}", 1)[-1]
-        rename = mapping["native"].get("state_field_map", {})
-        datatype = element.get("datatype", "string")
-        if apparmor:
-            ensure(field == "loaded_profiles_count" and datatype == "int"
-                   and element.get("operation") == "greater than or equal"
-                   and element.text == "0" and old_field["value"] == 0
-                   and old_test["match"] == "all",
-                   "pinned AppArmor integer State/Test check changed")
-        ensure(datatype in ({"int"} if apparmor else {"string", "version"}) and
-               element.tag == "{" + namespace + "}" + field
-               and field in rename and rename[field] == old_field["field"]
-               and not list(element)
-               and set(element.attrib) <= {"operation", "datatype", "entity_check",
-                                          "entity_existence"}
-               and element.get("entity_check", "all") == "all"
-               and element.get("entity_existence", "at_least_one_exists") ==
-                   "at_least_one_exists"
-               and old_field["datatype"] == ("integer" if apparmor else datatype)
-               and old_field["match"] == "all"
-               and old_field["existence"] == "one_or_more"
-               and (int(element.text) if apparmor else (element.text or "")) == old_field["value"],
-               "source State field/existence/check/value mismatch")
-        operation = element.get("operation", "equals")
-        operation_map = ({"greater than or equal": ("greater_than_or_equal", "greater_than_or_equal")}
-                         if apparmor else SOURCE_OPERATIONS if datatype == "string" else VERSION_OPERATIONS)
-        ensure(operation in operation_map
-               and old_field["operation"] == operation_map[operation][0],
-               "source State operation lost by mature 0.3 lowering")
-        native_states = [{rename[field]: {
-            "require": "at_least_one_exists_and_all_match",
-            operation_map[operation][1]: old_field["value"],
-            **({"datatype": old_field["datatype"]} if apparmor else {})}}]
+        old_fields = old_state["state"].get("all") if uname else [old_state["state"]]
+        ensure(isinstance(old_fields, list) and len(old_fields) == len(original_state)
+               and (not uname or set(old_state["state"]) == {"all"}),
+               "source State AND field closure changed")
+        native_fields = []
+        for element, old_field in zip(original_state, old_fields):
+            ensure(isinstance(old_field, dict) and
+                   set(old_field) == {"field", "value", "operation", "datatype", "match", "existence"}
+                   and (type(old_field["value"]) is int if apparmor else
+                        isinstance(old_field["value"], str)),
+                   "mapped State must be one literal scalar comparison")
+            field = element.tag.rsplit("}", 1)[-1]
+            rename = mapping["native"].get("state_field_map", {})
+            datatype = element.get("datatype", "string")
+            if apparmor:
+                ensure(field == "loaded_profiles_count" and datatype == "int"
+                       and element.get("operation") == "greater than or equal"
+                       and element.text == "0" and old_field["value"] == 0
+                       and old_test["match"] == "all",
+                       "pinned AppArmor integer State/Test check changed")
+            ensure(datatype in ({"int"} if apparmor else {"string", "version"}) and
+                   element.tag == "{" + namespace + "}" + field
+                   and field in rename and rename[field] == old_field["field"]
+                   and not list(element)
+                   and set(element.attrib) <= {"operation", "datatype", "entity_check",
+                                              "entity_existence"}
+                   and element.get("entity_check", "all") == "all"
+                   and element.get("entity_existence", "at_least_one_exists") ==
+                       "at_least_one_exists"
+                   and old_field["datatype"] == ("integer" if apparmor else datatype)
+                   and old_field["match"] == "all"
+                   and old_field["existence"] == "one_or_more"
+                   and (int(element.text) if apparmor else (element.text or "")) == old_field["value"],
+                   "source State field/existence/check/value mismatch")
+            operation = element.get("operation", "equals")
+            operation_map = ({"greater than or equal": ("greater_than_or_equal", "greater_than_or_equal")}
+                             if apparmor else {**SOURCE_OPERATIONS, **({"case insensitive not equal":
+                                 ("case_insensitive_not_equal", "case_insensitive_not_equal")}
+                                if environment else {})} if datatype == "string" else VERSION_OPERATIONS)
+            ensure(operation in operation_map
+                   and old_field["operation"] == operation_map[operation][0],
+                   "source State operation lost by mature 0.3 lowering")
+            native_fields.append({rename[field]: {
+                "require": "at_least_one_exists_and_all_match",
+                operation_map[operation][1]: old_field["value"],
+                **({"datatype": old_field["datatype"]} if apparmor else {})}})
+        native_states = [{"and": native_fields}] if uname else native_fields
 
     native_id = "loaded-apparmor-profiles-test" if apparmor else slug(old_test["test_title"])
+    if environment and not native_id.startswith("test-"):
+        native_id = "test-" + native_id
     native_test = {
         "test_title": old_test["test_title"], "capability": capability,
         "reported_elements": "all",
@@ -343,7 +381,7 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
         "purpose": a["purpose"],
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
         "tests": {native_id: native_test},
-        "evaluate": {"and": [{"test": native_id}]} if apparmor else {"test": native_id},
+        "evaluate": {"and": [{"test": native_id}]} if apparmor or uname else {"test": native_id},
     }}
     # Invertible no-op here proves we have already emitted the native flat
     # grammar: neither source wrappers nor hidden collection containers remain.

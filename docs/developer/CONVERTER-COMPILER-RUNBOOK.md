@@ -40,6 +40,9 @@ SCAP_NG_PROFILES_SOURCE_XML=/path/to/macos-def_profiles_test.xml \
   python tools/test_scap_converter_core_singleton_presence.py -v
 SCAP_NG_APPARMOR_SOURCE_XML=/path/to/linux-def_apparmorstatus_test.xml \
   python tools/test_scap_converter_core_apparmorstatus.py -v
+SCAP_NG_ENVIRONMENT58_SOURCE_XML=/path/to/linux/ind-def_environmentvariable58_test_linux.xml \
+SCAP_NG_UNAME_SOURCE_XML=/path/to/unix/unix-def_uname_test.xml \
+  python tools/test_scap_converter_core_environment_uname.py -v
 python tools/test_v04_public_cli_smoke.py -v
 SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML=/path/to/oval-def_constant_variable.xml \
 SCAP_NG_CHECK_ENUMERATION_SOURCE_XML=/path/to/oval_check_enumeration_variable_values.xml \
@@ -77,6 +80,49 @@ Test/State binding and operand is checked against the original graph.
 The independent AppArmor oracle is used only by differential tests, never
 to supply converter output. This does not admit other integer/singleton shapes
 or establish live AppArmor scanner behavior (Refs #232 #248).
+
+The same shared bridge now admits exactly two additional original Definitions
+at that immutable Self-Assertion revision (Refs
+[#248](https://github.com/vanderpol/scap-ng/issues/248) and
+[#232](https://github.com/vanderpol/scap-ng/issues/232)):
+
+| Original file under `SCAP_1.4/OVAL_Test_Content/` | Definition | Source SHA-256 |
+| --- | --- | --- |
+| `linux/ind-def_environmentvariable58_test_linux.xml` | `oval:org.mitre.oval.test:def:354` | `c6ac03ec0d2745e3545d16cb3fba38e8b7486cbbbb39c03edf5fa27960d49c73` |
+| `unix/unix-def_uname_test.xml` | `oval:navy.navwar.niwcatlantic.scc.test:def:932` | `3c175c94a1a43a17049d39002f95d8e3ed9143eb943c76c47047f1f535c7c070` |
+
+Previously both source graphs lowered to 0.3 but failed the bounded native
+projection. For environmentvariable58, the three ordered AND criteria retain
+`at_least_one_exists` / `at least one` Test checks. The Object selectors become
+`pid: null` plus `name.equals: HOME`; `pid.equals: 1` plus
+`name.not_equal: PATH`; and `pid.greater_than: 0` plus
+`name.matches_regex: ^S`. PID operands remain integers. State comparisons remain
+string equality, case-insensitive inequality, and regex respectively. A nil
+PID still selects the assessment tool's process per the existing mapping.
+For uname, the empty original Object is the existing implicit system singleton;
+`at_least_one_exists` / `all` and all six string `.*` State comparisons remain
+explicit, with the original AND retained. No language/result behavior changes.
+
+Only these exact bytes/Definitions are admitted for these additions. Raw and
+aligned mature 0.3 graphs, including provenance, are fingerprinted with only
+the caller-selected Assessment ID excluded. Missing inputs, changed source,
+selectors, nil, State operands/types/quantifiers, graph closure or source
+bindings fail closed. Evidence retains source bindings outside native authoring.
+Other OS variants of Definition 354, variables, filters, sets, additional
+criteria and other unproved shapes are not admitted by this extension.
+A new parser, independent-importer fallback, and copied oracle output were
+rejected in favor of the existing mature lowering and direct-State bridge.
+
+The dedicated tests independently reconstruct OVAL from emitted native operands
+and compare its semantic graph to the original, including negative native
+quantifier/operand mutations. They also reject source and both lowering-stage
+mutations, validate current authoring/schema, and compile/verify bundle hashes.
+The coverage auditor records source and both lowering hashes for these exact
+Definitions, preserving blocked cases in its denominator. The focused
+`v04-converter-core-bridge.yml` gate runs these checks; it does not run the
+65-benchmark corpus or assert scanner execution parity. Owner authorization:
+bounded source-verified extension requested 2026-10-23; normative schemas and
+language meaning are unchanged.
 
 The checkout must contain both `schema/v0.3.0/capability-mappings/supported/`
 and `schema/v0.4.0/capability-mappings/supported/`. In particular the mature

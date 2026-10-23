@@ -15,6 +15,7 @@ on:
       - 'tools/test_scap_converter_core_multistate.py'
       - 'tools/test_scap_converter_core_singleton_presence.py'
       - 'tools/test_scap_converter_core_apparmorstatus.py'
+      - 'tools/test_scap_converter_core_environment_uname.py'
       - 'tools/prove_v04_oval_apparmorstatus_source.py'
       - 'tools/test_v04_public_cli_smoke.py'
       - 'tools/test_scap_converter_core_constant_matrix.py'
@@ -78,6 +79,9 @@ jobs:
           python tools/test_scap_converter_core_singleton_presence.py -v
           test -f "$SCAP_NG_APPARMOR_SOURCE_XML"
           python tools/test_scap_converter_core_apparmorstatus.py -v
+          test -f "$SCAP_NG_ENVIRONMENT58_SOURCE_XML"
+          test -f "$SCAP_NG_UNAME_SOURCE_XML"
+          python tools/test_scap_converter_core_environment_uname.py -v
           python tools/test_v04_public_cli_smoke.py -v
           test -f "$SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML"
           test -f "$SCAP_NG_CHECK_ENUMERATION_SOURCE_XML"
@@ -93,6 +97,8 @@ jobs:
           python tools/test_audit_scap_converter_core_coverage.py -v
           python tools/test_import_v04_oval_leaf_pilot.py -v
         env:
+          SCAP_NG_ENVIRONMENT58_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/linux/ind-def_environmentvariable58_test_linux.xml
+          SCAP_NG_UNAME_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/unix/unix-def_uname_test.xml
           SCAP_NG_VARIABLE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml
           SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval-def_constant_variable.xml
           SCAP_NG_CHECK_ENUMERATION_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval_check_enumeration_variable_values.xml
