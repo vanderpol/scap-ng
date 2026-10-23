@@ -31,6 +31,9 @@ class ConverterCoverageInventoryTests(unittest.TestCase):
         self.assertNotIn("v003_lowerable_but_v004_unproved", r["counts"])
         self.assertEqual({entry["maintained_v004_core"] for entry in r["definitions"]},
                          {"SOURCE_PROVEN"})
+        self.assertEqual(r["lowerable_but_unproved"]["blocked_0_3_lowerable_definitions"], 0)
+        self.assertTrue(all(entry["v003_shape"]["tests"] == 1
+                            for entry in r["definitions"]))
         self.assertFalse(r["full_oval_coverage"])
         self.assertFalse(r["scanner_parity"])
 
@@ -42,6 +45,9 @@ class ConverterCoverageInventoryTests(unittest.TestCase):
         self.assertEqual(result["counts"]["maintained_v004_core_blocked_nondeprecated"], 1)
         self.assertEqual(result["definitions"][0]["maintained_v004_core"], "BLOCKED")
         self.assertIn("v004_diagnostic", result["definitions"][0])
+        self.assertEqual(result["lowerable_but_unproved"]["blocked_0_3_lowerable_definitions"], 1)
+        self.assertIn("independent.shellcommand",
+                      result["lowerable_but_unproved"]["by_capability"])
 
     def test_malformed_extra_file_does_not_hide_valid_definition(self):
         (self.root / "shell.xml").write_bytes(shell_source())

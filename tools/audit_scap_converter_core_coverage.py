@@ -46,6 +46,62 @@ def source_files(source: Path):
     return source, files
 
 
+def v003_shape(assessment):
+    """Summarize *preserved* source semantics without treating them as 0.4."""
+    tests = assessment.get("tests") or {}
+    objects = assessment.get("objects") or {}
+    states = assessment.get("states") or {}
+    variables = assessment.get("variables") or {}
+
+    def contains(node, key):
+        if isinstance(node, dict):
+            return key in node or any(contains(child, key) for child in node.values())
+        if isinstance(node, list):
+            return any(contains(child, key) for child in node)
+        return False
+
+    return {
+        "tests": len(tests),
+        "objects": len(objects),
+        "states": len(states),
+        "variables": len(variables),
+        "capabilities": sorted({test["capability"] for test in tests.values()
+                                if isinstance(test, dict) and isinstance(test.get("capability"), str)}),
+        "evaluate_root": next(iter(assessment.get("evaluate") or {}), "none"),
+        "has_sets": contains(objects, "set"),
+        "has_filters": contains(objects, "filters"),
+    }
+
+
+def unresolved_shape_summary(rows):
+    """Prioritize missing *families* rather than publishing a one-off list."""
+    blocked = [r for r in rows if r.get("v003_source_lowering") == "PASS"
+               and r.get("maintained_v004_core") == "BLOCKED"]
+    caps = Counter()
+    patterns = Counter()
+    examples = {}
+    for item in blocked:
+        shape = item["v003_shape"]
+        for capability in shape["capabilities"]:
+            caps[capability] += 1
+            examples.setdefault(capability, {
+                "source_file": item["source_file"],
+                "definition_id": item["definition_id"],
+                "shape": shape,
+            })
+        pattern = (f"T{shape['tests']}/O{shape['objects']}/S{shape['states']}"
+                   f"/V{shape['variables']}/Set{int(shape['has_sets'])}"
+                   f"/Filter{int(shape['has_filters'])}"
+                   f"/{shape['evaluate_root']}")
+        patterns[pattern] += 1
+    return {
+        "blocked_0_3_lowerable_definitions": len(blocked),
+        "by_capability": dict(caps.most_common()),
+        "by_semantic_shape": dict(patterns.most_common()),
+        "first_source_per_capability": examples,
+    }
+
+
 def inventory(source: Path):
     root_path, files = source_files(source)
     counts = Counter()
@@ -93,6 +149,7 @@ def inventory(source: Path):
                     raise ValueError("0.3 capability graph not aligned")
                 item["v003_source_lowering"] = "PASS"
                 counts["v003_source_lowering_pass"] += 1
+                item["v003_shape"] = v003_shape(aligned["assessment"])
                 if modern is not None:
                     item["v003_modernization_report_present"] = True
             except (TypeError, KeyError, ValueError, IndexError, AttributeError) as exc:
@@ -127,6 +184,7 @@ def inventory(source: Path):
         "source": str(root_path),
         "counts": dict(sorted(counts.items())),
         "v004_error_class_counts": dict(sorted(diagnostics.items())),
+        "lowerable_but_unproved": unresolved_shape_summary(rows),
         "definitions": sorted(rows, key=lambda row: (
             row["source_file"], row.get("definition_id", ""))),
         "full_oval_coverage": False,
@@ -143,7 +201,14 @@ def main():
     result = inventory(args.source)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps(result["counts"], sort_keys=True))
+    print(json.dumps({
+        "counts": result["counts"],
+        "top_blocked_capabilities": list(
+            result["lowerable_but_unproved"]["by_capability"].items())[:25],
+        "top_blocked_shapes": list(
+            result["lowerable_but_unproved"]["by_semantic_shape"].items())[:15],
+        "source_example_per_capability": result["lowerable_but_unproved"]["first_source_per_capability"],
+    }, sort_keys=True))
 
 
 if __name__ == "__main__":
