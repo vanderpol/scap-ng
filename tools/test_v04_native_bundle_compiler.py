@@ -16,7 +16,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from test_v04_canonical_source_ir import sample
 from v04_a_authoring_graph_index import canonical_json
-from v04_canonical_unsigned_package import build_package as source_package
+from v04_canonical_source_ir import validate_docs
+from v04_canonical_unsigned_package import (
+    _package_validators, build_package as source_package,
+)
 from v04_native_bundle_compiler import (
     build_bundle, compile_from_archive, compile_from_pair, compile_from_source_package,
     compile_test_instruction, verify_bundle, MANIFEST_MEMBER,
@@ -149,6 +152,49 @@ class NativeBundleCompilerTests(unittest.TestCase):
         compiled, report = compile_from_source_package(source, validate_schema=False)
         self.assertNotEqual(compiled, source)
         self.assertEqual(report["programs"], 1)
+
+    def test_manual_alternative_retained_without_inventing_a_native_program(self):
+        docs = fixture()
+        manual = {"assessment": {
+            "id": "manual-assessment-1", "version": 1,
+            "assessment_title": "Check the configured file permission",
+            "mode": "manual", "class": "compliance", "purpose": "assessment",
+            "procedure": "Review the configured permission with the system owner.",
+            "response": {
+                "type": "human-compliance-disposition",
+                "choices": [
+                    {"value": "compliant", "outcome": "true"},
+                    {"value": "noncompliant", "outcome": "false"},
+                ],
+                "allow_comment": True, "allow_evidence": True,
+            },
+        }}
+        validate_docs({"authoring/demo/assessments/manual.json": manual},
+                      _package_validators())
+        invalid_manual = deepcopy(manual)
+        invalid_manual["assessment"].pop("response")
+        with self.assertRaisesRegex(ValueError, "native 0.4.0 schema failure"):
+            validate_docs({"authoring/demo/assessments/manual.json": invalid_manual},
+                          _package_validators())
+        docs["authoring/demo/assessments/manual.json"] = manual
+        choices = docs["authoring/demo/rules/r1.json"]["rule"]["assessment_choices"]
+        choices["manual"] = {"assessment": "manual-assessment-1"}
+        raw, manifest = build_bundle(docs, validate_schema=False)
+        checked = verify_bundle(raw, validate_schema=False)
+        self.assertEqual((checked["documents"], checked["programs"], checked["tests"]),
+                         (4, 1, 1))
+        self.assertIn("manual-assessment-1", manifest["objects"])
+        self.assertNotIn("manual-assessment-1",
+                         manifest["build_provenance"]["compiled_programs"])
+        with zipfile.ZipFile(io.BytesIO(raw)) as zf:
+            member = manifest["objects"]["manual-assessment-1"]["path"]
+            self.assertEqual(json.loads(zf.read(member)), manual)
+        self.assertFalse(checked["scanner_evaluated"])
+        with tempfile.TemporaryDirectory() as td:
+            paths = authoring_archives(docs, Path(td))
+            independent, report = compile_from_pair(*paths, validate_schema=False)
+        self.assertEqual(independent, {"demo": raw})
+        self.assertEqual(report["demo"], checked)
 
     def test_preserve_source_exact_fallback_without_reinterpretation(self):
         test = deepcopy(fixture()["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"])

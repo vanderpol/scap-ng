@@ -8,6 +8,11 @@ proposals are not listed as delivered features.
 
 ### Native content compilation
 
+- Added native bundle regression coverage for schema-valid manual Assessment
+  alternatives: both independent authoring formats preserve the manual
+  procedure/response and Rule choice without inventing an automated Test
+  program. Incomplete manual responses fail native schema validation.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
 - Extended the pinned real RHEL 9 OVAL-to-0.4 converter regression through
   schema-checked native `.scapng` construction and independent verification,
   including program/Test inventories and explicit non-scanner status. This
