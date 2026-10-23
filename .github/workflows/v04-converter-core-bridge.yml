@@ -5,7 +5,9 @@ on:
     branches: [main]
     paths:
       - 'tools/scap_converter_core.py'
+      - 'tools/v04_source_verified_object_presence.py'
       - 'tools/test_scap_converter_core.py'
+      - 'tools/test_scap_converter_core_object_presence.py'
       - 'tools/test_scap_converter_core_variable.py'
       - 'tools/test_scap_converter_core_family.py'
       - 'tools/audit_scap_converter_core_coverage.py'
@@ -46,6 +48,9 @@ jobs:
         run: |
           python tools/test_oval_semantic_core_preservation.py -v
           python tools/test_scap_converter_core.py -v
+          test -f "$SCAP_NG_IOS_BGP_SOURCE_XML"
+          test -f "$SCAP_NG_IOS_SECTION_SOURCE_XML"
+          python tools/test_scap_converter_core_object_presence.py -v
           test -f "$SCAP_NG_VARIABLE_SOURCE_XML"
           python tools/test_scap_converter_core_variable.py -v
           test -f "$SCAP_NG_FAMILY_SOURCE_XML"
@@ -55,3 +60,5 @@ jobs:
         env:
           SCAP_NG_VARIABLE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml
           SCAP_NG_FAMILY_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml
+          SCAP_NG_IOS_BGP_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/ios/ios-def_bgpneighbor_test.xml
+          SCAP_NG_IOS_SECTION_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/ios/ios-def_section_test.xml

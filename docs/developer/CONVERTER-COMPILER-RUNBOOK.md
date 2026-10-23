@@ -29,6 +29,7 @@ python tools/scap_converter_core.py \
   --evidence /tmp/assessment-conversion-evidence.json
 
 python tools/test_scap_converter_core.py -v
+python tools/test_scap_converter_core_object_presence.py -v
 python tools/test_oval_semantic_core_preservation.py -v
 # With the pinned source available (see below):
 SCAP_NG_VARIABLE_SOURCE_XML=/path/to/ind-def_variable_test.xml \
@@ -41,8 +42,10 @@ The current implementation calls the established semantic IR parser and
 `scap_upconvert_v003` source/language lowering plus its 0.3 capability
 alignment. A distinct 0.4 projection reuses the verified flat-Object and
 requirement transformations, validates the Test through the native 0.4
-compiler, and checks source-exact agreement with the independently developed
-original-OVAL importer (normalized to final flat-Object syntax).
+compiler. For the original two leaf shapes it checks agreement with the
+independently developed OVAL importer (normalized to flat-Object syntax).
+For direct Object-only cases it instead compares the mature 0.3 graph field
+by field to the original OVAL Test and Object before emitting native syntax.
 The checkout must contain both `schema/v0.3.0/capability-mappings/supported/`
 and `schema/v0.4.0/capability-mappings/supported/`. In particular the mature
 0.3 mapper represents a direct shell Filter using an intermediate single
@@ -50,7 +53,16 @@ UNION Set operand; the 0.4 adapter admits that exact source-proven shape,
 while real original OVAL Sets remain unsupported. Missing 0.3 mappings are
 an error, never an implied conversion fallback.
 
-**Supported in this checkpoint:** one direct
+**Supported in this checkpoint:** a source-verified single direct Object-only
+Test with mapped string selectors and an explicit OVAL existence requirement
+(`any_exist`, `at_least_one_exists`, `none_exist` or `only_one_exists`), with
+no State, Variable, Set, Filter or nested Boolean criteria. The current core
+reuses the mature 0.3 lowering, verifies every Test/Object/selector binding
+against the original OVAL, and compiles a native 0.4 presence instruction.
+The immutable IOS BGP-neighbor and section examples exercise this path.
+These checks do **not** establish scanner-result parity.
+
+Previously admitted are one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`
 Filter, or one direct `windows.registry` value-equality Test with its
 original `only one` item quantifier; **also** one pinned
@@ -65,16 +77,19 @@ Also admitted: pinned `independent.family_test` Definition
 preserves State `var_check=all` and the Test `at least one` check, and has
 independent 0.4 import/export and semantic round-trip proof.
 
-For the Variable regression, retrieve only the immutable
+For source regressions, retrieve only the immutable
 [`e3538595` Self-Assertion source](https://github.com/OVAL-Community/SCAP-Self-Assertion/commit/e3538595c5083b9c34d937a81d319234df9bbfaa)
 at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
-`SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`;
-both regressions check their SHA256. The sources are fetched by the maintained
+`SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus the two
+`ios/ios-def_bgpneighbor_test.xml` and `ios/ios-def_section_test.xml` files
+under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family
+regressions check their SHA256, and the Object-only regression independently
+checks OVAL source Test/Object/selector details. Sources are fetched by the maintained
 GitHub Actions test, not copied into the repository.
 
-These four source-bound cases are **not** a general language-coverage claim;
+These source-bound subsets are **not** a general language-coverage claim;
 both Variable cases already had independent 0.4 coverage prior to integration.
-All other shapes must error, including genuine Sets, arbitrary Variable
+Other shapes must error, including genuine Sets, arbitrary Variable
 references/function chains, arbitrary nested criteria, unsupported Filters
 and unmatched Test/State semantics. The legacy broad 0.3 importer
 remains available to avoid destroying existing source support while verified
@@ -110,8 +125,9 @@ Definitions through this reporting path as well as the direct conversion path.
 For the full 167-Definition Self-Assertion source audit, manually trigger
 `0.4 original OVAL core conversion coverage` in GitHub Actions. It
 checks out the original repository at its immutable revision and uploads the
-complete per-Definition report. The audit also runs when its own script or
-workflow changes, but deliberately does not run on unrelated pushes.
+complete per-Definition report. The audit also runs when its own script,
+converter code or workflow changes, but deliberately does not run on
+unrelated pushes.
 
 ## Compiler: canonical 0.4 graph only
 

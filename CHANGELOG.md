@@ -99,6 +99,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Extended the maintained shared-source converter with a generic **direct
+  Object-only Test** 0.4 adapter. The established 0.3 lowerer supplies the
+  graph, and the adapter checks its Test identity, existence quantifier,
+  selector mapping and scalar operation against original OVAL before compiling
+  a native presence instruction. Synthetic mutation tests and two immutable
+  IOS Self-Assertion examples are pinned in CI. Complex Tests remain blocked,
+  and live scanner parity is not implied.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Added a read-only, publicly runnable original-OVAL coverage auditor for
   the maintained converter. It counts mature 0.3 lowering and source-proven
   0.4 output separately per Definition, retains source hashes/diagnostics,

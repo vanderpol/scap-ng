@@ -2,8 +2,9 @@
 """Shared-source OVAL -> canonical 0.4 converter integration checkpoint.
 
 The source lowering is the mature 0.3 converter; native 0.4 projection is a
-strict, separately checked boundary. Two leaf shapes and two source-pinned
-Variable cases are admitted. This is NOT general OVAL 5.12.3 coverage.
+strict, separately checked boundary. Original-source-attested direct
+Object-only presence checks extend the two narrow leaf and two pinned
+Variable cases. This is NOT general OVAL 5.12.3 coverage.
 
 Refs #232 #229 #248.
 """
@@ -14,6 +15,7 @@ from functools import lru_cache
 import hashlib
 import json
 from pathlib import Path
+import re
 import xml.etree.ElementTree as ET
 
 from compare_v04_fresh_oval_import import compare as compare_independent
@@ -34,6 +36,7 @@ from scap_upconvert_v003.convert_collection_review import postprocess_automated_
 from v04_field_requirement import promote_test, restore_test
 from v04_flat_object_authoring import flatten_document, load_catalog, restore_document
 from v04_native_bundle_compiler import compile_test_instruction
+from v04_source_verified_object_presence import convert as project_object_presence
 
 
 def require(ok, reason):
@@ -401,21 +404,35 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         if assessment_id:
             independent["assessment"]["id"] = assessment_id
     else:
-        independent = independent_leaf_import(original, definition_id, assessment_id=assessment_id)
-    ident = independent["assessment"]["id"]
+        # The independently written leaf importer handles its approved source
+        # families. Direct Object-only source cases use their own narrow,
+        # original-OVAL-verified proof; neither code path asserts scanner parity.
+        try:
+            independent = independent_leaf_import(original, definition_id,
+                                                  assessment_id=assessment_id)
+        except ValueError:
+            independent = None
+    ident = (independent["assessment"]["id"] if independent is not None else
+             assessment_id or re.sub(r"[^a-z0-9]+", "-", definition_id.lower()).strip("-")
+             + ".assessment")
     provenance = {}
     lower, err = lower_definition(ET.fromstring(original), definition_id,
                                   ident, collection_graph=True, provenance=provenance)
     require(err is None, "0.3 source lowering failed: " + str(err))
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
+    object_presence = independent is None
     native = (project_v003_variable_to_v04(aligned, provenance, original)
               if variable_source else project_v003_family_to_v04(aligned, provenance)
-              if family_source else project_v003_to_v04(aligned))
+              if family_source else project_object_presence(
+                  aligned, original, definition_id, provenance,
+                  Path(__file__).resolve().parents[1] /
+                  "schema/v0.4.0/capability-mappings/supported", flat_catalog())
+              if object_presence else project_v003_to_v04(aligned))
     # The independent original-OVAL importer predates the final flat Object
     # syntax. Normalize it using the *same invertible* approved 0.4 pass;
     # compare executable fields only after both are in canonical 0.4 grammar.
-    if variable_source or family_source:
+    if variable_source or family_source or object_presence:
         independent_flat = independent
     else:
         independent_flat, flat_proof = flatten_document(independent, flat_catalog())
@@ -426,19 +443,22 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         # shapes; compare the complete independently generated Assessment.
         require(native == independent_flat,
                 "0.3 Variable/Test/State projection differs from independent 0.4 OVAL import")
-    else:
+    elif not object_presence:
         compare_independent(native, independent_flat)  # Author identities only ignored.
     evidence = {
         "status": ("V003_SHARED_LOWERING_TO_CANONICAL_V04_VARIABLE_FOUR_WAY_LOCKSTEP"
                    if variable_source else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_FAMILY_VARIABLE_LOCKSTEP"
                    if family_source else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_OBJECT_PRESENCE"
+                   if object_presence else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
         "v004_flat_and_requirement_inverse_checked": not(variable_source or family_source),
-        "independent_leaf_import_agreement": not(variable_source or family_source),
+        "independent_leaf_import_agreement": not(variable_source or family_source or object_presence),
+        "original_oval_object_presence_attested": object_presence,
         "independent_variable_import_agreement": variable_source,
         "independent_family_import_agreement": family_source,
         "full_oval_coverage": False, "scanner_parity": False,

@@ -56,14 +56,17 @@ These are the preferred entry points for routine conversion, normalization, vali
 
 This is the new single-tree converter entry point: it reuses mature 0.3 OVAL
 semantic lowering and mappings, then applies checked native 0.4 promotion and
-compares its result with independently developed original-OVAL imports. It
+independent original-OVAL source checks. It
 supports two proven direct leaf patterns (PowerShell `shellcommand`
 with a direct include Filter, and Windows `registry` string equality with
 the original `only one` Test check), plus the pinned four-Test/two-Variable
 `independent.variable_test` Definition `oval:org.mitre.oval.test:def:538`
 and the pinned regex-backed `independent.family_test` Definition
-`oval:org.mitre.oval.test:def:95`.
-This is **not** general Variable or OVAL coverage. All other inputs error; use
+`oval:org.mitre.oval.test:def:95`. It also admits direct Object-only Test
+presence checks with simple source-attested scalar selectors, including
+immutable IOS BGP-neighbor and section regression examples; other cases
+remain explicitly blocked when no source-exact adapter is implemented.
+This is **not** general Variable or OVAL coverage. For broader source research, use
 the established 0.3 full-review converter below for broader source research.
 
 ```powershell
