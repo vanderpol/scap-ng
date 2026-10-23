@@ -108,9 +108,10 @@ inventory only, **not** a scanner parity or STIG benchmark completion report.
 The dedicated CI converter regression tests the two pinned external Variable
 Definitions through this reporting path as well as the direct conversion path.
 For the full 167-Definition Self-Assertion source audit, manually trigger
-`0.4 original OVAL core conversion coverage (manual)` in GitHub Actions. It
+`0.4 original OVAL core conversion coverage` in GitHub Actions. It
 checks out the original repository at its immutable revision and uploads the
-complete per-Definition report; this deliberately does not run on every push.
+complete per-Definition report. The audit also runs when its own script or
+workflow changes, but deliberately does not run on unrelated pushes.
 
 ## Compiler: canonical 0.4 graph only
 
