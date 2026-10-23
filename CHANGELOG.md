@@ -52,6 +52,11 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring checkpoint
 
+- Kept four superseded 0.4-A r3 research workflows available for explicit
+  historical diagnostics but removed their automatic push triggers; their
+  frozen source archive predates the 11 shared Applicability Assessment
+  restorations. Active 0.4 tools remain covered by canonical fast checks.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
 - Published source-invertible, native-schema-validated 0.4.0 JSON/YAML
   authoring for six STIGs (4,012 documents, 1,390 automated Tests), after
   restoring 11 omitted shared applicability Assessments from immutable 0.3
