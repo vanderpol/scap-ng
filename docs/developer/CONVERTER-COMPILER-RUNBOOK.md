@@ -30,6 +30,7 @@ python tools/scap_converter_core.py \
 
 python tools/test_scap_converter_core.py -v
 python tools/test_scap_converter_core_object_presence.py -v
+python tools/test_scap_converter_core_multitest.py -v
 python tools/test_oval_semantic_core_preservation.py -v
 # With the pinned source available (see below):
 SCAP_NG_VARIABLE_SOURCE_XML=/path/to/ind-def_variable_test.xml \
@@ -77,6 +78,14 @@ original OVAL singleton-object migration crosswalk. The immutable ASA version
 case verifies this optimization, including a `version` comparison and a
 negative test that rejects nonempty singleton Objects.
 
+A flat original OVAL `AND` over 2–15 distinct direct no-State Object Tests
+also reuses the mature 0.3 lowering. Each Test's capability, source reference,
+check/existence, Object selector, operation and order are independently
+attested; the native result has explicit `and` semantics and compiles every
+Test. The pinned IOS global example has two direct Test/Object branches.
+Original `OR`, negation, shared Objects, State-bearing branches and missing
+provenance fail closed until their own semantic proof is added.
+
 Previously admitted are one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`
 Filter, or one direct `windows.registry` value-equality Test with its
@@ -98,6 +107,7 @@ at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus
 `aix/aix-def_fileset_test.xml`, `asa/asa-def_line_test.xml`,
 `asa/asa-def_version_test.xml`,
+`ios/ios-def_global_test.xml`,
 `ios/ios-def_bgpneighbor_test.xml`, and
 `ios/ios-def_section_test.xml` files
 under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family

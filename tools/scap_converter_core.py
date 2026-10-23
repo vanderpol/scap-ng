@@ -37,6 +37,7 @@ from v04_field_requirement import promote_test, restore_test
 from v04_flat_object_authoring import flatten_document, load_catalog, restore_document
 from v04_native_bundle_compiler import compile_test_instruction
 from v04_source_verified_object_presence import convert as project_object_presence
+from v04_source_verified_multitest_presence import convert as project_direct_multitest
 
 
 def require(ok, reason):
@@ -421,7 +422,9 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     require(err is None, "0.3 source lowering failed: " + str(err))
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
-    object_presence = independent is None
+    multi_direct_presence = (independent is None and
+                             len(aligned["assessment"].get("tests") or {}) >= 2)
+    object_presence = independent is None and not multi_direct_presence
     direct_scalar_state = object_presence and bool(aligned["assessment"].get("states"))
     native = (project_v003_variable_to_v04(aligned, provenance, original)
               if variable_source else project_v003_family_to_v04(aligned, provenance)
@@ -429,11 +432,15 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                   aligned, original, definition_id, provenance,
                   Path(__file__).resolve().parents[1] /
                   "schema/v0.4.0/capability-mappings/supported", flat_catalog())
-              if object_presence else project_v003_to_v04(aligned))
+              if object_presence else project_direct_multitest(
+                  aligned, original, definition_id, provenance,
+                  Path(__file__).resolve().parents[1] /
+                  "schema/v0.4.0/capability-mappings/supported", flat_catalog())
+              if multi_direct_presence else project_v003_to_v04(aligned))
     # The independent original-OVAL importer predates the final flat Object
     # syntax. Normalize it using the *same invertible* approved 0.4 pass;
     # compare executable fields only after both are in canonical 0.4 grammar.
-    if variable_source or family_source or object_presence:
+    if variable_source or family_source or object_presence or multi_direct_presence:
         independent_flat = independent
     else:
         independent_flat, flat_proof = flatten_document(independent, flat_catalog())
@@ -444,7 +451,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         # shapes; compare the complete independently generated Assessment.
         require(native == independent_flat,
                 "0.3 Variable/Test/State projection differs from independent 0.4 OVAL import")
-    elif not object_presence:
+    elif not object_presence and not multi_direct_presence:
         compare_independent(native, independent_flat)  # Author identities only ignored.
     evidence = {
         "status": ("V003_SHARED_LOWERING_TO_CANONICAL_V04_VARIABLE_FOUR_WAY_LOCKSTEP"
@@ -455,16 +462,19 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                    if direct_scalar_state else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_OBJECT_PRESENCE"
                    if object_presence else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_DIRECT_AND"
+                   if multi_direct_presence else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
         "v004_flat_and_requirement_inverse_checked": not(
-            variable_source or family_source or object_presence),
-        "v004_flat_object_inverse_checked": object_presence,
-        "independent_leaf_import_agreement": not(variable_source or family_source or object_presence),
+            variable_source or family_source or object_presence or multi_direct_presence),
+        "v004_flat_object_inverse_checked": object_presence or multi_direct_presence,
+        "independent_leaf_import_agreement": not(variable_source or family_source or object_presence or multi_direct_presence),
         "original_oval_object_presence_attested": object_presence and not direct_scalar_state,
         "original_oval_direct_scalar_state_attested": direct_scalar_state,
+        "original_oval_multi_direct_and_attested": multi_direct_presence,
         "independent_variable_import_agreement": variable_source,
         "independent_family_import_agreement": family_source,
         "full_oval_coverage": False, "scanner_parity": False,

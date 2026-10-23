@@ -99,6 +99,14 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Added a source-attested multi-Test AND bridge to the single 0.4 converter.
+  Two or more direct no-State OVAL Tests retain their separate native Test
+  programs, ordered Boolean conjunction and source-exact Object selectors.
+  Pinned IOS global content, a synthetic two-Test graph and mutations cover
+  preservation and fail-closed OR/negation/State/shared-Object boundaries.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Added source-attested singleton capability conversion to the maintained
   direct-Test bridge: a real empty original OVAL Object can be omitted when
   the 0.4 capability mapping explicitly declares that singleton and its

@@ -70,6 +70,9 @@ Test/State item quantifiers in the compiler's source-exact fallback. Other
 cases remain explicitly blocked when no source-exact adapter is implemented.
 An explicit singleton-source mapping permits a truly empty original Object
 to be omitted while preserving a scalar version State (pinned ASA version).
+Multiple independent Object-only Tests under a flat original OVAL AND also
+preserve every source Test and selector (pinned IOS global example); complex
+Boolean/State graphs remain outside the attested native subset.
 This is **not** general Variable or OVAL coverage. For broader source research, use
 the established 0.3 full-review converter below for broader source research.
 

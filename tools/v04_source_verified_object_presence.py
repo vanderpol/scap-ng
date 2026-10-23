@@ -62,6 +62,46 @@ def child(node, name):
     return matched[0]
 
 
+def direct_selectors(original_object, old_object, namespace, capability, mapping, catalog):
+    """Map direct scalar OVAL selectors, asserting all 0.3 operands exactly."""
+    renames = mapping["native"].get("selector_map", {})
+    ensure(set(old_object) == {"capability", "object_title", "select"}
+           and old_object["capability"] == capability
+           and (old_object["object_title"] is None or
+                isinstance(old_object["object_title"], str))
+           and original_object.get("comment") == old_object["object_title"],
+           "original Object/0.3 mapped Object identity differs")
+    source_selectors = old_object["select"]
+    ensure(isinstance(source_selectors, dict) and bool(source_selectors)
+           and len(source_selectors) == len(original_object)
+           and set(source_selectors) <= set(renames),
+           "source Object not direct mapped scalar selectors")
+    obj = {}
+    if old_object["object_title"] is not None:
+        obj["object_title"] = old_object["object_title"]
+    for node in original_object:
+        field = node.tag.rsplit("}", 1)[-1]
+        ensure(node.tag == "{" + namespace + "}" + field
+               and field in source_selectors and field in renames
+               and not list(node) and set(node.attrib) <= {"operation", "datatype"}
+               and node.get("datatype", "string") == "string"
+               and "var_ref" not in node.attrib,
+               "OVAL Object has unsupported selector/behaviors/filter/set")
+        operation = node.get("operation", "equals")
+        ensure(operation in SOURCE_OPERATIONS,
+               "unmapped original selector operation " + operation)
+        old_operation, native_operation = SOURCE_OPERATIONS[operation]
+        original_value = node.text or ""
+        ensure(source_selectors[field] == {
+            "operation": old_operation, "datatype": "string", "value": original_value},
+            "0.3 selector/operation/value drift from original OVAL")
+        native_name = renames[field]
+        ensure(native_name in catalog[capability]["selectors"]
+               and native_name not in obj, "selector native mapping collided")
+        obj[native_name] = {native_operation: original_value}
+    return obj
+
+
 def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
     """Reconcile one direct Test + Object and zero/one scalar State with OVAL."""
     a = v003["assessment"]
@@ -176,36 +216,12 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
            and (singleton or original_object.get("comment") == old_object["object_title"])
            and original_object.get("version") is not None,
            "source Object type/title/attributes changed")
-    source_selectors = {} if singleton else old_object["select"]
-    ensure((singleton and len(original_object) == 0) or
-           (isinstance(source_selectors, dict) and bool(source_selectors)
-            and len(source_selectors) == len(original_object)
-            and len(source_selectors) == len(set(source_selectors))
-            and set(source_selectors) <= set(renames)),
-           "source Object not an empty singleton or direct scalar selectors")
-    obj = {}
-    if not singleton and old_object["object_title"] is not None:
-        obj["object_title"] = old_object["object_title"]
-    for node in original_object:
-        field = node.tag.rsplit("}", 1)[-1]
-        ensure(node.tag == "{" + namespace + "}" + field
-               and field in source_selectors and field in renames
-               and not list(node) and set(node.attrib) <= {"operation", "datatype"}
-               and node.get("datatype", "string") == "string"
-               and "var_ref" not in node.attrib,
-               "OVAL Object has unsupported selector/behaviors/filter/set")
-        operation = node.get("operation", "equals")
-        ensure(operation in SOURCE_OPERATIONS,
-               "unmapped original selector operation " + operation)
-        old_operation, native_operation = SOURCE_OPERATIONS[operation]
-        original_value = node.text or ""
-        ensure(source_selectors[field] == {
-            "operation": old_operation, "datatype": "string", "value": original_value},
-            "0.3 selector/operation/value drift from original OVAL")
-        native_name = renames[field]
-        ensure(native_name in catalog[capability]["selectors"]
-               and native_name not in obj, "selector native mapping collided")
-        obj[native_name] = {native_operation: original_value}
+    if singleton:
+        ensure(len(original_object) == 0, "native singleton has unexpected source fields")
+        obj = {}
+    else:
+        obj = direct_selectors(original_object, old_object, namespace,
+                               capability, mapping, catalog)
 
     native_states = None
     if with_state:
