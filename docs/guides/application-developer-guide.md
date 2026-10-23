@@ -30,6 +30,10 @@ Conceptually, [Benchmark processing](../../specification/policy/benchmark.md) re
 
 The [Assessment contract](../../specification/assessment/assessment-method.md) separates Objects, collected Items, Test conditions and `evaluate`. Existence, value matching, completeness, and error/unknown propagation require the version's exact semantics. No ordinary Boolean simplification may be presumed to preserve six-state outcomes.
 
+Manual Assessments use a different execution model: the processor presents the authored procedure, accepts a human outcome, and preserves evaluator identity and completion time. It must not derive a verdict by interpreting the procedure as executable code. See [Manual Assessment](../../specification/assessment/manual-assessment.md).
+
+For Organizational Input, resolve and validate publisher-declared organization-specific values before Assessment execution. Each Input Set is explicitly bound to an Assessment Request; the processor does not choose one from target attributes or file names. Conflicting values are errors under the [current input contract](../../specification/policy/parameters-and-organizational-input.md).
+
 ## 4. What a validation claim means
 
 Report validation evidence at the layer actually tested:
