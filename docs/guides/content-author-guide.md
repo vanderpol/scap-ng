@@ -46,7 +46,17 @@ Here, `object` selects the mount, `items` constrains the collected Item populati
 
 More complex Assessments may use multiple Tests, logical composition, Variables, Sets, Filters, and nested record conditions. Consult the exact [0.4.0 schema](../../schema/v0.4.0/README.md) before writing them; avoid replacing uncommon source-proven behavior with an attractive but unproved shortcut.
 
-## 4. Validate, compile, then distribute
+## 4. Manual checks and organization-supplied values
+
+A procedure-only Manual Assessment needs an Assessment ID, `mode: manual`, and a human-readable `procedure`. The processor presents the procedure and records the operator's completed outcome and provenance; it does not infer the verdict from prose. See [Manual Assessment](../../specification/assessment/manual-assessment.md).
+
+A **Parameter** is policy data, not an Assessment Variable. When a publisher expressly leaves an expected value to an organization, **Organizational Input** supplies it through an authorized, validated binding. It cannot override an existing publisher requirement. See [Parameters and Organizational Input](../../specification/policy/parameters-and-organizational-input.md).
+
+## 5. Interpret results without losing meaning
+
+A Rule Result communicates a policy-facing outcome, while Assessment details and evidence explain the technical evaluation. Scoring disposition is separate from technical truth. **Draft — Needs Review:** final serialized `summary` wording and canonical-result projection behavior remain unresolved in the current [Results specification](../../specification/results/results.md). Do not fabricate scanner outcomes or assume proposed result fields are normative.
+
+## 6. Validate, compile, then distribute
 
 1. Use a single versioned authoring format. The current review set supplies equivalent YAML and JSON.
 2. Check syntax and the applicable JSON Schema; then check references and semantic constraints. **Schema validity alone does not establish semantic or scanner conformance.**
@@ -55,7 +65,7 @@ More complex Assessments may use multiple Tests, logical composition, Variables,
 
 See [conformance layers](../../specification/core/conformance.md), [packaging and integrity](../../specification/package/package-and-integrity.md), and the [current compilation limitations](../developer/CONVERTER-COMPILER-RUNBOOK.md).
 
-## 5. Before publishing
+## 7. Before publishing
 
 - Confirm exact SCAP-NG version, source identity, references, and Assessment choices.
 - Confirm that Items, fields, expected values, and logical composition express the intended requirement.
@@ -64,4 +74,4 @@ See [conformance layers](../../specification/core/conformance.md), [packaging an
 
 ### Appendix: migration terminology
 
-SCAP-NG does not require prior OVAL knowledge. For migration, use the [SCAP 1.4 concept crosswalk](../../specification/crosswalk/scap-1.4-concept-crosswalk.md) and [OVAL 5.12.3 mapping](../../specification/migration/oval-5.12.3-to-ng.md). Legacy behavior must be checked against the pinned upstream XSD, its annotations, and other applicable normative text; the legacy XML shape does not independently define native NG semantics.
+SCAP-NG does not require prior OVAL knowledge. For migration, use the [SCAP 1.4 concept crosswalk](../../specification/crosswalk/scap-1.4-concept-crosswalk.md) and [OVAL 5.12.3 mapping](../../specification/migration/oval-5.12.3-to-ng.md). Legacy behavior must be checked against pinned upstream XSDs and annotations, [NIST SP 800-126 Rev. 4](https://csrc.nist.gov/pubs/sp/800/126/r4/final), its [800-126A Rev. 4 annex](https://csrc.nist.gov/pubs/sp/800/126/a/r4/final), [NIST IR 7275 Rev. 4 (XCCDF 1.2)](https://csrc.nist.gov/pubs/ir/7275/r4/upd1/final), and applicable Schematron/normative prose. Legacy XML structure alone does not define native NG semantics.
