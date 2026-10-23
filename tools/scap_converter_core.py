@@ -2,8 +2,8 @@
 """Shared-source OVAL -> canonical 0.4 converter integration checkpoint.
 
 The source lowering is the mature 0.3 converter; native 0.4 projection is a
-strict, separately checked boundary. Two leaf shapes and one pinned four-Test
-variable source are admitted. This is NOT general OVAL 5.12.3 coverage.
+strict, separately checked boundary. Two leaf shapes and two source-pinned
+Variable cases are admitted. This is NOT general OVAL 5.12.3 coverage.
 
 Refs #232 #229 #248.
 """
@@ -17,6 +17,11 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from compare_v04_fresh_oval_import import compare as compare_independent
+from convert_v04_oval_family_constant_variable import (
+    convert as independent_family_import,
+    NAME as FAMILY_VARIABLE_NAME,
+    TEST_NAME as FAMILY_TEST_NAME,
+)
 from convert_v04_oval_independent_variable_test import (
     convert as independent_variable_import,
     NAMED_TESTS as VARIABLE_TEST_NAMES,
@@ -304,12 +309,74 @@ def project_v003_variable_to_v04(v003, provenance, original):
     }}
 
 
+def project_v003_family_to_v04(v003, provenance):
+    """Project a single regex-backed family State from the mature 0.3 graph."""
+    a = v003["assessment"]
+    require(a.get("specification", {}).get("version") == "0.3.0"
+            and a.get("mode") == "automated" and a.get("class") == "miscellaneous"
+            and a.get("purpose") == "assessment" and a.get("objects") == {},
+            "unproven 0.3 independent.family source/empty Object")
+    var_id, var = only_entry(a.get("variables"), "constant family Variable")
+    tid, old_test = only_entry(a.get("tests"), "independent.family Test")
+    state_id, old_state = only_entry(a.get("states"), "independent.family State")
+    require(set(provenance.get("source_test_bindings", {}).values()) == {tid}
+            and set(provenance.get("source_variable_bindings", {}).values()) == {var_id}
+            and len(provenance.get("source_test_bindings", {})) == 1
+            and len(provenance.get("source_variable_bindings", {})) == 1,
+            "0.3 family Test/Variable source identity dropped")
+    require(a.get("evaluate") == {"test": tid}, "family Test Boolean expression changed")
+    exact_keys(var, {"kind", "datatype", "title", "expression"}, "0.3 family Variable")
+    exact_keys(var["expression"], {"literal"}, "0.3 family Variable expression")
+    require(var["kind"] == "constant" and var["datatype"] == "string"
+            and isinstance(var["title"], str) and isinstance(var["expression"]["literal"], str)
+            and bool(var["expression"]["literal"]), "family Variable must be one string literal")
+    exact_keys(old_test, {"test_title", "capability", "states", "reported_elements",
+                          "existence", "match"}, "0.3 family Test")
+    require(old_test["capability"] == "independent.family"
+            and old_test["states"] == [state_id]
+            and old_test["reported_elements"] == "all"
+            and old_test["existence"] == "one_or_more"
+            and old_test["match"] == "one_or_more",
+            "family Test quantifier or source State changed")
+    exact_keys(old_state, {"state_title", "capability", "state"}, "0.3 family State")
+    s = old_state["state"]
+    exact_keys(s, {"field", "value", "operation", "datatype", "match",
+                   "value_match", "existence"}, "0.3 family State comparison")
+    exact_keys(s["value"], {"variable"}, "0.3 family State var_ref")
+    require(old_state["capability"] == "independent.family" and s["field"] == "family"
+            and s["operation"] == "pattern_match" and s["datatype"] == "string"
+            and s["match"] == "all" and s["value_match"] == "all"
+            and s["existence"] == "one_or_more" and s["value"]["variable"] == var_id,
+            "family State regex/var_check or source var_ref changed")
+    native_test = {
+        "test_title": old_test["test_title"], "capability": "independent.family",
+        "states": [{"family": {
+            "matches_regex": {"variable": FAMILY_VARIABLE_NAME},
+            "datatype": s["datatype"], "value_match": s["value_match"],
+            "require": "at_least_one_exists_and_all_match",
+        }}],
+        "reported_elements": old_test["reported_elements"],
+        "require": "at_least_one_exists_and_some_match",
+    }
+    compile_test_instruction(FAMILY_TEST_NAME, native_test)
+    return {"assessment": {
+        "id": a["id"], "version": a["version"],
+        "assessment_title": a["assessment_title"],
+        "mode": "automated", "class": a["class"], "purpose": a["purpose"],
+        "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
+        "variables": {FAMILY_VARIABLE_NAME: dict(var)},
+        "tests": {FAMILY_TEST_NAME: native_test},
+        "evaluate": {"test": FAMILY_TEST_NAME},
+    }}
+
+
 def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     """Use existing semantic IR + v003 lowering, then fail-closed v04 projection."""
     source_path = Path(source_path)
     original = source_path.read_bytes()
     mappings = Path(__file__).resolve().parents[1] / "schema/v0.3.0/capability-mappings/supported"
     require((mappings / "independent.shellcommand.json").is_file()
+            and (mappings / "independent.family.json").is_file()
             and (mappings / "variable.value.json").is_file()
             and (mappings / "windows.registry.json").is_file(),
             "complete 0.3 capability mapping files required (no unmapped fallback)")
@@ -319,11 +386,18 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     require(len(definitions) == 1 and definitions[0]["deprecated"] not in ("true", "1"),
             "missing or deprecated OVAL Definition")
     variable_source = definition_id == "oval:org.mitre.oval.test:def:538"
+    family_source = definition_id == "oval:org.mitre.oval.test:def:95"
     if variable_source:
         # A separately source-audited and source-roundtrip-proved 0.4 adapter.
         independent, independent_proof = independent_variable_import(original)
         require(independent_proof["original_definition_id"] == definition_id,
                 "pinned Variable source identity mismatch")
+        if assessment_id:
+            independent["assessment"]["id"] = assessment_id
+    elif family_source:
+        independent, independent_proof = independent_family_import(source_path)
+        require(independent_proof["original_definition_id"] == definition_id,
+                "pinned independent.family Definition identity mismatch")
         if assessment_id:
             independent["assessment"]["id"] = assessment_id
     else:
@@ -336,19 +410,20 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
     native = (project_v003_variable_to_v04(aligned, provenance, original)
-              if variable_source else project_v003_to_v04(aligned))
+              if variable_source else project_v003_family_to_v04(aligned, provenance)
+              if family_source else project_v003_to_v04(aligned))
     # The independent original-OVAL importer predates the final flat Object
     # syntax. Normalize it using the *same invertible* approved 0.4 pass;
     # compare executable fields only after both are in canonical 0.4 grammar.
-    if variable_source:
+    if variable_source or family_source:
         independent_flat = independent
     else:
         independent_flat, flat_proof = flatten_document(independent, flat_catalog())
         require(restore_document(independent_flat, flat_proof) == independent,
                 "independent OVAL leaf normalization not invertible")
-    if variable_source:
-        # The single-Test pilot comparator intentionally rejects multi-Test
-        # input; here compare the entire independent four-way Assessment.
+    if variable_source or family_source:
+        # The two-leaf comparator intentionally rejects these distinct source
+        # shapes; compare the complete independently generated Assessment.
         require(native == independent_flat,
                 "0.3 Variable/Test/State projection differs from independent 0.4 OVAL import")
     else:
@@ -356,13 +431,16 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     evidence = {
         "status": ("V003_SHARED_LOWERING_TO_CANONICAL_V04_VARIABLE_FOUR_WAY_LOCKSTEP"
                    if variable_source else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_FAMILY_VARIABLE_LOCKSTEP"
+                   if family_source else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
-        "v004_flat_and_requirement_inverse_checked": not variable_source,
-        "independent_leaf_import_agreement": not variable_source,
+        "v004_flat_and_requirement_inverse_checked": not(variable_source or family_source),
+        "independent_leaf_import_agreement": not(variable_source or family_source),
         "independent_variable_import_agreement": variable_source,
+        "independent_family_import_agreement": family_source,
         "full_oval_coverage": False, "scanner_parity": False,
     }
     return native, evidence

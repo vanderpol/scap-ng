@@ -60,7 +60,9 @@ compares its result with independently developed original-OVAL imports. It
 supports two proven direct leaf patterns (PowerShell `shellcommand`
 with a direct include Filter, and Windows `registry` string equality with
 the original `only one` Test check), plus the pinned four-Test/two-Variable
-`independent.variable_test` Definition `oval:org.mitre.oval.test:def:538`.
+`independent.variable_test` Definition `oval:org.mitre.oval.test:def:538`
+and the pinned regex-backed `independent.family_test` Definition
+`oval:org.mitre.oval.test:def:95`.
 This is **not** general Variable or OVAL coverage. All other inputs error; use
 the established 0.3 full-review converter below for broader source research.
 

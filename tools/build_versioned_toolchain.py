@@ -42,6 +42,7 @@ CURRENT_REQUIRED = (
     "tools/scap_converter_core.py",
     "tools/test_scap_converter_core.py",
     "tools/test_scap_converter_core_variable.py",
+    "tools/test_scap_converter_core_family.py",
     "tools/v04_native_bundle_compiler.py",
 )
 

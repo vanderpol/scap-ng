@@ -99,6 +99,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Added a second pinned Variable reuse path to the single-tree converter:
+  Self-Assertion `independent.family_test` with an empty singleton Object,
+  one regex constant Variable, `var_check=all`, and Test `at least one`.
+  The 0.3 mapped graph is checked against the previously independent 0.4
+  family importer, native schema/compiler and OVAL semantic round trip;
+  mutations fail closed. This integrates an already-proven source case,
+  without asserting generic regex/Variable coverage or scanner parity.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Extended the single-tree 0.4 converter with the mature 0.3 lowering for a
   pinned four-Test `independent.variable_test` source. The 0.3 source graph
   provides both constant Variables, all four pairings, Test checks and State
