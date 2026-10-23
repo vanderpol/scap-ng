@@ -41,6 +41,7 @@ from v04_flat_object_authoring import flatten_document, load_catalog, restore_do
 from v04_native_bundle_compiler import compile_test_instruction
 from v04_source_verified_object_presence import convert as project_object_presence
 from v04_source_verified_multitest_presence import convert as project_direct_multitest
+from v04_source_verified_multitest_states import convert as project_direct_multistate
 from v04_source_verified_constant_variable_matrix import project as project_constant_matrix
 
 
@@ -442,6 +443,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                              len(aligned["assessment"].get("tests") or {}) >= 2)
     object_presence = independent is None and not multi_direct_presence
     direct_scalar_state = object_presence and bool(aligned["assessment"].get("states"))
+    direct_multistate = multi_direct_presence and bool(aligned["assessment"].get("states"))
     native = (project_v003_variable_to_v04(aligned, provenance, original)
               if variable_source else project_v003_family_to_v04(aligned, provenance)
               if family_source else project_constant_matrix(aligned, provenance, original,
@@ -450,7 +452,11 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                   aligned, original, definition_id, provenance,
                   Path(__file__).resolve().parents[1] /
                   "schema/v0.4.0/capability-mappings/supported", flat_catalog())
-              if object_presence else project_direct_multitest(
+              if object_presence else project_direct_multistate(
+                  aligned, original, definition_id, provenance,
+                  Path(__file__).resolve().parents[1] /
+                  "schema/v0.4.0/capability-mappings/supported", flat_catalog())
+              if direct_multistate else project_direct_multitest(
                   aligned, original, definition_id, provenance,
                   Path(__file__).resolve().parents[1] /
                   "schema/v0.4.0/capability-mappings/supported", flat_catalog())
@@ -483,6 +489,8 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                    if direct_scalar_state else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_OBJECT_PRESENCE"
                    if object_presence else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_DIRECT_MULTI_STATE_AND"
+                   if direct_multistate else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_DIRECT_AND"
                    if multi_direct_presence else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
@@ -499,6 +507,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         "original_oval_object_presence_attested": object_presence and not direct_scalar_state,
         "original_oval_direct_scalar_state_attested": direct_scalar_state,
         "original_oval_multi_direct_and_attested": multi_direct_presence,
+        "original_oval_multi_state_and_attested": direct_multistate,
         "independent_variable_import_agreement": variable_source,
         "independent_family_import_agreement": family_source,
         "independent_constant_variable_matrix_agreement": constant_matrix_source,

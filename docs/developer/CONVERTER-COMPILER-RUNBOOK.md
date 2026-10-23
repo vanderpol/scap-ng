@@ -31,6 +31,9 @@ python tools/scap_converter_core.py \
 python tools/test_scap_converter_core.py -v
 python tools/test_scap_converter_core_object_presence.py -v
 python tools/test_scap_converter_core_multitest.py -v
+SCAP_NG_IOS_LINE_SOURCE_XML=/path/to/ios-def_line_test.xml \
+SCAP_NG_IOSXE_LINE_SOURCE_XML=/path/to/iosxe-def_line_test.xml \
+  python tools/test_scap_converter_core_multistate.py -v
 SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML=/path/to/oval-def_constant_variable.xml \
 SCAP_NG_CHECK_ENUMERATION_SOURCE_XML=/path/to/oval_check_enumeration_variable_values.xml \
   python tools/test_scap_converter_core_constant_matrix.py -v
@@ -86,8 +89,17 @@ also reuses the mature 0.3 lowering. Each Test's capability, source reference,
 check/existence, Object selector, operation and order are independently
 attested; the native result has explicit `and` semantics and compiles every
 Test. The pinned IOS global example has two direct Test/Object branches.
-Original `OR`, negation, shared Objects, State-bearing branches and missing
-provenance fail closed until their own semantic proof is added.
+Original `OR`, negation, shared Objects and missing provenance fail closed;
+the no-State variant separately rejects State-bearing branches.
+
+The multi-Test path also composes the **existing single-Test direct-State
+proof** when a flat original OVAL AND contains two or more distinct Test
+branches with at most one literal scalar State each. Source Test/collection/
+State identity closure, original source operations, quantifiers and ordering
+must still match the mature 0.3 graph. The immutable IOS and IOS XE line
+Self-Assertions exercise two regex State branches each. Arbitrary nested
+criteria, Object sharing, multi-field States and Variable-backed predicates
+are not admitted through this path.
 
 Previously admitted are one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`
@@ -123,6 +135,7 @@ at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `aix/aix-def_fileset_test.xml`, `asa/asa-def_line_test.xml`,
 `asa/asa-def_version_test.xml`,
 `ios/ios-def_global_test.xml`,
+`ios/ios-def_line_test.xml`, `iosxe/iosxe-def_line_test.xml`,
 `ios/ios-def_bgpneighbor_test.xml`, and
 `ios/ios-def_section_test.xml` files
 under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family

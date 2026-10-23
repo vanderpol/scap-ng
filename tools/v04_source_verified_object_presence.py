@@ -102,8 +102,15 @@ def direct_selectors(original_object, old_object, namespace, capability, mapping
     return obj
 
 
-def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
-    """Reconcile one direct Test + Object and zero/one scalar State with OVAL."""
+def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
+            *, source_criterion_ref=None):
+    """Reconcile one source Test/Object/State against the original OVAL.
+
+    A selected criterion of a verified flat AND allows the multi-Test adapter
+    to reuse this complete leaf proof without synthesizing altered source XML.
+    The caller must separately prove whole-graph criterion and reference
+    closure; the selected Test still comes directly from original source.
+    """
     a = v003["assessment"]
     ensure(a.get("specification", {}).get("version") == "0.3.0"
            and a.get("mode") == "automated"
@@ -172,9 +179,19 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
            "Definition metadata title differs from 0.3 lowering")
     criteria = child(original_definition, "criteria")
     ensure(set(criteria.attrib) <= {"operator"}
-           and criteria.get("operator", "AND") == "AND"
-           and len(criteria) == 1, "nontrivial source criteria")
-    criterion = criteria[0]
+           and criteria.get("operator", "AND") == "AND", "non-AND source criteria")
+    if source_criterion_ref is None:
+        ensure(len(criteria) == 1, "nontrivial source criteria")
+        criterion = criteria[0]
+    else:
+        ensure(len(criteria) >= 2, "selected criterion is not a multi-Test AND")
+        chosen = [c for c in criteria if c.get("test_ref") == source_criterion_ref]
+        ensure(len(chosen) == 1 and all(
+            c.tag == "{" + OD + "}criterion"
+            and set(c.attrib) <= {"test_ref", "comment", "negate"}
+            and c.get("negate", "false") == "false" and c.get("test_ref")
+            for c in criteria), "selected source criterion not uniquely present in flat AND")
+        criterion = chosen[0]
     ensure(criterion.tag == "{" + OD + "}criterion"
            and set(criterion.attrib) <= {"test_ref", "comment", "negate"}
            and criterion.get("negate", "false") == "false", "non-direct criterion")

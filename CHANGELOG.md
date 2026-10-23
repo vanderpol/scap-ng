@@ -99,6 +99,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Extended the established single-Test source-attested scalar-State adapter
+  across flat multi-Test AND criteria without a parallel importer. Each
+  original OVAL Test/Object/State pair is checked independently, including
+  source-order and complete 0.3 reference closure, then compiled together.
+  Immutable IOS and IOS XE line sources, negative Boolean/source mutations,
+  and a deliberately corrupted 0.3 State are regression-checked. Multi-field
+  States, shared Objects and scanner parity remain outside this proof.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Incorporated two previously independent integer constant-Variable OVAL
   sources into the single maintained 0.3-backed converter: 2-Test literal
   matrices and 10-Test `var_check` enumeration/negated-criteria matrices.
