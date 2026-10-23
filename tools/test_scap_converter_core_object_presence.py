@@ -18,7 +18,9 @@ from v04_native_bundle_compiler import compile_assessment_program
 
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
 IOS = OD + "#ios"
+AIX = OD + "#aix"
 ID = "oval:sample.ios:def:1"
+AIX_ID = "oval:sample.aix:def:1"
 
 
 def source():
@@ -38,15 +40,37 @@ def source():
 </oval_definitions>'''.encode()
 
 
+def scalar_state_source():
+    return f'''<oval_definitions xmlns="{OD}" xmlns:aix="{AIX}">
+  <definitions><definition id="{AIX_ID}" class="miscellaneous" version="1">
+    <metadata><title>Check example AIX fileset state</title>
+      <description>Check a single fileset match</description></metadata>
+    <criteria><criterion test_ref="oval:sample.aix:tst:1"/></criteria>
+  </definition></definitions>
+  <tests><aix:fileset_test id="oval:sample.aix:tst:1" version="1"
+      comment="Test example fileset" check="at least one"
+      check_existence="at_least_one_exists">
+    <aix:object object_ref="oval:sample.aix:obj:1"/>
+    <aix:state state_ref="oval:sample.aix:ste:1"/>
+  </aix:fileset_test></tests>
+  <objects><aix:fileset_object id="oval:sample.aix:obj:1" version="1"
+      comment="Find bos.rte fileset"><aix:flstinst>bos.rte</aix:flstinst>
+  </aix:fileset_object></objects>
+  <states><aix:fileset_state id="oval:sample.aix:ste:1" version="1"
+      comment="Fileset name equals bos.rte"><aix:flstinst>bos.rte</aix:flstinst>
+  </aix:fileset_state></states>
+</oval_definitions>'''.encode()
+
+
 class ObjectPresenceTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / "oval.xml"
 
-    def conversion(self, original):
+    def conversion(self, original, definition=ID):
         self.path.write_bytes(original)
-        return convert(self.path, ID)
+        return convert(self.path, definition)
 
     def test_source_verified_may_be_absent_regex_and_compiler(self):
         native, evidence = self.conversion(source())
@@ -91,6 +115,56 @@ class ObjectPresenceTests(unittest.TestCase):
         self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
                          {"items": "may_be_absent"})
 
+    def test_direct_scalar_state_preserved_and_compiles_source_exact(self):
+        native, evidence = self.conversion(scalar_state_source(), AIX_ID)
+        test = next(iter(native["assessment"]["tests"].values()))
+        self.assertEqual(test["object"]["flstinst"], {"equals": "bos.rte"})
+        self.assertEqual(test["states"], [{"flstinst": {
+            "require": "at_least_one_exists_and_all_match", "equals": "bos.rte"}}])
+        self.assertEqual(test["require"], "at_least_one_exists_and_some_match")
+        program = compile_assessment_program(native["assessment"])
+        self.assertEqual(program["test_instructions"][0]["opcode"],
+                         "CHECK_SOURCE_EXACT_STATES")
+        self.assertTrue(evidence["original_oval_direct_scalar_state_attested"])
+        self.assertFalse(evidence["original_oval_object_presence_attested"])
+        self.assertFalse(evidence["scanner_parity"])
+
+    def test_direct_scalar_state_mutations_fail_closed(self):
+        def mutate(source_name, value):
+            root = ET.fromstring(scalar_state_source())
+            original_state = next(n for n in root.iter()
+                                  if n.get("id") == "oval:sample.aix:ste:1")
+            if source_name == "var_ref":
+                original_state[0].set("var_ref", value)
+            elif source_name == "entity_existence":
+                original_state[0].set("entity_existence", value)
+            elif source_name == "extra_field":
+                ET.SubElement(original_state, "{" + AIX + "}flstinst").text = value
+            elif source_name == "datatype":
+                original_state[0].set("datatype", value)
+            return ET.tostring(root)
+        for name, value in (
+            ("var_ref", "oval:sample.aix:var:1"),
+            ("entity_existence", "none_exist"),
+            ("extra_field", "bad"),
+            ("datatype", "binary"),
+        ):
+            with self.subTest(name=name):
+                with self.assertRaises(ValueError):
+                    self.conversion(mutate(name, value), AIX_ID)
+
+    def test_mature_03_scalar_state_regression_detected_against_original_xml(self):
+        def mutate_lowering(*args, **kwargs):
+            aligned, report = postprocess_automated_assessment(*args, **kwargs)
+            aligned = deepcopy(aligned)
+            state = next(iter(aligned["assessment"]["states"].values()))
+            state["state"]["value"] = "different-fileset"
+            return aligned, report
+        with patch("scap_converter_core.postprocess_automated_assessment",
+                   side_effect=mutate_lowering):
+            with self.assertRaisesRegex(ValueError, "mismatch"):
+                self.conversion(scalar_state_source(), AIX_ID)
+
     def test_original_oval_source_mutations_fail_closed(self):
         def set_attr(root, suffix, attribute, value):
             next(x for x in root.iter() if x.tag.endswith("}" + suffix)).set(attribute, value)
@@ -130,6 +204,7 @@ class ObjectPresenceTests(unittest.TestCase):
 
     def test_immutable_external_real_oval_samples_if_available(self):
         for env_name, definition, cap in (
+            ("SCAP_NG_AIX_FILESET_SOURCE_XML", "oval:org.mitre.oval.test:def:241", "aix.fileset"),
             ("SCAP_NG_ASA_LINE_SOURCE_XML", "oval:org.joval.asa.test:def:6", "asa.line"),
             ("SCAP_NG_IOS_BGP_SOURCE_XML", "oval:org.joval.ios.test:def:1", "ios.bgpneighbor"),
             ("SCAP_NG_IOS_SECTION_SOURCE_XML", "oval:org.joval.ios.test:def:1", "ios.section"),
@@ -139,9 +214,10 @@ class ObjectPresenceTests(unittest.TestCase):
                 with self.subTest(source=env_name):
                     native, evidence = convert(Path(value), definition)
                     self.assertEqual(evidence["capability"], cap)
-                    expected = "one_or_more" if cap == "asa.line" else "may_be_absent"
+                    expected = ("at_least_one_exists_and_some_match" if cap == "aix.fileset"
+                                else "one_or_more" if cap == "asa.line" else "may_be_absent")
                     self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
-                                     {"items": expected})
+                                     expected if cap == "aix.fileset" else {"items": expected})
 
 
 if __name__ == "__main__":

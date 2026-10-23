@@ -422,6 +422,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
     object_presence = independent is None
+    direct_scalar_state = object_presence and bool(aligned["assessment"].get("states"))
     native = (project_v003_variable_to_v04(aligned, provenance, original)
               if variable_source else project_v003_family_to_v04(aligned, provenance)
               if family_source else project_object_presence(
@@ -450,15 +451,20 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                    if variable_source else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_FAMILY_VARIABLE_LOCKSTEP"
                    if family_source else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_SCALAR_STATE"
+                   if direct_scalar_state else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_OBJECT_PRESENCE"
                    if object_presence else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
-        "v004_flat_and_requirement_inverse_checked": not(variable_source or family_source),
+        "v004_flat_and_requirement_inverse_checked": not(
+            variable_source or family_source or object_presence),
+        "v004_flat_object_inverse_checked": object_presence,
         "independent_leaf_import_agreement": not(variable_source or family_source or object_presence),
-        "original_oval_object_presence_attested": object_presence,
+        "original_oval_object_presence_attested": object_presence and not direct_scalar_state,
+        "original_oval_direct_scalar_state_attested": direct_scalar_state,
         "independent_variable_import_agreement": variable_source,
         "independent_family_import_agreement": family_source,
         "full_oval_coverage": False, "scanner_parity": False,

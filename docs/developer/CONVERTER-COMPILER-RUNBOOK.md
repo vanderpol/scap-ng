@@ -62,6 +62,15 @@ against the original OVAL, and compiles a native 0.4 presence instruction.
 The immutable ASA line and IOS BGP-neighbor/section examples exercise this path.
 These checks do **not** establish scanner-result parity.
 
+Also admitted in the same source-attested direct-Test bridge: precisely one
+scalar State, with literal string equality or regex, default State field
+existence/check semantics, one direct Object, and the original Test `all` or
+`at least one` check. It emits the explicit source-exact 0.4 Test/State
+fallback, preserving quantifier boundaries. The immutable AIX fileset
+Self-Assertion source exercises this case. Variables, multiple State fields,
+nondefault field checks, Sets and Filters still fail closed. No live scanner
+evaluation or full six-state equivalence is claimed.
+
 Previously admitted are one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`
 Filter, or one direct `windows.registry` value-equality Test with its
@@ -81,7 +90,8 @@ For source regressions, retrieve only the immutable
 [`e3538595` Self-Assertion source](https://github.com/OVAL-Community/SCAP-Self-Assertion/commit/e3538595c5083b9c34d937a81d319234df9bbfaa)
 at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus
-`asa/asa-def_line_test.xml`, `ios/ios-def_bgpneighbor_test.xml`, and
+`aix/aix-def_fileset_test.xml`, `asa/asa-def_line_test.xml`,
+`ios/ios-def_bgpneighbor_test.xml`, and
 `ios/ios-def_section_test.xml` files
 under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family
 regressions check their SHA256, and the Object-only regression independently

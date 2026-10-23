@@ -99,6 +99,15 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Extended the original-OVAL-attested direct-Test adapter to a singleton
+  literal scalar State, preserving Test item quantifiers and State field
+  existence/check boundaries in the native 0.4 compiler's source-exact Test
+  form. The immutable AIX fileset original and deliberate invalid/mutated
+  source and 0.3-lowering regressions are checked. Broader State composition
+  and scanner-result parity remain outside the proven subset.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Extended the maintained shared-source converter with a generic **direct
   Object-only Test** 0.4 adapter. The established 0.3 lowerer supplies the
   graph, and the adapter checks its Test identity, existence quantifier,

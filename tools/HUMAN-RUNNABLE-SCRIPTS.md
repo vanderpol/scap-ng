@@ -64,8 +64,10 @@ the original `only one` Test check), plus the pinned four-Test/two-Variable
 and the pinned regex-backed `independent.family_test` Definition
 `oval:org.mitre.oval.test:def:95`. It also admits direct Object-only Test
 presence checks with simple source-attested scalar selectors, including
-immutable ASA line and IOS BGP-neighbor/section regression examples; other cases
-remain explicitly blocked when no source-exact adapter is implemented.
+immutable ASA line and IOS BGP-neighbor/section regression examples. A direct
+one-State scalar comparison (pinned AIX fileset example) also preserves OVAL
+Test/State item quantifiers in the compiler's source-exact fallback. Other
+cases remain explicitly blocked when no source-exact adapter is implemented.
 This is **not** general Variable or OVAL coverage. For broader source research, use
 the established 0.3 full-review converter below for broader source research.
 

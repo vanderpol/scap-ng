@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Narrow original-OVAL-verified 0.3 -> 0.4 Object-only Test bridge.
+"""Narrow original-OVAL-verified 0.3 -> 0.4 direct Object/Test bridge.
 
 The mature 0.3 lowering supplies the entire authoring graph. The original
 OVAL XML independently attests its direct Test, Object, selector values and
-check_existence. Unsupported semantics fail closed. This is a converter
+check_existence, plus a supported singleton scalar State if present.
+Unsupported semantics fail closed. This is a converter
 coverage proof, not a scanner six-state equivalence claim.
 
 Refs #232 #248 #229.
@@ -33,7 +34,7 @@ SOURCE_ITEM_CHECK = {"all": "all", "at least one": "one_or_more"}
 
 def ensure(condition, reason):
     if not condition:
-        raise ValueError("Object-presence source proof: " + reason)
+        raise ValueError("Direct Object/Test original OVAL source proof: " + reason)
 
 
 def one(source, kind):
@@ -55,23 +56,37 @@ def child(node, name):
 
 
 def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
-    """Reconcile a *single direct no-State Test* with its original OVAL source."""
+    """Reconcile one direct Test + Object and zero/one scalar State with OVAL."""
     a = v003["assessment"]
     ensure(a.get("specification", {}).get("version") == "0.3.0"
            and a.get("mode") == "automated"
            and a.get("class") in {"miscellaneous", "inventory", "compliance"},
            "unexpected 0.3 assessment envelope")
-    ensure(not a.get("states") and not a.get("variables")
-           and "shared_objects" not in a, "State/Variable graph not supported")
+    ensure(not a.get("variables") and "shared_objects" not in a,
+           "Variable/shared Object graph not supported")
+    with_state = bool(a.get("states"))
+    if with_state:
+        state_id, old_state = one(a.get("states"), "mapped scalar State")
+        expected_test_keys = {"test_title", "capability", "object", "states",
+                              "reported_elements", "existence", "match"}
+    else:
+        state_id, old_state = None, None
+        expected_test_keys = {"test_title", "capability", "object",
+                              "reported_elements", "existence", "match"}
     test_id, old_test = one(a.get("tests"), "mapped Test")
     object_id, old_object = one(a.get("objects"), "mapped Object")
     ensure(a.get("evaluate") == {"test": test_id} and
-           set(old_test) == {"test_title", "capability", "object",
-                             "reported_elements", "existence", "match"}
+           set(old_test) == expected_test_keys
            and old_test["object"] == object_id
            and old_test["reported_elements"] == "all"
            and old_test["match"] in SOURCE_ITEM_CHECK.values(),
            "unsupported Test graph/check")
+    if with_state:
+        ensure(old_test["states"] == [state_id]
+               and old_test["existence"] == "one_or_more"
+               and set(old_state) == {"state_title", "capability", "state"}
+               and old_state["capability"] == old_test["capability"],
+               "unsupported State reference/existence")
     ensure(set(old_object) == {"capability", "object_title", "select"}
            and old_object["capability"] == old_test["capability"]
            and (old_object["object_title"] is None or
@@ -123,10 +138,14 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
     mapped_existence, native_existence = SOURCE_EXISTENCE[original_existence]
     ensure(old_test["existence"] == mapped_existence,
            "0.3 Test existence differs from original OVAL")
-    ensure(len(original_test) == 1
+    ensure(len(original_test) == (2 if with_state else 1)
            and original_test[0].tag in {"{" + OD + "}object", "{" + namespace + "}object"}
            and set(original_test[0].attrib) == {"object_ref"},
-           "source Test uses State, complex Object binding or other children")
+           "source Test uses unsupported Object/State structure")
+    if with_state:
+        ensure(original_test[1].tag in {"{" + OD + "}state", "{" + namespace + "}state"}
+               and set(original_test[1].attrib) == {"state_ref"},
+               "source Test State binding not direct")
     original_object_id = original_test[0].get("object_ref")
     source_bindings = provenance.get("source_collection_bindings", {})
     ensure(set(source_bindings) == {original_object_id}
@@ -168,17 +187,62 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
                and native_name not in obj, "selector native mapping collided")
         obj[native_name] = {native_operation: original_value}
 
+    native_states = None
+    if with_state:
+        original_state = source_by_id(root, original_test[1].get("state_ref"))
+        ensure(original_state.tag == "{" + namespace + "}" + source["state"]
+               and set(original_state.attrib) <= {"id", "version", "comment"}
+               and original_state.get("version") is not None
+               and original_state.get("comment") == old_state["state_title"]
+               and len(original_state) == 1,
+               "source State title/type or scalar cardinality changed")
+        element = original_state[0]
+        old_field = old_state["state"]
+        ensure(isinstance(old_field, dict) and
+               set(old_field) == {"field", "value", "operation", "datatype", "match", "existence"}
+               and isinstance(old_field["value"], str),
+               "mapped State must be one literal scalar comparison")
+        field = element.tag.rsplit("}", 1)[-1]
+        rename = mapping["native"].get("state_field_map", {})
+        ensure(element.tag == "{" + namespace + "}" + field
+               and field in rename and rename[field] == old_field["field"]
+               and not list(element)
+               and set(element.attrib) <= {"operation", "datatype", "entity_check",
+                                          "entity_existence"}
+               and element.get("datatype", "string") == "string"
+               and element.get("entity_check", "all") == "all"
+               and element.get("entity_existence", "at_least_one_exists") ==
+                   "at_least_one_exists"
+               and old_field["datatype"] == "string"
+               and old_field["match"] == "all"
+               and old_field["existence"] == "one_or_more"
+               and (element.text or "") == old_field["value"],
+               "source State field/existence/check/value mismatch")
+        operation = element.get("operation", "equals")
+        ensure(operation in SOURCE_OPERATIONS
+               and old_field["operation"] == SOURCE_OPERATIONS[operation][0],
+               "source State operation lost by mature 0.3 lowering")
+        native_states = [{rename[field]: {
+            "require": "at_least_one_exists_and_all_match",
+            SOURCE_OPERATIONS[operation][1]: old_field["value"]}}]
+
     native_id = slug(old_test["test_title"])
+    native_test = {
+        "test_title": old_test["test_title"], "capability": capability,
+        "object": obj, "reported_elements": "all",
+        "require": ({"items": native_existence} if not with_state else
+                    "at_least_one_exists_and_" +
+                    ("all_match" if old_test["match"] == "all" else "some_match")),
+    }
+    if native_states is not None:
+        native_test["states"] = native_states
     candidate = {"assessment": {
         "id": a["id"], "version": a["version"],
         "assessment_title": a["assessment_title"],
         "mode": "automated", "class": a["class"],
         "purpose": a["purpose"],
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
-        "tests": {native_id: {
-            "test_title": old_test["test_title"], "capability": capability,
-            "object": obj, "reported_elements": "all",
-            "require": {"items": native_existence}}},
+        "tests": {native_id: native_test},
         "evaluate": {"test": native_id},
     }}
     # Invertible no-op here proves we have already emitted the native flat
@@ -187,6 +251,7 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
     ensure(not proof["edits"] and restore_document(flattened, proof) == candidate,
            "flat 0.4 projection source reconstruction failed")
     compiled = compile_test_instruction(native_id, candidate["assessment"]["tests"][native_id])
-    ensure(compiled["opcode"] == "CHECK_COLLECTION_PRESENCE",
-           "0.4 compiler dropped object-only Test semantics")
+    ensure(compiled["opcode"] == ("CHECK_SOURCE_EXACT_STATES" if with_state else
+                                  "CHECK_COLLECTION_PRESENCE"),
+           "0.4 compiler dropped source-exact Test/State semantics")
     return candidate
