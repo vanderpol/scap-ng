@@ -31,6 +31,18 @@ class LogicalVocabTests(unittest.TestCase):
             resolver=self.resolver)
         return list(validator.iter_errors(instance))
 
+    def test_evaluate_canonical_and_legacy_input_aliases_remain_schema_compatible(self):
+        schema=json.loads((ROOT/"schema/v0.4.0/expression.schema.json").read_text())
+        validator=Draft202012Validator(schema)
+        leaf={"test":"sample-test"}
+        for old,new in (("all","and"),("any","or"),("odd","xor")):
+            for op in (old,new):
+                with self.subTest(op=op):
+                    self.assertFalse(list(validator.iter_errors({op:[leaf]})))
+            self.assertTrue(list(validator.iter_errors({old:[leaf],new:[leaf]})))
+        for bad in ({"and":[]},{"or":"one_or_more"},{"xor":[{"items":"all"}]}):
+            self.assertTrue(list(validator.iter_errors(bad)))
+
     def test_both_state_entry_grammars_prefer_and_or_not_legacy_all_any(self):
         for name in ("state_entry","scoped_state_entry"):
             branches=self.schema["$defs"][name]["oneOf"]

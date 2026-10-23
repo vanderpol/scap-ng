@@ -28,7 +28,7 @@ def _bad(msg):
     raise ValueError("0.4 Boolean scope projection: "+msg)
 
 
-def evaluate_projection(expr):
+def evaluate_projection(expr, *, accept_canonical=False):
     """Change only complete-Test-result logical combiners; preserve conditionals."""
     if not isinstance(expr,dict) or not expr:
         _bad("invalid evaluate expression")
@@ -36,13 +36,14 @@ def evaluate_projection(expr):
         if len(expr)!=1:
             _bad("logical node has multiple operators")
         key,children=next(iter(expr.items()))
-        if key not in EVAL_TO_LOGIC or not isinstance(children,list) or not children:
+        operators = {**EVAL_TO_LOGIC, **({k:k for k in LOGIC_TO_OVAL} if accept_canonical else {})}
+        if key not in operators or not isinstance(children,list) or not children:
             _bad("unknown/empty legacy evaluate operator")
-        return {EVAL_TO_LOGIC[key]:[evaluate_projection(x) for x in children]}
+        return {operators[key]:[evaluate_projection(x, accept_canonical=accept_canonical) for x in children]}
     if set(expr)=={"not"}:
-        return {"not":evaluate_projection(expr["not"])}
+        return {"not":evaluate_projection(expr["not"], accept_canonical=accept_canonical)}
     if set(expr)=={"if","then","else"}:
-        return {k:evaluate_projection(expr[k]) for k in ("if","then","else")}
+        return {k:evaluate_projection(expr[k], accept_canonical=accept_canonical) for k in ("if","then","else")}
     if len(expr)==1 and next(iter(expr)) in LEAF:
         return deepcopy(expr)
     _bad("unknown evaluate expression or incomplete IF/THEN/ELSE")

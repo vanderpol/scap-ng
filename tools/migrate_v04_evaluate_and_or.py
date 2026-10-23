@@ -5,16 +5,16 @@ Scope is only assessment.evaluate, NEVER Test.require.items,
 Test.require.all_items_must, matching cardinality, State field/group logic,
 Objects, Filters, or Variable operand value_match.
 
-The released v0.4.0 expression schema currently expects all/any/one/odd.
-This tool creates an opt-in candidate; promotion requires full versioned
-schema migration. Refs #248 #239.
+Canonical generated expressions use and/or/one/xor. Legacy aliases remain
+accepted input; the ledger restores only changed sites, preserving mixed input.
+Refs #248 #239.
 """
 from __future__ import annotations
 from copy import deepcopy
 import hashlib
 import json
 
-from audit_v04_and_or_scope_projection import evaluate_projection,evaluate_inverse
+from audit_v04_and_or_scope_projection import evaluate_projection
 
 
 def digest(value):
@@ -46,11 +46,11 @@ def migrate(document):
     old=a.get("evaluate")
     if old is None:
         raise ValueError("Source automated Test evaluation is missing")
-    new=evaluate_projection(old)
+    new=evaluate_projection(old, accept_canonical=True)
     changes=changed_sites(old)
     if changes:
         a["evaluate"]=new
-        row={"assessment_id":a["id"],
+        row={"assessment_id":a.get("id"),
              "source_evaluate_sha256":digest(old),
              "candidate_evaluate_sha256":digest(new),
              "replaced_operators":changes}
@@ -69,7 +69,15 @@ def restore(candidate,ledger):
         raise ValueError("Wrong Test-result evaluation inversion identity")
     if digest(a.get("evaluate"))!=ledger[0]["candidate_evaluate_sha256"]:
         raise ValueError("Changed normalized Test-result logical expression")
-    a["evaluate"]=evaluate_inverse(a["evaluate"])
+    for edit in ledger[0]["replaced_operators"]:
+        node = a["evaluate"]
+        # Ledger routes describe the original tree, whose parents may already
+        # have been restored by an earlier edit.
+        for key in edit["site"]:
+            node = node[key]
+        if set(node) != {edit["to"]}:
+            raise ValueError("Changed normalized Test-result operator site")
+        node[edit["from"]] = node.pop(edit["to"])
     if digest(a["evaluate"])!=ledger[0]["source_evaluate_sha256"]:
         raise ValueError("Inverse lost original Test-result operators")
     if changed_sites(a["evaluate"])!=ledger[0]["replaced_operators"]:

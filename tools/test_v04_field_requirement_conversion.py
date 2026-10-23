@@ -273,6 +273,8 @@ class FieldRequirementConversionTests(unittest.TestCase):
             if isinstance(node, list): return [names(v) for v in node]
             return renames.get(node, node) if isinstance(node, str) else node
         source = names(single)
+        from migrate_v04_evaluate_and_or import migrate as migrate_evaluate, restore as restore_evaluate
+        _, evaluate_ledger = migrate_evaluate(source)
         proofs = {}; canonical, stats = promote(source, provenance=proofs)
         self.assertEqual(stats['all_items_must'], 2)
         recover(canonical, source)
@@ -295,6 +297,7 @@ class FieldRequirementConversionTests(unittest.TestCase):
         self.assertFalse(native_result['scanner_evaluated'])
         self.assertFalse(native_result['signature_verified'])
         restored = restore_document(decoded['authoring/trace/assessments/trace.json'], flat_ledger)
+        restored = restore_evaluate(restored, evaluate_ledger)
         for tid, proof in proofs.items():
             restored['assessment']['tests'][tid] = restore_test(restored['assessment']['tests'][tid], proof)
         reverse_names = {value: key for key, value in renames.items()}

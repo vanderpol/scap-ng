@@ -69,10 +69,26 @@ class EvaluateOnlyMigrationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"Changed normalized"):
             restore(bad,proof)
 
+    def test_canonical_input_is_idempotent_and_mixed_input_restores_exactly(self):
+        src=fixture()
+        src["assessment"]["evaluate"]={"and":[{"test":"a-test"},
+            {"any":[{"one":[{"test":"b-test"}]},
+                    {"xor":[{"test":"c-test"}, {"odd":[{"test":"d-test"}]}]}]}]}
+        new, proof=migrate(src)
+        self.assertTrue(assert_inverse(src,new,proof))
+        again, empty=migrate(new)
+        self.assertEqual(again,new)
+        self.assertEqual(empty,[])
+        self.assertEqual(restore(new,empty),new)
+        bad=deepcopy(proof)
+        bad[0]["replaced_operators"][0]["site"]=["missing"]
+        with self.assertRaises((ValueError,KeyError)):
+            restore(new,bad)
+
     def test_illegal_mixed_alias_or_extra_expression_fails_closed(self):
         for mutant in (
             {"all":[{"test":"a-test"}],"any":[{"test":"b-test"}]},
-            {"or":[{"test":"a-test"},{"test":"b-test"}]},
+            {"or":[],"any":[{"test":"b-test"}]},
             {"all":[]},
             {"if":{"test":"a-test"},"then":{"test":"b-test"}},
         ):

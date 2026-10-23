@@ -86,62 +86,53 @@ def resolve_object(obj, cap, catalog, route, edits):
     return effective
 
 
-def flatten_document(document, catalog):
-    source, doc = deepcopy(document), deepcopy(document)
-    changes = []
+def object_nodes(assessment):
+    """Yield grammar-owned Objects, paths and inherited capabilities.
 
-    # Only the native Object grammar owns an `object` key. A Variable,
-    # Filter predicate, provenance map or arbitrary scalar record can contain
-    # a property named `object` without declaring a collection Object.
-    # Never traverse arbitrary subtrees looking for that spelling.
+    Named library roots keep their metadata contract. Embedded Set operands
+    are private even inside a named Object. Never search arbitrary records,
+    selectors, Filters or Variable values for keys spelled `object`.
+    """
+    def walk(obj, cap, route, private):
+        effective = obj.get("capability", cap)
+        yield obj, effective, route, private
+        if isinstance(obj.get("set"), dict):
+            yield from walk_set(obj["set"], effective, route + ("set",))
+
     def walk_set(expression, cap, route):
-        if not isinstance(expression, dict):
-            return
         operands = expression.get("operands")
         if not isinstance(operands, list):
-            return  # Native JSON Schema separately rejects invalid Sets.
+            return
         for i, operand in enumerate(operands):
             if not isinstance(operand, dict):
                 continue
             path = route + ("operands", i)
-            inner = operand.get("object")
-            if isinstance(inner, dict):
-                effective = resolve_object(
-                    inner, cap, catalog, path + ("object",), changes)
-                walk_object(inner, effective, path + ("object",))
-            nested = operand.get("set")
-            if isinstance(nested, dict):
-                walk_set(nested, cap, path + ("set",))
+            if isinstance(operand.get("object"), dict):
+                yield from walk(operand["object"], cap, path + ("object",), True)
+            if isinstance(operand.get("set"), dict):
+                yield from walk_set(operand["set"], cap, path + ("set",))
 
-    def walk_object(obj, cap, route):
-        if isinstance(obj.get("set"), dict):
-            walk_set(obj["set"], cap, route + ("set",))
+    for section in ("objects", "shared_objects"):
+        library = assessment.get(section)
+        if isinstance(library, dict):
+            for name, obj in library.items():
+                if isinstance(obj, dict):
+                    yield from walk(obj, None, ("assessment", section, name), False)
+    tests = assessment.get("tests")
+    if isinstance(tests, dict):
+        for name, test in tests.items():
+            if isinstance(test, dict) and isinstance(test.get("object"), dict):
+                yield from walk(test["object"], test.get("capability"),
+                                ("assessment", "tests", name, "object"), True)
 
+
+def flatten_document(document, catalog):
+    source, doc = deepcopy(document), deepcopy(document)
+    changes = []
     assessment = doc.get("assessment")
     if isinstance(assessment, dict):
-        for section in ("objects", "shared_objects"):
-            library = assessment.get(section)
-            if not isinstance(library, dict):
-                continue
-            for obj_name, obj in library.items():
-                if not isinstance(obj, dict):
-                    continue
-                route = ("assessment", section, obj_name)
-                effective = resolve_object(
-                    obj, obj.get("capability"), catalog, route, changes)
-                walk_object(obj, effective, route)
-        tests = assessment.get("tests")
-        if isinstance(tests, dict):
-            for test_name, test in tests.items():
-                if not isinstance(test, dict):
-                    continue
-                obj = test.get("object")
-                if not isinstance(obj, dict):
-                    continue
-                route = ("assessment", "tests", test_name, "object")
-                effective = resolve_object(
-                    obj, test.get("capability"), catalog, route, changes)
-                walk_object(obj, effective, route)
+        for obj, cap, route, _ in object_nodes(assessment):
+            resolve_object(obj, cap, catalog, route, changes)
     proof = {"before": digest(source), "after": digest(doc), "edits": changes}
     if restore_document(doc, proof) != source:
         raise ValueError("Source reconstruction failed")

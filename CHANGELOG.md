@@ -6,6 +6,17 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+### Canonical authoring cleanup
+
+- Canonical six-STIG generation now emits `evaluate.and/or/xor`, using the
+  existing reversible migration while retaining legacy input compatibility.
+  Private inline/local Objects omit null `object_title`, including nested Set
+  operands; meaningful titles and named/shared Object contracts are preserved.
+  The authoring guard rejects both obsolete output forms, with focused
+  positive/negative tests and updated display vocabulary.
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+  [#239](https://github.com/vanderpol/scap-ng/issues/239)
+
 ### Developer toolchain release infrastructure
 
 - Added explicit historical version-tag source reconstruction for older 0.3

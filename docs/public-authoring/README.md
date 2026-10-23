@@ -28,6 +28,21 @@ This is a **small reading list, not a new language specification**. The [SCAP-NG
 | **Evaluate** | Combines individual Test outcomes under the version's exact six-state semantics |
 | **Fixture** | Synthetic or recorded observation and independently expected outcome for testing; not proof of real system compliance |
 
+Current 0.4 generated `evaluate` expressions use `and`, `or`, `one`, `xor`
+(odd parity), `not`, and the supported `if`/`then`/`else` form. Legacy
+`all`/`any`/`odd` remain accepted input aliases for migration and compilation;
+canonical generation emits `and`/`or`/`xor`. This changes spelling only:
+Item requirements, field/value quantifiers and fallback `states_match` tokens
+keep their separate meanings.
+
+On private inline/local Objects, omit `object_title` when its value is null,
+including Objects nested in Set operands. Preserve meaningful titles and
+named/shared Object metadata contracts. The canonical six-STIG guard rejects
+legacy evaluate spellings and private null titles in generated JSON and YAML.
+These generator rules apply when regenerating content; immutable older sample
+releases retain their original bytes.
+See the [version-local display vocabulary](../../schema/v0.4.0/authoring-vocabulary.en.json).
+
 Full definitions: [terminology](../../specification/terminology.md). The vocabulary above explains intent, not a second YAML syntax.
 
 ## Two real examples to begin with

@@ -15,6 +15,8 @@ import zipfile
 import yaml
 
 from build_v04_canonical_six_stigs import promote
+from v04_flat_object_authoring import object_nodes
+from migrate_v04_evaluate_and_or import migrate as migrate_evaluate
 
 
 def check_test(test, origin):
@@ -34,6 +36,20 @@ def check_test(test, origin):
     return True
 
 
+def check_assessment(assessment, origin):
+    # The same migration parses canonical and legacy input. Any migration
+    # change is forbidden at the generated archive boundary.
+    _, legacy = migrate_evaluate({"assessment": assessment})
+    if legacy:
+        raise ValueError(f"{origin}: legacy evaluate operator; use and/or/xor")
+    for obj, _, route, private in object_nodes(assessment):
+        if private and "object_title" in obj and obj["object_title"] is None:
+            raise ValueError(f"{origin} / {route}: private Object object_title must omit null")
+    for test_id, test in (assessment.get("tests") or {}).items():
+        check_test(test, f"{origin} / {test_id}")
+    return True
+
+
 def check_archive(archive_path):
     documents = tests = 0
     with zipfile.ZipFile(archive_path) as z:
@@ -47,13 +63,12 @@ def check_archive(archive_path):
             a = doc.get("assessment") if isinstance(doc, dict) else None
             if not isinstance(a, dict) or a.get("mode") != "automated":
                 continue
-            for test_id, test in (a.get("tests") or {}).items():
-                check_test(test, f"{path} / {test_id}")
-                tests += 1
+            check_assessment(a, path)
+            tests += len(a.get("tests") or {})
     if documents != 4012:
-        raise ValueError(f"Expected 4,001 documents, got {documents}")
+        raise ValueError(f"Expected 4,012 documents, got {documents}")
     if tests != 1390:
-        raise ValueError(f"Expected 1,375 distinct Tests, got {tests}")
+        raise ValueError(f"Expected 1,390 distinct Tests, got {tests}")
     print(f"PASS canonical 0.4 source guards: {documents} documents; {tests} Tests; {archive_path}")
 
 

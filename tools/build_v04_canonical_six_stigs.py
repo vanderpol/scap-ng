@@ -7,6 +7,7 @@ Promote proven scalar all-match States to canonical field_requirement and
 complete conditions. Preserve Item population separately and retain explicit
 source-exact uncommon, record and non-AND State fallbacks with diagnostics.
 Inherit inline Object capability only for identical Test/Object capability.
+Canonicalize evaluate spellings and omit null private Object titles.
 Preserve all other graph content and prove parsed-source exact recovery.
 
 Refs #251 #227 #232 #239 #246.
@@ -19,7 +20,8 @@ import json
 from pathlib import Path
 import zipfile
 import yaml
-from v04_flat_object_authoring import dump_hybrid
+from v04_flat_object_authoring import dump_hybrid, object_nodes
+from migrate_v04_evaluate_and_or import migrate as migrate_evaluate, restore as restore_evaluate, assert_inverse
 
 from migrate_v04_oval_proven_direct_filters import (
     index_provenance, migrate as migrate_proven_filter, recover_migration,
@@ -38,6 +40,17 @@ def promote(doc, *, provenance=None):
     a=new.get("assessment")
     if not isinstance(a,dict) or a.get("mode")!="automated":
         return new,audit
+    if "evaluate" in a:
+        migrated, ledger = migrate_evaluate(new)
+        assert_inverse(new, migrated, ledger)
+        new = migrated
+        a = new["assessment"]
+        audit["evaluate_operators_canonicalized"] += sum(
+            len(row["replaced_operators"]) for row in ledger)
+    for obj, _, _, private in object_nodes(a):
+        if private and "object_title" in obj and obj["object_title"] is None:
+            del obj["object_title"]
+            audit["private_null_object_titles_removed"] += 1
     for tid,test in (a.get("tests") or {}).items():
         cap=test.get("capability")
         obj=test.get("object")
@@ -58,15 +71,32 @@ def promote(doc, *, provenance=None):
     return new,audit
 
 def recover(candidate,original):
-    """Verify deterministic promotion and restore each checked source Test ledger."""
+    """Verify promotion and reconstruct Tests, evaluate spelling and Object metadata."""
     proofs = {}
     expected, _ = promote(original, provenance=proofs)
     if candidate != expected:
         raise ValueError("Original authoring source differs after exact reverse translation")
+    restored = deepcopy(candidate)
     for tid, proof in proofs.items():
-        test = candidate["assessment"]["tests"][tid]
-        if restore_test(test, proof) != proof["source_test"]:
-            raise ValueError("Test source reconstruction mismatch: " + tid)
+        test = restored["assessment"]["tests"][tid]
+        restored["assessment"]["tests"][tid] = restore_test(test, proof)
+    source = original.get("assessment")
+    if isinstance(source, dict) and source.get("mode") == "automated":
+        for obj, _, route, private in object_nodes(source):
+            if private and "object_title" in obj and obj["object_title"] is None:
+                node = restored
+                for key in route:
+                    node = node[key]
+                node["object_title"] = None
+        for tid, test in (source.get("tests") or {}).items():
+            obj = test.get("object")
+            if isinstance(obj, dict) and "capability" in obj:
+                restored["assessment"]["tests"][tid]["object"]["capability"] = obj["capability"]
+        if "evaluate" in source:
+            _, ledger = migrate_evaluate(original)
+            restored = restore_evaluate(restored, ledger)
+    if restored != original:
+        raise ValueError("Canonical authoring source reconstruction mismatch")
 
 
 def render_authoring(document, *, is_yaml):
