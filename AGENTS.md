@@ -80,6 +80,14 @@ The `specification/` tree is release output, not an active research notebook.
 - After that checkpoint, leave the specification unchanged until the next
   prerelease/release promotion.
 
+## Single-source, versioned-toolchain release invariant (owner decision 2026-10-23)
+
+- Maintain one authoritative conversion/compiler codebase on `main`, with version-neutral OVAL parsing/semantic IR reused by successive SCAP-NG renderers. Do not rebuild the OVAL importer for each new NG authoring revision.
+- Preserve the ability to reproduce historical versions through immutable Git refs and complete, separately published toolchain snapshots. Do not maintain a second active 0.3 code tree solely to generate old output, and do not remove historical code before its supported behavior is covered by 0.4 regression tests.
+- Every frozen toolchain release SHALL contain its exact specification, complete version-local schemas, developer implementation guides, upgrader, compiler, validators, verifier, tests, examples, dependency/environment records, source SHA/tag, manifest and checksums.
+- A schema-valid source archive alone is not a final toolchain release. Clean-checkout/clean-extract CLI execution, conversion/compilation and integrity regression evidence remain required. Runtime scanner parity and publisher trust are distinct gates.
+- Bounded research branches are permitted when registered under BRANCH-MANAGEMENT.md; accepted implementation is integrated into `main`. See [toolchain release contract](docs/releases/TOOLCHAIN-RELEASES.md).
+
 ## Release changelog invariant
 
 - `CHANGELOG.md` SHALL summarize material delivered changes by release.

@@ -6,6 +6,18 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+### Developer toolchain release infrastructure
+
+- Added an integrity-checked, deterministic source-toolchain archive builder,
+  a read-only standalone verifier and focused tamper/missing-doc regression
+  tests. A manual GitHub workflow can checkpoint the complete committed source,
+  including the normative specification, schemas, developer guides, tooling
+  and tests. This is a **candidate source snapshot** only; it is not an
+  approved 0.4 release or scanner-conformance claim.
+  [#27](https://github.com/vanderpol/scap-ng/issues/27)
+  [#49](https://github.com/vanderpol/scap-ng/issues/49)
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+
 ### Native content compilation
 
 - Added native bundle regression coverage for schema-valid manual Assessment

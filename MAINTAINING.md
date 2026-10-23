@@ -81,3 +81,20 @@ is distinct from that acceptance. After the owner accepts a candidate,
 publish a durable versioned GitHub prerelease with compact reader-facing
 content and externally linked raw engineering evidence. Historic votes,
 accepted designs and release artifacts shall not be silently rewritten.
+
+
+## Versioned developer toolchain releases
+
+Use one maintained source tree on `main`; release older versions as immutable
+toolchain snapshots, not active parallel source trees. Source-pinned OVAL
+semantic parsing and tests are shared infrastructure; new NG versions change
+the adapter/renderer only where approved grammar actually differs. Research
+branches must follow the branch registry and return accepted work to `main`.
+
+Every toolchain release must contain the specification, exact versioned schema,
+developer implementation guides, converter, compiler, verifier, regression
+fixtures, dependency record and a manifest/checksum set. The
+[toolchain release process](docs/releases/TOOLCHAIN-RELEASES.md) defines the
+snapshot builder and additional acceptance gates. Source snapshot integrity,
+native compilation, scanner parity, publisher trust, and human acceptance are
+distinct claims. Historical versions stay reproducible and are never overwritten.

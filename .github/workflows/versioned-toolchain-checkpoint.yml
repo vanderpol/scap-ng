@@ -1,0 +1,57 @@
+name: Versioned SCAP-NG source toolchain archive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/build_versioned_toolchain.py'
+      - 'tools/test_build_versioned_toolchain.py'
+      - 'docs/developer/README.md'
+      - 'docs/releases/TOOLCHAIN-RELEASES.md'
+      - '.github/workflows/versioned-toolchain-checkpoint.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Exact SCAP-NG source/schema version for a candidate snapshot'
+        required: true
+        default: '0.4.0'
+
+permissions:
+  contents: read
+
+jobs:
+  focused-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reproducible archive and fail-closed manifest tests
+        run: python tools/test_build_versioned_toolchain.py -v
+
+  candidate-snapshot:
+    if: github.event_name == 'workflow_dispatch'
+    needs: focused-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Snapshot the exact committed source (not a release promotion)
+        env:
+          SCAPNG_VERSION: ${{ inputs.version }}
+        run: |
+          python tools/build_versioned_toolchain.py \
+            --repo . --version "$SCAPNG_VERSION" \
+            --ref HEAD --output-dir work/toolchain
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scap-ng-${{ inputs.version }}-source-toolchain-CANDIDATE
+          path: |
+            work/toolchain/*.zip
+            work/toolchain/SHA256SUMS.txt
+          if-no-files-found: error

@@ -24,6 +24,25 @@ A green schema check, round trip, or converter run is evidence; it is not by its
 
 ---
 
+## Build or verify a versioned source toolchain
+
+**Script:** `tools/build_versioned_toolchain.py` — snapshots the complete
+committed Git tree, including the specification, versioned schemas, developer
+guides, tools and tests. It does not compile content or prove scanner parity.
+
+```powershell
+python tools/build_versioned_toolchain.py --repo . --version 0.4.0 --ref HEAD --output-dir work/toolchain
+python tools/build_versioned_toolchain.py --verify work/toolchain/PATH_TO_TOOLCHAIN.zip
+```
+
+The first command creates a **candidate snapshot**, not a frozen release.
+A final version requires an immutable `vX.Y.Z` tag (`--require-tag`) plus
+independent clean-install, converter, compiler, signing and conformance gates.
+See [the toolchain release policy](../docs/releases/TOOLCHAIN-RELEASES.md)
+and [developer guide index](../docs/developer/README.md). The older `v003`
+converter module is retained as input/semantic infrastructure during 0.4
+consolidation; its existence does not make 0.3 the current output target.
+
 # 1. Normal human workflows
 
 These are the preferred entry points for routine conversion, normalization, validation, packaging, and review work.
