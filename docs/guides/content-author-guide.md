@@ -15,6 +15,10 @@ Read SCAP-NG from the outside inward:
 
 A Benchmark's Rule membership defines its baseline. A publisher Profile can deselect member Rules; external Tailoring is a separate policy layer. Organizational Input supplies authorized expected-state data and is not the same as Tailoring. These distinctions are explained in [Benchmark/Rule](../../specification/policy/benchmark.md), [Profiles/Tailoring](../../specification/policy/profiles-and-tailoring.md), and [Parameters/Organizational Input](../../specification/policy/parameters-and-organizational-input.md).
 
+### Platform, applicability, compliance
+
+These are separate decisions: **Platform** asks whether the target is within the Benchmark's product scope; **Rule applicability** asks whether a selected Rule concerns that target; **compliance** asks whether an applicable Rule is satisfied. An external identifier such as CPE is not executable proof by itself; the Platform identifier must bind to an Assessment. See [Platform and applicability](../../specification/policy/platform-and-applicability.md).
+
 ## 2. Select an Assessment method
 
 A Rule may declare named manual and automated choices. Its `default_assessment_choice` names the publisher's selected default; other declared choices remain available under the rules of the [Assessment choice model](../../specification/policy/benchmark.md). A manual Assessment records a human procedure. An automated Assessment expresses technical collection and evaluation. See [manual assessments](../../specification/assessment/manual-assessment.md) and [assessment methods](../../specification/assessment/assessment-method.md).
