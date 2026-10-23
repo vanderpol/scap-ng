@@ -83,6 +83,14 @@ class ObjectPresenceTests(unittest.TestCase):
                 test = next(iter(native["assessment"]["tests"].values()))
                 self.assertEqual(test["require"], {"items": items})
 
+    def test_original_at_least_one_item_check_with_no_states(self):
+        root = ET.fromstring(source())
+        next(n for n in root.iter() if n.tag == "{" + IOS + "}section_test").set(
+            "check", "at least one")
+        native, _ = self.conversion(ET.tostring(root))
+        self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
+                         {"items": "may_be_absent"})
+
     def test_original_oval_source_mutations_fail_closed(self):
         def set_attr(root, suffix, attribute, value):
             next(x for x in root.iter() if x.tag.endswith("}" + suffix)).set(attribute, value)
@@ -122,6 +130,7 @@ class ObjectPresenceTests(unittest.TestCase):
 
     def test_immutable_external_real_oval_samples_if_available(self):
         for env_name, definition, cap in (
+            ("SCAP_NG_ASA_LINE_SOURCE_XML", "oval:org.joval.asa.test:def:6", "asa.line"),
             ("SCAP_NG_IOS_BGP_SOURCE_XML", "oval:org.joval.ios.test:def:1", "ios.bgpneighbor"),
             ("SCAP_NG_IOS_SECTION_SOURCE_XML", "oval:org.joval.ios.test:def:1", "ios.section"),
         ):
@@ -130,8 +139,9 @@ class ObjectPresenceTests(unittest.TestCase):
                 with self.subTest(source=env_name):
                     native, evidence = convert(Path(value), definition)
                     self.assertEqual(evidence["capability"], cap)
+                    expected = "one_or_more" if cap == "asa.line" else "may_be_absent"
                     self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
-                                     {"items": "may_be_absent"})
+                                     {"items": expected})
 
 
 if __name__ == "__main__":

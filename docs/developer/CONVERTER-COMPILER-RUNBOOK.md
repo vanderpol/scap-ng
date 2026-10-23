@@ -59,7 +59,7 @@ Test with mapped string selectors and an explicit OVAL existence requirement
 no State, Variable, Set, Filter or nested Boolean criteria. The current core
 reuses the mature 0.3 lowering, verifies every Test/Object/selector binding
 against the original OVAL, and compiles a native 0.4 presence instruction.
-The immutable IOS BGP-neighbor and section examples exercise this path.
+The immutable ASA line and IOS BGP-neighbor/section examples exercise this path.
 These checks do **not** establish scanner-result parity.
 
 Previously admitted are one direct
@@ -80,8 +80,9 @@ independent 0.4 import/export and semantic round-trip proof.
 For source regressions, retrieve only the immutable
 [`e3538595` Self-Assertion source](https://github.com/OVAL-Community/SCAP-Self-Assertion/commit/e3538595c5083b9c34d937a81d319234df9bbfaa)
 at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
-`SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus the two
-`ios/ios-def_bgpneighbor_test.xml` and `ios/ios-def_section_test.xml` files
+`SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus
+`asa/asa-def_line_test.xml`, `ios/ios-def_bgpneighbor_test.xml`, and
+`ios/ios-def_section_test.xml` files
 under the same `SCAP_1.4/OVAL_Test_Content/` prefix. The Variable and Family
 regressions check their SHA256, and the Object-only regression independently
 checks OVAL source Test/Object/selector details. Sources are fetched by the maintained

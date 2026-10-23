@@ -28,6 +28,7 @@ SOURCE_EXISTENCE = {
 }
 SOURCE_OPERATIONS = {"equals": ("equals", "equals"),
                      "pattern match": ("pattern_match", "matches_regex")}
+SOURCE_ITEM_CHECK = {"all": "all", "at least one": "one_or_more"}
 
 
 def ensure(condition, reason):
@@ -69,7 +70,8 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
                              "reported_elements", "existence", "match"}
            and old_test["object"] == object_id
            and old_test["reported_elements"] == "all"
-           and old_test["match"] == "all", "unsupported Test graph/check")
+           and old_test["match"] in SOURCE_ITEM_CHECK.values(),
+           "unsupported Test graph/check")
     ensure(set(old_object) == {"capability", "object_title", "select"}
            and old_object["capability"] == old_test["capability"]
            and (old_object["object_title"] is None or
@@ -111,7 +113,8 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
            and set(original_test.attrib) <= {
                "id", "version", "comment", "check_existence", "check"}
            and original_test.get("comment") == old_test["test_title"]
-           and original_test.get("check", "all") == "all"
+           and original_test.get("check", "all") in SOURCE_ITEM_CHECK
+           and SOURCE_ITEM_CHECK[original_test.get("check", "all")] == old_test["match"]
            and original_test.get("version") is not None,
            "source Test type/title/check/options changed")
     original_existence = original_test.get("check_existence", "at_least_one_exists")

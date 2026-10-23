@@ -103,8 +103,8 @@ proposals are not listed as delivered features.
   Object-only Test** 0.4 adapter. The established 0.3 lowerer supplies the
   graph, and the adapter checks its Test identity, existence quantifier,
   selector mapping and scalar operation against original OVAL before compiling
-  a native presence instruction. Synthetic mutation tests and two immutable
-  IOS Self-Assertion examples are pinned in CI. Complex Tests remain blocked,
+  a native presence instruction. Synthetic mutation tests and three immutable
+  ASA/IOS Self-Assertion examples are pinned in CI. Complex Tests remain blocked,
   and live scanner parity is not implied.
   [#232](https://github.com/vanderpol/scap-ng/issues/232)
   [#248](https://github.com/vanderpol/scap-ng/issues/248)
