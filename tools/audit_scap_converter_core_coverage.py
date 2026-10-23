@@ -67,6 +67,10 @@ def v003_shape(assessment):
         "variables": len(variables),
         "capabilities": sorted({test["capability"] for test in tests.values()
                                 if isinstance(test, dict) and isinstance(test.get("capability"), str)}),
+        "test_quantifiers": sorted({
+            f"{test.get('existence', 'missing')}|{test.get('match', 'missing')}"
+            for test in tests.values() if isinstance(test, dict)
+        }),
         "evaluate_root": next(iter(assessment.get("evaluate") or {}), "none"),
         "has_sets": contains(objects, "set"),
         "has_filters": contains(objects, "filters"),
@@ -80,6 +84,8 @@ def unresolved_shape_summary(rows):
     caps = Counter()
     patterns = Counter()
     examples = {}
+    simple_quantifiers = Counter()
+    simple_examples = {}
     for item in blocked:
         shape = item["v003_shape"]
         for capability in shape["capabilities"]:
@@ -94,11 +100,23 @@ def unresolved_shape_summary(rows):
                    f"/Filter{int(shape['has_filters'])}"
                    f"/{shape['evaluate_root']}")
         patterns[pattern] += 1
+        if (shape["tests"] == 1 and shape["objects"] == 1
+                and shape["states"] == 0 and shape["variables"] == 0
+                and not shape["has_sets"] and not shape["has_filters"]):
+            quantifier = ",".join(shape["test_quantifiers"])
+            simple_quantifiers[quantifier] += 1
+            simple_examples.setdefault(quantifier, {
+                "source_file": item["source_file"],
+                "definition_id": item["definition_id"],
+                "capabilities": shape["capabilities"],
+            })
     return {
         "blocked_0_3_lowerable_definitions": len(blocked),
         "by_capability": dict(caps.most_common()),
         "by_semantic_shape": dict(patterns.most_common()),
         "first_source_per_capability": examples,
+        "simple_object_only_by_test_quantifiers": dict(simple_quantifiers.most_common()),
+        "simple_object_only_examples": simple_examples,
     }
 
 
@@ -208,6 +226,10 @@ def main():
         "top_blocked_shapes": list(
             result["lowerable_but_unproved"]["by_semantic_shape"].items())[:15],
         "source_example_per_capability": result["lowerable_but_unproved"]["first_source_per_capability"],
+        "simple_object_only": {
+            "by_test_quantifier": result["lowerable_but_unproved"]["simple_object_only_by_test_quantifiers"],
+            "examples": result["lowerable_but_unproved"]["simple_object_only_examples"],
+        },
     }, sort_keys=True))
 
 
