@@ -14,6 +14,8 @@ on:
       - 'tools/test_scap_converter_core_multitest.py'
       - 'tools/test_scap_converter_core_multistate.py'
       - 'tools/test_scap_converter_core_singleton_presence.py'
+      - 'tools/test_scap_converter_core_apparmorstatus.py'
+      - 'tools/prove_v04_oval_apparmorstatus_source.py'
       - 'tools/test_v04_public_cli_smoke.py'
       - 'tools/test_scap_converter_core_constant_matrix.py'
       - 'tools/test_v04_source_verified_constant_datatypes.py'
@@ -44,7 +46,7 @@ jobs:
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Checkout immutable original OVAL variable source
+      - name: Checkout immutable original OVAL sources
         uses: actions/checkout@v4
         with:
           repository: OVAL-Community/SCAP-Self-Assertion
@@ -74,6 +76,8 @@ jobs:
           test -f "$SCAP_NG_FIRMWAREPASSWORD_SOURCE_XML"
           test -f "$SCAP_NG_PROFILES_SOURCE_XML"
           python tools/test_scap_converter_core_singleton_presence.py -v
+          test -f "$SCAP_NG_APPARMOR_SOURCE_XML"
+          python tools/test_scap_converter_core_apparmorstatus.py -v
           python tools/test_v04_public_cli_smoke.py -v
           test -f "$SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML"
           test -f "$SCAP_NG_CHECK_ENUMERATION_SOURCE_XML"
@@ -95,6 +99,7 @@ jobs:
           SCAP_NG_BOOLEAN_DATATYPE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval_boolean_datatype.xml
           SCAP_NG_STRING_DATATYPE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval_string_datatype.xml
           SCAP_NG_INT_DATATYPE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval_int_datatype.xml
+          SCAP_NG_APPARMOR_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/linux/linux-def_apparmorstatus_test.xml
           SCAP_NG_FAMILY_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml
           SCAP_NG_IOS_BGP_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/ios/ios-def_bgpneighbor_test.xml
           SCAP_NG_IOS_SECTION_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/ios/ios-def_section_test.xml

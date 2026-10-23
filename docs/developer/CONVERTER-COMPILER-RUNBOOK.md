@@ -38,6 +38,8 @@ SCAP_NG_FILEVAULT_SOURCE_XML=/path/to/macos-def_filevault_test.xml \
 SCAP_NG_FIRMWAREPASSWORD_SOURCE_XML=/path/to/macos-def_firmwarepassword_test.xml \
 SCAP_NG_PROFILES_SOURCE_XML=/path/to/macos-def_profiles_test.xml \
   python tools/test_scap_converter_core_singleton_presence.py -v
+SCAP_NG_APPARMOR_SOURCE_XML=/path/to/linux-def_apparmorstatus_test.xml \
+  python tools/test_scap_converter_core_apparmorstatus.py -v
 python tools/test_v04_public_cli_smoke.py -v
 SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML=/path/to/oval-def_constant_variable.xml \
 SCAP_NG_CHECK_ENUMERATION_SOURCE_XML=/path/to/oval_check_enumeration_variable_values.xml \
@@ -62,6 +64,20 @@ compiler. For the original two leaf shapes it checks agreement with the
 independently developed OVAL importer (normalized to flat-Object syntax).
 For direct Object-only cases it instead compares the mature 0.3 graph field
 by field to the original OVAL Test and Object before emitting native syntax.
+The pinned AppArmor singleton Definition `oval:com.jovalcm.test:def:967` is
+also supported through this same 0.3 lowering and direct State projection.
+Only the original Self-Assertion file at revision
+`e3538595c5083b9c34d937a81d319234df9bbfaa`, SHA-256
+`1e9b6d6bab5a40226db960cebf08c8124282b86e8b0c52316027d48b2c97a5d6`,
+is admitted. Its empty Object becomes an implicit singleton; the original
+Test existence/check quantifiers and integer `loaded_profiles_count >= 0`
+State remain explicit. The raw mature lowering graph is fingerprinted with
+only the caller-selected Assessment identity excluded, then each aligned
+Test/State binding and operand is checked against the original graph.
+The independent AppArmor oracle is used only by differential tests, never
+to supply converter output. This does not admit other integer/singleton shapes
+or establish live AppArmor scanner behavior (Refs #232 #248).
+
 The checkout must contain both `schema/v0.3.0/capability-mappings/supported/`
 and `schema/v0.4.0/capability-mappings/supported/`. In particular the mature
 0.3 mapper represents a direct shell Filter using an intermediate single

@@ -42,13 +42,20 @@ from scap_upconvert_v003.convert_collection_review import postprocess_automated_
 from v04_field_requirement import promote_test, restore_test
 from v04_flat_object_authoring import flatten_document, load_catalog, restore_document
 from v04_native_bundle_compiler import compile_test_instruction
-from v04_source_verified_object_presence import convert as project_object_presence
+from v04_source_verified_object_presence import (
+    convert as project_object_presence, APPARMOR_DEFINITION, APPARMOR_SOURCE_SHA256,
+)
 from v04_source_verified_multitest_presence import convert as project_direct_multitest
 from v04_source_verified_multitest_states import convert as project_direct_multistate
 from v04_source_verified_constant_variable_matrix import (
     project as project_constant_matrix, project_datatype_suite,
     DATATYPE_REUSE_CASES,
 )
+
+
+# Exact mature 0.3 graph + source bindings for the pinned AppArmor singleton.
+# Assessment identity is caller-selected and excluded from this attestation.
+APPARMOR_LOWERING_SHA256 = "8caa8af94f4cc619fe78634b7daac8c5c94f851b5960e5b712e61d9eb7bed1f0"
 
 
 def require(ok, reason):
@@ -389,6 +396,10 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     """Use existing semantic IR + v003 lowering, then fail-closed v04 projection."""
     source_path = Path(source_path)
     original = source_path.read_bytes()
+    apparmor_source = definition_id == APPARMOR_DEFINITION
+    if apparmor_source:
+        require(hashlib.sha256(original).hexdigest() == APPARMOR_SOURCE_SHA256,
+                "pinned AppArmor source SHA differs")
     mappings = Path(__file__).resolve().parents[1] / "schema/v0.3.0/capability-mappings/supported"
     require((mappings / "independent.shellcommand.json").is_file()
             and (mappings / "independent.family.json").is_file()
@@ -407,7 +418,11 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     datatype_suite_name = next(
         (name for name in DATATYPE_REUSE_CASES
          if DATATYPE_SUITE_CASES[name][0] == definition_id), None)
-    if variable_source:
+    if apparmor_source:
+        # The native graph must be projected from mature 0.3 lowering.
+        # The independent AppArmor oracle is used only in differential tests.
+        independent = None
+    elif variable_source:
         # A separately source-audited and source-roundtrip-proved 0.4 adapter.
         independent, independent_proof = independent_variable_import(original)
         require(independent_proof["original_definition_id"] == definition_id,
@@ -453,6 +468,14 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     lower, err = lower_definition(ET.fromstring(original), definition_id,
                                   ident, collection_graph=True, provenance=provenance)
     require(err is None, "0.3 source lowering failed: " + str(err))
+    if apparmor_source:
+        graph = {**lower, "assessment": {k:v for k,v in lower["assessment"].items() if k != "id"}}
+        lowering_sha = hashlib.sha256(json.dumps(
+            {"lowered": graph, "provenance": provenance}, sort_keys=True,
+            separators=(",", ":")).encode()).hexdigest()
+        require(lower["assessment"]["id"] == ident
+                and lowering_sha == APPARMOR_LOWERING_SHA256,
+                "pinned AppArmor mature 0.3 lowering graph differs")
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
     multi_direct_presence = (independent is None and
@@ -514,6 +537,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_ORIGINAL_OVAL_DIRECT_AND"
                    if multi_direct_presence else
                    "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
+        **({"v003_pinned_lowering_sha256": lowering_sha} if apparmor_source else {}),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
@@ -526,6 +550,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
             or object_presence or multi_direct_presence),
         "original_oval_object_presence_attested": object_presence and not direct_scalar_state,
         "original_oval_direct_scalar_state_attested": direct_scalar_state,
+        "original_oval_apparmor_singleton_integer_state_attested": apparmor_source,
         "original_oval_multi_direct_and_attested": multi_direct_presence,
         "original_oval_multi_state_and_attested": direct_multistate,
         "independent_variable_import_agreement": variable_source,

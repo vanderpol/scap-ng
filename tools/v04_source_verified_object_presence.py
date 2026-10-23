@@ -12,6 +12,7 @@ Refs #232 #248 #229.
 from __future__ import annotations
 
 import json
+from hashlib import sha256
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -21,6 +22,11 @@ from v04_native_bundle_compiler import compile_test_instruction
 
 
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+APPARMOR_DEFINITION = "oval:com.jovalcm.test:def:967"
+APPARMOR_SOURCE_SHA256 = "1e9b6d6bab5a40226db960cebf08c8124282b86e8b0c52316027d48b2c97a5d6"
+APPARMOR_TEST = "oval:com.jovalcm.test:tst:1766"
+APPARMOR_OBJECT = "oval:com.jovalcm.test:obj:1137"
+APPARMOR_STATE = "oval:com.jovalcm.test:ste:1660"
 SOURCE_EXISTENCE = {
     "any_exist": ("optional", "may_be_absent"),
     "at_least_one_exists": ("one_or_more", "one_or_more"),
@@ -153,6 +159,24 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
                     isinstance(old_object["object_title"], str)),
                "unsupported Object graph")
     capability = old_test["capability"]
+    apparmor = capability == "linux.apparmorstatus"
+    if apparmor:
+        # Integer singleton support is attested for precisely this original
+        # graph, not a general integer-State or singleton-shape expansion.
+        ensure(definition_id == APPARMOR_DEFINITION and source_criterion_ref is None
+               and sha256(source_xml).hexdigest() == APPARMOR_SOURCE_SHA256,
+               "pinned AppArmor source SHA/Definition differs")
+        ensure(set(a) == {"id", "version", "assessment_title", "mode", "class", "purpose",
+                          "specification", "objects", "states", "tests", "evaluate"}
+               and a["objects"] == {} and a["purpose"] == "assessment"
+               and a["specification"] == {"id": "scap-ng.pre-alpha.assessment", "version": "0.3.0"}
+               and singleton and with_state,
+               "pinned AppArmor lowered Assessment graph changed")
+        ensure(provenance.get("source_definition") == APPARMOR_DEFINITION
+               and provenance.get("source_variable_bindings") == {}
+               and provenance.get("source_collection_bindings") == {
+                   APPARMOR_OBJECT: "singleton-apparmorstatus-object-collection"},
+               "pinned AppArmor source provenance changed")
     catalog_path = catalog_dir / (capability + ".json")
     ensure(catalog_path.is_file() and capability in catalog,
            "unmapped source capability")
@@ -167,6 +191,11 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
 
     root = ET.fromstring(source_xml)
     ensure(root.tag == "{" + OD + "}oval_definitions", "not OVAL Definitions")
+    if apparmor:
+        ensure(all(len(child(root, section)) == 1 for section in
+                   ("definitions", "tests", "objects", "states"))
+               and root.find("{" + OD + "}variables") is None,
+               "pinned AppArmor source graph population differs")
     original_definition = source_by_id(root, definition_id)
     ensure(original_definition.tag == "{" + OD + "}definition"
            and original_definition.get("deprecated", "false") == "false"
@@ -197,6 +226,8 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     oval_test_id = criterion.get("test_ref")
     ensure(provenance.get("source_test_bindings") == {oval_test_id: test_id},
            "source Test identity lost by 0.3 lowering")
+    if apparmor:
+        ensure(oval_test_id == APPARMOR_TEST, "pinned AppArmor Test identity differs")
     original_test = source_by_id(root, oval_test_id)
     namespace = source["namespace"]
     ensure(original_test.tag == "{" + namespace + "}" + source["test"]
@@ -232,6 +263,10 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
            and (singleton or original_object.get("comment") == old_object["object_title"])
            and original_object.get("version") is not None,
            "source Object type/title/attributes changed")
+    if apparmor:
+        ensure(original_object_id == APPARMOR_OBJECT
+               and original_test[1].get("state_ref") == APPARMOR_STATE,
+               "pinned AppArmor Object/State reference differs")
     if singleton:
         ensure(len(original_object) == 0, "native singleton has unexpected source fields")
         obj = {}
@@ -252,12 +287,19 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
         old_field = old_state["state"]
         ensure(isinstance(old_field, dict) and
                set(old_field) == {"field", "value", "operation", "datatype", "match", "existence"}
-               and isinstance(old_field["value"], str),
+               and (type(old_field["value"]) is int if apparmor else
+                    isinstance(old_field["value"], str)),
                "mapped State must be one literal scalar comparison")
         field = element.tag.rsplit("}", 1)[-1]
         rename = mapping["native"].get("state_field_map", {})
         datatype = element.get("datatype", "string")
-        ensure(datatype in {"string", "version"} and
+        if apparmor:
+            ensure(field == "loaded_profiles_count" and datatype == "int"
+                   and element.get("operation") == "greater than or equal"
+                   and element.text == "0" and old_field["value"] == 0
+                   and old_test["match"] == "all",
+                   "pinned AppArmor integer State/Test check changed")
+        ensure(datatype in ({"int"} if apparmor else {"string", "version"}) and
                element.tag == "{" + namespace + "}" + field
                and field in rename and rename[field] == old_field["field"]
                and not list(element)
@@ -266,21 +308,23 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
                and element.get("entity_check", "all") == "all"
                and element.get("entity_existence", "at_least_one_exists") ==
                    "at_least_one_exists"
-               and old_field["datatype"] == datatype
+               and old_field["datatype"] == ("integer" if apparmor else datatype)
                and old_field["match"] == "all"
                and old_field["existence"] == "one_or_more"
-               and (element.text or "") == old_field["value"],
+               and (int(element.text) if apparmor else (element.text or "")) == old_field["value"],
                "source State field/existence/check/value mismatch")
         operation = element.get("operation", "equals")
-        operation_map = SOURCE_OPERATIONS if datatype == "string" else VERSION_OPERATIONS
+        operation_map = ({"greater than or equal": ("greater_than_or_equal", "greater_than_or_equal")}
+                         if apparmor else SOURCE_OPERATIONS if datatype == "string" else VERSION_OPERATIONS)
         ensure(operation in operation_map
                and old_field["operation"] == operation_map[operation][0],
                "source State operation lost by mature 0.3 lowering")
         native_states = [{rename[field]: {
             "require": "at_least_one_exists_and_all_match",
-            operation_map[operation][1]: old_field["value"]}}]
+            operation_map[operation][1]: old_field["value"],
+            **({"datatype": old_field["datatype"]} if apparmor else {})}}]
 
-    native_id = slug(old_test["test_title"])
+    native_id = "loaded-apparmor-profiles-test" if apparmor else slug(old_test["test_title"])
     native_test = {
         "test_title": old_test["test_title"], "capability": capability,
         "reported_elements": "all",
@@ -299,7 +343,7 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
         "purpose": a["purpose"],
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
         "tests": {native_id: native_test},
-        "evaluate": {"test": native_id},
+        "evaluate": {"and": [{"test": native_id}]} if apparmor else {"test": native_id},
     }}
     # Invertible no-op here proves we have already emitted the native flat
     # grammar: neither source wrappers nor hidden collection containers remain.

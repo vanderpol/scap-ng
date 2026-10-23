@@ -44,6 +44,14 @@ proposals are not listed as delivered features.
 
 ### Native content compilation
 
+- Extended the shared 0.3-derived converter with source-pinned AppArmor
+  singleton integer-State support. The empty original Object remains implicit;
+  Test existence/check and `loaded_profiles_count >= 0` remain source-exact.
+  Source and lowering graph mutations fail closed. Focused schema/compiler
+  tests compare against the independent original-OVAL oracle and graph.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Added native bundle regression coverage for schema-valid manual Assessment
   alternatives: both independent authoring formats preserve the manual
   procedure/response and Rule choice without inventing an automated Test
