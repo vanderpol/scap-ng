@@ -152,6 +152,12 @@ class NativeBundleCompilerTests(unittest.TestCase):
         compiled, report = compile_from_source_package(source, validate_schema=False)
         self.assertNotEqual(compiled, source)
         self.assertEqual(report["programs"], 1)
+        with tempfile.TemporaryDirectory() as td:
+            paths = authoring_archives(fixture(), Path(td))
+            directly_compiled, direct_report = compile_from_pair(*paths,
+                                                                  validate_schema=False)
+        self.assertEqual(directly_compiled, {"demo": compiled})
+        self.assertEqual(direct_report["demo"], report)
 
     def test_manual_alternative_retained_without_inventing_a_native_program(self):
         docs = fixture()

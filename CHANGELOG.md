@@ -132,6 +132,11 @@ proposals are not listed as delivered features.
 
 ### Language, schema, and results
 
+- The 0.4 fast CI now enforces the native Result schemas' required, nonblank
+  `summary` for both Rule Results and standalone Assessment Results. Top-level
+  Rule Result `message` is not an alternate canonical field; earlier version
+  snapshots remain unchanged. [#203](https://github.com/vanderpol/scap-ng/issues/203)
+  [#205](https://github.com/vanderpol/scap-ng/issues/205)
 - Made private Objects and States consumer-local and reserved `shared_objects:`
   for reusable/referenceable acquisition identity. [#165](https://github.com/vanderpol/scap-ng/issues/165)
 - Standardized meaningful internal component IDs with required type suffixes
