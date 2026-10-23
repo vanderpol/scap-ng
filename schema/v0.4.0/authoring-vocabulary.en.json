@@ -2,7 +2,7 @@
   "format": "scap-ng-authoring-vocabulary/0.1",
   "schema_version": "0.4.0",
   "language": "en",
-  "status": "0.4.0-owner-approved-shared-display-contract-draft",
+  "status": "0.4.0-cardinality-schema-review-draft",
   "normative": false,
   "description": "Version-local human-facing labels and concise operation/field explanations shared by editors and scanner reports. UI explanations do not alter grammar, datatypes or result semantics; source- and version-pinned native schema is authoritative.",
   "term_scopes": {
@@ -25,19 +25,9 @@
       "label": "All checks must pass",
       "description": "Logical AND over Test/Assessment expressions. Do not infer behavior of absent evidence from this operator alone."
     },
-    "assessment.evaluate.all": {
-      "label": "All checks must pass",
-      "description": "Legacy input alias for and; generated authoring uses and. Logical AND over Test/Assessment expressions. Do not infer behavior of absent evidence from this operator alone.",
-      "deprecated": true
-    },
     "assessment.evaluate.or": {
       "label": "At least one check must pass",
       "description": "Logical OR over Test/Assessment expressions. This does not imply any particular Item-existence requirement."
-    },
-    "assessment.evaluate.any": {
-      "label": "At least one check must pass",
-      "description": "Legacy input alias for or; generated authoring uses or. Logical OR over Test/Assessment expressions. This does not imply any particular Item-existence requirement.",
-      "deprecated": true
     },
     "assessment.evaluate.one": {
       "label": "Exactly one check must pass",
@@ -46,11 +36,6 @@
     "assessment.evaluate.xor": {
       "label": "An odd number of checks must pass",
       "description": "Logical XOR (odd parity) over Test/Assessment expressions; not exactly-one for three or more operands."
-    },
-    "assessment.evaluate.odd": {
-      "label": "An odd number of checks must pass",
-      "deprecated": true,
-      "description": "Legacy input alias for xor; generated authoring uses xor."
     },
     "test.capability": {
       "label": "How to inspect",
@@ -64,47 +49,39 @@
       "label": "Data source title",
       "description": "Preserve meaningful titles. Omit null object_title on private inline/local Objects, including nested private Set operands. Named/shared Object metadata contracts remain unchanged."
     },
-    "object.select": {
-      "label": "Where to look",
-      "prompt": "Which items should be collected?",
-      "description": "Capability-specific selectors; do not confuse an Object selector with a State expectation."
-    },
-    "test.states": {
-      "label": "What must be true",
-      "prompt": "Which expected fields or values should be checked?"
-    },
-    "test.states_match": {
-      "label": "Combine expected conditions on one collected item",
-      "prompt": "How must the State entries apply to the same collected item?",
-      "values": {
-        "all": {
-          "label": "All conditions",
-          "description": "Evaluate each State entry as authored on the same collected item."
-        },
-        "any": {
-          "label": "Any condition"
-        },
-        "one": {
-          "label": "Exactly one condition"
-        },
-        "odd": {
-          "label": "An odd number of conditions"
-        }
-      }
-    },
     "test.require": {
-      "label": "How many collected items must exist and match?",
-      "description": "Test-level existence and matching scope. Use the exact versioned requirement token; do not silently reinterpret unknown, error, incomplete, or empty collection outcomes."
+      "label": "What evidence is required?",
+      "description": "Contains distinct collected-Item existence and satisfaction counts, plus complete expected field/record conditions. Empty, incomplete, unknown, and error outcomes remain separate."
     },
-    "state.field.require": {
-      "label": "How many values of this field must exist and match?",
-      "description": "Applies inside a collected item to the State field (or record member) being checked, not to the collection of Tests."
+    "test.require.fields": {
+      "label": "Expected fields",
+      "description": "Conditions for one collected Item; distinct expected fields are combined with logical AND."
     },
-    "state.field.equals": {
+    "test.require.field_requirement": {
+      "label": "Shared field requirements",
+      "description": "Explicit values_found and values_matching pair inherited by nested fields until a nearer complete pair overrides it."
+    },
+    "field.values_found": {
+      "label": "Values found",
+      "description": "Existence requirement for matching field entities inside one Item, independent of comparison results."
+    },
+    "field.values_matching": {
+      "label": "Values matching",
+      "description": "How many existing field values must pass their comparison."
+    },
+    "record.records_found": {
+      "label": "Records found",
+      "description": "Existence requirement for records inside a collected Item."
+    },
+    "record.records_matching": {
+      "label": "Records matching",
+      "description": "How many records must satisfy their nested field conditions."
+    },
+    "field.equals": {
       "label": "Must equal",
       "description": "Exact comparison as defined by the authored field's datatype."
     },
-    "state.field.matches_regex": {
+    "field.matches_regex": {
       "label": "Must match pattern",
       "description": "Regular-expression comparison, not a literal-text comparison; a Guided literal-text field may escape the pattern for the author."
     },
@@ -116,27 +93,27 @@
       "label": "Repeat for each collected item",
       "description": "Correlation and source scoping must be preserved; the authoring UI must not turn per-parent requirements into a global union."
     },
-    "test.require.items": {
-      "label": "Required collected Items",
-      "description": "Explicit number of Items that must exist before applying matching predicates. Existence is separate from State matching."
+    "test.require.items_found": {
+      "label": "Items found",
+      "description": "How many selected Items must exist. OVAL Test all_exist and at_least_one_exists both map to one_or_more; original source spelling is retained in provenance."
     },
-    "test.require.items.one_or_more": {
+    "test.require.items_found.one_or_more": {
       "label": "At least one Item must exist",
       "description": "The collection must contain one or more selected Items. An empty collection does not satisfy this requirement."
     },
-    "test.require.items.may_be_absent": {
+    "test.require.items_found.may_be_absent": {
       "label": "Items may be absent",
       "description": "No minimum number of selected Items is required; matching and incomplete/error status remain independently significant."
     },
-    "test.require.all_items_must": {
-      "label": "Every collected Item must satisfy",
-      "description": "Apply the enclosed expected conditions independently to every selected Item. This does not itself require that any Item exists."
+    "test.require.items_satisfying": {
+      "label": "Items satisfying",
+      "description": "How many selected Items must satisfy the complete condition; independent of items_found."
     },
-    "test.require.all_items_must.and": {
+    "test.require.and": {
       "label": "All conditions must match",
       "description": "Logical AND of the expected field/record conditions on the same collected Item; field-level cardinality is independent."
     },
-    "test.require.all_items_must.or": {
+    "test.require.or": {
       "label": "At least one condition must match",
       "description": "Logical OR over expected State alternatives on the same collected Item. It does not mean that at least one collected Item must exist."
     },
@@ -144,7 +121,7 @@
       "label": "Collection capability",
       "description": "An inline Object inherits its enclosing Test capability. A shared or independently addressable Object declares its capability explicitly."
     },
-    "state.field.type": {
+    "field.type": {
       "label": "Collected value type",
       "description": "Interpretation is capability-specific; for Windows Registry this is the stored Registry type, not necessarily the comparison datatype."
     }

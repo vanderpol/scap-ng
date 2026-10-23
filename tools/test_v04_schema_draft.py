@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Focused pre-alpha v0.4.0 schema draft checks (not scanner conformance)."""
+"""Focused 0.4.0 canonical grammar tests; not scanner conformance."""
 from __future__ import annotations
 
-from copy import deepcopy
 import json
 from pathlib import Path
 import unittest
 
-from jsonschema import Draft202012Validator, RefResolver
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_DIR = ROOT / "schema" / "v0.4.0"
@@ -15,39 +15,42 @@ SCHEMAS = {
     p.name: json.loads(p.read_text(encoding="utf-8"))
     for p in sorted(SCHEMA_DIR.glob("*.schema.json"))
 }
-STORE = {s["$id"]: s for s in SCHEMAS.values()}
+REGISTRY = Registry().with_resources(
+    (s["$id"], Resource.from_contents(s)) for s in SCHEMAS.values())
 ASSESSMENT = SCHEMAS["assessment.schema.json"]
 COMMON = SCHEMAS["capability-common.schema.json"]
-VALIDATOR = Draft202012Validator(
-    ASSESSMENT, resolver=RefResolver.from_schema(ASSESSMENT, store=STORE)
-)
+VALIDATOR = Draft202012Validator(ASSESSMENT, registry=REGISTRY)
 FILTER_VALIDATOR = Draft202012Validator(
-    {"$ref": COMMON["$id"] + "#/$defs/state_filter"},
-    resolver=RefResolver.from_schema(COMMON, store=STORE),
+    {"$ref": COMMON["$id"] + "#/$defs/state_filter"}, registry=REGISTRY,
 )
+REQUIRED = {"values_found": "one_or_more", "values_matching": "every"}
 
 
-def fixture(*, requirement="at_least_one_exists_and_all_match", states=None):
+def requirement(field="owner_uid", operand=0):
+    return {
+        "items_found": "one_or_more",
+        "items_satisfying": "every",
+        "field_requirement": dict(REQUIRED),
+        "fields": {field: {"equals": operand}},
+    }
+
+
+def fixture(*, req=None, obj=None):
     test = {
-        "test_title": "0.4 structural example",
+        "test_title": "0.4 canonical example",
         "capability": "unix.file",
         "reported_elements": "all",
-        "require": requirement,
+        "object": {"object_title": "Collect file metadata", "filepath": "/etc/passwd"}
+            if obj is None else obj,
+        "require": requirement() if req is None else req,
     }
-    if states is not None:
-        test["states"] = states
     return {"assessment": {
         "id": "draft-schema-assessment", "version": 1,
-        "assessment_title": "0.4 structural example", "mode": "automated",
+        "assessment_title": "0.4 canonical example", "mode": "automated",
         "class": "compliance", "purpose": "assessment",
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
         "tests": {"demo-test": test}, "evaluate": {"test": "demo-test"},
     }}
-
-
-def field(name="owner_uid", operator="equals", value=0,
-          requirement="at_least_one_exists_and_all_match"):
-    return {name: {operator: value, "require": requirement}}
 
 
 def errors(document):
@@ -63,9 +66,7 @@ class V04DraftSchemaTests(unittest.TestCase):
                 self.assertEqual(schema.get("x-scap-ng-version"), "0.4.0")
                 self.assertTrue(schema.get("x-last-modified"))
                 self.assertEqual(
-                    schema.get("$id"),
-                    "https://scap-ng.dev/schema/v0.4.0/" + name,
-                )
+                    schema.get("$id"), "https://scap-ng.dev/schema/v0.4.0/" + name)
                 self.assertNotIn("schema/v0.3.0", json.dumps(schema))
         mappings = sorted((SCHEMA_DIR / "capability-mappings").rglob("*.json"))
         self.assertGreaterEqual(len(mappings), 100)
@@ -75,67 +76,100 @@ class V04DraftSchemaTests(unittest.TestCase):
                 self.assertEqual(value.get("specification_version"), "0.4.0")
                 self.assertNotIn("schema/v0.3.0", json.dumps(value))
 
-    def test_one_grammar_scalar_and_literal_field_names(self):
-        for key in ("owner_uid", "value", "all"):
-            with self.subTest(key=key):
-                self.assertFalse(errors(fixture(states=[field(key)])))
+    def test_inline_and_referenced_objects_are_both_optional_forms(self):
+        self.assertFalse(errors(fixture()))
+        self.assertFalse(errors(fixture(obj="shared-file-object")))
+        shared = fixture(obj="shared-file-object")
+        shared["assessment"]["shared_objects"] = {
+            "shared-file-object": {
+                "object_title": "Shared file metadata",
+                "capability": "unix.file",
+                "filepath": "/etc/passwd",
+            }
+        }
+        self.assertFalse(errors(shared))
+        self.assertTrue(errors(fixture(obj=[])))
 
-    def test_state_free_exactly_one(self):
-        self.assertFalse(errors(fixture(requirement="only_one_exists")))
-        self.assertTrue(errors(fixture(requirement="only_one_exists_and_matches")))
+    def test_structured_item_only_and_field_requirements(self):
+        self.assertFalse(errors(fixture(req={"items_found": "none"})))
+        self.assertFalse(errors(fixture(req={"items_found": "exactly_one"})))
+        for field in ("owner_uid", "value", "all"):
+            with self.subTest(field=field):
+                self.assertFalse(errors(fixture(req=requirement(field))))
+        no_scope = requirement()
+        del no_scope["field_requirement"]
+        self.assertTrue(errors(fixture(req=no_scope)))
 
-    def test_states_require_paired_quantifiers(self):
-        self.assertFalse(errors(fixture(states=[
-            field(requirement="only_one_exists_and_matches")
-        ], requirement="only_one_exists_and_matches")))
-        self.assertTrue(errors(fixture(states=[field()], requirement="only_one_exists")))
-        broken = fixture(states=[field()])
-        del broken["assessment"]["tests"]["demo-test"]["require"]
-        self.assertTrue(errors(broken))
+    def test_reject_scalar_require_and_legacy_state_forms(self):
+        missing = fixture()
+        del missing["assessment"]["tests"]["demo-test"]["require"]
+        self.assertTrue(errors(missing))
+        for scalar in ("only_one_exists", "at_least_one_exists_and_all_match"):
+            with self.subTest(scalar=scalar):
+                self.assertTrue(errors(fixture(req=scalar)))
+        for name, value in (
+            ("state", {"owner_uid": {"equals": 0}}),
+            ("states", [{"owner_uid": {"equals": 0}}]),
+            ("states_match", "all"),
+            ("state_fields_require", REQUIRED),
+            ("existence", "one_or_more"),
+            ("match", "all"),
+        ):
+            with self.subTest(name=name):
+                document = fixture()
+                document["assessment"]["tests"]["demo-test"][name] = value
+                self.assertTrue(errors(document))
+        document = fixture()
+        document["assessment"]["tests"]["demo-test"]["require"]["states"] = []
+        self.assertTrue(errors(document))
 
-    def test_reject_legacy_fields_and_ambiguous_operations(self):
-        old = fixture(states=[{
-            "field": "owner_uid", "value": 0, "operation": "equals",
-            "existence": "one_or_more", "match": "all",
-        }])
-        self.assertTrue(errors(old))
-        old2 = fixture(states=[{"owner_uid": {
-            "value": 0, "operation": "equals", "existence": "one_or_more",
-            "match": "all",
-        }}])
-        self.assertTrue(errors(old2))
-        bad = fixture(states=[field()])
-        pred = bad["assessment"]["tests"]["demo-test"]["states"][0]["owner_uid"]
-        pred["not_equal"] = 1
-        self.assertTrue(errors(bad))
-        good = fixture(states=[field()])
-        good["assessment"]["tests"]["demo-test"]["existence"] = "one_or_more"
-        self.assertTrue(errors(good))
+    def test_unknown_test_keys_rejected_without_dropping_variable_sources(self):
+        for unknown in ("item_conditions", "state", "selection_check", "unexpected"):
+            document = fixture()
+            document["assessment"]["tests"]["demo-test"][unknown] = {}
+            self.assertTrue(errors(document), unknown)
+        document = fixture()
+        document["assessment"]["tests"]["demo-test"].pop("object")
+        document["assessment"]["tests"]["demo-test"]["capability"] = "variable.value"
+        document["assessment"]["tests"]["demo-test"]["variable"] = "chosen-variable"
+        self.assertFalse(errors(document))
 
-    def test_array_and_variable_reference_retain_value_match(self):
-        for operand in ([0, 1000], {"variable": "allowed-uids-variable"},
-                        {"input": "organization-uid-input"}):
-            document = fixture(states=[field(value=operand)])
-            pred = document["assessment"]["tests"]["demo-test"]["states"][0]["owner_uid"]
-            pred["datatype"] = "integer"
+    def test_reject_obsolete_evaluate_aliases(self):
+        for old in ("all", "any", "odd"):
+            document = fixture()
+            document["assessment"]["evaluate"] = {old: [{"test": "demo-test"}]}
             self.assertTrue(errors(document))
-            pred["value_match"] = "one"
+        for current in ("and", "or", "one", "xor"):
+            document = fixture()
+            document["assessment"]["evaluate"] = {
+                current: [{"test": "demo-test"}]}
             self.assertFalse(errors(document))
 
-    def test_windows_record_nested_requirements(self):
-        record = {"value": {"record": {
-            "require": "at_least_one_exists_and_some_match",
-            "fields": {"productstate": {
-                "bitwise_and": 4096,
-                "require": "at_least_one_exists_and_all_match",
-            }},
-        }}}
-        self.assertFalse(errors(fixture(states=[record])))
+    def test_array_and_dynamic_references_retain_value_match(self):
+        for operand in ([0, 1000], {"variable": "allowed-uids-variable"},
+                        {"input": "organization-uid-input"}):
+            document = fixture(req=requirement(operand=operand))
+            field = document["assessment"]["tests"]["demo-test"]["require"][
+                "fields"]["owner_uid"]
+            field["datatype"] = "integer"
+            self.assertTrue(errors(document))
+            field["value_match"] = "exactly_one"
+            self.assertFalse(errors(document))
+
+    def test_reject_ambiguous_fields_and_unrecognized_operations(self):
+        for predicate in ({"equals": 1, "not_equal": 2},
+                          {"operation": "equals", "value": 0},
+                          {"unrecognized_operator": 0}):
+            document = fixture()
+            document["assessment"]["tests"]["demo-test"]["require"][
+                "fields"]["owner_uid"] = predicate
+            self.assertTrue(errors(document))
 
     def test_set_filter_requires_one_action(self):
         valid = {"exclude": {"mode": {
             "greater_than": 493,
-            "require": "at_least_one_exists_and_all_match",
+            "values_found": "one_or_more",
+            "values_matching": "every",
         }}}
         self.assertFalse(list(FILTER_VALIDATOR.iter_errors(valid)))
         self.assertTrue(list(FILTER_VALIDATOR.iter_errors({

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json",
   "title": "SCAP-NG 0.4 draft unified Assessment predicates",
-  "description": "SCAP-NG 0.4.0 Assessment predicates: canonical field_requirement scopes and complete conditions, with retained explicit source-exact fallback for uncommon OVAL requirements and records. Schema acceptance does not establish scanner conformance.",
+  "description": "SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit field_requirement scopes. Legacy State arrays and scalar Test.require are invalid. Schema acceptance does not establish scanner conformance.",
   "type": "object",
   "required": [
     "assessment"
@@ -32,63 +32,46 @@
   },
   "additionalProperties": false,
   "$defs": {
-    "paired_requirement": {
+    "cardinality": {
       "type": "string",
-      "enum": [
-        "none_exist",
-        "none_exist_and_only_one_matches",
-        "none_exist_and_some_match",
-        "none_exist_and_none_match",
-        "only_one_exists_and_matches",
-        "only_one_exists_and_only_one_matches",
-        "only_one_exists_and_some_match",
-        "only_one_exists_and_none_match",
-        "at_least_one_exists_and_all_match",
-        "at_least_one_exists_and_only_one_matches",
-        "at_least_one_exists_and_some_match",
-        "at_least_one_exists_and_none_match",
-        "all_exist_and_all_match",
-        "all_exist_and_only_one_matches",
-        "all_exist_and_some_match",
-        "all_exist_and_none_match",
-        "may_be_absent_and_all_match",
-        "may_be_absent_and_only_one_matches",
-        "may_be_absent_and_some_match",
-        "may_be_absent_and_none_match"
-      ],
-      "description": "Test-with-States, State-field, record, or record-field existence+matching requirement; generated names are draft candidates."
+      "enum": ["none", "exactly_one", "one_or_more", "every"],
+      "description": "Consistent 0.4 authoring cardinality vocabulary. 'every' means all relevant results satisfy the specified comparison; source OVAL lexical values belong in provenance only."
     },
-    "presence_requirement": {
+    "existence_cardinality": {
       "type": "string",
-      "enum": [
-        "none_exist",
-        "only_one_exists",
-        "at_least_one_exists",
-        "all_exist",
-        "may_be_absent"
-      ],
-      "description": "State-free Test: existence only; matching aggregator is inoperative."
+      "enum": ["none", "exactly_one", "one_or_more", "every", "may_be_absent"],
+      "description": "State field/record existence cardinality. Preserve the OVAL entity/record all_exist distinction pending separate evidence review."
+    },
+    "item_existence_cardinality": {
+      "type": "string",
+      "enum": ["none", "exactly_one", "one_or_more", "may_be_absent"],
+      "description": "Collected NG Items have no synthetic does-not-exist entries. OVAL Test all_exist and at_least_one_exists both map to one_or_more; preserve their original source attributes in provenance."
+    },
+    "paired_requirement": {
+      "type": "object",
+      "required": ["values_found", "values_matching"],
+      "properties": {
+        "values_found": {"$ref": "#/$defs/existence_cardinality"},
+        "values_matching": {"$ref": "#/$defs/cardinality"}
+      },
+      "additionalProperties": false,
+      "description": "Explicit State-field existence and matching cardinalities, when shared through a field_requirement inheritance scope."
     },
     "scalar_field_predicate": {
       "type": "object",
       "required": [
-        "require"
+        "values_found",
+        "values_matching"
       ],
       "properties": {
-        "require": {
-          "$ref": "#/$defs/paired_requirement"
-        },
+        "values_found": {"$ref": "#/$defs/existence_cardinality"},
+        "values_matching": {"$ref": "#/$defs/cardinality"},
         "datatype": {
           "type": "string",
           "minLength": 1
         },
         "value_match": {
-          "enum": [
-            "all",
-            "one",
-            "one_or_more",
-            "none"
-          ],
+          "$ref": "#/$defs/cardinality",
           "description": "Required on arrays, Variable references and Organizational Inputs. Independent of the observed-Item/State/record requirement."
         },
         "redact_result": {
@@ -6066,23 +6049,18 @@
     "record_field_predicate": {
       "type": "object",
       "required": [
-        "require"
+        "values_found",
+        "values_matching"
       ],
       "properties": {
-        "require": {
-          "$ref": "#/$defs/paired_requirement"
-        },
+        "values_found": {"$ref": "#/$defs/existence_cardinality"},
+        "values_matching": {"$ref": "#/$defs/cardinality"},
         "datatype": {
           "type": "string",
           "minLength": 1
         },
         "value_match": {
-          "enum": [
-            "all",
-            "one",
-            "one_or_more",
-            "none"
-          ]
+          "$ref": "#/$defs/cardinality"
         },
         "redact_result": {
           "const": true
@@ -9709,13 +9687,13 @@
         "record": {
           "type": "object",
           "required": [
-            "require",
+            "records_found",
+            "records_matching",
             "fields"
           ],
           "properties": {
-            "require": {
-              "$ref": "#/$defs/paired_requirement"
-            },
+            "records_found": {"$ref": "#/$defs/existence_cardinality"},
+            "records_matching": {"$ref": "#/$defs/cardinality"},
             "fields": {
               "type": "object",
               "minProperties": 1,
@@ -9760,102 +9738,6 @@
         {
           "type": "object",
           "required": [
-            "all"
-          ],
-          "properties": {
-            "all": {
-              "type": "array",
-              "minItems": 1,
-              "title": "All conditions must hold",
-              "description": "Legacy logical authoring spelling. Prefer 'and' for combining complete condition results; do not confuse this logical operator with Item/field/value cardinality. Legacy named aggregate: AND of nested conditions under the OVAL-style result model.",
-              "deprecated": true
-            },
-            "state_fields_require": {
-              "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
-            }
-          },
-          "additionalProperties": false,
-          "allOf": [
-            {
-              "if": {
-                "required": [
-                  "state_fields_require"
-                ]
-              },
-              "then": {
-                "properties": {
-                  "all": {
-                    "items": {
-                      "$ref": "#/$defs/scoped_state_entry"
-                    }
-                  }
-                }
-              },
-              "else": {
-                "properties": {
-                  "all": {
-                    "items": {
-                      "$ref": "#/$defs/state_entry"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "type": "object",
-          "required": [
-            "any"
-          ],
-          "properties": {
-            "any": {
-              "type": "array",
-              "minItems": 1,
-              "title": "At least one condition must hold",
-              "description": "Legacy logical authoring spelling. Prefer 'or' for combining complete condition results; do not confuse this logical operator with Item/field/value cardinality. Legacy named aggregate: OR of nested conditions under the OVAL-style result model.",
-              "deprecated": true
-            },
-            "state_fields_require": {
-              "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
-            }
-          },
-          "additionalProperties": false,
-          "allOf": [
-            {
-              "if": {
-                "required": [
-                  "state_fields_require"
-                ]
-              },
-              "then": {
-                "properties": {
-                  "any": {
-                    "items": {
-                      "$ref": "#/$defs/scoped_state_entry"
-                    }
-                  }
-                }
-              },
-              "else": {
-                "properties": {
-                  "any": {
-                    "items": {
-                      "$ref": "#/$defs/state_entry"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "type": "object",
-          "required": [
             "one"
           ],
           "properties": {
@@ -9865,10 +9747,10 @@
               "title": "Exactly one condition must hold",
               "description": "The OVAL-style exactly-one aggregation, preserving unknown and error outcomes."
             },
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             }
           },
           "additionalProperties": false,
@@ -9876,7 +9758,7 @@
             {
               "if": {
                 "required": [
-                  "state_fields_require"
+                  "field_requirement"
                 ]
               },
               "then": {
@@ -9906,10 +9788,10 @@
             "xor"
           ],
           "properties": {
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             },
             "xor": {
               "type": "array",
@@ -9923,12 +9805,12 @@
             {
               "if": {
                 "required": [
-                  "state_fields_require"
+                  "field_requirement"
                 ]
               },
               "then": {
                 "properties": {
-                  "odd": {
+                  "xor": {
                     "items": {
                       "$ref": "#/$defs/scoped_state_entry"
                     }
@@ -9937,55 +9819,7 @@
               },
               "else": {
                 "properties": {
-                  "odd": {
-                    "items": {
-                      "$ref": "#/$defs/state_entry"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "type": "object",
-          "required": [
-            "odd"
-          ],
-          "properties": {
-            "odd": {
-              "type": "array",
-              "minItems": 1,
-              "title": "An odd number of conditions must hold",
-              "description": "Legacy OVAL odd-parity logical operator across complete condition outcomes; prefer 'xor' (not exactly-one).",
-              "deprecated": true
-            },
-            "state_fields_require": {
-              "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
-            }
-          },
-          "additionalProperties": false,
-          "allOf": [
-            {
-              "if": {
-                "required": [
-                  "state_fields_require"
-                ]
-              },
-              "then": {
-                "properties": {
-                  "odd": {
-                    "items": {
-                      "$ref": "#/$defs/scoped_state_entry"
-                    }
-                  }
-                }
-              },
-              "else": {
-                "properties": {
-                  "odd": {
+                  "xor": {
                     "items": {
                       "$ref": "#/$defs/state_entry"
                     }
@@ -10008,10 +9842,10 @@
               "description": "Combine nested condition results using OVAL-aligned Boolean AND, including non-Boolean evaluation outcomes.",
               "deprecated": false
             },
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             }
           },
           "additionalProperties": false,
@@ -10019,7 +9853,7 @@
             {
               "if": {
                 "required": [
-                  "state_fields_require"
+                  "field_requirement"
                 ]
               },
               "then": {
@@ -10056,10 +9890,10 @@
               "description": "Combine nested condition results using OVAL-aligned Boolean OR, including non-Boolean evaluation outcomes.",
               "deprecated": false
             },
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             }
           },
           "additionalProperties": false,
@@ -10067,7 +9901,7 @@
             {
               "if": {
                 "required": [
-                  "state_fields_require"
+                  "field_requirement"
                 ]
               },
               "then": {
@@ -10097,336 +9931,44 @@
     },
     "test": {
       "type": "object",
+      "required": [
+        "require"
+      ],
       "properties": {
+        "test_title": {"type": ["string", "null"]},
+        "capability": {"type": "string", "minLength": 1},
+        "reported_elements": {"$ref": "reported-elements.schema.json"},
+        "object": {"$ref": "capability-common.schema.json#/$defs/object_use"},
+        "variable": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$"
+        },
         "require": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/paired_requirement"
-            },
-            {
-              "$ref": "#/$defs/presence_requirement"
-            },
-            {
-              "$ref": "#/$defs/canonical_all_items_requirement"
-            },
-            {
-              "$ref": "#/$defs/item_presence_requirement"
-            }
-          ]
-        },
-        "states": {
-          "type": "array"
-        },
-        "states_match": {
-          "enum": [
-            "all",
-            "any",
-            "one",
-            "odd"
-          ]
-        },
-        "state_fields_require": {
-          "$ref": "#/$defs/paired_requirement",
-          "description": "Explicit field cardinality inherited by Test State predicates when they do not declare their own."
+          "oneOf": [
+            {"$ref": "#/$defs/canonical_all_items_requirement"},
+            {"$ref": "#/$defs/item_presence_requirement"}
+          ],
+          "description": "Structured Item-existence and complete field conditions; scalar legacy requirements are invalid."
         }
       },
       "not": {
         "anyOf": [
-          {
-            "required": [
-              "existence"
-            ]
-          },
-          {
-            "required": [
-              "match"
-            ]
-          },
-          {
-            "required": [
-              "field_requirement"
-            ]
-          },
-          {
-            "required": [
-              "override_fields_requirement"
-            ]
-          },
-          {
-            "required": [
-              "fields_requirement"
-            ]
-          },
-          {
-            "required": [
-              "fields_require"
-            ]
-          },
-          {
-            "required": [
-              "collected_items_require"
-            ]
-          }
+          {"required": ["state"]},
+          {"required": ["states"]},
+          {"required": ["states_match"]},
+          {"required": ["state_fields_require"]},
+          {"required": ["existence"]},
+          {"required": ["match"]},
+          {"required": ["field_requirement"]},
+          {"required": ["override_fields_requirement"]},
+          {"required": ["fields_requirement"]},
+          {"required": ["fields_require"]},
+          {"required": ["collected_items_require"]}
         ]
       },
-      "allOf": [
-        {
-          "if": {
-            "required": [
-              "require"
-            ],
-            "properties": {
-              "require": {
-                "type": "object"
-              }
-            }
-          },
-          "then": {
-            "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "states"
-                  ]
-                },
-                {
-                  "required": [
-                    "states_match"
-                  ]
-                },
-                {
-                  "required": [
-                    "state_fields_require"
-                  ]
-                }
-              ]
-            }
-          },
-          "else": {
-            "allOf": [
-              {
-                "if": {
-                  "not": {
-                    "required": [
-                      "states"
-                    ]
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "require": {
-                      "anyOf": [
-                        {
-                          "$ref": "#/$defs/presence_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/all_items_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/item_presence_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/scoped_all_items_requirement"
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "states": {
-                      "type": "null"
-                    }
-                  },
-                  "required": [
-                    "states"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "require": {
-                      "$ref": "#/$defs/presence_requirement"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "states": {
-                      "type": "array",
-                      "minItems": 2
-                    }
-                  },
-                  "required": [
-                    "states"
-                  ]
-                },
-                "then": {
-                  "required": [
-                    "states_match"
-                  ]
-                }
-              },
-              {
-                "if": {
-                  "required": [
-                    "states"
-                  ],
-                  "properties": {
-                    "states": {
-                      "type": "array"
-                    }
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "require": {
-                      "$ref": "#/$defs/paired_requirement"
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "require": {
-                      "$ref": "#/$defs/all_items_requirement"
-                    }
-                  },
-                  "required": [
-                    "require"
-                  ]
-                },
-                "then": {
-                  "not": {
-                    "required": [
-                      "states"
-                    ]
-                  }
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "require": {
-                      "$ref": "#/$defs/item_presence_requirement"
-                    }
-                  },
-                  "required": [
-                    "require"
-                  ]
-                },
-                "then": {
-                  "not": {
-                    "anyOf": [
-                      {
-                        "required": [
-                          "states"
-                        ]
-                      },
-                      {
-                        "required": [
-                          "states_match"
-                        ]
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "if": {
-                  "required": [
-                    "state_fields_require"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "require": {
-                      "anyOf": [
-                        {
-                          "$ref": "#/$defs/paired_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/presence_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/all_items_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/scoped_all_items_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/item_presence_requirement"
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "not": {
-                    "required": [
-                      "state_fields_require"
-                    ]
-                  }
-                },
-                "then": {
-                  "properties": {
-                    "require": {
-                      "anyOf": [
-                        {
-                          "$ref": "#/$defs/paired_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/presence_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/all_items_requirement"
-                        },
-                        {
-                          "$ref": "#/$defs/item_presence_requirement"
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              {
-                "if": {
-                  "required": [
-                    "state_fields_require"
-                  ]
-                },
-                "then": {
-                  "properties": {
-                    "states": {
-                      "items": {
-                        "$ref": "#/$defs/scoped_state_entry"
-                      }
-                    }
-                  }
-                },
-                "else": {
-                  "properties": {
-                    "states": {
-                      "items": {
-                        "$ref": "#/$defs/state_entry"
-                      }
-                    }
-                  }
-                }
-              }
-            ]
-          }
-        }
-      ],
-      "additionalProperties": true,
+      "additionalProperties": false,
       "title": "Automated Test",
-      "description": "Collect evidence using an Object, then evaluate explicit Item existence and expected conditions."
+      "description": "Use a Test Object or reference and a structured require; no separate State layer."
     },
     "object_selector_predicate": {
       "type": "object",
@@ -10437,12 +9979,7 @@
           "minLength": 1
         },
         "value_match": {
-          "enum": [
-            "all",
-            "one",
-            "one_or_more",
-            "none"
-          ],
+          "$ref": "#/$defs/cardinality",
           "description": "Required on arrays, Variable references and Organizational Inputs. Independent of the observed-Item/State/record requirement."
         },
         "redact_result": {
@@ -15553,12 +15090,7 @@
           "minLength": 1
         },
         "value_match": {
-          "enum": [
-            "all",
-            "one",
-            "one_or_more",
-            "none"
-          ],
+          "$ref": "#/$defs/cardinality",
           "description": "Required on arrays, Variable references and Organizational Inputs. Independent of the observed-Item/State/record requirement."
         },
         "redact_result": {
@@ -17932,12 +17464,7 @@
           ]
         },
         "selection_match": {
-          "enum": [
-            "all",
-            "one",
-            "one_or_more",
-            "none"
-          ],
+          "$ref": "#/$defs/cardinality",
           "description": "Collector record-field selection cardinality; does not imply observed-Item or field existence and is independent of value_match."
         }
       },
@@ -20667,74 +20194,21 @@
       ],
       "description": "WMI/cmdlet native collector record field. One explicit comparator plus required selection_match; no existence/require hidden default."
     },
-    "all_items_requirement": {
-      "type": "object",
-      "required": [
-        "items",
-        "all_items_must"
-      ],
-      "properties": {
-        "items": {
-          "type": "string",
-          "enum": [
-            "one_or_more",
-            "may_be_absent"
-          ],
-          "description": "Explicit Item-existence requirement, corresponding to OVAL check_existence (not check).",
-          "title": "How many Items must exist"
-        },
-        "all_items_must": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/state_entry"
-          },
-          "description": "For each selected Item, these conditions must be satisfied under the OVAL check='all' aggregation; empty-set behavior is controlled separately by items.",
-          "title": "Conditions every Item must satisfy"
-        }
-      },
-      "additionalProperties": false,
-      "description": "For each selected Item, verify the nested field predicates; population existence is checked independently.",
-      "title": "Item existence and all-Items conditions"
-    },
     "item_presence_requirement": {
       "type": "object",
       "required": [
-        "items"
+        "items_found"
       ],
       "properties": {
-        "items": {
-          "type": "string",
-          "enum": [
-            "one_or_more",
-            "none",
-            "exactly_one",
-            "all",
-            "may_be_absent"
-          ],
+        "items_found": {
+          "$ref": "#/$defs/item_existence_cardinality",
           "title": "Required Item existence",
-          "description": "Explicit selected-Item existence only; no States and no Item matching. The 'all' token retains the original OVAL all_exist population semantics."
+          "description": "Explicit selected-Item existence only, no matching. OVAL all_exist and at_least_one_exists are equivalent at Test level; preserve the original source attribute separately in provenance."
         }
       },
       "additionalProperties": false,
       "title": "Item existence requirement",
       "description": "Checks population existence without comparing State predicates; corresponds to State-free OVAL check_existence."
-    },
-    "inherited_field_predicate": {
-      "type": "object",
-      "required": [],
-      "properties": {
-        "require": {
-          "$ref": "#/$defs/paired_requirement"
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "#/$defs/field_predicate_body"
-        }
-      ],
-      "description": "Only valid when a containing State group or Test explicitly supplies state_fields_require; no implicit field cardinality.",
-      "unevaluatedProperties": false
     },
     "scoped_state_entry": {
       "oneOf": [
@@ -20749,61 +20223,13 @@
           "additionalProperties": {
             "oneOf": [
               {
-                "$ref": "#/$defs/inherited_field_predicate"
+                "$ref": "#/$defs/canonical_field_predicate"
               },
               {
                 "$ref": "#/$defs/record_wrapper_predicate"
               }
             ]
           }
-        },
-        {
-          "type": "object",
-          "required": [
-            "all"
-          ],
-          "properties": {
-            "all": {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "$ref": "#/$defs/scoped_state_entry"
-              },
-              "title": "All conditions must hold",
-              "description": "Legacy logical authoring spelling. Prefer 'and' for combining complete condition results; do not confuse this logical operator with Item/field/value cardinality. Legacy named aggregate: AND of nested conditions under the OVAL-style result model.",
-              "deprecated": true
-            },
-            "state_fields_require": {
-              "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "required": [
-            "any"
-          ],
-          "properties": {
-            "any": {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "$ref": "#/$defs/scoped_state_entry"
-              },
-              "title": "At least one condition must hold",
-              "description": "Legacy logical authoring spelling. Prefer 'or' for combining complete condition results; do not confuse this logical operator with Item/field/value cardinality. Legacy named aggregate: OR of nested conditions under the OVAL-style result model.",
-              "deprecated": true
-            },
-            "state_fields_require": {
-              "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
-            }
-          },
-          "additionalProperties": false
         },
         {
           "type": "object",
@@ -20820,10 +20246,10 @@
               "title": "Exactly one condition must hold",
               "description": "The OVAL-style exactly-one aggregation, preserving unknown and error outcomes."
             },
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             }
           },
           "additionalProperties": false
@@ -20834,10 +20260,10 @@
             "xor"
           ],
           "properties": {
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             },
             "xor": {
               "type": "array",
@@ -20847,30 +20273,6 @@
               },
               "title": "Odd-parity (XOR) of conditions",
               "description": "Logical XOR: odd number of condition results true under OVAL six-state semantics; distinct from ONE."
-            }
-          },
-          "additionalProperties": false
-        },
-        {
-          "type": "object",
-          "required": [
-            "odd"
-          ],
-          "properties": {
-            "odd": {
-              "type": "array",
-              "minItems": 1,
-              "items": {
-                "$ref": "#/$defs/scoped_state_entry"
-              },
-              "title": "An odd number of conditions must hold",
-              "description": "Legacy OVAL odd-parity logical operator across complete condition outcomes; prefer 'xor' (not exactly-one).",
-              "deprecated": true
-            },
-            "state_fields_require": {
-              "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
             }
           },
           "additionalProperties": false
@@ -20891,10 +20293,10 @@
               "description": "Combine nested condition results using OVAL-aligned Boolean AND, including non-Boolean evaluation outcomes.",
               "deprecated": false
             },
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             }
           },
           "additionalProperties": false
@@ -20915,10 +20317,10 @@
               "description": "Combine nested condition results using OVAL-aligned Boolean OR, including non-Boolean evaluation outcomes.",
               "deprecated": false
             },
-            "state_fields_require": {
+            "field_requirement": {
               "$ref": "#/$defs/paired_requirement",
-              "title": "Requirements for fields within this State group",
-              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped State; independent from Test Item existence."
+              "title": "Requirements for fields within this condition group",
+              "description": "Explicit OVAL-aligned per-field existence and matching requirement inherited only by the fields in this grouped condition; independent from Test Item existence."
             }
           },
           "additionalProperties": false
@@ -20926,36 +20328,6 @@
       ],
       "title": "Expected evidence condition",
       "description": "A field predicate or logical combination of predicates applied to one collected Item."
-    },
-    "scoped_all_items_requirement": {
-      "type": "object",
-      "required": [
-        "items",
-        "all_items_must"
-      ],
-      "properties": {
-        "items": {
-          "type": "string",
-          "enum": [
-            "one_or_more",
-            "may_be_absent"
-          ],
-          "description": "Explicit Item-existence requirement, corresponding to OVAL check_existence (not check).",
-          "title": "How many Items must exist"
-        },
-        "all_items_must": {
-          "type": "array",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/scoped_state_entry"
-          },
-          "description": "For each selected Item, these conditions must be satisfied under the OVAL check='all' aggregation; empty-set behavior is controlled separately by items.",
-          "title": "Conditions every Item must satisfy"
-        }
-      },
-      "additionalProperties": false,
-      "description": "Test-level state_fields_require is explicit, allowing nested predicates to inherit their field cardinality.",
-      "title": "Item existence and all-Items conditions"
     },
     "field_predicate_body": {
       "type": "object",
@@ -20965,12 +20337,7 @@
           "minLength": 1
         },
         "value_match": {
-          "enum": [
-            "all",
-            "one",
-            "one_or_more",
-            "none"
-          ],
+          "$ref": "#/$defs/cardinality",
           "description": "Required on arrays, Variable references and Organizational Inputs. Independent of the observed-Item/State/record requirement."
         },
         "redact_result": {
@@ -26935,9 +26302,13 @@
     "canonical_field_predicate": {
       "type": "object",
       "properties": {
-        "field_requirement": {
-          "$ref": "#/$defs/paired_requirement",
-          "description": "Overrides any inherited requirement for this field only; other fields retain their applicable requirements. The nearest explicitly declared requirement wins; omission creates no implicit default. This controls field presence and matching, independently of require.items."
+        "values_found": {
+          "$ref": "#/$defs/existence_cardinality",
+          "description": "Overrides inherited field-existence cardinality for this field; if specified, values_matching is also required."
+        },
+        "values_matching": {
+          "$ref": "#/$defs/cardinality",
+          "description": "Overrides inherited field-match cardinality for this field; if specified, values_found is also required."
         }
       },
       "allOf": [
@@ -26945,6 +26316,10 @@
           "$ref": "#/$defs/field_predicate_body"
         }
       ],
+      "dependentRequired": {
+        "values_found": ["values_matching"],
+        "values_matching": ["values_found"]
+      },
       "unevaluatedProperties": false
     },
     "explicit_field_predicate": {
@@ -26954,7 +26329,8 @@
         },
         {
           "required": [
-            "field_requirement"
+            "values_found",
+            "values_matching"
           ]
         }
       ]
@@ -26979,7 +26355,10 @@
                 "minLength": 1
               },
               "additionalProperties": {
-                "$ref": "#/$defs/canonical_field_predicate"
+                "oneOf": [
+                  {"$ref": "#/$defs/canonical_field_predicate"},
+                  {"$ref": "#/$defs/record_wrapper_predicate"}
+                ]
               }
             }
           },
@@ -27092,7 +26471,10 @@
                 "minLength": 1
               },
               "additionalProperties": {
-                "$ref": "#/$defs/canonical_field_predicate"
+                "oneOf": [
+                  {"$ref": "#/$defs/canonical_field_predicate"},
+                  {"$ref": "#/$defs/record_wrapper_predicate"}
+                ]
               }
             }
           },
@@ -27111,7 +26493,10 @@
                 "properties": {
                   "fields": {
                     "additionalProperties": {
-                      "$ref": "#/$defs/explicit_field_predicate"
+                      "oneOf": [
+                        {"$ref": "#/$defs/explicit_field_predicate"},
+                        {"$ref": "#/$defs/record_wrapper_predicate"}
+                      ]
                     }
                   }
                 }
@@ -27288,32 +26673,62 @@
     "canonical_all_items_requirement": {
       "type": "object",
       "required": [
-        "items",
-        "all_items_must"
+        "items_found",
+        "items_satisfying"
       ],
       "properties": {
-        "items": {
-          "type": "string",
-          "enum": [
-            "one_or_more",
-            "may_be_absent"
-          ],
-          "description": "Explicit Item-existence requirement, corresponding to OVAL check_existence (not check).",
-          "title": "How many Items must exist"
+        "items_found": {
+          "$ref": "#/$defs/item_existence_cardinality",
+          "description": "Selected-Item existence requirement (OVAL Test check_existence). Both source all_exist and at_least_one_exists map to one_or_more; preserve their distinct source spellings only in provenance."
+        },
+        "items_satisfying": {
+          "$ref": "#/$defs/cardinality",
+          "description": "How many collected Items must satisfy the complete condition (OVAL Test check). Never conflated with items_found."
         },
         "field_requirement": {
           "$ref": "#/$defs/paired_requirement",
-          "description": "Applies to all fields evaluated by this Test, including all branches of nested logical groups and complete conditions, unless a nearer field_requirement explicitly overrides it. Precedence: Test -> enclosing logical groups -> complete condition -> individual field. The nearest explicitly declared requirement wins; omission creates no implicit default. This controls field presence and matching, independently of require.items."
+          "description": "Optional shared values_found/values_matching pair for fields in this Test, overridden only by a closer complete pair on a group, condition, or individual field. No implicit field requirement."
         },
-        "all_items_must": {
+        "fields": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"type": "string", "minLength": 1},
+          "additionalProperties": {
+            "oneOf": [
+              {"$ref": "#/$defs/canonical_field_predicate"},
+              {"$ref": "#/$defs/record_wrapper_predicate"}
+            ]
+          },
+          "description": "One complete condition; distinct fields are combined with logical AND."
+        },
+        "and": {
           "type": "array",
           "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/canonical_inherited_condition"
-          },
-          "description": "Every collected Item must satisfy these complete conditions under OVAL check=all; Item existence is controlled separately by items."
+          "items": {"$ref": "#/$defs/canonical_inherited_condition"}
+        },
+        "or": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/canonical_inherited_condition"}
+        },
+        "one": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/canonical_inherited_condition"}
+        },
+        "xor": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"$ref": "#/$defs/canonical_inherited_condition"}
         }
       },
+      "oneOf": [
+        {"required": ["fields"]},
+        {"required": ["and"]},
+        {"required": ["or"]},
+        {"required": ["one"]},
+        {"required": ["xor"]}
+      ],
       "additionalProperties": false,
       "allOf": [
         {
@@ -27326,18 +26741,25 @@
           },
           "then": {
             "properties": {
-              "all_items_must": {
-                "items": {
-                  "$ref": "#/$defs/canonical_condition"
+              "fields": {
+                "additionalProperties": {
+                  "oneOf": [
+                    {"$ref": "#/$defs/explicit_field_predicate"},
+                    {"$ref": "#/$defs/record_wrapper_predicate"}
+                  ]
                 }
-              }
+              },
+              "and": {"items": {"$ref": "#/$defs/canonical_condition"}},
+              "or": {"items": {"$ref": "#/$defs/canonical_condition"}},
+              "one": {"items": {"$ref": "#/$defs/canonical_condition"}},
+              "xor": {"items": {"$ref": "#/$defs/canonical_condition"}}
             }
           }
         }
       ],
-      "description": "Collected-Item population and field requirements are independent. No implicit field requirement is supplied. Uncommon source requirements and records retain the explicit source-exact Test.require string plus states fallback."
+      "description": "One complete Test requirement: items_found is existence, items_satisfying is comparison aggregation. Conditions follow directly as fields/and/or/one/xor. Omitted field cardinality is never silently defaulted."
     }
   },
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-10-22"
+  "x-last-modified": "2026-10-23"
 }

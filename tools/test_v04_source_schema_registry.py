@@ -1,10 +1,12 @@
 """Cross-document reference scope regression for the 0.4 source validators."""
 
 import os
+import json
 from pathlib import Path
 import unittest
 
-from v04_canonical_source_ir import _schema_validators
+from jsonschema import Draft202012Validator
+from referencing import Registry, Resource
 
 
 SCHEMA_DIR = Path(os.environ.get(
@@ -14,16 +16,18 @@ SCHEMA_DIR = Path(os.environ.get(
 
 def assessment(*, scoped=True):
     require = {
-        "items": "one_or_more",
-        "all_items_must": [{"or": [
+        "items_found": "one_or_more",
+        "items_satisfying": "every",
+        "or": [
             {"fields": {"type": {"equals": "string"},
                         "value": {"equals": "Enterprise"}}},
             {"fields": {"type": {"equals": "string"},
                         "value": {"equals": "EnterpriseS"}}},
-        ]}],
+        ],
     }
     if scoped:
-        require["field_requirement"] = "at_least_one_exists_and_all_match"
+        require["field_requirement"] = {
+            "values_found": "one_or_more", "values_matching": "every"}
     return {"assessment": {
         "id": "edition-assessment", "version": 1,
         "assessment_title": "Windows Enterprise editions", "mode": "automated",
@@ -40,7 +44,13 @@ def assessment(*, scoped=True):
 class RegistryResolutionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.validator = _schema_validators(SCHEMA_DIR)["assessment"]
+        schemas = [json.loads(path.read_text()) for path in
+                   SCHEMA_DIR.glob('*.schema.json')]
+        registry = Registry().with_resources(
+            (schema['$id'], Resource.from_contents(schema)) for schema in schemas)
+        assessment_schema = next(schema for schema in schemas
+                                 if schema['$id'].endswith('/assessment.schema.json'))
+        cls.validator = Draft202012Validator(assessment_schema, registry=registry)
 
     def test_nested_field_body_resolves_against_language_schema(self):
         self.assertEqual(list(self.validator.iter_errors(assessment())), [])

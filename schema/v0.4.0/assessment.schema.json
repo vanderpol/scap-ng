@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.4.0/assessment.schema.json",
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-10-22",
+  "x-last-modified": "2026-10-23",
   "title": "SCAP-NG Assessment v0.4.0 draft",
   "description": "Pre-alpha 0.4 Assessment single authoring grammar. Import conversion required for 0.3 syntax.",
   "type": "object",
@@ -84,7 +84,8 @@
             "type": "object",
             "required": [
               "test_title",
-              "capability"
+              "capability",
+              "require"
             ],
             "properties": {
               "test_title": {
@@ -107,28 +108,18 @@
                 "title": "Collection Object",
                 "description": "Defines the evidence source and selectors; an inline Object inherits its Test capability."
               },
-              "states": {
-                "type": "array"
-              },
-              "states_match": {
+              "variable": {
                 "type": "string",
-                "enum": [
-                  "all",
-                  "any",
-                  "one",
-                  "odd"
-                ]
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+                "description": "Named Variable used as the native Test source where the capability supports variable.value."
               },
               "require": {
                 "$ref": "assessment-language.schema.json#/$defs/test/properties/require",
                 "title": "Required evidence conditions",
-                "description": "Explicit collected-Item population and field requirements, or source-exact fallback; no hidden field default."
-              },
-              "state_fields_require": {
-                "$ref": "assessment-language.schema.json#/$defs/paired_requirement"
+                "description": "Structured collected-Item population and field requirements; no legacy State wrapper or implicit field default."
               }
             },
-            "additionalProperties": true,
+            "additionalProperties": false,
             "allOf": [
               {
                 "if": {
@@ -145,26 +136,7 @@
                 },
                 "then": {
                   "required": [
-                    "reported_elements",
-                    "require"
-                  ]
-                }
-              },
-              {
-                "if": {
-                  "properties": {
-                    "states": {
-                      "type": "array",
-                      "minItems": 2
-                    }
-                  },
-                  "required": [
-                    "states"
-                  ]
-                },
-                "then": {
-                  "required": [
-                    "states_match"
+                    "reported_elements"
                   ]
                 }
               },
@@ -187,6 +159,26 @@
                 {
                   "required": [
                     "match"
+                  ]
+                },
+                {
+                  "required": [
+                    "state"
+                  ]
+                },
+                {
+                  "required": [
+                    "states"
+                  ]
+                },
+                {
+                  "required": [
+                    "states_match"
+                  ]
+                },
+                {
+                  "required": [
+                    "state_fields_require"
                   ]
                 }
               ]
@@ -224,7 +216,7 @@
               "cardinality": {
                 "type": "string",
                 "enum": [
-                  "one",
+                  "exactly_one",
                   "zero_or_one",
                   "one_or_more",
                   "zero_or_more"

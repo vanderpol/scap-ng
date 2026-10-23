@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Production 0.4 field-requirement schema boundaries; no scanner claims.
+"""0.4 field cardinality scoping and record requirements, no scanner claims.
 
-The Enterprise/EnterpriseS fixture follows the source-backed owner scope packet
-review/current/0.4.0-FIELD-REQUIREMENT-SCOPE.md (OVAL State AND, Test OR).
+The Enterprise/EnterpriseS fixture retains the reviewed real-source shape:
+two independent complete conditions joined with OR; per-field existence and
+matching requirements must be explicit or inherited through declared scopes.
 Refs #240 #248 #239.
 """
-from copy import deepcopy
 import json
 from pathlib import Path
 import unittest
@@ -13,19 +13,21 @@ import unittest
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
+
 ROOT = Path(__file__).resolve().parents[1]
-REQUIRED = 'at_least_one_exists_and_all_match'
-OPTIONAL = 'may_be_absent_and_all_match'
+REQUIRED = {'values_found': 'one_or_more', 'values_matching': 'every'}
+OPTIONAL = {'values_found': 'may_be_absent', 'values_matching': 'every'}
 
 
 def requirement():
-    return {'items': 'one_or_more', 'field_requirement': REQUIRED,
-            'all_items_must': [{'or': [
+    return {'items_found': 'one_or_more', 'items_satisfying': 'every',
+            'field_requirement': dict(REQUIRED),
+            'or': [
                 {'fields': {'type': {'equals': 'string'},
                             'value': {'equals': 'Enterprise'}}},
                 {'fields': {'type': {'equals': 'string'},
                             'value': {'equals': 'EnterpriseS'}}},
-            ]}]}
+            ]}
 
 
 def document(req):
@@ -56,138 +58,157 @@ class ProductionFieldRequirementTests(unittest.TestCase):
         doc = document(req)
         doc['assessment']['tests']['edition-test'].update(test_changes or {})
         for validator in self.validators:
-            with self.subTest(schema=validator.schema['$id']):
+            with self.subTest(schema=validator.schema['$id'], req=req):
                 errors = list(validator.iter_errors(doc))
                 self.assertEqual(not errors, valid,
-                                 '\n'.join(e.message for e in errors)[:1500])
+                                 '\n'.join(e.message for e in errors)[:1400])
 
     def test_enterprise_alternative_complete_conditions(self):
         self.assert_valid(requirement())
-        value = requirement()
-        value['items'] = 'may_be_absent'
-        self.assert_valid(value)
+        req = requirement()
+        req['items_found'] = 'may_be_absent'
+        req['items_satisfying'] = 'one_or_more'
+        self.assert_valid(req)
 
-    def test_all_four_scopes_and_nearest_overrides(self):
-        value = requirement()
-        group = value['all_items_must'][0]
-        group['field_requirement'] = OPTIONAL
-        group['or'][0]['field_requirement'] = REQUIRED
-        group['or'][0]['fields']['value']['field_requirement'] = 'only_one_exists_and_matches'
-        group['or'][1] = {'and': [group['or'][1]], 'field_requirement': REQUIRED}
-        self.assert_valid(value)
-        for scope in (value, group, group['or'][0], group['or'][0]['fields']['value']):
+    def test_test_group_condition_and_field_scopes(self):
+        req = requirement()
+        # Test-wide inheritance applies to both OR alternatives.
+        self.assert_valid(req)
+        req['or'][0] = {'and': [req['or'][0]], 'field_requirement': dict(OPTIONAL)}
+        req['or'][0]['and'][0]['field_requirement'] = dict(REQUIRED)
+        req['or'][0]['and'][0]['fields']['value'].update(OPTIONAL)
+        self.assert_valid(req)
+        for scope in (req, req['or'][0], req['or'][0]['and'][0]):
             old = scope['field_requirement']
-            scope['field_requirement'] = 'one_or_more'
-            self.assert_valid(value, valid=False)
+            scope['field_requirement'] = 'at_least_one_exists_and_all_match'
+            self.assert_valid(req, valid=False)
             scope['field_requirement'] = old
+        field = req['or'][0]['and'][0]['fields']['value']
+        field['values_matching'] = 'all'
+        self.assert_valid(req, valid=False)
 
-    def test_explicit_requirement_can_start_at_any_scope(self):
-        for scope in ('group', 'condition', 'field'):
-            value = requirement()
-            del value['field_requirement']
-            group = value['all_items_must'][0]
-            if scope == 'group':
-                group['field_requirement'] = REQUIRED
-            else:
-                for condition in group['or']:
-                    if scope == 'condition':
-                        condition['field_requirement'] = REQUIRED
-                    else:
-                        for field in condition['fields'].values():
-                            field['field_requirement'] = REQUIRED
-            self.assert_valid(value)
+    def test_explicit_requirement_can_start_at_each_scope(self):
+        for scope in ('test', 'group', 'condition', 'field'):
+            req = requirement()
+            if scope != 'test':
+                del req['field_requirement']
+                if scope == 'group':
+                    # Individual alternatives can inherit from their own group.
+                    req['or'] = [{'and': [alt], 'field_requirement': dict(REQUIRED)}
+                                 for alt in req['or']]
+                elif scope == 'condition':
+                    for alt in req['or']:
+                        alt['field_requirement'] = dict(REQUIRED)
+                else:
+                    for alt in req['or']:
+                        for field in alt['fields'].values():
+                            field.update(REQUIRED)
+            self.assert_valid(req)
 
     def test_missing_scope_and_sibling_leakage_rejected(self):
-        value = requirement()
-        del value['field_requirement']
-        self.assert_valid(value, valid=False)
-        group = value['all_items_must'][0]
-        group['or'][0]['field_requirement'] = REQUIRED
-        self.assert_valid(value, valid=False)
-        group['or'][1] = {'and': [group['or'][1]], 'field_requirement': REQUIRED}
-        self.assert_valid(value)
-        del group['or'][1]['field_requirement']
-        group['or'][1]['and'][0]['fields']['value']['field_requirement'] = REQUIRED
-        self.assert_valid(value, valid=False)  # type remains unscoped
+        req = requirement()
+        del req['field_requirement']
+        self.assert_valid(req, valid=False)
+        req['or'][0]['field_requirement'] = dict(REQUIRED)
+        self.assert_valid(req, valid=False)
+        req['or'][1]['field_requirement'] = dict(REQUIRED)
+        self.assert_valid(req)
+        del req['or'][1]['field_requirement']
+        req['or'][1]['fields']['value'].update(REQUIRED)
+        self.assert_valid(req, valid=False)  # type remains unscoped
 
-    def test_legacy_names_rejected_at_each_canonical_scope(self):
-        for name in ('require', 'state_fields_require', 'override_fields_requirement',
-                     'fields_require', 'fields_requirement', 'state'):
-            for location in ('test', 'group', 'condition', 'field'):
-                with self.subTest(name=name, location=location):
-                    value = requirement()
-                    group = value['all_items_must'][0]
-                    target = {'test': value, 'group': group,
-                              'condition': group['or'][0],
-                              'field': group['or'][0]['fields']['value']}[location]
-                    target[name] = REQUIRED
-                    self.assert_valid(value, valid=False)
+    def test_old_names_rejected_in_every_scope(self):
+        for name in ('require', 'state_fields_require', 'states_match',
+                     'override_fields_requirement', 'fields_require', 'state'):
+            req = requirement()
+            req[name] = dict(REQUIRED)
+            self.assert_valid(req, valid=False)
+            req = requirement()
+            req['or'][0][name] = dict(REQUIRED)
+            self.assert_valid(req, valid=False)
+            req = requirement()
+            req['or'][0]['fields']['value'][name] = dict(REQUIRED)
+            self.assert_valid(req, valid=False)
         for name in ('state_fields_require', 'field_requirement',
                      'override_fields_requirement', 'collected_items_require'):
-            self.assert_valid(requirement(), test_changes={name: REQUIRED}, valid=False)
+            self.assert_valid(requirement(),
+                              test_changes={name: dict(REQUIRED)}, valid=False)
 
-    def test_population_and_field_policy_are_distinct(self):
-        for items in ('none', 'exactly_one', 'all', 'and', REQUIRED):
-            value = requirement(); value['items'] = items
-            self.assert_valid(value, valid=False)
-        for items in ('one_or_more', 'none', 'exactly_one', 'all', 'may_be_absent'):
-            self.assert_valid({'items': items})  # existing state-free vocabulary
-        value = requirement(); del value['items']
-        self.assert_valid(value, valid=False)
+    def test_item_existence_does_not_encode_satisfaction(self):
+        for found in ('none', 'exactly_one', 'one_or_more', 'may_be_absent'):
+            self.assert_valid({'items_found': found})
+            for satisfying in ('none', 'exactly_one', 'one_or_more', 'every'):
+                req = requirement()
+                req['items_found'] = found
+                req['items_satisfying'] = satisfying
+                self.assert_valid(req)
+        for old in ('all', 'every', 'and', 'at_least_one_exists'):
+            req = requirement()
+            req['items_found'] = old
+            self.assert_valid(req, valid=False)
 
-    def test_complete_condition_logic_and_structural_rejections(self):
-        for op in ('and', 'or', 'one', 'xor'):
-            value = requirement()
-            value['all_items_must'][0] = {op: value['all_items_must'][0]['or']}
-            self.assert_valid(value)
-        for condition in ({'or': []}, {'fields': {}}, {'or': 'all'},
-                          {'or': [{'fields': {'value': {'equals': 1}}}], 'and': []},
-                          {'value': {'equals': 'Enterprise', 'field_requirement': REQUIRED}},
-                          {'fields': [{'value': {'equals': 1}}], 'fields_operator': 'or'}):
-            value = requirement(); value['all_items_must'] = [condition]
-            self.assert_valid(value, valid=False)
-        for changes in ({'states': []}, {'states_match': 'any'}):
-            self.assert_valid(requirement(), test_changes=changes, valid=False)
+    def test_logical_operators_and_structural_rejections(self):
+        for operator in ('and', 'or', 'one', 'xor'):
+            req = requirement()
+            req[operator] = req.pop('or')
+            self.assert_valid(req)
+        for invalid in ({'or': []}, {'fields': {}}, {'or': 'all'},
+                        {'or': [{'fields': {'value': {'equals': 1}}}], 'and': []},
+                        {'fields': [{'value': {'equals': 1}}]},
+                        {'or': [{'fields': {'value': {'equals': 1}}}],
+                         'field_requirement': 'one_or_more'}):
+            req = {'items_found': 'one_or_more', 'items_satisfying': 'every', **invalid}
+            self.assert_valid(req, valid=False)
 
-    def test_operator_and_dynamic_operand_guards_preserved(self):
+    def test_expected_operand_matching_remains_independent(self):
         for pred in ({'bitwise_and': 4096}, {'version_greater_than': '1.2'},
-                     {'equals': [1, 2], 'datatype': 'integer', 'value_match': 'one'},
+                     {'equals': [1, 2], 'datatype': 'integer',
+                      'value_match': 'exactly_one'},
                      {'equals': {'variable': 'edition-variable'},
                       'datatype': 'string', 'value_match': 'one_or_more'},
                      {'equals': {'input': 'edition-input'},
-                      'datatype': 'string', 'value_match': 'all'}):
-            value = requirement()
-            value['all_items_must'] = [{'fields': {'value': pred}}]
-            self.assert_valid(value)
+                      'datatype': 'string', 'value_match': 'every'}):
+            req = requirement()
+            req['or'] = [{'fields': {'value': pred}}]
+            self.assert_valid(req)
         for pred in ({'equals': [1, 2]}, {'equals': {'variable': 'edition-variable'}},
-                     {'equals': 1, 'not_equal': 2}, {'unrecognized_operator': 1}):
-            value = requirement(); value['all_items_must'] = [{'fields': {'value': pred}}]
-            self.assert_valid(value, valid=False)
+                     {'equals': 1, 'not_equal': 2}, {'unknown_comparison': 1}):
+            req = requirement()
+            req['or'] = [{'fields': {'value': pred}}]
+            self.assert_valid(req, valid=False)
 
-    def test_uncommon_source_exact_and_record_fallback_retained(self):
-        state = {'value': {'record': {
-            'require': 'at_least_one_exists_and_some_match',
-            'fields': {'productstate': {'bitwise_and': 4096, 'require': REQUIRED}}}}}
-        for op in ('and', 'or', 'one', 'xor'):
-            self.assert_valid('only_one_exists_and_none_match', test_changes={
-                'states': [{op: [deepcopy(state), deepcopy(state)]}],
-                'states_match': 'any'})
-        self.assert_valid('only_one_exists')
+    def test_existing_record_nesting_with_distinct_requirements(self):
+        # Source-backed Windows 11 SV-253264 record subtree; fixture wrapper
+        # is not a claim to reconstruct the complete source OVAL Test.
+        record = {'record': {
+            'records_found': 'one_or_more', 'records_matching': 'one_or_more',
+            'fields': {'productstate': {'bitwise_and': 4096, **REQUIRED}}}}
+        req = requirement()
+        req['or'] = [{'fields': {'value': record}}]
+        self.assert_valid(req)
+        for invalid in (
+            {'record': {'fields': record['record']['fields']}},
+            {'record': {'records_found': 'one_or_more',
+                        'fields': record['record']['fields']}},
+            {'record': {'records_found': 'one_or_more',
+                        'records_matching': 'every',
+                        'fields': {'productstate': {'bitwise_and': 4096}}}},
+            {'record': {**record['record'], 'item_conditions': 'all'}},
+            {'bitwise_and': 4096, 'records_matching': 'every'},
+        ):
+            req['or'] = [{'fields': {'value': invalid}}]
+            self.assert_valid(req, valid=False)
 
-    def test_machine_readable_scope_and_and_descriptions(self):
-        defs = self.language['$defs']
-        self.assertIn('all fields', defs['canonical_all_items_requirement']['properties']['field_requirement']['description'])
-        self.assertIn('this field only', defs['canonical_field_predicate']['properties']['field_requirement']['description'])
-        for name in ('canonical_condition', 'canonical_inherited_condition'):
-            for branch in defs[name]['oneOf']:
-                text = branch['properties']['field_requirement']['description']
-                self.assertIn('nearest explicitly declared', text)
-                self.assertIn('no implicit default', text)
-                self.assertIn('independently of require.items', text)
-                if branch['required'] == ['fields']:
-                    self.assertIn('implicitly ANDed', branch['description'])
-                else:
-                    self.assertIn('all descendant fields in every branch', text)
+    def test_description_distinguishes_three_scopes(self):
+        definitions = self.language['$defs']
+        self.assertEqual(definitions['cardinality']['enum'],
+                         ['none', 'exactly_one', 'one_or_more', 'every'])
+        self.assertNotIn('every', definitions['item_existence_cardinality']['enum'])
+        self.assertIn('provenance',
+                      definitions['canonical_all_items_requirement']['properties']
+                      ['items_found']['description'])
+        self.assertIn('never silently defaulted',
+                      definitions['canonical_all_items_requirement']['description'])
 
 
 if __name__ == '__main__':

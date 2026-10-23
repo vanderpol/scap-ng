@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Versioned 0.4.0 Test-result operator aliases: accepted new, retained legacy.
+"""Versioned 0.4.0 Test-result operators: canonical forms only.
 
 This test checks the actual maintained 0.4.0 expression schema, not a
 temporary research dialect. AND/OR/ONE/XOR apply to whole Test outcomes,
@@ -32,20 +32,19 @@ class TestEvaluateLogicalOperators(unittest.TestCase):
                 self.assertTrue(self.valid({op:[
                     {"test":"first-test"},{"test":"second-test"}]}))
 
-    def test_legacy_source_remains_parseable_and_marked_deprecated(self):
+    def test_legacy_source_aliases_are_rejected(self):
         for old,new in (("all","and"),("any","or"),("odd","xor")):
             with self.subTest(alias=old):
-                self.assertTrue(self.valid({old:[{"test":"first-test"}]}))
-                self.assertTrue(self.choices[old]["properties"][old]["deprecated"])
-                self.assertIn(new,self.choices[old]["properties"][old]["description"])
+                self.assertFalse(self.valid({old:[{"test":"first-test"}]}))
+                self.assertNotIn(old,self.choices)
                 self.assertFalse(self.choices[new]["properties"][new].get("deprecated",False))
 
-    def test_nested_if_not_and_mixed_new_and_old_across_separate_nodes(self):
+    def test_nested_if_not_and_canonical_operators(self):
         expr={"if":{"test":"applicability-test"},
               "then":{"and":[{"test":"one-test"},
                              {"not":{"or":[{"test":"two-test"},
                                            {"test":"three-test"}]}}]},
-              "else":{"all":[{"test":"four-test"},
+              "else":{"and":[{"test":"four-test"},
                              {"xor":[{"test":"five-test"},
                                      {"test":"six-test"}]}]}}
         self.assertTrue(self.valid(expr))
@@ -68,7 +67,7 @@ class TestEvaluateLogicalOperators(unittest.TestCase):
 
     def test_versioned_schema_metadata_stays_self_contained(self):
         self.assertEqual(self.schema["x-scap-ng-version"],"0.4.0")
-        self.assertEqual(self.schema["x-last-modified"],"2026-10-21")
+        self.assertEqual(self.schema["x-last-modified"],"2026-10-23")
         self.assertIn("/v0.4.0/",self.schema["$id"])
 
 
