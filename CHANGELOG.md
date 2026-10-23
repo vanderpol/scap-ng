@@ -99,6 +99,16 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Incorporated two previously independent integer constant-Variable OVAL
+  sources into the single maintained 0.3-backed converter: 2-Test literal
+  matrices and 10-Test `var_check` enumeration/negated-criteria matrices.
+  The executable 0.4 output is derived from the mature 0.3 graph, independently
+  compared with immutable original OVAL imports, schema-checked and compiled;
+  altered OVAL hashes, value literals or 0.3 `var_check` mappings fail closed.
+  No generalized Variable or scanner-parity claim is implied.
+  [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Added a source-attested multi-Test AND bridge to the single 0.4 converter.
   Two or more direct no-State OVAL Tests retain their separate native Test
   programs, ordered Boolean conjunction and source-exact Object selectors.

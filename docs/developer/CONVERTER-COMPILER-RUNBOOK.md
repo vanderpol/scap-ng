@@ -31,6 +31,9 @@ python tools/scap_converter_core.py \
 python tools/test_scap_converter_core.py -v
 python tools/test_scap_converter_core_object_presence.py -v
 python tools/test_scap_converter_core_multitest.py -v
+SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML=/path/to/oval-def_constant_variable.xml \
+SCAP_NG_CHECK_ENUMERATION_SOURCE_XML=/path/to/oval_check_enumeration_variable_values.xml \
+  python tools/test_scap_converter_core_constant_matrix.py -v
 python tools/test_oval_semantic_core_preservation.py -v
 # With the pinned source available (see below):
 SCAP_NG_VARIABLE_SOURCE_XML=/path/to/ind-def_variable_test.xml \
@@ -101,10 +104,22 @@ Also admitted: pinned `independent.family_test` Definition
 preserves State `var_check=all` and the Test `at least one` check, and has
 independent 0.4 import/export and semantic round-trip proof.
 
+The shared converter additionally imports two existing independent pinned
+integer-constant-Variable matrix cases (`oval:org.mitre.oval.test:def:92`
+and `def:170`). These cover one/multiple literal values, `equals`, integer
+less/greater comparisons, all four original `var_check` quantifiers and
+negated AND criteria across two and ten Tests. Their **executable output**
+comes from the mature 0.3 lowered Variable/Test/State graph; a separate
+source-pinned OVAL importer supplies a whole-Assessment differential oracle.
+Original SHA drift, lost source references and changed 0.3 predicates cause
+hard errors. This is two reviewed source files, not general Variable coverage.
+
 For source regressions, retrieve only the immutable
 [`e3538595` Self-Assertion source](https://github.com/OVAL-Community/SCAP-Self-Assertion/commit/e3538595c5083b9c34d937a81d319234df9bbfaa)
 at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml` and
 `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml`, plus
+`agnostic/oval-def_constant_variable.xml`,
+`agnostic/oval_check_enumeration_variable_values.xml`,
 `aix/aix-def_fileset_test.xml`, `asa/asa-def_line_test.xml`,
 `asa/asa-def_version_test.xml`,
 `ios/ios-def_global_test.xml`,

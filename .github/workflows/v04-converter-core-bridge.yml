@@ -7,14 +7,17 @@ on:
       - 'tools/scap_converter_core.py'
       - 'tools/v04_source_verified_object_presence.py'
       - 'tools/v04_source_verified_multitest_presence.py'
+      - 'tools/v04_source_verified_constant_variable_matrix.py'
       - 'tools/test_scap_converter_core.py'
       - 'tools/test_scap_converter_core_object_presence.py'
       - 'tools/test_scap_converter_core_multitest.py'
+      - 'tools/test_scap_converter_core_constant_matrix.py'
       - 'tools/test_scap_converter_core_variable.py'
       - 'tools/test_scap_converter_core_family.py'
       - 'tools/audit_scap_converter_core_coverage.py'
       - 'tools/test_audit_scap_converter_core_coverage.py'
       - 'tools/convert_v04_oval_independent_variable_test.py'
+      - 'tools/convert_v04_oval_constant_variable_matrix.py'
       - 'tools/convert_v04_oval_family_constant_variable.py'
       - 'tools/export_v04_oval_family_constant_variable.py'
       - 'tools/audit_v04_original_oval_variable_test.py'
@@ -58,6 +61,9 @@ jobs:
           python tools/test_scap_converter_core_object_presence.py -v
           test -f "$SCAP_NG_IOS_GLOBAL_SOURCE_XML"
           python tools/test_scap_converter_core_multitest.py -v
+          test -f "$SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML"
+          test -f "$SCAP_NG_CHECK_ENUMERATION_SOURCE_XML"
+          python tools/test_scap_converter_core_constant_matrix.py -v
           test -f "$SCAP_NG_VARIABLE_SOURCE_XML"
           python tools/test_scap_converter_core_variable.py -v
           test -f "$SCAP_NG_FAMILY_SOURCE_XML"
@@ -66,6 +72,8 @@ jobs:
           python tools/test_import_v04_oval_leaf_pilot.py -v
         env:
           SCAP_NG_VARIABLE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml
+          SCAP_NG_CONSTANT_VARIABLE_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval-def_constant_variable.xml
+          SCAP_NG_CHECK_ENUMERATION_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/oval_check_enumeration_variable_values.xml
           SCAP_NG_FAMILY_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_family_test.xml
           SCAP_NG_IOS_BGP_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/ios/ios-def_bgpneighbor_test.xml
           SCAP_NG_IOS_SECTION_SOURCE_XML: pinned-self-assertion/SCAP_1.4/OVAL_Test_Content/ios/ios-def_section_test.xml
