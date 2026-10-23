@@ -20,7 +20,7 @@ import xml.etree.ElementTree as ET
 
 from jsonschema import Draft202012Validator
 
-from audit_v04_original_oval_variable_test import BASE, IND, tag
+from audit_v04_original_oval_variable_test import IND, tag
 from convert_v04_oval_independent_variable_test import convert as independent_convert
 from export_v04_oval_independent_variable_test import emit
 from scap_converter_core import convert, postprocess_automated_assessment
@@ -39,7 +39,12 @@ class MatureVariableLoweringIntegrationTests(unittest.TestCase):
     def setUpClass(cls):
         path = os.environ.get("SCAP_NG_VARIABLE_SOURCE_XML")
         if not path:
-            raise RuntimeError("SCAP_NG_VARIABLE_SOURCE_XML must name the pinned external OVAL fixture")
+            # The repository-wide smoke runner discovers *every* test module
+            # but does not checkout external source. The dedicated converter
+            # workflow supplies the pinned file and executes every case.
+            raise unittest.SkipTest(
+                "pinned OVAL fixture unavailable; dedicated converter workflow must set "
+                "SCAP_NG_VARIABLE_SOURCE_XML")
         cls.original = Path(path).read_bytes()
         if sha256(cls.original).hexdigest() != SOURCE_SHA256:
             raise RuntimeError("external pinned OVAL variable fixture SHA256 does not match")
