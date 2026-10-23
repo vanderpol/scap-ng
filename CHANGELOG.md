@@ -99,6 +99,17 @@ proposals are not listed as delivered features.
 
 ### Converter and authoring safeguards
 
+- Extended the single-tree 0.4 converter with the mature 0.3 lowering for a
+  pinned four-Test `independent.variable_test` source. The 0.3 source graph
+  provides both constant Variables, all four pairings, Test checks and State
+  `var_check`; the adapter checks complete native output against an independent
+  0.4 importer, passes schema/compiler tests, and regenerates semantically
+  equivalent OVAL. CI pins original source revision and SHA256 and tests
+  deliberately corrupted source and lowering. This is an integration of an
+  already individually proven source case, not broader OVAL language coverage
+  or live scanner parity. [#232](https://github.com/vanderpol/scap-ng/issues/232)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Added the first single-tree conversion integration entry point: actual 0.3
   semantic lowering and capability mapping feed final flat-Object 0.4 authoring,
   the current native Test compiler, and an independent original-OVAL differential

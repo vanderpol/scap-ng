@@ -2,8 +2,8 @@
 """Shared-source OVAL -> canonical 0.4 converter integration checkpoint.
 
 The source lowering is the mature 0.3 converter; native 0.4 projection is a
-strict, separately checked boundary. Only two independently proven leaf
-shapes are admitted for now. This is NOT general OVAL 5.12.3 coverage.
+strict, separately checked boundary. Two leaf shapes and one pinned four-Test
+variable source are admitted. This is NOT general OVAL 5.12.3 coverage.
 
 Refs #232 #229 #248.
 """
@@ -17,6 +17,11 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from compare_v04_fresh_oval_import import compare as compare_independent
+from convert_v04_oval_independent_variable_test import (
+    convert as independent_variable_import,
+    NAMED_TESTS as VARIABLE_TEST_NAMES,
+    VARS as VARIABLE_NAMES,
+)
 from import_v04_oval_leaf_pilot import convert as independent_leaf_import
 from oval_semantic_ir import parse as parse_oval_semantic_ir
 from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
@@ -176,12 +181,136 @@ def project_v003_to_v04(v003):
     return flattened
 
 
+def project_v003_variable_to_v04(v003, provenance, original):
+    """Map the mature 0.3 four-way variable graph, never the oracle's output.
+
+    The pinned OVAL source has a dedicated independently audited 0.4 importer;
+    it supplies the *scope check* and the external differential, not any
+    executable Test, State, or Variable in this projection.
+    """
+    a = v003["assessment"]
+    require(a.get("specification", {}).get("version") == "0.3.0"
+            and a.get("mode") == "automated" and a.get("class") == "miscellaneous"
+            and a.get("purpose") == "assessment", "unexpected 0.3 variable Definition")
+    require(a.get("objects") == {}, "variable.value must bind variables directly")
+    old_variables = a.get("variables")
+    old_tests = a.get("tests")
+    old_states = a.get("states")
+    require(isinstance(old_variables, dict) and len(old_variables) == 2
+            and isinstance(old_tests, dict) and len(old_tests) == 4
+            and isinstance(old_states, dict) and len(old_states) == 2,
+            "wrong 0.3 four-way Variable/Test/State graph")
+
+    from audit_v04_original_oval_variable_test import BASE, tag
+
+    tree = ET.fromstring(original)
+    variables_node = tree.find(tag(BASE, "variables"))
+    definition = tree.find(tag(BASE, "definitions"))
+    require(variables_node is not None and definition is not None
+            and len(definition) == 1, "unexpected source Variable/Definition scope")
+    criteria = definition[0].find(tag(BASE, "criteria"))
+    require(criteria is not None and len(criteria) == 4,
+            "source criteria not four distinct OVAL Tests")
+    source_variables = [v.get("id") for v in variables_node]
+    source_test_ids = [entry.get("test_ref") for entry in criteria]
+    variable_bindings = provenance.get("source_variable_bindings", {})
+    test_bindings = provenance.get("source_test_bindings", {})
+    require(set(variable_bindings) == set(source_variables)
+            and set(test_bindings) == set(source_test_ids),
+            "0.3 lowering omitted/added source identities")
+    require(set(variable_bindings.values()) == set(old_variables)
+            and set(test_bindings.values()) == set(old_tests),
+            "0.3 source identities do not cover the lowered graph")
+    require(a.get("evaluate") == {"all": [
+        {"test": test_bindings[tid]} for tid in source_test_ids]},
+        "OVAL conjunction/order not preserved in 0.3 graph")
+
+    names = {variable_bindings[ident]: name
+             for ident, name in zip(source_variables, VARIABLE_NAMES)}
+    projected_variables = {}
+    for old_id, name in names.items():
+        variable = old_variables[old_id]
+        exact_keys(variable, {"kind", "datatype", "title", "expression"},
+                   "0.3 constant Variable")
+        require(variable["kind"] == "constant" and variable["datatype"] == "string"
+                and isinstance(variable["title"], str), "unproven Variable type")
+        expression = variable["expression"]
+        exact_keys(expression, {"literal"}, "0.3 constant Variable expression")
+        require(isinstance(expression["literal"], list)
+                and len(expression["literal"]) == 4
+                and all(isinstance(x, str) for x in expression["literal"]),
+                "unproven Variable literal values")
+        projected_variables[name] = dict(variable)
+
+    used_states = set()
+    projected_tests = {}
+    for criterion, new_test_id in zip(criteria, VARIABLE_TEST_NAMES):
+        old_test_id = test_bindings[criterion.get("test_ref")]
+        old_test = old_tests[old_test_id]
+        exact_keys(old_test, {"test_title", "capability", "states", "reported_elements",
+                              "existence", "match", "variable"}, "0.3 variable Test")
+        require(old_test["capability"] == "variable.value"
+                and old_test["reported_elements"] == "all"
+                and old_test["existence"] == "one_or_more"
+                and old_test["match"] == "one_or_more"
+                and old_test["variable"] in names
+                and isinstance(old_test["states"], list)
+                and len(old_test["states"]) == 1,
+                "unproved variable Test binding or source quantifier")
+        state_id = old_test["states"][0]
+        require(state_id in old_states, "Test references missing 0.3 State")
+        used_states.add(state_id)
+        state = old_states[state_id]
+        exact_keys(state, {"state_title", "capability", "state"}, "0.3 variable State")
+        exact_keys(state["state"], {"field", "value", "operation", "datatype",
+                                    "match", "value_match", "existence"},
+                   "0.3 variable State predicate")
+        comparison = state["state"]
+        exact_keys(comparison["value"], {"variable"}, "0.3 State Variable reference")
+        require(state["capability"] == "variable.value"
+                and comparison["field"] == "value"
+                and comparison["operation"] == "equals"
+                and comparison["datatype"] == "string"
+                and comparison["match"] == "all"
+                and comparison["value_match"] == "one_or_more"
+                and comparison["existence"] == "one_or_more"
+                and comparison["value"]["variable"] in names,
+                "unproven source State operation or var_check")
+        # The requirement aliases have already been independently proved
+        # OVAL-roundtrip-equivalent for THIS exact source quantifier tuple.
+        projected_tests[new_test_id] = {
+            "test_title": criterion.get("comment") or old_test["test_title"],
+            "capability": old_test["capability"],
+            "variable": names[old_test["variable"]],
+            "states": [{"value": {
+                "equals": {"variable": names[comparison["value"]["variable"]]},
+                "datatype": comparison["datatype"],
+                "value_match": comparison["value_match"],
+                "require": "at_least_one_exists_and_some_match",
+            }}],
+            "reported_elements": old_test["reported_elements"],
+            "require": "at_least_one_exists_and_some_match",
+        }
+        compile_test_instruction(new_test_id, projected_tests[new_test_id])
+    require(used_states == set(old_states), "unused or missing 0.3 source State")
+    return {"assessment": {
+        "id": a["id"], "version": a["version"],
+        "assessment_title": a["assessment_title"], "mode": "automated",
+        "class": a["class"], "purpose": a["purpose"],
+        "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
+        "variables": projected_variables,
+        "tests": projected_tests,
+        "evaluate": {"and": [{"test": name} for name in VARIABLE_TEST_NAMES]},
+    }}
+
+
 def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     """Use existing semantic IR + v003 lowering, then fail-closed v04 projection."""
     source_path = Path(source_path)
     original = source_path.read_bytes()
     mappings = Path(__file__).resolve().parents[1] / "schema/v0.3.0/capability-mappings/supported"
     require((mappings / "independent.shellcommand.json").is_file()
+            and (mappings / "variable.value.json").is_file()
             and (mappings / "windows.registry.json").is_file(),
             "complete 0.3 capability mapping files required (no unmapped fallback)")
     ir = parse_oval_semantic_ir(source_path)
@@ -189,9 +318,16 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     definitions = [d for d in ir["definitions"] if d["id"] == definition_id]
     require(len(definitions) == 1 and definitions[0]["deprecated"] not in ("true", "1"),
             "missing or deprecated OVAL Definition")
-    # The independent importer remains a temporary two-leaf *scope oracle*;
-    # it does not supply native output. Extend this boundary only with new proof.
-    independent = independent_leaf_import(original, definition_id, assessment_id=assessment_id)
+    variable_source = definition_id == "oval:org.mitre.oval.test:def:538"
+    if variable_source:
+        # A separately source-audited and source-roundtrip-proved 0.4 adapter.
+        independent, independent_proof = independent_variable_import(original)
+        require(independent_proof["original_definition_id"] == definition_id,
+                "pinned Variable source identity mismatch")
+        if assessment_id:
+            independent["assessment"]["id"] = assessment_id
+    else:
+        independent = independent_leaf_import(original, definition_id, assessment_id=assessment_id)
     ident = independent["assessment"]["id"]
     provenance = {}
     lower, err = lower_definition(ET.fromstring(original), definition_id,
@@ -199,21 +335,34 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     require(err is None, "0.3 source lowering failed: " + str(err))
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
-    native = project_v003_to_v04(aligned)
+    native = (project_v003_variable_to_v04(aligned, provenance, original)
+              if variable_source else project_v003_to_v04(aligned))
     # The independent original-OVAL importer predates the final flat Object
     # syntax. Normalize it using the *same invertible* approved 0.4 pass;
     # compare executable fields only after both are in canonical 0.4 grammar.
-    independent_flat, flat_proof = flatten_document(independent, flat_catalog())
-    require(restore_document(independent_flat, flat_proof) == independent,
-            "independent OVAL leaf normalization not invertible")
-    compare_independent(native, independent_flat)  # Author identities only ignored.
+    if variable_source:
+        independent_flat = independent
+    else:
+        independent_flat, flat_proof = flatten_document(independent, flat_catalog())
+        require(restore_document(independent_flat, flat_proof) == independent,
+                "independent OVAL leaf normalization not invertible")
+    if variable_source:
+        # The single-Test pilot comparator intentionally rejects multi-Test
+        # input; here compare the entire independent four-way Assessment.
+        require(native == independent_flat,
+                "0.3 Variable/Test/State projection differs from independent 0.4 OVAL import")
+    else:
+        compare_independent(native, independent_flat)  # Author identities only ignored.
     evidence = {
-        "status": "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP",
+        "status": ("V003_SHARED_LOWERING_TO_CANONICAL_V04_VARIABLE_FOUR_WAY_LOCKSTEP"
+                   if variable_source else
+                   "V003_SHARED_LOWERING_TO_CANONICAL_V04_TWO_LEAF_LOCKSTEP"),
         "source_sha256": hashlib.sha256(original).hexdigest(),
         "definition_id": definition_id, "capability": next(iter(native["assessment"]["tests"].values()))["capability"],
         "shared_semantic_ir": ir["ir_version"], "v003_source_lowering_reused": True,
-        "v004_flat_and_requirement_inverse_checked": True,
-        "independent_leaf_import_agreement": True,
+        "v004_flat_and_requirement_inverse_checked": not variable_source,
+        "independent_leaf_import_agreement": not variable_source,
+        "independent_variable_import_agreement": variable_source,
         "full_oval_coverage": False, "scanner_parity": False,
     }
     return native, evidence

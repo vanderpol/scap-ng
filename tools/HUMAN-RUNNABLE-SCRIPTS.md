@@ -50,16 +50,18 @@ consolidation; its existence does not make 0.3 the current output target.
 
 These are the preferred entry points for routine conversion, normalization, validation, packaging, and review work.
 
-## Convert a verified original OVAL leaf to current 0.4.0 authoring
+## Convert a verified original OVAL source case to current 0.4.0 authoring
 
 **Script:** `tools/scap_converter_core.py`
 
 This is the new single-tree converter entry point: it reuses mature 0.3 OVAL
 semantic lowering and mappings, then applies checked native 0.4 promotion and
-compares its result with the independent source importer. The first version
-supports only two proven direct leaf patterns (PowerShell `shellcommand`
+compares its result with independently developed original-OVAL imports. It
+supports two proven direct leaf patterns (PowerShell `shellcommand`
 with a direct include Filter, and Windows `registry` string equality with
-the original `only one` Test check). All other inputs error explicitly; use
+the original `only one` Test check), plus the pinned four-Test/two-Variable
+`independent.variable_test` Definition `oval:org.mitre.oval.test:def:538`.
+This is **not** general Variable or OVAL coverage. All other inputs error; use
 the established 0.3 full-review converter below for broader source research.
 
 ```powershell

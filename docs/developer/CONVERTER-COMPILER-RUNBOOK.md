@@ -30,6 +30,9 @@ python tools/scap_converter_core.py \
 
 python tools/test_scap_converter_core.py -v
 python tools/test_oval_semantic_core_preservation.py -v
+# With the pinned source available (see below):
+SCAP_NG_VARIABLE_SOURCE_XML=/path/to/ind-def_variable_test.xml \
+  python tools/test_scap_converter_core_variable.py -v
 ```
 
 The current implementation calls the established semantic IR parser and
@@ -48,10 +51,25 @@ an error, never an implied conversion fallback.
 **Supported in this checkpoint:** one direct
 `independent.shellcommand` PowerShell presence Test with a single `include`
 Filter, or one direct `windows.registry` value-equality Test with its
-original `only one` item quantifier. These are the two existing pilot fixtures,
-not an expansion of the language-coverage denominator. All other shapes
-must error, including Sets, Variable references, nested criteria, unsupported
-Filters and unmatched Test/State semantics. The legacy broad 0.3 importer
+original `only one` item quantifier; **also** one pinned
+`independent.variable_test` four-way source Definition
+`oval:org.mitre.oval.test:def:538`. It contains four distinct AND-ed Test
+bindings across two constant string Variables and preserves State `var_check`
+separately from Test item quantifiers. The shared core uses the mature 0.3
+graph as its executable source, checks it against the independently audited
+native 0.4 implementation and regenerates OVAL for semantic comparison.
+
+For the Variable regression, retrieve only the immutable
+[`e3538595` Self-Assertion source](https://github.com/OVAL-Community/SCAP-Self-Assertion/commit/e3538595c5083b9c34d937a81d319234df9bbfaa)
+at `SCAP_1.4/OVAL_Test_Content/agnostic/ind-def_variable_test.xml`;
+the regression checks its SHA256. The source is fetched by the maintained
+GitHub Actions test, not copied into the repository.
+
+These three source-bound cases are **not** a general language-coverage claim;
+the Variable case already had independent 0.4 coverage prior to integration.
+All other shapes must error, including genuine Sets, arbitrary Variable
+references/function chains, arbitrary nested criteria, unsupported Filters
+and unmatched Test/State semantics. The legacy broad 0.3 importer
 remains available to avoid destroying existing source support while verified
 0.4 adapters are added.
 

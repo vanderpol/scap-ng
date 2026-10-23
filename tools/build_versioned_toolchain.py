@@ -41,6 +41,7 @@ CURRENT_REQUIRED = (
     "docs/releases/TOOLCHAIN-RELEASES.md",
     "tools/scap_converter_core.py",
     "tools/test_scap_converter_core.py",
+    "tools/test_scap_converter_core_variable.py",
     "tools/v04_native_bundle_compiler.py",
 )
 
