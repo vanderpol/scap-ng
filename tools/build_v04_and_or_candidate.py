@@ -56,7 +56,7 @@ def _writestr(zipout,name,raw):
     zipout.writestr(info,raw)
 
 
-def build(source_json,source_yaml,output_dir):
+def build(source_json,source_yaml,output_dir, *, original_03=None):
     jdocs=_archive_raw(source_json,"json")
     ydocs=_archive_raw(source_yaml,"yaml")
     src_j={name.removesuffix(".json"):value for name,value in jdocs.items()}
@@ -100,7 +100,7 @@ def build(source_json,source_yaml,output_dir):
     # This compiler checks the entire generated authoring graph, not only
     # the sites modified in the narrow logical scope modernization.
     ir_bytes,report=compile_pair(Path(targets["json"]),Path(targets["yaml"]),
-                                 validate_schema=True, legacy_review=True)
+                                 validate_schema=True, legacy_review=True, legacy_original_03=original_03)
     return {
         "status":"REVIEW_CANDIDATE_AND_OR_ONLY_SOURCE_INVERSE_PROVEN",
         "source_json_sha256":sha(source_json.read_bytes()),
@@ -130,8 +130,10 @@ def main():
     p.add_argument("--canonical-json-zip",type=Path,required=True)
     p.add_argument("--canonical-yaml-zip",type=Path,required=True)
     p.add_argument("--output-dir",type=Path,required=True)
+    p.add_argument("--original-03",type=Path,required=True,
+                   help="Pinned original source for the 11 proven Applicability omissions")
     a=p.parse_args()
-    report=build(a.canonical_json_zip,a.canonical_yaml_zip,a.output_dir)
+    report=build(a.canonical_json_zip,a.canonical_yaml_zip,a.output_dir,original_03=a.original_03)
     dest=a.output_dir/"and-or-candidate-manifest.json"
     dest.write_text(json.dumps(report,indent=2,sort_keys=True)+"\n")
     print(json.dumps({k:v for k,v in report.items()

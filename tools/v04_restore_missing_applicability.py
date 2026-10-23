@@ -94,26 +94,7 @@ def _restore_from_03(original):
     return scoped
 
 
-def restore_archive_pair(historical_json, historical_yaml, original_03,
-                         out_json, out_yaml, *, check_pins=True):
-    sources = {"historical_json": Path(historical_json),
-               "historical_yaml": Path(historical_yaml),
-               "original_03": Path(original_03)}
-    digests = {name: sha256(path.read_bytes()).hexdigest()
-               for name, path in sources.items()}
-    if check_pins and digests != PINS:
-        raise ValueError("original immutable source digest mismatch: " + repr(digests))
-
-    jdocs = read_authoring_archive(historical_json, "json")
-    ydocs = read_authoring_archive(historical_yaml, "yaml")
-    if {_logical(p): doc for p, doc in jdocs.items()} != {
-        _logical(p): doc for p, doc in ydocs.items()
-    }:
-        raise ValueError("pinned historical YAML/JSON sources differ before restoration")
-    missing = _missing(jdocs)
-    if missing != _missing({_logical(p) + ".json": doc for p, doc in ydocs.items()}):
-        raise ValueError("historical missing-reference inventory differs by format")
-
+def _restore_nodes(original_03, missing):
     restored = {}
     provenance = {}
     with zipfile.ZipFile(original_03) as archive:
@@ -140,6 +121,56 @@ def restore_archive_pair(historical_json, historical_yaml, original_03,
     if set(restored) != missing:
         raise ValueError("pinned 0.3 source does not close historical omissions: "
                          + repr(sorted(missing - set(restored))))
+
+    return restored, provenance
+
+
+def restore_legacy_view_documents(documents, original_03):
+    """Close ONLY the known 22 missing links in a historical compilation view.
+
+    Existing preview documents are never replaced. Reuse the original
+    source restoration and inverse checks; arbitrary graph defects fail.
+    """
+    source = Path(original_03)
+    if sha256(source.read_bytes()).hexdigest() != PINS['original_03']:
+        raise ValueError('original immutable 0.3 source digest mismatch')
+    missing = _missing(documents)
+    restored, provenance = _restore_nodes(source, missing)
+    additions = {path.removesuffix('.yaml') + '.json': doc
+                 for path, doc in restored.values()}
+    if set(additions) & set(documents):
+        raise ValueError('restoration overwrote original preview source')
+    complete = {**documents, **additions}
+    _, problems = scan(complete)
+    if problems:
+        raise ValueError('restored preview graph still has unresolved references')
+    return complete, {'source_sha256': PINS['original_03'],
+                      'source_documents': len(documents),
+                      'restored_dependency_documents': len(additions),
+                      'provenance': provenance}
+
+
+def restore_archive_pair(historical_json, historical_yaml, original_03,
+                         out_json, out_yaml, *, check_pins=True):
+    sources = {"historical_json": Path(historical_json),
+               "historical_yaml": Path(historical_yaml),
+               "original_03": Path(original_03)}
+    digests = {name: sha256(path.read_bytes()).hexdigest()
+               for name, path in sources.items()}
+    if check_pins and digests != PINS:
+        raise ValueError("original immutable source digest mismatch: " + repr(digests))
+
+    jdocs = read_authoring_archive(historical_json, "json")
+    ydocs = read_authoring_archive(historical_yaml, "yaml")
+    if {_logical(p): doc for p, doc in jdocs.items()} != {
+        _logical(p): doc for p, doc in ydocs.items()
+    }:
+        raise ValueError("pinned historical YAML/JSON sources differ before restoration")
+    missing = _missing(jdocs)
+    if missing != _missing({_logical(p) + ".json": doc for p, doc in ydocs.items()}):
+        raise ValueError("historical missing-reference inventory differs by format")
+
+    restored, provenance = _restore_nodes(original_03, missing)
 
     added_json = {path.removesuffix(".yaml") + ".json": {"assessment": data["assessment"]}
                   for path, data in restored.values()}

@@ -30,13 +30,15 @@ from build_v04_canonical_six_stigs import promote, recover
 LOGICAL=frozenset(("and","or","one","xor","all","any","odd"))
 
 
-def native_schema_projection(documents):
+def native_schema_projection(documents, *, objects_flat=False):
     """Versioned projection used ONLY for validation of legacy review inputs.
 
     Pinned review ZIPs predate flat Objects and canonical field conditions.
     Reuse canonical Test generation and Object flattening, verifying their
     exact source inverses. Never relax active schemas or mutate the input
     archives and their independent State/field/evaluate migration ledgers.
+    Callers with a separately verified flat-Object inverse must select
+    objects_flat explicitly: native cmdlet.select is not a legacy wrapper.
     """
     catalog=load_catalog(Path(__file__).resolve().parents[1] /
                          "schema/v0.4.0/capability-mappings/supported")
@@ -44,10 +46,13 @@ def native_schema_projection(documents):
     for path,doc in documents.items():
         canonical,_=promote(doc,legacy_review=True)
         recover(canonical,doc,legacy_review=True)
-        current,proof=flatten_document(canonical,catalog)
-        if restore_document(current,proof)!=canonical:
-            raise ValueError("Legacy Object source inverse failed: "+path)
-        projected[path]=current
+        if objects_flat:
+            projected[path]=canonical
+        else:
+            current,proof=flatten_document(canonical,catalog)
+            if restore_document(current,proof)!=canonical:
+                raise ValueError("Legacy Object source inverse failed: "+path)
+            projected[path]=current
     return projected
 
 

@@ -12,7 +12,9 @@ proposals are not listed as delivered features.
   projecting legacy structured conditions and Object wrappers through the
   canonical generator. The pinned Apache `stdout_line` condition and named
   shell Object examples now validate under the active schema; original
-  archives and source-inverse ledgers remain unchanged. Validators stay strict.
+  archives and source-inverse ledgers remain unchanged. Known missing shared
+  Applicability dependencies are restored only in the compilation view from
+  the immutable 0.3 source. Validators and graph closure stay strict.
   [#248](https://github.com/vanderpol/scap-ng/issues/248)
   [#239](https://github.com/vanderpol/scap-ng/issues/239)
 

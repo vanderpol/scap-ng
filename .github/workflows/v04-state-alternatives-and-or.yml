@@ -8,6 +8,7 @@ on:
       - 'tools/v04_field_requirement.py'
       - 'tools/build_v04_canonical_six_stigs.py'
       - 'tools/v04_canonical_source_ir.py'
+      - 'tools/v04_restore_missing_applicability.py'
       - 'tools/validate_v04_fields_condition_preview.py'
       - 'tools/migrate_v04_states_match_to_logic.py'
       - 'tools/test_migrate_v04_states_match_to_logic.py'
@@ -41,6 +42,15 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/test_migrate_v04_states_match_to_logic.py -v
+      - name: Obtain pinned source for the known shared Applicability omissions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/dependencies
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern 'scap-ng-0.3-six-stig-authoring.zip' --dir work/dependencies
+          echo '9b8d6e3528d52a7babc9d3fd0bdcad03664edfa9a754c65d49df5765f2b7473f  work/dependencies/scap-ng-0.3-six-stig-authoring.zip' | sha256sum -c -
       - name: Retrieve canonical 0.4.0 source-verified six-STIG artifact only
         env:
           GH_TOKEN: ${{ github.token }}
@@ -119,6 +129,7 @@ jobs:
           python tools/build_v04_and_or_candidate.py \
             --canonical-json-zip work/source/scap-ng-0.4.0-six-stigs.json.zip \
             --canonical-yaml-zip work/source/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --original-03 work/dependencies/scap-ng-0.3-six-stig-authoring.zip \
             --output-dir work/normalized
           python - <<'PY'
           import json
@@ -130,7 +141,8 @@ jobs:
           assert rep['source_reconstruction']=='PASS'
           assert rep['yaml_json_byte_parity']=='PASS'
           assert rep['native_source_schema']=='PASS'
-          assert rep['documents']==4001
+          assert rep['documents']==4012
+          assert rep['legacy_dependency_restoration']['restored_dependency_documents']==11
           print('PASS: full canonical six-STIG 0.4 authored graph and both source formats')
           PY
       - name: Inventory real fields mapping candidates without changing the native grammar

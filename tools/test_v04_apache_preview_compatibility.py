@@ -20,6 +20,7 @@ from rename_v04_field_requirement_preview import migrate_document, restore_test 
 from test_v04_public_cli_smoke import schema_valid_docs, authoring_archives
 from v04_canonical_source_ir import _schema_validators, validate_docs, compile_pair, decode_and_verify
 from v04_field_requirement import promote_test, restore_test
+from v04_restore_missing_applicability import restore_legacy_view_documents
 from v04_flat_object_authoring import flatten_document, restore_document, load_catalog
 from validate_v04_fields_condition_preview import native_schema_projection
 
@@ -77,7 +78,7 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
             self.assertEqual(restore_document(flat, objects), renamed)
             for stage in (source, state_view, fields_view, renamed, flat):
                 with self.subTest(path=path, stage=stage['assessment']['id']):
-                    validate_docs(native_schema_projection({path: stage}), self.validators)
+                    validate_docs(native_schema_projection({path: stage}, objects_flat=stage is flat), self.validators)
 
     def test_stdout_line_uses_fields_without_changing_pattern_or_cardinality(self):
         source = self.applicability()
@@ -148,13 +149,41 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
 
     def test_projection_is_idempotent_and_does_not_weaken_schema(self):
         current = native_schema_projection(self.sources)
-        self.assertEqual(native_schema_projection(current), current)
+        self.assertEqual(native_schema_projection(current, objects_flat=True), current)
         broken = deepcopy(current)
         doc = next(v for k,v in broken.items() if '/applicability/' in k)
         condition = doc['assessment']['tests'][GATHER]['require']['all_items_must'][0]
         condition.update(condition.pop('fields'))
         with self.assertRaisesRegex(ValueError, 'schema failure'):
             validate_docs(broken, self.validators)
+
+    def test_flat_cmdlet_select_is_a_native_parameter_not_a_legacy_wrapper(self):
+        docs = schema_valid_docs()
+        test = docs['authoring/demo/assessments/a1.json']['assessment']['tests']['file-mode-test']
+        test.update(capability='windows.cmdlet', object={
+            'module_name': 'TrustedPlatformModule', 'module_id': None, 'module_version': None,
+            'verb': 'Get', 'noun': 'Tpm', 'parameters': None,
+            'select': {'fields': {'property': {'selection_match': 'all',
+                                             'equals': 'tpmpresent,tpmready,tpmenabled'}}}},
+                    require={'items': 'one_or_more'})
+        with self.assertRaisesRegex(ValueError, 'ambiguous'):
+            native_schema_projection(docs)
+        projected = native_schema_projection(docs, objects_flat=True)
+        validate_docs(projected, self.validators)
+        self.assertEqual(projected, docs)
+        invalid = deepcopy(docs)
+        invalid['authoring/demo/assessments/a1.json']['assessment']['mode'] = 'not-a-mode'
+        with self.assertRaisesRegex(ValueError, 'schema failure'):
+            validate_docs(native_schema_projection(invalid, objects_flat=True), self.validators)
+
+    def test_dependency_restoration_requires_immutable_source_and_explicit_view(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fake = Path(tmp) / 'changed-original-source.zip'
+            fake.write_bytes(b'not the pinned immutable source')
+            with self.assertRaisesRegex(ValueError, 'digest mismatch'):
+                restore_legacy_view_documents(self.sources, fake)
+            with self.assertRaisesRegex(ValueError, 'explicit legacy review'):
+                compile_pair(fake, fake, legacy_original_03=fake)
 
     def test_ambiguous_or_unscoped_legacy_requirements_fail_closed(self):
         base = self.applicability()['assessment']['tests'][GATHER]

@@ -252,7 +252,9 @@ def validate_docs(documents, validators):
                              f"{list(first.absolute_path)}: {first.message[:280]}")
 
 
-def compile_pair(json_archive, yaml_archive, *, validate_schema=True, legacy_review=False):
+def compile_pair(json_archive, yaml_archive, *, validate_schema=True, legacy_review=False, legacy_original_03=None):
+    if legacy_original_03 is not None and not legacy_review:
+        raise ValueError("original 0.3 dependencies require an explicit legacy review view")
     json_docs = read_authoring_archive(json_archive, "json")
     yaml_docs = read_authoring_archive(yaml_archive, "yaml")
     if legacy_review:
@@ -263,6 +265,14 @@ def compile_pair(json_archive, yaml_archive, *, validate_schema=True, legacy_rev
         if ({_logical_source(path): doc for path, doc in json_docs.items()} !=
                 {_logical_source(path): doc for path, doc in yaml_docs.items()}):
             raise ValueError("legacy review JSON/YAML source mismatch")
+        closure = None
+        if legacy_original_03 is not None:
+            from v04_restore_missing_applicability import restore_legacy_view_documents
+            original_paths = set(json_docs)
+            json_docs, closure = restore_legacy_view_documents(json_docs, legacy_original_03)
+            yaml_docs = {**yaml_docs, **{
+                path.removesuffix('.json') + '.yaml': doc for path, doc in json_docs.items()
+                if path not in original_paths}}
         json_docs = native_schema_projection(json_docs)
         yaml_docs = native_schema_projection(yaml_docs)
     if validate_schema:
@@ -302,7 +312,9 @@ def compile_pair(json_archive, yaml_archive, *, validate_schema=True, legacy_rev
         "yaml_json_byte_parity": "PASS",
         "native_source_schema": "PASS" if validate_schema else "NOT_TESTED_FIXTURE",
         **({"schema_validation_view": "CANONICAL_PROJECTION_OF_LEGACY_REVIEW_INPUT",
-            "legacy_source_inverse": "PASS"} if legacy_review else {}),
+            "legacy_source_inverse": "PASS",
+            **({"legacy_dependency_restoration": closure} if closure else {})}
+           if legacy_review else {}),
         "native_executable_compiler_complete": False,
         "signed_bundle": False,
         "scanner_parity": False,

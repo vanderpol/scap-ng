@@ -8,6 +8,7 @@ on:
       - 'tools/v04_field_requirement.py'
       - 'tools/build_v04_canonical_six_stigs.py'
       - 'tools/v04_canonical_source_ir.py'
+      - 'tools/v04_restore_missing_applicability.py'
       - 'tools/validate_v04_fields_condition_preview.py'
       - 'tools/migrate_v04_evaluate_and_or.py'
       - 'tools/test_migrate_v04_evaluate_and_or.py'
@@ -41,6 +42,15 @@ jobs:
           python tools/test_audit_v04_evaluate_six_state.py -v
           python tools/test_v04_evaluate_operator_schema.py -v
           python -m unittest test_v04_review_reference_graph -v
+      - name: Obtain pinned source for the known shared Applicability omissions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p work/dependencies
+          gh release download v0.3.0-six-stig-typed-operators-5796d016b12f \
+            --pattern 'scap-ng-0.3-six-stig-authoring.zip' --dir work/dependencies
+          echo '9b8d6e3528d52a7babc9d3fd0bdcad03664edfa9a754c65d49df5765f2b7473f  work/dependencies/scap-ng-0.3-six-stig-authoring.zip' | sha256sum -c -
       - name: Retrieve prior source-verified 123-State AND/OR candidate
         env:
           GH_TOKEN: ${{ github.token }}
@@ -67,6 +77,7 @@ jobs:
           python tools/build_v04_complete_boolean_preview.py \
             --first-pass-json work/source/scap-ng-0.4.0-six-stigs.and-or.json.zip \
             --first-pass-yaml work/source/scap-ng-0.4.0-six-stigs.and-or.yaml.zip \
+            --original-03 work/dependencies/scap-ng-0.3-six-stig-authoring.zip \
             --out-dir work/preview
       - name: Independently compare old/new evaluation outcomes across six OVAL statuses
         env:
@@ -96,8 +107,9 @@ jobs:
           assert p['maintained_compiler_candidate_ir']['source_reconstruction']=='PASS'
           assert p['maintained_compiler_candidate_ir']['yaml_json_byte_parity']=='PASS'
           assert p['maintained_compiler_candidate_ir']['native_source_schema']=='PASS'
-          assert p['maintained_compiler_candidate_ir']['tests']==1375
-          assert p['maintained_compiler_candidate_ir']['documents']==4001
+          assert p['maintained_compiler_candidate_ir']['tests']==1390
+          assert p['maintained_compiler_candidate_ir']['documents']==4012
+          assert p['maintained_compiler_candidate_ir']['legacy_dependency_restoration']['restored_dependency_documents']==11
           audit=json.loads(Path('work/preview/original-vs-renamed-evaluate-six-state.json').read_text())
           assert audit['status']=='SIX_STATE_EVALUATE_OPERATOR_PARITY_PASS_SCANNER_OPEN'
           assert audit['documents']==4001

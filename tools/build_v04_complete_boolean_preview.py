@@ -110,7 +110,7 @@ def validate_candidate_evaluate(a):
     return count
 
 
-def build(source_json,source_yaml,destination):
+def build(source_json,source_yaml,destination, *, original_03=None):
     destination.mkdir(parents=True,exist_ok=True)
     originals={}
     results={}
@@ -177,21 +177,21 @@ def build(source_json,source_yaml,destination):
     # Run the maintained v0.4 source graph compiler against the source
     # authoring we can EXACTLY reconstruct, not the as-yet-unaccepted
     # new-wire-grammar. Both old input source formats passed active schema.
-    _,rep=compile_pair(source_json,source_yaml,validate_schema=True,legacy_review=True)
+    _,rep=compile_pair(source_json,source_yaml,validate_schema=True,legacy_review=True,legacy_original_03=original_03)
     if (rep.get("source_reconstruction")!="PASS" or
         rep.get("yaml_json_byte_parity")!="PASS" or
-        rep.get("documents")!=4001):
+        rep.get("documents")!=4012):
         raise ValueError("Exact-inverse source failed maintained typed IR compiler")
     # The versioned 0.4.0 schema now accepts AND/OR/XOR alongside
     # deprecated all/any/odd spellings. Require the maintained full
     # source-IR compiler to consume the NEW candidate archives directly,
     # not only a reconstructed copy of the pre-migration files.
-    _,candidate_ir=compile_pair(generated["json"],generated["yaml"],validate_schema=True,legacy_review=True)
+    _,candidate_ir=compile_pair(generated["json"],generated["yaml"],validate_schema=True,legacy_review=True,legacy_original_03=original_03)
     if (candidate_ir.get("source_reconstruction")!="PASS" or
         candidate_ir.get("yaml_json_byte_parity")!="PASS" or
         candidate_ir.get("native_source_schema")!="PASS" or
-        candidate_ir.get("documents")!=4001 or
-        candidate_ir.get("tests")!=1375 or
+        candidate_ir.get("documents")!=4012 or
+        candidate_ir.get("tests")!=1390 or
         candidate_ir.get("rule_choice_links")!=rep.get("rule_choice_links")):
         raise ValueError("Direct new-grammar candidate failed current typed-source compiler")
     status={
@@ -232,8 +232,10 @@ def main():
     p.add_argument("--first-pass-json",type=Path,required=True)
     p.add_argument("--first-pass-yaml",type=Path,required=True)
     p.add_argument("--out-dir",type=Path,required=True)
+    p.add_argument("--original-03",type=Path,required=True,
+                   help="Pinned original source for the 11 proven Applicability omissions")
     a=p.parse_args()
-    build(a.first_pass_json,a.first_pass_yaml,a.out_dir)
+    build(a.first_pass_json,a.first_pass_yaml,a.out_dir,original_03=a.original_03)
 
 
 if __name__=="__main__":
