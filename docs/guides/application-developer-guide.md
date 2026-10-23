@@ -34,6 +34,8 @@ Manual Assessments use a different execution model: the processor presents the a
 
 For Organizational Input, resolve and validate publisher-declared organization-specific values before Assessment execution. Each Input Set is explicitly bound to an Assessment Request; the processor does not choose one from target attributes or file names. Conflicting values are errors under the [current input contract](../../specification/policy/parameters-and-organizational-input.md).
 
+SCAP-NG content is untrusted input. Validate structure, references, integrity and semantics before executing it; Organizational Input must remain policy data and cannot inject commands or collector choices. Results may contain sensitive host and policy information. The final trust/signature and confidentiality profiles remain open. See [Security Considerations](../../specification/security/security-considerations.md).
+
 ## 4. What a validation claim means
 
 Report validation evidence at the layer actually tested:
