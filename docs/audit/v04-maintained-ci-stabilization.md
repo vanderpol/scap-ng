@@ -181,3 +181,45 @@ passed. Hosted CI and implementation commit SHAs are recorded below after push.
 Related issues: [#251](https://github.com/vanderpol/scap-ng/issues/251),
 [#248](https://github.com/vanderpol/scap-ng/issues/248). No scanner-runtime
 conformance or equivalence claim is made.
+
+## Hosted follow-up and standalone generator validation
+
+Implementation commit: `a285719aa6123105418499bea2c8478b1db0fdc6`.
+
+Hosted generation caught a new test dependency boundary: importing the production
+Test validator pulled in historical modules requiring PyYAML, while the standalone
+capability-generation job deliberately installs only jsonschema. Reproduced in a
+fresh venv with only jsonschema 4.25.1: `ModuleNotFoundError: No module named 'yaml'`.
+The follow-up loads the normative schema and resource Registry directly, retaining
+all comparisons and avoiding converter/research imports. No dependency was added
+to hide the problem.
+
+The standalone CLI census also retained the obsolete fixed-result minimal-Test
+assertion. It now requires the approved structured Test requirement uniformly
+and rejects every deprecated Test property across all supported mappings.
+Validation in that same minimal environment:
+
+```bash
+PYTHONPATH=tools python tools/test_generate_capability_schema_v04.py -v
+PYTHONPATH=tools python tools/test_generate_capability_schema_v04_corpus.py \
+  --output /tmp/generator-census.json
+```
+
+**14 generator tests pass; 100/100 supported capabilities generate, zero failures,
+694 field predicates, 140 selectors, four capabilities with records.** This is a
+schema-generation census, not a STIG conversion or scanner test. The complete
+maintained runner was repeated after this follow-up: unchanged final 3,037 /
+2 failures / 127 errors / 26 skips, with zero newly failing IDs.
+
+The first implementation's hosted canonical fast checks, current-design checks,
+and standard Markdown audit passed. Rebaseline remains red, as independently
+reproduced and explicitly retained above. Old source-proof/research workflows
+also remain failing; their legacy outputs are not claimed as current-schema
+acceptance. A separate optional `audit_markdown_links.py --strict-current` run
+found three unchanged old Board-discussion links to a removed specification
+heading; the standard hosted documentation audit passes. Published Board records
+and normative pages were not edited to conceal these unrelated stale links.
+
+Issue-write attempt: `gh issue comment 251 --repo vanderpol/scap-ng ...` returned
+`Post "https://api.github.com/graphql": Forbidden`. No repeated attempts. This
+committed report and inventory are the fallback shared handoff.

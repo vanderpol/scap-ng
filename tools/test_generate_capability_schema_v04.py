@@ -118,8 +118,15 @@ class CapabilityV04Tests(unittest.TestCase):
             name: leaf for field in fields for name, leaf in field.items()}))
 
     def test_fixed_result_generated_contract_matches_approved_test_and_resolves_metadata(self):
-        from v04_field_requirement import test_validator
         schema = materialize('independent.unknown')
+        # The generator is deliberately standalone (stdlib + jsonschema).
+        # Resolve the normative Test directly, without importing converter or
+        # historical research modules and their unrelated YAML dependencies.
+        language = SCHEMAS['assessment-language.schema.json']
+        registry = Registry().with_resources(
+            (uri, Resource.from_contents(doc)) for uri, doc in STORE.items())
+        approved = Draft202012Validator(
+            {'$ref': language['$id'] + '#/$defs/test'}, registry=registry)
         valid = {'test_title': 'Unknown result', 'capability': 'independent.unknown',
                  'reported_elements': 'all', 'require': {'items_found': 'one_or_more'}}
         candidates = [valid]
@@ -132,7 +139,7 @@ class CapabilityV04Tests(unittest.TestCase):
         for candidate in candidates:
             with self.subTest(candidate=candidate):
                 self.assertEqual(not validate(schema, 'test', candidate),
-                                 test_validator().is_valid(candidate))
+                                 approved.is_valid(candidate))
         # Absolute version-local references must resolve even though generated
         # schema IDs live below generated/capabilities/, not the version root.
         self.assertEqual(schema['$defs']['test']['properties']['reported_elements']['$ref'],

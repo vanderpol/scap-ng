@@ -57,17 +57,12 @@ def audit_all():
                 ):
                     raise ValueError(f"External/unknown versioned schema URL: {ref}")
             defs=schema["$defs"]
-            # OVAL independent.unknown has a fixed scanner outcome and no
-            # collected Items/State, so canonical 0.4 authoring correctly
-            # permits only test_title + capability. All other capabilities
-            # still require the explicit Test result/existence contract.
+            # Execution outcome metadata does not exempt any capability from
+            # the approved uniform structured Test.require authoring contract.
             required=set(defs["test"]["required"])
-            if mapping["capability"] == "independent.unknown":
-                if not {"test_title", "capability"} <= required or "require" in required:
-                    raise ValueError("Fixed-result unknown Test must be minimal")
-            elif "require" not in required:
+            if "require" not in required:
                 raise ValueError("No required native Test requirement")
-            for legacy in ("existence","match"):
+            for legacy in ("existence","match","states","states_match","state_fields_require"):
                 if legacy in defs["test"]["required"] or legacy in defs["test"]["properties"]:
                     raise ValueError(f"Legacy Test cardinality still accepted: {legacy}")
             if "state" in defs:
