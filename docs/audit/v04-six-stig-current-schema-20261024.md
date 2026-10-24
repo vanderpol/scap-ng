@@ -32,7 +32,11 @@ Refs #232, #233, #251. Base `main`: `6514d7195faab384ed0f198592f6f241388171c4`.
   content bundles, with equal native bytes from JSON and YAML inputs. The
   compiler reports 3,573 programs and 5,365 Test references across the six
   benchmark packages; `scanner_evaluated: false` and
-  `signature_verified: false` for each. Bundle SHA-256 values:
+  `signature_verified: false` for each. Its package verifier checks manifest,
+  exact content/program member inventory, hashes, source graph and Rule
+  references. An entirely separate second full compilation produced all six
+  bundles **byte-for-byte identical** to the first, and the JSON verification
+  reports matched SHA-256. Bundle SHA-256 values (both runs):
 
   | Benchmark | Native bundle SHA-256 |
   | --- | --- |
@@ -71,8 +75,8 @@ The migration report retains original and normalized requirements, original
 OVAL attributes/text, hashes and the owner decision separately from content.
 **The published original XML is not edited.**
 
-Remaining: deterministic rebuild, independent manifest/reference closure review,
-source/feature coverage ledger and fresh original-SCAP import validation.
+Remaining: independent package-consumer acceptance, source/feature coverage
+ledger and fresh original-SCAP import validation.
 Absent/present/empty/incomplete/error/unknown scanner outcomes require later
 independent execution; do not claim runtime equivalence from these tests.
 
