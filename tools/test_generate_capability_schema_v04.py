@@ -58,8 +58,8 @@ def test_object(capability,select,**extra):
 class CapabilityV04Tests(unittest.TestCase):
     def test_published_bluetooth_flat_object_inherits_capability_and_item_requirement(self):
         # The published 0.4 six-STIG Assessment uses canonical Test-scoped
-        # capability and `{items: one_or_more}`. Every generated native
-        # capability contract must accept this same approved authoring grammar.
+        # capability and canonical Item counts. Every generated native
+        # contract must accept the current projection of this source example.
         schema = materialize("independent.shellcommand")
         valid = {
             "test_title": "Report true if bluetooth installed",
@@ -71,11 +71,11 @@ class CapabilityV04Tests(unittest.TestCase):
                 "error_if_stderr_exists": False,
                 "filters": [{"include": {"stdout_line": {
                     "case_insensitive_equals": "Bluetooth",
-                    "require": "at_least_one_exists_and_all_match",
+                    "values_found": "one_or_more", "values_matching": "every",
                 }}}],
             },
             "reported_elements": "all",
-            "require": {"items": "one_or_more"},
+            "require": {"items_found": "one_or_more"},
         }
         self.assertFalse(validate(schema, "test", valid))
         explicit = deepcopy(valid)
@@ -95,24 +95,48 @@ class CapabilityV04Tests(unittest.TestCase):
                 self.assertTrue(validate(schema, "test", invalid),
                                 "A malformed direct-Filter source Test must fail closed")
 
-    def test_generated_states_use_canonical_and_or_xor_with_legacy_aliases(self):
+    def test_generated_conditions_use_only_canonical_operators(self):
         # OVAL lockoutpolicy_state has four distinct fields whose conditions
         # are combined. The capability-specific schema must not reject the
         # canonical operators already allowed by the 0.4 language schema.
         schema = materialize("windows.lockoutpolicy")
         fields = [{name: {
             "greater_than_or_equal": -1 if name == "force_logoff" else 0,
-            "datatype": "integer", "require": "at_least_one_exists_and_all_match",
+            "datatype": "integer", "values_found": "one_or_more", "values_matching": "every",
         }} for name in ("force_logoff", "lockout_duration",
                         "lockout_observation_window", "lockout_threshold")]
-        for operator in ("and", "or", "one", "xor", "all", "any", "odd"):
+        for operator in ("and", "or", "one", "xor"):
             with self.subTest(operator=operator):
                 self.assertFalse(validate(schema, "state_expression",
                                           {operator: fields}))
+        for alias in ('all', 'any', 'odd'):
+            with self.subTest(rejected_alias=alias):
+                self.assertTrue(validate(schema, 'state_expression', {alias: fields}))
         # This version requires an explicit operator for a group, rather
         # than silently defaulting the matching semantics of four fields.
         self.assertTrue(validate(schema, "state_expression", {
             name: leaf for field in fields for name, leaf in field.items()}))
+
+    def test_fixed_result_generated_contract_matches_approved_test_and_resolves_metadata(self):
+        from v04_field_requirement import test_validator
+        schema = materialize('independent.unknown')
+        valid = {'test_title': 'Unknown result', 'capability': 'independent.unknown',
+                 'reported_elements': 'all', 'require': {'items_found': 'one_or_more'}}
+        candidates = [valid]
+        for field, value in (('reported_elements', 'invented'),
+                             ('require', 'at_least_one_exists'), ('states', [])):
+            candidates.append({**deepcopy(valid), field: value})
+        missing = deepcopy(valid)
+        missing.pop('require')
+        candidates.append(missing)
+        for candidate in candidates:
+            with self.subTest(candidate=candidate):
+                self.assertEqual(not validate(schema, 'test', candidate),
+                                 test_validator().is_valid(candidate))
+        # Absolute version-local references must resolve even though generated
+        # schema IDs live below generated/capabilities/, not the version root.
+        self.assertEqual(schema['$defs']['test']['properties']['reported_elements']['$ref'],
+                         'https://scap-ng.dev/schema/v0.4.0/reported-elements.schema.json')
 
     def test_generator_cli_reports_real_flat_object_field_counts(self):
         # After eliminating generic select/collect, CLI metadata must count
@@ -159,7 +183,7 @@ class CapabilityV04Tests(unittest.TestCase):
         selector = {"mount_point": {"equals": "/home", "datatype": "string"}}
         include = {"include": {
             "mount_point": {"equals": "/home",
-                            "require": "at_least_one_exists_and_all_match"}}}
+                            "values_found": "one_or_more", "values_matching": "every"}}}
         leaf = test_object("linux.partition", selector, filters=[include])
         self.assertFalse(validate(schema, "object", leaf),
                          "A filtered leaf Object must validate without a Set")
@@ -214,13 +238,13 @@ class CapabilityV04Tests(unittest.TestCase):
         schema=materialize("linux.partition")
         valid={"mount_options":{
             "equals":"nosuid",
-            "require":"at_least_one_exists_and_some_match",
+            "values_found":"one_or_more", "values_matching":"one_or_more",
             "datatype":"string",
         }}
         self.assertFalse(validate(schema,"state_predicate",valid))
         for candidate in (
             {"not_a_real_field":{
-                "equals":"nosuid","require":"at_least_one_exists_and_some_match"}},
+                "equals":"nosuid","values_found":"one_or_more", "values_matching":"one_or_more"}},
             {"mount_options":{"value":"nosuid","operation":"equals",
                               "existence":"one_or_more","match":"all"}},
             {"mount_options":{"equals":"nosuid"}},
@@ -243,10 +267,9 @@ class CapabilityV04Tests(unittest.TestCase):
             "test_title":"policy State check",
             "reported_elements":"all",
             "capability":"windows.passwordpolicy",
-            "states":[{field_name:{
-                "equals":14,"require":"at_least_one_exists_and_all_match"
-            }}],
-            "require":"at_least_one_exists_and_all_match",
+            "require":{"items_found":"one_or_more", "items_satisfying":"every",
+                       "fields":{field_name:{"equals":14,
+                           "values_found":"one_or_more", "values_matching":"every"}}},
         }
         self.assertFalse(validate(schema,"test",valid))
         bad=deepcopy(valid)
@@ -260,7 +283,7 @@ class CapabilityV04Tests(unittest.TestCase):
             "object_title":"Directories",
             "directory":{
                 "equals":["/lib","/lib64"],
-                "datatype":"string","value_match":"one"
+                "datatype":"string","value_match":"exactly_one"
             },
             "name":None,
             "filesystem":"all",
@@ -284,10 +307,10 @@ class CapabilityV04Tests(unittest.TestCase):
         schema = materialize("linux.partition")
         selected = {"mount_point": {
             "equals": {"variable": "home-mount-variable"},
-            "datatype": "string", "value_match": "one"}}
+            "datatype": "string", "value_match": "exactly_one"}}
         filter_entry = {"include": {"mount_point": {
             "equals": "/home",
-            "require": "at_least_one_exists_and_all_match"}}}
+            "values_found": "one_or_more", "values_matching": "every"}}}
         leaf = test_object("linux.partition", selected)
         composed = {
             "capability": "linux.partition",
@@ -313,7 +336,7 @@ class CapabilityV04Tests(unittest.TestCase):
     def test_registry_literal_value_field_keeps_its_name(self):
         schema=materialize("windows.registry")
         state={"value":{"equals":"4",
-                        "require":"at_least_one_exists_and_all_match",
+                        "values_found":"one_or_more", "values_matching":"every",
                         "datatype":"string"}}
         self.assertFalse(validate(schema,"state_predicate",state))
         self.assertTrue(validate(schema,"state_predicate",{
@@ -329,10 +352,9 @@ class CapabilityV04Tests(unittest.TestCase):
             "object":test_object("linux.partition",{
                 "mount_point":{"equals":"/home"}
             }),
-            "states":[{"mount_options":{
-                "equals":"nosuid","require":"at_least_one_exists_and_some_match"
-            }}],
-            "require":"at_least_one_exists_and_all_match",
+            "require":{"items_found":"one_or_more", "items_satisfying":"every",
+                       "fields":{"mount_options":{"equals":"nosuid",
+                           "values_found":"one_or_more", "values_matching":"one_or_more"}}},
         }
         self.assertFalse(validate(schema,"test",valid))
         missing=deepcopy(valid)
@@ -341,6 +363,10 @@ class CapabilityV04Tests(unittest.TestCase):
         legacy=deepcopy(valid)
         legacy["existence"]="one_or_more"
         self.assertTrue(validate(schema,"test",legacy))
+        for alias in ('states', 'states_match', 'state_fields_require'):
+            legacy = deepcopy(valid)
+            legacy[alias] = [] if alias == 'states' else 'all'
+            self.assertTrue(validate(schema, 'test', legacy), alias)
         legacy_object=deepcopy(valid)
         legacy_object["object"]["mount_point"]={
             "value":"/home","operation":"equals"
@@ -357,16 +383,16 @@ class CapabilityV04Tests(unittest.TestCase):
         )))
         self.assertFalse(validate(schema,"object",selected({
             "equals":["SE_NETWORK_LOGON_NAME","SE_DENY_NETWORK_LOGON_NAME"],
-            "datatype":"string","value_match":"one",
+            "datatype":"string","value_match":"exactly_one",
         })))
         self.assertFalse(validate(schema,"object",selected({
             "equals":{"variable":"enumerated-rights-variable"},
-            "datatype":"string","value_match":"one",
+            "datatype":"string","value_match":"exactly_one",
         })))
         for bad in (
             {"equals":"FICTIONAL_RIGHT"},
             {"equals":["SE_NETWORK_LOGON_NAME","FICTIONAL_RIGHT"],
-             "datatype":"string","value_match":"one"},
+             "datatype":"string","value_match":"exactly_one"},
             {"matches_regex":"SE_.*"},
             {"not_equal":"SE_NETWORK_LOGON_NAME"},
             {"variable":"enumerated-rights-variable"},

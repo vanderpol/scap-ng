@@ -29,8 +29,26 @@ ROOT_ID = f"https://scap-ng.dev/schema/v{VERSION}/"
 LANG = ROOT_ID + "assessment-language.schema.json"
 COMMON = ROOT_ID + "capability-common.schema.json"
 # Use the same explicit 0.4 Boolean spellings as assessment-language.schema:
-# AND/OR and odd parity XOR; retain the parseable older aliases for migration.
-LOGIC = ("and", "or", "one", "xor", "all", "any", "odd")
+# Source aliases belong to the upgrader, not generated current contracts.
+LOGIC = ("and", "or", "one", "xor")
+
+
+def _qualify_refs(schema):
+    """Keep generated-local recursion and normative document scopes distinct."""
+    from urllib.parse import urljoin
+    def visit(node):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key == '$ref':
+                    node[key] = (schema['$id'] + value if value.startswith('#')
+                                 else urljoin(ROOT_ID, value))
+                else:
+                    visit(value)
+        elif isinstance(node, list):
+            for value in node:
+                visit(value)
+    visit(schema)
+    return schema
 
 
 def _field_expression(name: str, child: dict) -> dict:
@@ -118,15 +136,14 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         old_test = defs["test"]
         old_test["required"] = sorted(
             set(old_test["required"]) - {
-                "existence", "match", "require", "reported_elements"
+                "existence", "match", "reported_elements"
             }
         )
-        # OVAL independent.unknown has a fixed outcome regardless of the
-        # original check/check_existence boilerplate. Accept old explicit
-        # fields for published-source compatibility, but do not require
-        # meaningless authoring controls on a native fixed-result Test.
+        # Fixed execution outcome does not exempt authored input from the
+        # approved uniform Test.require contract.
+        old_test['required'] = sorted(set(old_test['required']) | {'require'})
         old_test["properties"]["require"] = {
-            "$ref": LANG + "#/$defs/presence_requirement"
+            "$ref": LANG + "#/$defs/test/properties/require"
         }
         old_test["properties"]["reported_elements"] = {
             "$ref": ROOT_ID + "reported-elements.schema.json"
@@ -137,7 +154,10 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         # predicate. Drop 0.3's legacy named State wrapper and do not provide
         # a second authoring spelling through unused schema definitions.
         defs.pop("state",None)
-        return result
+        for name in ('states', 'state', 'states_match'):
+            old_test['properties'].pop(name, None)
+        old_test.setdefault('allOf', []).append({'$ref': LANG + '#/$defs/test'})
+        return _qualify_refs(result)
 
     native_selector_fields = _selector_fields(mapping,repo_root)
     select = defs.get("object",{}).get("properties",{}).get("select")
@@ -298,15 +318,13 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     test["required"] = sorted(required)
     test["properties"].pop("existence",None)
     test["properties"].pop("match",None)
-    # Reuse the complete canonical Test requirement grammar, including
-    # `{items: one_or_more}` and structured all-Items conditions. The older
-    # string-only adapter was narrower than the published Assessment schema.
+    # Reuse the approved structured Item/field requirement grammar, without a
+    # generated-only spelling or legacy scalar requirement exception.
     test["properties"]["require"] = {
         "$ref": LANG + "#/$defs/test/properties/require"
     }
-    test["properties"]["states"] = {
-        "type":"array", "items":{"$ref":"#/$defs/state_expression"}
-    }
+    for name in ('states', 'state', 'states_match', 'state_fields_require'):
+        test['properties'].pop(name, None)
     if "object" in test["properties"]:
         test["properties"]["object"] = {
             "oneOf":[
@@ -327,17 +345,7 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     # Resolver scope changes when traversing external 0.4 language schemas.
     # Use fully qualified references for generated native recursion, so local
     # State expressions cannot accidentally resolve against an external schema.
-    def qualify_local_refs(node):
-        if isinstance(node, dict):
-            for key, val in node.items():
-                if key == "$ref" and isinstance(val, str) and val.startswith("#/$defs/"):
-                    node[key] = result["$id"] + val
-                else:
-                    qualify_local_refs(val)
-        elif isinstance(node,list):
-            for entry in node:qualify_local_refs(entry)
-    qualify_local_refs(result)
-    return result
+    return _qualify_refs(result)
 
 
 def main():

@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-"""Fixed-result independent.unknown must not demand meaningless Item controls.
+"""Fixed-result execution does not exempt current authoring from Test.require.
 
-The original OVAL 5.12.3 unknown_test always returns unknown regardless of
-check/check_existence. Published 0.4 authoring that explicitly supplies these
-legacy controls remains accepted, while minimal new authoring needs only the
-capability and a Test title. All other Test capabilities retain explicit
-reported_elements and require obligations. Refs #248 #229 #232.
+The approved schema requires structured require for every Test. Historical
+minimal/scalar-require fixtures are negative inputs, not a second dialect.
+No scanner execution or outcome semantics are changed. Refs #251 #248.
 """
 from __future__ import annotations
 
@@ -46,16 +44,21 @@ class FixedUnknownSchema(unittest.TestCase):
         validate_docs({"authoring/source-unknown.assessment.json": assessment(test)},
                       self.validators)
 
-    def test_minimal_fixed_result_has_no_item_obligations(self):
+    def test_minimal_fixed_result_still_requires_structured_require(self):
         test = {"test_title": "Always unknown", "capability": "independent.unknown"}
-        self.check_doc(test)
-        self.assertEqual(validate(self.capability, "test", test), [])
+        with self.assertRaisesRegex(ValueError, 'required property'):
+            self.check_doc(test)
+        self.assertTrue(validate(self.capability, "test", test))
 
-    def test_existing_published_explicit_form_remains_valid(self):
+    def test_canonical_explicit_form_valid_and_historical_scalar_rejected(self):
         test = {"test_title": "Always unknown", "capability": "independent.unknown",
-                "reported_elements": "all", "require": "at_least_one_exists"}
+                "reported_elements": "all", "require": {"items_found": "one_or_more"}}
         self.check_doc(test)
         self.assertEqual(validate(self.capability, "test", test), [])
+        test['require'] = 'at_least_one_exists'
+        with self.assertRaisesRegex(ValueError, 'schema failure'):
+            self.check_doc(test)
+        self.assertTrue(validate(self.capability, 'test', test))
 
     def test_other_capabilities_still_require_explicit_fields(self):
         test = {"test_title": "Must inspect system family", "capability": "independent.family"}
@@ -65,7 +68,8 @@ class FixedUnknownSchema(unittest.TestCase):
         self.assertTrue(validate(family, "test", test))
 
     def test_unknown_rejects_invented_runtime_result_and_object(self):
-        test = {"test_title": "Always unknown", "capability": "independent.unknown"}
+        test = {"test_title": "Always unknown", "capability": "independent.unknown",
+                "require": {"items_found": "one_or_more"}}
         for bad_field, value in (("result", "pass"), ("object", {"shell": "bash"}),
                                  ("states", [{"value": {"equals": 1}}])):
             bad = deepcopy(test)

@@ -8,6 +8,17 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- Repaired maintained capability-generator and Apache preview regression
+  fixtures for the approved structured requirement/count vocabulary. Generated
+  contracts now resolve version-local references correctly and enforce the
+  uniform Test requirement for fixed-result capabilities. Explicit preview
+  validation flattens historical Object wrappers before strict promotion,
+  checking both inverses. Historical research and the source-backed Gatekeeper
+  absence boundary remain visible in the full gate; no schema or scanner
+  semantics changed.
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - The direct registry converter now preserves multiple literal scalar OVAL
   States as structured Test `require.and/or`, retaining each State's complete
   field condition and the original Test/field operators. Original-source

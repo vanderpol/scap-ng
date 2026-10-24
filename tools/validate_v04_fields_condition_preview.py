@@ -44,15 +44,18 @@ def native_schema_projection(documents, *, objects_flat=False):
                          "schema/v0.4.0/capability-mappings/supported")
     projected={}
     for path,doc in documents.items():
-        canonical,_=promote(doc,legacy_review=True)
-        recover(canonical,doc,legacy_review=True)
         if objects_flat:
-            projected[path]=canonical
+            flat = doc
         else:
-            current,proof=flatten_document(canonical,catalog)
-            if restore_document(current,proof)!=canonical:
+            # Promotion validates Test Objects against the approved grammar.
+            # Remove historical wrappers in this explicit review-only bridge
+            # before that validation, with an independent acquisition inverse.
+            flat,proof=flatten_document(doc,catalog)
+            if restore_document(flat,proof)!=doc:
                 raise ValueError("Legacy Object source inverse failed: "+path)
-            projected[path]=current
+        canonical,_=promote(flat,legacy_review=True)
+        recover(canonical,flat,legacy_review=True)
+        projected[path]=canonical
     return projected
 
 

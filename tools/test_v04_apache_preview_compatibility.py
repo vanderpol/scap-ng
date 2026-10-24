@@ -55,11 +55,11 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
         validate_docs(projected, self.validators)
         self.assertEqual(self.sources, before)
         for path, source in self.sources.items():
-            canonical, _ = promote(source, legacy_review=True)
-            recover(canonical, source, legacy_review=True)
-            flat, ledger = flatten_document(canonical, self.catalog)
-            self.assertEqual(flat, projected[path])
-            self.assertEqual(restore_document(flat, ledger), canonical)
+            flat, ledger = flatten_document(source, self.catalog)
+            self.assertEqual(restore_document(flat, ledger), source)
+            canonical, _ = promote(flat, legacy_review=True)
+            recover(canonical, flat, legacy_review=True)
+            self.assertEqual(canonical, projected[path])
 
     def test_each_affected_preview_stage_validates_and_retains_its_exact_inverse(self):
         for path, source in self.sources.items():
@@ -85,13 +85,16 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
         original = source['assessment']['tests'][GATHER]
         with self.assertRaisesRegex(ValueError, 'invalid canonical'):
             promote_test(original)
-        current, proof = promote_test(original, legacy_review=True)
-        self.assertEqual(current['require'], {'items': 'one_or_more', 'all_items_must': [
-            {'fields': {'stdout_line': {'matches_regex': '^/',
-             'field_requirement': 'at_least_one_exists_and_all_match'}}}]})
-        self.assertEqual(restore_test(current, proof), original)
+        flat, ledger = flatten_document(source, self.catalog)
+        self.assertEqual(restore_document(flat, ledger), source)
+        flat_test = flat['assessment']['tests'][GATHER]
+        current, proof = promote_test(flat_test, legacy_review=True)
+        self.assertEqual(current['require'], {'items_found': 'one_or_more',
+            'items_satisfying': 'every', 'fields': {'stdout_line': {
+                'matches_regex': '^/', 'values_found': 'one_or_more', 'values_matching': 'every'}}})
+        self.assertEqual(restore_test(current, proof), flat_test)
         bad = deepcopy(current)
-        bad['require']['all_items_must'][0]['fields']['stdout_line']['matches_regex'] = '^wrong/'
+        bad['require']['fields']['stdout_line']['matches_regex'] = '^wrong/'
         with self.assertRaisesRegex(ValueError, 'changed'):
             restore_test(bad, proof)
 
@@ -152,7 +155,7 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
         self.assertEqual(native_schema_projection(current, objects_flat=True), current)
         broken = deepcopy(current)
         doc = next(v for k,v in broken.items() if '/applicability/' in k)
-        condition = doc['assessment']['tests'][GATHER]['require']['all_items_must'][0]
+        condition = doc['assessment']['tests'][GATHER]['require']
         condition.update(condition.pop('fields'))
         with self.assertRaisesRegex(ValueError, 'schema failure'):
             validate_docs(broken, self.validators)
@@ -163,9 +166,9 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
         test.update(capability='windows.cmdlet', object={
             'module_name': 'TrustedPlatformModule', 'module_id': None, 'module_version': None,
             'verb': 'Get', 'noun': 'Tpm', 'parameters': None,
-            'select': {'fields': {'property': {'selection_match': 'all',
+            'select': {'fields': {'property': {'selection_match': 'every',
                                              'equals': 'tpmpresent,tpmready,tpmenabled'}}}},
-                    require={'items': 'one_or_more'})
+                    require={'items_found': 'one_or_more'})
         with self.assertRaisesRegex(ValueError, 'ambiguous'):
             native_schema_projection(docs)
         projected = native_schema_projection(docs, objects_flat=True)
