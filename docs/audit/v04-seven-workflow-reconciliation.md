@@ -150,3 +150,45 @@ acceptance, production signing/trust, release reproducibility/documentation and
 scanner/collector acceptance. This task does not declare release readiness.
 Issue writes remain unavailable (`Post "https://api.github.com/graphql": Forbidden`);
 this committed report is the authorized handoff.
+
+## Publication, changed files and exact hosted outcomes
+
+Implementation and workflow-definition SHA:
+[`d73068caf6e678c262bda377fe2e143cd358c82f`](https://github.com/vanderpol/scap-ng/commit/d73068caf6e678c262bda377fe2e143cd358c82f),
+pushed normally to `main`. Historical replay **code/schema** remains separately
+pinned to `2de578c088291558f44d0c7a505ad149dea5fc76`; original workflow Git blobs
+and hashes are recorded individually in the routing manifest. These source and
+workflow identities must not be confused with an artifact's native schema version.
+
+Exact-SHA [CI conclusion inventory](v04-seven-workflow-ci.json):
+
+| Workflow | Outcome |
+| --- | --- |
+| [Mandatory rebaseline](https://github.com/vanderpol/scap-ng/actions/runs/40138248860) | Passed |
+| [Shared converter core, including retained original-source assertions](https://github.com/vanderpol/scap-ng/actions/runs/40138248838) | Passed |
+| [Canonical fast, including Boolean/State/enum/Apache guards](https://github.com/vanderpol/scap-ng/actions/runs/40138248858) | Passed |
+| [Current-design contracts](https://github.com/vanderpol/scap-ng/actions/runs/40138248852) | Passed |
+| [Repository preservation](https://github.com/vanderpol/scap-ng/actions/runs/40138248882) | Passed |
+| [Markdown](https://github.com/vanderpol/scap-ng/actions/runs/40138248870) | Passed |
+| [Issue references](https://github.com/vanderpol/scap-ng/actions/runs/40138248928) | Passed |
+| [Separately pinned historical research](https://github.com/vanderpol/scap-ng/actions/runs/40138248845) | Failed, retained visibly outside mandatory production CI |
+
+Queried all seven replay workflow histories for this exact SHA: **zero automatic
+runs**, as required by their manual-only routing. Their previous failures remain
+linked in the classification table; no historical replay is reported green or
+claimed rerun. The unrelated pinned historical-test workflow still executes and
+reports red. Branch-protection administration was not changed or claimed audited.
+
+The implementation changes exactly 15 files: the seven workflow files named in
+the classification table; `.github/workflows/rebaseline-smoke.yml`,
+`.github/workflows/v04-canonical-fast.yml`,
+`.github/workflows/v04-converter-core-bridge.yml`; `docs/repository-policy.json`;
+`tests/ci/legacy-workflows.json`; `tools/test_v04_reconciled_workflow_sources.py`;
+`tools/test_v04_workflow_reconciliation.py`; and this engineering report. The CI
+conclusion JSON is a report-only follow-up. Temporary XSD artifacts were retained
+outside the repository; the working tree was clean after publication.
+
+No new current-production failure or semantic decision remains from this task.
+The historical artifact availability/mutable-URL limitations above are preserved
+reproduction limits, not permission to substitute sources or weaken assertions.
+This bounded completion is not a final-release or scanner-parity declaration.
