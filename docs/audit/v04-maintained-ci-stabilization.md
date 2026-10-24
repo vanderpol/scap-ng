@@ -223,3 +223,48 @@ and normative pages were not edited to conceal these unrelated stale links.
 Issue-write attempt: `gh issue comment 251 --repo vanderpol/scap-ng ...` returned
 `Post "https://api.github.com/graphql": Forbidden`. No repeated attempts. This
 committed report and inventory are the fallback shared handoff.
+
+## Final commit and hosted CI evidence
+
+- Maintained repairs and full occurrence inventory:
+  [`a285719aa6123105418499bea2c8478b1db0fdc6`](https://github.com/vanderpol/scap-ng/commit/a285719aa6123105418499bea2c8478b1db0fdc6).
+- Minimal-dependency regression and census follow-up:
+  [`779a2930bd67fb1e25ab8d5a573b8faa3c01a451`](https://github.com/vanderpol/scap-ng/commit/779a2930bd67fb1e25ab8d5a573b8faa3c01a451).
+
+Exact-commit hosted results for `779a2930bd67fb1e25ab8d5a573b8faa3c01a451`:
+
+| Workflow | Result | Run |
+| --- | --- | --- |
+| Native capability schema generation (including all 100 mappings) | Passed | [40106119413](https://github.com/vanderpol/scap-ng/actions/runs/40106119413) |
+| Current-design regression contracts | Passed | [40106119504](https://github.com/vanderpol/scap-ng/actions/runs/40106119504) |
+| Canonical authoring fast checks | Passed | [40106119499](https://github.com/vanderpol/scap-ng/actions/runs/40106119499) |
+| Markdown navigation and duplication audit | Passed | [40106119480](https://github.com/vanderpol/scap-ng/actions/runs/40106119480) |
+| Commit issue reference | Passed | [40106119427](https://github.com/vanderpol/scap-ng/actions/runs/40106119427) |
+| Rebaseline smoke regression | **Failed** | [40106119490](https://github.com/vanderpol/scap-ng/actions/runs/40106119490) |
+
+The rebaseline gate is not green. Its local final inventory remains two failures,
+127 errors and 26 skips; hosted detailed per-test logs require sign-in and were
+not read through the blocked API. The public run result confirms failure. Old
+source-proof/research workflow failures are not current-schema acceptance claims.
+No manual workflow dispatch or full 65-STIG execution was requested.
+
+The Gatekeeper source-algebra counterexample was independently checked using
+`evaluate_state_entity_existence('none_exist', does_not_exist=1)` → `true` and
+`evaluate_state_entity_existence('none_exist', exists=1)` → `false`. A current
+comparator-free `unlabeled` field with `values_found: none` is rejected for either
+`values_matching: every` or `none`. Neither changing matching cardinality nor
+inventing a comparison value is silently used to force acceptance.
+
+Next actions for Jack:
+
+1. Decide whether historical A/C proposal consumers remain current release
+   requirements or belong to a reviewed, explicitly separate historical gate
+   against a pinned matching toolchain. Until that decision, all run and remain
+   visible in the existing required runner.
+2. Authorize a separate review of comparator-free field-absence representation,
+   or explicitly retain Gatekeeper's source shape as unsupported. No existing
+   positive test is flipped to expected failure without that decision.
+3. Preserve the independent unresolved Test-population `all_exist` decision.
+
+The fallback handoff is this committed report plus the complete JSON inventory;
+GitHub issue-write access still returns `Forbidden`.
