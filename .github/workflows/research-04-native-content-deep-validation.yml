@@ -1,30 +1,30 @@
-name: 0.4 strict six-anchor authoring schema gate
-
+name: Historical manual — 0.4 strict six-anchor authoring schema gate
+# #251: dated replay only; current production checks remain in mandatory CI.
+# Code/schema pin: 2de578c088291558f44d0c7a505ad149dea5fc76
 on:
-  push:
-    branches: [main]
-    paths:
-      - tools/research_04_native_deep_content_census.py
-      - tools/generate_capability_schema_v04.py
-      - tools/migrate_v04_enum_selectors.py
-      - tools/test_migrate_v04_enum_selectors.py
-      - schema/v0.4.0/**
-      - .github/workflows/research-04-native-content-deep-validation.yml
   workflow_dispatch:
-
+    inputs:
+      allow_historical:
+        description: 'Explicitly replay dated research, not current production acceptance'
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
 
 jobs:
   audit:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 2de578c088291558f44d0c7a505ad149dea5fc76
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema
+          python-version: "3.12.14"
+      - run: python -m pip install --disable-pip-version-check PyYAML==6.0.3 jsonschema==4.25.1
       - name: Download verified immutable six-STIG 0.3 source
         env:
           GH_TOKEN: ${{ github.token }}

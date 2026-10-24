@@ -1,37 +1,29 @@
-name: 0.4.0 complete AND-OR-XOR authoring candidate proof
+name: Historical manual — 0.4.0 complete AND-OR-XOR authoring candidate proof
+# #251: dated replay only; current production checks remain in mandatory CI.
+# Code/schema pin: 2de578c088291558f44d0c7a505ad149dea5fc76
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'tools/test_v04_apache_preview_compatibility.py'
-      - 'tests/fixtures/v04-apache-preview/**'
-      - 'tools/v04_field_requirement.py'
-      - 'tools/build_v04_canonical_six_stigs.py'
-      - 'tools/v04_canonical_source_ir.py'
-      - 'tools/v04_restore_missing_applicability.py'
-      - 'tools/validate_v04_fields_condition_preview.py'
-      - 'tools/migrate_v04_evaluate_and_or.py'
-      - 'tools/test_migrate_v04_evaluate_and_or.py'
-      - 'tools/audit_v04_evaluate_six_state.py'
-      - 'tools/test_audit_v04_evaluate_six_state.py'
-      - 'tools/test_v04_evaluate_operator_schema.py'
-      - 'tools/test_v04_review_reference_graph.py'
-      - 'schema/v0.4.0/expression.schema.json'
-      - 'tools/build_v04_complete_boolean_preview.py'
-      - '.github/workflows/v04-complete-boolean-preview.yml'
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly replay dated research, not current production acceptance'
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
 jobs:
   full-boolean-scope-candidate:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 2de578c088291558f44d0c7a505ad149dea5fc76
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
       - run: python -m pip install jsonschema==4.25.1 PyYAML==6.0.3
       - name: Prove Test-result AND/OR conversion does not touch State or Item matching
         env:

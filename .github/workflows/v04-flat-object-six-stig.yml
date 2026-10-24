@@ -1,34 +1,29 @@
-name: SCAP-NG 0.4 six-STIG flat Object preview
+name: Historical manual — SCAP-NG 0.4 six-STIG flat Object preview
+# #251: dated replay only; current production checks remain in mandatory CI.
+# Code/schema pin: 2de578c088291558f44d0c7a505ad149dea5fc76
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'tools/test_v04_apache_preview_compatibility.py'
-      - 'tests/fixtures/v04-apache-preview/**'
-      - 'tools/v04_field_requirement.py'
-      - 'tools/build_v04_canonical_six_stigs.py'
-      - 'tools/v04_canonical_source_ir.py'
-      - 'tools/validate_v04_fields_condition_preview.py'
-      - 'tools/v04_flat_object_authoring.py'
-      - 'tools/test_v04_flat_object_authoring.py'
-      - 'tools/rename_v04_field_requirement_preview.py'
-      - 'tools/flatten_v04_object_schema.py'
-      - 'tools/generate_capability_schema_v04.py'
-      - 'schema/v0.4.0/**'
-      - '.github/workflows/v04-flat-object-six-stig.yml'
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly replay dated research, not current production acceptance'
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
 jobs:
   six-stig-review:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 2de578c088291558f44d0c7a505ad149dea5fc76
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
       - run: python -m pip install jsonschema==4.25.1 PyYAML==6.0.3
       - name: Verify flat Object and hybrid YAML syntax
         env:

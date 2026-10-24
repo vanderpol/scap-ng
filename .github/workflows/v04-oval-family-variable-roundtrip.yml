@@ -1,25 +1,26 @@
-name: 0.4.0 OVAL family constant Variable original XML roundtrip
+name: Historical manual — 0.4.0 OVAL family constant Variable original XML roundtrip
+# #251: dated replay only; current production checks remain in mandatory CI.
+# Code/schema pin: 2de578c088291558f44d0c7a505ad149dea5fc76
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/v04-oval-family-variable-roundtrip.yml'
-      - 'tools/convert_v04_oval_family_constant_variable.py'
-      - 'tools/export_v04_oval_family_constant_variable.py'
-      - 'tools/promote_v04_family_variable_oval_proof.py'
-      - 'schema/v0.4.0/**'
-      - 'tools/generate_capability_schema_v04.py'
   workflow_dispatch:
+    inputs:
+      allow_historical:
+        description: 'Explicitly replay dated research, not current production acceptance'
+        required: true
+        type: boolean
+        default: false
 permissions:
   contents: read
   actions: read
 jobs:
   family-variable-original-oval:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_historical }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: 2de578c088291558f44d0c7a505ad149dea5fc76
           path: scap-ng
       - uses: actions/checkout@v4
         with:
@@ -35,7 +36,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12.14'
       - run: python -m pip install PyYAML==6.0.3 jsonschema==4.25.1 lxml==6.0.2
       - name: Check exact pinned original source
         run: |
