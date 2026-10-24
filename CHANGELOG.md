@@ -8,6 +8,16 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- **2026-10-24:** Added a source-pinned, reversible six-STIG review-archive
+  bridge to the current 0.4 `require` grammar. The owner approved removing
+  the redundant `.*` comparator from the one Oracle Linux 9 SV-271844
+  `stderr_line` absence requirement; original published OVAL bytes, identities,
+  operand and rationale remain in a separate provenance report. All 4,012
+  YAML and JSON documents pass current schemas, with negative source-mutation
+  guards. This is not a fresh original-SCAP import, signed release, or scanner
+  equivalence claim. [#233](https://github.com/vanderpol/scap-ng/issues/233)
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+
 - **2026-10-24:** Integrated the owner-approved Test-level OVAL `all_exist` to
   `items_found: one_or_more` normalization under the versioned actual-Items
   collection contract. Admission is pinned to the proven RHEL 9 audit-syscall
