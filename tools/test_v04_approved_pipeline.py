@@ -167,6 +167,7 @@ class ApprovedPipelineTests(unittest.TestCase):
             (out / 'provenance.json').write_text(json.dumps(evidence, indent=2) + '\n')
 
     def test_real_all_exist_source_requires_owner_population_decision(self):
+        """Retained counterexample identity; the owner decision is now explicit."""
         from build_v04_canonical_six_stigs import upgrade_v003
         path = ROOT / 'research/assessment-simplification/evidence/rhel_9/SV-258179/source-oval.xml'
         self.assertEqual(sha256(path.read_bytes()).hexdigest(),
@@ -179,8 +180,11 @@ class ApprovedPipelineTests(unittest.TestCase):
                                          collection_graph=True, provenance={})
         self.assertIsNone(error)
         aligned, _ = postprocess_automated_assessment(native, target_ng_version='0.3.0')
-        with self.assertRaisesRegex(AssertionError, 'does not match source'):
-            upgrade_v003(aligned)
+        from v04_all_exist_normalization import CONTRACT
+        normalized, proof = upgrade_v003(aligned, collection_contract=CONTRACT)
+        self.assertEqual(len(proof['source_audit']['test_existence_normalizations']), 16)
+        self.assertFalse(proof['source_audit']['unrestricted_original_axes_equivalent'])
+        self.assertEqual(len(normalized['assessment']['tests']), 24)
         from oval_result_truth_tables import evaluate_collected_object_test
         boundary = dict(has_state=False, check='all', exists=1, does_not_exist=1)
         self.assertEqual(evaluate_collected_object_test('complete', existence='all_exist', **boundary), 'false')

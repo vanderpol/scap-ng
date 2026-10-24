@@ -49,6 +49,10 @@ from v04_source_verified_object_presence import (
 )
 from v04_source_verified_multitest_presence import convert as project_direct_multitest
 from v04_source_verified_multitest_states import convert as project_direct_multistate
+from v04_all_exist_normalization import (
+    CONTRACT as ACTUAL_ITEMS_CONTRACT, SOURCE_SHA256 as ALL_EXIST_SOURCE_SHA256,
+    DEFINITION as ALL_EXIST_DEFINITION, source_normalizations,
+)
 from v04_source_verified_constant_variable_matrix import (
     project as project_constant_matrix, project_datatype_suite,
     DATATYPE_REUSE_CASES,
@@ -424,6 +428,10 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     """Use existing semantic IR + v003 lowering, then fail-closed v04 projection."""
     source_path = Path(source_path)
     original = source_path.read_bytes()
+    all_exist_source = definition_id == ALL_EXIST_DEFINITION
+    if all_exist_source:
+        require(hashlib.sha256(original).hexdigest() == ALL_EXIST_SOURCE_SHA256,
+                'pinned all_exist normalization source SHA differs')
     pinned_direct = definition_id in PINNED_DIRECT_SOURCES
     if pinned_direct:
         require(hashlib.sha256(original).hexdigest() == PINNED_DIRECT_SOURCES[definition_id],
@@ -499,6 +507,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
              assessment_id or ({
                  "oval:org.mitre.oval.test:def:354": "environmentvariable58-self-assertion.assessment",
                  "oval:navy.navwar.niwcatlantic.scc.test:def:932": "uname-self-assertion.assessment",
+                 ALL_EXIST_DEFINITION: "audit-extended-attribute-syscalls-assessment",
              }.get(definition_id)) or re.sub(r"[^a-z0-9]+", "-", definition_id.lower()).strip("-")
              + ".assessment")
     provenance = {}
@@ -527,7 +536,7 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
     attest_pinned_graph(aligned, "aligned")
-    if hashlib.sha256(original).hexdigest() in APPROVED_REQUIRE_SOURCES:
+    if hashlib.sha256(original).hexdigest() in APPROVED_REQUIRE_SOURCES or all_exist_source:
         # Original OVAL -> mature lowering must independently reconstruct the
         # original semantic graph before any presentation/grammar projection.
         from scap_ng_roundtrip_v003.native_assessment_to_oval import build
@@ -539,7 +548,10 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
             tree.write(regenerated, encoding='utf-8')
             require(compare(source_path, regenerated, definition_id, regenerated_id,
                             root_only=True)['equal'], 'original OVAL semantic graph differs')
-        native, proof = upgrade_v003(aligned)
+        native, proof = upgrade_v003(aligned, collection_contract=(
+            ACTUAL_ITEMS_CONTRACT if all_exist_source else None))
+        normalizations = (source_normalizations(original, definition_id, provenance, proof)
+                          if all_exist_source else [])
         from v04_canonical_source_ir import validate_docs, _schema_validators
         validate_docs({'authoring/source/a.json': native}, _schema_validators(
             Path(__file__).resolve().parents[1] / 'schema/v0.4.0'))
@@ -549,6 +561,9 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
                         'source_sha256': hashlib.sha256(original).hexdigest(),
                         'definition_id': definition_id, 'source_provenance': provenance,
                         'approved_require_projection': proof,
+                        'test_existence_normalizations': normalizations,
+                        'unrestricted_oval_equivalence': not bool(normalizations),
+                        'source_file': str(source_path),
                         'original_oval_semantic_roundtrip': 'PASS',
                         'v003_source_lowering_reused': True, 'full_oval_coverage': False,
                         'scanner_parity': False}

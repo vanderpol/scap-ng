@@ -106,7 +106,10 @@ def comparison_matrix(axis):
 
 
 def compare_original_to_canonical(original, canonical, *, filter_proof=None,
-                                  additional_proof=None):
+                                  additional_proof=None, collection_contract=None):
+    if collection_contract is not None:
+        from v04_all_exist_normalization import contract_evidence
+        contract_evidence(collection_contract)
     if set(original) != set(canonical):
         raise ValueError("different original/canonical document path sets")
     # The reviewed Benchmark 0.3 -> 0.4 declaration update is the only
@@ -137,6 +140,7 @@ def compare_original_to_canonical(original, canonical, *, filter_proof=None,
     counts = Counter()
     axes = set()
     by_capability = Counter()
+    normalizations = []
     for path, doc in sorted(original.items()):
         if promoted[path] != canonical[path]:
             raise ValueError(f"{path}: canonical content differs from exact source promotion")
@@ -150,7 +154,13 @@ def compare_original_to_canonical(original, canonical, *, filter_proof=None,
             expected = source_axes(src)
             actual = describe(req)
             if actual != expected:
-                raise AssertionError(f"{path}/{tid}: canonical existence/check does not match source")
+                if (collection_contract is not None and expected == ('all_exist', 'all', False)
+                        and actual == ('at_least_one_exists', 'all', False)):
+                    normalizations.append({'path': path, 'test_id': tid,
+                                           'source_axis': list(expected), 'native_axis': list(actual),
+                                           'contract': collection_contract})
+                else:
+                    raise AssertionError(f"{path}/{tid}: canonical existence/check does not match source")
             axes.add(actual)
             counts["converted_all_items" if actual[2] else "converted_presence"] += 1
             by_capability[candidate["capability"]] += 1
@@ -159,7 +169,12 @@ def compare_original_to_canonical(original, canonical, *, filter_proof=None,
     matrix = {"/".join([axis[0], axis[1], str(axis[2])]): comparison_matrix(axis)
               for axis in sorted(axes)}
     return {
-        "status": "SOURCE_AXES_AND_PINNED_OVAL_RESULT_ORACLE_PASS",
+        "status": ("SOURCE_AXES_WITH_APPROVED_TEST_EXISTENCE_NORMALIZATION" if normalizations
+                   else "SOURCE_AXES_AND_PINNED_OVAL_RESULT_ORACLE_PASS"),
+        "test_existence_normalizations": normalizations,
+        "unrestricted_original_axes_equivalent": not bool(normalizations),
+        "generic_scenarios_scope": ("normalized native axes; not unrestricted original all_exist"
+                                    if normalizations else "unchanged source axes"),
         "documents": len(original),
         "test_population": dict(sorted(counts.items())),
         "converted_by_capability": dict(sorted(by_capability.items())),

@@ -245,7 +245,7 @@ def promote_test(original, *, legacy_review=False):
             existence, matching = PAIR_BY_NAME[requirement]
             found = FIELD_EXISTENCE[existence]
             if found == 'every':
-                diagnostic = 'source_all_exist_requires_population_evidence'
+                diagnostic = 'test_all_exist_normalization_requires_actual_items_contract'
                 found = 'one_or_more'  # Approved Test-only crosswalk; source retained below.
             conditions = [complete_condition(state) for state in states]
             operator = test.get('states_match')
@@ -266,7 +266,7 @@ def promote_test(original, *, legacy_review=False):
         elif requirement in PRESENCE and 'states' not in test and 'states_match' not in test:
             test['require'] = {'items_found': PRESENCE[requirement]}
             if requirement == 'all_exist':
-                diagnostic = 'source_all_exist_requires_population_evidence'
+                diagnostic = 'test_all_exist_normalization_requires_actual_items_contract'
             shape = 'presence_only_structured'
         else:
             raise ValueError(f'unrepresentable source Test requirement: {requirement!r}')

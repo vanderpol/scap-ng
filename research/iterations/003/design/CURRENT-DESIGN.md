@@ -59,6 +59,7 @@
 
 ## OVAL/SCAP migration
 
+- **Owner-approved 2026-10-24, 0.4.0 only ([#251](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6388735943)):** Test-level `all_exist` may intentionally normalize to `items_found: one_or_more` under the versioned actual-Items collection contract, without synthetic nonexistent Items and without dropping error/unknown collection evidence. This is not unrestricted OVAL truth-table equivalence. Preserve original Test/Object identities, attributes, versions and hashes, plus normalization scope/reason, in provenance; field/record semantics are unchanged. The shared converter currently admits the source-proven pinned RHEL 9 case only. See the [review and implementation packet](../../../../docs/audit/v04-owner-decisions-integration.md).
 - Faithful conversion does not infer Benchmark Group taxonomy by default.
 - Conversion tools MAY expose explicit opt-in automatic grouping (currently `--auto-map-groups`) for editorial normalization.
 - Automatic grouping SHALL use only high-confidence mappings; uncertain Rules remain ungrouped rather than being forced into a catch-all Group.

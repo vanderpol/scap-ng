@@ -8,6 +8,17 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- **2026-10-24:** Integrated the owner-approved Test-level OVAL `all_exist` to
+  `items_found: one_or_more` normalization under the versioned actual-Items
+  collection contract. Admission is pinned to the proven RHEL 9 audit-syscall
+  source; original source attributes/identities/hashes and explicit reason/scope
+  remain in provenance. Mixed nonexistent-Item OVAL counterexamples remain
+  different; error/incomplete/uncollected evidence is not treated as complete
+  success. Field/record semantics are unchanged. Historical research now runs
+  separately against its exact pinned toolchain with actual red diagnostics;
+  current production/source/schema/compiler regressions remain mandatory.
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+
 - Integrated the reviewed comparator-free field and record absence forms:
   `values_found: none` and `record: {records_found: none}`. Source-verified DNS
   and Gatekeeper absence now survives promotion and compilation without a

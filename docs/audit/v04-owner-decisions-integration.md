@@ -76,3 +76,164 @@ python /path/to/current/tools/run_current_tool_regressions.py \
 Hosted workflows retain these same report artifacts. GitHub branch-protection
 administration was not changed; selecting required check names externally is
 distinct from the repository's authorized test routing.
+
+First implementation commit:
+[`6836bb3bd`](https://github.com/vanderpol/scap-ng/commit/6836bb3bd).
+Terminal hosted results for that SHA:
+
+| Workflow | Result |
+| --- | --- |
+| [Mandatory rebaseline](https://github.com/vanderpol/scap-ng/actions/runs/40133051561) | Passed |
+| [Pinned historical research](https://github.com/vanderpol/scap-ng/actions/runs/40133051545) | Failed, retained separately with actual diagnostics |
+| [Repository preservation](https://github.com/vanderpol/scap-ng/actions/runs/40133051559) | Passed |
+| [Markdown](https://github.com/vanderpol/scap-ng/actions/runs/40133051791) | Passed |
+| [Issue references](https://github.com/vanderpol/scap-ng/actions/runs/40133051553) | Passed |
+
+## Test-level all_exist normalization: reviewed semantic packet
+
+**Dated owner decision: 2026-10-24**, linked above. The intended change is an
+explicit semantic normalization under a narrower evidence model, not a schema
+change or an unrestricted OVAL 5.12.3 equivalence proof. The review packet below
+records the source-backed example, boundary evidence and rejected alternatives.
+Implementation version: `scap-ng-0.4.0/actual-items-test-all-exist/1`.
+
+Original pinned production source:
+`research/assessment-simplification/evidence/rhel_9/SV-258179/source-oval.xml`,
+SHA-256 `463b539c469c3302aa52c23fdca35814f40fd5fd7de31346964e1b4a97b5d8a9`.
+Definition `oval:mil.disa.stig.defs:def:230413` extends other source Definitions;
+its mature shared lowering retains 24 Tests and 17 Variables. Its generator
+reports OVAL schema version **5.11**, preserved unchanged in provenance; the
+semantic reference baseline is OVAL 5.12.3. Sixteen original Tests explicitly
+use `all_exist`; eight use/default to `at_least_one_exists`.
+
+Minimal source example (original Test has no State):
+
+```xml
+<textfilecontent54_test id="oval:mil.disa.stig.ind:tst:23041300"
+  version="1" check_existence="all_exist" check="all">
+  <object object_ref="oval:mil.disa.stig.ind:obj:23041300"/>
+</textfilecontent54_test>
+```
+
+The original Object selects `/etc/audit/audit.rules`, the setxattr b32/auid>=1000
+regex and `instance >= 1`. All remain unchanged. The previous source-backed
+upgrade rejected the all_exist/one_or_more source-axis difference. After the
+approved normalization the actual generated Test requirement is:
+
+```yaml
+require: {items_found: one_or_more}
+```
+
+Original OVAL Test/Object IDs, versions, the exact source file hash, serialized
+original Object XML hash, original existence attribute, source schema version,
+native Test ID, dated decision, scope/reason and contract version are recorded
+outside authoring in `test_existence_normalizations`. The original XML remains
+unchanged. The inverse ledger restores each original Test's `all_exist`; the
+other eight retain their distinct original requirements. Original OVAL semantic
+reconstruction is checked **before normalization**, never presented as an
+unrestricted equivalence proof of the normalized result.
+
+### Admission and evidence boundaries
+
+- The shared converter admits the exact pinned file/Definition only, after
+  original semantic-root reconstruction. Changed source bytes, corrupted mature
+  lowering or an unreviewed collection contract fail closed. The ordinary
+  source-axis oracle still rejects silent all_exist normalization without the
+  explicit contract. State-bearing all_exist remains outside this new proof.
+- The upgrader's explicit contract option changes only the source-axis audit for
+  state-free Test existence. Structured source promotion, graph/reference checks,
+  whole-document equality and both source/Object inverses remain enforced.
+  Field/record existence, matching and comparisons are untouched; no new schema
+  key, authored alias, collector implementation or evaluation kernel was added.
+- `collected-item.schema.json` already excludes synthetic `does_not_exist` Items
+  and retains `error`/`not_collected` diagnostics. The admission helper checks this
+  unchanged schema contract. Source existence metadata stays in provenance, not
+  synthetic authored/native Items.
+- The evidence-conformance checker rejects synthetic Items and contradictory
+  complete-success declarations containing error/not-collected Item evidence.
+  It does not discard that evidence or compute Test results. Error/unknown
+  diagnostics must retain collection-level error/unknown status. A real scanner
+  must independently demonstrate this contract; no live collector/runtime proof
+  is claimed by this conversion implementation.
+
+Retained source-reference cases:
+
+| Evidence | Original all_exist | Normalized native presence | Disposition |
+| --- | --- | --- | --- |
+| Complete, zero actual Items | false | false | Required absence outcome |
+| Complete, one or more actual Items | true | true | Subject to separate State/matching requirements; pinned Tests have none |
+| Error collection, including existing Items | error | error | Never silently converted to complete success |
+| Incomplete or not-collected collection | unknown | unknown | Existing Items do not erase incomplete evidence |
+| Complete, one exists + one synthetic does_not_exist OVAL Item | false | true under at_least_one_exists | **Retained counterexample**, intentionally outside native contract; synthetic Item rejected |
+| Complete with material Item error/not-collected diagnostics | Not asserted equivalent | Invalid complete-success evidence for this proof | Reject contradictory evidence, preserve diagnostics |
+
+No generic six-state/scanner parity follows. The generic matrix report explicitly
+labels normalized native axes and reports `unrestricted_original_axes_equivalent:
+false`; it is not relabeled an exact original-axes proof. Existing original OVAL
+truth-table functions and their counterexamples are unchanged.
+
+Rejected alternatives: changing approved grammar, adding legacy aliases,
+inventing nonexistent Items, globally replacing every all_exist token (including
+fields/records), silently discarding error evidence, or falsely asserting full
+OVAL equivalence. None is needed or authorized.
+
+### Source inventory, regressions and scope
+
+The [read-only metadata inventory](v04-source-test-all-exist-inventory.json)
+scanned all **13 checked-in production `source-oval.xml` fixtures**, finding
+**16 all_exist occurrences**, all state-free textfilecontent54 Tests in this
+one pinned file. This is not a full corpus conversion or conformance denominator.
+No other source family is newly admitted. The 16 affected Tests and all eight
+unaffected Tests in that Definition are checked explicitly.
+
+`test_v04_all_exist_normalization` checks source/metadata/inverse preservation,
+the public converter CLI, canonical YAML/JSON equality, typed IR reconstruction,
+full schema validation, the actual compiled 24-Test program and bundle verifier,
+the original mixed-population difference, empty/positive/error/incomplete/unknown
+evidence, result-schema synthetic-Item rejection, source drift and corrupt mature
+lowering. `test_v04_canonical_requirement_oracle` retains its implicit-mapping
+negative and adds explicit-contract/field-axis boundary coverage. The existing
+`test_real_all_exist_source_requires_owner_population_decision` identity now
+tests the approved explicit normalization while keeping its original OVAL
+counterexample; its historical method name is retained for inventory continuity.
+
+Focused results: **20 tests passed** in the first repaired source/pipeline/oracle
+run, then **16 passed** after adding public CLI and full result-schema evidence
+checks (eight normalization plus eight oracle tests). No skip or expected failure
+was added. Final full mandatory and hosted results follow after publication.
+
+Reproduce with the same Python/dependencies and fixture bindings as above:
+
+```bash
+python -m unittest -v test_v04_all_exist_normalization \
+  test_v04_approved_pipeline test_v04_canonical_requirement_oracle
+python tools/scap_converter_core.py \
+  --source-xml research/assessment-simplification/evidence/rhel_9/SV-258179/source-oval.xml \
+  --definition-id oval:mil.disa.stig.defs:def:230413 \
+  --output /tmp/audit-syscalls.json --evidence /tmp/audit-syscalls-provenance.json
+python tools/run_current_tool_regressions.py --report /tmp/current-normalized.json
+```
+
+The native compiler already preserves these requirement operands; its code and
+schema JSON are unchanged. The shared converter-core CI now explicitly runs the
+new source-backed suite in addition to the mandatory full current partition.
+
+Final local mandatory run after both changes: **2,898 tests, zero failures,
+zero errors, one pre-existing optional research-corpus skip**, in 127.312 seconds.
+All 3,070 baseline discovered identities remain accounted for; nine new methods
+(eight normalization, one oracle boundary) default into mandatory CI. The exact
+selection report records no missing baseline IDs. No historical test sources,
+assertions or original OVAL XML were changed. Schema JSON and native compiler
+code are unchanged. Layout-preservation and whitespace checks passed; standard
+Markdown audit has no new broken references (three old Board-heading links remain).
+
+Remaining release gates are independent source/capability coverage, whole-package
+acceptance at its separately authorized checkpoint, production publisher trust
+and signing policy, clean-extract toolchain reproducibility, normative-document
+reconciliation and scanner/collector acceptance. The two decisions implemented
+here no longer block this bounded work. No six-STIG or 65-benchmark conversion,
+release publication, editor change or scanner-parity claim was made.
+
+Issue-write access was previously denied with
+`Post "https://api.github.com/graphql": Forbidden`; the committed engineering
+report remains the authorized handoff without repeated permission attempts.

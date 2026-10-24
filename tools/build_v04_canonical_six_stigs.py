@@ -119,7 +119,7 @@ def recover(candidate,original, *, legacy_review=False):
         raise ValueError("Canonical authoring source reconstruction mismatch")
 
 
-def upgrade_v003(aligned):
+def upgrade_v003(aligned, *, collection_contract=None):
     """Reuse the maintained semantic graph and existing reversible 0.4 passes.
 
     This adapter does no OVAL parsing. Literal data is never renamed with IDs.
@@ -174,7 +174,8 @@ def upgrade_v003(aligned):
         raise ValueError('0.4 Object projection inverse failed')
     from v04_canonical_requirement_oracle import compare_original_to_canonical
     audit = compare_original_to_canonical({'authoring/source/a.json': source},
-                                          {'authoring/source/a.json': flat})
+                                          {'authoring/source/a.json': flat},
+                                          collection_contract=collection_contract)
     return flat, {'test_proofs': proofs, 'identity_projection': renames,
                   'inert_source_check_notes': notes, 'source_audit': audit}
 

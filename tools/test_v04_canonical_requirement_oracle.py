@@ -98,6 +98,21 @@ class SourceRequirementOracleTests(unittest.TestCase):
         with self.assertRaisesRegex(AssertionError, 'does not match source'):
             compare_original_to_canonical(source, newer)
 
+    def test_explicit_contract_normalization_is_distinct_from_field_and_state_axes(self):
+        from v04_all_exist_normalization import CONTRACT
+        source, newer = self._docs({'capability': 'unix.file', 'require': 'all_exist'})
+        report = compare_original_to_canonical(source, newer, collection_contract=CONTRACT)
+        self.assertFalse(report['unrestricted_original_axes_equivalent'])
+        self.assertEqual(len(report['test_existence_normalizations']), 1)
+        # State-bearing / field every is not authorized by the state-free pin.
+        source, newer = self._docs({'capability': 'unix.file',
+            'require': 'all_exist_and_all_match', 'states': [
+                {'mode': {'equals': '0600', 'require': 'all_exist_and_all_match'}}]})
+        self.assertEqual(newer['authoring/demo/a.json']['assessment']['tests']['test']
+                         ['require']['fields']['mode']['values_found'], 'every')
+        with self.assertRaisesRegex(AssertionError, 'does not match source'):
+            compare_original_to_canonical(source, newer, collection_contract=CONTRACT)
+
 
 if __name__ == "__main__":
     unittest.main()
