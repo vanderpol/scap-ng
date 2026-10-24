@@ -11,16 +11,20 @@ from prove_v04_oval_macos_gatekeeper_source import (
 )
 from test_generate_capability_schema_v04 import materialize, validate
 from v04_canonical_source_ir import _schema_validators, validate_docs
+from build_v04_canonical_six_stigs import promote, recover
 
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path(os.environ.get(
     "OVAL_GATEKEEPER_SOURCE",
-    str(ROOT.parent / "SCAP-Self-Assertion/SCAP_1.4/OVAL_Test_Content/macos/macos-def_gatekeeper_test.xml")))
+    str(ROOT / "tests/fixtures/v04-absence-only/macos-def_gatekeeper_test.xml")))
 
 
 def sample():
-    return source_to_native(SOURCE.read_bytes())
+    original = source_to_native(SOURCE.read_bytes())
+    canonical, _ = promote(original)
+    recover(canonical, original)
+    return canonical
 
 
 class MacosNoneExistSource(unittest.TestCase):
@@ -46,19 +50,19 @@ class MacosNoneExistSource(unittest.TestCase):
 
     def test_absence_only_field_cannot_require_matches(self):
         doc = sample()
-        doc["assessment"]["tests"][NAME]["states"][0]["and"][1][
-            "unlabeled"]["require"] = "at_least_one_exists_and_all_match"
+        doc["assessment"]["tests"][NAME]["require"]["and"][1]['fields'][
+            "unlabeled"]["values_matching"] = "every"
         self.assertFalse(self.check(doc))
 
     def test_absence_only_field_cannot_use_inapplicable_datatype(self):
         doc = sample()
-        doc["assessment"]["tests"][NAME]["states"][0]["and"][1][
+        doc["assessment"]["tests"][NAME]["require"]["and"][1]['fields'][
             "unlabeled"]["datatype"] = "string"
         self.assertFalse(self.check(doc))
 
     def test_required_comparator_still_enforced_elsewhere(self):
         doc = sample()
-        doc["assessment"]["tests"][NAME]["states"][0]["and"][0][
+        doc["assessment"]["tests"][NAME]["require"]["and"][0]['fields'][
             "enabled"].pop("equals")
         self.assertFalse(self.check(doc))
 

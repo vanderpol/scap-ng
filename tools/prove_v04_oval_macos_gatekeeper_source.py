@@ -20,6 +20,7 @@ from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from test_generate_capability_schema_v04 import materialize, validate
 from v04_canonical_source_ir import _schema_validators, validate_docs
 from v04_flat_object_authoring import dump_hybrid
+from build_v04_canonical_six_stigs import promote, recover
 from validate_v04_oval_5123 import check
 
 PIN = "e3538595c5083b9c34d937a81d319234df9bbfaa"
@@ -67,7 +68,7 @@ def source_to_native(raw):
             unlabeled.get("check_existence") == "none_exist" and
             unlabeled.text is None and len(unlabeled) == 0,
             "source boolean enabled=true and unlabeled none_exist cardinality")
-    return {"assessment": {
+    source = {"assessment": {
         "id": ASSESSMENT_ID, "version": int(definition.get("version")),
         "assessment_title": one(one(definition, OD, "metadata"), OD, "title").text,
         "mode": "automated", "class": "miscellaneous",
@@ -85,6 +86,9 @@ def source_to_native(raw):
         }},
         "evaluate": {"test": NAME},
     }}
+    native, _ = promote(source)
+    recover(native, source)
+    return native
 
 
 def native_to_oval(doc):
@@ -98,16 +102,14 @@ def native_to_oval(doc):
             a["evaluate"] == {"test": NAME} and set(a["tests"]) == {NAME},
             "canonical macOS Assessment structure")
     t = a["tests"][NAME]
-    require(set(t) == {"test_title", "capability", "states",
+    require(set(t) == {"test_title", "capability",
                        "reported_elements", "require"} and
             t["capability"] == CAPABILITY and
             t["reported_elements"] == "all" and
-            t["require"] == "at_least_one_exists_and_all_match" and
-            t["states"] == [{"and": [
-                {"enabled": {"equals": True,
-                             "require": "at_least_one_exists_and_all_match"}},
-                {"unlabeled": {"require": "none_exist"}},
-            ]}],
+            t["require"] == {'items_found': 'one_or_more', 'items_satisfying': 'every',
+                'and': [{'fields': {'enabled': {'equals': True,
+                    'values_found': 'one_or_more', 'values_matching': 'every'}}},
+                        {'fields': {'unlabeled': {'values_found': 'none'}}}]},
             "singleton implicit Object and independent Field-cardinality semantics")
     ET.register_namespace("oval-def", OD)
     ET.register_namespace("oval", OC)
@@ -178,8 +180,8 @@ def prove(source, schema_root, xsd_root, output):
     else:
         raise AssertionError("accepted changed original Gatekeeper existence")
     changed = deepcopy(doc)
-    changed["assessment"]["tests"][NAME]["states"][0]["and"][1][
-        "unlabeled"]["require"] = "at_least_one_exists_and_all_match"
+    changed["assessment"]["tests"][NAME]["require"]['and'][1]['fields'][
+        "unlabeled"]["values_found"] = "one_or_more"
     try:
         native_to_oval(changed)
     except ValueError:

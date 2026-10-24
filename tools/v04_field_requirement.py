@@ -74,6 +74,10 @@ def source_predicate(predicate):
         if set(out) != {'record'}:
             raise ValueError('unmapped source record wrapper attributes')
         record = out['record']
+        if isinstance(record, dict) and record.get('require') == 'none_exist':
+            if set(record) - {'require', 'fields'} or record.get('fields', {}) != {}:
+                raise ValueError('record absence cannot discard member predicates or attributes')
+            return {'record': {'records_found': 'none'}}
         if not isinstance(record, dict) or not isinstance(record.get('fields'), dict):
             raise ValueError('invalid source record')
         counts = field_pair(record.pop('require', None))
@@ -82,6 +86,22 @@ def source_predicate(predicate):
         record['fields'] = {name: source_predicate(value)
                             for name, value in record['fields'].items()}
     elif 'require' in out:
+        if out['require'] == 'none_exist':
+            # Original Gatekeeper and DNS entities explicitly assert
+            # check_existence=none_exist with no operand. Mature XML lowering
+            # may materialize that missing text as equals:""/datatype:string.
+            # This is an explicit source-dialect migration, not canonical input
+            # repair. A present-value equals:"" uses a different source token
+            # and is retained. The full lexical source remains in the ledger.
+            if (set(out) - {'require', 'equals', 'datatype'}
+                    or ('equals' in out and out['equals'] != '')
+                    or ('datatype' in out and out['datatype'] not in {'string', 'record'})):
+                raise ValueError('field absence cannot discard a meaningful comparison or attributes')
+            if out.get('datatype') == 'record':
+                # Empty OVAL record entities have no member list for the old
+                # mapper to recognize; retain the explicit record type here.
+                return {'record': {'records_found': 'none'}}
+            return {'values_found': 'none'}
         out.update(field_pair(out.pop('require')))
     if 'value_match' in out:
         if out['value_match'] not in MATCH:
@@ -288,7 +308,7 @@ def field_scopes(requirement):
                 record = predicate['record']
                 found.append({'path': [*field_path, 'record'],
                               'record_requirement': {key: record[key] for key in
-                                  ('records_found', 'records_matching')}})
+                                  ('records_found', 'records_matching') if key in record}})
                 visit(record, [*field_path, 'record'])
                 continue
             explicit = {key: predicate[key] for key in ('values_found', 'values_matching')

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+                  xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-definitions-5#macos https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/macos-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-common-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-common-schema.xsd">
+  <generator>
+    <oval:product_name>Oval Test Content</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-06-10T12:05:51</oval:timestamp>
+    <terms_of_use>Portions of this document were developed at Naval Information Warfare Center Atlantic by employees of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the United States Code this software is not subject to copyright protection and is in the public domain. The Government assumes no responsibility whatsoever for its use by other parties, and the software is provided "AS IS" without warranty or guarantee of any kind, express or implied, including, but not limited to, the warranties of merchantability and of fitness for a particular purpose. In no event shall the Government be liable for any claim, damages or other liability, whether in an action of contract, tort or other dealings in the software. The Government has no obligation hereunder to provide maintenance, support, updates, enhancements, or modifications. We would appreciate acknowledgement if the software is used. This software can be redistributed and/or
+    modified freely provided that any derivative works bear some notice that they are derived from it, and any modified versions bear some notice that they have been modified.</terms_of_use>
+  </generator>
+  <definitions>
+    <definition id="oval:navy.navwar.niwcatlantic.scc:def:1" version="1" class="miscellaneous">
+      <metadata>
+        <title>Evaluate to true if the macos-def:gatekeeper_test is properly supported.</title>
+        <description>The definition should evaluate to true if the tool supports the macos-def:launchd_test properly and no unlabeled applications exist.</description>
+      </metadata>
+      <notes>
+        <note>This definition checks the functionality of the macos-def:gatekeeper_test and may require adjustment of the gatekeeper_object or gatekeeper_state paramaters based on the configuration of the system being tested.</note>
+      </notes>
+      <criteria operator="AND">
+        <criterion test_ref="oval:navy.navwar.niwcatlantic.scc:tst:1" comment="Test that the gatekeeper_test is supported with a state entity existence check of 'none exist'." />
+        <!-- NOTE THAT THE OVAL GATEKEEPER OBJECT HAS NO SUBELEMENTS AND PRODUCES A SINGLE OVAL ITEM.  -->
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <gatekeeper_test id="oval:navy.navwar.niwcatlantic.scc:tst:1" version="1" comment="Test that the gatekeeper_test is supported with a state entity 'enabled' of '1' and 'unlabeled' existence check of 'none exist'." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc:obj:1" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc:ste:1" />
+    </gatekeeper_test>
+  </tests>
+  <objects>
+    <gatekeeper_object id="oval:navy.navwar.niwcatlantic.scc:obj:1" version="1" comment="Retrieve list of unlabeled applications." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos" />
+  </objects>
+  <states>
+    <gatekeeper_state id="oval:navy.navwar.niwcatlantic.scc:ste:1" version="1" comment="Confirm 'enabled' is '1' and no 'unlabeled' application paths are identified." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#macos">
+      <enabled datatype="boolean">1</enabled>
+      <unlabeled check_existence="none_exist" />
+    </gatekeeper_state>
+  </states>
+</oval_definitions>

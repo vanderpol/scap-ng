@@ -90,6 +90,13 @@ class FieldRequirementConversionTests(unittest.TestCase):
                     {'equals': 'x', 'require': token})
                 old = {'capability': 'windows.wmi', 'require': SOURCE_REQUIRED,
                        'states': [{'value': predicate}]}
+                if field_pair(token)['values_found'] == 'none':
+                    # Keep every cross-product case: a comparison or member
+                    # predicate alongside absence is not canonical and cannot
+                    # be discarded without original-source evidence.
+                    with self.subTest(token=token, record=record), self.assertRaises(ValueError):
+                        promote_test(old)
+                    continue
                 new, proof = promote_test(old)
                 self.assertEqual(restore_test(new, proof), old)
                 pred = new['require']['fields']['value']

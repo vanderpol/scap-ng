@@ -8,6 +8,16 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- Integrated the reviewed comparator-free field and record absence forms:
+  `values_found: none` and `record: {records_found: none}`. Source-verified DNS
+  and Gatekeeper absence now survives promotion and compilation without a
+  fabricated empty-string comparison or matching count. Present empty values
+  remain comparisons; nonempty ambiguous predicates reject. Added original-source
+  and controlled-record XSD/inverse regressions, preserving error/uncollected
+  distinctions and the separate unresolved Item-level population boundary.
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Repaired maintained capability-generator and Apache preview regression
   fixtures for the approved structured requirement/count vocabulary. Generated
   contracts now resolve version-local references correctly and enforce the
