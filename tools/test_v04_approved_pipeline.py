@@ -189,6 +189,70 @@ class ApprovedPipelineTests(unittest.TestCase):
     def test_linux_filters_permissions_and_variables(self):
         self.check_case(CASES[0])
 
+    def test_windows_enterprise_state_or_through_inline_yaml_and_compiled_json(self):
+        """Real two-State OR, using existing adapters; not unified CLI coverage."""
+        import yaml
+        from build_v04_canonical_six_stigs import upgrade_v003
+
+        path = ROOT / 'research/assessment-simplification/evidence/ms_windows_11/SV-253254/source-oval.xml'
+        self.assertEqual(sha256(path.read_bytes()).hexdigest(),
+                         'a056aafd7326bac213cab63da8c3746a49dfd5fc03f1812426bc8804e6e32926')
+        root = ET.parse(path).getroot()
+        did = 'oval:mil.disa.stig.defs:def:253254'
+        native, error = lower_definition(root, did, 'enterprise-editions-assessment',
+                                         collection_graph=True, provenance={})
+        self.assertIsNone(error)
+        tree, reconstructed_id = build(native)
+        with tempfile.TemporaryDirectory() as tmp:
+            reconstructed = Path(tmp) / 'oval.xml'
+            tree.write(reconstructed, encoding='utf-8')
+            self.assertTrue(compare(path, reconstructed, did, reconstructed_id,
+                                    root_only=True)['equal'])
+        aligned, _ = postprocess_automated_assessment(native, target_ng_version='0.3.0')
+        flat, _ = upgrade_v003(aligned)
+        assessment = flat['assessment']
+        test = assessment['tests']['editionid-enterprise-or-enterprises-test']
+        # The upgrader retains source Object identity. Explicitly exercise the
+        # supported inline representation for this single-consumer fixture.
+        shared_program = compile_assessment_program(assessment)
+        obj = assessment.pop('shared_objects')[test['object']]
+        self.assertEqual(obj.pop('capability'), test['capability'])
+        test['object'] = obj
+        self.assertEqual(obj['hive'], 'local_machine')
+        self.assertEqual(obj['key']['equals'], r'SOFTWARE\Microsoft\Windows NT\CurrentVersion')
+        self.assertEqual(obj['name']['equals'], 'EditionId')
+        expected = {'items_found': 'one_or_more', 'items_satisfying': 'every',
+                    'or': [{'and': [{'fields': {field: {
+                        'datatype': 'string', 'equals': value,
+                        'values_found': 'one_or_more', 'values_matching': 'every'}}}
+                        for field, value in [('type', 'string'), ('value', edition)]]}
+                        for edition in ('Enterprise', 'EnterpriseS')]}
+        self.assertEqual(test['require'], expected)
+        self.assertNotIn('states', test)
+        self.assertNotIn('states_match', test)
+        text = render_authoring(flat, is_yaml=True)
+        parsed = yaml.safe_load(text)
+        self.assertEqual(parsed, flat)
+        self.assertIsInstance(parsed['assessment']['tests'][
+            'editionid-enterprise-or-enterprises-test']['object'], dict)
+        data, report = compile_documents(documents(parsed))
+        self.assertEqual(report['native_source_schema'], 'PASS')
+        self.assertEqual(report['yaml_json_byte_parity'], 'PASS')
+        decoded = decode_and_verify(json.loads(data))
+        self.assertEqual(decoded, documents(parsed))
+        raw, manifest = build_bundle(decoded)
+        self.assertEqual(verify_bundle(raw)['tests'], 1)
+        with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+            program_path = manifest['build_provenance']['compiled_programs'][assessment['id']]['path']
+            program = json.loads(archive.read(program_path))
+        shared_instruction, = shared_program['test_instructions']
+        self.assertEqual(shared_instruction['operands']['require'], expected)
+        self.assertEqual(shared_instruction['operands']['object'], 'editionid-object')
+        instruction, = program['test_instructions']
+        self.assertEqual(instruction['opcode'], 'CHECK_ITEM_CONDITION')
+        self.assertEqual(instruction['operands']['object'], obj)
+        self.assertEqual(instruction['operands']['require'], expected)
+
     def test_windows_record_and_shared_object(self):
         self.check_case(CASES[1])
 
