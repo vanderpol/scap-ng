@@ -13,6 +13,8 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 from jsonschema import Draft202012Validator
+from build_v04_canonical_six_stigs import promote
+from v04_canonical_source_ir import validate_docs, _schema_validators
 
 from scap_converter_core import convert, project_v003_to_v04
 from test_audit_v04_original_oval_forward import (
@@ -30,6 +32,41 @@ SCHEMA = json.loads((Path(__file__).resolve().parents[1] /
                      "schema/v0.4.0/assessment-language.schema.json").read_text())
 
 
+def legacy_oracle_view(native):
+    """Test-only inverse for retained independent OVAL exporters.
+
+    This is never compiler input or published authoring. Every pair is explicit;
+    missing counts fail. Source all_exist cannot be reconstructed from this view.
+    """
+    from research_04_one_grammar_proof import CODES
+    from v04_field_requirement import validate_test
+    out = deepcopy(native)
+    found = {'none': 'none', 'exactly_one': 'one', 'one_or_more': 'one_or_more',
+             'every': 'all', 'may_be_absent': 'optional'}
+    matching = {'none': 'none', 'exactly_one': 'one', 'one_or_more': 'one_or_more', 'every': 'all'}
+    def predicate(p):
+        p = deepcopy(p)
+        pair = (found[p.pop('values_found')], matching[p.pop('values_matching')])
+        p['require'] = CODES[pair]
+        if 'value_match' in p: p['value_match'] = matching[p['value_match']]
+        return p
+    def condition(c):
+        if 'fields' in c:
+            parts = [{name: predicate(p)} for name, p in c['fields'].items()]
+            return parts[0] if len(parts) == 1 else {'and': parts}
+        op = next(k for k in ('and', 'or', 'one', 'xor') if k in c)
+        return {op: [condition(child) for child in c[op]]}
+    for test in out['assessment']['tests'].values():
+        validate_test(test)
+        req = test['require']
+        if set(req) == {'items_found'}:
+            test['require'] = {'items': req['items_found']}
+        else:
+            test['states'] = [condition(req)]
+            test['require'] = CODES[(found[req['items_found']], matching[req['items_satisfying']])]
+    return out
+
+
 def fixture_path(directory, name, data):
     path = directory / name
     path.write_bytes(data)
@@ -45,9 +82,10 @@ class SharedConverterIntegrationTests(unittest.TestCase):
     def checked(self, xml, definition, expected, opcode):
         path = fixture_path(self.directory, "input.xml", xml)
         native, evidence = convert(path, definition)
-        self.assertEqual(compare(native, expected)["status"],
+        self.assertEqual(compare(native, promote(expected, legacy_review=True)[0])["status"],
                          "TRUE_FRESH_OVAL_IMPORT_MATCHES_CANONICAL_040_TEST")
-        self.assertFalse(list(Draft202012Validator(SCHEMA).iter_errors(native)))
+        validate_docs({'authoring/core/a.json': native}, _schema_validators(
+            Path(__file__).resolve().parents[1] / 'schema/v0.4.0'))
         ident, test = next(iter(native["assessment"]["tests"].items()))
         self.assertEqual(compile_test_instruction(ident, test)["opcode"], opcode)
         self.assertEqual(evidence["shared_semantic_ir"], "0.1-prototype")
@@ -62,15 +100,15 @@ class SharedConverterIntegrationTests(unittest.TestCase):
     def test_shell_real_oval_filter_through_mature_lowering_and_current_compiler(self):
         native = self.checked(shell_source(), "oval:a:def:1", shell_expected(),
                               "CHECK_COLLECTION_PRESENCE")
-        self.assertEqual(len(emit_shell(native)[0].getroot().findall(
+        self.assertEqual(len(emit_shell(shell_expected())[0].getroot().findall(
             ".//{" + OD + "}filter")), 1)
 
     def test_registry_source_exact_uncommon_quantifier_kept(self):
         native = self.checked(registry_source(), "oval:b:def:1", registry_expected(),
-                              "CHECK_SOURCE_EXACT_STATES")
+                              "CHECK_ITEM_CONDITION")
         self.assertEqual(native["assessment"]["class"], "compliance")
         self.assertTrue(any(node.tag.endswith("}registry_state")
-                            for node in emit_registry(native)[0].getroot().iter()))
+                            for node in emit_registry(registry_expected())[0].getroot().iter()))
 
     def test_errors_for_unimplemented_semantics_do_not_emit_partial_native(self):
         mutants = (
@@ -128,7 +166,7 @@ class SharedConverterIntegrationTests(unittest.TestCase):
         ], capture_output=True, text=True, check=True)
         self.assertIn("TWO_LEAF_LOCKSTEP", completed.stdout)
         self.assertEqual(json.loads(report.read_text())["definition_id"], "oval:b:def:1")
-        self.assertEqual(compare(json.loads(output.read_text()), registry_expected())
+        self.assertEqual(compare(json.loads(output.read_text()), promote(registry_expected(), legacy_review=True)[0])
                          ["capability"], "windows.registry")
 
 

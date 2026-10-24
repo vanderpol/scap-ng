@@ -11,6 +11,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 from jsonschema import Draft202012Validator
+from v04_canonical_source_ir import _schema_validators
 
 from scap_converter_core import convert, postprocess_automated_assessment
 from v04_native_bundle_compiler import compile_assessment_program
@@ -101,7 +102,7 @@ class ObjectPresenceTests(unittest.TestCase):
         tid, test = next(iter(a["tests"].items()))
         self.assertEqual(test["object"]["section_command"],
                          {"matches_regex": "^line vty.*"})
-        self.assertEqual(test["require"], {"items": "may_be_absent"})
+        self.assertEqual(test["require"], {"items_found": "may_be_absent"})
         self.assertEqual(a["evaluate"], {"test": tid})
         program = compile_assessment_program(a)
         self.assertEqual(program["test_instructions"][0]["opcode"],
@@ -114,7 +115,7 @@ class ObjectPresenceTests(unittest.TestCase):
         import json
         schema = json.loads((Path(__file__).resolve().parents[1] /
                              "schema/v0.4.0/assessment-language.schema.json").read_text())
-        self.assertFalse(list(Draft202012Validator(schema).iter_errors(native)))
+        self.assertFalse(list(_schema_validators(Path(__file__).resolve().parents[1] / 'schema/v0.4.0')['assessment'].iter_errors(native)))
 
     def test_other_explicit_source_existence_quantifiers(self):
         for source_existence, items in (
@@ -128,7 +129,7 @@ class ObjectPresenceTests(unittest.TestCase):
                     "check_existence", source_existence)
                 native, _ = self.conversion(ET.tostring(root))
                 test = next(iter(native["assessment"]["tests"].values()))
-                self.assertEqual(test["require"], {"items": items})
+                self.assertEqual(test["require"], {"items_found": items})
 
     def test_original_at_least_one_item_check_with_no_states(self):
         root = ET.fromstring(source())
@@ -136,18 +137,18 @@ class ObjectPresenceTests(unittest.TestCase):
             "check", "at least one")
         native, _ = self.conversion(ET.tostring(root))
         self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
-                         {"items": "may_be_absent"})
+                         {"items_found": "may_be_absent"})
 
     def test_direct_scalar_state_preserved_and_compiles_source_exact(self):
         native, evidence = self.conversion(scalar_state_source(), AIX_ID)
         test = next(iter(native["assessment"]["tests"].values()))
         self.assertEqual(test["object"]["flstinst"], {"equals": "bos.rte"})
-        self.assertEqual(test["states"], [{"flstinst": {
-            "require": "at_least_one_exists_and_all_match", "equals": "bos.rte"}}])
-        self.assertEqual(test["require"], "at_least_one_exists_and_some_match")
+        self.assertEqual(test['require']['fields']['flstinst'],
+                         {'equals': 'bos.rte', 'values_found': 'one_or_more', 'values_matching': 'every'})
+        self.assertEqual(test['require']['items_satisfying'], 'one_or_more')
         program = compile_assessment_program(native["assessment"])
         self.assertEqual(program["test_instructions"][0]["opcode"],
-                         "CHECK_SOURCE_EXACT_STATES")
+                         "CHECK_ITEM_CONDITION")
         self.assertTrue(evidence["original_oval_direct_scalar_state_attested"])
         self.assertFalse(evidence["original_oval_object_presence_attested"])
         self.assertFalse(evidence["scanner_parity"])
@@ -156,13 +157,13 @@ class ObjectPresenceTests(unittest.TestCase):
         native, evidence = self.conversion(singleton_version_source(), ASA_ID)
         test = next(iter(native["assessment"]["tests"].values()))
         self.assertNotIn("object", test)
-        self.assertEqual(test["states"], [{"asa_major_release": {
-            "require": "at_least_one_exists_and_all_match",
-            "version_greater_than_or_equal": "9.0"}}])
-        self.assertEqual(test["require"], "at_least_one_exists_and_some_match")
+        self.assertEqual(test['require']['fields']['asa_major_release'],
+                         {'version_greater_than_or_equal': '9.0',
+                          'values_found': 'one_or_more', 'values_matching': 'every'})
+        self.assertEqual(test['require']['items_satisfying'], 'one_or_more')
         self.assertTrue(evidence["original_oval_direct_scalar_state_attested"])
         self.assertEqual(compile_assessment_program(native["assessment"])[
-            "test_instructions"][0]["opcode"], "CHECK_SOURCE_EXACT_STATES")
+            "test_instructions"][0]["opcode"], "CHECK_ITEM_CONDITION")
         self.assertFalse(evidence["scanner_parity"])
 
     def test_singleton_with_real_selector_is_not_silently_dropped(self):
@@ -260,8 +261,13 @@ class ObjectPresenceTests(unittest.TestCase):
                     self.assertEqual(evidence["capability"], cap)
                     expected = ("at_least_one_exists_and_some_match" if cap in {"aix.fileset", "asa.version"}
                                 else "one_or_more" if cap == "asa.line" else "may_be_absent")
-                    self.assertEqual(next(iter(native["assessment"]["tests"].values()))["require"],
-                                     expected if cap in {"aix.fileset", "asa.version"} else {"items": expected})
+                    req = next(iter(native['assessment']['tests'].values()))['require']
+                    if cap in {'aix.fileset', 'asa.version'}:
+                        self.assertEqual((req['items_found'], req['items_satisfying']),
+                                         ('one_or_more', 'one_or_more'))
+                    else:
+                        self.assertEqual(req, {'items_found': expected})
+
 
 
 if __name__ == "__main__":

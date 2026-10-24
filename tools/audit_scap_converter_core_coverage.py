@@ -24,8 +24,8 @@ from v04_native_bundle_compiler import compile_assessment_program
 
 
 FORMAT = "scap-ng-maintained-converter-oval-coverage/0.1"
-SCHEMA = Draft202012Validator(json.loads((Path(__file__).resolve().parents[1] /
-                                          "schema/v0.4.0/assessment-language.schema.json").read_text()))
+from v04_canonical_source_ir import _schema_validators
+SCHEMA = _schema_validators(Path(__file__).resolve().parents[1] / 'schema/v0.4.0')['assessment']
 
 
 def safe_error(exc):

@@ -1,0 +1,296 @@
+{
+  "assessment": {
+    "id": "source-sv-259345-assessment",
+    "version": 8,
+    "assessment_title": "The validity period for the Resource Record Signatures (RRSIGs) covering a zone's DNSKEY RRSet must be no less than two days and no more than one week.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "variables": {
+      "command-get-issigned-setting-each-forward-lookup-zone-variable": {
+        "title": "The command to get the 'IsSigned' setting for each forward lookup zone",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "value": "try {Get-DnsServerZone -Name ",
+                "datatype": "string"
+              }
+            },
+            {
+              "values": {
+                "object": "list-all-forward-lookup-zones-object",
+                "field": "stdout_line"
+              }
+            },
+            {
+              "literal": {
+                "value": " | ForEach-Object {$_.IsSigned}} catch {}",
+                "datatype": "string"
+              }
+            }
+          ]
+        }
+      },
+      "command-get-list-dns-key-signature-validity-periods-zone-signing-variable": {
+        "title": "The command to get the list of DNS key signature validity periods for the zone signing keys",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "value": "try {Get-DNSServerSigningKey -ZoneName ",
+                "datatype": "string"
+              }
+            },
+            {
+              "values": {
+                "object": "list-all-forward-lookup-zones-object",
+                "field": "stdout_line"
+              }
+            },
+            {
+              "literal": {
+                "value": " | Where-Object KeyType -eq 'ZoneSigningKey' | ForEach-Object {$_.DnsKeySignatureValidityPeriod.Days * 24 + $_.DnsKeySignatureValidityPeriod.Hours}} catch {Write-Output '0'}",
+                "datatype": "string"
+              }
+            }
+          ]
+        }
+      },
+      "command-get-list-dns-key-signature-validity-periods-key-signing-variable": {
+        "title": "The command to get the list of DNS key signature validity periods for the key signing keys",
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "value": "try {Get-DNSServerSigningKey -ZoneName ",
+                "datatype": "string"
+              }
+            },
+            {
+              "values": {
+                "object": "list-all-forward-lookup-zones-object",
+                "field": "stdout_line"
+              }
+            },
+            {
+              "literal": {
+                "value": " | Where-Object KeyType -eq 'KeySigningKey' | ForEach-Object {$_.DnsKeySignatureValidityPeriod.Days * 24 + $_.DnsKeySignatureValidityPeriod.Hours}} catch {Write-Output '0'}",
+                "datatype": "string"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "tests": {
+      "dns-server-caching-only-there-no-forward-or-reverse-lookup-test": {
+        "test_title": "DNS server is caching only (there are no forward or reverse lookup zones)",
+        "capability": "independent.shellcommand",
+        "object": "list-all-forward-reverse-lookup-zones-object",
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "datatype": "string",
+              "equals": "",
+              "values_found": "none",
+              "values_matching": "every"
+            }
+          }
+        }
+      },
+      "all-forward-lookup-zones-if-any-integrated-active-directory-test": {
+        "test_title": "All forward lookup zones (if any) are integrated with Active Directory",
+        "capability": "independent.shellcommand",
+        "object": "list-all-forward-lookup-zones-that-not-integrated-active-directory-object",
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "datatype": "string",
+              "equals": "",
+              "values_found": "none",
+              "values_matching": "every"
+            }
+          }
+        }
+      },
+      "all-forward-lookup-zones-dnssec-signed-test": {
+        "test_title": "All forward lookup zones are DNSSEC signed",
+        "capability": "independent.shellcommand",
+        "object": "issigned-setting-each-forward-lookup-zone-object",
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "datatype": "string",
+              "equals": "True",
+              "values_found": "exactly_one",
+              "values_matching": "every"
+            }
+          }
+        }
+      },
+      "all-forward-lookup-zones-have-dns-key-signature-validity-periods-test": {
+        "test_title": "All forward lookup zones have DNS key signature validity periods between two days and a week for their zone signing keys",
+        "capability": "independent.shellcommand",
+        "object": "list-dns-key-signature-validity-periods-zone-signing-keys-object",
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "integer",
+                  "greater_than_or_equal": 48,
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "integer",
+                  "less_than_or_equal": 168,
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "all-forward-lookup-zones-have-dns-key-signature-validity-periods-2-test": {
+        "test_title": "All forward lookup zones have DNS key signature validity periods between two days and a week for their key signing keys",
+        "capability": "independent.shellcommand",
+        "object": "list-dns-key-signature-validity-periods-key-signing-keys-object",
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "integer",
+                  "greater_than_or_equal": 48,
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "integer",
+                  "less_than_or_equal": 168,
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "evaluate": {
+      "or": [
+        {
+          "test": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test"
+        },
+        {
+          "test": "all-forward-lookup-zones-if-any-integrated-active-directory-test"
+        },
+        {
+          "and": [
+            {
+              "test": "all-forward-lookup-zones-dnssec-signed-test"
+            },
+            {
+              "test": "all-forward-lookup-zones-have-dns-key-signature-validity-periods-test"
+            },
+            {
+              "test": "all-forward-lookup-zones-have-dns-key-signature-validity-periods-2-test"
+            }
+          ]
+        }
+      ]
+    },
+    "shared_objects": {
+      "list-all-forward-reverse-lookup-zones-object": {
+        "capability": "independent.shellcommand",
+        "object_title": "The list of all forward and reverse lookup zones",
+        "shell": "powershell",
+        "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}",
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      },
+      "list-all-forward-lookup-zones-that-not-integrated-active-directory-object": {
+        "capability": "independent.shellcommand",
+        "object_title": "The list of all forward lookup zones that are not integrated with Active Directory",
+        "shell": "powershell",
+        "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}",
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      },
+      "list-all-forward-lookup-zones-object": {
+        "capability": "independent.shellcommand",
+        "object_title": "The list of all forward lookup zones",
+        "shell": "powershell",
+        "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}",
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      },
+      "issigned-setting-each-forward-lookup-zone-object": {
+        "capability": "independent.shellcommand",
+        "object_title": "The 'IsSigned' setting for each forward lookup zone",
+        "shell": "powershell",
+        "command": {
+          "variable": "command-get-issigned-setting-each-forward-lookup-zone-variable"
+        },
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      },
+      "list-dns-key-signature-validity-periods-zone-signing-keys-object": {
+        "capability": "independent.shellcommand",
+        "object_title": "The list of DNS key signature validity periods for the zone signing keys",
+        "shell": "powershell",
+        "command": {
+          "variable": "command-get-list-dns-key-signature-validity-periods-zone-signing-variable"
+        },
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      },
+      "list-dns-key-signature-validity-periods-key-signing-keys-object": {
+        "capability": "independent.shellcommand",
+        "object_title": "The list of DNS key signature validity periods for the key signing keys",
+        "shell": "powershell",
+        "command": {
+          "variable": "command-get-list-dns-key-signature-validity-periods-key-signing-variable"
+        },
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      }
+    }
+  }
+}

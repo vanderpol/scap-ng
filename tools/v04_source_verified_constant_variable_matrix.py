@@ -16,6 +16,7 @@ from convert_v04_oval_variable_datatype_suite import (
     NATIVE_DTYPE as DATATYPE_NATIVE, OP as DATATYPE_OPERATIONS,
 )
 from v04_native_bundle_compiler import compile_test_instruction
+from v04_field_requirement import promote_test
 
 
 REQUIRE_ALL = "at_least_one_exists_and_all_match"
@@ -137,6 +138,7 @@ def project(v003, provenance, original, oracle_proof):
                                   "require": REQUIRE_ALL}}],
             "reported_elements": "all", "require": REQUIRE_ALL,
         }
+        new_tests[name], _ = promote_test(new_tests[name], legacy_review=True)
         compile_test_instruction(name, new_tests[name])
     demand(used_states == set(old_states), "source States not fully consumed")
     old_eval = a.get("evaluate")
@@ -352,6 +354,7 @@ def project_datatype_suite(v003, provenance, original, source_name):
             "reported_elements": "all",
             "require": "at_least_one_exists_and_some_match",
         }
+        native_tests[name], _ = promote_test(native_tests[name], legacy_review=True)
         compile_test_instruction(name, native_tests[name])
     demand(used_states == set(old_states) and seen_objects == set(source_objects),
            "unconsumed source State/Object references")

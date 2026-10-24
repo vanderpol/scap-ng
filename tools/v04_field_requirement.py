@@ -141,6 +141,13 @@ def legacy_review_source(test):
     """
     source = deepcopy(test)
     req = source['require']
+    if set(req) == {'items'}:
+        source['require'] = {'one_or_more': 'at_least_one_exists', 'none': 'none_exist',
+                             'exactly_one': 'only_one_exists', 'all': 'all_exist',
+                             'may_be_absent': 'may_be_absent'}.get(req['items'])
+        if source['require'] is None:
+            raise ValueError('unmapped legacy review Item population')
+        return source
     if (set(req) - {'items', 'all_items_must', 'field_requirement'}
             or req.get('items') not in PAIRS.values()
             or not isinstance(req.get('all_items_must'), list)

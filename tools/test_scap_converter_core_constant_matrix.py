@@ -42,9 +42,9 @@ class ConstantVariableMatrixCoreTests(unittest.TestCase):
                                     for x in v["expression"]["literal"]))
                 self.assertEqual(len(compile_assessment_program(a)["test_instructions"]), count)
                 if count == 10:
-                    matches = {t["states"][0]["value"].get("value_match")
+                    matches = {t["require"]["fields"]["value"].get("value_match")
                                for t in a["tests"].values()}
-                    self.assertEqual(matches, {"all", "one_or_more", "none", "one"})
+                    self.assertEqual(matches, {"every", "one_or_more", "none", "exactly_one"})
                     self.assertEqual(sum("not" in x for x in a["evaluate"]["and"]), 5)
 
     def test_alternate_filepath_and_assessment_id(self):

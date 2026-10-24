@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Previously independent 0.4 datatypes reconciled against v0.3 lowering."""
 from __future__ import annotations
+from build_v04_canonical_six_stigs import promote
+from test_scap_converter_core import legacy_oracle_view
+from v04_canonical_source_ir import _schema_validators
+
 
 from copy import deepcopy
 import os
@@ -53,7 +57,7 @@ class DatatypeReuseTests(unittest.TestCase):
                 raw = path.read_bytes()
                 oracle, v003, provenance = source_graph(raw, name, did)
                 native = project_datatype_suite(v003, provenance, raw, name)
-                self.assertEqual(native, oracle)
+                self.assertEqual(native, promote(oracle, legacy_review=True)[0])
                 assessment = native["assessment"]
                 self.assertEqual(len(assessment["tests"]), count)
                 self.assertEqual(len(compile_assessment_program(assessment)["test_instructions"]),

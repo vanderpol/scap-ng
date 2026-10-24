@@ -119,6 +119,66 @@ def recover(candidate,original, *, legacy_review=False):
         raise ValueError("Canonical authoring source reconstruction mismatch")
 
 
+def upgrade_v003(aligned):
+    """Reuse the maintained semantic graph and existing reversible 0.4 passes.
+
+    This adapter does no OVAL parsing. Literal data is never renamed with IDs.
+    The caller separately audits its original XML and source graph.
+    """
+    from scap_upconvert_v003.embed_predicates import embed_predicates
+    from research_04_one_grammar_proof import make_single, lower_single, normalize_inert_source_checks
+    from v04_flat_object_authoring import flatten_document, load_catalog, restore_document
+    embedded, embedding = embed_predicates(aligned)
+    single, _, notes = make_single(embedded)
+    if lower_single(single) != normalize_inert_source_checks(embedded, notes):
+        raise ValueError('0.4 source predicate projection inverse failed')
+    source = deepcopy(single)
+    a = source['assessment']
+    a['specification']['version'] = '0.4.0'
+    a['shared_objects'] = a.pop('objects')
+    renames = {}
+    for section, suffix in [('tests', 'test'), ('shared_objects', 'object'), ('variables', 'variable')]:
+        mapping = {}
+        for key in a.get(section, {}):
+            name = key.removeprefix('test-') if section == 'tests' else key
+            if not name.endswith('-' + suffix):
+                name += '-' + suffix
+            if name in mapping.values():
+                raise ValueError('canonical source identifier collision')
+            mapping[key] = name
+        renames[section] = mapping
+        if section in a:
+            a[section] = {mapping[key]: value for key, value in a[section].items()}
+    def references(node):
+        if isinstance(node, list):
+            return [references(child) for child in node]
+        if not isinstance(node, dict):
+            return node
+        out = {}
+        for key, value in node.items():
+            section = {'test': 'tests', 'object': 'shared_objects', 'variable': 'variables'}.get(key)
+            if section and isinstance(value, str):
+                out[key] = renames[section].get(value, value)
+            elif key == 'for_each' and isinstance(value, dict):
+                out[key] = {**references(value), 'in': renames['shared_objects'].get(value['in'], value['in'])}
+            else:
+                out[key] = references(value)
+        return out
+    source = references(source)
+    proofs = {}
+    canonical, _ = promote(source, provenance=proofs)
+    recover(canonical, source)
+    flat, ledger = flatten_document(canonical, load_catalog(
+        Path(__file__).resolve().parents[1] / 'schema/v0.4.0/capability-mappings/supported'))
+    if restore_document(flat, ledger) != canonical:
+        raise ValueError('0.4 Object projection inverse failed')
+    from v04_canonical_requirement_oracle import compare_original_to_canonical
+    audit = compare_original_to_canonical({'authoring/source/a.json': source},
+                                          {'authoring/source/a.json': flat})
+    return flat, {'test_proofs': proofs, 'identity_projection': renames,
+                  'inert_source_check_notes': notes, 'source_audit': audit}
+
+
 def render_authoring(document, *, is_yaml):
     """Keep short canonical predicates inline without changing their data graph."""
     return (dump_hybrid(document) if is_yaml

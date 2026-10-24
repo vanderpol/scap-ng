@@ -5,6 +5,10 @@ The external OVAL-Community fixture is fetched at its immutable commit in CI
 and is never silently synthesized or substituted. Ref #232 #248 #229.
 """
 from __future__ import annotations
+from build_v04_canonical_six_stigs import promote
+from test_scap_converter_core import legacy_oracle_view
+from v04_canonical_source_ir import _schema_validators
+
 
 from copy import deepcopy
 from hashlib import sha256
@@ -59,8 +63,8 @@ class MatureVariableLoweringIntegrationTests(unittest.TestCase):
     def test_four_way_shared_lowering_matches_independent_040_and_compiles(self):
         native, evidence = convert(self.path, DID)
         expected, _ = independent_convert(self.original)
-        self.assertEqual(native, expected)
-        self.assertFalse(list(Draft202012Validator(SCHEMA).iter_errors(native)))
+        self.assertEqual(native, promote(expected, legacy_review=True)[0])
+        self.assertFalse(list(_schema_validators(Path(__file__).resolve().parents[1] / 'schema/v0.4.0')['assessment'].iter_errors(native)))
         self.assertEqual(evidence["source_sha256"], SOURCE_SHA256)
         self.assertTrue(evidence["v003_source_lowering_reused"])
         self.assertTrue(evidence["independent_variable_import_agreement"])
@@ -69,20 +73,20 @@ class MatureVariableLoweringIntegrationTests(unittest.TestCase):
         assessment = native["assessment"]
         self.assertEqual(len(assessment["variables"]), 2)
         self.assertEqual(len(assessment["tests"]), 4)
-        comparisons = {(t["variable"], t["states"][0]["value"]["equals"]["variable"])
+        comparisons = {(t["variable"], t["require"]["fields"]["value"]["equals"]["variable"])
                        for t in assessment["tests"].values()}
         keys = set(assessment["variables"])
         self.assertEqual(comparisons, {(a, b) for a in keys for b in keys})
         for test in assessment["tests"].values():
-            self.assertEqual(test["require"], "at_least_one_exists_and_some_match")
-            self.assertEqual(test["states"][0]["value"]["value_match"], "one_or_more")
+            self.assertEqual(test["require"]["items_satisfying"], "one_or_more")
+            self.assertEqual(test["require"]["fields"]["value"]["value_match"], "one_or_more")
         program = compile_assessment_program(assessment)
         self.assertEqual([t["opcode"] for t in program["test_instructions"]],
-                         ["CHECK_SOURCE_EXACT_STATES"] * 4)
+                         ["CHECK_ITEM_CONDITION"] * 4)
 
         # Independently regenerate OVAL from this shared core's result, not
         # the previously validated standalone importer output.
-        tree, exported_did = emit(native)
+        tree, exported_did = emit(legacy_oracle_view(native))
         exported = self.directory / "regenerated.xml"
         exported.write_bytes(ET.tostring(tree.getroot(), encoding="utf-8"))
         semantic = compare_oval(self.path, exported, source_root=DID,

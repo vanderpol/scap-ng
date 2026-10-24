@@ -50,7 +50,7 @@ class SingletonPresenceCoreTests(unittest.TestCase):
                 self.assertEqual(test["capability"], capability)
                 self.assertNotIn("object", test)
                 self.assertNotIn("states", test)
-                self.assertEqual(test["require"], {"items": "one_or_more"})
+                self.assertEqual(test["require"], {"items_found": "one_or_more"})
                 self.assertTrue(evidence["original_oval_object_presence_attested"])
                 program = compile_assessment_program(assessment)
                 self.assertEqual(len(program["test_instructions"]), 1)
@@ -81,7 +81,7 @@ class SingletonPresenceCoreTests(unittest.TestCase):
             changed.write_bytes(ET.tostring(root))
             assessment, _ = convert(changed, ident)
         native_test = next(iter(assessment["assessment"]["tests"].values()))
-        self.assertEqual(native_test["require"], {"items": "exactly_one"})
+        self.assertEqual(native_test["require"], {"items_found": "exactly_one"})
 
     def test_no_unaudited_crosswalk_fallback(self):
         path, ident, capability, _ = self.sources[0]

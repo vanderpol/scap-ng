@@ -40,6 +40,7 @@ from oval_semantic_ir import parse as parse_oval_semantic_ir
 from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
 from scap_upconvert_v003.convert_collection_review import postprocess_automated_assessment
 from v04_field_requirement import promote_test, restore_test
+from build_v04_canonical_six_stigs import promote as promote_approved, upgrade_v003
 from v04_flat_object_authoring import flatten_document, load_catalog, restore_document
 from v04_native_bundle_compiler import compile_test_instruction
 from v04_source_verified_object_presence import (
@@ -52,6 +53,14 @@ from v04_source_verified_constant_variable_matrix import (
     project as project_constant_matrix, project_datatype_suite,
     DATATYPE_REUSE_CASES,
 )
+
+
+# Bounded original-source integration cases; not broad corpus authorization.
+APPROVED_REQUIRE_SOURCES = {
+    '7be599449201b641e35a6a0c005b3dfbd812fdc1a94889b90b0b2a161513ffd4',
+    'ffb4e844e9a7cfb1d7d3b549ac219bc0a45963ca8e965864b4fb040b339f75a7',
+    '44411063be71910f348a31059b69338f3c83a68db4082cafeac198ff440f04d2',
+}
 
 
 # Exact mature 0.3 graph + source bindings for the pinned AppArmor singleton.
@@ -179,7 +188,7 @@ def project_v003_to_v04(v003):
                            "filters": [{"include": {"stdout_line": {
                                "require": "at_least_one_exists_and_all_match",
                                "case_insensitive_equals": value}}}]},
-                "reported_elements": "all", "require": {"items": "one_or_more"}}
+                "reported_elements": "all", "require": "at_least_one_exists"}
     elif cap == "windows.registry":
         require(old_test.get("match") == "one" and len(old_test.get("states", [])) == 1,
                 "unsupported registry Test check or State count")
@@ -206,6 +215,7 @@ def project_v003_to_v04(v003):
     else:
         raise ValueError("Shared 0.3 -> canonical 0.4 converter: unproved capability " + str(cap))
 
+    tid = tid.removeprefix('test-') + '-test'
     candidate = {"assessment": {
         "id": a["id"], "version": a["version"], "assessment_title": a["assessment_title"],
         "mode": "automated", "class": a["class"],
@@ -334,6 +344,7 @@ def project_v003_variable_to_v04(v003, provenance, original):
             "reported_elements": old_test["reported_elements"],
             "require": "at_least_one_exists_and_some_match",
         }
+        projected_tests[new_test_id], _ = promote_test(projected_tests[new_test_id])
         compile_test_instruction(new_test_id, projected_tests[new_test_id])
     require(used_states == set(old_states), "unused or missing 0.3 source State")
     return {"assessment": {
@@ -396,6 +407,7 @@ def project_v003_family_to_v04(v003, provenance):
         "reported_elements": old_test["reported_elements"],
         "require": "at_least_one_exists_and_some_match",
     }
+    native_test, _ = promote_test(native_test)
     compile_test_instruction(FAMILY_TEST_NAME, native_test)
     return {"assessment": {
         "id": a["id"], "version": a["version"],
@@ -515,6 +527,31 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
     aligned, modern = postprocess_automated_assessment(lower, target_ng_version="0.3.0")
     require(modern is None, "unexpected 0.3 modernization")
     attest_pinned_graph(aligned, "aligned")
+    if hashlib.sha256(original).hexdigest() in APPROVED_REQUIRE_SOURCES:
+        # Original OVAL -> mature lowering must independently reconstruct the
+        # original semantic graph before any presentation/grammar projection.
+        from scap_ng_roundtrip_v003.native_assessment_to_oval import build
+        from scap_ng_roundtrip_v003.compare_oval_semantics import compare
+        import tempfile
+        tree, regenerated_id = build(lower)
+        with tempfile.TemporaryDirectory() as temporary:
+            regenerated = Path(temporary) / 'oval.xml'
+            tree.write(regenerated, encoding='utf-8')
+            require(compare(source_path, regenerated, definition_id, regenerated_id,
+                            root_only=True)['equal'], 'original OVAL semantic graph differs')
+        native, proof = upgrade_v003(aligned)
+        from v04_canonical_source_ir import validate_docs, _schema_validators
+        validate_docs({'authoring/source/a.json': native}, _schema_validators(
+            Path(__file__).resolve().parents[1] / 'schema/v0.4.0'))
+        from v04_native_bundle_compiler import compile_assessment_program
+        compile_assessment_program(native['assessment'])
+        return native, {'status': 'APPROVED_REQUIRE_ORIGINAL_OVAL_INTEGRATION',
+                        'source_sha256': hashlib.sha256(original).hexdigest(),
+                        'definition_id': definition_id, 'source_provenance': provenance,
+                        'approved_require_projection': proof,
+                        'original_oval_semantic_roundtrip': 'PASS',
+                        'v003_source_lowering_reused': True, 'full_oval_coverage': False,
+                        'scanner_parity': False}
     multi_direct_presence = (independent is None and
                              len(aligned["assessment"].get("tests") or {}) >= 2)
     object_presence = independent is None and not multi_direct_presence
@@ -549,6 +586,11 @@ def convert(source_path: Path, definition_id: str, *, assessment_id=None):
         independent_flat, flat_proof = flatten_document(independent, flat_catalog())
         require(restore_document(independent_flat, flat_proof) == independent,
                 "independent OVAL leaf normalization not invertible")
+    # Both legacy adapter products cross the explicit versioned upgrader. No
+    # authored input is silently repaired by the compiler or its validators.
+    native, _ = promote_approved(native, legacy_review=True)
+    if independent_flat is not None:
+        independent_flat, _ = promote_approved(independent_flat, legacy_review=True)
     if variable_source or family_source or constant_matrix_source or datatype_suite_name:
         # The two-leaf comparator intentionally rejects these distinct source
         # shapes; compare the complete independently generated Assessment.

@@ -17,6 +17,7 @@ import xml.etree.ElementTree as ET
 from import_v04_oval_leaf_pilot import slug
 from v04_flat_object_authoring import flatten_document, restore_document
 from v04_native_bundle_compiler import compile_assessment_program
+from build_v04_canonical_six_stigs import promote
 from v04_source_verified_object_presence import (
     OD, SOURCE_EXISTENCE, SOURCE_ITEM_CHECK, child,
     direct_selectors, ensure, source_by_id,
@@ -144,6 +145,7 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog):
     flattened, proof = flatten_document(result, catalog)
     ensure(not proof["edits"] and restore_document(flattened, proof) == result,
            "multi-Test flat Object inverse unexpectedly changed")
+    result, _ = promote(result, legacy_review=True)
     program = compile_assessment_program(result["assessment"])
     ensure(len(program["test_instructions"]) == len(tests)
            and all(instruction["opcode"] == "CHECK_COLLECTION_PRESENCE"

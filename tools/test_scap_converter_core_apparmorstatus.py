@@ -3,6 +3,10 @@
 
 Refs #232 #248.
 """
+
+from build_v04_canonical_six_stigs import promote
+from test_scap_converter_core import legacy_oracle_view
+from v04_canonical_source_ir import _schema_validators
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -51,7 +55,7 @@ class AppArmorCoreTests(unittest.TestCase):
         with patch.object(core, "lower_definition", wraps=core.lower_definition) as lower:
             native, proof = self.convert()
         lower.assert_called_once()
-        self.assertEqual(native, source_to_native(self.raw))
+        self.assertEqual(native, promote(source_to_native(self.raw), legacy_review=True)[0])
         self.assertEqual(proof["source_sha256"], SHA)
         self.assertEqual(proof["v003_pinned_lowering_sha256"], core.APPARMOR_LOWERING_SHA256)
         self.assertTrue(proof["v003_source_lowering_reused"])
@@ -61,10 +65,10 @@ class AppArmorCoreTests(unittest.TestCase):
         a = native["assessment"]
         self.assertNotIn("objects", a)
         self.assertNotIn("object", a["tests"][NAME])
-        self.assertEqual(a["tests"][NAME]["require"], "at_least_one_exists_and_all_match")
-        self.assertEqual(a["tests"][NAME]["states"], [{"loaded_profiles_count": {
-            "greater_than_or_equal": 0, "datatype": "integer",
-            "require": "at_least_one_exists_and_all_match"}}])
+        self.assertEqual(a['tests'][NAME]['require'], {
+            'items_found': 'one_or_more', 'items_satisfying': 'every', 'fields': {
+                'loaded_profiles_count': {'greater_than_or_equal': 0, 'datatype': 'integer',
+                                         'values_found': 'one_or_more', 'values_matching': 'every'}}})
         validate_docs({"authoring/apparmor.json": native},
                       _schema_validators(ROOT / "schema/v0.4.0"))
         docs = schema_valid_docs()
@@ -75,7 +79,7 @@ class AppArmorCoreTests(unittest.TestCase):
         self.assertEqual((checked["documents"], checked["programs"], checked["tests"]), (3, 1, 1))
         self.assertFalse(checked["scanner_evaluated"])
         exported = self.work / "independently-regenerated.xml"
-        native_to_oval(native).write(exported, encoding="utf-8", xml_declaration=True)
+        native_to_oval(legacy_oracle_view(native)).write(exported, encoding="utf-8", xml_declaration=True)
         self.assertTrue(compare(self.source, exported, source_root=SOURCE_DEF,
                                 regenerated_root=NEW + "def:1", root_only=True)["equal"])
 
@@ -84,7 +88,7 @@ class AppArmorCoreTests(unittest.TestCase):
                    side_effect=AssertionError("oracle output cannot supply native graph")), \
              patch.object(core, "independent_leaf_import", side_effect=AssertionError("no leaf bypass")):
             native, _ = self.convert()
-        self.assertEqual(native, source_to_native(self.raw))
+        self.assertEqual(native, promote(source_to_native(self.raw), legacy_review=True)[0])
         with patch.object(core, "lower_definition", return_value=(None, "deliberate failure")):
             with self.assertRaisesRegex(ValueError, "0.3 source lowering failed"):
                 self.convert()
@@ -95,7 +99,7 @@ class AppArmorCoreTests(unittest.TestCase):
                       _schema_validators(ROOT / "schema/v0.4.0"))
         expected = source_to_native(self.raw)
         expected["assessment"]["id"] = native["assessment"]["id"]
-        self.assertEqual(native, expected)
+        self.assertEqual(native, promote(expected, legacy_review=True)[0])
 
     def test_cli_identity_override_and_evidence(self):
         dest, evidence = self.work / "native.json", self.work / "evidence.json"

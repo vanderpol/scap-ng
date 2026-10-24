@@ -39,7 +39,7 @@ class MultiStateOriginalTests(unittest.TestCase):
                 self.assertEqual(len(a["evaluate"]["and"]), 2)
                 self.assertEqual({t["capability"] for t in a["tests"].values()},
                                  {capability})
-                self.assertEqual([list(x["states"][0].values())[0]["matches_regex"]
+                self.assertEqual([list(x["require"]["fields"].values())[0]["matches_regex"]
                                   for x in a["tests"].values()],
                                  [".*http server", ".*"])
                 self.assertEqual(len(compile_assessment_program(a)["test_instructions"]), 2)

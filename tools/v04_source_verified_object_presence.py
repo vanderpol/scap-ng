@@ -19,6 +19,7 @@ import xml.etree.ElementTree as ET
 from import_v04_oval_leaf_pilot import slug
 from v04_flat_object_authoring import flatten_document, restore_document
 from v04_native_bundle_compiler import compile_test_instruction
+from v04_field_requirement import promote_test
 
 
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
@@ -388,8 +389,10 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     flattened, proof = flatten_document(candidate, catalog)
     ensure(not proof["edits"] and restore_document(flattened, proof) == candidate,
            "flat 0.4 projection source reconstruction failed")
+    candidate['assessment']['tests'][native_id], _ = promote_test(
+        candidate['assessment']['tests'][native_id], legacy_review=True)
     compiled = compile_test_instruction(native_id, candidate["assessment"]["tests"][native_id])
-    ensure(compiled["opcode"] == ("CHECK_SOURCE_EXACT_STATES" if with_state else
+    ensure(compiled["opcode"] == ("CHECK_ITEM_CONDITION" if with_state else
                                   "CHECK_COLLECTION_PRESENCE"),
            "0.4 compiler dropped source-exact Test/State semantics")
     return candidate

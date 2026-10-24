@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Pinned family regex Variable OVAL -> maintained 0.3 lowering -> 0.4 core."""
 from __future__ import annotations
+from build_v04_canonical_six_stigs import promote
+from test_scap_converter_core import legacy_oracle_view
+from v04_canonical_source_ir import _schema_validators
+
 
 from copy import deepcopy
 from hashlib import sha256
@@ -52,22 +56,22 @@ class MatureFamilyVariableIntegrationTests(unittest.TestCase):
     def test_mature_source_and_independent_importer_match_schema_compiler_roundtrip(self):
         native, evidence = convert(self.src, DID)
         expected, _ = independent_family_import(self.src)
-        self.assertEqual(native, expected)
-        self.assertFalse(list(Draft202012Validator(SCHEMA).iter_errors(native)))
+        self.assertEqual(native, promote(expected, legacy_review=True)[0])
+        self.assertFalse(list(_schema_validators(Path(__file__).resolve().parents[1] / 'schema/v0.4.0')['assessment'].iter_errors(native)))
         self.assertTrue(evidence["v003_source_lowering_reused"])
         self.assertTrue(evidence["independent_family_import_agreement"])
         self.assertFalse(evidence["scanner_parity"])
         self.assertFalse(evidence["full_oval_coverage"])
         a = native["assessment"]
         test = a["tests"]["system-family-matches-test"]
-        self.assertEqual(test["require"], "at_least_one_exists_and_some_match")
-        self.assertEqual(test["states"][0]["family"]["value_match"], "all")
-        self.assertEqual(test["states"][0]["family"]["require"],
-                         "at_least_one_exists_and_all_match")
+        self.assertEqual(test["require"]["items_satisfying"], "one_or_more")
+        self.assertEqual(test["require"]["fields"]["family"]["value_match"], "every")
+        self.assertEqual(test["require"]["fields"]["family"]["values_matching"],
+                         "every")
         compiled = compile_assessment_program(a)
         self.assertEqual(compiled["test_instructions"][0]["opcode"],
-                         "CHECK_SOURCE_EXACT_STATES")
-        tree, exported_did = emit(native)
+                         "CHECK_ITEM_CONDITION")
+        tree, exported_did = emit(legacy_oracle_view(native))
         exported = self.dir / "regenerated.xml"
         exported.write_bytes(ET.tostring(tree.getroot(), encoding="utf-8"))
         comparison = compare_oval(self.src, exported, source_root=DID,

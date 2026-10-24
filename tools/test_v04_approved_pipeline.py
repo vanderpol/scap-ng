@@ -92,6 +92,10 @@ class ApprovedPipelineTests(unittest.TestCase):
         recover(canonical, source)
         catalog = load_catalog(ROOT / 'schema/v0.4.0/capability-mappings/supported')
         flat, flat_ledger = flatten_document(canonical, catalog)
+        from scap_converter_core import convert
+        production, production_evidence = convert(path, did, assessment_id=a['id'])
+        self.assertEqual(production, flat)
+        self.assertEqual(production_evidence['original_oval_semantic_roundtrip'], 'PASS')
         source_audit = compare_original_to_canonical(
             {'authoring/trace/a.json': source}, {'authoring/trace/a.json': flat})
         self.assertEqual(source_audit['source_exact_promotion'], 'PASS')
@@ -158,8 +162,29 @@ class ApprovedPipelineTests(unittest.TestCase):
                         'compiled_report': result, 'original_oval_semantic_roundtrip': 'PASS',
                         'schema_baseline': '5a43f45a972fb63526e71ac872b21d97a676044c',
                         'requirement_source_audit': source_audit,
+                        'production_converter_evidence': production_evidence,
                         'scanner_equivalence': False}
             (out / 'provenance.json').write_text(json.dumps(evidence, indent=2) + '\n')
+
+    def test_real_all_exist_source_requires_owner_population_decision(self):
+        from build_v04_canonical_six_stigs import upgrade_v003
+        path = ROOT / 'research/assessment-simplification/evidence/rhel_9/SV-258179/source-oval.xml'
+        self.assertEqual(sha256(path.read_bytes()).hexdigest(),
+                         '463b539c469c3302aa52c23fdca35814f40fd5fd7de31346964e1b4a97b5d8a9')
+        root = ET.parse(path).getroot()
+        original = next(n for n in root.iter() if n.get('id') == 'oval:mil.disa.stig.ind:tst:23041300')
+        self.assertEqual(original.get('check_existence'), 'all_exist')
+        did = next(n.get('id') for n in root.iter() if n.tag.endswith('}definition'))
+        native, error = lower_definition(root, did, 'all-exist-counterexample-assessment',
+                                         collection_graph=True, provenance={})
+        self.assertIsNone(error)
+        aligned, _ = postprocess_automated_assessment(native, target_ng_version='0.3.0')
+        with self.assertRaisesRegex(AssertionError, 'does not match source'):
+            upgrade_v003(aligned)
+        from oval_result_truth_tables import evaluate_collected_object_test
+        boundary = dict(has_state=False, check='all', exists=1, does_not_exist=1)
+        self.assertEqual(evaluate_collected_object_test('complete', existence='all_exist', **boundary), 'false')
+        self.assertEqual(evaluate_collected_object_test('complete', existence='at_least_one_exists', **boundary), 'true')
 
     def test_linux_filters_permissions_and_variables(self):
         self.check_case(CASES[0])

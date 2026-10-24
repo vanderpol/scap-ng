@@ -17,6 +17,7 @@ from unittest.mock import patch
 import xml.etree.ElementTree as ET
 
 import scap_converter_core as core
+from test_scap_converter_core import legacy_oracle_view
 from audit_scap_converter_core_coverage import inventory
 from check_current_authoring_contract import violations
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
@@ -35,6 +36,7 @@ CASES = (
 
 def native_to_oval(native, original):
     """Independent bounded inverse; require all native graph nodes consumed."""
+    native = legacy_oracle_view(native)
     root = ET.fromstring(original)
     definition = root.find('{'+OD+'}definitions')[0]
     criteria = definition.find('{'+OD+'}criteria')
@@ -140,25 +142,24 @@ class EnvironmentUnameCoreTests(unittest.TestCase):
         self.assertEqual([t['object']['pid'] for t in tests],[None,{'equals':1},{'greater_than':0}])
         self.assertIs(type(tests[1]['object']['pid']['equals']),int)
         self.assertEqual([t['object']['name'] for t in tests],[{'equals':'HOME'},{'not_equal':'PATH'},{'matches_regex':'^S'}])
-        self.assertEqual(tests[1]['states'],[{'name':{'require':'at_least_one_exists_and_all_match','case_insensitive_not_equal':'PATH'}}])
-        self.assertTrue(all(t['require']=='at_least_one_exists_and_some_match' for t in tests))
+        self.assertEqual(tests[1]['require']['fields']['name'],{'values_found':'one_or_more','values_matching':'every','case_insensitive_not_equal':'PATH'})
+        self.assertTrue(all(t['require']['items_satisfying']=='one_or_more' for t in tests))
 
     def test_uname_singleton_all_six_state_fields(self):
         native,_ = core.convert(*self.sources[1][:2])
         test = next(iter(native['assessment']['tests'].values()))
         self.assertNotIn('object',test)
         self.assertNotIn('objects',native['assessment'])
-        self.assertEqual(test['require'],'at_least_one_exists_and_all_match')
-        fields = test['states'][0]['and']
+        self.assertEqual(test['require']['items_satisfying'],'every')
+        fields = [branch['fields'] for branch in test['require']['and']]
         self.assertEqual([next(iter(f)) for f in fields],['machine_class','node_name','os_name','os_release','os_version','processor_type'])
-        self.assertTrue(all(next(iter(f.values())) == {'matches_regex':'.*','require':'at_least_one_exists_and_all_match'} for f in fields))
+        self.assertTrue(all(next(iter(f.values())) == {'matches_regex':'.*','values_found':'one_or_more','values_matching':'every'} for f in fields))
 
     def test_independent_graph_comparison_detects_native_semantic_mutations(self):
         for path,did,_ in self.sources:
             native,_ = core.convert(path,did)
             first = next(iter(native['assessment']['tests'].values()))
-            first['require'] = ('at_least_one_exists_and_all_match' if '354' in did
-                                else 'at_least_one_exists_and_some_match')
+            first['require']['items_satisfying'] = ('every' if '354' in did else 'one_or_more')
             exported = self.work/'changed-check.xml'
             native_to_oval(native,path.read_bytes()).write(exported,encoding='utf-8')
             self.assertFalse(compare(path,exported,source_root=did,regenerated_root=did,root_only=True)['equal'])
@@ -167,7 +168,7 @@ class EnvironmentUnameCoreTests(unittest.TestCase):
             if '354' in did:
                 first['object']['pid'] = {'equals':0}
             else:
-                first['states'][0]['and'][2]['os_name']['matches_regex'] = 'Linux'
+                first['require']['and'][2]['fields']['os_name']['matches_regex'] = 'Linux'
             exported = self.work/'changed-operand.xml'
             native_to_oval(native,path.read_bytes()).write(exported,encoding='utf-8')
             self.assertFalse(compare(path,exported,source_root=did,regenerated_root=did,root_only=True)['equal'])
