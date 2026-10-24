@@ -183,3 +183,28 @@ eight passing workflows and red rebaseline. No manual workflow, full six-STIG or
 with `Post "https://api.github.com/graphql": Forbidden`; the coordination comment
 explicitly preserves the committed-report fallback. No repeated issue-write
 attempt or scheduling claim is made.
+
+## Published audit and hosted results
+
+Audit/report/replay command:
+[`d60fcf462fa7180590e0efce60b301e7b86c2fea`](https://github.com/vanderpol/scap-ng/commit/d60fcf462fa7180590e0efce60b301e7b86c2fea),
+pushed normally to `main`. The reviewed Assessment schema Git blob remains
+`725bba3c6588368a91c9d8dc4fbae8ca2462b524`. Only the audit command and three
+engineering evidence files changed. Layout preservation and diff-whitespace
+checks passed; the Markdown audit reports the same three pre-existing Board
+heading links, with no new broken links.
+
+All four automatically triggered monitored workflows reached terminal status:
+
+| Workflow at the audit commit | Result |
+| --- | --- |
+| [Canonical authoring fast checks](https://github.com/vanderpol/scap-ng/actions/runs/40122703294) | Passed |
+| [Markdown audit](https://github.com/vanderpol/scap-ng/actions/runs/40122703306) | Passed |
+| [Issue references](https://github.com/vanderpol/scap-ng/actions/runs/40122703301) | Passed |
+| [Rebaseline smoke](https://github.com/vanderpol/scap-ng/actions/runs/40122703299) | Failed; remains an unwaived release blocker |
+
+The public hosted conclusion is distinct from the retained exact local
+failure-identity inventory. This audit does not claim to have read authenticated
+hosted per-test logs or equate a red conclusion with success. Existing source,
+schema and compiler regression evidence is retained; no CI filter or pass
+criterion was changed to obtain these results.
