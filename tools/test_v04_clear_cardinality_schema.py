@@ -89,16 +89,21 @@ class ClearCardinalitySchemaTests(unittest.TestCase):
                                                satisfying=satisfying))
 
     def test_field_and_record_quantifiers_cover_complete_cross_product(self):
+        # Preserve coverage of all combinations, but reject redundant comparison
+        # clauses when confirmed absence is the complete requirement. The OVAL
+        # source attributes remain separate migration provenance.
         for found in EXISTENCE:
             for matching in SATISFACTION:
                 fields = {'equals': 1, 'values_found': found,
                           'values_matching': matching}
-                self.assert_grammar(with_field(field=fields))
+                self.assert_grammar(with_field(field=fields), valid=found != 'none')
                 record = {'record': {
                     'records_found': found, 'records_matching': matching,
                     'fields': {'productstate': {
                         'bitwise_and': 4096, **FIELD_COUNT}}}}
-                self.assert_grammar(with_field(field=record))
+                self.assert_grammar(with_field(field=record), valid=found != 'none')
+        self.assert_grammar(with_field(field={'values_found': 'none'}))
+        self.assert_grammar(with_field(field={'record': {'records_found': 'none'}}))
 
     def test_inline_scalar_and_nested_record_require_explicit_cardinality(self):
         for field in (

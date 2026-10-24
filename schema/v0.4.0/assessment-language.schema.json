@@ -55,13 +55,13 @@
         "values_matching": {"$ref": "#/$defs/cardinality"}
       },
       "additionalProperties": false,
-      "description": "Explicit State-field existence and matching cardinalities, when shared through a field_requirement inheritance scope."
+      "not": {"properties": {"values_found": {"const": "none"}}, "required": ["values_found"]},
+      "description": "Explicit field existence and matching cardinalities inherited together. Comparator-free absence is authored only on the individual field as values_found: none."
     },
     "scalar_field_predicate": {
       "type": "object",
       "required": [
-        "values_found",
-        "values_matching"
+        "values_found"
       ],
       "properties": {
         "values_found": {"$ref": "#/$defs/existence_cardinality"},
@@ -3322,15 +3322,15 @@
           "oneOf": [
             {
               "required": [
-                "require"
+                "values_found"
               ],
               "properties": {
-                "require": {
-                  "const": "none_exist"
+                "values_found": {
+                  "const": "none"
                 }
               },
               "maxProperties": 1,
-              "description": "OVAL State entity check_existence=none_exist without a value comparison."
+              "description": "Confirmed State field absence with no comparator or matching cardinality."
             },
             {
               "required": [
@@ -6044,13 +6044,15 @@
             ]
           }
         }
-      ]
+      ],
+      "if": {"properties": {"values_found": {"const": "none"}}, "required": ["values_found"]},
+      "then": {"maxProperties": 1},
+      "else": {"required": ["values_matching"]}
     },
     "record_field_predicate": {
       "type": "object",
       "required": [
-        "values_found",
-        "values_matching"
+        "values_found"
       ],
       "properties": {
         "values_found": {"$ref": "#/$defs/existence_cardinality"},
@@ -9309,6 +9311,12 @@
         {
           "oneOf": [
             {
+              "required": ["values_found"],
+              "properties": {"values_found": {"const": "none"}},
+              "maxProperties": 1,
+              "description": "Confirmed record-member field absence without a comparison."
+            },
+            {
               "required": [
                 "equals"
               ]
@@ -9676,7 +9684,10 @@
             ]
           }
         }
-      ]
+      ],
+      "if": {"properties": {"values_found": {"const": "none"}}, "required": ["values_found"]},
+      "then": {"maxProperties": 1},
+      "else": {"required": ["values_matching"]}
     },
     "record_wrapper_predicate": {
       "type": "object",
@@ -9687,9 +9698,7 @@
         "record": {
           "type": "object",
           "required": [
-            "records_found",
-            "records_matching",
-            "fields"
+            "records_found"
           ],
           "properties": {
             "records_found": {"$ref": "#/$defs/existence_cardinality"},
@@ -9709,7 +9718,10 @@
               "const": true
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "if": {"properties": {"records_found": {"const": "none"}}, "required": ["records_found"]},
+          "then": {"maxProperties": 1},
+          "else": {"required": ["records_matching", "fields"]}
         }
       },
       "additionalProperties": false
@@ -26299,27 +26311,39 @@
         }
       ]
     },
+    "absence_only_field_predicate": {
+      "type": "object",
+      "required": ["values_found"],
+      "properties": {"values_found": {"const": "none"}},
+      "additionalProperties": false,
+      "description": "The only comparator-free field condition is confirmed absence, not an empty value or failed collection."
+    },
     "canonical_field_predicate": {
       "type": "object",
       "properties": {
         "values_found": {
           "$ref": "#/$defs/existence_cardinality",
-          "description": "Overrides inherited field-existence cardinality for this field; if specified, values_matching is also required."
+          "description": "Overrides inherited field-existence cardinality. The value none is a standalone confirmed-absence condition and forbids comparison properties."
         },
         "values_matching": {
           "$ref": "#/$defs/cardinality",
-          "description": "Overrides inherited field-match cardinality for this field; if specified, values_found is also required."
+          "description": "Overrides inherited field-match cardinality for a comparison; never used with values_found: none."
         }
       },
       "allOf": [
         {
-          "$ref": "#/$defs/field_predicate_body"
+          "oneOf": [
+            {"$ref": "#/$defs/field_predicate_body"},
+            {"$ref": "#/$defs/absence_only_field_predicate"}
+          ]
         }
       ],
-      "dependentRequired": {
+      "if": {"properties": {"values_found": {"const": "none"}}, "required": ["values_found"]},
+      "then": {"maxProperties": 1},
+      "else": {"dependentRequired": {
         "values_found": ["values_matching"],
         "values_matching": ["values_found"]
-      },
+      }},
       "unevaluatedProperties": false
     },
     "explicit_field_predicate": {
@@ -26329,8 +26353,7 @@
         },
         {
           "required": [
-            "values_found",
-            "values_matching"
+            "values_found"
           ]
         }
       ]
@@ -26761,5 +26784,5 @@
     }
   },
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-10-23"
+  "x-last-modified": "2026-10-24"
 }

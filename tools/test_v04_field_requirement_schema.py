@@ -199,6 +199,70 @@ class ProductionFieldRequirementTests(unittest.TestCase):
             req['or'] = [{'fields': {'value': invalid}}]
             self.assert_valid(req, valid=False)
 
+    def test_field_absence_has_one_canonical_comparator_free_form(self):
+        # OVAL State entity check_existence=none_exist is independent of
+        # value matching. A field-local absence overrides inherited matching.
+        req = requirement()
+        req['or'] = [{'fields': {'unlabeled': {'values_found': 'none'}}}]
+        self.assert_valid(req)
+        del req['field_requirement']
+        self.assert_valid(req)  # explicit absence needs no inherited pair
+
+        for predicate in (
+            {'values_found': 'none', 'values_matching': 'every'},
+            {'values_found': 'none', 'equals': ''},
+            {'values_found': 'none', 'datatype': 'string'},
+            {'values_found': 'none', 'value_match': 'none'},
+            {'values_found': 'none', 'redact_result': True},
+            {'values_found': 'none', 'equals': None},
+            {'require': 'none_exist'},
+            {'absent': True},
+            {'exists': False},
+            {'values_found': 'one_or_more'},
+        ):
+            with self.subTest(predicate=predicate):
+                req['or'] = [{'fields': {'unlabeled': predicate}}]
+                self.assert_valid(req, valid=False)
+
+        # 'none matching' means values were observed but failed comparison.
+        req = requirement()
+        req['or'] = [{'fields': {'unlabeled': {
+            'values_found': 'one_or_more', 'values_matching': 'none',
+            'equals': 'unexpected'}}}]
+        self.assert_valid(req)
+
+    def test_field_absence_cannot_be_duplicated_as_inherited_pair(self):
+        for scope in ('test', 'condition'):
+            req = requirement()
+            requirement_pair = {'values_found': 'none', 'values_matching': 'every'}
+            if scope == 'test':
+                req['field_requirement'] = requirement_pair
+            else:
+                req['or'][0]['field_requirement'] = requirement_pair
+            self.assert_valid(req, valid=False)
+
+    def test_record_and_record_member_absence_use_matching_count_vocabulary(self):
+        req = requirement()
+        req['or'] = [{'fields': {'record_value': {
+            'record': {'records_found': 'none'}}}}]
+        self.assert_valid(req)
+        req['or'] = [{'fields': {'record_value': {'record': {
+            'records_found': 'one_or_more', 'records_matching': 'every',
+            'fields': {'unlabeled': {'values_found': 'none'}}}}}}]
+        self.assert_valid(req)
+
+        for record in (
+            {'records_found': 'none', 'records_matching': 'every'},
+            {'records_found': 'none', 'fields': {'unlabeled': {'values_found': 'none'}}},
+            {'records_found': 'none', 'redact_result': True},
+            {'records_found': 'one_or_more'},
+            {'records_found': 'one_or_more', 'records_matching': 'every'},
+            {'require': 'none_exist'},
+        ):
+            with self.subTest(record=record):
+                req['or'] = [{'fields': {'record_value': {'record': record}}}]
+                self.assert_valid(req, valid=False)
+
     def test_description_distinguishes_three_scopes(self):
         definitions = self.language['$defs']
         self.assertEqual(definitions['cardinality']['enum'],
