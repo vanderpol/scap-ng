@@ -3,11 +3,13 @@
 
 The mature 0.3 lowering supplies the entire authoring graph. The original
 OVAL XML independently attests its direct Test, Object, selector values and
-check_existence, plus a supported singleton scalar State if present.
+check_existence, plus supported scalar States if present. Registry Tests may
+combine complete scalar States with AND/OR; each State retains its own field
+operator. Records, dynamic operands and unsupported quantifiers fail closed.
 Unsupported semantics fail closed. This is a converter
 coverage proof, not a scanner six-state equivalence claim.
 
-Refs #232 #248 #229.
+Refs #251 #232 #248 #229.
 """
 from __future__ import annotations
 
@@ -122,6 +124,15 @@ def direct_selectors(original_object, old_object, namespace, capability, mapping
                "unmapped original selector operation " + operation)
         old_operation, native_operation = SOURCE_OPERATIONS[operation]
         original_value = node.text or ""
+        crosswalk = mapping["native"].get("selector_value_crosswalk", {}).get(field)
+        if capability == "windows.registry" and crosswalk:
+            values = mapping["migration_crosswalk"][crosswalk]
+            ensure(operation == "equals" and original_value in values
+                   and values[original_value] in mapping["native"]["selector_value_enums"][field]
+                   and source_selectors[field] == values[original_value],
+                   "registry enum selector/operation/value drift")
+            obj[renames[field]] = values[original_value]
+            continue
         ensure(source_selectors[field] == {
             "operation": old_operation, "datatype": "string", "value": original_value},
             "0.3 selector/operation/value drift from original OVAL")
@@ -132,9 +143,84 @@ def direct_selectors(original_object, old_object, namespace, capability, mapping
     return obj
 
 
+def registry_state_requirement(root, original_test, old_test, states, namespace, mapping):
+    """Attest literal scalar States independently of mature 0.3 lowering.
+
+    Keep Test State aggregation outside each complete State's field aggregation.
+    No flattening across those two scopes is valid, even for repeated fields.
+    """
+    operator = original_test.get("state_operator", "AND")
+    ensure(operator in {"AND", "OR"}, "unsupported registry state_operator " + operator)
+    ensure(old_test.get("states_match") == {"AND": "all", "OR": "any"}[operator],
+           "registry Test state_operator differs from mature lowering")
+    refs = list(original_test)[1:]
+    state_ids = old_test["states"]
+    ensure(len(refs) == len(state_ids) >= 2
+           and len(set(state_ids)) == len(state_ids) and set(state_ids) == set(states)
+           and len({ref.get('state_ref') for ref in refs}) == len(refs),
+           "registry State reference closure changed")
+    conditions = []
+    for ref, state_id in zip(refs, state_ids):
+        original = source_by_id(root, ref.get("state_ref"))
+        old = states[state_id]
+        field_operator = original.get("operator", "AND")
+        ensure(original.tag == "{" + namespace + "}" + mapping["source"]["state"]
+               and set(original.attrib) <= {"id", "version", "comment", "operator"}
+               and original.get("version") is not None
+               and field_operator in {"AND", "OR"} and len(original) > 0
+               and set(old) == {"state_title", "capability", "state"}
+               and old["capability"] == "windows.registry"
+               and old["state_title"] == original.get("comment"),
+               "unsupported registry State type/title/operator")
+        payload = old["state"]
+        logical = {"AND": "all", "OR": "any"}[field_operator]
+        if len(original) == 1:
+            old_fields = [payload]
+        else:
+            ensure(isinstance(payload, dict) and set(payload) == {logical},
+                   "registry State field operator differs from mature lowering")
+            old_fields = payload[logical]
+        ensure(isinstance(old_fields, list) and len(old_fields) == len(original),
+               "registry State field closure changed")
+        fields = []
+        for element, old_field in zip(original, old_fields):
+            field = element.tag.rsplit("}", 1)[-1]
+            rename = mapping["native"]["state_field_map"].get(field)
+            datatype = element.get("datatype", "string")
+            operation = element.get("operation", "equals")
+            operations = SOURCE_OPERATIONS if datatype == "string" else VERSION_OPERATIONS
+            value = element.text or ""
+            crosswalk = mapping["native"].get("state_value_crosswalk", {}).get(field)
+            if crosswalk:
+                values = mapping["migration_crosswalk"][crosswalk]
+                ensure(operation == "equals" and value in values
+                       and values[value] in mapping["native"]["state_value_enums"][field],
+                       "unsupported registry enum State comparison")
+                value = values[value]
+            ensure(element.tag == "{" + namespace + "}" + field and rename
+                   and datatype in {"string", "version"} and not list(element)
+                   and set(element.attrib) <= {"datatype", "operation", "entity_check", "entity_existence"}
+                   and element.get("entity_check", "all") == "all"
+                   and element.get("entity_existence", "at_least_one_exists") == "at_least_one_exists"
+                   and operation in operations,
+                   "unsupported registry scalar State datatype/operation/quantifier")
+            ensure(old_field == {"field": rename, "value": value,
+                                 "operation": operations[operation][0], "datatype": datatype,
+                                 "match": "all", "existence": "one_or_more"},
+                   "registry State field/operation/value differs from mature lowering")
+            fields.append({"fields": {rename: {
+                "datatype": datatype, operations[operation][1]: value,
+                "values_found": "one_or_more", "values_matching": "every"}}})
+        conditions.append(fields[0] if len(fields) == 1 else
+                          {field_operator.lower(): fields})
+    return {"items_found": "one_or_more",
+            "items_satisfying": {"all": "every", "one_or_more": "one_or_more"}[old_test["match"]],
+            operator.lower(): conditions}
+
+
 def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
             *, source_criterion_ref=None):
-    """Reconcile one source Test/Object and optional scalar State with OVAL.
+    """Reconcile one source Test/Object and supported scalar States with OVAL.
 
     A selected criterion of a verified flat AND allows the multi-Test adapter
     to reuse this complete leaf proof without synthesizing altered source XML.
@@ -149,15 +235,19 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     ensure(not a.get("variables") and "shared_objects" not in a,
            "Variable/shared Object graph not supported")
     with_state = bool(a.get("states"))
+    test_id, old_test = one(a.get("tests"), "mapped Test")
+    registry_states = (old_test.get("capability") == "windows.registry"
+                       and len(a.get("states") or {}) >= 2)
     if with_state:
-        state_id, old_state = one(a.get("states"), "mapped scalar State")
+        state_id, old_state = (None, None) if registry_states else one(a.get("states"), "mapped scalar State")
         expected_test_keys = {"test_title", "capability", "object", "states",
                               "reported_elements", "existence", "match"}
+        if registry_states:
+            expected_test_keys.add("states_match")
     else:
         state_id, old_state = None, None
         expected_test_keys = {"test_title", "capability", "object",
                               "reported_elements", "existence", "match"}
-    test_id, old_test = one(a.get("tests"), "mapped Test")
     singleton = not a.get("objects")
     if singleton:
         object_id, old_object = None, None
@@ -171,10 +261,10 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
            and old_test["match"] in SOURCE_ITEM_CHECK.values(),
            "unsupported Test graph/check")
     if with_state:
-        ensure(old_test["states"] == [state_id]
+        ensure((registry_states or old_test["states"] == [state_id])
                and old_test["existence"] == "one_or_more"
-               and set(old_state) == {"state_title", "capability", "state"}
-               and old_state["capability"] == old_test["capability"],
+               and (registry_states or (set(old_state) == {"state_title", "capability", "state"}
+                    and old_state["capability"] == old_test["capability"])),
                "unsupported State reference/existence")
     if not singleton:
         ensure(set(old_object) == {"capability", "object_title", "select"}
@@ -261,8 +351,9 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     original_test = source_by_id(root, oval_test_id)
     namespace = source["namespace"]
     ensure(original_test.tag == "{" + namespace + "}" + source["test"]
-           and set(original_test.attrib) <= {
+           and set(original_test.attrib) <= ({
                "id", "version", "comment", "check_existence", "check"}
+               | ({"state_operator"} if registry_states else set()))
            and original_test.get("comment") == old_test["test_title"]
            and original_test.get("check", "all") in SOURCE_ITEM_CHECK
            and SOURCE_ITEM_CHECK[original_test.get("check", "all")] == old_test["match"]
@@ -274,13 +365,13 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     mapped_existence, native_existence = SOURCE_EXISTENCE[original_existence]
     ensure(old_test["existence"] == mapped_existence,
            "0.3 Test existence differs from original OVAL")
-    ensure(len(original_test) == (2 if with_state else 1)
+    ensure(len(original_test) == (1 + len(old_test["states"]) if with_state else 1)
            and original_test[0].tag in {"{" + OD + "}object", "{" + namespace + "}object"}
            and set(original_test[0].attrib) == {"object_ref"},
            "source Test uses unsupported Object/State structure")
     if with_state:
-        ensure(original_test[1].tag in {"{" + OD + "}state", "{" + namespace + "}state"}
-               and set(original_test[1].attrib) == {"state_ref"},
+        ensure(all(ref.tag in {"{" + OD + "}state", "{" + namespace + "}state"}
+                   and set(ref.attrib) == {"state_ref"} for ref in list(original_test)[1:]),
                "source Test State binding not direct")
     original_object_id = original_test[0].get("object_ref")
     source_bindings = provenance.get("source_collection_bindings", {})
@@ -305,7 +396,7 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
                                capability, mapping, catalog)
 
     native_states = None
-    if with_state:
+    if with_state and not registry_states:
         original_state = source_by_id(root, original_test[1].get("state_ref"))
         ensure(original_state.tag == "{" + namespace + "}" + source["state"]
                and set(original_state.attrib) <= {"id", "version", "comment"}
@@ -375,6 +466,9 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
         native_test["object"] = obj
     if native_states is not None:
         native_test["states"] = native_states
+    if registry_states:
+        native_test["require"] = registry_state_requirement(
+            root, original_test, old_test, a["states"], namespace, mapping)
     candidate = {"assessment": {
         "id": a["id"], "version": a["version"],
         "assessment_title": a["assessment_title"],

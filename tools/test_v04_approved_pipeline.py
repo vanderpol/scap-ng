@@ -190,9 +190,9 @@ class ApprovedPipelineTests(unittest.TestCase):
         self.check_case(CASES[0])
 
     def test_windows_enterprise_state_or_through_inline_yaml_and_compiled_json(self):
-        """Real two-State OR, using existing adapters; not unified CLI coverage."""
+        """Actual pinned two-State OR through the production converter."""
         import yaml
-        from build_v04_canonical_six_stigs import upgrade_v003
+        from scap_converter_core import convert
 
         path = ROOT / 'research/assessment-simplification/evidence/ms_windows_11/SV-253254/source-oval.xml'
         self.assertEqual(sha256(path.read_bytes()).hexdigest(),
@@ -208,16 +208,14 @@ class ApprovedPipelineTests(unittest.TestCase):
             tree.write(reconstructed, encoding='utf-8')
             self.assertTrue(compare(path, reconstructed, did, reconstructed_id,
                                     root_only=True)['equal'])
-        aligned, _ = postprocess_automated_assessment(native, target_ng_version='0.3.0')
-        flat, _ = upgrade_v003(aligned)
+        flat, evidence = convert(path, did, assessment_id='enterprise-editions-assessment')
+        self.assertTrue(evidence['original_oval_direct_scalar_state_attested'])
         assessment = flat['assessment']
-        test = assessment['tests']['editionid-enterprise-or-enterprises-test']
-        # The upgrader retains source Object identity. Explicitly exercise the
-        # supported inline representation for this single-consumer fixture.
-        shared_program = compile_assessment_program(assessment)
-        obj = assessment.pop('shared_objects')[test['object']]
-        self.assertEqual(obj.pop('capability'), test['capability'])
-        test['object'] = obj
+        test_id, test = next(iter(assessment['tests'].items()))
+        self.assertNotIn('shared_objects', assessment)
+        obj = test['object']
+        self.assertIsInstance(obj, dict)
+        self.assertNotIn('capability', obj)
         self.assertEqual(obj['hive'], 'local_machine')
         self.assertEqual(obj['key']['equals'], r'SOFTWARE\Microsoft\Windows NT\CurrentVersion')
         self.assertEqual(obj['name']['equals'], 'EditionId')
@@ -233,8 +231,7 @@ class ApprovedPipelineTests(unittest.TestCase):
         text = render_authoring(flat, is_yaml=True)
         parsed = yaml.safe_load(text)
         self.assertEqual(parsed, flat)
-        self.assertIsInstance(parsed['assessment']['tests'][
-            'editionid-enterprise-or-enterprises-test']['object'], dict)
+        self.assertIsInstance(parsed['assessment']['tests'][test_id]['object'], dict)
         data, report = compile_documents(documents(parsed))
         self.assertEqual(report['native_source_schema'], 'PASS')
         self.assertEqual(report['yaml_json_byte_parity'], 'PASS')
@@ -245,9 +242,6 @@ class ApprovedPipelineTests(unittest.TestCase):
         with zipfile.ZipFile(io.BytesIO(raw)) as archive:
             program_path = manifest['build_provenance']['compiled_programs'][assessment['id']]['path']
             program = json.loads(archive.read(program_path))
-        shared_instruction, = shared_program['test_instructions']
-        self.assertEqual(shared_instruction['operands']['require'], expected)
-        self.assertEqual(shared_instruction['operands']['object'], 'editionid-object')
         instruction, = program['test_instructions']
         self.assertEqual(instruction['opcode'], 'CHECK_ITEM_CONDITION')
         self.assertEqual(instruction['operands']['object'], obj)

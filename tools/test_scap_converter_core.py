@@ -170,5 +170,157 @@ class SharedConverterIntegrationTests(unittest.TestCase):
                          ["capability"], "windows.registry")
 
 
+class EnterpriseRegistryStateTests(unittest.TestCase):
+    """Pinned NIWC Test 25325400; source AST comparison is not scanner parity."""
+    definition = 'oval:mil.disa.stig.defs:def:253254'
+    source_test = 'oval:mil.disa.stig.win:tst:25325400'
+    windows = OD + '#windows'
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.directory = Path(self.temp.name)
+        self.source = Path(__file__).resolve().parents[1] / (
+            'research/assessment-simplification/evidence/ms_windows_11/SV-253254/source-oval.xml')
+        self.root = ET.parse(self.source).getroot()
+
+    def converted(self, root=None):
+        path = self.directory / 'source.xml'
+        ET.ElementTree(self.root if root is None else root).write(path, encoding='utf-8')
+        native, evidence = convert(path, self.definition)
+        validate_docs({'authoring/enterprise/a.json': native}, _schema_validators(
+            Path(__file__).resolve().parents[1] / 'schema/v0.4.0'))
+        return path, native
+
+    def source_semantics(self, path, native):
+        """Independent narrow reverse oracle, built solely from generated 0.4.
+
+        Compare effective OVAL Test/Object/State semantics, including defaults,
+        rather than source IDs or metadata. No original XML subtrees are copied.
+        """
+        from scap_ng_roundtrip_v003.compare_oval_semantics import Model
+        _, test = next(iter(native['assessment']['tests'].items()))
+        req = test['require']
+        outer = next(k for k in ('and', 'or') if k in req)
+        out = ET.Element('{' + OD + '}oval_definitions')
+        tests = ET.SubElement(out, '{' + OD + '}tests')
+        ot = ET.SubElement(tests, '{' + self.windows + '}registry_test',
+                           id='rebuilt-test', check={'every': 'all', 'one_or_more': 'at least one'}[
+                               req['items_satisfying']],
+                           check_existence='at_least_one_exists', state_operator=outer.upper())
+        ET.SubElement(ot, '{' + self.windows + '}object', object_ref='rebuilt-object')
+        objects = ET.SubElement(out, '{' + OD + '}objects')
+        obj = ET.SubElement(objects, '{' + self.windows + '}registry_object', id='rebuilt-object')
+        for field in ('hive', 'key', 'name'):
+            value = test['object'][field]
+            if field == 'hive':
+                value = 'HKEY_LOCAL_MACHINE' if value == 'local_machine' else value
+            else:
+                value = value['equals']
+            ET.SubElement(obj, '{' + self.windows + '}' + field, datatype='string').text = value
+        states = ET.SubElement(out, '{' + OD + '}states')
+        for index, branch in enumerate(req[outer]):
+            sid = 'rebuilt-state-' + str(index)
+            ET.SubElement(ot, '{' + self.windows + '}state', state_ref=sid)
+            inner = next((k for k in ('and', 'or') if k in branch), None)
+            state = ET.SubElement(states, '{' + self.windows + '}registry_state',
+                                  id=sid, operator=inner.upper() if inner else 'AND')
+            for term in branch[inner] if inner else [branch]:
+                for field, predicate in term['fields'].items():
+                    value = predicate['equals']
+                    if field == 'type':
+                        self.assertEqual(value, 'string')
+                        value = 'reg_sz'
+                    ET.SubElement(state, '{' + self.windows + '}' + field,
+                                  datatype=predicate['datatype']).text = value
+        rebuilt = self.directory / 'rebuilt.xml'
+        ET.ElementTree(out).write(rebuilt, encoding='utf-8')
+        self.assertEqual(Model(path).test(self.source_test), Model(rebuilt).test('rebuilt-test'))
+
+    def test_original_and_default_and_explicit_state_operators_preserve_source_semantics(self):
+        for operator in ('OR', 'AND', None):
+            for field_operator in ('AND', 'OR'):
+                with self.subTest(state_operator=operator, field_operator=field_operator):
+                    root = deepcopy(self.root)
+                    test = root.find('.//{' + self.windows + '}registry_test')
+                    if operator is None:
+                        test.attrib.pop('state_operator')
+                    else:
+                        test.set('state_operator', operator)
+                    for state in root.findall('.//{' + self.windows + '}registry_state'):
+                        state.set('operator', field_operator)
+                    path, native = self.converted(root)
+                    self.source_semantics(path, native)
+                    _, generated = next(iter(native['assessment']['tests'].items()))
+                    self.assertIsInstance(generated['object'], dict)
+                    self.assertFalse({'states', 'states_match', 'state_fields_require'} & set(generated))
+
+    def test_unsupported_source_semantics_fail_closed(self):
+        mutations = {
+            'state XOR': lambda r: r.find('.//{' + self.windows + '}registry_test').set('state_operator', 'XOR'),
+            'field ONE': lambda r: r.find('.//{' + self.windows + '}registry_state').set('operator', 'ONE'),
+            'all_exist': lambda r: r.find('.//{' + self.windows + '}registry_test').set('check_existence', 'all_exist'),
+            'entity quantifier': lambda r: r.find('.//{' + self.windows + '}value').set('entity_check', 'at least one'),
+            'dynamic value': lambda r: r.find('.//{' + self.windows + '}value').set('var_ref', 'oval:missing:var:1'),
+            'unsupported scalar datatype': lambda r: r.find('.//{' + self.windows + '}value').set('datatype', 'int'),
+            'negated criterion': lambda r: r.find('.//{' + OD + '}criterion').set('negate', 'true'),
+        }
+        for label, mutate in mutations.items():
+            with self.subTest(mutation=label), self.assertRaises(ValueError):
+                root = deepcopy(self.root)
+                mutate(root)
+                self.converted(root)
+
+    def test_mature_lowering_corruption_is_rejected_against_original_states(self):
+        from scap_converter_core import postprocess_automated_assessment
+        mutations = {
+            'operand': lambda a: next(iter(a['states'].values()))['state']['all'][1].update(value='Education'),
+            'Test operator': lambda a: next(iter(a['tests'].values())).update(states_match='all'),
+            'field operator': lambda a: next(iter(a['states'].values()))['state'].update(
+                any=next(iter(a['states'].values()))['state'].pop('all')),
+            'hive': lambda a: next(iter(a['objects'].values()))['select'].update(hive='users'),
+        }
+        for label, mutate in mutations.items():
+            def corrupt(*args, **kwargs):
+                native, report = postprocess_automated_assessment(*args, **kwargs)
+                native = deepcopy(native)
+                mutate(native['assessment'])
+                return native, report
+            with self.subTest(mutation=label), patch(
+                    'scap_converter_core.postprocess_automated_assessment', side_effect=corrupt):
+                with self.assertRaisesRegex(ValueError, 'differs|drift'):
+                    self.converted()
+
+    def test_semantic_oracle_rejects_changed_grouping_and_operands(self):
+        path, native = self.converted()
+        for change in ('outer AND', 'inner OR', 'different value'):
+            bad = deepcopy(native)
+            req = next(iter(bad['assessment']['tests'].values()))['require']
+            if change == 'outer AND':
+                req['and'] = req.pop('or')
+            elif change == 'inner OR':
+                req['or'][0]['or'] = req['or'][0].pop('and')
+            else:
+                req['or'][0]['and'][1]['fields']['value']['equals'] = 'Education'
+            with self.subTest(change=change), self.assertRaises(AssertionError):
+                self.source_semantics(path, bad)
+
+    def test_production_cli_and_yaml_projection_preserve_source(self):
+        import yaml
+        from build_v04_canonical_six_stigs import render_authoring
+        output, report = self.directory / 'enterprise.json', self.directory / 'proof.json'
+        result = subprocess.run([sys.executable, str(Path(__file__).with_name('scap_converter_core.py')),
+            '--source-xml', str(self.source), '--definition-id', self.definition,
+            '--output', str(output), '--evidence', str(report)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        emitted = json.loads(output.read_text())
+        native = yaml.safe_load(render_authoring(emitted, is_yaml=True))
+        self.assertEqual(native, emitted)
+        _, test = next(iter(native['assessment']['tests'].items()))
+        self.assertIsInstance(test['object'], dict)
+        self.assertIn('or', test['require'])
+        self.source_semantics(self.source, native)
+
+
 if __name__ == "__main__":
     unittest.main()

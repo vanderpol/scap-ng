@@ -8,6 +8,15 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- The direct registry converter now preserves multiple literal scalar OVAL
+  States as structured Test `require.and/or`, retaining each State's complete
+  field condition and the original Test/field operators. Original-source
+  attestation rejects unsupported dynamic operands and quantifiers. Added a
+  pinned Enterprise/EnterpriseS production-CLI, YAML and compiled-JSON regression;
+  no schema change or scanner-parity claim.
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Integrated the existing 0.4 converter/upgrader, typed source IR and native
   compiler with explicit Item, field and record counts in the approved `require`
   grammar. Preserve complete logical alternatives, source ledgers, Sets/Filters,
