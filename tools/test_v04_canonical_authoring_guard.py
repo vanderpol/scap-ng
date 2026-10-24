@@ -15,6 +15,7 @@ import zipfile
 import yaml
 
 from build_v04_canonical_six_stigs import promote
+from v04_field_requirement import validate_test
 from v04_flat_object_authoring import object_nodes
 from migrate_v04_evaluate_and_or import migrate as migrate_evaluate
 
@@ -31,8 +32,9 @@ def check_test(test, origin):
     if isinstance(req, dict):
         if "states" in test:
             raise ValueError(f"{origin}: structured require cannot coexist with legacy states")
-        if set(req) == {"items"} and "states_match" in test:
+        if set(req) == {"items_found"} and "states_match" in test:
             raise ValueError(f"{origin}: existence-only Test cannot have states_match")
+    validate_test(test)
     return True
 
 
@@ -74,7 +76,7 @@ def check_archive(archive_path):
 
 def self_test():
     base = {"capability": "unix.file", "object": {"select": {"filepath": {"equals": "/tmp/test"}}},
-            "require": {"items": "one_or_more"}}
+            "require": {"items_found": "one_or_more"}}
     assert check_test(base, "valid")
     invalid = [
         ({**base, "object": {"capability": "unix.file"}}, "inline Object capability"),
@@ -97,7 +99,7 @@ def self_test():
         "example-test": {"capability": "unix.file", "object": {"capability": "unix.file"},
                          "require": "at_least_one_exists"}}}}
     candidate, _ = promote(source)
-    assert candidate["assessment"]["tests"]["example-test"]["require"] == {"items": "one_or_more"}
+    assert candidate["assessment"]["tests"]["example-test"]["require"] == {"items_found": "one_or_more"}
     assert check_test(candidate["assessment"]["tests"]["example-test"], "promoted")
     for changes in (
         {"object": {"capability": "windows.registry"}},

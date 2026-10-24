@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Production 0.4 Test promotion and source-exact inverse (Refs #251 #240).
 
-Input States retain their original boundaries. Only ordinary scalar AND States
-are compacted; records, repeated entities and non-AND State operators retain
-the explicit source-exact fallback. No collection or result evaluation occurs.
+Source States retain logical boundaries, repeated fields, record counts and
+expected-value quantifiers. Unsupported source shapes fail closed; source-only
+spellings remain in checked provenance. No collection or evaluation occurs.
 """
 from copy import deepcopy
 from functools import lru_cache
@@ -11,13 +11,28 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
+# Source adapter vocabulary, never accepted as authored 0.4 aliases.
+from research_04_one_grammar_proof import PAIR_BY_NAME
 PAIRS = {'at_least_one_exists_and_all_match': 'one_or_more',
          'may_be_absent_and_all_match': 'may_be_absent'}
 PRESENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
-            'only_one_exists': 'exactly_one', 'all_exist': 'all',
+            'only_one_exists': 'exactly_one', 'all_exist': 'one_or_more',
             'may_be_absent': 'may_be_absent'}
+FIELD_EXISTENCE = {'none': 'none', 'one': 'exactly_one',
+                   'one_or_more': 'one_or_more', 'all': 'every',
+                   'optional': 'may_be_absent'}
+MATCH = {'all': 'every', 'one': 'exactly_one',
+         'one_or_more': 'one_or_more', 'none': 'none'}
 LOGIC = {'all': 'and', 'any': 'or', 'one': 'one', 'odd': 'xor',
          'and': 'and', 'or': 'or', 'xor': 'xor'}
+
+
+def field_pair(name):
+    if name not in PAIR_BY_NAME:
+        raise ValueError(f'unmapped source field requirement: {name!r}')
+    existence, match = PAIR_BY_NAME[name]
+    return {'values_found': FIELD_EXISTENCE[existence],
+            'values_matching': MATCH[match]}
 
 
 def digest(value):
@@ -30,7 +45,12 @@ def test_validator():
     from jsonschema import Draft202012Validator
     path = Path(__file__).resolve().parents[1] / 'schema/v0.4.0/assessment-language.schema.json'
     schema = json.loads(path.read_text())
-    return Draft202012Validator({'$defs': schema['$defs'], '$ref': '#/$defs/test'})
+    from referencing import Registry, Resource
+    schemas = [json.loads(p.read_text()) for p in path.parent.glob('*.schema.json')]
+    registry = Registry().with_resources(
+        (s['$id'], Resource.from_contents(s)) for s in schemas)
+    return Draft202012Validator({'$id': schema['$id'], '$defs': schema['$defs'],
+                                 '$ref': '#/$defs/test'}, registry=registry)
 
 
 def validate_test(test):
@@ -44,43 +64,72 @@ class ExplicitFallback(Exception):
     """Known source shape without an independently approved compact lowering."""
 
 
+def source_predicate(predicate):
+    if not isinstance(predicate, dict) or not predicate:
+        raise ValueError('invalid source field predicate')
+    out = deepcopy(predicate)
+    if 'field_requirement' in out or 'values_found' in out:
+        raise ValueError('mixed source/canonical field requirement')
+    if 'record' in out:
+        if set(out) != {'record'}:
+            raise ValueError('unmapped source record wrapper attributes')
+        record = out['record']
+        if not isinstance(record, dict) or not isinstance(record.get('fields'), dict):
+            raise ValueError('invalid source record')
+        counts = field_pair(record.pop('require', None))
+        record['records_found'] = counts['values_found']
+        record['records_matching'] = counts['values_matching']
+        record['fields'] = {name: source_predicate(value)
+                            for name, value in record['fields'].items()}
+    elif 'require' in out:
+        out.update(field_pair(out.pop('require')))
+    if 'value_match' in out:
+        if out['value_match'] not in MATCH:
+            raise ValueError('unmapped source expected-value quantifier')
+        out['value_match'] = MATCH[out['value_match']]
+    return out
+
+
 def complete_condition(state):
     if not isinstance(state, dict) or not state:
         raise ValueError('invalid source State condition')
-    scope = state.get('state_fields_require')
     keys = set(state) - {'state_fields_require'}
     if len(keys) != 1:
         raise ValueError('ambiguous source State condition')
     key = next(iter(keys)); payload = state[key]
+    scope = ({'field_requirement': field_pair(state['state_fields_require'])}
+             if 'state_fields_require' in state else {})
     if key in LOGIC and isinstance(payload, list):
-        if key not in ('and', 'all'):
-            raise ExplicitFallback('non_and_state_operator')
         if not payload:
             raise ValueError('empty source State')
-        entries = payload
-    else:
-        entries = [{key: payload}]
-    fields = {}
-    for entry in entries:
-        if not isinstance(entry, dict) or len(entry) != 1:
-            raise ExplicitFallback('nested_state_condition')
-        name, predicate = next(iter(entry.items()))
-        if not isinstance(predicate, dict) or not predicate:
-            raise ExplicitFallback('nested_state_condition')
-        if 'record' in predicate:
-            raise ExplicitFallback('record_cardinality')
-        if name in fields:
-            raise ExplicitFallback('repeated_state_field')
-        field = deepcopy(predicate)
-        if 'field_requirement' in field:
-            raise ValueError('mixed source/canonical field requirement')
-        if 'require' in field:
-            field['field_requirement'] = field.pop('require')
-        fields[name] = field
-    condition = {'fields': fields}
-    if 'state_fields_require' in state:
-        condition['field_requirement'] = scope
-    return condition
+        # Keep repeated field predicates and logical boundaries distinct.
+        return {**scope, LOGIC[key]: [complete_condition(child) for child in payload]}
+    return {**scope, 'fields': {key: source_predicate(payload)}}
+
+
+def source_object_counts(node, *, filter_condition=False):
+    """Versioned source adapter: retain acquisition/Set/Filter position and operands."""
+    if isinstance(node, list):
+        return [source_object_counts(v, filter_condition=filter_condition) for v in node]
+    if not isinstance(node, dict):
+        return deepcopy(node)
+    if isinstance(node.get('record'), dict) and 'require' in node['record']:
+        return source_predicate(node)
+    out = {}
+    for key, value in node.items():
+        if key == 'require' and isinstance(value, str):
+            out.update(field_pair(value))
+        elif key in ('value_match', 'selection_match'):
+            if value not in MATCH:
+                raise ValueError(f'unmapped source {key}: {value}')
+            out[key] = MATCH[value]
+        elif filter_condition and key == 'state_fields_require':
+            out['field_requirement'] = field_pair(value)
+        else:
+            target = LOGIC.get(key, key) if filter_condition and isinstance(value, list) else key
+            out[target] = source_object_counts(value,
+                filter_condition=filter_condition or key == 'filters')
+    return out
 
 
 def legacy_review_source(test):
@@ -145,7 +194,7 @@ def legacy_review_source(test):
 
 
 def promote_test(original, *, legacy_review=False):
-    """Return canonical/fallback Test and a separate checked inverse ledger."""
+    """Return a schema-valid canonical Test and separate checked source ledger."""
     test = deepcopy(original)
     if 'collected_items_require' in test:
         if 'require' in test:
@@ -160,44 +209,45 @@ def promote_test(original, *, legacy_review=False):
         return candidate, {**proof, 'source_test': deepcopy(original),
                            'source_sha256': digest(original), 'legacy_review': True}
     if isinstance(requirement, dict):
-        validate_test(test)  # Never guess an import dialect from its nesting.
+        validate_test(test)
     elif isinstance(requirement, str):
         states = test.get('states')
-        if requirement in PAIRS and isinstance(states, list) and states:
-            try:
-                conditions = [complete_condition(state) for state in states]
-                operator = test.get('states_match')
-                if operator is not None and operator not in LOGIC:
-                    raise ValueError('unknown source Test State operator')
-                if len(conditions) > 1 and operator is None:
-                    raise ValueError('multiple source States lack explicit State operator')
-                if operator is not None:
-                    conditions = [{LOGIC[operator]: conditions}]
-                req = {'items': PAIRS[requirement], 'all_items_must': conditions}
-                if 'state_fields_require' in test:
-                    req['field_requirement'] = test.pop('state_fields_require')
-                test.pop('states'); test.pop('states_match', None)
-                test['require'] = req
-                validate_test(test)
-                shape = 'all_items_must'
-            except ExplicitFallback as exc:
-                # Start again from the source: partial projection must not leak.
-                test = deepcopy(original)
-                if 'collected_items_require' in test:
-                    test['require'] = test.pop('collected_items_require')
-                diagnostic = str(exc)
-                shape = 'explicit_fallback'
+        if isinstance(states, list) and states:
+            if requirement not in PAIR_BY_NAME:
+                raise ValueError(f'unmapped source Test requirement: {requirement}')
+            existence, matching = PAIR_BY_NAME[requirement]
+            found = FIELD_EXISTENCE[existence]
+            if found == 'every':
+                diagnostic = 'source_all_exist_requires_population_evidence'
+                found = 'one_or_more'  # Approved Test-only crosswalk; source retained below.
+            conditions = [complete_condition(state) for state in states]
+            operator = test.get('states_match')
+            if operator is not None and operator not in LOGIC:
+                raise ValueError('unknown source Test State operator')
+            if len(conditions) > 1 and operator is None:
+                raise ValueError('multiple source States lack explicit State operator')
+            condition = ({LOGIC[operator]: conditions} if operator is not None
+                         else conditions[0])
+            if 'state_fields_require' in test and 'field_requirement' in condition:
+                condition = {'and': [condition]}
+            req = {'items_found': found, 'items_satisfying': MATCH[matching], **condition}
+            if 'state_fields_require' in test:
+                req['field_requirement'] = field_pair(test.pop('state_fields_require'))
+            test.pop('states'); test.pop('states_match', None)
+            test['require'] = req
+            shape = 'structured_condition'
         elif requirement in PRESENCE and 'states' not in test and 'states_match' not in test:
-            test['require'] = {'items': PRESENCE[requirement]}
-            validate_test(test)
+            test['require'] = {'items_found': PRESENCE[requirement]}
+            if requirement == 'all_exist':
+                diagnostic = 'source_all_exist_requires_population_evidence'
             shape = 'presence_only_structured'
         else:
-            diagnostic = 'uncommon_test_requirement'
-            shape = 'explicit_fallback'
+            raise ValueError(f'unrepresentable source Test requirement: {requirement!r}')
+        if isinstance(test.get('object'), dict):
+            test['object'] = source_object_counts(test['object'])
+        validate_test(test)
     else:
         raise ValueError('missing or invalid source Test requirement')
-    if shape == 'explicit_fallback':
-        validate_test(test)
     ledger = {'source_test': deepcopy(original), 'source_sha256': digest(original),
               'candidate_sha256': digest(test), 'shape': shape,
               'diagnostic': diagnostic, 'scanner_parity': False}
@@ -217,35 +267,34 @@ def restore_test(candidate, ledger):
 
 
 def field_scopes(requirement):
-    """Index effective declarations without changing the source AST or results.
-
-    Paths identify each field in its complete condition and the nearest authored
-    declaration. Each recursive branch receives its own inherited scope.
-    """
-    if not isinstance(requirement, dict) or 'all_items_must' not in requirement:
-        return []
+    """Index explicit/inherited scalar and record counts without changing the AST."""
     found = []
-    def visit(node, path, inherited, declared_at):
+    def visit(node, path, inherited=None, declared_at=None):
+        if not isinstance(node, dict):
+            return
         if 'field_requirement' in node:
             inherited = node['field_requirement']
             declared_at = [*path, 'field_requirement']
-        if 'fields' in node:
-            for name, predicate in sorted(node['fields'].items()):
-                field_path = [*path, 'fields', name]
-                effective = predicate.get('field_requirement', inherited)
-                declaration = ([*field_path, 'field_requirement']
-                               if 'field_requirement' in predicate else declared_at)
-                if effective is None:
-                    raise ValueError('field has no explicit or inherited requirement')
-                found.append({'path': field_path, 'field_requirement': effective,
-                              'declaration_path': declaration})
-        else:
-            for operator in ('and', 'or', 'one', 'xor'):
-                if operator in node:
-                    for index, child in enumerate(node[operator]):
-                        visit(child, [*path, operator, index], inherited, declared_at)
-    inherited = requirement.get('field_requirement')
-    declared_at = ['require', 'field_requirement'] if inherited is not None else None
-    for index, node in enumerate(requirement['all_items_must']):
-        visit(node, ['require', 'all_items_must', index], inherited, declared_at)
+        for name, predicate in node.get('fields', {}).items():
+            field_path = [*path, 'fields', name]
+            if 'record' in predicate:
+                record = predicate['record']
+                found.append({'path': [*field_path, 'record'],
+                              'record_requirement': {key: record[key] for key in
+                                  ('records_found', 'records_matching')}})
+                visit(record, [*field_path, 'record'])
+                continue
+            explicit = {key: predicate[key] for key in ('values_found', 'values_matching')
+                        if key in predicate}
+            effective = explicit or predicate.get('field_requirement', inherited)
+            if effective is None:
+                raise ValueError('field has no explicit or inherited requirement')
+            found.append({'path': field_path, 'field_requirement': effective,
+                          'declaration_path': (field_path if explicit else
+                              [*field_path, 'field_requirement'] if 'field_requirement' in predicate
+                              else declared_at)})
+        for operator in ('and', 'or', 'one', 'xor'):
+            for index, child in enumerate(node.get(operator, [])):
+                visit(child, [*path, operator, index], inherited, declared_at)
+    visit(requirement, ['require'])
     return found

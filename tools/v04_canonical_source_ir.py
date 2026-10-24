@@ -3,7 +3,7 @@
 
 Consumes *regenerated* canonical YAML and JSON authoring, never the older
 research 0.4-A syntax. Normalizes independently parsed source and retains
-the full AST, including unconverted unusual Test semantics. This is a
+the full approved AST, including unusual nested Test requirements. This is a
 lossless compilation FRONT END, not executable scanner IR or a .scapng bundle.
 
 The benchmark version mismatch is reported and blocks executable promotion;
@@ -18,7 +18,7 @@ from functools import lru_cache
 import json
 from pathlib import Path
 
-from v04_field_requirement import field_scopes, promote_test, validate_test
+from v04_field_requirement import field_scopes, validate_test
 
 from v04_a_authoring_graph_index import (
     canonical_json, graph_index, read_authoring_archive,
@@ -30,7 +30,6 @@ from v04_a_dataflow_index import index_assessment_dataflow
 
 FORMAT = "scap-ng-0.4.0-canonical-typed-source-ir/0.1"
 STATUS = "SOURCE_IR_VERIFIED_NOT_EXECUTABLE"
-ITEMS = frozenset(("one_or_more", "none", "exactly_one", "all", "may_be_absent"))
 
 
 def _logical_source(path):
@@ -75,36 +74,13 @@ def normalize_documents(documents):
                     raise ValueError(f"{path}: missing Test capability {test_id}")
                 validate_test(test)
                 requirement = test.get("require")
-                if isinstance(requirement, dict):
-                    if set(requirement) == {"items"}:
-                        if requirement["items"] not in ITEMS or (
-                            "states" in test or "states_match" in test
-                        ):
-                            raise ValueError(f"{path}: invalid presence-only Test {test_id}")
-                        shape = "presence"
-                    elif {"items", "all_items_must"} <= set(requirement) <= {"items", "all_items_must", "field_requirement"}:
-                        if (requirement["items"] not in {"one_or_more", "may_be_absent"}
-                                or not isinstance(requirement["all_items_must"], list)
-                                or not requirement["all_items_must"]
-                                or "states" in test):
-                            raise ValueError(f"{path}: invalid all-Items Test {test_id}")
-                        shape = "all_items"
-                    else:
-                        raise ValueError(f"{path}: unknown structured requirement in {test_id}")
-                elif isinstance(requirement, str) and requirement:
-                    # Retain uncommon source-exact existence/match combinations;
-                    # no speculative lowering into a different result algebra.
-                    if not isinstance(test.get("states"), list) or not test["states"]:
-                        raise ValueError(f"{path}: opaque legacy Test lacks States {test_id}")
-                    shape = "source_exact_fallback"
-                else:
-                    raise ValueError(f"{path}: missing Test requirement {test_id}")
+                shape = ('presence' if set(requirement) == {'items_found'}
+                         else 'item_condition')
                 indexed.append({
                     "id": test_id, "capability": cap, "requirement_shape": shape,
                     "requirement": requirement, "test_sha256": sha256(canonical_json(test)).hexdigest(),
                     "field_requirements": field_scopes(requirement),
-                    "fallback_diagnostic": (promote_test(test)[1]["diagnostic"]
-                                            if shape == "source_exact_fallback" else None),
+                    "fallback_diagnostic": None,
                 })
                 totals[shape] += 1
         dataflow = None
@@ -297,9 +273,9 @@ def compile_pair(json_archive, yaml_archive, *, validate_schema=True, legacy_rev
         "status": STATUS,
         "documents": j_ir["totals"]["documents"],
         "tests": sum(j_ir["totals"].get(key, 0) for key in
-                     ("presence", "all_items", "source_exact_fallback")),
+                     ("presence", "item_condition")),
         "requirement_shapes": {key: j_ir["totals"].get(key, 0) for key in
-                               ("presence", "all_items", "source_exact_fallback")},
+                               ("presence", "item_condition")},
         "rule_choice_links": j_ir["rule_choice_links"],
         "assessment_truth_dependencies": j_ir["assessment_truth_dependencies"],
         "source_dataflow": j_ir["source_dataflow"],
@@ -335,7 +311,7 @@ def main():
         report["documents"], report["tests"], report["rule_choice_links"],
         report["requirement_shapes"]
     ) != (4012, 1390, 2958,
-          {"presence": 399, "all_items": 770, "source_exact_fallback": 221}):
+          {"presence": 399, "item_condition": 991}):
         raise ValueError("canonical six-STIG source IR regression counts changed")
     args.out_ir.parent.mkdir(parents=True, exist_ok=True)
     args.out_ir.write_bytes(data)

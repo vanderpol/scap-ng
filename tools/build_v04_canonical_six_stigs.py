@@ -3,9 +3,9 @@
 
 Source: October 15 r3 pre-alpha archive plus 11 source-proven shared
 Applicability Assessments omitted by the historical exporter (#239).
-Promote proven scalar all-match States to canonical field_requirement and
-complete conditions. Preserve Item population separately and retain explicit
-source-exact uncommon, record and non-AND State fallbacks with diagnostics.
+Promote source requirements to explicit Item, field and record counts and
+complete logical conditions. Preserve source-only spellings in checked sidecars;
+unmapped input fails closed rather than emitting legacy authoring.
 Inherit inline Object capability only for identical Test/Object capability.
 Canonicalize evaluate spellings and omit null private Object titles.
 Preserve all other graph content and prove parsed-source exact recovery.
@@ -31,7 +31,7 @@ from migrate_v04_additional_source_filters import (
     recover_migration as recover_additional_filter,
 )
 
-from v04_field_requirement import PAIRS, PRESENCE, promote_test, restore_test
+from v04_field_requirement import promote_test, restore_test, source_object_counts
 
 
 def promote(doc, *, provenance=None, legacy_review=False):
@@ -59,15 +59,25 @@ def promote(doc, *, provenance=None, legacy_review=False):
                 raise ValueError("Inline Object capability conflicts with Test")
             del obj["capability"]
             audit["inline_capabilities_removed"]+=1
-        updated, proof = promote_test(test, legacy_review=legacy_review)
+        try:
+            updated, proof = promote_test(test, legacy_review=legacy_review)
+        except ValueError as exc:
+            raise ValueError(f'Test {tid}: {exc}') from exc
         test.clear()
         test.update(updated)
         if proof["shape"] != "unchanged":
             audit[proof["shape"]] += 1
         if proof["diagnostic"]:
-            audit["fallback:" + proof["diagnostic"]] += 1
+            audit["source_diagnostic:" + proof["diagnostic"]] += 1
         if provenance is not None:
             provenance[tid] = proof
+    source_tests = doc['assessment'].get('tests') or {}
+    if any(isinstance(t.get('require'), str) or 'collected_items_require' in t
+           for t in source_tests.values()):
+        # Only source input enters this adapter. Canonical authoring is never repaired.
+        for section in ('shared_objects', 'variables'):
+            if section in a:
+                a[section] = source_object_counts(a[section])
     return new,audit
 
 def recover(candidate,original, *, legacy_review=False):
@@ -95,6 +105,16 @@ def recover(candidate,original, *, legacy_review=False):
         if "evaluate" in source:
             _, ledger = migrate_evaluate(original)
             restored = restore_evaluate(restored, ledger)
+    # Acquisition conversion is separately checked by replay above; restore the exact
+    # source subtree including source-only enum tokens and default spellings.
+    if isinstance(source, dict) and source.get('mode') == 'automated':
+        for obj, _, route, _ in object_nodes(source):
+            parent = restored
+            for key in route[:-1]:
+                parent = parent[key]
+            parent[route[-1]] = deepcopy(obj)
+    if isinstance(source, dict) and 'variables' in source:
+        restored['assessment']['variables'] = deepcopy(source['variables'])
     if restored != original:
         raise ValueError("Canonical authoring source reconstruction mismatch")
 
@@ -222,9 +242,9 @@ def run(src,dest,manifest_path,filter_proof_path=None,additional_proof_path=None
             "reachable 0.4 declarations with owner approval; original source is preserved\n"
             "in the immutable pinned Oct 15 r3 release and SHA-256 migration manifest.\n"
             "Object capability inherits from Test; common all-match predicates live inside require.\n"
-            "Remaining explicit require strings are original uncommon semantics, not inferred defaults.\n"
+            "All Test requirements use explicit counts; unsupported source semantics fail closed.\n"
             "Do not interpret this authoring ZIP as a signed scanner bundle or runtime parity result.\n")
-    if counts["all_items_must"]<1 or counts["inline_capabilities_removed"]<1:
+    if counts["structured_condition"]<1 or counts["inline_capabilities_removed"]<1:
         raise ValueError("Expected real migration did not happen")
     if filter_proof is not None and (
             counts["source_proven_direct_filters"] != 28

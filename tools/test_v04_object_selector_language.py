@@ -9,7 +9,7 @@ from copy import deepcopy
 import unittest
 from test_v04_schema_draft import (
     SCHEMAS, VALIDATOR, fixture, errors as _general_schema_errors,
-    Draft202012Validator, RefResolver,
+    Draft202012Validator, REGISTRY,
 )
 from test_generate_capability_schema_v04 import materialize, validate as native_validate
 
@@ -18,7 +18,7 @@ LANGUAGE = SCHEMAS["assessment-language.schema.json"]
 STORE = {schema["$id"]: schema for schema in SCHEMAS.values()}
 SELECTOR = Draft202012Validator(
     {"$ref": COMMON["$id"] + "#/$defs/object_entity_base"},
-    resolver=RefResolver.from_schema(COMMON, store=STORE),
+    registry=REGISTRY,
 )
 # Generic Assessment validation intentionally does not know every native
 # capability's Object properties. Enforce the generated native 0.4 Object
@@ -37,7 +37,7 @@ def errors(doc):
 
 
 def assessment_with_directory(predicate):
-    doc = fixture(requirement="at_least_one_exists")
+    doc = fixture(req={"items_found": "one_or_more"})
     doc["assessment"]["tests"]["demo-test"]["object"] = {
         "capability": "unix.file",
         "directory": predicate,
@@ -73,7 +73,7 @@ class V04ObjectSelectorTests(unittest.TestCase):
     def test_array_with_explicit_independent_value_match(self):
         pred = {
             "equals": ["/lib", "/lib64", "/usr/lib"],
-            "value_match": "one",
+            "value_match": "exactly_one",
             "datatype": "string",
         }
         self.assertTrue(self.valid(pred))
@@ -117,7 +117,7 @@ class V04ObjectSelectorTests(unittest.TestCase):
     def test_legacy_object_selectors_no_longer_valid(self):
         for predicate in (
             {"value": "/etc/passwd", "operation": "equals"},
-            {"value": ["/lib", "/lib64"], "operation": "equals", "value_match": "one"},
+            {"value": ["/lib", "/lib64"], "operation": "equals", "value_match": "exactly_one"},
             {"equals": "/etc/passwd", "operation": "equals"},
         ):
             with self.subTest(predicate=predicate):
@@ -127,11 +127,11 @@ class V04ObjectSelectorTests(unittest.TestCase):
     def test_no_hidden_comparator_or_multiple_operator_choices(self):
         for predicate in (
             {"datatype": "string"},
-            {"value_match": "one"},
+            {"value_match": "exactly_one"},
             {"equals": "/tmp", "not_equal": "/var"},
             {"equals": "/tmp", "matches_regex": ".*"},
-            {"equals": ["/tmp", "/var"], "value_match": "one", "require": "none_exist"},
-            {"equals": "/tmp", "value_match": "one"},
+            {"equals": ["/tmp", "/var"], "value_match": "exactly_one", "require": "none_exist"},
+            {"equals": "/tmp", "value_match": "exactly_one"},
         ):
             with self.subTest(predicate=predicate):
                 self.assertFalse(self.valid(predicate))
@@ -141,16 +141,16 @@ class V04ObjectSelectorTests(unittest.TestCase):
         collector=Draft202012Validator(
             {"$id":COMMON["$id"],"$defs":COMMON["$defs"],
              "$ref":"#/$defs/object_record_field"},
-            resolver=RefResolver.from_schema(COMMON,store=STORE),
+            registry=REGISTRY,
         )
-        good={"equals":"tpmpresent,tpmready","selection_match":"all"}
+        good={"equals":"tpmpresent,tpmready","selection_match":"every"}
         self.assertFalse(list(collector.iter_errors(good)))
         for broken in (
             {"equals":"tpmpresent,tpmready"},
             {"equals":"tpmpresent","match":"all"},
-            {"equals":"tpmpresent","selection_match":"all","require":"none_exist"},
-            {"value":"tpmpresent","operation":"equals","selection_match":"all"},
-            {"equals":"tpmpresent","selection_match":"all",
+            {"equals":"tpmpresent","selection_match":"every","require":"none_exist"},
+            {"value":"tpmpresent","operation":"equals","selection_match":"every"},
+            {"equals":"tpmpresent","selection_match":"every",
              "not_equal":"tpmready"},
         ):
             with self.subTest(broken=broken):
@@ -186,7 +186,7 @@ class V04ObjectSelectorTests(unittest.TestCase):
         # Native collectors can have capability-specific sources other than
         # select (e.g. Variable/cmdlet). This test does not validate them;
         # separate generated capability schemas must close those alternatives.
-        doc = fixture(requirement="at_least_one_exists")
+        doc = fixture(req={"items_found": "one_or_more"})
         doc["assessment"]["tests"]["demo-test"]["object"] = {"capability": "unix.file"}
         self.assertFalse(_general_schema_errors(doc))
         # The native unix.file schema must reject an Object missing the

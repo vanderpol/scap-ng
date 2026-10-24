@@ -38,9 +38,9 @@ class SourceRequirementOracleTests(unittest.TestCase):
         result = compare_original_to_canonical(source, newer)
         self.assertEqual(result["test_population"]["converted_all_items"], 1)
         canonical = newer["authoring/demo/a.json"]["assessment"]["tests"]["test"]
-        self.assertEqual(canonical["require"]["items"], "one_or_more")
-        self.assertEqual(canonical["require"]["all_items_must"], [{"fields": {
-            "value": {"equals": 0, "field_requirement": "at_least_one_exists_and_all_match"}}}])
+        self.assertEqual(canonical["require"]["items_found"], "one_or_more")
+        self.assertEqual(canonical['require']['fields']['value'],
+                         {'equals': 0, 'values_found': 'one_or_more', 'values_matching': 'every'})
         self.assertNotIn("capability", canonical["object"])
 
     def test_flat_object_promotion_must_be_source_exact(self):
@@ -71,16 +71,11 @@ class SourceRequirementOracleTests(unittest.TestCase):
         source, newer = self._docs({
             "capability": "unix.file", "require": "at_least_one_exists_and_some_match",
             "states": [{"mode": {"equals": "0700", "require": "at_least_one_exists_and_all_match"}}]})
-        # No supported structured axes exists; old Test is preserved verbatim.
-        with self.assertRaisesRegex(ValueError, "exceptional"):
-            source_axes(source["authoring/demo/a.json"]["assessment"]["tests"]["test"])
-        source["authoring/demo/a.json"]["assessment"]["tests"]["presence-test"] = {
-            "capability": "unix.file", "require": "none_exist"}
-        newer = {path: promote(doc)[0] for path, doc in source.items()}
+        self.assertEqual(source_axes(source['authoring/demo/a.json']['assessment']['tests']['test']),
+                         ('at_least_one_exists', 'at least one', True))
         result = compare_original_to_canonical(source, newer)
-        self.assertEqual(result["test_population"]["exceptional_source_exact"], 1)
-        self.assertEqual(result["test_population"]["converted_presence"], 1)
-        self.assertFalse(result["source_exception_matching_equivalence_proved"])
+        self.assertEqual(result['test_population']['converted_all_items'], 1)
+        self.assertFalse(result['source_exception_matching_equivalence_proved'])
 
     def test_source_change_or_fake_result_fails(self):
         source, newer = self._docs({
@@ -92,16 +87,16 @@ class SourceRequirementOracleTests(unittest.TestCase):
             compare_original_to_canonical(source, newer)
 
     def test_all_supported_existence_modes_have_matrix(self):
-        for req in (
-            {"items": "one_or_more"}, {"items": "none"},
-            {"items": "exactly_one"}, {"items": "all"},
-            {"items": "may_be_absent"},
-            {"items": "one_or_more", "all_items_must": [{"mode": {"equals": "0700"}}]},
-            {"items": "may_be_absent", "all_items_must": [{"mode": {"equals": "0700"}}]},
-        ):
-            axis = describe(req)
-            counts = comparison_matrix(axis)
-            self.assertGreater(counts["compared"], 0)
+        for found in ('one_or_more', 'none', 'exactly_one', 'may_be_absent'):
+            req = {'items_found': found}
+            self.assertGreater(comparison_matrix(describe(req))['compared'], 0)
+
+    def test_source_all_exist_is_not_silently_declared_equivalent(self):
+        # The owner-approved structural crosswalk deliberately loses this source
+        # axis. Provenance retains it; this oracle must never claim equivalence.
+        source, newer = self._docs({'capability': 'unix.file', 'require': 'all_exist'})
+        with self.assertRaisesRegex(AssertionError, 'does not match source'):
+            compare_original_to_canonical(source, newer)
 
 
 if __name__ == "__main__":

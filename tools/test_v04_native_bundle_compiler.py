@@ -74,7 +74,7 @@ class NativeBundleCompilerTests(unittest.TestCase):
         with zipfile.ZipFile(io.BytesIO(raw)) as zf:
             program = json.loads(zf.read(path))
         self.assertEqual(program["test_instructions"][0]["opcode"],
-                         "CHECK_EACH_ITEM_REQUIREMENT")
+                         "CHECK_ITEM_CONDITION")
         self.assertEqual(program["test_instructions"][0]["operands"]["require"],
                          docs["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"]["require"])
         self.assertEqual(len(program["result_instructions"]), 1)
@@ -202,14 +202,46 @@ class NativeBundleCompilerTests(unittest.TestCase):
         self.assertEqual(independent, {"demo": raw})
         self.assertEqual(report["demo"], checked)
 
-    def test_preserve_source_exact_fallback_without_reinterpretation(self):
+    def test_legacy_source_exact_fallback_is_rejected(self):
         test = deepcopy(fixture()["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"])
         test["require"] = "at_least_one_exists_and_some_match"
         test["states"] = [{"mode": {"equals": "0600",
                                       "require": "at_least_one_exists_and_all_match"}}]
-        instruction = compile_test_instruction("t1", test)
-        self.assertEqual(instruction["opcode"], "CHECK_SOURCE_EXACT_STATES")
-        self.assertEqual(instruction["operands"], test)
+        with self.assertRaises(ValueError):
+            compile_test_instruction("t1", test)
+
+    def test_approved_requirements_reject_legacy_unknown_and_invalid_counts(self):
+        original = fixture()['authoring/demo/assessments/a1.json']['assessment']['tests']['t1']
+        changes = [('state', {}), ('states', []), ('states_match', 'all'),
+                   ('item_conditions', []), ('unknown', True)]
+        for key, value in changes:
+            bad = deepcopy(original); bad[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                compile_test_instruction('t1', bad)
+        for key in ('items_found', 'items_satisfying'):
+            for value in ('all', 'one', 'invalid', 'all_exist'):
+                bad = deepcopy(original); bad['require'][key] = value
+                with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                    compile_test_instruction('t1', bad)
+        bad = deepcopy(original); bad['require'] = 'none_exist'
+        with self.assertRaises(ValueError): compile_test_instruction('t1', bad)
+        for key in ('values_found', 'values_matching'):
+            bad = deepcopy(original); bad['require']['fields']['mode'][key] = 'invalid'
+            with self.assertRaises(ValueError): compile_test_instruction('t1', bad)
+
+    def test_referenced_object_resolution_and_capability_conflicts(self):
+        from v04_native_bundle_compiler import compile_assessment_program
+        a = deepcopy(fixture()['authoring/demo/assessments/a1.json']['assessment'])
+        obj = a['tests']['t1']['object']
+        a['shared_objects'] = {'shared-object': {'capability': 'unix.file', **obj}}
+        a['tests']['t1']['object'] = 'shared-object'
+        self.assertEqual(len(compile_assessment_program(a)['test_instructions']), 1)
+        a['shared_objects']['shared-object']['capability'] = 'windows.registry'
+        with self.assertRaisesRegex(ValueError, 'capability conflicts'):
+            compile_assessment_program(a)
+        a['shared_objects'] = {}
+        with self.assertRaisesRegex(ValueError, 'unresolved'):
+            compile_assessment_program(a)
 
     def test_reject_missing_or_damaged_program(self):
         raw, manifest = build_bundle(fixture(), validate_schema=False)
@@ -229,7 +261,7 @@ class NativeBundleCompilerTests(unittest.TestCase):
         def forge(files):
             from hashlib import sha256
             program = json.loads(files[program_path])
-            program["test_instructions"][0]["operands"]["require"]["items"] = "none"
+            program["test_instructions"][0]["operands"]["require"]["items_found"] = "none"
             altered = canonical_json(program)
             files[program_path] = altered
             revised = json.loads(files[MANIFEST_MEMBER])

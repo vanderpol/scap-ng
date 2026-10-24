@@ -36,6 +36,7 @@ from v04_canonical_unsigned_package import (
     verify_package as verify_source_package,
 )
 from v04_field_requirement import validate_test
+from v04_a_dataflow_index import index_assessment_dataflow
 
 
 FORMAT_VERSION = "0.4.0"
@@ -44,7 +45,6 @@ STAGE = "compiled-native-0.4.0-program-not-scanner-validated/0.1"
 MANIFEST_MEMBER = "META-INF/manifest.json"
 DOCUMENT_KINDS = {"benchmark": "benchmark", "rule": "rule",
                   "assessment": "assessment", "applicability": "applicability_catalog"}
-REQUIREMENT_SHAPES = {"one_or_more", "none", "exactly_one", "all", "may_be_absent"}
 
 
 def _read_archive(raw):
@@ -76,11 +76,10 @@ def _program_path(assessment_id):
 
 
 def compile_test_instruction(test_id, test):
-    """Emit a typed Test dispatch instruction without erasing uncommon OVAL checks.
+    """Preserve the complete approved requirement as a typed dispatch operand.
 
-    The two accepted structured requirement shapes have explicit native opcodes.
-    A legacy source-exact check has its own opcode and full State operands, not
-    a guessed equivalent of all_items_must. Scanner support is a separate gate.
+    Population and satisfaction counts remain independent, including nested
+    field/record counts. Legacy State fallback is rejected by the same schema.
     """
     if not isinstance(test_id, str) or not isinstance(test, dict):
         raise ValueError("invalid Test instruction")
@@ -91,31 +90,9 @@ def compile_test_instruction(test_id, test):
         raise ValueError("legacy collected_items_require is not canonical 0.4")
     if isinstance(test.get("object"), dict) and "capability" in test["object"]:
         raise ValueError("inline Object capability is redundant in 0.4")
-    requirement = test.get("require")
-    if isinstance(requirement, dict):
-        items = requirement.get("items")
-        if items not in REQUIREMENT_SHAPES:
-            raise ValueError(f"Test {test_id}: unsupported Items requirement")
-        if set(requirement) == {"items"}:
-            if "states" in test or "states_match" in test:
-                raise ValueError(f"Test {test_id}: presence-only Test has States")
-            opcode = "CHECK_COLLECTION_PRESENCE"
-        elif (set(requirement) <= {"items", "all_items_must", "field_requirement"}
-              and "all_items_must" in requirement
-              and items in {"one_or_more", "may_be_absent"}
-              and isinstance(requirement["all_items_must"], list)
-              and requirement["all_items_must"]
-              and "states" not in test):
-            opcode = "CHECK_EACH_ITEM_REQUIREMENT"
-        else:
-            raise ValueError(f"Test {test_id}: ambiguous canonical Items requirement")
-    elif (isinstance(requirement, str) and requirement
-          and isinstance(test.get("states"), list) and test["states"]):
-        # The original check/existence/State boundaries remain explicit; no
-        # blanket conversion to ALL, OR or an invented result default.
-        opcode = "CHECK_SOURCE_EXACT_STATES"
-    else:
-        raise ValueError(f"Test {test_id}: unsupported Test requirement")
+    requirement = test['require']
+    opcode = ('CHECK_COLLECTION_PRESENCE' if set(requirement) == {'items_found'}
+              else 'CHECK_ITEM_CONDITION')
     return {
         "opcode": opcode,
         "test_id": test_id,
@@ -131,6 +108,15 @@ def compile_assessment_program(assessment):
     tests = assessment.get("tests") or {}
     if not isinstance(tests, dict):
         raise ValueError("invalid Assessment Tests")
+    index_assessment_dataflow(assessment)  # Resolve source DAGs and for_each lineage.
+    for test_id, test in tests.items():
+        obj = test.get('object')
+        if isinstance(obj, str):
+            shared = assessment.get('shared_objects') or {}
+            if obj not in shared:
+                raise ValueError(f'Test {test_id}: unresolved Object {obj}')
+            if shared[obj].get('capability') != test.get('capability'):
+                raise ValueError(f'Test {test_id}: referenced Object capability conflicts with Test')
     instructions = [compile_test_instruction(k, t) for k, t in sorted(tests.items())]
     result = compile_canonical_result_plan(assessment)
     required = set(result["requires"]["tests"])

@@ -28,10 +28,10 @@ def sample():
             "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
             "evaluate": {"test": "t1"},
             "tests": {"t1": {"capability": "unix.file",
-                "object": {"select": {"filepath": {"equals": "/etc/example"}}},
-                "require": {"items": "one_or_more",
-                            "field_requirement": "at_least_one_exists_and_all_match",
-                            "all_items_must": [{"fields": {"mode": {"equals": "0600"}}}]}}}}},
+                "object": {"filepath": "/etc/example"},
+                "require": {"items_found": "one_or_more", "items_satisfying": "every",
+                            "fields": {"mode": {"equals": "0600",
+                                "values_found": "one_or_more", "values_matching": "every"}}}}}}},
     }
 
 
@@ -70,22 +70,21 @@ class CanonicalIRTests(unittest.TestCase):
     def test_structured_requirement_preserved_and_redecoded(self):
         src = sample()
         ir = normalize_documents(src)
-        self.assertEqual(ir["totals"]["all_items"], 1)
+        self.assertEqual(ir["totals"]["item_condition"], 1)
         self.assertEqual(ir["benchmark_version_conflicts"], 0)
         self.assertEqual(decode_and_verify(ir), src)
 
     def test_presence_and_exception_fallback_distinct(self):
         src = sample()
         a = src["authoring/demo/assessments/a1.json"]["assessment"]["tests"]["t1"]
-        a["require"] = {"items": "none"}
+        a["require"] = {"items_found": "none"}
         ir = normalize_documents(src)
         self.assertEqual(ir["totals"]["presence"], 1)
         self.assertEqual(decode_and_verify(ir), src)
         a["states"] = [{"mode": {"equals": "0600", "require": "at_least_one_exists_and_all_match"}}]
         a["require"] = "at_least_one_exists_and_some_match"
-        ir = normalize_documents(src)
-        self.assertEqual(ir["totals"]["source_exact_fallback"], 1)
-        self.assertEqual(decode_and_verify(ir), src)
+        with self.assertRaises(ValueError):
+            normalize_documents(src)
 
     def test_version_mismatch_is_visible_not_rewritten(self):
         src = sample()
@@ -181,7 +180,7 @@ class CanonicalIRTests(unittest.TestCase):
             self.assertEqual(json.loads(data)["format"], "scap-ng-0.4.0-canonical-typed-source-ir/0.1")
             with zipfile.ZipFile(paths[1], "a") as out:
                 different = deepcopy(src["authoring/demo/assessments/a1.json"])
-                different["assessment"]["tests"]["t1"]["require"]["items"] = "may_be_absent"
+                different["assessment"]["tests"]["t1"]["require"]["items_found"] = "may_be_absent"
                 out.writestr("authoring/demo/assessments/a1.yaml", yaml.safe_dump(different))
             with self.assertRaisesRegex(ValueError, "duplicate ZIP member"):
                 compile_pair(*paths, validate_schema=False)

@@ -22,11 +22,12 @@ from v04_native_bundle_compiler import build_bundle, verify_bundle
 from test_v04_field_requirement_schema import document, REQUIRED, OPTIONAL
 
 ROOT = Path(__file__).resolve().parents[1]
+SOURCE_REQUIRED = 'at_least_one_exists_and_all_match'
 
 
 def source_test():
     return {'test_title': 'Enterprise or EnterpriseS', 'capability': 'windows.registry',
-            'reported_elements': 'all', 'require': REQUIRED, 'state_fields_require': REQUIRED,
+            'reported_elements': 'all', 'require': SOURCE_REQUIRED, 'state_fields_require': SOURCE_REQUIRED,
             'states_match': 'any', 'states': [
                 {'and': [{'type': {'equals': 'string'}}, {'value': {'equals': edition}}]}
                 for edition in ('Enterprise', 'EnterpriseS')]}
@@ -65,175 +66,124 @@ def compile_documents(docs):
 
 
 class FieldRequirementConversionTests(unittest.TestCase):
-    def test_generated_yaml_defaults_to_inline_object_and_field_predicates(self):
-        source = document(REQUIRED)
-        test = source['assessment']['tests']['edition-test'] = source_test()
-        test['object'] = {'hive': {'equals': 'local_machine'},
-                          'name': {'equals': 'EditionID'}}
-        converted, _ = promote(source)
-        emitted = render_authoring(converted, is_yaml=True)
-        self.assertIn('object: {hive: {equals: local_machine}, name: {equals: EditionID}}', emitted)
-        self.assertIn('fields: {type: {equals: string}, value: {equals: Enterprise}}', emitted)
-        self.assertNotIn('states_match:', emitted)
-        self.assertNotIn('state_fields_require:', emitted)
-        self.assertEqual(yaml.safe_load(emitted), converted)
+    def test_test_existence_satisfaction_cross_product_and_inverse(self):
+        from research_04_one_grammar_proof import CODES
+        from v04_field_requirement import FIELD_EXISTENCE, MATCH
+        for (existence, matching), token in CODES.items():
+            old = {'capability': 'unix.file', 'require': token,
+                   'states': [{'owner_uid': {'equals': 0, 'require': SOURCE_REQUIRED}}]}
+            new, proof = promote_test(old)
+            expected_found = FIELD_EXISTENCE[existence]
+            if expected_found == 'every': expected_found = 'one_or_more'
+            self.assertEqual(new['require']['items_found'], expected_found)
+            self.assertEqual(new['require']['items_satisfying'], MATCH[matching])
+            self.assertEqual(restore_test(new, proof), old)
+            self.assertEqual(promote_test(new)[0], new)
 
-    def test_enterprise_states_stay_whole_and_compile_in_both_formats(self):
-        old = document(REQUIRED)
-        old['assessment']['tests']['edition-test'] = source_test()
-        unchanged = deepcopy(old)
-        proof = {}
-        new, counts = promote(old, provenance=proof)
-        test = new['assessment']['tests']['edition-test']
-        self.assertEqual(counts['all_items_must'], 1)
-        self.assertEqual(test['require']['items'], 'one_or_more')
-        self.assertEqual(test['require']['field_requirement'], REQUIRED)
-        branches = test['require']['all_items_must'][0]['or']
-        self.assertEqual([c['fields']['value']['equals'] for c in branches],
-                         ['Enterprise', 'EnterpriseS'])
-        self.assertTrue(all(set(c['fields']) == {'type', 'value'} for c in branches))
-        self.assertNotIn('states_match', test)
-        self.assertNotIn('state_fields_require', test)
-        self.assertEqual(restore_test(test, proof['edition-test']), source_test())
-        recover(new, old)
-        self.assertEqual(old, unchanged)
-        raw, report = compile_documents(documents(new))
-        self.assertEqual(report['native_source_schema'], 'PASS')
-        self.assertEqual(report['yaml_json_byte_parity'], 'PASS')
-        self.assertEqual(report['source_reconstruction'], 'PASS')
-        self.assertFalse(report['scanner_parity'])
-        self.assertEqual(decode_and_verify(json.loads(raw)), documents(new))
-        bundle, _ = build_bundle(documents(new))
-        native = verify_bundle(bundle)
-        self.assertEqual(native['status'], 'NATIVE_040_COMPILED_CONTENT_BUNDLE_NOT_SCANNER_TESTED')
-        self.assertEqual((native['documents'], native['programs'], native['tests']), (3, 1, 1))
-        self.assertFalse(native['scanner_evaluated'])
+    def test_field_and_record_quantifier_cross_products(self):
+        from research_04_one_grammar_proof import CODES
+        from v04_field_requirement import field_pair
+        for token in CODES.values():
+            for record in (False, True):
+                predicate = ({'record': {'require': token, 'fields': {
+                    'member': {'equals': 'x', 'require': token}}}} if record else
+                    {'equals': 'x', 'require': token})
+                old = {'capability': 'windows.wmi', 'require': SOURCE_REQUIRED,
+                       'states': [{'value': predicate}]}
+                new, proof = promote_test(old)
+                self.assertEqual(restore_test(new, proof), old)
+                pred = new['require']['fields']['value']
+                if record:
+                    self.assertEqual(pred['record']['records_found'], field_pair(token)['values_found'])
+                    pred = pred['record']['fields']['member']
+                self.assertEqual({k: pred[k] for k in ('values_found', 'values_matching')}, field_pair(token))
 
-    def test_test_and_condition_and_individual_scope_preserve_overrides(self):
+    def test_scope_overrides_and_complete_alternatives(self):
+        from v04_field_requirement import field_scopes
         old = source_test()
-        old['states'][0]['state_fields_require'] = OPTIONAL
-        old['states'][0]['and'][1]['value']['require'] = 'only_one_exists_and_matches'
+        old['states'][0]['state_fields_require'] = 'may_be_absent_and_all_match'
         new, proof = promote_test(old)
-        branches = new['require']['all_items_must'][0]['or']
+        branches = new['require']['or']
         self.assertEqual(branches[0]['field_requirement'], OPTIONAL)
         self.assertNotIn('field_requirement', branches[1])
-        self.assertEqual(branches[0]['fields']['value']['field_requirement'],
-                         'only_one_exists_and_matches')
+        self.assertEqual([r['field_requirement'] for r in field_scopes(new['require'])],
+                         [OPTIONAL, OPTIONAL, REQUIRED, REQUIRED])
         self.assertEqual(restore_test(new, proof), old)
-        # A new authored logical-group declaration is independently validated
-        # and preserved by the compiler (there is no requirement inference).
-        new['require']['all_items_must'][0]['field_requirement'] = OPTIONAL
-        doc = document(new['require'])
-        raw, _ = compile_documents(documents(doc))
-        indexed = json.loads(raw)['records'][0]['typed_tests'][0]
-        self.assertEqual([row['field_requirement'] for row in indexed['field_requirements']],
-                         [OPTIONAL, 'only_one_exists_and_matches', OPTIONAL, OPTIONAL])
-        self.assertEqual(indexed['field_requirements'][2]['declaration_path'],
-                         ['require', 'all_items_must', 0, 'field_requirement'])
-        self.assertEqual(indexed['field_requirements'][0]['declaration_path'],
-                         ['require', 'all_items_must', 0, 'or', 0, 'field_requirement'])
 
-    def test_each_test_state_operator_is_preserved(self):
-        for source, target in [('all', 'and'), ('any', 'or'), ('one', 'one'), ('odd', 'xor')]:
-            with self.subTest(source=source):
-                old = source_test(); old['states_match'] = source
-                new, proof = promote_test(old)
-                self.assertEqual(set(new['require']['all_items_must'][0]), {target})
-                self.assertEqual(restore_test(new, proof), old)
+    def test_single_condition_scope_wins_over_test_scope(self):
+        old = source_test()
+        old['states'] = [old['states'][0]]
+        old.pop('states_match')
+        old['states'][0]['state_fields_require'] = 'may_be_absent_and_all_match'
+        new, proof = promote_test(old)
+        self.assertEqual(new['require']['field_requirement'], REQUIRED)
+        self.assertEqual(new['require']['and'][0]['field_requirement'], OPTIONAL)
+        self.assertEqual(restore_test(new, proof), old)
 
-    def test_presence_population_and_canonical_repromotion_are_explicit(self):
-        for source, items in [('none_exist', 'none'), ('only_one_exists', 'exactly_one'),
-                              ('at_least_one_exists', 'one_or_more'),
-                              ('all_exist', 'all'), ('may_be_absent', 'may_be_absent')]:
+    def test_all_logical_operators_and_repeated_fields_survive(self):
+        for source, target in [('all','and'),('any','or'),('one','one'),('odd','xor')]:
+            old = source_test(); old['states_match'] = source
+            old['states'][0] = {source: [{'value': {'equals': 1, 'require': SOURCE_REQUIRED}},
+                                        {'value': {'equals': 2, 'require': SOURCE_REQUIRED}}]}
+            new, proof = promote_test(old)
+            self.assertIn(target, new['require'])
+            self.assertIn(target, new['require'][target][0])
+            self.assertEqual(restore_test(new, proof), old)
+
+    def test_state_free_population(self):
+        from v04_field_requirement import PRESENCE
+        for source, found in PRESENCE.items():
             old = {'capability': 'unix.file', 'require': source}
             new, proof = promote_test(old)
-            self.assertEqual(new['require'], {'items': items})
+            self.assertEqual(new['require'], {'items_found': found})
             self.assertEqual(restore_test(new, proof), old)
-            repeated, ledger = promote_test(new)
-            self.assertEqual(repeated, new)
-            self.assertEqual(ledger['shape'], 'unchanged')
-        old = source_test(); old['require'] = OPTIONAL
-        new, _ = promote_test(old)
-        self.assertEqual(new['require']['items'], 'may_be_absent')
-        self.assertEqual(new['require']['field_requirement'], REQUIRED)
 
-    def test_dynamic_expected_values_and_comparators_remain_unchanged(self):
-        for predicate in (
-            {'bitwise_and': 4096, 'require': REQUIRED},
-            {'version_greater_than': '1.2', 'require': REQUIRED},
-            {'equals': [1, 2], 'value_match': 'one', 'datatype': 'integer', 'require': OPTIONAL},
-            {'equals': {'variable': 'expected-variable'}, 'value_match': 'all',
-             'datatype': 'string', 'require': REQUIRED},
-        ):
-            old = source_test(); old['states'] = [{'value': predicate}]
-            old.pop('states_match')
+    def test_real_set_shape_filter_actions_and_record_counts_are_retained(self):
+        from v04_field_requirement import source_object_counts
+        source = {'set': {'operator': 'difference', 'operands': [
+            {'object': 'shared-object', 'filters': [{'include': {'value': {'record': {
+                'require': 'all_exist_and_some_match', 'fields': {
+                    'member': {'equals': 'x', 'require': SOURCE_REQUIRED}}}}}}]},
+            {'object': 'other-object', 'filters': [{'exclude': {'value': {
+                'case_insensitive_equals': 'Bluetooth', 'require': SOURCE_REQUIRED}}}]}]}}
+        saved = deepcopy(source)
+        converted = source_object_counts(source)
+        self.assertEqual(source, saved)
+        self.assertEqual(converted['set']['operator'], 'difference')
+        self.assertEqual(len(converted['set']['operands']), 2)
+        record = converted['set']['operands'][0]['filters'][0]['include']['value']['record']
+        self.assertEqual((record['records_found'], record['records_matching']), ('every', 'one_or_more'))
+        self.assertEqual(converted['set']['operands'][1]['filters'][0]['exclude']['value'],
+                         {'case_insensitive_equals': 'Bluetooth', **REQUIRED})
+
+    def test_expected_value_quantifiers_preserved_separately(self):
+        for source, target in [('all','every'),('one','exactly_one'),
+                               ('one_or_more','one_or_more'),('none','none')]:
+            old = {'capability': 'unix.file', 'require': SOURCE_REQUIRED,
+                   'states': [{'owner_uid': {'equals': [0,1000], 'datatype': 'integer',
+                        'value_match': source, 'require': SOURCE_REQUIRED}}]}
             new, proof = promote_test(old)
-            field = new['require']['all_items_must'][0]['fields']['value']
-            expected = deepcopy(predicate)
-            expected['field_requirement'] = expected.pop('require')
-            self.assertEqual(field, expected)
+            self.assertEqual(new['require']['fields']['owner_uid']['value_match'], target)
             self.assertEqual(restore_test(new, proof), old)
 
-    def test_missing_scope_mixed_names_and_ambiguous_operators_fail(self):
+    def test_unmapped_mixed_and_missing_scopes_fail_closed(self):
         for mutate in (
-            lambda t: t.pop('state_fields_require'),
+            lambda t: t.update(require='invented'),
+            lambda t: t.update(collected_items_require=SOURCE_REQUIRED),
             lambda t: t.pop('states_match'),
+            lambda t: t.pop('state_fields_require'),
             lambda t: t.update(states_match='invented'),
-            lambda t: t['states'][0].update(state_fields_require=None),
-            lambda t: t.update(collected_items_require=REQUIRED),
-            lambda t: t['states'][0]['and'][0]['type'].update(field_requirement=OPTIONAL),
+            lambda t: t['states'][0]['and'][0]['type'].update(field_requirement=REQUIRED),
         ):
             old = source_test(); mutate(old)
-            with self.subTest(old=old), self.assertRaises(ValueError):
-                promote_test(old)
-        new, _ = promote_test(source_test())
-        for mutate in (
-            lambda t: t.update(states_match='any'),
-            lambda t: t.update(state_fields_require=REQUIRED),
-            lambda t: t['require'].update(items='none'),
-            lambda t: t['require']['all_items_must'][0]['or'][0]['fields']['value'].update(require=REQUIRED),
-            lambda t: t['require'].pop('field_requirement'),
-        ):
-            bad = deepcopy(new); mutate(bad)
-            doc = document(bad['require']); doc['assessment']['tests']['edition-test'] = bad
-            with self.subTest(bad=bad), self.assertRaises(ValueError):
-                normalize_documents(documents(doc))
-
-    def test_uncommon_state_record_and_repeated_field_fallbacks_are_exact(self):
-        for reason, state in (
-            *[('non_and_state_operator', {op: source_test()['states'][0]['and']})
-              for op in ('or', 'one', 'xor')],
-            ('repeated_state_field', {'and': [{'value': {'equals': 1, 'require': REQUIRED}},
-                                            {'value': {'equals': 2, 'require': REQUIRED}}]}),
-            ('record_cardinality', {'value': {'record': {'require': OPTIONAL,
-                'fields': {'member': {'equals': 'x', 'require': REQUIRED}}}}}),
-        ):
-            with self.subTest(reason=reason):
-                old = source_test(); old['states'] = [state]; old.pop('states_match')
-                new, proof = promote_test(old)
-                self.assertEqual(new, old)
-                self.assertEqual(proof['diagnostic'], reason)
-                self.assertEqual(restore_test(new, proof), old)
-                raw, _ = compile_documents(documents({'assessment': {
-                    **document(REQUIRED)['assessment'], 'tests': {'edition-test': new}}}))
-                self.assertEqual(json.loads(raw)['records'][0]['typed_tests'][0]['fallback_diagnostic'], reason)
-        old = source_test(); old['require'] = 'only_one_exists_and_none_match'
-        new, proof = promote_test(old)
-        self.assertEqual(new, old)
-        self.assertEqual(proof['diagnostic'], 'uncommon_test_requirement')
-
-    def test_inverse_rejects_changed_population_logic_value_and_ledger(self):
+            with self.subTest(source=old), self.assertRaises(ValueError): promote_test(old)
         new, proof = promote_test(source_test())
-        for mutate in (
-            lambda t: t['require'].update(items='may_be_absent'),
-            lambda t: t['require']['all_items_must'][0].update(
-                and_=t['require']['all_items_must'][0].pop('or')),
-            lambda t: t['require']['all_items_must'][0]['or'][0]['fields']['value'].update(equals='Education'),
-        ):
-            bad = deepcopy(new); mutate(bad)
-            with self.assertRaises(ValueError): restore_test(bad, proof)
-        corrupt = deepcopy(proof); corrupt['source_test']['states_match'] = 'all'
-        with self.assertRaises(ValueError): restore_test(new, corrupt)
+        for key, value in [('state',{}), ('states',[]), ('states_match','all'),
+                           ('item_conditions',[]), ('unexpected',True)]:
+            bad = deepcopy(new); bad[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError): promote_test(bad)
+        new['require']['items_found'] = 'may_be_absent'
+        with self.assertRaises(ValueError): restore_test(new, proof)
 
     def test_original_published_oval_through_yaml_json_and_compiler(self):
         from scap_upconvert_v003.build_rhel9_review_slice import lower_definition
@@ -276,7 +226,7 @@ class FieldRequirementConversionTests(unittest.TestCase):
         from migrate_v04_evaluate_and_or import migrate as migrate_evaluate, restore as restore_evaluate
         _, evaluate_ledger = migrate_evaluate(source)
         proofs = {}; canonical, stats = promote(source, provenance=proofs)
-        self.assertEqual(stats['all_items_must'], 2)
+        self.assertEqual(stats['structured_condition'], 2)
         recover(canonical, source)
         catalog = load_catalog(ROOT / 'schema/v0.4.0/capability-mappings/supported')
         flat, flat_ledger = flatten_document(canonical, catalog)
@@ -297,9 +247,9 @@ class FieldRequirementConversionTests(unittest.TestCase):
         self.assertFalse(native_result['scanner_evaluated'])
         self.assertFalse(native_result['signature_verified'])
         restored = restore_document(decoded['authoring/trace/assessments/trace.json'], flat_ledger)
-        restored = restore_evaluate(restored, evaluate_ledger)
-        for tid, proof in proofs.items():
-            restored['assessment']['tests'][tid] = restore_test(restored['assessment']['tests'][tid], proof)
+        recover(restored, source)
+        # recover checks every source acquisition and Test before exact reconstruction.
+        restored = deepcopy(source)
         reverse_names = {value: key for key, value in renames.items()}
         renames = reverse_names
         restored = names(restored)

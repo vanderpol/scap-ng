@@ -8,6 +8,16 @@ proposals are not listed as delivered features.
 
 ### Canonical authoring cleanup
 
+- Integrated the existing 0.4 converter/upgrader, typed source IR and native
+  compiler with explicit Item, field and record counts in the approved `require`
+  grammar. Preserve complete logical alternatives, source ledgers, Sets/Filters,
+  Variables and Object sharing; reject obsolete authored State forms and invalid
+  quantifiers. Added three pinned Linux/Windows end-to-end cases and focused CI.
+  Source OVAL `all_exist` population semantics remain separately audited; no
+  scanner equivalence or 0.4.0 completion is claimed.
+  [#251](https://github.com/vanderpol/scap-ng/issues/251)
+  [#248](https://github.com/vanderpol/scap-ng/issues/248)
+
 - Repaired CI fixture wiring for pinned AppArmor, environmentvariable58 and
   uname source tests. The condition-fields preview now reuses source-inverse
   restoration of the 11 missing Applicability dependencies in its strict typed

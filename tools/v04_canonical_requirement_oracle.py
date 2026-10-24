@@ -23,7 +23,8 @@ from itertools import product
 import json
 from pathlib import Path
 
-from build_v04_canonical_six_stigs import promote, PAIRS, PRESENCE, reconcile_benchmark_specifications
+from build_v04_canonical_six_stigs import promote, reconcile_benchmark_specifications
+from v04_field_requirement import PAIR_BY_NAME, FIELD_EXISTENCE, PRESENCE, validate_test
 from v04_a_authoring_graph_index import read_authoring_archive
 from v04_flat_object_authoring import load_catalog, flatten_document, restore_document
 from oval_result_truth_tables import evaluate_collected_object_test
@@ -35,34 +36,34 @@ EXISTENCE = {
     "one_or_more": "at_least_one_exists",
     "none": "none_exist",
     "exactly_one": "only_one_exists",
-    "all": "all_exist",
     "may_be_absent": "any_exist",
 }
 
 
 def describe(requirement):
-    if not isinstance(requirement, dict):
-        raise ValueError("expected structured canonical Test requirement")
-    if set(requirement) == {"items"}:
-        return EXISTENCE[requirement["items"]], "all", False
-    if {"items", "all_items_must"} <= set(requirement) <= {"items", "all_items_must", "field_requirement"}:
-        if requirement["items"] not in PAIRS.values() or not requirement["all_items_must"]:
-            raise ValueError("invalid structured all-match requirement")
-        return EXISTENCE[requirement["items"]], "all", True
-    raise ValueError("unknown structured requirement")
+    validate_test({'require': requirement})
+    existence = EXISTENCE[requirement['items_found']]
+    if set(requirement) == {'items_found'}:
+        return existence, 'all', False
+    check = {'every': 'all', 'one_or_more': 'at least one',
+             'exactly_one': 'only one', 'none': 'none satisfy'}[requirement['items_satisfying']]
+    return existence, check, True
 
 
 def source_axes(source_test):
-    old = source_test.get("collected_items_require", source_test.get("require"))
+    old = source_test.get('collected_items_require', source_test.get('require'))
+    if source_test.get('states'):
+        if old not in PAIR_BY_NAME:
+            raise ValueError('source Test requires exceptional semantics')
+        existence, match = PAIR_BY_NAME[old]
+        found = FIELD_EXISTENCE[existence]
+        original_existence = 'all_exist' if found == 'every' else EXISTENCE[found]
+        check = {'all': 'all', 'one': 'only one', 'one_or_more': 'at least one',
+                 'none': 'none satisfy'}[match]
+        return original_existence, check, True
     if old in PRESENCE:
-        if source_test.get("states") or "states_match" in source_test:
-            raise ValueError("source State-free Test unexpectedly has States")
-        return EXISTENCE[PRESENCE[old]], "all", False
-    if old in PAIRS:
-        if not source_test.get("states"):
-            raise ValueError("source all-match Test lacks States")
-        return EXISTENCE[PAIRS[old]], "all", True
-    raise ValueError("source Test requires exceptional semantics")
+        return ('all_exist' if old == 'all_exist' else EXISTENCE[PRESENCE[old]]), 'all', False
+    raise ValueError('source Test requires exceptional semantics')
 
 
 def comparison_matrix(axis):
@@ -146,9 +147,6 @@ def compare_original_to_canonical(original, canonical, *, filter_proof=None,
         for tid, src in (old.get("tests") or {}).items():
             candidate = next_tests[tid]
             req = candidate.get("require")
-            if isinstance(req, str):
-                counts["exceptional_source_exact"] += 1
-                continue
             expected = source_axes(src)
             actual = describe(req)
             if actual != expected:
@@ -200,7 +198,7 @@ def main():
         result["test_population"].get("converted_presence"),
         result["test_population"].get("converted_all_items"),
         result["test_population"].get("exceptional_source_exact"),
-    ) != (4012, 399, 770, 221):
+    ) != (4012, 399, 991, None):
         raise ValueError("full six-STIG canonical requirement population changed")
     a.report.parent.mkdir(parents=True, exist_ok=True)
     a.report.write_text(json.dumps(result, sort_keys=True, indent=2) + "\n")
