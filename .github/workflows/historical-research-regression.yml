@@ -1,0 +1,44 @@
+name: Pinned historical research regression (not 0.4 release gate)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/run_current_tool_regressions.py'
+      - 'tests/ci/**'
+      - '.github/workflows/historical-research-regression.yml'
+  pull_request:
+    paths:
+      - 'tools/run_current_tool_regressions.py'
+      - 'tests/ci/**'
+      - '.github/workflows/historical-research-regression.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  original-research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          ref: b1b1722acef4ee0a4f9d6f5be09c76aab65228aa
+          path: historical-source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.14'
+      - name: Install pinned original research dependencies
+        run: python -m pip install PyYAML==6.0.3 lxml==6.1.1 jsonschema==4.25.1 cryptography==50.0.2
+      - name: Execute original tests and retain their actual exit status
+        working-directory: historical-source
+        env:
+          PYTHONPATH: .:tools:tools/scap_upconvert_v003:tools/scap_ng_roundtrip_v003
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python ../tools/run_current_tool_regressions.py --partition historical --source-root . --report ../work/historical-regressions.json
+      - name: Retain exact historical selection, failures and tracebacks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pinned-historical-research-results
+          path: work/historical-regressions.json
+          if-no-files-found: error
