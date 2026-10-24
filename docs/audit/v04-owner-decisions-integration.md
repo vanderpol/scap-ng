@@ -237,3 +237,68 @@ release publication, editor change or scanner-parity claim was made.
 Issue-write access was previously denied with
 `Post "https://api.github.com/graphql": Forbidden`; the committed engineering
 report remains the authorized handoff without repeated permission attempts.
+
+## Final publication and exact CI outcomes
+
+- Historical routing implementation:
+  [`6836bb3bd187418553c4fe1e47ee9fe2d5a82342`](https://github.com/vanderpol/scap-ng/commit/6836bb3bd187418553c4fe1e47ee9fe2d5a82342).
+- Test normalization implementation:
+  [`2de578c088291558f44d0c7a505ad149dea5fc76`](https://github.com/vanderpol/scap-ng/commit/2de578c088291558f44d0c7a505ad149dea5fc76).
+
+Both were normal, non-forced pushes directly to `main`. The working tree was
+clean after removing only this task's temporary Python caches/operator-XSD output.
+The complete [hosted conclusion inventory](v04-owner-decisions-ci.json) records
+all 18 runs observed for the normalization SHA: **11 passed, seven failed**.
+The historical workflow ran separately on the routing SHA and remains red above.
+Public run conclusions are not substituted for authenticated per-test logs;
+precise local test counts/identities and hosted report artifacts are distinguished.
+
+Current-workflow results on the normalization SHA:
+
+| Workflow | Exact outcome |
+| --- | --- |
+| [Mandatory rebaseline](https://github.com/vanderpol/scap-ng/actions/runs/40133633841) | Passed |
+| [0.4 schema](https://github.com/vanderpol/scap-ng/actions/runs/40133633882) | Passed |
+| [Shared converter core, including normalization](https://github.com/vanderpol/scap-ng/actions/runs/40133633935) | Passed |
+| [Canonical fast checks](https://github.com/vanderpol/scap-ng/actions/runs/40133633833) | Passed |
+| [Current-design contracts](https://github.com/vanderpol/scap-ng/actions/runs/40133633898) | Passed |
+| [Repository preservation](https://github.com/vanderpol/scap-ng/actions/runs/40133633837) | Passed |
+| [Markdown](https://github.com/vanderpol/scap-ng/actions/runs/40133633913) | Passed |
+| [Issue references](https://github.com/vanderpol/scap-ng/actions/runs/40133633864) | Passed |
+| [Original core conversion coverage](https://github.com/vanderpol/scap-ng/actions/runs/40133633854) | Passed |
+| [Toolchain clean-extract smoke](https://github.com/vanderpol/scap-ng/actions/runs/40133633910) | Passed; bounded smoke, not full release reproducibility/trust acceptance |
+| [003 Self-Assertion semantics](https://github.com/vanderpol/scap-ng/actions/runs/40133633874) | Passed; not 0.4 scanner parity |
+
+Other automatically triggered source-preview/research workflows remain visible:
+
+| Workflow | Exact outcome |
+| --- | --- |
+| [Original OVAL multi-Test flat-Object pilot](https://github.com/vanderpol/scap-ng/actions/runs/40133633843) | Failed |
+| [Original OVAL constant family Variable XML roundtrip](https://github.com/vanderpol/scap-ng/actions/runs/40133633917) | Failed |
+| [OVAL family constant Variable original XML roundtrip](https://github.com/vanderpol/scap-ng/actions/runs/40133633876) | Failed |
+| [Complete AND-OR-XOR authoring candidate proof](https://github.com/vanderpol/scap-ng/actions/runs/40133633919) | Failed |
+| [Strict six-anchor authoring schema gate](https://github.com/vanderpol/scap-ng/actions/runs/40133633853) | Failed |
+| [Six-STIG flat Object preview](https://github.com/vanderpol/scap-ng/actions/runs/40133633807) | Failed |
+| [State alternatives AND/OR normalization proof](https://github.com/vanderpol/scap-ng/actions/runs/40133633855) | Failed |
+
+These failures are neither hidden nor waived by the maintained-test split. Their
+per-workflow diagnosis/reconciliation remains separate readiness work; this task
+does not claim every workflow is green or that these seven all have the same root
+cause. No fresh six-STIG production regeneration or manual dispatch was performed;
+existing automation triggered the listed preview/research checks on the push.
+Do not publish a final release based only on the now-green maintained regression.
+
+Changed files by implementation (the report spans both):
+
+- CI routing: `tools/run_current_tool_regressions.py`,
+  `tests/ci/historical-research.json`, `.github/workflows/rebaseline-smoke.yml`,
+  `.github/workflows/historical-research-regression.yml`, this engineering report.
+- Normalization: `tools/v04_all_exist_normalization.py`,
+  `tools/scap_converter_core.py`, `tools/build_v04_canonical_six_stigs.py`,
+  `tools/v04_canonical_requirement_oracle.py`, `tools/v04_field_requirement.py`;
+  `tools/test_v04_all_exist_normalization.py`, `tools/test_v04_approved_pipeline.py`,
+  `tools/test_v04_canonical_requirement_oracle.py`;
+  `.github/workflows/v04-converter-core-bridge.yml`, `CHANGELOG.md`,
+  `schema/v0.4.0/README.md`, `research/iterations/003/design/CURRENT-DESIGN.md`,
+  the source-Test inventory and this report. The final hosted-conclusion JSON is
+  a report-only handoff addition.
