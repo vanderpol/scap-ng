@@ -186,7 +186,36 @@ python tools/run_current_tool_regressions.py
 
 The source integration fixtures are self-contained for CI. The schema workflow
 now runs the new source-backed integration test and Gatekeeper regression.
-Commit SHAs and hosted CI results will be recorded after publication.
+Published directly to `main` with a normal, non-forced push:
+
+- Schema-only candidate: [7ff986ce04c2ea8c128d2c39f7f9ff90cc707e19](https://github.com/vanderpol/scap-ng/commit/7ff986ce04c2ea8c128d2c39f7f9ff90cc707e19).
+- Converter/upgrader integration, source proofs, fixtures and regressions:
+  [8d4774f4e9ef75d628ed9d832a6c634ba2591bcf](https://github.com/vanderpol/scap-ng/commit/8d4774f4e9ef75d628ed9d832a6c634ba2591bcf).
+
+Terminal hosted results for the integration SHA, observed 2026-10-24:
+
+| Workflow | Result |
+| --- | --- |
+| [0.4 draft schema](https://github.com/vanderpol/scap-ng/actions/runs/40121214869) | Passed, including the new source-backed absence integration tests |
+| [Shared converter core](https://github.com/vanderpol/scap-ng/actions/runs/40121214715) | Passed |
+| [Original Gatekeeper source roundtrip](https://github.com/vanderpol/scap-ng/actions/runs/40121214762) | Passed |
+| [Capability schema generation](https://github.com/vanderpol/scap-ng/actions/runs/40121214800) | Passed |
+| [Current-design contracts](https://github.com/vanderpol/scap-ng/actions/runs/40121214684) | Passed |
+| [Canonical authoring fast checks](https://github.com/vanderpol/scap-ng/actions/runs/40121214753) | Passed |
+| [Markdown audit](https://github.com/vanderpol/scap-ng/actions/runs/40121214752) | Passed |
+| [Commit issue reference](https://github.com/vanderpol/scap-ng/actions/runs/40121214785) | Passed |
+| [Rebaseline smoke](https://github.com/vanderpol/scap-ng/actions/runs/40121214750) | Failed; not a green release gate |
+
+The local pinned-dependency broad comparison above establishes zero new failing
+test identities and one resolved absence regression. The hosted rebaseline
+conclusion is reported separately; its failure is not suppressed or interpreted
+as success. Historical classification and recommended release-scope follow-up
+remain in the [maintained regression report](v04-maintained-ci-stabilization.md).
+This task does not change their gating status.
+
+Issue-write access in this environment previously returned the exact error
+`Post "https://api.github.com/graphql": Forbidden`; it was not retried in a loop.
+This committed report is the durable GitHub handoff fallback.
 
 No unresolved semantic choice was made for the supported source cases. Unsupported
 nonempty comparisons/member predicates remain explicitly blocked pending original
