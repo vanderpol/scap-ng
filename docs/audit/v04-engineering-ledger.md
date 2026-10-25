@@ -24,12 +24,29 @@ The one final issue-comment attempt returned `Post "https://api.github.com/graph
 the linked committed report is the fallback, with no retry.
 
 [Architecture packet and evidence](v04-architecture-acceptance.md) contains exact
-SHAs, source hashes, proof cases and CI links. [Audit-policy packet](v04-audit-policy-direct.md) records the next completed
-increment. The next bounded objective is original closed-domain Registry hive
-selection equivalence (19 candidate Rules), with whole-closure proof, error
-evidence, native enum contract and negative tests required before admission.
-SID/user-right (39) and WMI (26) remain ranked source censuses; counts overlap
-and never constitute admission. These are queued engineering objectives, not
+SHAs, source hashes, proof cases and CI links. [Audit-policy packet](v04-audit-policy-direct.md)
+records its completed increment.
+
+The [closed-domain Registry hive checkpoint](v04-direct-registry-hive.md) is now
+complete: `cef742119` → `2c850a36b`. All 19 additional original Rule closures
+independently prove and compile; the 49-pair original Object/Item enum relation
+is explicit and source tokens remain in provenance. Current coverage is
+**149 proved / zero compiled-unproved / 142 blocked** of 291. All prior 130 program
+hashes are unchanged. Mandatory regressions: **3,026 tests**, zero failures/errors,
+one unchanged skip; all five exact implementation-head workflows PASS. Authoring
+remains local by default: 114 inline Test Objects, one named Object/seven references,
+71 intentional no-Object Tests and 120 compact Registry Object sites. Public gates
+validate 300 JSON/300 YAML documents and independently verify 149 programs.
+Empty/dynamic hives, State-level enum comparator changes and extra `all_exist`
+normalizations remain blocked. No unmatched-workload speedup is claimed.
+
+The next bounded objective is original user-rights proof. A completed read-only
+census finds 39 Rule closures with 79 Definitions, 53 Tests, 34 Objects, 18 States
+and one Variable; WMI record dependencies and a 45-value Variable/filter Object
+require independent treatment. Preserve the source's default `var_check: all`;
+do not silently change it to match an apparent policy intent. WMI (26) remains
+the next ranked source census. Counts overlap and never constitute admission.
+These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
 authorized GitHub handoff if that restriction persists.
