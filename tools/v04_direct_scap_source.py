@@ -46,8 +46,8 @@ def digest(value):
     return sha256(json.dumps(value, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode()).hexdigest()
 
 
-def native_identifier(element, suffix):
-    title = (element.get('comment') or element.findtext(f'{{{XCCDF}}}title') or
+def native_identifier(element, suffix, title=None):
+    title = (title or element.get('comment') or element.findtext(f'{{{XCCDF}}}title') or
              element.findtext(f'{{{OVAL}}}metadata/{{{OVAL}}}title') or local_name(element))
     stem = re.sub('[^a-z0-9]+', '-', title.lower()).strip('-')[:70].rstrip('-')
     return f'{stem}-{digest(element.get("id"))[:8]}-{suffix}'
@@ -112,6 +112,38 @@ class SourceModel:
             self.catalog[uri.get('name')] = self.component_for_reference(uri.get('uri')[1:])
         self.parents = {child: parent for parent in self.benchmark.iter() for child in parent}
         self.rules = {rule.get('id'): rule for rule in self.benchmark.iter(f'{{{XCCDF}}}Rule')}
+
+    def object_uses(self, component, identifier, kind):
+        """Count acquisition edges in one reachable Assessment, not the Benchmark.
+
+        Visit each semantic node once: reusing a Test/Variable does not duplicate
+        its acquisition. Distinct consumers and repeated Set operands do count.
+        Filter States and their Variable dependencies participate in the walk.
+        Identity is component + source ID, never equality of selector payloads.
+        Conversion still diagnoses cycles, wrong kinds and unsupported syntax.
+        """
+        references = {'definition_ref': 'definition', 'test_ref': 'test',
+                      'object_ref': 'object', 'state_ref': 'state', 'var_ref': 'variable'}
+        counts, visited = Counter(), set()
+
+        def visit(identifier, kind):
+            if (kind, identifier) in visited:
+                return
+            visited.add((kind, identifier))
+            node = self.node(component, identifier, kind)
+            for child in node.iter():
+                edges = [(child.get(attr), target) for attr, target in references.items() if attr in child.attrib]
+                if child.tag in (f'{{{OVAL}}}object_reference', f'{{{OVAL}}}filter'):
+                    edges.append(((child.text or '').strip(), 'object' if local_name(child) == 'object_reference' else 'state'))
+                for target, target_kind in edges:
+                    if target_kind == 'object':
+                        counts[target] += 1
+                    visit(target, target_kind)
+
+        if kind == 'object':
+            counts[identifier] += 1  # A focused acquisition also has its caller.
+        visit(identifier, kind)
+        return counts
 
     def component_for_reference(self, reference_id):
         ensure(reference_id in self.references, f'unresolved component-ref: {reference_id}')

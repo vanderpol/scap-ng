@@ -52,6 +52,7 @@ class AssessmentConverter:
         self.source, self.component_id, self.mappings = source, component_id, mappings
         self.active, self.cache, self.used = set(), {}, {}
         self.tests, self.variables, self.shared_objects = {}, {}, {}
+        self.object_uses = None
 
     def capability(self, element, kind):
         matches = [mapping for mapping in self.mappings if element.tag ==
@@ -60,6 +61,8 @@ class AssessmentConverter:
         return matches[0]
 
     def reference(self, identifier, kind):
+        if self.object_uses is None:
+            self.object_uses = self.source.object_uses(self.component_id, identifier, kind)
         key = kind, identifier
         ensure(key not in self.active, f'cyclic {kind} dependency: {identifier}')
         if key in self.cache:
@@ -184,12 +187,30 @@ class AssessmentConverter:
             if filters:
                 acquisition['filters'] = filters
         # Source identity, not payload equality, determines shared acquisitions.
-        if self.source.object_references[self.component_id, element.get('id')] > 1:
-            identifier = native_identifier(element, 'object')
-            acquisition['object_title'] = element.get('comment') or mapping['capability'] + ' acquisition'
+        if self.object_uses[element.get('id')] > 1:
+            title = self.object_title(element, mapping)
+            identifier = native_identifier(element, 'object', title=title)
+            acquisition['object_title'] = title
             self.shared_objects[identifier] = acquisition
             return identifier
         return acquisition
+
+    def object_title(self, element, mapping):
+        """Describe source acquisition facts, never infer an unstated purpose."""
+        comment = (element.get('comment') or '').strip()
+        def words(value):
+            return ' '.join(value.lower().replace('.', ' ').replace('_', ' ').replace('-', ' ').split())
+        generic = {words(mapping['capability']), words(mapping['capability'] + ' object'),
+                   words(mapping['capability'] + ' acquisition'), words(local_name(element))}
+        if comment and words(comment) not in generic:
+            return comment
+        details = []
+        for child in element:
+            if local_name(child) in mapping['native'].get('selector_map', {}):
+                value = 'from a source Variable' if child.get('var_ref') else repr(child.text or '')
+                details.append(f'{local_name(child)} {child.get("operation", "equals")} {value}')
+        ensure(details, 'shared acquisition has no source-grounded title')
+        return local_name(element).removesuffix('_object').replace('_', ' ').capitalize() + ': ' + '; '.join(details)
 
     def set_expression(self, element, mapping):
         attributes(element, {'set_operator'})
@@ -213,7 +234,10 @@ class AssessmentConverter:
                 self.same_family(identifier, 'object', mapping)
                 # OVAL applies each ordered Filter to EACH operand before the
                 # operator. A root post-Set Filter would change that boundary.
-                operands.append({'object': self.reference(identifier, 'object'), 'filters': deepcopy(predicates)})
+                acquisition = self.reference(identifier, 'object')
+                if isinstance(acquisition, dict):
+                    acquisition.pop('capability')  # Inherit down this same-family Set boundary.
+                operands.append({'object': acquisition, 'filters': deepcopy(predicates)})
         return {'operator': SET_OPERATORS[operator], 'operands': operands}
 
     def filter(self, element, mapping):
@@ -408,11 +432,11 @@ def convert_rule(source, source_id, mappings):
     title = rule.findtext(f'{{{XCCDF}}}title', '')
     assessment = {'id': assessment_id, 'version': 1, 'assessment_title': title,
         'mode': 'automated', 'class': source.node(component, definition, 'definition').get('class'),
-        'purpose': 'assessment', 'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
-        'tests': converter.tests, 'evaluate': expression}
-    for section in ('variables', 'shared_objects'):
+        'purpose': 'assessment', 'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'}}
+    for section in ('shared_objects', 'variables'):
         if getattr(converter, section):
             assessment[section] = getattr(converter, section)
+    assessment.update(tests=converter.tests, evaluate=expression)
     documents[f'authoring/direct-slice/assessments/{assessment_id}.json'] = {'assessment': assessment}
     # This is a compilation fixture, not a full Rule-policy renderer.
     native_rule = {'id': rule_id, 'version': rule.findtext(f'{{{XCCDF}}}version', ''), 'title': title,
@@ -586,13 +610,13 @@ def main():
     else:
         documents, trace, manifest = convert_benchmark(source, inventory_only=arguments.inventory_only, timings=stages)
     converted = time.perf_counter()
-    import yaml
+    from v04_direct_yaml import authoring_yaml
     arguments.output.mkdir(parents=True)
     for relative, document in documents.items():
         target = arguments.output / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(document, indent=2) + '\n')
-        target.with_suffix('.yaml').write_text(yaml.safe_dump(document, sort_keys=False))
+        target.with_suffix('.yaml').write_text(authoring_yaml(document))
     (arguments.output / 'source-trace.json').write_text(json.dumps(trace, indent=2) + '\n')
     if manifest is not None:
         from v04_direct_inventory import coverage_markdown
