@@ -6,8 +6,9 @@
 Implementation commit:
 [`f851e3abb432e0853bbb15bde5ec68b163e7445e`](https://github.com/vanderpol/scap-ng/commit/f851e3abb432e0853bbb15bde5ec68b163e7445e).
 Portability follow-up and terminal hosted CI are recorded below. No schema,
-normative specification, release gate, original
-fixture, pinned archive, six-STIG bundle or proof-coverage ledger was changed.
+normative specification, release gate, original fixture, pinned 0.4.0 archive,
+pinned 0.4.0 six-STIG bundle or proof-coverage ledger was changed. An unintended
+automatic **0.3** publication is disclosed separately below.
 
 ## Engineering result
 
@@ -233,11 +234,79 @@ was attempted once. Cancellation was blocked before the request by exact error:
 
 `Get "https://api.github.com/repos/vanderpol/scap-ng/actions/runs/40191627218?exclude_pull_requests=true": Forbidden`
 
-**External permission/owner action:** inspect/cancel that unrelated publishing
-run and decide separately how to prevent automatic historical publication on
-ordinary validator changes. No gate was changed or bypassed here. No local
-six-STIG regeneration or replacement was performed. Terminal CI and any observed
-publication outcome will be stated explicitly in the final handoff.
+The run was subsequently observed **SUCCESS**. Public release evidence confirms
+it created [v0.3.0-six-stig-typed-operators-f851e3abb432](https://github.com/vanderpol/scap-ng/releases/tag/v0.3.0-six-stig-typed-operators-f851e3abb432)
+at **2026-10-25 12:12:53 UTC**, with six 0.3 bundles, one authoring ZIP, DOWNLOADS.json
+and SHA256SUMS.txt. [Exact asset inventory and cancellation error](v04-object-processing/unintended-v03-publication.json).
+This publication was an unrequested side effect of the existing push-triggered
+workflow. The trigger should have been identified before pushing. No release
+or asset was manually altered/deleted; the inability to cancel is not evidence
+that publication was approved.
+
+**External permission/owner action:** review this unintended 0.3 prerelease and
+decide its disposition, plus separately authorize prevention of automatic
+historical publication on ordinary validator changes. No gate was changed or
+bypassed here. No local six-STIG regeneration or replacement was performed;
+the pinned 0.4.0 package audit remains read-only. The other automatic 0.3 human
+review build's publication job is explicitly dispatch-only and was not invoked.
+
+## Terminal engineering handoff
+
+Both issue-linked commits were normally pushed directly to main:
+
+- Implementation/evidence:
+  [`f851e3abb432e0853bbb15bde5ec68b163e7445e`](https://github.com/vanderpol/scap-ng/commit/f851e3abb432e0853bbb15bde5ec68b163e7445e).
+- Portable shared visitor/dependency regression:
+  [`a683e28d15e6a4a8f1a2d1edaa6757cdbafff199`](https://github.com/vanderpol/scap-ng/commit/a683e28d15e6a4a8f1a2d1edaa6757cdbafff199).
+
+Full changed-file sets are in those commits. Production changes are limited to
+the shared Object contract/visitor, reversible historical promotion, public
+schema validator, compiler preflight, and the source-backed 0.4 Registry adapter.
+The XML workflow gained only its missing dependency path trigger; fast CI gained
+the two regression modules. No release gate was weakened or reclassified.
+
+Local final: **2,974 mandatory tests / 0 failures / 0 errors / 1 existing skip**;
+**89 targeted tests passed**; **100/100 capability generation audit passed**.
+The corpus audit was independently rerun after the implementation settled:
+all five emitted candidate/inventory/proof files reproduced byte-for-byte,
+including inventory SHA-256
+`d8f28450d72fbb9eda9db28a26fdf73586b395394e9cccdae7446094ca1de3f5`.
+
+Hosted implementation: **15 SUCCESS / 2 FAILURE**. The Windows pilot failure
+was corrected in the portability commit; the historical condition-fields
+failure is unchanged from baseline and is not hidden. Hosted portability commit:
+**7/7 SUCCESS**:
+
+| Workflow | Terminal result / run |
+| --- | --- |
+| Rebaseline smoke | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265860) |
+| Current-design regression | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265847) |
+| Canonical fast checks | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265836) |
+| Windows original XML pilot | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265846) |
+| Markdown navigation | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265869) |
+| Issue-linked commits | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265854) |
+| Repository preservation | [SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40192265882) |
+
+Other applicable implementation checks: [draft schema SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40191627176),
+[converter core SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40191627237),
+[clean-extract SUCCESS](https://github.com/vanderpol/scap-ng/actions/runs/40191627136).
+[hosted-ci.json](v04-object-processing/hosted-ci.json) preserves all 24 terminal
+workflow observations, including failures and the unintended publishing run.
+
+Remaining blockers/actions for Jack:
+
+1. Review the unrequested automatic 0.3 prerelease and its disposition; resolve
+   the publishing trigger separately. Cancellation access was Forbidden.
+2. Review the incomplete `all_exist` reference-helper counterexample and the two
+   separate source-pinned Windows population decisions. No normalization is
+   admitted by this task.
+3. Authorize a later bounded source-backed repair for the five remaining
+   historical Object predicate documents before any package regeneration.
+4. Decide the historical condition-fields proposal workflow's future scope
+   separately; four old errors remain visible, with no alias/gate workaround.
+
+No full 65-benchmark execution, new 883-Assessment proof sweep, scanner work,
+signing policy or scanner-runtime equivalence claim was made.
 
 ## Decisions and handoff
 
