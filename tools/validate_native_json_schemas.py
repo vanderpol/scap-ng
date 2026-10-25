@@ -44,6 +44,14 @@ def schema_store(schema_dir: Path):
 def validator(schema_dir: Path, filename: str, store):
     schema=json.loads((schema_dir/filename).read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(schema)
+    if schema.get('x-scap-ng-version') == '0.4.0':
+        # Draft 2020-12 unevaluatedProperties uses the referencing resolver.
+        # Mixing it with legacy RefResolver can bind a nested local $ref to
+        # assessment.schema.json instead of assessment-language.schema.json.
+        from referencing import Registry, Resource
+        registry = Registry().with_resources(
+            (uri, Resource.from_contents(document)) for uri, document in store.items())
+        return Draft202012Validator(schema, registry=registry)
     resolver=RefResolver.from_schema(schema,store=store)
     return Draft202012Validator(schema,resolver=resolver)
 

@@ -15,6 +15,40 @@ python -m pip install PyYAML==6.0.3 lxml==6.1.1 jsonschema cryptography
 
 Python 3.12 is the maintained local baseline. Some packaging/signing experiments also require a local OpenSSL executable.
 
+## Independent 0.4 package acceptance (#251)
+
+The read-only consumer below imports no compiler code. Supply current-schema
+authoring, not an older review ZIP. It checks unsigned packages; publisher trust
+and scanner execution remain separate. The six-bundle audit additionally requires
+the exact hashes at reviewed checkpoint `4e1ec2737`.
+
+```bash
+python tools/verify_v04_package_consumer.py content.scapng \
+  --source-json current.json.zip --source-yaml current.yaml.zip --report consumer.json
+python tools/audit_v04_package_acceptance.py --bundles-dir compiled \
+  --source-json current.json.zip --source-yaml current.yaml.zip --report six-consumer.json
+python tools/audit_v04_original_source_ledger.py --inputs-dir pinned-original-six \
+  --authoring-json current.json.zip --migration-report migration.json --report source-ledger.json
+```
+
+The source ledger inventories all original declarations but converts only five
+already-proved fixtures. It does not promote archive migration to original-source
+equivalence. The clean-environment runner builds two identical toolchain snapshots,
+extracts outside the checkout and executes the public converter, validator,
+compiler, existing verifier API and independent consumer using a separately
+installed venv:
+
+```bash
+python tools/audit_v04_clean_environment.py --repo /path/to/scap-ng --ref FULL_COMMIT_SHA \
+  --python /path/to/clean-venv/bin/python --source /path/to/ind-def_family_test.xml \
+  --evidence-dir /tmp/unique-clean-acceptance
+```
+
+Use the [Linux/Python 3.12 acceptance dependency lock](../docs/audit/v04-package-acceptance/requirements-linux-py312.lock)
+with `pip install --require-hashes`; exact wheels and download hashes are recorded
+in the sibling `dependency-wheels.json`. This is an acceptance profile, not a
+cross-platform production dependency or signing policy.
+
 Before using generated native content, read:
 
 - `research/iterations/003/design/CURRENT-DESIGN.md`
