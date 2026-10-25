@@ -3344,16 +3344,91 @@
       ],
       "trust": "Original signed ZIP bytes are pinned; this prototype does not verify publisher signature trust."
     },
-    "method": "3 fresh processes, 1 cold + 5 warm calls each, then 3 fresh standalone processes; sequential; source rebuilt every call; OS scheduling/caches uncontrolled; compiler includes mandatory preflight"
+    "method": "3 fresh processes, 1 cold + 5 warm calls each, then 3 fresh standalone processes; sequential; source rebuilt every call; OS scheduling/caches uncontrolled; compiler includes mandatory preflight",
+    "measurement_code_note": "Stage timings and emitted bytes from implementation 648ff7435; subsequent test-only correction requires six JSON files through the same public API rather than an empty YAML-only CLI scan. Converter core unchanged.",
+    "existing_public_core_trials": [
+      {
+        "source_rule": "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule",
+        "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:278139",
+        "command": [
+          "/workspace/.onboarding/rebaseline-venv/bin/python",
+          "tools/scap_converter_core.py",
+          "--source-xml",
+          "/workspace/.onboarding/direct-maintainability/legacy-comparison/component-0.xml",
+          "--definition-id",
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278139",
+          "--output",
+          "/workspace/.onboarding/direct-maintainability/legacy-comparison/output-0.json"
+        ],
+        "returncode": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/workspace/scap-ng/tools/scap_converter_core.py\", line 681, in <module>\n    main()\n  File \"/workspace/scap-ng/tools/scap_converter_core.py\", line 670, in main\n    native, evidence = convert(args.source_xml, args.definition_id,\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scap-ng/tools/scap_converter_core.py\", line 581, in convert\n    if datatype_suite_name else project_object_presence(\n                                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scap-ng/tools/v04_source_verified_object_presence.py\", line 238, in convert\n    ensure(not a.get(\"variables\") and \"shared_objects\" not in a,\n  File \"/workspace/scap-ng/tools/v04_source_verified_object_presence.py\", line 59, in ensure\n    raise ValueError(\"Direct Object/Test original OVAL source proof: \" + reason)\nValueError: Direct Object/Test original OVAL source proof: Variable/shared Object graph not supported\n",
+        "stdout": "",
+        "input_note": "XML serialization of unchanged pinned source component; no source semantics mutated; not the original ZIP byte stream."
+      },
+      {
+        "source_rule": "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule",
+        "definition": "oval:mil.disa.stig.windows2025:def:278080",
+        "command": [
+          "/workspace/.onboarding/rebaseline-venv/bin/python",
+          "tools/scap_converter_core.py",
+          "--source-xml",
+          "/workspace/.onboarding/direct-maintainability/legacy-comparison/component-1.xml",
+          "--definition-id",
+          "oval:mil.disa.stig.windows2025:def:278080",
+          "--output",
+          "/workspace/.onboarding/direct-maintainability/legacy-comparison/output-1.json"
+        ],
+        "returncode": 1,
+        "stderr": "Traceback (most recent call last):\n  File \"/workspace/scap-ng/tools/scap_converter_core.py\", line 681, in <module>\n    main()\n  File \"/workspace/scap-ng/tools/scap_converter_core.py\", line 670, in main\n    native, evidence = convert(args.source_xml, args.definition_id,\n                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scap-ng/tools/scap_converter_core.py\", line 581, in convert\n    if datatype_suite_name else project_object_presence(\n                                ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/scap-ng/tools/v04_source_verified_object_presence.py\", line 346, in convert\n    ensure(criterion.tag == \"{\" + OD + \"}criterion\"\n  File \"/workspace/scap-ng/tools/v04_source_verified_object_presence.py\", line 59, in ensure\n    raise ValueError(\"Direct Object/Test original OVAL source proof: \" + reason)\nValueError: Direct Object/Test original OVAL source proof: non-direct criterion\n",
+        "stdout": "",
+        "input_note": "XML serialization of unchanged pinned source component; no source semantics mutated; not the original ZIP byte stream."
+      }
+    ],
+    "legacy_comparison": "Both selected Definition trials through unchanged public scap_converter_core.py fail closed: Variable/shared Object graph not supported; non-direct criterion. This production bridge therefore provides no successful equivalent workload for timing. The whole-Benchmark splitter has no Rule-subset CLI and broad conversion is out of scope. No speedup ratio claimed; original-source fidelity never judged against legacy output."
   },
   "validation": {
     "json": {
-      "documents_checked": 0,
-      "valid": 0,
+      "documents_checked": 6,
+      "valid": 6,
       "invalid": 0,
-      "unclassified_yaml": 0,
-      "unclassified_paths": [],
-      "results": []
+      "results": [
+        {
+          "path": "authoring/direct-slice/applicability.json",
+          "kind": "applicability",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json",
+          "kind": "assessment",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.json",
+          "kind": "assessment",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "authoring/direct-slice/benchmark.json",
+          "kind": "benchmark",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.json",
+          "kind": "rule",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.json",
+          "kind": "rule",
+          "valid": true,
+          "errors": []
+        }
+      ]
     },
     "yaml": {
       "documents_checked": 6,
@@ -3399,7 +3474,8 @@
           "errors": []
         }
       ]
-    }
+    },
+    "method": "JSON: unmodified public validator API, six serialized files; YAML: unmodified public directory CLI, six files. CLI discovers YAML only; empty JSON CLI scan is not a gate."
   },
   "compilation": {
     "direct-slice": {
@@ -3475,13 +3551,13 @@
     "lines": {
       "tools/v04_direct_scap_source.py": 176,
       "tools/v04_direct_converter.py": 429,
-      "tools/test_v04_direct_converter.py": 494
+      "tools/test_v04_direct_converter.py": 517
     },
     "conversion_lines_total": 605,
     "new_code_sha256": {
       "tools/v04_direct_scap_source.py": "e98ec1cafb23ef2ae8eaa65488919ffcf5825460145cc45214d2b72cde38da87",
       "tools/v04_direct_converter.py": "d483559496ac55f51d46125736e5878754ae0c311a381e2d660a86a38409f353",
-      "tools/test_v04_direct_converter.py": "786b8f9853d85eb50d06f1d9994e022cb903b1768835882f548a60051d52df33"
+      "tools/test_v04_direct_converter.py": "12f513d90020ab67cb7e8672a144402971563b0b5c8bd4d7415f0cd1d1db2ade"
     },
     "legacy_reference_static_closure": {
       "repository_modules": 77,
@@ -3804,7 +3880,11 @@
         "yaml"
       ]
     },
-    "comparison_limit": "Production supports substantially more features and its static closure includes shared/deferred code. No equal-feature complexity or production speedup claim. Previous direct prototype is an immutable checkpoint, never imported by new conversion code."
+    "comparison_limit": "Production supports substantially more features and its static closure includes shared/deferred code. No equal-feature complexity or production speedup claim. Previous direct prototype is an immutable checkpoint, never imported by new conversion code.",
+    "commits": [
+      "648ff743592782efd3ece2444e680de5da855e4f",
+      "966a734729595cdaf210bf5b56a6268a662d0d1d"
+    ]
   },
   "environment": {
     "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
@@ -3826,5 +3906,62 @@
     "Only pinned ZIP bytes/CRC checked; no signature trust or scanner equivalence."
   ],
   "go_no_go": "GO for owner review of further bounded direct-architecture development; NO-GO production replacement; relative production performance unproven.",
-  "reproduction": "PYTHONPATH=tools python tools/test_v04_direct_converter.py --measure /tmp/new-direct-spike-evidence"
+  "reproduction": "PYTHONPATH=tools python tools/test_v04_direct_converter.py --measure /tmp/new-direct-spike-evidence",
+  "hosted_ci": {
+    "sha": "966a734729595cdaf210bf5b56a6268a662d0d1d",
+    "all_triggered_checks_passed": true,
+    "runs": [
+      {
+        "workflowName": "Markdown navigation and duplication audit",
+        "workflowFilePath": ".github/workflows/documentation-cross-reference-audit.yml",
+        "id": "40210080610",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40210080610"
+      },
+      {
+        "workflowName": "Commit issue reference",
+        "workflowFilePath": ".github/workflows/commit-issue-reference.yml",
+        "id": "40210080583",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40210080583"
+      },
+      {
+        "workflowName": "0.4.0 canonical authoring fast checks",
+        "workflowFilePath": ".github/workflows/v04-canonical-fast.yml",
+        "id": "40210080578",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40210080578"
+      },
+      {
+        "workflowName": "Current-design regression contracts",
+        "workflowFilePath": ".github/workflows/scap-ng-current-regression.yml",
+        "id": "40210080611",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40210080611"
+      },
+      {
+        "workflowName": "Rebaseline smoke regression",
+        "workflowFilePath": ".github/workflows/rebaseline-smoke.yml",
+        "id": "40210080579",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40210080579"
+      }
+    ]
+  },
+  "handoff_policy": "Per owner comment 6397830903, the committed report plus exact-head CI is the primary final handoff. One final issue-comment attempt is secondary; Forbidden does not invalidate the engineering result and is not retried."
 }

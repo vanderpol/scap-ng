@@ -1,5 +1,8 @@
 # Direct 0.4 prototype — bounded decision report
 
+Historical checkpoint preserved. The fresh implementation and current decision are in
+[the canonical spike report](v04-direct-converter-spike.md).
+
 **Experiment: SUCCESS for the slice. GO for review of the direct approach;
 NO-GO for production replacement. Relative production speedup is unproven.**
 [Owner scope](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6397760243).
