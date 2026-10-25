@@ -1,4 +1,4 @@
-"""Reproduce six browsable, original-source-proved authoring examples and counts.
+"""Reproduce browsable, original-source-proved authoring examples and counts.
 
 Selection is by emitted structure, never an admission allowlist. All supported
 Rules are proved and compiled before representatives are copied. Output is new
@@ -84,9 +84,27 @@ def example_filename(assessment):
     return assessment['id'].removesuffix('-assessment') + '.assessment'
 
 
+def capability_examples(documents, capability):
+    """Choose actual emitted shapes for inspection; never control admission."""
+    assessments = [d['assessment'] for d in documents.values() if 'assessment' in d
+        and any(t['capability'] == capability for t in d['assessment']['tests'].values())]
+    if not assessments:
+        raise ValueError('no source-proved Assessments for capability: ' + capability)
+    selected = {'ordinary-acquisition': next(a for a in assessments if not a.get('shared_objects')
+        and not any(n.get('filters') for n in walk(a)))}
+    for label, predicate in (
+            ('source-filter-variable', lambda a: any(n.get('filters') for n in walk(a))),
+            ('shared-acquisition', lambda a: bool(a.get('shared_objects')))):
+        candidates = [a for a in assessments if predicate(a)]
+        if candidates:
+            selected[label] = candidates[0]
+    return selected
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--capability', help='publish actual acquisition/Filter/shared examples for this capability')
     args = parser.parse_args()
     if args.output.exists() and any(args.output.iterdir()):
         parser.error('output must be new or empty')
@@ -106,7 +124,7 @@ def main():
         kind, = document
         assert not list(document_errors(validators[kind + '.schema.json'], document))
         assert yaml.safe_load(authoring_yaml(document)) == document
-    selected = choose_examples(documents)
+    selected = capability_examples(documents, args.capability) if args.capability else choose_examples(documents)
     bindings = {row['assessment']: row for row in trace['rules']}
     # Compile the exact selected subset too; whole-source compilation alone is
     # not evidence that these examples have a closed Benchmark/Rule wrapper.
@@ -133,18 +151,21 @@ def main():
         'compiled_program_comparison': program_comparison,
         'blocked': len(trace['omitted_rules']), 'examples': examples,
         'limitations': 'Representative automated subset; not complete policy, scanner parity or a production release. '
-                        'No nonempty Filter is source-proved in this subset; nested Sets are real original source.'}
+                        'Original Variable matching is preserved, including potentially unintended source behavior.'}
     (args.output / 'manifest.json').write_text(json.dumps(packet, indent=2) + '\n')
-    links = '\n'.join(f'- {e["category"].split("-", 1)[1]}: [{e["title"]}]({e["file"]}.yaml) · '
+    links = '\n'.join(f'- {e["category"]}: [{e["title"]}]({e["file"]}.yaml) · '
                       f'[JSON]({e["file"]}.json)' for e in examples)
     (args.output / 'README.md').write_text('# Direct 0.4.0 representative automated-subset examples\n\n' +
         'Actual converter output from the pinned original Windows Server 2025 SCAP 1.4 package.\n'
         'These are Assessments, not a complete Benchmark or six-STIG release.\n\n' + links + '\n\n' +
         '[Manifest](manifest.json) records original Benchmark/Rule/Definition IDs, dependency hashes, '
         'converter SHA and validation, compilation and independent proof outcomes.\n'
-        'The nested Set example has no nonempty Filters; none is independently proved in the current subset.\n\n'
+        'Examples retain their exact original Variable quantifiers and collection boundaries. '
+        'Source fidelity does not establish that the original policy check is effective.\n\n'
         'Regenerate into a new directory from the pinned converter commit:\n\n'
-        '```bash\nPYTHONPATH=tools python tools/v04_direct_authoring_examples.py --output /tmp/direct-authoring-examples\n```\n\n'
+        '```bash\nPYTHONPATH=tools python tools/v04_direct_authoring_examples.py ' +
+        (('--capability ' + args.capability + ' ') if args.capability else '') +
+        '--output /tmp/direct-authoring-examples\n```\n\n'
         'Use PyYAML 6.0.3 and jsonschema 4.25.1; see the [developer guide](../../developer/DIRECT-V04-CONVERTER.md). '
         'The command revalidates/proves/compiles the entire supported subset and the selected closed wrapper. '
         'Generated files are not edited by hand. Signature trust and scanner equivalence are not claimed.\n')

@@ -16,7 +16,8 @@ from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
-         OD + '#independent}textfilecontent54': 'independent.textfilecontent54'}
+         OD + '#independent}textfilecontent54': 'independent.textfilecontent54',
+         OD + '#windows}userright': 'windows.userright'}
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
 FILE_FIELDS = {**NAMES, 'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
                'gexec': 'group_execute', 'oread': 'other_read', 'owrite': 'other_write',
@@ -95,6 +96,18 @@ def original_registry_hive_contract():
     return {'domains': domains, 'literal_pairs_proved': len(pairs), 'source_xsd_sha256': hashes}
 
 
+@lru_cache(maxsize=1)
+def original_userright_contract():
+    """Original field/enum boundaries, independently of converter mappings."""
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
+    state = schema.find(xs + 'element[@name="userright_state"]')
+    fields = {n.get('name') for n in state.findall('.//' + xs + 'sequence/' + xs + 'element')}
+    enum = schema.find(xs + 'complexType[@name="EntityObjectUserRightType"]')
+    values = {n.get('value') for n in enum.findall('.//' + xs + 'enumeration') if n.get('value')}
+    return fields, values
+
+
 class ExpandedSource(Source):
     def __init__(self, oval):
         super().__init__(oval)
@@ -155,6 +168,14 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'windows.userright':
+            fields, values = original_userright_contract()
+            for entity in self.get(ident, 'states'):
+                need(entity.tag == '{' + OD + '#windows}' + local(entity) and local(entity) in fields,
+                     'unknown original user-rights State field')
+                need(entity.get('datatype', 'string') == 'string', 'user-rights field datatype')
+                if local(entity) == 'userright' and not entity.get('var_ref'):
+                    need(entity.text in values, 'unknown original user-right enum')
         if cap == AUDIT:
             fields, values = original_audit_contract()
             for entity in self.get(ident, 'states'):
@@ -227,6 +248,24 @@ class ExpandedSource(Source):
             self.active.add(ident)
             try:
                 return {'capability': cap, 'set': self.set_term(sets[0], cap)}
+            finally:
+                self.active.remove(ident)
+        if cap == 'windows.userright':
+            need(ident not in self.active, 'cyclic Object')
+            keys(n, META, 'user-rights Object')
+            self.active.add(ident)
+            try:
+                entities = [c for c in n if c.tag == '{' + OD + '#windows}userright']
+                filters = [c for c in n if c.tag == '{' + OD + '}filter']
+                need(len(entities) == 1 and len(n) == len(entities) + len(filters), 'user-rights acquisition shape')
+                value = {'capability': cap, 'selectors': {'userright': self.entity(entities[0], selector=True)}}
+                operand = value['selectors']['userright']['operand']
+                constants = operand.get('constant_values', [operand])
+                need(all(v.get('datatype') == 'string' and v.get('value') in original_userright_contract()[1]
+                         for v in constants), 'unknown/dynamic original user-right enum')
+                if filters:
+                    value['filters'] = self.filters(filters, cap)
+                return value
             finally:
                 self.active.remove(ident)
         if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
@@ -414,6 +453,13 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
+        if cap == 'windows.userright' and 'set' not in n:
+            keys(n, {'capability', 'object_title', 'userright', 'filters'}, 'native user-rights Object')
+            need('userright' in n, 'missing native user-right selector')
+            value = {'capability': cap, 'selectors': {'userright': self.predicate(n['userright'], selector=True)}}
+            if n.get('filters'):
+                value['filters'] = self.filters(n['filters'])
+            return value
         if 'collect' in n:
             keys(n, {'capability', 'collect', 'object_title'}, 'embedded Object')
             return self.object({**n['collect'], 'capability': cap})

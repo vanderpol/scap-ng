@@ -17,7 +17,8 @@ from v04_direct_scap_source import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories')
+CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
+                'windows.userright')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -369,6 +370,14 @@ class AssessmentConverter:
                 operation = 'equals'
             ensure(isinstance(value, str) and value in aliases, 'unsupported enum comparison/value')
             value = aliases[value]
+        if selector:
+            field = mapping['native']['selector_map'].get(local_name(element))
+            enumeration = mapping['native'].get('selector_value_enums', {}).get(field)
+            if enumeration:
+                ensure(operation == 'equals', 'unsupported enum selector comparator')
+                expected = value if isinstance(value, list) else [value]
+                ensure(all(isinstance(v, str) and v in enumeration for v in expected),
+                       'enum selector requires known supported values')
         if not selector:
             native_field = mapping['native']['state_field_map'].get(local_name(element))
             enumeration = mapping['native'].get('state_value_enums', {}).get(native_field)

@@ -69,7 +69,10 @@ class DirectAuthoringStyle(unittest.TestCase):
         self.assertEqual(len(converter.shared_objects), 1)
 
     def test_real_reuse_preserves_stable_identity_and_meaningful_source_title(self):
-        assessment = self.examples['02-shared-object']
+        # This checks the original pinned seven-use acquisition, independently
+        # of which newly supported capability supplies the first shared example.
+        assessment = next(d['assessment'] for d in self.documents.values() if 'assessment' in d
+            and 'legal-notice-text-8db50cbc-object' in d['assessment'].get('shared_objects', {}))
         self.assertEqual(len(assessment['shared_objects']), 1)
         identifier, obj = next(iter(assessment['shared_objects'].items()))
         self.assertEqual(obj['object_title'], 'Legal notice text')
@@ -188,7 +191,7 @@ class DirectAuthoringStyle(unittest.TestCase):
                 if test['capability'] == 'windows.auditeventpolicysubcategories':
                     self.assertNotIn('object', test)
         stats = authoring_statistics(self.documents)
-        self.assertEqual((stats['assessments'], stats['tests'], stats['no_object_tests']), (149, 192, 71))
+        self.assertEqual((stats['assessments'], stats['tests'], stats['no_object_tests']), (183, 227, 71))
         self.assertEqual(stats['shared_objects'], stats['multiply_used_named_objects'])
 
     def test_representatives_retain_independent_source_and_compiled_operand_proof(self):

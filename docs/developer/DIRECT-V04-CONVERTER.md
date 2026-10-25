@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-149 converted + 142 blocked, all 149 source-proved. The earlier 84/207 and 81/3
+183 converted + 108 blocked, all 183 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -357,3 +357,33 @@ literal hives, the 49-pair domain proof, exact compilation and negative mutants.
 The browsable authoring examples remain pinned to their manifest's converter
 commit; run regeneration from that commit to reproduce their historical 130-Rule
 snapshot. Current `main` regeneration reports the larger supported subset.
+
+## Windows user-rights capability
+
+`windows.userright` uses the existing generic selector, field, constant-Variable,
+Filter and Set visitors. Known enum selectors retain `equals` and explicit
+`value_match` for arrays; computed enum values without proved membership remain
+unsupported. Original trustee names/SIDs retain their string comparators and
+field quantifiers. The independent reader derives allowed fields and rights from
+original OVAL XSD, without importing the producer's capability mapping.
+
+Of 39 original candidate Rule closures, 34 independently prove and compile;
+five have WMI record dependencies and remain blocked atomically. No supported
+branch is published as an incomplete substitute for one of those Rules.
+
+The original orphaned-SID check uses 45 constant rights, an include Filter and
+`none_exist`. Its omitted `var_check` means **all**, preserved as `value_match:
+every`; changing it to `one_or_more` fails source proof. This may differ from the
+source author's apparent intent: one scalar right cannot equal all 45 distinct
+values under complete evidence. Preserve the source, flag the concern and obtain
+explicit owner authorization before any source-specific repair. Error/incomplete
+evidence must not be described as successful complete collection.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_userright.py -v
+PYTHONPATH=tools python tools/v04_direct_authoring_examples.py --capability windows.userright --output /tmp/direct-userright-examples
+```
+
+The example selection controls inspection only. Whole-source admission still
+walks every dependency and runs strict validation. Old example packets retain
+their pinned converter SHA; new generation records the current SHA and counts.
