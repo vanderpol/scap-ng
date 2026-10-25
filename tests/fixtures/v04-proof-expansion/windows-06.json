@@ -1,0 +1,869 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253394\" version=\"3\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows Update for workstations must not obtain updates from other PCs on the internet.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria operator=\"OR\">\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:254357\" comment=\"'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple, or Bypass' selected.\" />\n            <ns0:criteria operator=\"AND\" comment=\"Standalone version of Windows and Download mode is configured through the Settings App\">\n              <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25339402\" comment=\"Standalone Windows system\" />\n              <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25339403\" comment=\"'DownloadMode' is set to 'Enabled' with 'HTTP only, or LAN' selected.\" />\n            </ns0:criteria>\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.defs:def:254357\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows Update must not obtain updates from other PCs on the internet.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25339401\" comment=\"'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple, or Bypass' selected.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows11:def:253394\" version=\"2\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows 11</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Windows 11 allows Windows Update to obtain updates from additional sources instead of Microsoft. In addition to Microsoft, updates can be obtained from and sent to PCs on the local network as well as on the Internet. This is part of the Windows Update trusted process, however to minimize outside exposure, obtaining updates from or sending to systems on the internet must be prevented.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253394\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25339401\" version=\"1\" check_existence=\"at_least_one_exists\" check=\"all\" state_operator=\"OR\" comment=\"'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple or Bypass' selected.\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25339400\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000000\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000001\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000002\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25339400\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25339401\" />\n        </ns1:registry_test>\n        <ns1:wmi57_test id=\"oval:mil.disa.stig.win:tst:25339402\" version=\"2\" check=\"all\" state_operator=\"OR\" comment=\"The system is a Windows Standalone Workstation or Server\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:10000100\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:10000100\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:10000300\" />\n        </ns1:wmi57_test>\n        <ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25339403\" version=\"2\" check_existence=\"at_least_one_exists\" check=\"all\" state_operator=\"OR\" comment=\"'DownloadMode' is set to 'Enabled' with 'HTTP only or LAN' selected.\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25339401\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000000\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000001\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:wmi57_object id=\"oval:mil.disa.stig.win:obj:10000100\" version=\"1\">\n          <ns1:namespace>root\\cimv2</ns1:namespace>\n          <ns1:wql>SELECT DomainRole FROM win32_computersystem</ns1:wql>\n        </ns1:wmi57_object>\n        <ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25339400\" version=\"1\">\n          <ns1:hive datatype=\"string\" operation=\"equals\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" operation=\"equals\">Software\\Policies\\Microsoft\\Windows\\DeliveryOptimization</ns1:key>\n          <ns1:name datatype=\"string\" operation=\"equals\">DODownloadMode</ns1:name>\n        </ns1:registry_object>\n        <ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25339401\" version=\"1\" comment=\"DownloadMode set through the Settings App\">\n          <ns1:hive datatype=\"string\" operation=\"equals\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" operation=\"equals\">SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config</ns1:key>\n          <ns1:name datatype=\"string\" operation=\"equals\">DODownloadMode</ns1:name>\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:10000100\" version=\"1\" comment=\"Standalone Workstation\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"domainrole\">0</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:10000300\" version=\"1\" comment=\"Standalone Server\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"domainrole\">2</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000000\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\">0</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000001\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\">1</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000002\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\">2</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25339400\" version=\"1\" comment=\"Reg_Dword type and value equals 99\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\" operation=\"equals\">99</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25339401\" version=\"1\" comment=\"Reg_Dword type and value equals 100\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\" operation=\"equals\">100</ns1:value>\n        </ns1:registry_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows11:def:253394",
+  "assessment": {
+    "assessment_title": "WN11-CC-000206 - Windows Update must not obtain updates from other PCs on the internet.",
+    "class": "compliance",
+    "evaluate": {
+      "or": [
+        {
+          "test": "downloadmode-set-enabled-http-only-lan-group-simple-or-bypass-test"
+        },
+        {
+          "and": [
+            {
+              "test": "system-windows-standalone-workstation-or-server-test"
+            },
+            {
+              "test": "downloadmode-set-enabled-http-only-or-lan-selected-test"
+            }
+          ]
+        }
+      ]
+    },
+    "id": "SV-253394.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "downloadmode-set-enabled-http-only-lan-group-simple-or-bypass-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "Software\\Policies\\Microsoft\\Windows\\DeliveryOptimization"
+          },
+          "name": {
+            "equals": "DODownloadMode"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 0
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 2
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 99
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 100
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "test_title": "'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple or Bypass' selected."
+      },
+      "downloadmode-set-enabled-http-only-or-lan-selected-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config"
+          },
+          "name": {
+            "equals": "DODownloadMode"
+          },
+          "object_title": "DownloadMode set through the Settings App"
+        },
+        "reported_elements": "all",
+        "require": {
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 0
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 1
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "test_title": "'DownloadMode' is set to 'Enabled' with 'HTTP only or LAN' selected."
+      },
+      "system-windows-standalone-workstation-or-server-test": {
+        "capability": "windows.wmi.query",
+        "object": {
+          "namespace": "root\\cimv2",
+          "query": "SELECT DomainRole FROM win32_computersystem"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "domainrole": {
+                        "equals": "0",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            },
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "domainrole": {
+                        "equals": "2",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "test_title": "The system is a Windows Standalone Workstation or Server"
+      }
+    },
+    "version": 2
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253394.automated",
+    "assessment_source_sha256": "dd27be6acf376565ee3cbce56cb120b217dc4c2bc33857300d723ca892adad0a",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "6930d4359207193b24ef1f4c421d0e9bb2d5262413ff9887d14623e2e82d0343",
+    "result_instructions": [
+      {
+        "id": "downloadmode-set-enabled-http-only-lan-group-simple-or-bypass-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          0
+        ]
+      },
+      {
+        "id": "system-windows-standalone-workstation-or-server-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          1,
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "downloadmode-set-enabled-http-only-or-lan-selected-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          1,
+          "all",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "all",
+        "path": [
+          "evaluate",
+          "any",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "any",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "downloadmode-set-enabled-http-only-lan-group-simple-or-bypass-test",
+        "downloadmode-set-enabled-http-only-or-lan-selected-test",
+        "system-windows-standalone-workstation-or-server-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "Software\\Policies\\Microsoft\\Windows\\DeliveryOptimization"
+            },
+            "name": {
+              "equals": "DODownloadMode"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 99
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 100
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "test_title": "'DownloadMode' is set to 'Enabled' with 'HTTP only, LAN, Group, Simple or Bypass' selected."
+        },
+        "source_test_sha256": "0e971cc58ac44f915239a6746166b83e3dbdce1cfb85727317733667d6bb60ed",
+        "test_id": "downloadmode-set-enabled-http-only-lan-group-simple-or-bypass-test"
+      },
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\DeliveryOptimization\\Config"
+            },
+            "name": {
+              "equals": "DODownloadMode"
+            },
+            "object_title": "DownloadMode set through the Settings App"
+          },
+          "reported_elements": "all",
+          "require": {
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "test_title": "'DownloadMode' is set to 'Enabled' with 'HTTP only or LAN' selected."
+        },
+        "source_test_sha256": "f6bbe97cca62fa848c1d1be7d724db63e6002d8ea99e54476d0212c313594410",
+        "test_id": "downloadmode-set-enabled-http-only-or-lan-selected-test"
+      },
+      {
+        "capability": "windows.wmi.query",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.wmi.query",
+          "object": {
+            "namespace": "root\\cimv2",
+            "query": "SELECT DomainRole FROM win32_computersystem"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "domainrole": {
+                          "equals": "0",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "domainrole": {
+                          "equals": "2",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "test_title": "The system is a Windows Standalone Workstation or Server"
+        },
+        "source_test_sha256": "1ca6cbc4225a199ba7e56282afd59d7cb11db70942052289767af09409dfee50",
+        "test_id": "system-windows-standalone-workstation-or-server-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253394",
+    "rule_path": "rules/SV-253394-9abc025c552e.json",
+    "assessment": "SV-253394.automated",
+    "assessment_path": "assessments/SV-253394.automated-452bf798964d.json",
+    "assessment_sha256": "733b2ea898b621aa0b962b211b5c007d202591e0b37a191e06963a8c5d1437c3",
+    "program_path": "programs/b64f1e5b0d96d0bc05aec3e20b9e4de70a85eeb6feb124977362f4046ce67456.json",
+    "program_sha256": "f60e67b242a01aaf4dfcc038db95c9b955453f0e065a8787a8a019d140d17b56",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-06",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253394r1256679_rule",
+    "xccdf_rule_sha256": "349ca250838875139f1b3f3eb82aae7f7eabd75c2c4f077350bcac99a625703f",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253394"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253394"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:26701"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "definition": "oval:mil.disa.stig.windows11:def:253394",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253394",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "3",
+          "sha256": "158b9c7218492901a17aa16d3de8069b2763e78b42e2f802336415bdc9f783e3"
+        },
+        {
+          "id": "oval:mil.disa.stig.defs:def:254357",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "0d7c6da0348203b5a8300df5091d4d9bb12fb8459bc932a13029553ef02bcb59"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:10000100",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_object",
+          "version": "1",
+          "sha256": "fbdf9e8515136c89fce70351906e4564a5040c3762cc22454abd9e636c9b9f75"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25339400",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "beee097ea5ca9eb5300631983afbce4ef17e35cde3074a81035842fced655b41"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25339401",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "e2870225bfb6834b0c417e660c4e4441ad42c274fa6733073f39c62016dbeacb"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:10000100",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "1",
+          "sha256": "3451096aea8a656b12064acd77197055f3eb9e8e92d80717c37078fab9684130"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:10000300",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "1",
+          "sha256": "7beaf520f72d140cf652a6517537a928b3f2c174ea17f50d32bfc20e72cc99c4"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000000",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "f87f4b20af2264c5bfae8f17965ef3219c6bdc59d10dec4cb3dd7b1bb8a73c07"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000001",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "90b5e9925de1fc45f0bee457c995cc8f36bc22b26956ccbf3e9f89a5dd47549e"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000002",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "9f4d12de6f6e33c5acc6c62709ff4f4c1d001796aa687ff10efb00568eec3ecc"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25339400",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "54aa7f2cc8a18725701bf71c45ae26b78fa088757010502bf69bae6721149dd4"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25339401",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "5c5cb0660f7c4dac814f695d9d2c3f8601e178b8c458d7fe968425a203214044"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25339401",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "d7c62ae138c68dda833bd2c3bdd2058e2ed645c9c81ee646b7fbaab1f0ba4749"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25339402",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test",
+          "version": "2",
+          "sha256": "e357e9fdb2332c237312c42b6bd876d5d3db922e80221a41438727b23756157a"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25339403",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "2",
+          "sha256": "1b7860a752f9808078df2a121283c0eb9abb8ae70f54656beadc3847b01dc28c"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows11:def:253394",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "2",
+          "sha256": "b6c197513d0d1654e44c35515c048becb9989f96409182b87dc76a058a669aca"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows11:def:253394",
+          "oval:mil.disa.stig.defs:def:253394",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253394",
+          "oval:mil.disa.stig.defs:def:254357",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:254357",
+          "oval:mil.disa.stig.win:tst:25339401",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339401",
+          "oval:mil.disa.stig.win:obj:25339400",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339401",
+          "oval:mil.disa.stig.win:ste:20000000",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339401",
+          "oval:mil.disa.stig.win:ste:20000001",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339401",
+          "oval:mil.disa.stig.win:ste:20000002",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339401",
+          "oval:mil.disa.stig.win:ste:25339400",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339401",
+          "oval:mil.disa.stig.win:ste:25339401",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253394",
+          "oval:mil.disa.stig.win:tst:25339402",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339402",
+          "oval:mil.disa.stig.win:obj:10000100",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339402",
+          "oval:mil.disa.stig.win:ste:10000100",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339402",
+          "oval:mil.disa.stig.win:ste:10000300",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253394",
+          "oval:mil.disa.stig.win:tst:25339403",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339403",
+          "oval:mil.disa.stig.win:obj:25339401",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339403",
+          "oval:mil.disa.stig.win:ste:20000000",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25339403",
+          "oval:mil.disa.stig.win:ste:20000001",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "f01e9c4905a179aed8bb1222c05400db496680e88dc8dd989e91866b0c5a93ae",
+    "features": {
+      "source_nodes": 16,
+      "kinds": {
+        "definitions": 3,
+        "objects": 3,
+        "states": 7,
+        "tests": 3
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 2,
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test": 1
+      },
+      "multi_state_tests": 3,
+      "constructs": {
+        "extend_definition": 2
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

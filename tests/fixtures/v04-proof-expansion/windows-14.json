@@ -1,0 +1,361 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:278146\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows Server 2025 directory data (outside the root DSE) of a nonpublic directory must be configured to prevent anonymous access.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601\" comment=\"Windows Server directory data (outside the root DSE) of a nonpublic directory must be configured to prevent anonymous access. Analyze the dsHeuristics to check for annonymous access.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602\" comment=\"Windows Server directory data (outside the root DSE) of a nonpublic directory must be configured to prevent anonymous access. Verify ANONYMOUS LOGON permissions are not allowed on Active Directory Users and Computers domain security permission settings.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601\" version=\"1\" comment=\"Analyze the dsHeuristics to check for annonymous access.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602\" version=\"1\" comment=\"Open Active Directory Users and Computers. Select View - Advanced Features. Right click on domain name in left pane (which is listed under Active Directory Users and Computers) and click properties. Select the Security Tab and click Advanced. Verify Allow permissions of any kind are not granted to ANONYMOUS LOGON.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601\" version=\"1\" comment=\"Analyze the dsHeuristics to check for annonymous access\">\n          <ns1:behaviors error_if_stderr_exists=\"true\" />\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>$( try { $obj=Get-ADObject -Filter \"objectClass -eq 'nTDSService'\" -Properties dsHeuristics -SearchBase \"CN=Services,$((Get-ADRootDSE).configurationNamingContext)\" -ErrorAction Stop; if ($null -eq $obj) { throw } $h=$obj.dsHeuristics; if ($null -eq $h) { [PSCustomObject]@{ Status='PASS'; Detail='dsHeuristics attribute is not set (Defaults secure)' } } else { $isAnon=($h.Length -ge 7) -and ($h[6] -eq '2'); $stat=if($isAnon){'FAIL'}else{'PASS'}; $msg=if($isAnon){'Allows Anonymous Access'}else{'Secure'}; $c=if($h.Length -ge 7){$h[6]}else{'N/A'}; [PSCustomObject]@{ Status=$stat; Detail=(\"dsHeuristics value is [{0}]. Seventh char is '{1}' ({2}).\" -f $h,$c,$msg) } } } catch { [PSCustomObject]@{ Status='ERROR'; Detail=\"Directory Service object could not be located or read.\" } } ) | Out-String -Width 4096</ns1:command>\n          <ns1:pattern>.+</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602\" version=\"1\" comment=\"Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>if (([adsi]\"LDAP://$((Get-ADDomain).DistinguishedName)\").PSBase.ObjectSecurity.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq 'S-1-5-7' -and $_.AccessControlType -eq 'Allow' }) { Write-Host \"FAIL: ANONYMOUS LOGON is configured with ALLOW permissions.\" } else { Write-Host \"PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions.\" }</ns1:command>\n          <ns1:pattern>.+</ns1:pattern>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601\" version=\"1\" comment=\"No lines shall exist listed with status of 'FAIL'\">\n          <ns1:stdout_line entity_check=\"none satisfy\" operation=\"pattern match\">FAIL</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:278146",
+  "assessment": {
+    "assessment_title": "Windows Server 2025 directory data (outside the root DSE) of a nonpublic directory must be configured to prevent anonymous access.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "analyze-dsheuristics-check-annonymous-access-test"
+        },
+        {
+          "test": "open-active-directory-users-computers-select-view-advanced-features-right-test"
+        }
+      ]
+    },
+    "id": "SV-278146.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "analyze-dsheuristics-check-annonymous-access-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "$( try { $obj=Get-ADObject -Filter \"objectClass -eq 'nTDSService'\" -Properties dsHeuristics -SearchBase \"CN=Services,$((Get-ADRootDSE).configurationNamingContext)\" -ErrorAction Stop; if ($null -eq $obj) { throw } $h=$obj.dsHeuristics; if ($null -eq $h) { [PSCustomObject]@{ Status='PASS'; Detail='dsHeuristics attribute is not set (Defaults secure)' } } else { $isAnon=($h.Length -ge 7) -and ($h[6] -eq '2'); $stat=if($isAnon){'FAIL'}else{'PASS'}; $msg=if($isAnon){'Allows Anonymous Access'}else{'Secure'}; $c=if($h.Length -ge 7){$h[6]}else{'N/A'}; [PSCustomObject]@{ Status=$stat; Detail=(\"dsHeuristics value is [{0}]. Seventh char is '{1}' ({2}).\" -f $h,$c,$msg) } } } catch { [PSCustomObject]@{ Status='ERROR'; Detail=\"Directory Service object could not be located or read.\" } } ) | Out-String -Width 4096",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": true,
+          "object_title": "Analyze the dsHeuristics to check for annonymous access",
+          "pattern": ".+",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "matches_regex": "FAIL",
+                  "values_found": "one_or_more",
+                  "values_matching": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Analyze the dsHeuristics to check for annonymous access."
+      },
+      "open-active-directory-users-computers-select-view-advanced-features-right-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "if (([adsi]\"LDAP://$((Get-ADDomain).DistinguishedName)\").PSBase.ObjectSecurity.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq 'S-1-5-7' -and $_.AccessControlType -eq 'Allow' }) { Write-Host \"FAIL: ANONYMOUS LOGON is configured with ALLOW permissions.\" } else { Write-Host \"PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions.\" }",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.",
+          "pattern": ".+",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "matches_regex": "FAIL",
+                  "values_found": "one_or_more",
+                  "values_matching": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Open Active Directory Users and Computers. Select View - Advanced Features. Right click on domain name in left pane (which is listed under Active Directory Users and Computers) and click properties. Select the Security Tab and click Advanced. Verify Allow permissions of any kind are not granted to ANONYMOUS LOGON."
+      }
+    },
+    "version": 1
+  },
+  "compiled_program": {
+    "assessment_id": "SV-278146.automated",
+    "assessment_source_sha256": "4a6e99ac3c488eb01c888c5668950387eafcc5944f47d70ba8f68d228530d86f",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "1d29da1de3a234e56795ba2dbec430a59263292c080a3eb46c3a418f592d5cb5",
+    "result_instructions": [
+      {
+        "id": "analyze-dsheuristics-check-annonymous-access-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "open-active-directory-users-computers-select-view-advanced-features-right-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "analyze-dsheuristics-check-annonymous-access-test",
+        "open-active-directory-users-computers-select-view-advanced-features-right-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "$( try { $obj=Get-ADObject -Filter \"objectClass -eq 'nTDSService'\" -Properties dsHeuristics -SearchBase \"CN=Services,$((Get-ADRootDSE).configurationNamingContext)\" -ErrorAction Stop; if ($null -eq $obj) { throw } $h=$obj.dsHeuristics; if ($null -eq $h) { [PSCustomObject]@{ Status='PASS'; Detail='dsHeuristics attribute is not set (Defaults secure)' } } else { $isAnon=($h.Length -ge 7) -and ($h[6] -eq '2'); $stat=if($isAnon){'FAIL'}else{'PASS'}; $msg=if($isAnon){'Allows Anonymous Access'}else{'Secure'}; $c=if($h.Length -ge 7){$h[6]}else{'N/A'}; [PSCustomObject]@{ Status=$stat; Detail=(\"dsHeuristics value is [{0}]. Seventh char is '{1}' ({2}).\" -f $h,$c,$msg) } } } catch { [PSCustomObject]@{ Status='ERROR'; Detail=\"Directory Service object could not be located or read.\" } } ) | Out-String -Width 4096",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": true,
+            "object_title": "Analyze the dsHeuristics to check for annonymous access",
+            "pattern": ".+",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "matches_regex": "FAIL",
+                    "values_found": "one_or_more",
+                    "values_matching": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Analyze the dsHeuristics to check for annonymous access."
+        },
+        "source_test_sha256": "1a6c266eb2482c5acdf066018dd72166036b817f3a2d95cad20b4972e1f4abaa",
+        "test_id": "analyze-dsheuristics-check-annonymous-access-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "if (([adsi]\"LDAP://$((Get-ADDomain).DistinguishedName)\").PSBase.ObjectSecurity.GetAccessRules($true, $true, [System.Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference -eq 'S-1-5-7' -and $_.AccessControlType -eq 'Allow' }) { Write-Host \"FAIL: ANONYMOUS LOGON is configured with ALLOW permissions.\" } else { Write-Host \"PASS: ANONYMOUS LOGON is missing or does not have ALLOW permissions.\" }",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Analyse permissions on Active Directory Users and Computers. Domain Security Permissions via PowerShell.",
+            "pattern": ".+",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "matches_regex": "FAIL",
+                    "values_found": "one_or_more",
+                    "values_matching": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Open Active Directory Users and Computers. Select View - Advanced Features. Right click on domain name in left pane (which is listed under Active Directory Users and Computers) and click properties. Select the Security Tab and click Advanced. Verify Allow permissions of any kind are not granted to ANONYMOUS LOGON."
+        },
+        "source_test_sha256": "bbeec33454605ae3cca78799a5fc966fd0b15954eb53db19b7e75df6d917dd0f",
+        "test_id": "open-active-directory-users-computers-select-view-advanced-features-right-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_2025",
+    "package": "ms_windows_server_2025.scapng",
+    "package_sha256": "c3b08d822ec363a6dadf2f3a3e430b7a3796a784a1f5f96475a4b70dc88577f4",
+    "manifest_sha256": "cb3559904f7d717559c930280045ba68042554315b3714e681664ff0a97dde6b",
+    "rule": "SV-278146",
+    "rule_path": "rules/SV-278146-58f288c417d6.json",
+    "assessment": "SV-278146.automated",
+    "assessment_path": "assessments/SV-278146.automated-2e3d154dfd14.json",
+    "assessment_sha256": "6c04004707fb2bf5fd5b4c9ca44b29a949fad21dc387083e3928ec9462d02062",
+    "program_path": "programs/c7c7f215bc35dbe6741a3487e4017d82391157087f883df7bb0190bf5c7bd711.json",
+    "program_sha256": "36654a85adfc1fa9f494ce436a5b05dfb97753a4a81d9595d44fd089ba8375e8",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-14",
+    "platform": "ms_windows_server_2025",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-278146r1182098_rule",
+    "xccdf_rule_sha256": "7cc4187b6e40f63ab4c10a38de1dfaea04bb40d33f13733f8a86fee995a06a53",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:278146"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:278146"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:32301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:278146",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:278146",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "7da0940279f4fc3300008d24644d8b362e7f1ee0af12ea99ad1dbdce54bf9c01"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "903be774e1edf77a8ba7ee68457999385522e7d823b562bdaccbddb90f2eef9e"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "11c93b8636177dd5b5baf4d0d3aff1237dbd5a631c16aa2c45a4f83b375b8bd2"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "1",
+          "sha256": "959fe35d375acd765e51637b3a73f6afa0baf62063066a0e02dde1c3593c1950"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "49144654a69cf7524a75c614f93ccd277c864ba8446e5b71010932da54007b95"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "c665cc35e6171a21309b449c54ee976b34bc7ae2245239f57b2c15e492ad93c8"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278146",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278146",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27814602",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27814602",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27814601",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "0b4feac8b355a4a843b5125f7c1311f4250863da95c4441021080b42b073ccc3",
+    "features": {
+      "source_nodes": 6,
+      "kinds": {
+        "definitions": 1,
+        "objects": 2,
+        "states": 1,
+        "tests": 2
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 2
+      },
+      "multi_state_tests": 0,
+      "constructs": {}
+    },
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED"
+}

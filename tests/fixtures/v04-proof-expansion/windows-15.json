@@ -1,0 +1,398 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253446\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>The Windows message title for the legal notice must be configured.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria operator=\"OR\">\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25344600\" comment=\"Legal Notice Caption - DoD Notice and Consent Banner\" />\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25344601\" comment=\"Legal Notice Caption - US Department of Defense Warning Statement\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows2025:def:278208\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN25-SO-000140 - Windows Server 2025 title for legal banner dialog box must be configured with the appropriate text.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows Server 2025</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Failure to display the logon banner prior to a logon attempt will negate legal proceedings resulting from unauthorized access to system resources.\n\n  Satisfies: SRG-OS-000023-GPOS-00006, SRG-OS-000228-GPOS-00088</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253446\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25344600\" version=\"1\" check_existence=\"all_exist\" check=\"all\" comment=\"Legal Notice Caption - DoD Notice and Consent Banner\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25344600\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25344600\" />\n        </ns1:registry_test>\n        <ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25344601\" version=\"1\" check_existence=\"all_exist\" check=\"all\" comment=\"Legal Notice Caption - US Department of Defense Warning Statement\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25344600\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25344601\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25344600\" version=\"1\">\n          <ns1:hive datatype=\"string\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\">SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System</ns1:key>\n          <ns1:name datatype=\"string\">LegalNoticeCaption</ns1:name>\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25344600\" version=\"1\">\n          <ns1:type>reg_sz</ns1:type>\n          <ns1:value datatype=\"string\" operation=\"pattern match\">^D(oD|OD) N(otice|OTICE) (and|AND) C(onsent|ONSENT) B(anner|ANNER)$</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25344601\" version=\"1\">\n          <ns1:type>reg_sz</ns1:type>\n          <ns1:value datatype=\"string\" operation=\"pattern match\">^U\\.?S\\.? D(EPARTMENT|epartment) (OF|Of|of) D(EFENSE|efense) W(ARNING|arning) S(TATEMENT|tatement)$</ns1:value>\n        </ns1:registry_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows2025:def:278208",
+  "assessment": {
+    "assessment_title": "WN25-SO-000140 - Windows Server 2025 title for legal banner dialog box must be configured with the appropriate text.",
+    "class": "compliance",
+    "evaluate": {
+      "or": [
+        {
+          "test": "legal-notice-caption-dod-notice-consent-banner-test"
+        },
+        {
+          "test": "legal-notice-caption-us-department-defense-warning-statement-test"
+        }
+      ]
+    },
+    "id": "SV-278208.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "shared_objects": {
+      "windows-registry-object": {
+        "capability": "windows.registry",
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System"
+        },
+        "name": {
+          "equals": "LegalNoticeCaption"
+        },
+        "object_title": null
+      }
+    },
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "legal-notice-caption-dod-notice-consent-banner-test": {
+        "capability": "windows.registry",
+        "object": "windows-registry-object",
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "string"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "matches_regex": "^D(oD|OD) N(otice|OTICE) (and|AND) C(onsent|ONSENT) B(anner|ANNER)$"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Legal Notice Caption - DoD Notice and Consent Banner"
+      },
+      "legal-notice-caption-us-department-defense-warning-statement-test": {
+        "capability": "windows.registry",
+        "object": "windows-registry-object",
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "string"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "matches_regex": "^U\\.?S\\.? D(EPARTMENT|epartment) (OF|Of|of) D(EFENSE|efense) W(ARNING|arning) S(TATEMENT|tatement)$"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Legal Notice Caption - US Department of Defense Warning Statement"
+      }
+    },
+    "version": 1
+  },
+  "compiled_program": {
+    "assessment_id": "SV-278208.automated",
+    "assessment_source_sha256": "e9435a6d01a0107eea88c66e71986894e0d5fc42833c0b3f85bba9a62d141f03",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "1e01dc659b0d2dd4dddeda8519e392f3063ee06ca06daf5e3e7ae3060dbcea7b",
+    "result_instructions": [
+      {
+        "id": "legal-notice-caption-dod-notice-consent-banner-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          0
+        ]
+      },
+      {
+        "id": "legal-notice-caption-us-department-defense-warning-statement-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "any",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "legal-notice-caption-dod-notice-consent-banner-test",
+        "legal-notice-caption-us-department-defense-warning-statement-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": "windows-registry-object",
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "string"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "matches_regex": "^D(oD|OD) N(otice|OTICE) (and|AND) C(onsent|ONSENT) B(anner|ANNER)$"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Legal Notice Caption - DoD Notice and Consent Banner"
+        },
+        "source_test_sha256": "2596c341c5ebb38370b229418ed01f154aa4f87b13953ce776ca08002f94da40",
+        "test_id": "legal-notice-caption-dod-notice-consent-banner-test"
+      },
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": "windows-registry-object",
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "string"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "matches_regex": "^U\\.?S\\.? D(EPARTMENT|epartment) (OF|Of|of) D(EFENSE|efense) W(ARNING|arning) S(TATEMENT|tatement)$"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Legal Notice Caption - US Department of Defense Warning Statement"
+        },
+        "source_test_sha256": "4a7d92d6f7a80d26cbeed8a6d8d6b367f3a587eb02d874d7f571f3b773dd4bc9",
+        "test_id": "legal-notice-caption-us-department-defense-warning-statement-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_2025",
+    "package": "ms_windows_server_2025.scapng",
+    "package_sha256": "c3b08d822ec363a6dadf2f3a3e430b7a3796a784a1f5f96475a4b70dc88577f4",
+    "manifest_sha256": "cb3559904f7d717559c930280045ba68042554315b3714e681664ff0a97dde6b",
+    "rule": "SV-278208",
+    "rule_path": "rules/SV-278208-ed1a1c4ff63c.json",
+    "assessment": "SV-278208.automated",
+    "assessment_path": "assessments/SV-278208.automated-9b6ad1fc1e7c.json",
+    "assessment_sha256": "8cde82da6a8eb8ff7273040cf5f4801c2c7289394cfe7540f1b678d7525f2628",
+    "program_path": "programs/db9a14fc7434e2862f7ff1441263bb9c2a6428426d09d1ac6d1b434ccb9324cb.json",
+    "program_sha256": "b95d67ebfdd179640b4c9aef5ce6d41775f3452341dcafe9f832eabe8c37113e",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-15",
+    "platform": "ms_windows_server_2025",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-278208r1181330_rule",
+    "xccdf_rule_sha256": "2428f212ffa2bbf9bbe393f8defe93d803b394f84618535eac4f63eb2d6a98b2",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+            "name": "oval:mil.disa.stig.windows2025:def:278208"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+            "name": "oval:mil.disa.stig.windows2025:def:278208"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:44301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "definition": "oval:mil.disa.stig.windows2025:def:278208",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253446",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "90bd25629efe390dda7a5ba627fd0e299577e70c1bf400a4d7f58d5940649bd8"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25344600",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "be3fd4da898d9119d3639835c96b25a05799efaf038c98c9346f8b5dfc966a4f"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25344600",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "ec6ea5cdd4d71df213e2f543712cf9a520b50cb85b30b2a91989416f2044df32"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25344601",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "0605d284184273d1d711caeaae2a682af1992da9eb92dcfd2edb198751e878b3"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25344600",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "0ac86139cfdf32b79f934a52bca93d85ead85084c44ce7af4f270bc624fe3012"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25344601",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "a60aa59b2772ad0f28e7c1295c622a48cee37a44fa986496eb5fd5b6522df7ef"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows2025:def:278208",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "865f9a059e8be0315f0879e859a7af02c37c85f4006e16bde22cf05204b6bc96"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows2025:def:278208",
+          "oval:mil.disa.stig.defs:def:253446",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253446",
+          "oval:mil.disa.stig.win:tst:25344600",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25344600",
+          "oval:mil.disa.stig.win:obj:25344600",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25344600",
+          "oval:mil.disa.stig.win:ste:25344600",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253446",
+          "oval:mil.disa.stig.win:tst:25344601",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25344601",
+          "oval:mil.disa.stig.win:obj:25344600",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25344601",
+          "oval:mil.disa.stig.win:ste:25344601",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "e8d84cfbe1c1a1278fbc0411a20a8e61eef2d823edb2affd229ac895ee625365",
+    "features": {
+      "source_nodes": 7,
+      "kinds": {
+        "definitions": 2,
+        "objects": 1,
+        "states": 2,
+        "tests": 2
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 2
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "extend_definition": 1
+      }
+    },
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED"
+}

@@ -1,0 +1,655 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253255\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows domain-joined systems must have a Trusted Platform Module (TPM) enabled.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25325500\" comment=\"TPM is enabled\" />\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25325501\" comment=\"TPM is activated\" />\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25325502\" comment=\"TPM is owned\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows2025:def:277993\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN25-00-000090 - Windows Server 2025 domain-joined systems must have a Trusted Platform Module (TPM) enabled and ready for use.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows Server 2025</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Credential Guard uses virtualization-based security to protect data that could be used in credential theft attacks if compromised. A number of system requirements must be met for Credential Guard to be configured and enabled properly. Without a TPM enabled and ready for use, Credential Guard keys are stored in a less secure method using software.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253255\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:wmi57_test id=\"oval:mil.disa.stig.win:tst:25325500\" version=\"2\" check=\"all\" state_operator=\"OR\" comment=\"TPM IsEnabled_InitialValue equals True\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25325500\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325500\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325503\" />\n        </ns1:wmi57_test>\n        <ns1:wmi57_test id=\"oval:mil.disa.stig.win:tst:25325501\" version=\"2\" check=\"all\" state_operator=\"OR\" comment=\"TPM IsActivated_InitialValue equals True\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25325501\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325501\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325504\" />\n        </ns1:wmi57_test>\n        <ns1:wmi57_test id=\"oval:mil.disa.stig.win:tst:25325502\" version=\"2\" check=\"all\" state_operator=\"OR\" comment=\"TPM IsOwned_InitialValue equals True\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25325502\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325502\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325505\" />\n        </ns1:wmi57_test>\n        </ns0:tests><ns0:objects><ns1:wmi57_object id=\"oval:mil.disa.stig.win:obj:25325500\" version=\"1\">\n          <ns1:namespace>root\\cimv2\\security\\microsofttpm</ns1:namespace>\n          <ns1:wql>SELECT IsEnabled_InitialValue FROM Win32_Tpm</ns1:wql>\n        </ns1:wmi57_object>\n        <ns1:wmi57_object id=\"oval:mil.disa.stig.win:obj:25325501\" version=\"1\">\n          <ns1:namespace>root\\cimv2\\security\\microsofttpm</ns1:namespace>\n          <ns1:wql>SELECT IsActivated_InitialValue FROM Win32_Tpm</ns1:wql>\n        </ns1:wmi57_object>\n        <ns1:wmi57_object id=\"oval:mil.disa.stig.win:obj:25325502\" version=\"1\">\n          <ns1:namespace>root\\cimv2\\security\\microsofttpm</ns1:namespace>\n          <ns1:wql>SELECT IsOwned_InitialValue FROM Win32_Tpm</ns1:wql>\n        </ns1:wmi57_object>\n        </ns0:objects><ns0:states><ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325500\" version=\"2\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"isenabled_initialvalue\">1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325501\" version=\"2\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"isactivated_initialvalue\">1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325502\" version=\"2\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"isowned_initialvalue\">1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325503\" version=\"1\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"isenabled_initialvalue\">-1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325504\" version=\"1\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"isactivated_initialvalue\">-1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        <ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325505\" version=\"1\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"isowned_initialvalue\">-1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows2025:def:277993",
+  "assessment": {
+    "assessment_title": "WN25-00-000090 - Windows Server 2025 domain-joined systems must have a Trusted Platform Module (TPM) enabled and ready for use.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "tpm-isenabled-initialvalue-equals-true-test"
+        },
+        {
+          "test": "tpm-isactivated-initialvalue-equals-true-test"
+        },
+        {
+          "test": "tpm-isowned-initialvalue-equals-true-test"
+        }
+      ]
+    },
+    "id": "SV-277993.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "tpm-isactivated-initialvalue-equals-true-test": {
+        "capability": "windows.wmi.query",
+        "object": {
+          "namespace": "root\\cimv2\\security\\microsofttpm",
+          "query": "SELECT IsActivated_InitialValue FROM Win32_Tpm"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "isactivated_initialvalue": {
+                        "equals": "1",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            },
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "isactivated_initialvalue": {
+                        "equals": "-1",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "test_title": "TPM IsActivated_InitialValue equals True"
+      },
+      "tpm-isenabled-initialvalue-equals-true-test": {
+        "capability": "windows.wmi.query",
+        "object": {
+          "namespace": "root\\cimv2\\security\\microsofttpm",
+          "query": "SELECT IsEnabled_InitialValue FROM Win32_Tpm"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "isenabled_initialvalue": {
+                        "equals": "1",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            },
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "isenabled_initialvalue": {
+                        "equals": "-1",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "test_title": "TPM IsEnabled_InitialValue equals True"
+      },
+      "tpm-isowned-initialvalue-equals-true-test": {
+        "capability": "windows.wmi.query",
+        "object": {
+          "namespace": "root\\cimv2\\security\\microsofttpm",
+          "query": "SELECT IsOwned_InitialValue FROM Win32_Tpm"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "isowned_initialvalue": {
+                        "equals": "1",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            },
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "fields": {
+                      "isowned_initialvalue": {
+                        "equals": "-1",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    },
+                    "records_found": "one_or_more",
+                    "records_matching": "every"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "test_title": "TPM IsOwned_InitialValue equals True"
+      }
+    },
+    "version": 1
+  },
+  "compiled_program": {
+    "assessment_id": "SV-277993.automated",
+    "assessment_source_sha256": "415df78ecfbc8f31a4d882939277b3de71f40040006f48c93146ef79100178fd",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "a30f934ea28203f3d676fc6ec200287eccc3b897b5d722b3b117619452c0a5b0",
+    "result_instructions": [
+      {
+        "id": "tpm-isenabled-initialvalue-equals-true-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "tpm-isactivated-initialvalue-equals-true-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "id": "tpm-isowned-initialvalue-equals-true-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          2
+        ]
+      },
+      {
+        "count": 3,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "tpm-isactivated-initialvalue-equals-true-test",
+        "tpm-isenabled-initialvalue-equals-true-test",
+        "tpm-isowned-initialvalue-equals-true-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.wmi.query",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.wmi.query",
+          "object": {
+            "namespace": "root\\cimv2\\security\\microsofttpm",
+            "query": "SELECT IsActivated_InitialValue FROM Win32_Tpm"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "isactivated_initialvalue": {
+                          "equals": "1",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "isactivated_initialvalue": {
+                          "equals": "-1",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "test_title": "TPM IsActivated_InitialValue equals True"
+        },
+        "source_test_sha256": "a258cf473e0b8e7c936cbb24a4d7a3a22cd525fb4e625f93a332a14a9ca76996",
+        "test_id": "tpm-isactivated-initialvalue-equals-true-test"
+      },
+      {
+        "capability": "windows.wmi.query",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.wmi.query",
+          "object": {
+            "namespace": "root\\cimv2\\security\\microsofttpm",
+            "query": "SELECT IsEnabled_InitialValue FROM Win32_Tpm"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "isenabled_initialvalue": {
+                          "equals": "1",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "isenabled_initialvalue": {
+                          "equals": "-1",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "test_title": "TPM IsEnabled_InitialValue equals True"
+        },
+        "source_test_sha256": "e4a03d705c1e3e6a7455c9d0b0aaadf2ac3ddd061f0c7039611a9a230c5f92c3",
+        "test_id": "tpm-isenabled-initialvalue-equals-true-test"
+      },
+      {
+        "capability": "windows.wmi.query",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.wmi.query",
+          "object": {
+            "namespace": "root\\cimv2\\security\\microsofttpm",
+            "query": "SELECT IsOwned_InitialValue FROM Win32_Tpm"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "isowned_initialvalue": {
+                          "equals": "1",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "result": {
+                    "record": {
+                      "fields": {
+                        "isowned_initialvalue": {
+                          "equals": "-1",
+                          "values_found": "one_or_more",
+                          "values_matching": "every"
+                        }
+                      },
+                      "records_found": "one_or_more",
+                      "records_matching": "every"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "test_title": "TPM IsOwned_InitialValue equals True"
+        },
+        "source_test_sha256": "349bf177889d75790a5df2283a2425467a238e6f4410c4fa039b4776a8d1f329",
+        "test_id": "tpm-isowned-initialvalue-equals-true-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_2025",
+    "package": "ms_windows_server_2025.scapng",
+    "package_sha256": "c3b08d822ec363a6dadf2f3a3e430b7a3796a784a1f5f96475a4b70dc88577f4",
+    "manifest_sha256": "cb3559904f7d717559c930280045ba68042554315b3714e681664ff0a97dde6b",
+    "rule": "SV-277993",
+    "rule_path": "rules/SV-277993-21593a64677b.json",
+    "assessment": "SV-277993.automated",
+    "assessment_path": "assessments/SV-277993.automated-01e03459da1f.json",
+    "assessment_sha256": "749dce134b8ce0a021f190b96c592d2756532083c707abf18342e265a5723c0d",
+    "program_path": "programs/3a73897c63064d57602f5b7f8690795e78aac9e441314c0c92531e1d9812cfab.json",
+    "program_sha256": "84d8f76ce5fc93cea9ad0f194f7e98294baf67cca5501ccaa91744e8d3abbc73",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-09",
+    "platform": "ms_windows_server_2025",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-277993r1212171_rule",
+    "xccdf_rule_sha256": "a2f782159c408a89112b2b8f47daf9587188b4f9f76d038dedab4e4e7aac5086",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+            "name": "oval:mil.disa.stig.windows2025:def:277993"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+            "name": "oval:mil.disa.stig.windows2025:def:277993"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:2101"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "definition": "oval:mil.disa.stig.windows2025:def:277993",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253255",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "604cd939b8915382511328f29623465291668c434bc3771487ddae5d5ef0e8df"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25325500",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_object",
+          "version": "1",
+          "sha256": "92242dbb92d512e60b4504c19a386d8f0f44ffd5f79bde9cf0f681a95ee8771c"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25325501",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_object",
+          "version": "1",
+          "sha256": "6760c6e7d261b247a73540d4b90f46d4035e0adad027c7dc14f098b816dfb6fd"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25325502",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_object",
+          "version": "1",
+          "sha256": "8d54508492fcff9954d2af1c765999dbb17dee59d72d37df07695d95f970728d"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325500",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "2",
+          "sha256": "04e1b86db612ce1efa4c06d6a036c4335941628b77e09669215e8358590c9838"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325501",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "2",
+          "sha256": "949777b72ad85a086f62fb4e92d422ecb7244f7298a6e5ee16eedc843a797df8"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325502",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "2",
+          "sha256": "24c4e30eb2e8de4d23db67a89949d32da9b3f7994f37524ed066da849048325d"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325503",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "1",
+          "sha256": "7b88d92a6e7985d29696bccf3b46cfdbd0fdfd9de49bce0f4e5d6924156b2948"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325504",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "1",
+          "sha256": "62593ab4b7abc44481f4330f06eadca965a16c0badcef775de00f00b45b25662"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325505",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "1",
+          "sha256": "69083e7a573edc960473c29a143bbf99a8d3150cfa180f029698d89642b15616"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25325500",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test",
+          "version": "2",
+          "sha256": "b8aaeaf1eca36bac300d32ae0e558601899a17a9a74e4bdc74e6614d305d5216"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25325501",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test",
+          "version": "2",
+          "sha256": "1f1c68877ef78e55d4adc9b0f4e8d5e48c88b3a71163f93058bb23be0e2addb6"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25325502",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test",
+          "version": "2",
+          "sha256": "3bb28b17ee8ce6d9b1e787618b23dfb8460d6a8c00abd3ac8d0fdedfb5fd4f4b"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows2025:def:277993",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "7912e011cc2f8fd2b343546db09f9eed8b076349a60bc3f99c8a0945287dc2ae"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows2025:def:277993",
+          "oval:mil.disa.stig.defs:def:253255",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253255",
+          "oval:mil.disa.stig.win:tst:25325500",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325500",
+          "oval:mil.disa.stig.win:obj:25325500",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325500",
+          "oval:mil.disa.stig.win:ste:25325500",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325500",
+          "oval:mil.disa.stig.win:ste:25325503",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253255",
+          "oval:mil.disa.stig.win:tst:25325501",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325501",
+          "oval:mil.disa.stig.win:obj:25325501",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325501",
+          "oval:mil.disa.stig.win:ste:25325501",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325501",
+          "oval:mil.disa.stig.win:ste:25325504",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253255",
+          "oval:mil.disa.stig.win:tst:25325502",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325502",
+          "oval:mil.disa.stig.win:obj:25325502",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325502",
+          "oval:mil.disa.stig.win:ste:25325502",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325502",
+          "oval:mil.disa.stig.win:ste:25325505",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "00e4c2e0f8fab486f80098464c5d5c0d8daf7b2831c766cec1d656e3bda0af6b",
+    "features": {
+      "source_nodes": 14,
+      "kinds": {
+        "definitions": 2,
+        "objects": 3,
+        "states": 6,
+        "tests": 3
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test": 3
+      },
+      "multi_state_tests": 3,
+      "constructs": {
+        "extend_definition": 1
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

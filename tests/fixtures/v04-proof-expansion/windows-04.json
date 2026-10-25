@@ -1,0 +1,290 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:253266\" version=\"18\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Alternate operating systems must not be permitted on the same system.</ns0:title>\n            <ns0:description>Allowing other operating systems to run on a secure system may allow security to be circumvented.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601\" comment=\"Alternate operating systems must not be permitted on the same system.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601\" version=\"18\" comment=\"Review Installed OS via PowerShell\" check_existence=\"only_one_exists\" check=\"only one\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25326601\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25326601\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25326601\" version=\"18\" comment=\"Review Installed OS via PowerShell\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>bcdedit /enum</ns1:command>\n          <ns1:pattern>^description</ns1:pattern>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25326601\" version=\"18\" comment=\"Boot Loader Description must be only Windows 11 (note Windows Boot Manager entry can be ignored)\">\n          <ns1:command>bcdedit /enum</ns1:command>\n          <ns1:pattern>^description</ns1:pattern>\n          <ns1:exit_status datatype=\"int\">0</ns1:exit_status>\n          <ns1:stdout_line operation=\"pattern match\">^description(\\s*)Windows (11|Boot Manager)$</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:253266",
+  "assessment": {
+    "assessment_title": "Alternate operating systems must not be permitted on the same system.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "review-installed-os-via-powershell-test"
+    },
+    "id": "SV-253266.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "review-installed-os-via-powershell-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "bcdedit /enum",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Review Installed OS via PowerShell",
+          "pattern": "^description",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "command": {
+                  "equals": "bcdedit /enum"
+                }
+              }
+            },
+            {
+              "fields": {
+                "pattern": {
+                  "equals": "^description"
+                }
+              }
+            },
+            {
+              "fields": {
+                "exit_status": {
+                  "equals": 0
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "matches_regex": "^description(\\s*)Windows (11|Boot Manager)$"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "exactly_one",
+          "items_satisfying": "exactly_one"
+        },
+        "test_title": "Review Installed OS via PowerShell"
+      }
+    },
+    "version": 18
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253266.automated",
+    "assessment_source_sha256": "e8b4cdef48ace356d3b1a5f2bba5d7fc44ce88528a5e3e69a36a42504cccec96",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "fa46d49a61d4aaa0c25ba30634917a75e6a719f46e05f348e2b5ad2e5109c705",
+    "result_instructions": [
+      {
+        "id": "review-installed-os-via-powershell-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "review-installed-os-via-powershell-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "bcdedit /enum",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Review Installed OS via PowerShell",
+            "pattern": "^description",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "command": {
+                    "equals": "bcdedit /enum"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "pattern": {
+                    "equals": "^description"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "exit_status": {
+                    "equals": 0
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stdout_line": {
+                    "matches_regex": "^description(\\s*)Windows (11|Boot Manager)$"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "exactly_one",
+            "items_satisfying": "exactly_one"
+          },
+          "test_title": "Review Installed OS via PowerShell"
+        },
+        "source_test_sha256": "9979abaf11ff2ef9cd8dd9f0112680263283b939a84433eaea8eaa594acef4d1",
+        "test_id": "review-installed-os-via-powershell-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253266",
+    "rule_path": "rules/SV-253266-51f1579261f4.json",
+    "assessment": "SV-253266.automated",
+    "assessment_path": "assessments/SV-253266.automated-d6181b943f5e.json",
+    "assessment_sha256": "8c45bc7109d2554127009be71c1efcbb3fd7b41a8ceef2ede07e54c99326020f",
+    "program_path": "programs/292680d36d57feefc622c5305f50a84b1603c7483954d1f6ff242e5379f5eca4.json",
+    "program_sha256": "8d41f630624fab0eb3336fabf0ade9878f8f0a1f4828dc6278f701ba663a5c5e",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-04",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253266r991589_rule",
+    "xccdf_rule_sha256": "a03d0a4c467a82daf0b8e895b86a684d247fb0850713f44fe45c21615e346140",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:253266"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:253266"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:2301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:253266",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:253266",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "18",
+          "sha256": "2da10180bbe265302388740e541a4556e3a9ef958673b9d86a19301e1f1e035c"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25326601",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "18",
+          "sha256": "7a338f5e3c3a65e6ef057e45ba6b5495deecb29bed1e0ea031ea099b69abc628"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25326601",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "18",
+          "sha256": "8256094ef84546ca0392900d07fcd62cbc2f849b4bc73124ecd33b97b75a5710"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "18",
+          "sha256": "d621ea73a5e8f9a81bc4df3ac38d5d4856e56180eaff73c2a99e91f049b58442"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:253266",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25326601",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25326601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25326601",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "6559f38cca47eb470f27759c5ac84a07b99ee37d6815030adaaf00852b37ea2b",
+    "features": {
+      "source_nodes": 4,
+      "kinds": {
+        "definitions": 1,
+        "objects": 1,
+        "states": 1,
+        "tests": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 1
+      },
+      "multi_state_tests": 0,
+      "constructs": {}
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

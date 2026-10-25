@@ -1,0 +1,964 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\" xmlns:ns3=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:278028\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows Server 2025 FTP servers must be configured to prevent access to the system drive.</ns0:title>\n            <ns0:description> If FTP is not installed on the system, this is NA.\n\nOpen \"Internet Information Services (IIS) Manager\".\n\nSelect \"Sites\" under the server name.\n\nFor any sites with a Binding that lists FTP, right-click the site and select \"Explore\".\n\nIf the site is not defined to a specific folder for shared FTP resources, this is a finding.\n\nIf the site includes any system areas such as root of the drive, Program Files, or Windows directories, this is a finding.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801\" comment=\"FTP servers must be configured to prevent access to the system drive. If the site includes root of the drive this is a finding.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802802\" comment=\"FTP servers must be configured to prevent access to the system drive. If the site includes Program Files this is a finding.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803\" comment=\"FTP servers must be configured to prevent access to the system drive. If the site includes Program Files(x86) this is a finding.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804\" comment=\"FTP servers must be configured to prevent access to the system drive. If the site includes Windows Directory this is a finding.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801\" version=\"1\" comment=\"If the site includes root of the drive this is a finding.\" check_existence=\"none_exist\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802802\" version=\"1\" comment=\"If the site includes Program Files this is a finding.\" check_existence=\"none_exist\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803\" version=\"1\" comment=\"If the site includes Program Files(x86) this is a finding.\" check_existence=\"none_exist\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804\" version=\"1\" comment=\"If the site includes Windows Directory this is a finding.\" check_existence=\"none_exist\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801\" version=\"1\" comment=\"If the site includes root of the drive this is a finding.\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802801\" />\n          <ns1:pattern />\n          <ns0:filter action=\"include\">oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801</ns0:filter>\n        </ns1:shellcommand_object>\n        <ns1:environmentvariable58_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802\" version=\"1\" comment=\"Get boot drive\">\n          <ns1:pid datatype=\"int\" xsi:nil=\"true\" />\n          <ns1:name>SYSTEMDRIVE</ns1:name>\n        </ns1:environmentvariable58_object>\n        <ns3:appcmd_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803\" version=\"1\" comment=\"Get Website Bindings with filter applied for ones that include FTP\">\n          <ns3:identifier_type>Site</ns3:identifier_type>\n          <ns3:identifier operation=\"pattern match\">.*</ns3:identifier>\n          <ns3:parameter>bindings</ns3:parameter>\n          <ns0:filter action=\"include\">oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802</ns0:filter>\n        </ns3:appcmd_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810\" version=\"1\" comment=\"If the site includes Program Files this is a finding.\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802801\" />\n          <ns1:pattern />\n          <ns0:filter action=\"include\">oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810</ns0:filter>\n        </ns1:shellcommand_object>\n        <ns1:environmentvariable58_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811\" version=\"1\" comment=\"Get the Program Files Directory\">\n          <ns1:pid datatype=\"int\" xsi:nil=\"true\" />\n          <ns1:name>PROGRAMFILES</ns1:name>\n        </ns1:environmentvariable58_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820\" version=\"1\" comment=\"If the site includes Program Files(x86) this is a finding.\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802801\" />\n          <ns1:pattern />\n          <ns0:filter action=\"include\">oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820</ns0:filter>\n        </ns1:shellcommand_object>\n        <ns1:environmentvariable58_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821\" version=\"1\" comment=\"Get the Program Files(x86) Directory\">\n          <ns1:pid datatype=\"int\" xsi:nil=\"true\" />\n          <ns1:name>PROGRAMFILES(X86)</ns1:name>\n        </ns1:environmentvariable58_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830\" version=\"1\" comment=\"If the site includes Windows Directory this is a finding.\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802801\" />\n          <ns1:pattern />\n          <ns0:filter action=\"include\">oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830</ns0:filter>\n        </ns1:shellcommand_object>\n        <ns1:environmentvariable58_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831\" version=\"1\" comment=\"Get the Windows Directory\">\n          <ns1:pid datatype=\"int\" xsi:nil=\"true\" />\n          <ns1:name>WINDIR</ns1:name>\n        </ns1:environmentvariable58_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801\" version=\"1\" comment=\"Boot Drive with Forward Slash Added\">\n          <ns1:stdout_line operation=\"case insensitive equals\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802804\" />\n        </ns1:shellcommand_state>\n        <ns3:appcmd_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802\" version=\"1\" comment=\"results include FTP\">\n          <ns3:result operation=\"pattern match\" entity_check=\"all\">ftp</ns3:result>\n        </ns3:appcmd_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810\" version=\"1\" comment=\"Program Files\">\n          <ns1:stdout_line operation=\"case insensitive equals\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802810\" />\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820\" version=\"1\" comment=\"Program Files(x86)\">\n          <ns1:stdout_line operation=\"case insensitive equals\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802820\" />\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830\" version=\"1\" comment=\"Windows Directory\">\n          <ns1:stdout_line operation=\"case insensitive equals\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802830\" />\n        </ns1:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802801\" version=\"1\" datatype=\"string\" comment=\"update\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802802\" />\n            <ns0:object_component item_field=\"identifier\" object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803\" />\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802803\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:constant_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802802\" version=\"1\" comment=\"'\" datatype=\"string\">\n          <ns0:value>Get-Website '</ns0:value>\n        </ns0:constant_variable>\n        <ns0:constant_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802803\" version=\"1\" comment=\"'\" datatype=\"string\">\n          <ns0:value>' | Select-Object -ExpandProperty physicalPath</ns0:value>\n        </ns0:constant_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802804\" version=\"1\" datatype=\"string\" comment=\"Boot Drive with Forward Slash Added\">\n          <ns0:concat>\n            <ns0:object_component item_field=\"value\" object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802\" />\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802805\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:constant_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802805\" version=\"1\" comment=\"Forward Slash\" datatype=\"string\">\n          <ns0:value>\\</ns0:value>\n        </ns0:constant_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802810\" version=\"1\" datatype=\"string\" comment=\"Program Files\">\n          <ns0:object_component item_field=\"value\" object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811\" />\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802820\" version=\"1\" datatype=\"string\" comment=\"Program Files(x86)\">\n          <ns0:object_component item_field=\"value\" object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821\" />\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27802830\" version=\"1\" datatype=\"string\" comment=\"Windows Directory\">\n          <ns0:object_component item_field=\"value\" object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831\" />\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+  "assessment": {
+    "assessment_title": "Windows Server 2025 FTP servers must be configured to prevent access to the system drive.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "if-site-includes-root-drive-this-finding-test"
+        },
+        {
+          "test": "if-site-includes-program-files-this-finding-test"
+        },
+        {
+          "test": "if-site-includes-program-files-x86-this-finding-test"
+        },
+        {
+          "test": "if-site-includes-windows-directory-this-finding-test"
+        }
+      ]
+    },
+    "id": "SV-278028.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "if-site-includes-program-files-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "program-files-variable"
+                  },
+                  "datatype": "string",
+                  "value_match": "every",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes Program Files this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "none"
+        },
+        "test_title": "If the site includes Program Files this is a finding."
+      },
+      "if-site-includes-program-files-x86-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "program-files-x86-variable"
+                  },
+                  "datatype": "string",
+                  "value_match": "every",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes Program Files(x86) this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "none"
+        },
+        "test_title": "If the site includes Program Files(x86) this is a finding."
+      },
+      "if-site-includes-root-drive-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "boot-drive-forward-slash-added-variable"
+                  },
+                  "datatype": "string",
+                  "value_match": "every",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes root of the drive this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "none"
+        },
+        "test_title": "If the site includes root of the drive this is a finding."
+      },
+      "if-site-includes-windows-directory-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "windows-directory-variable"
+                  },
+                  "datatype": "string",
+                  "value_match": "every",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes Windows Directory this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items_found": "none"
+        },
+        "test_title": "If the site includes Windows Directory this is a finding."
+      }
+    },
+    "variables": {
+      "boot-drive-forward-slash-added-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "values": {
+                "field": "value",
+                "object": {
+                  "capability": "independent.environmentvariable58",
+                  "object_title": "Get boot drive",
+                  "select": {
+                    "name": {
+                      "equals": "SYSTEMDRIVE"
+                    },
+                    "pid": null
+                  }
+                }
+              }
+            },
+            {
+              "literal": "\\"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "Boot Drive with Forward Slash Added"
+      },
+      "program-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "values": {
+            "field": "value",
+            "object": {
+              "capability": "independent.environmentvariable58",
+              "object_title": "Get the Program Files Directory",
+              "select": {
+                "name": {
+                  "equals": "PROGRAMFILES"
+                },
+                "pid": null
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Program Files"
+      },
+      "program-files-x86-variable": {
+        "datatype": "string",
+        "expression": {
+          "values": {
+            "field": "value",
+            "object": {
+              "capability": "independent.environmentvariable58",
+              "object_title": "Get the Program Files(x86) Directory",
+              "select": {
+                "name": {
+                  "equals": "PROGRAMFILES(X86)"
+                },
+                "pid": null
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Program Files(x86)"
+      },
+      "update-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": "Get-Website '"
+            },
+            {
+              "values": {
+                "field": "identifier",
+                "object": {
+                  "capability": "windows.appcmd",
+                  "object_title": "Get Website Bindings with filter applied for ones that include FTP",
+                  "set": {
+                    "operands": [
+                      {
+                        "filters": [
+                          {
+                            "include": {
+                              "result": {
+                                "matches_regex": "ftp",
+                                "require": "at_least_one_exists_and_all_match"
+                              }
+                            }
+                          }
+                        ],
+                        "object": {
+                          "capability": "windows.appcmd",
+                          "object_title": "Get Website Bindings with filter applied for ones that include FTP",
+                          "select": {
+                            "identifier": {
+                              "matches_regex": ".*"
+                            },
+                            "identifier_type": {
+                              "equals": "Site"
+                            },
+                            "parameter": {
+                              "equals": "bindings"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "operator": "union"
+                  }
+                }
+              }
+            },
+            {
+              "literal": "' | Select-Object -ExpandProperty physicalPath"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "update"
+      },
+      "windows-directory-variable": {
+        "datatype": "string",
+        "expression": {
+          "values": {
+            "field": "value",
+            "object": {
+              "capability": "independent.environmentvariable58",
+              "object_title": "Get the Windows Directory",
+              "select": {
+                "name": {
+                  "equals": "WINDIR"
+                },
+                "pid": null
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Windows Directory"
+      }
+    },
+    "version": 1
+  },
+  "compiled_program": {
+    "assessment_id": "SV-278028.automated",
+    "assessment_source_sha256": "220c2b07d33906d14bc80714887aac91a0cf28049838db3843955e3a74a1f3b5",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "b1903880796ad1671131b99b803079c795e8a225fdb77685219571bb22bc243f",
+    "result_instructions": [
+      {
+        "id": "if-site-includes-root-drive-this-finding-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "if-site-includes-program-files-this-finding-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "id": "if-site-includes-program-files-x86-this-finding-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          2
+        ]
+      },
+      {
+        "id": "if-site-includes-windows-directory-this-finding-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          3
+        ]
+      },
+      {
+        "count": 4,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "if-site-includes-program-files-this-finding-test",
+        "if-site-includes-program-files-x86-this-finding-test",
+        "if-site-includes-root-drive-this-finding-test",
+        "if-site-includes-windows-directory-this-finding-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_COLLECTION_PRESENCE",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "update-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "filters": [
+              {
+                "include": {
+                  "stdout_line": {
+                    "case_insensitive_equals": {
+                      "variable": "program-files-variable"
+                    },
+                    "datatype": "string",
+                    "value_match": "every",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "object_title": "If the site includes Program Files this is a finding.",
+            "pattern": "",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "none"
+          },
+          "test_title": "If the site includes Program Files this is a finding."
+        },
+        "source_test_sha256": "523e9ef609f5daff559a13d4612984ae7166c03314fdd2cbc2f33f2c78879e62",
+        "test_id": "if-site-includes-program-files-this-finding-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_COLLECTION_PRESENCE",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "update-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "filters": [
+              {
+                "include": {
+                  "stdout_line": {
+                    "case_insensitive_equals": {
+                      "variable": "program-files-x86-variable"
+                    },
+                    "datatype": "string",
+                    "value_match": "every",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "object_title": "If the site includes Program Files(x86) this is a finding.",
+            "pattern": "",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "none"
+          },
+          "test_title": "If the site includes Program Files(x86) this is a finding."
+        },
+        "source_test_sha256": "73c82e3e959ef6c91297a958e555fa52c8e971ab5543619d79d44bcce07fbe77",
+        "test_id": "if-site-includes-program-files-x86-this-finding-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_COLLECTION_PRESENCE",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "update-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "filters": [
+              {
+                "include": {
+                  "stdout_line": {
+                    "case_insensitive_equals": {
+                      "variable": "boot-drive-forward-slash-added-variable"
+                    },
+                    "datatype": "string",
+                    "value_match": "every",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "object_title": "If the site includes root of the drive this is a finding.",
+            "pattern": "",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "none"
+          },
+          "test_title": "If the site includes root of the drive this is a finding."
+        },
+        "source_test_sha256": "878caa7c72776973d8217d19a86f2f304e435330687167a0eb1bbfb65fd782e4",
+        "test_id": "if-site-includes-root-drive-this-finding-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_COLLECTION_PRESENCE",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "update-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "filters": [
+              {
+                "include": {
+                  "stdout_line": {
+                    "case_insensitive_equals": {
+                      "variable": "windows-directory-variable"
+                    },
+                    "datatype": "string",
+                    "value_match": "every",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "object_title": "If the site includes Windows Directory this is a finding.",
+            "pattern": "",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "items_found": "none"
+          },
+          "test_title": "If the site includes Windows Directory this is a finding."
+        },
+        "source_test_sha256": "bc55da93f7d3672fd09b8f8808b4233faebb4e6a95c9ebd5d8672ae96df6cd14",
+        "test_id": "if-site-includes-windows-directory-this-finding-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_2025",
+    "package": "ms_windows_server_2025.scapng",
+    "package_sha256": "c3b08d822ec363a6dadf2f3a3e430b7a3796a784a1f5f96475a4b70dc88577f4",
+    "manifest_sha256": "cb3559904f7d717559c930280045ba68042554315b3714e681664ff0a97dde6b",
+    "rule": "SV-278028",
+    "rule_path": "rules/SV-278028-f3c341117f93.json",
+    "assessment": "SV-278028.automated",
+    "assessment_path": "assessments/SV-278028.automated-53773107ae6c.json",
+    "assessment_sha256": "e322fc98c976665dd6a53b3a87b607e6bf6bbdb911bac3c6cb1aeb8f33a06527",
+    "program_path": "programs/7d56e466ce61035eaf26072b94e076f45f7e8251a7a11537d22b49c72db50127.json",
+    "program_sha256": "a3476b78cee7edbda7b8ff45d55effcf6d5e12a63e6bda642bed80aafb3e2b8a",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-11",
+    "platform": "ms_windows_server_2025",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-278028r1182265_rule",
+    "xccdf_rule_sha256": "601cab34520b8eab72417a72261d932112869c66e98c503eafb1fb1bedbc43d8",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:278028"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:278028"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:8901"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "56cac7db7c84fe69f6ff71ea5bf4184f0027edd08d016a880456a43b672f2c5a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "03e3a1ee3d25b15985c29f3b5bf1c7a264391eb4207849acfead726580588f41"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}environmentvariable58_object",
+          "version": "1",
+          "sha256": "dcdca3d2e0a0fb757a2bdb3e11ce12e2b333f114cb5b0b922ea351652efb6745"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}appcmd_object",
+          "version": "1",
+          "sha256": "e846c499a6e82f61db08d22417366a4bac19a67115e2ffd85313a98621f19265"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "9a833ef2aa6ae12f643a7cac26a35b42a0d1f504aa8e65b9c2d9e85193ead736"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}environmentvariable58_object",
+          "version": "1",
+          "sha256": "b0380a4981703f8ccea6b0718c35013381aed90ef0ffcfab41a2cf845bcc830a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "f90599fb8fe837e2d3f39ac6e0812ed94acd7e1a8763e6ee09ab7149960b7832"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}environmentvariable58_object",
+          "version": "1",
+          "sha256": "61dd3b1a84d55a1d20d614a8759016aa64d3a15fc41efbfd85fe7875f587ca8b"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "fd72b78ae30877cb3ecd080fee454663d59605bb1651f04b8cded16c97f8bb10"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}environmentvariable58_object",
+          "version": "1",
+          "sha256": "00ddcd6e0a61ccea08b60d6bab6c4b2b8f6919949e504c29f30e1552c3e77134"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "1",
+          "sha256": "e7c81b03a72295077a51c201210cc71a6d358b26af69e12f311d832663815660"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}appcmd_state",
+          "version": "1",
+          "sha256": "7e30d7473a90fe7a355c69863415e6463e45ffaccd99f0d414f7aaed1d7c09bc"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "1",
+          "sha256": "1749204c4e186394cabbb436cc4bced593b490e7e154c680d608c2a2e8773cbc"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "1",
+          "sha256": "018ee12db0282b7176bcab732a229f9a4dbd593b1a0f20634903326cd810c44b"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "1",
+          "sha256": "24a88781f4c9d6034e89d6c32e0b644468e3588853e622d631b1516a343a7c32"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "ff430638a457e3aaa580bf4a879baa969ece48098444217f2be0e8bf077f71ff"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802802",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "dbab907b7fd49b7d88e053cd2bf0113c50aa722dd593d4e7417ce4d6bb199a9f"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "efaedc7b487518c56002236549f65178df12518abb8780356f9bbd50e59990d2"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "614c939f07bdddb327555c145182f6cabd7fc21ddf3fb8a8a2aa70d63dc994e4"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "1",
+          "sha256": "325e1f596d0760cfb0a7c7603aa932b43dc85d1ce6ee85c68b08ee217a189b18"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802802",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}constant_variable",
+          "version": "1",
+          "sha256": "89effddfb2d914a5f351c6b2d823b809cf3e339d4796fdb27adbfec59c148e63"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802803",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}constant_variable",
+          "version": "1",
+          "sha256": "4352d13c71f2bf8d476ddc8bad51e44603b6d2db747bfa1ab4893ff8e24e327d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802804",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "1",
+          "sha256": "08ee72d8bcdf3c9934d5e7665688000e051f08f37e3a10dbae4bc5a66729c499"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802805",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}constant_variable",
+          "version": "1",
+          "sha256": "de088751e4d4a1ad042b3b6844147701af81ea86c4170d1f541b8a95f61bd175"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802810",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "1",
+          "sha256": "4e96ace08799b7e2bd4e8afd8d372d5387d9efa2a6911387c2b3b27bc3228ef5"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802820",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "1",
+          "sha256": "53baa7582bb9624cf74e420859c309e4be4a64534c89658a1d7077fa6356a03f"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27802830",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "1",
+          "sha256": "2cd5cbdc75ca11065f209dbc746417f6d30a6e1edefa9ad553db0cd8ee6f7634"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802802",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802803",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802802",
+          "filter"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802803",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801",
+          "filter"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802804",
+          "stdout_line"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802804",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802802",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802804",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802805",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802802",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802802",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810",
+          "filter"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802810",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802810",
+          "stdout_line"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802810",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802811",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802803",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820",
+          "filter"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802820",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802820",
+          "stdout_line"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802820",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802821",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278028",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27802804",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802801",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830",
+          "filter"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27802830",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802830",
+          "stdout_line"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27802830",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27802831",
+          "object_component"
+        ]
+      ]
+    },
+    "closure_sha256": "c6ca65035445afe1d9b885a813886dc0bda5235819924f4b31ba5e41511c158b",
+    "features": {
+      "source_nodes": 27,
+      "kinds": {
+        "definitions": 1,
+        "objects": 9,
+        "states": 5,
+        "tests": 4,
+        "variables": 8
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 4
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "filter": 5,
+        "concat": 2,
+        "variable_component": 3,
+        "object_component": 5
+      }
+    },
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED"
+}

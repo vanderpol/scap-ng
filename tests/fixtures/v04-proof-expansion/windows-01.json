@@ -1,0 +1,260 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253259\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows information systems must use BitLocker to encrypt all disks to protect the confidentiality and integrity of all information at rest.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25325900\" comment=\"BitLocker must be enabled on all fixed drives.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows11:def:253259\" version=\"2\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN11-00-000030 - Windows 11 information systems must use BitLocker to encrypt all disks to protect the confidentiality and integrity of all information at rest.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows 11</ns0:platform>\n            </ns0:affected>\n            <ns0:description>If data at rest is unencrypted, it is vulnerable to disclosure. Even if the operating system enforces permissions on data access, an adversary can remove non-volatile memory and read it directly, thereby circumventing operating system controls. Encrypting the data ensures that confidentiality is protected even when the operating system is not running.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253259\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:wmi57_test id=\"oval:mil.disa.stig.win:tst:25325900\" version=\"1\" check_existence=\"all_exist\" check=\"all\" comment=\"BitLocker must be enabled on all fixed drives.\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25325900\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325900\" />\n        </ns1:wmi57_test>\n        </ns0:tests><ns0:objects><ns1:wmi57_object id=\"oval:mil.disa.stig.win:obj:25325900\" version=\"1\" comment=\"BitLocker status\">\n          <ns1:namespace datatype=\"string\">root\\cimv2\\security\\microsoftvolumeencryption</ns1:namespace>\n          <ns1:wql datatype=\"string\">SELECT protectionstatus FROM win32_encryptablevolume</ns1:wql>\n        </ns1:wmi57_object>\n        </ns0:objects><ns0:states><ns1:wmi57_state id=\"oval:mil.disa.stig.win:ste:25325900\" version=\"1\" comment=\"BitLocker status is Protected\">\n          <ns1:result datatype=\"record\" operation=\"equals\">\n            <ns0:field name=\"protectionstatus\">1</ns0:field>\n          </ns1:result>\n        </ns1:wmi57_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows11:def:253259",
+  "assessment": {
+    "assessment_title": "WN11-00-000030 - Windows 11 information systems must use BitLocker to encrypt all disks to protect the confidentiality and integrity of all information at rest.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "bitlocker-enabled-on-all-fixed-drives-test"
+    },
+    "id": "SV-253259.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "bitlocker-enabled-on-all-fixed-drives-test": {
+        "capability": "windows.wmi.query",
+        "object": {
+          "namespace": "root\\cimv2\\security\\microsoftvolumeencryption",
+          "object_title": "BitLocker status",
+          "query": "SELECT protectionstatus FROM win32_encryptablevolume"
+        },
+        "reported_elements": "all",
+        "require": {
+          "fields": {
+            "result": {
+              "record": {
+                "fields": {
+                  "protectionstatus": {
+                    "equals": "1",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                },
+                "records_found": "one_or_more",
+                "records_matching": "every"
+              }
+            }
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "BitLocker must be enabled on all fixed drives."
+      }
+    },
+    "version": 2
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253259.automated",
+    "assessment_source_sha256": "36ef887e9bf409bae0553c10b36126fa3b45cc96c78d127ac357cc0b6ad04028",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "d906b4cda72ae838e88c356aaaeb6bb666e3b536078fc7ae3ee0c2478ccabcc5",
+    "result_instructions": [
+      {
+        "id": "bitlocker-enabled-on-all-fixed-drives-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "bitlocker-enabled-on-all-fixed-drives-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.wmi.query",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.wmi.query",
+          "object": {
+            "namespace": "root\\cimv2\\security\\microsoftvolumeencryption",
+            "object_title": "BitLocker status",
+            "query": "SELECT protectionstatus FROM win32_encryptablevolume"
+          },
+          "reported_elements": "all",
+          "require": {
+            "fields": {
+              "result": {
+                "record": {
+                  "fields": {
+                    "protectionstatus": {
+                      "equals": "1",
+                      "values_found": "one_or_more",
+                      "values_matching": "every"
+                    }
+                  },
+                  "records_found": "one_or_more",
+                  "records_matching": "every"
+                }
+              }
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "BitLocker must be enabled on all fixed drives."
+        },
+        "source_test_sha256": "3e4d6892ccdd0077857a781cefa18b5662f89c17858c7497133eba49f65d3ac8",
+        "test_id": "bitlocker-enabled-on-all-fixed-drives-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253259",
+    "rule_path": "rules/SV-253259-cd9afb8f6ac0.json",
+    "assessment": "SV-253259.automated",
+    "assessment_path": "assessments/SV-253259.automated-94c5125cc50e.json",
+    "assessment_sha256": "caec5aebf0afa4d63880a8c7d314558febf464e21d5361e2d458743bf230796a",
+    "program_path": "programs/e69cc8f65cc30c853b405d1ceb08f0022544feb3bf776d60706bd3603b7a4044.json",
+    "program_sha256": "f3454de694deb43b8babbac711c10b38a3d5d1a405930c66a69b8982dbabc8bb",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-01",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253259r1210282_rule",
+    "xccdf_rule_sha256": "b32bf02cde9bdb139b9b24f5d01267abd74dca75c6bfeac794690740528ff045",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253259"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253259"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:901"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "definition": "oval:mil.disa.stig.windows11:def:253259",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253259",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "c47c16d061961a364d09704eb97368e73c7ae8d38544bb69b751c2b587418b63"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25325900",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_object",
+          "version": "1",
+          "sha256": "ad963f66203569a39d6136357e07ebf6cde067cafce2a98924d3c2e0967795ef"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325900",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_state",
+          "version": "1",
+          "sha256": "10356eaa89faf5b83b2f046cf806d4d70fd7ad0d0467057e99beb3203ca94a2c"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25325900",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test",
+          "version": "1",
+          "sha256": "94eb0ee0233a3be7616034135a6b6b210be0f44f2db7d389bee427daee3b7083"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows11:def:253259",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "2",
+          "sha256": "5c84a905299d0332d192789a64ff7eedbf4392a2f065ac300b14d14b037358eb"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows11:def:253259",
+          "oval:mil.disa.stig.defs:def:253259",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253259",
+          "oval:mil.disa.stig.win:tst:25325900",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325900",
+          "oval:mil.disa.stig.win:obj:25325900",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325900",
+          "oval:mil.disa.stig.win:ste:25325900",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "02a65e5d1cd142290ce242192a0b04f4c9b47c05c28aa898ae74d2b330c4ce73",
+    "features": {
+      "source_nodes": 5,
+      "kinds": {
+        "definitions": 2,
+        "objects": 1,
+        "states": 1,
+        "tests": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}wmi57_test": 1
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "extend_definition": 1
+      }
+    },
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED"
+}

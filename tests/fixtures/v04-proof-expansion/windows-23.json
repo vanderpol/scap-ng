@@ -1,0 +1,360 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:259381\" version=\"8\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>The Name Resolution Policy Table (NRPT) must be configured in Group Policy to enforce clients to request DNSSEC validation for a domain.</ns0:title>\n            <ns0:description>The Name Resolution Policy Table (NRPT) must be configured in Group Policy to enforce clients to request DNSSEC validation for a domain.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria operator=\"OR\">\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25938101\" comment=\"The 'DnsSecValidationRequired' setting is set to 'True'\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25938102\" comment=\"All zones (if any) are integrated with Active Directory\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25938101\" version=\"8\" comment=\"The 'DnsSecValidationRequired' setting is set to 'True'\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25938101\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25938101\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25938102\" version=\"8\" comment=\"All zones (if any) are integrated with Active Directory\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25938102\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25938102\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25938101\" version=\"8\" comment=\"The 'DnsSecValidationRequired' setting\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsClientNrptPolicy | ForEach-Object {$_.DnsSecValidationRequired}</ns1:command>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25938102\" version=\"8\" comment=\"The list of all zones that are not integrated with Active Directory\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25938101\" version=\"8\" comment=\"The 'DnsSecValidationRequired' setting is set to 'True'\">\n          <ns1:stdout_line operation=\"equals\" entity_check=\"all\" check_existence=\"only_one_exists\">True</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25938102\" version=\"8\" comment=\"There are no zones that are not integrated with Active Directory\">\n          <ns1:stdout_line check_existence=\"none_exist\" />\n        </ns1:shellcommand_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259381",
+  "assessment": {
+    "assessment_title": "The Name Resolution Policy Table (NRPT) must be configured in Group Policy to enforce clients to request DNSSEC validation for a domain.",
+    "class": "compliance",
+    "evaluate": {
+      "or": [
+        {
+          "test": "dnssecvalidationrequired-setting-set-true-test"
+        },
+        {
+          "test": "all-zones-if-any-integrated-active-directory-test"
+        }
+      ]
+    },
+    "id": "SV-259381.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "all-zones-if-any-integrated-active-directory-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The list of all zones that are not integrated with Active Directory",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "values_found": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "All zones (if any) are integrated with Active Directory"
+      },
+      "dnssecvalidationrequired-setting-set-true-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "Get-DnsClientNrptPolicy | ForEach-Object {$_.DnsSecValidationRequired}",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The 'DnsSecValidationRequired' setting",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "equals": "True",
+                  "values_found": "exactly_one",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "The 'DnsSecValidationRequired' setting is set to 'True'"
+      }
+    },
+    "version": 8
+  },
+  "compiled_program": {
+    "assessment_id": "SV-259381.automated",
+    "assessment_source_sha256": "a166dc91b0abdaaa41970d4f84ab8a0a5000a36f8dc13c89195c011e3e535314",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "1d48120e5b71c3d195694d26b0d1ebbc39b17ada89c68fb6ab94ddaedd536759",
+    "result_instructions": [
+      {
+        "id": "dnssecvalidationrequired-setting-set-true-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          0
+        ]
+      },
+      {
+        "id": "all-zones-if-any-integrated-active-directory-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "any",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "all-zones-if-any-integrated-active-directory-test",
+        "dnssecvalidationrequired-setting-set-true-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The list of all zones that are not integrated with Active Directory",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "values_found": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "All zones (if any) are integrated with Active Directory"
+        },
+        "source_test_sha256": "8532dd954fb513881eb6b082b5a8d7a5b5c4e384a0302c1fd2806c55a64f06cf",
+        "test_id": "all-zones-if-any-integrated-active-directory-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "Get-DnsClientNrptPolicy | ForEach-Object {$_.DnsSecValidationRequired}",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The 'DnsSecValidationRequired' setting",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "equals": "True",
+                    "values_found": "exactly_one",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "The 'DnsSecValidationRequired' setting is set to 'True'"
+        },
+        "source_test_sha256": "1d65f8af4eaa20a318ddd9dff48a2585719da7a540dabeae728a8b9e91c0d7a0",
+        "test_id": "dnssecvalidationrequired-setting-set-true-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_dns",
+    "package": "ms_windows_server_dns.scapng",
+    "package_sha256": "82fdb4d0ea0bd614b799f2de595618a0511d31db600b25bdb5ab3568b28ec834",
+    "manifest_sha256": "19a7b47ebdf7213090ac0d797184abe0bf1f6206309ae38be4772fd8ff5a8bf3",
+    "rule": "SV-259381",
+    "rule_path": "rules/SV-259381-8de4ca78f3e6.json",
+    "assessment": "SV-259381.automated",
+    "assessment_path": "assessments/SV-259381.automated-547b5e278f25.json",
+    "assessment_sha256": "b5b7d96f8c054ced68601a62788cee33e40ca8ca85f5c28e24304365e615496a",
+    "program_path": "programs/58c6414c5a910caf345256784e2991c066e53c13ad88326c334871ca05a6fc28.json",
+    "program_sha256": "3628117e87f235ac374148a9c152a06ca161d723b44eaff72fb44185ac68d26c",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-23",
+    "platform": "ms_windows_server_dns",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "source_zip_sha256": "f674b67e74acbd3037093d50e33dc20765bd9d45a6c9ed2be5d463d009a6c6b8",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "xml_member": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.xml",
+    "xml_sha256": "17ea87e0c528072eef99c7a28e306d9351b5f4b00c7440b13c4bdf00c354d0ba",
+    "xccdf_rule": "xccdf_navy.navwar.niwcatlantic.scc.ms.dns_rule_SV-259381r961107_rule",
+    "xccdf_rule_sha256": "9c85448e5ecf6c1802e15ec7c21048fafa08031f515fa9c9ddf372bbaa91c9a9",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259381"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259381"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.server:questionnaire:9101"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259381",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:259381",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "8",
+          "sha256": "0d473b87629b08a4659af103852fbfb58fb439f6e3ddb7aa30118ec06e79f173"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25938101",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "edf7f5add63b1b0db0ceecfd3bf6641836058dd4bb749e425059caae9c50a282"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25938102",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "acb0db3c33bdfbbbee6ba347d747062626bbd3b9da697531ca8e30fadb9a7395"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25938101",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "34eceec6cbeb65938a12f517273f0411664e308241a5f5d83aa1064167f70262"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25938102",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "e711d1c3bf1d20f29ebef6a1f6e3294b152be75b8e219364a9fad4091a997195"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938101",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "7eda1869a02b533a32556f178fdc6baf88dbd33c494c4fe8173e9bde6b9804bc"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938102",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "6f5648ae1d9d6ab1d192ba8f2fbf7f9fa53d61d3312c40fd90e7ac7d9c8d973b"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259381",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938101",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938101",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25938101",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938101",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25938101",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259381",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938102",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938102",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25938102",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25938102",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25938102",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "354f0f350fd087fc7a022623cd523a4d6135320552b45d033040a58720fa6f1a",
+    "features": {
+      "source_nodes": 7,
+      "kinds": {
+        "definitions": 1,
+        "objects": 2,
+        "states": 2,
+        "tests": 2
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 2
+      },
+      "multi_state_tests": 0,
+      "constructs": {}
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

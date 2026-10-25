@@ -13,6 +13,10 @@ closures; these are distinct from the earlier 37 standalone-Test evidence count.
 No production converter/compiler, schema, specification or release gate changed.
 No original source, migrated authoring or native package was regenerated or edited.
 
+This is the dated pilot baseline. The owner-approved
+[proof expansion and fixed Windows 24](v04-proof-expansion.md) provides the
+subsequent monotonic coverage overlay; the original evidence below is retained.
+
 ## Eight fixed selections and outcomes
 
 The eight selections were frozen in `CASES` before comparison. None was replaced

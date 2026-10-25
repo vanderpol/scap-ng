@@ -1,0 +1,957 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\" xmlns:ns2=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:253274\" version=\"18\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Permissions for system files and directories must conform to minimum requirements.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327401\" comment=\"Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402\" comment=\"Windows permissions for the system drive root directory (usually C:\\) must conform to minimum requirements.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403\" comment=\"Windows permissions for the Windows installation directory must conform to minimum requirements.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327404\" comment=\"Windows permissions must conform to minimum requirements for Program Files directory.\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405\" comment=\"Windows permissions must conform to minimum requirements for Program Files(x86) directory.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327401\" version=\"18\" comment=\"Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'\" check_existence=\"at_least_one_exists\" check=\"only one\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327401\" />\n        </ns1:registry_test>\n        <ns2:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402\" version=\"18\" comment=\"System drive root directory permissions must conform to minimum requirements.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns2:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402\" />\n          <ns2:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402\" />\n        </ns2:shellcommand_test>\n        <ns2:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403\" version=\"18\" comment=\"Windows installation directory permissions must conform to minimum requirements.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns2:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327403\" />\n          <ns2:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403\" />\n        </ns2:shellcommand_test>\n        <ns2:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327404\" version=\"18\" comment=\"Program Files directory permissions must conform to minimum requirements.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns2:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404\" />\n          <ns2:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403\" />\n        </ns2:shellcommand_test>\n        <ns2:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405\" version=\"18\" comment=\"Program Files (x86) directory permissions must conform to minimum requirements.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns2:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405\" />\n          <ns2:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403\" />\n        </ns2:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401\" version=\"18\" comment=\"everyoneincludesanonymous must be configured\">\n          <ns1:hive>HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key>SYSTEM\\CurrentControlSet\\Control\\Lsa</ns1:key>\n          <ns1:name>everyoneincludesanonymous</ns1:name>\n        </ns1:registry_object>\n        <ns2:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402\" version=\"18\" comment=\"Run Icacls command against system drive root directory\">\n          <ns2:shell>powershell</ns2:shell>\n          <ns2:command>icacls($env:SystemDrive + '\\')</ns2:command>\n          <ns2:pattern>:</ns2:pattern>\n        </ns2:shellcommand_object>\n        <ns2:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327403\" version=\"18\" comment=\"Run Icacls command against Windows install directory\">\n          <ns2:shell>powershell</ns2:shell>\n          <ns2:command>icacls($env:windir)</ns2:command>\n          <ns2:pattern>:</ns2:pattern>\n        </ns2:shellcommand_object>\n        <ns2:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404\" version=\"18\" comment=\"Run Icacls command against Program Files directory\">\n          <ns2:shell>powershell</ns2:shell>\n          <ns2:command>icacls (Get-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\" -Name ProgramFilesDir).ProgramFilesDir</ns2:command>\n          <ns2:pattern>:</ns2:pattern>\n        </ns2:shellcommand_object>\n        <ns2:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405\" version=\"18\" comment=\"Run Icacls command against Program Files (x86) directory\">\n          <ns2:shell>powershell</ns2:shell>\n          <ns2:command>icacls (Get-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\" -Name 'ProgramFilesDir (x86)').'ProgramFilesDir (x86)'</ns2:command>\n          <ns2:pattern>:</ns2:pattern>\n        </ns2:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327401\" version=\"18\" comment=\"Value must be equal to 0\">\n          <ns1:value datatype=\"int\" operation=\"equals\">0</ns1:value>\n        </ns1:registry_state>\n        <ns2:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402\" version=\"18\" comment=\"Permissions must equal expected output\">\n          <ns2:exit_status datatype=\"int\">0</ns2:exit_status>\n          <ns2:stdout_line var_check=\"at least one\" operation=\"pattern match\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25327402\" />\n          <ns2:stderr_line check_existence=\"none_exist\" />\n        </ns2:shellcommand_state>\n        <ns2:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403\" version=\"18\" comment=\"Permissions must equal expected output\">\n          <ns2:exit_status datatype=\"int\">0</ns2:exit_status>\n          <ns2:stdout_line var_check=\"at least one\" operation=\"pattern match\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25327403\" />\n          <ns2:stderr_line check_existence=\"none_exist\" />\n        </ns2:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:constant_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25327402\" version=\"18\" datatype=\"string\" comment=\"Required Permissions\">\n          <ns0:value>(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\\(S,RD,X,RA\\)</ns0:value>\n          <ns0:value>(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(RX\\)</ns0:value>\n          <ns0:value>(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(M\\)</ns0:value>\n          <ns0:value>(?i)NT AUTHORITY\\\\Authenticated Users:\\(AD\\)</ns0:value>\n          <ns0:value>(?i)Mandatory Label\\\\High Mandatory Level:\\(OI\\)\\(NP\\)\\(IO\\)\\(NW\\)</ns0:value>\n        </ns0:constant_variable>\n        <ns0:constant_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25327403\" version=\"18\" datatype=\"string\" comment=\"Required Permissions\">\n          <ns0:value>(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)</ns0:value>\n          <ns0:value>(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)</ns0:value>\n          <ns0:value>(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Administrators:\\(M\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Users:\\(RX\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)</ns0:value>\n          <ns0:value>(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)</ns0:value>\n          <ns0:value>(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)</ns0:value>\n          <ns0:value>(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)</ns0:value>\n          <ns0:value>(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)</ns0:value>\n        </ns0:constant_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+  "assessment": {
+    "assessment_title": "Permissions for system files and directories must conform to minimum requirements.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test"
+        },
+        {
+          "test": "system-drive-root-directory-permissions-conform-minimum-requirements-test"
+        },
+        {
+          "test": "windows-installation-directory-permissions-conform-minimum-requirements-test"
+        },
+        {
+          "test": "program-files-directory-permissions-conform-minimum-requirements-test"
+        },
+        {
+          "test": "program-files-x86-directory-permissions-conform-minimum-requirements-test"
+        }
+      ]
+    },
+    "id": "SV-253274.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SYSTEM\\CurrentControlSet\\Control\\Lsa"
+          },
+          "name": {
+            "equals": "everyoneincludesanonymous"
+          },
+          "object_title": "everyoneincludesanonymous must be configured"
+        },
+        "reported_elements": "all",
+        "require": {
+          "fields": {
+            "value": {
+              "equals": 0,
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "exactly_one"
+        },
+        "test_title": "Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'"
+      },
+      "program-files-directory-permissions-conform-minimum-requirements-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "icacls (Get-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\" -Name ProgramFilesDir).ProgramFilesDir",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Run Icacls command against Program Files directory",
+          "pattern": ":",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "exit_status": {
+                  "equals": 0
+                }
+              }
+            },
+            {
+              "fields": {
+                "stderr_line": {
+                  "values_found": "none"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "string",
+                  "matches_regex": [
+                    "(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)",
+                    "(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(M\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Users:\\(RX\\)",
+                    "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                    "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                  ],
+                  "value_match": "one_or_more"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Program Files directory permissions must conform to minimum requirements."
+      },
+      "program-files-x86-directory-permissions-conform-minimum-requirements-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "icacls (Get-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\" -Name 'ProgramFilesDir (x86)').'ProgramFilesDir (x86)'",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Run Icacls command against Program Files (x86) directory",
+          "pattern": ":",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "exit_status": {
+                  "equals": 0
+                }
+              }
+            },
+            {
+              "fields": {
+                "stderr_line": {
+                  "values_found": "none"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "string",
+                  "matches_regex": [
+                    "(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)",
+                    "(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(M\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Users:\\(RX\\)",
+                    "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                    "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                  ],
+                  "value_match": "one_or_more"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Program Files (x86) directory permissions must conform to minimum requirements."
+      },
+      "system-drive-root-directory-permissions-conform-minimum-requirements-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "icacls($env:SystemDrive + '\\')",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Run Icacls command against system drive root directory",
+          "pattern": ":",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "exit_status": {
+                  "equals": 0
+                }
+              }
+            },
+            {
+              "fields": {
+                "stderr_line": {
+                  "values_found": "none"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "string",
+                  "matches_regex": [
+                    "(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\\(S,RD,X,RA\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(RX\\)",
+                    "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(M\\)",
+                    "(?i)NT AUTHORITY\\\\Authenticated Users:\\(AD\\)",
+                    "(?i)Mandatory Label\\\\High Mandatory Level:\\(OI\\)\\(NP\\)\\(IO\\)\\(NW\\)"
+                  ],
+                  "value_match": "one_or_more"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "System drive root directory permissions must conform to minimum requirements."
+      },
+      "windows-installation-directory-permissions-conform-minimum-requirements-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "icacls($env:windir)",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Run Icacls command against Windows install directory",
+          "pattern": ":",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "exit_status": {
+                  "equals": 0
+                }
+              }
+            },
+            {
+              "fields": {
+                "stderr_line": {
+                  "values_found": "none"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "string",
+                  "matches_regex": [
+                    "(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)",
+                    "(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)",
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(M\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Users:\\(RX\\)",
+                    "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                    "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)",
+                    "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                  ],
+                  "value_match": "one_or_more"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Windows installation directory permissions must conform to minimum requirements."
+      }
+    },
+    "version": 18
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253274.automated",
+    "assessment_source_sha256": "4211e5e0c73f254ae69d5e806f257ad85611021e84fc997ec7f99ee24230add7",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "74f6eaa62ff426f8baac34080ee36e4fe52a13ecda2f76bb07fd23c403b92b88",
+    "result_instructions": [
+      {
+        "id": "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "system-drive-root-directory-permissions-conform-minimum-requirements-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "id": "windows-installation-directory-permissions-conform-minimum-requirements-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          2
+        ]
+      },
+      {
+        "id": "program-files-directory-permissions-conform-minimum-requirements-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          3
+        ]
+      },
+      {
+        "id": "program-files-x86-directory-permissions-conform-minimum-requirements-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          4
+        ]
+      },
+      {
+        "count": 5,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test",
+        "program-files-directory-permissions-conform-minimum-requirements-test",
+        "program-files-x86-directory-permissions-conform-minimum-requirements-test",
+        "system-drive-root-directory-permissions-conform-minimum-requirements-test",
+        "windows-installation-directory-permissions-conform-minimum-requirements-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SYSTEM\\CurrentControlSet\\Control\\Lsa"
+            },
+            "name": {
+              "equals": "everyoneincludesanonymous"
+            },
+            "object_title": "everyoneincludesanonymous must be configured"
+          },
+          "reported_elements": "all",
+          "require": {
+            "fields": {
+              "value": {
+                "equals": 0,
+                "values_found": "one_or_more",
+                "values_matching": "every"
+              }
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "exactly_one"
+          },
+          "test_title": "Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'"
+        },
+        "source_test_sha256": "8c5bd02d09f568a3027e11200e8463c8e8c2ae3ec85b3ae1cf003d389df3b21f",
+        "test_id": "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "icacls (Get-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\" -Name ProgramFilesDir).ProgramFilesDir",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Run Icacls command against Program Files directory",
+            "pattern": ":",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "exit_status": {
+                    "equals": 0
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stderr_line": {
+                    "values_found": "none"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stdout_line": {
+                    "datatype": "string",
+                    "matches_regex": [
+                      "(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)",
+                      "(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(M\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Users:\\(RX\\)",
+                      "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                      "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                    ],
+                    "value_match": "one_or_more"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Program Files directory permissions must conform to minimum requirements."
+        },
+        "source_test_sha256": "19033a7d584ba5bc7494ec9532cc5434b7aafae2187f367c84aeca878f74be59",
+        "test_id": "program-files-directory-permissions-conform-minimum-requirements-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "icacls (Get-ItemProperty -Path \"HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\" -Name 'ProgramFilesDir (x86)').'ProgramFilesDir (x86)'",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Run Icacls command against Program Files (x86) directory",
+            "pattern": ":",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "exit_status": {
+                    "equals": 0
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stderr_line": {
+                    "values_found": "none"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stdout_line": {
+                    "datatype": "string",
+                    "matches_regex": [
+                      "(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)",
+                      "(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(M\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Users:\\(RX\\)",
+                      "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                      "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                    ],
+                    "value_match": "one_or_more"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Program Files (x86) directory permissions must conform to minimum requirements."
+        },
+        "source_test_sha256": "315f83fa5770a3b682a9948cf8a33f05e692350710365beae5c71d45b2ecc778",
+        "test_id": "program-files-x86-directory-permissions-conform-minimum-requirements-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "icacls($env:SystemDrive + '\\')",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Run Icacls command against system drive root directory",
+            "pattern": ":",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "exit_status": {
+                    "equals": 0
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stderr_line": {
+                    "values_found": "none"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stdout_line": {
+                    "datatype": "string",
+                    "matches_regex": [
+                      "(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\\(S,RD,X,RA\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(RX\\)",
+                      "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(M\\)",
+                      "(?i)NT AUTHORITY\\\\Authenticated Users:\\(AD\\)",
+                      "(?i)Mandatory Label\\\\High Mandatory Level:\\(OI\\)\\(NP\\)\\(IO\\)\\(NW\\)"
+                    ],
+                    "value_match": "one_or_more"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "System drive root directory permissions must conform to minimum requirements."
+        },
+        "source_test_sha256": "43ffba6b7ce683afccc388c676a7150fa96e36a6322863b06aa20f749dac4b52",
+        "test_id": "system-drive-root-directory-permissions-conform-minimum-requirements-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "icacls($env:windir)",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Run Icacls command against Windows install directory",
+            "pattern": ":",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "exit_status": {
+                    "equals": 0
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stderr_line": {
+                    "values_found": "none"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stdout_line": {
+                    "datatype": "string",
+                    "matches_regex": [
+                      "(?i)NT SERVICE\\\\TrustedInstaller:\\(F\\)",
+                      "(?i)NT SERVICE\\\\TrustedInstaller:\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(M\\)",
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(M\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Users:\\(RX\\)",
+                      "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                      "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(RX\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(RX\\)",
+                      "(?i)APPLICATION PACKAGE AUTHORITY\\\\ALL RESTRICTED APPLICATION PACKAGES:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                    ],
+                    "value_match": "one_or_more"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Windows installation directory permissions must conform to minimum requirements."
+        },
+        "source_test_sha256": "7b68782b7733eff8808b1828af394926e4da400b67fb19b32f09bc9b73f699bf",
+        "test_id": "windows-installation-directory-permissions-conform-minimum-requirements-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253274",
+    "rule_path": "rules/SV-253274-de3f87bb67b9.json",
+    "assessment": "SV-253274.automated",
+    "assessment_path": "assessments/SV-253274.automated-524aac60fec0.json",
+    "assessment_sha256": "8b40a97dd3fe00f9905893f83a4ab3008078f1b6917ab724de1866cd9607a435",
+    "program_path": "programs/2db73c8193467559b5e9bdd01522e2bb5f4ce3b48b8aff641accad0b05c6a382.json",
+    "program_sha256": "6260bc137f1188fa1136ab9bec9520fcaf449a06d6996d7a4cd865ab3cf6dacd",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-05",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253274r1016661_rule",
+    "xccdf_rule_sha256": "1adb85b6c8aa3576379a6313fc286daec8d7586c5dc0fb774b4fb2a3e7b2caf3",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:253274"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:253274"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:3901"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "18",
+          "sha256": "731e896fed44a437d61d3cb703731b17b7e5a7c667a31d4f8f7e4b6b4f2b538c"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "18",
+          "sha256": "0140729a290c9a55443b6145d740b512e8165dc6c078aca205760ea0a194536b"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "18",
+          "sha256": "78d62abcd37cff46075912b3e9cd4af67cdeae4f74b4dcff843181c54bcb6b28"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327403",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "18",
+          "sha256": "b7fc1d7cebf6f1710c67b54cd80e625d886d4aa23cec169bd9c54839ab8e7027"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "18",
+          "sha256": "765d3267a37368e9b049e7cf9f4f0d86325576b0312f0ea2be5ca05f3c9b6902"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "18",
+          "sha256": "5d8c305dbbac7e3c84f22adabca48403ee43e2bd527b3fcc94bd8432d7706c9a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327401",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "18",
+          "sha256": "0cfd92c1d096c344a753be74e2df0e0c82c9ad5e4554576ecbb7ad608221ee82"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "18",
+          "sha256": "6a28eec5d4a89cc6adfcbf142f85b26d8c76d6fef96939dcd110ed5c3d63bdf4"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "18",
+          "sha256": "21a0d3fe8d9d3cd275399811b636d6308e8816aef731ba1169c26dd99fba7e11"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327401",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "18",
+          "sha256": "e3615a2a4c1b9eb2e604d35b7502b9f2752a1ece287e61cc4e255a1525d18214"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "18",
+          "sha256": "65f14d3face118c8af3752ecad9e9a30da4045f4c86b92d9afb0b16e9fb018f0"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "18",
+          "sha256": "a31fe76c25f13c5892dfae34c9b7b45e47c21e7f7162b3c1236344bfbb4025b0"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327404",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "18",
+          "sha256": "4c958348990f9b758b218bcb42fe714c0ff3d34b5d9353c54a60f1bb4e709182"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "18",
+          "sha256": "f8f903c34771b443b7b27ee3739dd56b5b13735a1ad285fc41a365ae4c9eac70"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:25327402",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}constant_variable",
+          "version": "18",
+          "sha256": "19496c840ba0eeb61512b9bbbe4a70f8efa34064cb0ddfd4e04cd062cf677ecc"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:25327403",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}constant_variable",
+          "version": "18",
+          "sha256": "5f97bafd18d2f028bec6ce9a8970cf9743d2184fdaa3b958eb86ae212c0c58bc"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327401",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327401",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327401",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327401",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327401",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327402",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327402",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327402",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25327402",
+          "stdout_line"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327403",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327403",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25327403",
+          "stdout_line"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327404",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327404",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327404",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327404",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:253274",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25327405",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25327405",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25327403",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "cf2ffed7314a8853786191a6cd4d8b590c65777c4b60fb50f4e4cf9d332784bf",
+    "features": {
+      "source_nodes": 16,
+      "kinds": {
+        "definitions": 1,
+        "objects": 5,
+        "states": 3,
+        "tests": 5,
+        "variables": 2
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 1,
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 4
+      },
+      "multi_state_tests": 0,
+      "constructs": {}
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

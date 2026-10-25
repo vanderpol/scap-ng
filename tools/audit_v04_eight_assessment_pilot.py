@@ -34,7 +34,7 @@ CASES = (
 )
 
 
-def original(inputs, platform, rule, pins):
+def original(inputs, platform, rule, pins, *, source_type=Source):
     pin = pins[platform]
     path = inputs / pin['file']
     require(sha256(path.read_bytes()).hexdigest() == pin['zip_sha256'], 'original ZIP pin mismatch')
@@ -84,7 +84,7 @@ def original(inputs, platform, rule, pins):
     comp = ids[href[1:]]
     ovals = [n for n in comp if n.tag == '{http://oval.mitre.org/XMLSchema/oval-definitions-5}oval_definitions']
     require(len(ovals) == 1, 'catalog did not resolve one original OVAL component')
-    source = Source(ovals[0])
+    source = source_type(ovals[0])
     closure = source.closure(ref['name'])
     return source, ref['name'], {'source_zip': pin['file'], 'source_zip_sha256': pin['zip_sha256'],
         'revision': pin['revision'], 'source_path': pin['source_path'],

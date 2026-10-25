@@ -465,9 +465,9 @@ def first_difference(expected, actual, path='$'):
     return None
 
 
-def compare(source, definition, assessment):
+def compare(source, definition, assessment, *, native_type=Native):
     """Bind Test IDs by the complete criteria/evaluate structure, never titles."""
-    native = Native(assessment)
+    native = native_type(assessment)
     need(assessment.get('class') == source.get(definition, 'definitions').get('class')
          and assessment.get('purpose') == 'assessment', 'Assessment class/purpose boundary')
     expected, actual = source.expression(definition), native.expression(assessment['evaluate'])

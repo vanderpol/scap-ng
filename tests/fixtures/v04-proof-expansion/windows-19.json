@@ -1,0 +1,710 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:259346\" version=\"8\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>NSEC3 must be used for all internal DNS zones.</ns0:title>\n            <ns0:description>NSEC3 must be used for all internal DNS zones.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria operator=\"OR\">\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934603\" comment=\"DNS server is caching only (there are no forward or reverse lookup zones)\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934604\" comment=\"All forward lookup zones (if any) are integrated with Active Directory\" />\n            <ns0:criteria operator=\"AND\">\n              <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934601\" comment=\"All forward lookup zones are DNSSEC signed\" />\n              <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934602\" comment=\"All forward lookup zones have at least one NSEC3 record\" />\n            </ns0:criteria>\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934601\" version=\"8\" comment=\"All forward lookup zones are DNSSEC signed\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934601\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934601\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934602\" version=\"8\" comment=\"All forward lookup zones have at least one NSEC3 record\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934603\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934602\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934603\" version=\"8\" comment=\"DNS server is caching only (there are no forward or reverse lookup zones)\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934604\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934603\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25934604\" version=\"8\" comment=\"All forward lookup zones (if any) are integrated with Active Directory\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934605\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934604\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934601\" version=\"8\" comment=\"The 'IsSigned' setting for each forward lookup zone\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25934601\" />\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934602\" version=\"8\" comment=\"The list of all forward lookup zones\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934603\" version=\"8\" comment=\"The number of NSEC3 records for a given zone\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25934602\" />\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934604\" version=\"8\" comment=\"The list of all forward and reverse lookup zones\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934605\" version=\"8\" comment=\"The list of all forward lookup zones that are not integrated with Active Directory\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934601\" version=\"8\" comment=\"The 'IsSigned' setting for each forward lookup zone is set to 'True'\">\n          <ns1:stdout_line operation=\"equals\" entity_check=\"all\" check_existence=\"only_one_exists\">True</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934602\" version=\"8\" comment=\"The number of NSEC3 records associated with a zone is greater than 0\">\n          <ns1:stdout_line operation=\"greater than\" entity_check=\"all\" check_existence=\"only_one_exists\" datatype=\"int\">0</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934603\" version=\"8\" comment=\"There are no forward or reverse lookup zones\">\n          <ns1:stdout_line check_existence=\"none_exist\" />\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25934604\" version=\"8\" comment=\"There are no forward lookup zones that are not integrated with Active Directory\">\n          <ns1:stdout_line check_existence=\"none_exist\" />\n        </ns1:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25934601\" version=\"8\" datatype=\"string\" comment=\"The command to get the 'IsSigned' setting for each forward lookup zone\">\n          <ns0:concat>\n            <ns0:literal_component>try {Get-DnsServerZone -Name </ns0:literal_component>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934602\" item_field=\"stdout_line\" />\n            <ns0:literal_component> | ForEach-Object {$_.IsSigned}} catch {}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25934602\" version=\"8\" datatype=\"string\" comment=\"The command to get the number of NSEC3 records for a given zone\">\n          <ns0:concat>\n            <ns0:literal_component>try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName </ns0:literal_component>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25934602\" item_field=\"stdout_line\" />\n            <ns0:literal_component> -RRType NSec3 | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output '0'}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+  "assessment": {
+    "assessment_title": "NSEC3 must be used for all internal DNS zones.",
+    "class": "compliance",
+    "evaluate": {
+      "or": [
+        {
+          "test": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test"
+        },
+        {
+          "test": "all-forward-lookup-zones-if-any-integrated-active-directory-test"
+        },
+        {
+          "and": [
+            {
+              "test": "all-forward-lookup-zones-dnssec-signed-test"
+            },
+            {
+              "test": "all-forward-lookup-zones-have-at-least-one-nsec3-record-test"
+            }
+          ]
+        }
+      ]
+    },
+    "id": "SV-259346.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "shared_objects": {
+      "list-all-forward-lookup-zones-object": {
+        "capability": "independent.shellcommand",
+        "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}",
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false,
+        "object_title": "The list of all forward lookup zones",
+        "shell": "powershell"
+      }
+    },
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "all-forward-lookup-zones-dnssec-signed-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "command-get-issigned-setting-each-forward-lookup-zone-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The 'IsSigned' setting for each forward lookup zone",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "equals": "True",
+                  "values_found": "exactly_one",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "All forward lookup zones are DNSSEC signed"
+      },
+      "all-forward-lookup-zones-have-at-least-one-nsec3-record-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "command-get-number-nsec3-records-given-zone-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The number of NSEC3 records for a given zone",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "greater_than": 0,
+                  "values_found": "exactly_one",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "All forward lookup zones have at least one NSEC3 record"
+      },
+      "all-forward-lookup-zones-if-any-integrated-active-directory-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The list of all forward lookup zones that are not integrated with Active Directory",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "values_found": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "All forward lookup zones (if any) are integrated with Active Directory"
+      },
+      "dns-server-caching-only-there-no-forward-or-reverse-lookup-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The list of all forward and reverse lookup zones",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "values_found": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "DNS server is caching only (there are no forward or reverse lookup zones)"
+      }
+    },
+    "variables": {
+      "command-get-issigned-setting-each-forward-lookup-zone-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "try {Get-DnsServerZone -Name "
+              }
+            },
+            {
+              "values": {
+                "field": "stdout_line",
+                "object": "list-all-forward-lookup-zones-object"
+              }
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": " | ForEach-Object {$_.IsSigned}} catch {}"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "The command to get the 'IsSigned' setting for each forward lookup zone"
+      },
+      "command-get-number-nsec3-records-given-zone-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName "
+              }
+            },
+            {
+              "values": {
+                "field": "stdout_line",
+                "object": "list-all-forward-lookup-zones-object"
+              }
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": " -RRType NSec3 | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output '0'}"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "The command to get the number of NSEC3 records for a given zone"
+      }
+    },
+    "version": 8
+  },
+  "compiled_program": {
+    "assessment_id": "SV-259346.automated",
+    "assessment_source_sha256": "ae7637b53f4b8ea7ac3f2c28b4e33eae0154a5723aa7e4018ca646730ed4f1ac",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "d8a8f47f30834e5cc92eb5ea8e5f34b4dc0f4e9568b5bc046cc83d514e15b213",
+    "result_instructions": [
+      {
+        "id": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          0
+        ]
+      },
+      {
+        "id": "all-forward-lookup-zones-if-any-integrated-active-directory-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          1
+        ]
+      },
+      {
+        "id": "all-forward-lookup-zones-dnssec-signed-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          2,
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "all-forward-lookup-zones-have-at-least-one-nsec3-record-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          2,
+          "all",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "all",
+        "path": [
+          "evaluate",
+          "any",
+          2
+        ]
+      },
+      {
+        "count": 3,
+        "op": "any",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "all-forward-lookup-zones-dnssec-signed-test",
+        "all-forward-lookup-zones-have-at-least-one-nsec3-record-test",
+        "all-forward-lookup-zones-if-any-integrated-active-directory-test",
+        "dns-server-caching-only-there-no-forward-or-reverse-lookup-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "command-get-issigned-setting-each-forward-lookup-zone-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The 'IsSigned' setting for each forward lookup zone",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "equals": "True",
+                    "values_found": "exactly_one",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "All forward lookup zones are DNSSEC signed"
+        },
+        "source_test_sha256": "cb9b95d5b04a5822d1c5c3d3a8d6e08f0fa6b65c435cd2f0a0f40fa55aee6ecc",
+        "test_id": "all-forward-lookup-zones-dnssec-signed-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "command-get-number-nsec3-records-given-zone-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The number of NSEC3 records for a given zone",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "greater_than": 0,
+                    "values_found": "exactly_one",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "All forward lookup zones have at least one NSEC3 record"
+        },
+        "source_test_sha256": "3a8b69c49b27649a11f8d401fcd0934a5f75babd73b10f563a07837dc409cbe8",
+        "test_id": "all-forward-lookup-zones-have-at-least-one-nsec3-record-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and -Not($_.IsReverseLookupZone) -and (-Not $_.IsDsIntegrated)} | ForEach-Object {$_.ZoneName}",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The list of all forward lookup zones that are not integrated with Active Directory",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "values_found": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "All forward lookup zones (if any) are integrated with Active Directory"
+        },
+        "source_test_sha256": "22a16289c4e71b49a62857f3eacacfe020fa3a0b0216decb0267a6fc63708c25",
+        "test_id": "all-forward-lookup-zones-if-any-integrated-active-directory-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The list of all forward and reverse lookup zones",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "values_found": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "DNS server is caching only (there are no forward or reverse lookup zones)"
+        },
+        "source_test_sha256": "e3c94f43b3fcd003e625af647b3f976dfb2d85e02e04a6568450842c644fa990",
+        "test_id": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_dns",
+    "package": "ms_windows_server_dns.scapng",
+    "package_sha256": "82fdb4d0ea0bd614b799f2de595618a0511d31db600b25bdb5ab3568b28ec834",
+    "manifest_sha256": "19a7b47ebdf7213090ac0d797184abe0bf1f6206309ae38be4772fd8ff5a8bf3",
+    "rule": "SV-259346",
+    "rule_path": "rules/SV-259346-b11955f32345.json",
+    "assessment": "SV-259346.automated",
+    "assessment_path": "assessments/SV-259346.automated-2cf96116bdbc.json",
+    "assessment_sha256": "f0649ef20d61d9227694c6a958f31fe215e7b89a05a5a44184b5ff6a1b5b2841",
+    "program_path": "programs/a6a763c5340126c82f69cdaa5ff1982e8845ca4e5f6df0a878445d6402fcedcc.json",
+    "program_sha256": "c2047100393511024232d6a31a81b64bfcabef5c1fdcf7dc05c3aee4f864aa97",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-19",
+    "platform": "ms_windows_server_dns",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "source_zip_sha256": "f674b67e74acbd3037093d50e33dc20765bd9d45a6c9ed2be5d463d009a6c6b8",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "xml_member": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.xml",
+    "xml_sha256": "17ea87e0c528072eef99c7a28e306d9351b5f4b00c7440b13c4bdf00c354d0ba",
+    "xccdf_rule": "xccdf_navy.navwar.niwcatlantic.scc.ms.dns_rule_SV-259346r1156952_rule",
+    "xccdf_rule_sha256": "1b64bcd887ad5476a1caae0ce1616a39282872d91143f2f0bd2acb77ccdbc8c5",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259346"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259346"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.server:questionnaire:2501"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "8",
+          "sha256": "186fd37604eef20770bdf4be70359fd3f553d84304609bc9ddfcfc2075a19128"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934601",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "f41705c2d2735cd20036508767f760b2197747a7b3db8debac5290ad9e6ea4ba"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934602",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "74b4f8ee797c0dbf71fb268bc816ad18e042c211f41f3ffb7f23f61d5a856803"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934603",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "0850698ce1ffdbffa8ff753b8f92cae4a40152624a3a5ec6188e140bb2cc8083"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934604",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "6495b7d0534fd2c2c4d05391321fb8a0bc3c070f698cfb6dc5fba446ff539fd2"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934605",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "925ecbc46944d96ce12c559f723b8ae69f6dbc799ab188402025369ffc590ef2"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934601",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "08c7c7af644e2cc88ae685703414ba04b6d6d1fda30f68a06144bb064bd2afa4"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934602",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "87f9ca0169efb2ce92ff2a834892b60c1f7912700a5de7c72b47c09735ee1e07"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934603",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "128e22f42f02edd95d87ff96c07107f9a83336cb06ab03b0b50eedbd6d62b531"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934604",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "51211b5c7bec3f4f64a0869238c0de35bc56d795fb711066b52ec97eacbe6f00"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934601",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "758cca85ae78913f70ed0470ccf738f498ade7ab160d73d9a1d5d9042a0d0438"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934602",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "31a29258f6b4b184238f8000b08c7bc07df5ce9fe45f4ab3725486f87e3f903d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934603",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "218592a765cb6af19e2f4de53eb1dd7d335a9ae37f94e0963293557cbe4e0de2"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934604",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "463d30d213472dfe1de6327b06633f1d86a7ea3ecb02638fb6de37a524216fff"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:25934601",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "8",
+          "sha256": "0e7ed89b7bd538ae5d3395c0afa5e47b224f625d49107e684f20218003d26dab"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:25934602",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "8",
+          "sha256": "404f814277a2c966f7fe99f19043d34b23f2ac3f71c17da0e71fabcd35b4bbb3"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934603",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934603",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934604",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934603",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934603",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934604",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934604",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934605",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934604",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934604",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934601",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934601",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25934601",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25934601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934602",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934601",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934601",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259346",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934602",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934602",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934603",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934603",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25934602",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25934602",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25934602",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25934602",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25934602",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "b7181fe417fc7f626c7c9a2f712354badaac0141631792a147610c9b3635912c",
+    "features": {
+      "source_nodes": 16,
+      "kinds": {
+        "definitions": 1,
+        "objects": 5,
+        "states": 4,
+        "tests": 4,
+        "variables": 2
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 4
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "concat": 2,
+        "object_component": 2
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

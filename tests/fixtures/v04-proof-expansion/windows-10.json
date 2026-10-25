@@ -1,0 +1,434 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\" xmlns:ns2=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:277998\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows Server 2025 permissions for the system drive root directory (usually C:\\) must conform to minimum requirements.</ns0:title>\n            <ns0:description>Permissions for the system drive root directory (usually C:\\) must conform to minimum requirements.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion comment=\"Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'\" test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801\" />\n            <ns0:criterion comment=\"Permissions must conform to minimum requirements for system drive root directory.\" test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801\" version=\"1\" comment=\"Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'\" check_existence=\"at_least_one_exists\" check=\"only one\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801\" />\n        </ns1:registry_test>\n        <ns2:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802\" version=\"1\" comment=\"Permissions must conform to minimum requirements.\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns2:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802\" />\n          <ns2:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802\" />\n        </ns2:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801\" version=\"1\" comment=\"everyoneincludesanonymous must be configured\">\n          <ns1:hive>HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key>SYSTEM\\CurrentControlSet\\Control\\Lsa</ns1:key>\n          <ns1:name>everyoneincludesanonymous</ns1:name>\n        </ns1:registry_object>\n        <ns2:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802\" version=\"1\" comment=\"Run Icacls command against system drive root directory\">\n          <ns2:shell>powershell</ns2:shell>\n          <ns2:command>icacls($env:SystemDrive + '\\')</ns2:command>\n          <ns2:pattern>:</ns2:pattern>\n        </ns2:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801\" version=\"1\" comment=\"Value must be equal to 0\">\n          <ns1:value datatype=\"int\" operation=\"equals\">0</ns1:value>\n        </ns1:registry_state>\n        <ns2:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802\" version=\"1\" comment=\"Permissions must equal expected output\">\n          <ns2:exit_status datatype=\"int\">0</ns2:exit_status>\n          <ns2:stdout_line var_check=\"at least one\" operation=\"pattern match\" var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27799801\" />\n          <ns2:stderr_line check_existence=\"none_exist\" />\n        </ns2:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:constant_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:27799801\" version=\"1\" datatype=\"string\" comment=\"Required Permissions\">\n          <ns0:value>(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(RX\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Users:\\(CI\\)\\(AD\\)</ns0:value>\n          <ns0:value>(?i)BUILTIN\\\\Users:\\(CI\\)\\(IO\\)\\(WD\\)</ns0:value>\n          <ns0:value>(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)</ns0:value>\n          <ns0:value>(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\\(S,RD,X,RA\\)</ns0:value>\n        </ns0:constant_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:277998",
+  "assessment": {
+    "assessment_title": "Windows Server 2025 permissions for the system drive root directory (usually C:\\) must conform to minimum requirements.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test"
+        },
+        {
+          "test": "permissions-conform-minimum-requirements-test"
+        }
+      ]
+    },
+    "id": "SV-277998.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SYSTEM\\CurrentControlSet\\Control\\Lsa"
+          },
+          "name": {
+            "equals": "everyoneincludesanonymous"
+          },
+          "object_title": "everyoneincludesanonymous must be configured"
+        },
+        "reported_elements": "all",
+        "require": {
+          "fields": {
+            "value": {
+              "equals": 0,
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "exactly_one"
+        },
+        "test_title": "Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'"
+      },
+      "permissions-conform-minimum-requirements-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "icacls($env:SystemDrive + '\\')",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Run Icacls command against system drive root directory",
+          "pattern": ":",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "exit_status": {
+                  "equals": 0
+                }
+              }
+            },
+            {
+              "fields": {
+                "stderr_line": {
+                  "values_found": "none"
+                }
+              }
+            },
+            {
+              "fields": {
+                "stdout_line": {
+                  "datatype": "string",
+                  "matches_regex": [
+                    "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(F\\)",
+                    "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(RX\\)",
+                    "(?i)BUILTIN\\\\Users:\\(CI\\)\\(AD\\)",
+                    "(?i)BUILTIN\\\\Users:\\(CI\\)\\(IO\\)\\(WD\\)",
+                    "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                    "(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\\(S,RD,X,RA\\)"
+                  ],
+                  "value_match": "one_or_more"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Permissions must conform to minimum requirements."
+      }
+    },
+    "version": 1
+  },
+  "compiled_program": {
+    "assessment_id": "SV-277998.automated",
+    "assessment_source_sha256": "b1a29b7b6c48962982fe166d945487856e8abcdb95fba1dee5ecf0372e518655",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "d68c3e6af80761b7840110c6929f3133d1f0c91dcfc5747c9e0b663564b6bb7d",
+    "result_instructions": [
+      {
+        "id": "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "permissions-conform-minimum-requirements-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test",
+        "permissions-conform-minimum-requirements-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SYSTEM\\CurrentControlSet\\Control\\Lsa"
+            },
+            "name": {
+              "equals": "everyoneincludesanonymous"
+            },
+            "object_title": "everyoneincludesanonymous must be configured"
+          },
+          "reported_elements": "all",
+          "require": {
+            "fields": {
+              "value": {
+                "equals": 0,
+                "values_found": "one_or_more",
+                "values_matching": "every"
+              }
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "exactly_one"
+          },
+          "test_title": "Network access: Let Everyone permissions apply to anonymous users is set to 'Disabled'"
+        },
+        "source_test_sha256": "8c5bd02d09f568a3027e11200e8463c8e8c2ae3ec85b3ae1cf003d389df3b21f",
+        "test_id": "network-access-let-everyone-permissions-apply-anonymous-users-set-disabled-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "icacls($env:SystemDrive + '\\')",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Run Icacls command against system drive root directory",
+            "pattern": ":",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "exit_status": {
+                    "equals": 0
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stderr_line": {
+                    "values_found": "none"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "stdout_line": {
+                    "datatype": "string",
+                    "matches_regex": [
+                      "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(F\\)",
+                      "(?i)BUILTIN\\\\Users:\\(OI\\)\\(CI\\)\\(RX\\)",
+                      "(?i)BUILTIN\\\\Users:\\(CI\\)\\(AD\\)",
+                      "(?i)BUILTIN\\\\Users:\\(CI\\)\\(IO\\)\\(WD\\)",
+                      "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                      "(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\\(S,RD,X,RA\\)"
+                    ],
+                    "value_match": "one_or_more"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Permissions must conform to minimum requirements."
+        },
+        "source_test_sha256": "929f6e6117418cdd70b0ab55809fdcf6efdbe9d5db7c45fefc06eb769fef8be7",
+        "test_id": "permissions-conform-minimum-requirements-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_2025",
+    "package": "ms_windows_server_2025.scapng",
+    "package_sha256": "c3b08d822ec363a6dadf2f3a3e430b7a3796a784a1f5f96475a4b70dc88577f4",
+    "manifest_sha256": "cb3559904f7d717559c930280045ba68042554315b3714e681664ff0a97dde6b",
+    "rule": "SV-277998",
+    "rule_path": "rules/SV-277998-2c0b13d8c757.json",
+    "assessment": "SV-277998.automated",
+    "assessment_path": "assessments/SV-277998.automated-89478c0288bc.json",
+    "assessment_sha256": "fc73061db91398551ae6a30482e743007e9feab8d6b5d68daa1b9e1d1a8af31f",
+    "program_path": "programs/2900fa06239987323b1006f6512a10b38a8443dce73d528d24ad7b1afb5449e5.json",
+    "program_sha256": "6a090af70b121960000136de0b91b260dd199d97bfbff9ebc41c06ce1fb8d495",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-10",
+    "platform": "ms_windows_server_2025",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-277998r1180700_rule",
+    "xccdf_rule_sha256": "5e2c6b5e1105b0bc8082be4d9faff8a811963e4917743f41b16b07d9d4951f1f",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:277998"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:277998"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:2901"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:277998",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:277998",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "f4c25a0dc3ec613c5d84ef0fcbad36d997d53b8490eadfee3b78707cc93fbec7"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "709bbb19d26e69137c0914dec0b4ffbfd43011616594edc7a3cd36de6a2e7a95"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "1",
+          "sha256": "22599f83ed8e7f5dac45ca90ddd832fc9032204adb282b852ff49c4e550fbd23"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "69c5145d9b0b399806a45a9d83b28ecf614636e3beefaf035f2c5ab395e6203d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "1",
+          "sha256": "6f997feed46d393aab267416b86aa25f5a3a03e118341d3684c2711868492a66"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "7ce3ba3a3f274de90f1abcdcada6d296af9affbeb7193916b83463d2f74ce5e8"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "1",
+          "sha256": "64878cc5e69a4db1023014978194039f78d3860b92ecb25135c34f3e9c47f21f"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:27799801",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}constant_variable",
+          "version": "1",
+          "sha256": "b65bbf4dee4217d2c5b6177ada487052e23b5990ab5e4241343339d94ccaa8b5"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:277998",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27799801",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799801",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27799801",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:277998",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27799802",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27799802",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27799802",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27799801",
+          "stdout_line"
+        ]
+      ]
+    },
+    "closure_sha256": "a0345ed4a4261165c03f0a75fd8d97aebed3ccaf0fc91a4fbd484a67a9769249",
+    "features": {
+      "source_nodes": 8,
+      "kinds": {
+        "definitions": 1,
+        "objects": 2,
+        "states": 2,
+        "tests": 2,
+        "variables": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 1,
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 1
+      },
+      "multi_state_tests": 0,
+      "constructs": {}
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

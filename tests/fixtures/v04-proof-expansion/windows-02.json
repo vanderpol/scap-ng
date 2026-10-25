@@ -1,0 +1,284 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253261\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows systems must use a BitLocker PIN with a minimum length of six digits for pre-boot authentication.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25326100\" comment=\"BitLocker must be 6 digits or more.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows11:def:253261\" version=\"2\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN11-00-000032 - Windows 11 systems must use a BitLocker PIN with a minimum length of six digits for pre-boot authentication.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows 11</ns0:platform>\n            </ns0:affected>\n            <ns0:description>If data at rest is unencrypted, it is vulnerable to disclosure. Even if the operating system enforces permissions on data access, an adversary can remove non-volatile memory and read it directly, thereby circumventing operating system controls. Encrypting the data ensures that confidentiality is protected even when the operating system is not running. Pre-boot authentication prevents unauthorized users from accessing encrypted drives. Increasing the pin length requires a greater number of guesses for an attacker.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253261\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25326100\" version=\"1\" check_existence=\"at_least_one_exists\" check=\"all\" comment=\"BitLocker must be 6 digits or more.\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25326100\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25326100\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25326100\" version=\"1\" comment=\"Check for BitLocker MinimumPIN\">\n          <ns1:hive datatype=\"string\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\">SOFTWARE\\Policies\\Microsoft\\FVE</ns1:key>\n          <ns1:name datatype=\"string\" operation=\"case insensitive equals\">MinimumPIN</ns1:name>\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25326100\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\" operation=\"greater than or equal\">6</ns1:value>\n        </ns1:registry_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows11:def:253261",
+  "assessment": {
+    "assessment_title": "WN11-00-000032 - Windows 11 systems must use a BitLocker PIN with a minimum length of six digits for pre-boot authentication.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "bitlocker-6-digits-or-more-test"
+    },
+    "id": "SV-253261.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "bitlocker-6-digits-or-more-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Policies\\Microsoft\\FVE"
+          },
+          "name": {
+            "case_insensitive_equals": "MinimumPIN"
+          },
+          "object_title": "Check for BitLocker MinimumPIN"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "dword"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "greater_than_or_equal": 6
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "BitLocker must be 6 digits or more."
+      }
+    },
+    "version": 2
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253261.automated",
+    "assessment_source_sha256": "a2b78e5dbbbbda02c3d622028f288062626f3e8fb3892e9f8400426860dc5154",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "5758768842804c53f67b2c8ce1294c772d97d4773e9daa2697fae704b5b15a14",
+    "result_instructions": [
+      {
+        "id": "bitlocker-6-digits-or-more-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "bitlocker-6-digits-or-more-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SOFTWARE\\Policies\\Microsoft\\FVE"
+            },
+            "name": {
+              "case_insensitive_equals": "MinimumPIN"
+            },
+            "object_title": "Check for BitLocker MinimumPIN"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "dword"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "greater_than_or_equal": 6
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "BitLocker must be 6 digits or more."
+        },
+        "source_test_sha256": "dcd816b830e9fb28ca60ba49e5aaf51a802f2402c08de84008760c8b6749e0d9",
+        "test_id": "bitlocker-6-digits-or-more-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253261",
+    "rule_path": "rules/SV-253261-ebd9f7524da5.json",
+    "assessment": "SV-253261.automated",
+    "assessment_path": "assessments/SV-253261.automated-42cf04f15e3f.json",
+    "assessment_sha256": "166faf7cc13f9e54acc2039df99ca17b324486cb85ac81c5691f2e6d74c26b12",
+    "program_path": "programs/f905492c654c5db9d2b0142f3df4c66c32ff8955c529a5eee603ce7f8974ac77.json",
+    "program_sha256": "a7e7232eeabc9b89674a284acd19e23fbd6bff787e182ed2662c34028220d0c5",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-02",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253261r1210284_rule",
+    "xccdf_rule_sha256": "8b74b6813e0b49feaf1d6fb9477788a507c929f050918d8179f14307750d2fdb",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253261"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253261"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:1301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "definition": "oval:mil.disa.stig.windows11:def:253261",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253261",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "b823aba0c1964638ecd3203b1ce594a811448a172de6e96966075002dfd31481"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25326100",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "68b0b1820e5b59931606127d82f995fd2299ba03a4d2364d669ef90d27131d76"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25326100",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "218f259b5194e8c2f8faf3d085b0b1578fa89b2b96f16415090118eb2a66bd8d"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25326100",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "37ba84045c04db7253b805f88c8e09c9cd903ee6b9a4f17a379acd40da4cd31a"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows11:def:253261",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "2",
+          "sha256": "614545555ed2c8d7acc32c89f51ffe6a0be3cbe86418d0626673a1e94f25cba4"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows11:def:253261",
+          "oval:mil.disa.stig.defs:def:253261",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253261",
+          "oval:mil.disa.stig.win:tst:25326100",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25326100",
+          "oval:mil.disa.stig.win:obj:25326100",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25326100",
+          "oval:mil.disa.stig.win:ste:25326100",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "cdbafc88d115aaba99f6645fa50555232d0e429f3c1c9b2f90e4aa11b29cbdfb",
+    "features": {
+      "source_nodes": 5,
+      "kinds": {
+        "definitions": 2,
+        "objects": 1,
+        "states": 1,
+        "tests": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 1
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "extend_definition": 1
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

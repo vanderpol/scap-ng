@@ -1,0 +1,430 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:259360\" version=\"8\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Nonroutable IPv6 link-local scope addresses must not be configured in any zone.</ns0:title>\n            <ns0:description>IPv6 link-local scope addresses must not be configured in any zone.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria operator=\"OR\">\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25936005\" comment=\"DNS server is caching only (there are no forward or reverse lookup zones)\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25936004\" comment=\"IPv6 link-local scope addresses are not configured in any zone\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25936004\" version=\"8\" comment=\"IPv6 link-local scope addresses are not configured in any zone\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25936005\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25936004\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25936005\" version=\"8\" comment=\"DNS server is caching only (there are no forward or reverse lookup zones)\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25936006\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25936005\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25936002\" version=\"8\" comment=\"The list of all forward lookup zones\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25936005\" version=\"8\" comment=\"The number of IPv6 link-local scope addresses for a given zone\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25936004\" />\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25936006\" version=\"8\" comment=\"The list of all forward and reverse lookup zones\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25936004\" version=\"8\" comment=\"The number of IPv6 link-local scope addresses associated with a zone is equal to 0\">\n          <ns1:stdout_line operation=\"equals\" entity_check=\"all\" check_existence=\"only_one_exists\" datatype=\"int\">0</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25936005\" version=\"8\" comment=\"There are no forward or reverse lookup zones\">\n          <ns1:stdout_line check_existence=\"none_exist\" />\n        </ns1:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25936004\" version=\"8\" datatype=\"string\" comment=\"The command to get the number of IPv6 link-local scope addresses for a given zone\">\n          <ns0:concat>\n            <ns0:literal_component>try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName </ns0:literal_component>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25936002\" item_field=\"stdout_line\" />\n            <ns0:literal_component> | Where-Object {$_.RecordData.IPv6Address.IPAddressToString -match '(^[Ff][Ee]8|^[Ff][Ee]9|^[Ff][Ee][Aa]|^[Ff][Ee][Bb])'} | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output '0'}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259360",
+  "assessment": {
+    "assessment_title": "Nonroutable IPv6 link-local scope addresses must not be configured in any zone.",
+    "class": "compliance",
+    "evaluate": {
+      "or": [
+        {
+          "test": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test"
+        },
+        {
+          "test": "ipv6-link-local-scope-addresses-not-configured-in-any-zone-test"
+        }
+      ]
+    },
+    "id": "SV-259360.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "dns-server-caching-only-there-no-forward-or-reverse-lookup-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The list of all forward and reverse lookup zones",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "values_found": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "DNS server is caching only (there are no forward or reverse lookup zones)"
+      },
+      "ipv6-link-local-scope-addresses-not-configured-in-any-zone-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "command-get-number-ipv6-link-local-scope-addresses-given-zone-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The number of IPv6 link-local scope addresses for a given zone",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "equals": 0,
+                  "values_found": "exactly_one",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "IPv6 link-local scope addresses are not configured in any zone"
+      }
+    },
+    "variables": {
+      "command-get-number-ipv6-link-local-scope-addresses-given-zone-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "try {Get-DNSServerResourceRecord -ComputerName $env:COMPUTERNAME -ZoneName "
+              }
+            },
+            {
+              "values": {
+                "field": "stdout_line",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "collect": {
+                    "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}",
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false,
+                    "shell": "powershell"
+                  },
+                  "object_title": "The list of all forward lookup zones"
+                }
+              }
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": " | Where-Object {$_.RecordData.IPv6Address.IPAddressToString -match '(^[Ff][Ee]8|^[Ff][Ee]9|^[Ff][Ee][Aa]|^[Ff][Ee][Bb])'} | Measure-Object | Select-Object -ExpandProperty Count} catch {Write-Output '0'}"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "The command to get the number of IPv6 link-local scope addresses for a given zone"
+      }
+    },
+    "version": 8
+  },
+  "compiled_program": {
+    "assessment_id": "SV-259360.automated",
+    "assessment_source_sha256": "d59c02b2cdbe7f80486a23e6f9f38f968dbac4bc033f68f68d6fd09f0379e8ec",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "60bd3ac7e607decc5a8e997c0abba2369255bc19519fabc1b3c1f3e4302bb4fd",
+    "result_instructions": [
+      {
+        "id": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          0
+        ]
+      },
+      {
+        "id": "ipv6-link-local-scope-addresses-not-configured-in-any-zone-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "any",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "any",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "dns-server-caching-only-there-no-forward-or-reverse-lookup-test",
+        "ipv6-link-local-scope-addresses-not-configured-in-any-zone-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated)} | ForEach-Object {$_.ZoneName}",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The list of all forward and reverse lookup zones",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "values_found": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "DNS server is caching only (there are no forward or reverse lookup zones)"
+        },
+        "source_test_sha256": "e3c94f43b3fcd003e625af647b3f976dfb2d85e02e04a6568450842c644fa990",
+        "test_id": "dns-server-caching-only-there-no-forward-or-reverse-lookup-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "command-get-number-ipv6-link-local-scope-addresses-given-zone-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The number of IPv6 link-local scope addresses for a given zone",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "equals": 0,
+                    "values_found": "exactly_one",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "IPv6 link-local scope addresses are not configured in any zone"
+        },
+        "source_test_sha256": "cb672b4c31f23e1d9cde781844a25fdd8b3bd83c459782d49326ee9fe540feca",
+        "test_id": "ipv6-link-local-scope-addresses-not-configured-in-any-zone-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_dns",
+    "package": "ms_windows_server_dns.scapng",
+    "package_sha256": "82fdb4d0ea0bd614b799f2de595618a0511d31db600b25bdb5ab3568b28ec834",
+    "manifest_sha256": "19a7b47ebdf7213090ac0d797184abe0bf1f6206309ae38be4772fd8ff5a8bf3",
+    "rule": "SV-259360",
+    "rule_path": "rules/SV-259360-e748d2f64f2a.json",
+    "assessment": "SV-259360.automated",
+    "assessment_path": "assessments/SV-259360.automated-c446b8eb6ca6.json",
+    "assessment_sha256": "c0b4e72ce5a8461a1c695cbe595f792b4e02283f67ea5202d5eed4f2018b7bbe",
+    "program_path": "programs/572c9aa7cf098236a17e6299eebed40648fcc74b3605c82085125817cdcbd376.json",
+    "program_sha256": "c4a66ab86ca87b6ac6b407cc8a2837e4cbdd23daf808ec2cc35e2c892489159a",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-21",
+    "platform": "ms_windows_server_dns",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "source_zip_sha256": "f674b67e74acbd3037093d50e33dc20765bd9d45a6c9ed2be5d463d009a6c6b8",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "xml_member": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.xml",
+    "xml_sha256": "17ea87e0c528072eef99c7a28e306d9351b5f4b00c7440b13c4bdf00c354d0ba",
+    "xccdf_rule": "xccdf_navy.navwar.niwcatlantic.scc.ms.dns_rule_SV-259360r961863_rule",
+    "xccdf_rule_sha256": "c1f8155ac46a6b91b946c5823d9eef454750f1162aca7a9f8f4876e719daa146",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259360"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259360"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.server:questionnaire:5301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259360",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:259360",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "8",
+          "sha256": "edef3eaea475a3ee858a665739b1820c2fc74c211e93b529bead3c4e87f2bdf6"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936002",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "edf1e03f773a7c02a55186bb65dfe057e0958dd44182b525e3bddd77707c103d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936005",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "5fcf7322e15ad622df4529eb377b311214e10f4bdff2c3e88917b7bdd6f8e2c4"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936006",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "79e774e5167095f47fa3d9f1ce6b5dd3bf457cda74bd76d2df2c9634a633cbe5"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25936004",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "b202d23dac8e6782a711d2fb5807e260aaec989fa66933f3bf333c2dfde3ce03"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25936005",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "22838733e12e7b822de37a86cdf5f84102573d87aad0b39859771448730dadb3"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936004",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "ec9e6a8d49a67572a9848be1bafad71aad12ea10912d934fb60c6cdeacee2b8d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936005",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "0425f533e0b2f0ce6e12102152ad0a3189a0eae630da6766e752edffc9d9c94f"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:25936004",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "8",
+          "sha256": "f1b691616bffb81915a9deb06484f0794270974efae94c56a6bff1030c9443d3"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259360",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936005",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936005",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936006",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936005",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25936005",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259360",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936004",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936004",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936005",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936005",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25936004",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25936004",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25936002",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25936004",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25936004",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "232fb4ca812d9f2ed6ff20aa385acb6da4f14e1d8e31d87d3e85e6403dcc2011",
+    "features": {
+      "source_nodes": 9,
+      "kinds": {
+        "definitions": 1,
+        "objects": 3,
+        "states": 2,
+        "tests": 2,
+        "variables": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 2
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "concat": 1,
+        "object_component": 1
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

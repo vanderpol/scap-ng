@@ -1022,3 +1022,15 @@ remains unverified. See [pilot commands, pins and proof limits](../docs/audit/v0
 Run `python tools/audit_v04_eight_assessment_pilot.py --help` for explicit input
 and output paths, and `PYTHONPATH=tools python tools/test_v04_source_package_semantics.py`
 for the portable positive/adversarial regressions. No scanner/trust claim is made.
+
+
+## Fixed Windows 24 and Linux/Apache proof expansion (#251)
+
+`audit_v04_proof_expansion.py` accepts pinned original input and native bundle
+directories plus an output report. It runs only the committed 24 Windows identities
+and eight original pilot revisits; it has no full-883 mode. The runner verifies the
+frozen manifest hash, keeps unsupported outcomes visible, enforces monotonic
+883-ID coverage and separates reproducible proof data from timing measurements.
+See [commands, source-rule citations and outcomes](../docs/audit/v04-proof-expansion.md).
+Run `PYTHONPATH=tools python tools/test_v04_expanded_source_proof.py` for the
+source-backed status, normalization and internally consistent forgery negatives.

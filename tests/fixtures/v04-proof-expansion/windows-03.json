@@ -1,0 +1,430 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253263\" version=\"4\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows systems must be maintained at a supported servicing level.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25326300\" comment=\"The OS Version is equal to or greater than 6.3\" />\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25326301\" comment=\"The OS Build is equal to or greater than minimum build permitted for compliance\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows11:def:253263\" version=\"2\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN11-00-000040 - Windows 11 systems must be maintained at a supported servicing level.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows 11</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Windows 11 is maintained by Microsoft at servicing levels for specific periods of time to support Windows as a Service. Systems at unsupported servicing levels or releases will not receive security updates for new vulnerabilities which leaves them subject to exploitation.\n\nNew versions with feature updates are planned to be released on a semi-annual basis with an estimated support timeframe of 18 to 30 months depending on the release. Support for previously released versions has been extended for Enterprise editions.\n\nA separate servicing branch intended for special purpose systems is the Long-Term Servicing Channel (LTSC, formerly Branch - LTSB) which will receive security updates for 10 years but excludes feature updates.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253263\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25326300\" version=\"1\" check_existence=\"at_least_one_exists\" check=\"all\" comment=\"The OS Version is equal to or greater than 6.3\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25326300\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25326300\" />\n        </ns1:registry_test>\n        <ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25326301\" version=\"2\" check_existence=\"at_least_one_exists\" check=\"all\" comment=\"The OS Build is equal to or greater than 22621\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25326301\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25326301\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25326300\" version=\"2\">\n          <ns1:hive datatype=\"string\" operation=\"equals\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" operation=\"equals\">SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion</ns1:key>\n          <ns1:name datatype=\"string\" operation=\"equals\">CurrentVersion</ns1:name>\n        </ns1:registry_object>\n        <ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25326301\" version=\"2\">\n          <ns1:hive datatype=\"string\" operation=\"equals\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" operation=\"equals\">SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion</ns1:key>\n          <ns1:name datatype=\"string\" operation=\"equals\">CurrentBuildNumber</ns1:name>\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25326300\" version=\"2\">\n          <ns1:type>reg_sz</ns1:type>\n          <ns1:value datatype=\"version\" operation=\"greater than or equal\">6.3</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25326301\" version=\"2\">\n          <ns1:type>reg_sz</ns1:type>\n          <ns1:value datatype=\"version\" operation=\"greater than or equal\">22621</ns1:value>\n        </ns1:registry_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows11:def:253263",
+  "assessment": {
+    "assessment_title": "WN11-00-000040 - Windows 11 systems must be maintained at a supported servicing level.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "os-version-equal-or-greater-than-6-3-test"
+        },
+        {
+          "test": "os-build-equal-or-greater-than-22621-test"
+        }
+      ]
+    },
+    "id": "SV-253263.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "os-build-equal-or-greater-than-22621-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+          },
+          "name": {
+            "equals": "CurrentBuildNumber"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "string"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "version_greater_than_or_equal": "22621"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "The OS Build is equal to or greater than 22621"
+      },
+      "os-version-equal-or-greater-than-6-3-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+          },
+          "name": {
+            "equals": "CurrentVersion"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "string"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "version_greater_than_or_equal": "6.3"
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "The OS Version is equal to or greater than 6.3"
+      }
+    },
+    "version": 2
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253263.automated",
+    "assessment_source_sha256": "20dee3a226a12a710cb49c484e4c9bc98e59acd1845442878bf98c32f6d31511",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "dcc3af532c43c997a1908c686950afad002fcd65f272f0c3fa48d4631f2fec90",
+    "result_instructions": [
+      {
+        "id": "os-version-equal-or-greater-than-6-3-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "os-build-equal-or-greater-than-22621-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "os-build-equal-or-greater-than-22621-test",
+        "os-version-equal-or-greater-than-6-3-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+            },
+            "name": {
+              "equals": "CurrentBuildNumber"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "string"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "version_greater_than_or_equal": "22621"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "The OS Build is equal to or greater than 22621"
+        },
+        "source_test_sha256": "8c0cfd7eade9c4b667088ddf94832219d8dd95acb5e2f8774588c10571641191",
+        "test_id": "os-build-equal-or-greater-than-22621-test"
+      },
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+            },
+            "name": {
+              "equals": "CurrentVersion"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "string"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "version_greater_than_or_equal": "6.3"
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "The OS Version is equal to or greater than 6.3"
+        },
+        "source_test_sha256": "ad03e54004abf715a42bcb01e08ea2227c31af42f1b9c67a771cea1c78241590",
+        "test_id": "os-version-equal-or-greater-than-6-3-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253263",
+    "rule_path": "rules/SV-253263-fac79b57005a.json",
+    "assessment": "SV-253263.automated",
+    "assessment_path": "assessments/SV-253263.automated-5816ea61bfaf.json",
+    "assessment_sha256": "1391feb5bda0077cad1642fc8b6570c6542621d7476f51534a180bd00dabb1cf",
+    "program_path": "programs/6e759f09bac4b597cb74a738af9781bb1c4aa9409adda90ce47cf4c602138ec7.json",
+    "program_sha256": "1129e380c9f87b4fa1e5b715d1264af2f63d896b4d5edefd8f39e7adfcd171e5",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-03",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253263r1016364_rule",
+    "xccdf_rule_sha256": "ca060d1a640808038d012ae3d18b9f3db6ed74c3942d0178f611f0d641d50c72",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253263"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253263"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:1701"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "definition": "oval:mil.disa.stig.windows11:def:253263",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253263",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "4",
+          "sha256": "e8f43f5298a6dec076780b5402d32b8ae5d9af2c363e8e4a78bc62dda7d9be9f"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25326300",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "2",
+          "sha256": "6afb29d141904269c6f97ab4d69a004d66cf61582548a6223d57a856525137f8"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25326301",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "2",
+          "sha256": "80da0c743fa08b56ed594308dbdf4a3c7b5e0c8d7d2cb0c85478ad6df9df74fa"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25326300",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "2",
+          "sha256": "762424d9f095963fd71f96a3e761596a60543987845d7a7c9625f5c1730aaa1c"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25326301",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "2",
+          "sha256": "bdb01b4f18fcbb884655bca3bb53416045b89dde714daafdce311456af906e67"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25326300",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "e7ac9440a3534497da634d322d5abf622798e39e712a4b7e823c81ec51621a62"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25326301",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "2",
+          "sha256": "d524ae56cbe650eae883b659246d06d63883cf7629fcb66211857535fecd8c67"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows11:def:253263",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "2",
+          "sha256": "e48ab9e3189943df719d804c76e04ba37c3d99a2a2ea794e0eaf3bb22e444be5"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows11:def:253263",
+          "oval:mil.disa.stig.defs:def:253263",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253263",
+          "oval:mil.disa.stig.win:tst:25326300",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25326300",
+          "oval:mil.disa.stig.win:obj:25326300",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25326300",
+          "oval:mil.disa.stig.win:ste:25326300",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253263",
+          "oval:mil.disa.stig.win:tst:25326301",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25326301",
+          "oval:mil.disa.stig.win:obj:25326301",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25326301",
+          "oval:mil.disa.stig.win:ste:25326301",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "bcb30c06a634944ea86beab86a34ab0fdff6629c55cacf9d61293a60e4740069",
+    "features": {
+      "source_nodes": 8,
+      "kinds": {
+        "definitions": 2,
+        "objects": 2,
+        "states": 2,
+        "tests": 2
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 2
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "extend_definition": 1
+      }
+    },
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED"
+}

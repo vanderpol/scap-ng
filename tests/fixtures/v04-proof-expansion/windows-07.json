@@ -1,0 +1,447 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253401\" version=\"3\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows must be configured to require a minimum pin length of six characters or greater.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25340100\" comment=\"Minimum PIN length is 6 or greater\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows11:def:253401\" version=\"3\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN11-CC-000260 - Windows 11 must be configured to require a minimum PIN length of six characters or greater</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows 11</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Windows allows the use of PINs and biometrics for authentication without sending a password to a network or website where it could be compromised. Longer minimum PIN lengths increase the available combinations an attacker would have to attempt. Shorter minimum length significantly reduces the strength.\n\nNote: A different registry location is needed when systems are managed by Intune versus GPO.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253401\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25340100\" version=\"3\" check=\"all\" comment=\"Minimum PIN length is 6 or greater\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25340100\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25340100\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25340100\" version=\"2\" comment=\"Registry entries for MinimumPINLength\">\n          <ns0:set set_operator=\"UNION\">\n            <ns0:object_reference>oval:mil.disa.stig.win:obj:25340101</ns0:object_reference>\n            <ns0:object_reference>oval:mil.disa.stig.win:obj:25340102</ns0:object_reference>\n          </ns0:set>\n        </ns1:registry_object>\n        <ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25340101\" version=\"1\" comment=\"Group Policy registry entry for MinimumPINLength\">\n          <ns1:hive datatype=\"string\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\">SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity</ns1:key>\n          <ns1:name datatype=\"string\">MinimumPINLength</ns1:name>\n        </ns1:registry_object>\n        <ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25340102\" version=\"4\" comment=\"Intune registry entry for MinimumPINLength\">\n          <ns1:hive datatype=\"string\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" var_ref=\"oval:mil.disa.stig.defs:var:25340100\" var_check=\"at least one\" />\n          <ns1:name datatype=\"string\">MinimumPINLength</ns1:name>\n        </ns1:registry_object>\n        <ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25340103\" version=\"4\" comment=\"Registry object for the Tenant ID of the account currently in use\">\n          <ns1:hive datatype=\"string\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" operation=\"pattern match\">(?i)SYSTEM\\\\CurrentControlSet\\\\Control\\\\CloudDomainJoin\\\\TenantInfo\\\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}</ns1:key>\n          <ns1:name xsi:nil=\"true\" />\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25340100\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\" operation=\"greater than or equal\">6</ns1:value>\n        </ns1:registry_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:mil.disa.stig.defs:var:25340100\" version=\"2\" datatype=\"string\" comment=\"GUID of current Tenant\">\n          <ns0:concat>\n            <ns0:literal_component>SOFTWARE\\Microsoft\\Policies\\PassportForWork\\</ns0:literal_component>\n            <ns0:regex_capture pattern=\"(?i)\\\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$\">\n              <ns0:object_component object_ref=\"oval:mil.disa.stig.win:obj:25340103\" item_field=\"key\" />\n            </ns0:regex_capture>\n            <ns0:literal_component>\\device\\policies\\PINComplexity</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows11:def:253401",
+  "assessment": {
+    "assessment_title": "WN11-CC-000260 - Windows 11 must be configured to require a minimum PIN length of six characters or greater",
+    "class": "compliance",
+    "evaluate": {
+      "test": "minimum-pin-length-6-or-greater-test"
+    },
+    "id": "SV-253401.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "minimum-pin-length-6-or-greater-test": {
+        "capability": "windows.registry",
+        "object": {
+          "object_title": "Registry entries for MinimumPINLength",
+          "set": {
+            "operands": [
+              {
+                "filters": [],
+                "object": {
+                  "capability": "windows.registry",
+                  "hive": {
+                    "equals": "local_machine"
+                  },
+                  "key": {
+                    "equals": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
+                  },
+                  "name": {
+                    "equals": "MinimumPINLength"
+                  },
+                  "object_title": "Group Policy registry entry for MinimumPINLength"
+                }
+              },
+              {
+                "filters": [],
+                "object": {
+                  "capability": "windows.registry",
+                  "hive": {
+                    "equals": "local_machine"
+                  },
+                  "key": {
+                    "datatype": "string",
+                    "equals": {
+                      "variable": "guid-current-tenant-variable"
+                    },
+                    "value_match": "one_or_more"
+                  },
+                  "name": {
+                    "equals": "MinimumPINLength"
+                  },
+                  "object_title": "Intune registry entry for MinimumPINLength"
+                }
+              }
+            ],
+            "operator": "union"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "dword"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "greater_than_or_equal": 6
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Minimum PIN length is 6 or greater"
+      }
+    },
+    "variables": {
+      "guid-current-tenant-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "SOFTWARE\\Microsoft\\Policies\\PassportForWork\\"
+              }
+            },
+            {
+              "regex_capture": {
+                "pattern": "(?i)\\\\([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$",
+                "value": {
+                  "values": {
+                    "field": "key",
+                    "object": {
+                      "capability": "windows.registry",
+                      "object_title": "Registry object for the Tenant ID of the account currently in use",
+                      "select": {
+                        "hive": {
+                          "equals": "local_machine"
+                        },
+                        "key": {
+                          "matches_regex": "(?i)SYSTEM\\\\CurrentControlSet\\\\Control\\\\CloudDomainJoin\\\\TenantInfo\\\\[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+                        },
+                        "name": null
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "\\device\\policies\\PINComplexity"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "GUID of current Tenant"
+      }
+    },
+    "version": 3
+  },
+  "compiled_program": {
+    "assessment_id": "SV-253401.automated",
+    "assessment_source_sha256": "fdca3848308982306bbba946b0da2f10d6f0f1a6c308ed067fe001c5dff04ee9",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "406f83233fce03f94f1f1ae3196c1a156807dc6cfc92c853887827695431d350",
+    "result_instructions": [
+      {
+        "id": "minimum-pin-length-6-or-greater-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "minimum-pin-length-6-or-greater-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "object_title": "Registry entries for MinimumPINLength",
+            "set": {
+              "operands": [
+                {
+                  "filters": [],
+                  "object": {
+                    "capability": "windows.registry",
+                    "hive": {
+                      "equals": "local_machine"
+                    },
+                    "key": {
+                      "equals": "SOFTWARE\\Policies\\Microsoft\\PassportForWork\\PINComplexity"
+                    },
+                    "name": {
+                      "equals": "MinimumPINLength"
+                    },
+                    "object_title": "Group Policy registry entry for MinimumPINLength"
+                  }
+                },
+                {
+                  "filters": [],
+                  "object": {
+                    "capability": "windows.registry",
+                    "hive": {
+                      "equals": "local_machine"
+                    },
+                    "key": {
+                      "datatype": "string",
+                      "equals": {
+                        "variable": "guid-current-tenant-variable"
+                      },
+                      "value_match": "one_or_more"
+                    },
+                    "name": {
+                      "equals": "MinimumPINLength"
+                    },
+                    "object_title": "Intune registry entry for MinimumPINLength"
+                  }
+                }
+              ],
+              "operator": "union"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "dword"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "greater_than_or_equal": 6
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Minimum PIN length is 6 or greater"
+        },
+        "source_test_sha256": "17482aa8eb9b348244990475c6579cd949d5c4753245c4fa4262e4120e0a11e8",
+        "test_id": "minimum-pin-length-6-or-greater-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253401",
+    "rule_path": "rules/SV-253401-5679e09d5d1b.json",
+    "assessment": "SV-253401.automated",
+    "assessment_path": "assessments/SV-253401.automated-76316426ff94.json",
+    "assessment_sha256": "a9edadd721c84f4b0cde6dda987a8b23e25ece488be34f013e25fca19d55d5ed",
+    "program_path": "programs/b08cd82f1254b480b74c5bfa8ca67ab6cb7c4275f2651eb3f0013636458714b9.json",
+    "program_sha256": "ad4282936d9383340075629c7dc654d8e7b1ce68609a4a4f82711865a24c0b9e",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-07",
+    "platform": "ms_windows_11",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253401r1210296_rule",
+    "xccdf_rule_sha256": "547c29f3d3479d1cf150bf9ad100886e8d8024a670bdbb017d7f9c8db3ab03bb",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253401"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253401"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:28101"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "definition": "oval:mil.disa.stig.windows11:def:253401",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253401",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "3",
+          "sha256": "ed0d4aa744281b2aa14378cc560ef6524eb21f63cc811a1f2dc1e08b21a902c4"
+        },
+        {
+          "id": "oval:mil.disa.stig.defs:var:25340100",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "2e1a5f99caa9efa539343d0e5566fee49e1c45117c0f386c84242ca6354959ed"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25340100",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "2",
+          "sha256": "e3d19f6ff070b3ced111828a40cc8972d6639c9c6197b8a7547c978e24729b3a"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25340101",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "c3ad3310881cb05e00193c51c4964d3eb51a7abf4702aad550861a99261022dd"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25340102",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "4",
+          "sha256": "f97915e425b1563d7b21504ba04a956282618e2b36c02955151333035aa6cf63"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25340103",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "4",
+          "sha256": "3400dfed3b69ed609ffbd327b57ea6dfdd84475f5627826d65fc3876018fa412"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25340100",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "d4e4468b7b1600c054f70ea9aae6d87edabcd4b140c0a6c98fc0a0aeb53f5070"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25340100",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "3",
+          "sha256": "8c42b59d310f6ed427f5f01b4ee83cb4742c43cb8e5f2fe8380b2a7ad1fd2b06"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows11:def:253401",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "3",
+          "sha256": "b06a679c2004f0364bd3e5931656c8d3869067cf0f4868e12266b072625e9d1c"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows11:def:253401",
+          "oval:mil.disa.stig.defs:def:253401",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253401",
+          "oval:mil.disa.stig.win:tst:25340100",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25340100",
+          "oval:mil.disa.stig.win:obj:25340100",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:obj:25340100",
+          "oval:mil.disa.stig.win:obj:25340101",
+          "object_reference"
+        ],
+        [
+          "oval:mil.disa.stig.win:obj:25340100",
+          "oval:mil.disa.stig.win:obj:25340102",
+          "object_reference"
+        ],
+        [
+          "oval:mil.disa.stig.win:obj:25340102",
+          "oval:mil.disa.stig.defs:var:25340100",
+          "key"
+        ],
+        [
+          "oval:mil.disa.stig.defs:var:25340100",
+          "oval:mil.disa.stig.win:obj:25340103",
+          "object_component"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25340100",
+          "oval:mil.disa.stig.win:ste:25340100",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "8e5512073e4baf48cd7685c2f97a48a64324a2931d095d8170126e18fb6afba0",
+    "features": {
+      "source_nodes": 9,
+      "kinds": {
+        "definitions": 2,
+        "variables": 1,
+        "objects": 4,
+        "states": 1,
+        "tests": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 1
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "concat": 1,
+        "regex_capture": 1,
+        "object_component": 1,
+        "set": 1,
+        "extend_definition": 1
+      }
+    },
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED"
+}

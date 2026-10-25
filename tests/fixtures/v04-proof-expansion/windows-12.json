@@ -1,0 +1,434 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:205870\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Windows Update must not obtain updates from other PCs on the internet.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25435700\" comment=\"DODownloadMode==0,1,2,OR 99\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows2025:def:278104\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN25-CC-000260 - Windows Server 2025 Windows Update must not obtain updates from other PCs on the internet.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows Server 2025</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Windows Update can obtain updates from additional sources instead of Microsoft. In addition to Microsoft, updates can be obtained from and sent to PCs on the local network as well as on the internet. This is part of the Windows Update trusted process; however, to minimize outside exposure, obtaining updates from or sending to systems on the internet must be prevented.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:205870\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25435700\" version=\"1\" check_existence=\"at_least_one_exists\" check=\"all\" state_operator=\"OR\" comment=\"DODownloadMode==0,1,2,OR 99\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:25339400\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000000\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000001\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000002\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25339400\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:mil.disa.stig.win:obj:25339400\" version=\"1\">\n          <ns1:hive datatype=\"string\" operation=\"equals\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\" operation=\"equals\">Software\\Policies\\Microsoft\\Windows\\DeliveryOptimization</ns1:key>\n          <ns1:name datatype=\"string\" operation=\"equals\">DODownloadMode</ns1:name>\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000000\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\">0</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000001\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\">1</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000002\" version=\"1\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\">2</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25339400\" version=\"1\" comment=\"Reg_Dword type and value equals 99\">\n          <ns1:type>reg_dword</ns1:type>\n          <ns1:value datatype=\"int\" operation=\"equals\">99</ns1:value>\n        </ns1:registry_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows2025:def:278104",
+  "assessment": {
+    "assessment_title": "WN25-CC-000260 - Windows Server 2025 Windows Update must not obtain updates from other PCs on the internet.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "dodownloadmode-0-1-2-or-99-test"
+    },
+    "id": "SV-278104.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "dodownloadmode-0-1-2-or-99-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "Software\\Policies\\Microsoft\\Windows\\DeliveryOptimization"
+          },
+          "name": {
+            "equals": "DODownloadMode"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 0
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 1
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 2
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "dword"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": 99
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "test_title": "DODownloadMode==0,1,2,OR 99"
+      }
+    },
+    "version": 1
+  },
+  "compiled_program": {
+    "assessment_id": "SV-278104.automated",
+    "assessment_source_sha256": "85fe409013d470d4dcb817f8707d9853b6239aa8dabde0b2b0e59ac19bac9bee",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "1b42ab872f54810b67c62039075d9cba47d696d536332f7297bb31a34f23d655",
+    "result_instructions": [
+      {
+        "id": "dodownloadmode-0-1-2-or-99-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "dodownloadmode-0-1-2-or-99-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "Software\\Policies\\Microsoft\\Windows\\DeliveryOptimization"
+            },
+            "name": {
+              "equals": "DODownloadMode"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 2
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 99
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "test_title": "DODownloadMode==0,1,2,OR 99"
+        },
+        "source_test_sha256": "3ccaab53c3c409de5b44c231735079c399065c964b3b31487e160e8227568b1d",
+        "test_id": "dodownloadmode-0-1-2-or-99-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_2025",
+    "package": "ms_windows_server_2025.scapng",
+    "package_sha256": "c3b08d822ec363a6dadf2f3a3e430b7a3796a784a1f5f96475a4b70dc88577f4",
+    "manifest_sha256": "cb3559904f7d717559c930280045ba68042554315b3714e681664ff0a97dde6b",
+    "rule": "SV-278104",
+    "rule_path": "rules/SV-278104-b9c97d141b29.json",
+    "assessment": "SV-278104.automated",
+    "assessment_path": "assessments/SV-278104.automated-64a3668cc0af.json",
+    "assessment_sha256": "1a8a5d823c6824296237f80e99531002e84e8da254cbc1c5cc7cc9b11150c772",
+    "program_path": "programs/fe423eafd3f848f8b5f180e7752325e23d82450ba4315921b9031b6dbb32bb73.json",
+    "program_sha256": "a5d0731bc56aac0d32d06b96f12a0922f37419afa3dc916fa62d26b9ace9dc9a",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-12",
+    "platform": "ms_windows_server_2025",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-278104r1181018_rule",
+    "xccdf_rule_sha256": "28f8f2c783e0938c0e315bf65211a1490c686d81622e05983fad32560cb106ce",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+            "name": "oval:mil.disa.stig.windows2025:def:278104"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+            "name": "oval:mil.disa.stig.windows2025:def:278104"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows2025:questionnaire:23901"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+    "definition": "oval:mil.disa.stig.windows2025:def:278104",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:205870",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "ee56f3e215ac1639c91a47723ba6695b952f57e55475b8f1ac9a3dc94aeb56f9"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:25339400",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "beee097ea5ca9eb5300631983afbce4ef17e35cde3074a81035842fced655b41"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000000",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "f87f4b20af2264c5bfae8f17965ef3219c6bdc59d10dec4cb3dd7b1bb8a73c07"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000001",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "90b5e9925de1fc45f0bee457c995cc8f36bc22b26956ccbf3e9f89a5dd47549e"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000002",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "9f4d12de6f6e33c5acc6c62709ff4f4c1d001796aa687ff10efb00568eec3ecc"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25339400",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "1",
+          "sha256": "54aa7f2cc8a18725701bf71c45ae26b78fa088757010502bf69bae6721149dd4"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25435700",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "1",
+          "sha256": "cf4b8fa3d4ec96493055ada2b9b98a14902b45e7b63251b392c9cdb7c38bc34e"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows2025:def:278104",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "be9eafb9d85c2447cad13e468cbd8edc62a191d4366b4e36dd2cde10e1b10d66"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows2025:def:278104",
+          "oval:mil.disa.stig.defs:def:205870",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:205870",
+          "oval:mil.disa.stig.win:tst:25435700",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25435700",
+          "oval:mil.disa.stig.win:obj:25339400",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25435700",
+          "oval:mil.disa.stig.win:ste:20000000",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25435700",
+          "oval:mil.disa.stig.win:ste:20000001",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25435700",
+          "oval:mil.disa.stig.win:ste:20000002",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25435700",
+          "oval:mil.disa.stig.win:ste:25339400",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "19a6bfba6018f39c42d6ee57d373ae200a122a11bc337d59023cde9cdcb7f5eb",
+    "features": {
+      "source_nodes": 8,
+      "kinds": {
+        "definitions": 2,
+        "objects": 1,
+        "states": 4,
+        "tests": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test": 1
+      },
+      "multi_state_tests": 1,
+      "constructs": {
+        "extend_definition": 1
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}

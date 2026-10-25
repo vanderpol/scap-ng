@@ -1,0 +1,312 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.windows:def:259377\" version=\"8\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WINS lookups must be disabled on the Windows DNS Server.</ns0:title>\n            <ns0:description>WINS lookups must be disabled on the Windows DNS Server.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria operator=\"OR\">\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25937701\" comment=\"All forward lookup zones have WINS forward lookup disabled\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.windows:tst:25937701\" version=\"8\" comment=\"All forward lookup zones have WINS forward lookup disabled\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25937701\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25937701\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25937701\" version=\"8\" comment=\"The 'IsWinsEnabled' setting for each forward lookup zone\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25937701\" />\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25937702\" version=\"8\" comment=\"The list of all forward lookup zones\">\n          <ns1:shell>powershell</ns1:shell>\n          <ns1:command>Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}</ns1:command>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.windows:ste:25937701\" version=\"8\" comment=\"The 'IsWinsEnabled' setting for each forward lookup zone is set to 'False'\">\n          <ns1:stdout_line operation=\"equals\" entity_check=\"all\" check_existence=\"any_exist\">False</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.windows:var:25937701\" version=\"8\" datatype=\"string\" comment=\"The command to get the 'IsWinsEnabled' setting for each forward lookup zone\">\n          <ns0:concat>\n            <ns0:literal_component>try {Get-DnsServerZone -Name </ns0:literal_component>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.windows:obj:25937702\" item_field=\"stdout_line\" />\n            <ns0:literal_component> | ForEach-Object {$_.IsWinsEnabled}} catch {}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259377",
+  "assessment": {
+    "assessment_title": "WINS lookups must be disabled on the Windows DNS Server.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "all-forward-lookup-zones-have-wins-forward-lookup-disabled-test"
+    },
+    "id": "SV-259377.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "all-forward-lookup-zones-have-wins-forward-lookup-disabled-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "command-get-iswinsenabled-setting-each-forward-lookup-zone-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "The 'IsWinsEnabled' setting for each forward lookup zone",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "equals": "False",
+                  "values_found": "may_be_absent",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "All forward lookup zones have WINS forward lookup disabled"
+      }
+    },
+    "variables": {
+      "command-get-iswinsenabled-setting-each-forward-lookup-zone-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "try {Get-DnsServerZone -Name "
+              }
+            },
+            {
+              "values": {
+                "field": "stdout_line",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "collect": {
+                    "command": "Get-DnsServerZone | Where-Object {$_.ZoneType -notin @('Forwarder') -and $_.ZoneName -notin @('TrustAnchors') -and (-Not $_.IsAutoCreated) -and (-Not($_.IsReverseLookupZone))} | ForEach-Object {$_.ZoneName}",
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false,
+                    "shell": "powershell"
+                  },
+                  "object_title": "The list of all forward lookup zones"
+                }
+              }
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": " | ForEach-Object {$_.IsWinsEnabled}} catch {}"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "The command to get the 'IsWinsEnabled' setting for each forward lookup zone"
+      }
+    },
+    "version": 8
+  },
+  "compiled_program": {
+    "assessment_id": "SV-259377.automated",
+    "assessment_source_sha256": "2a943ac47ee346feb7a4b763cfbbeba8b3b2a72933e0565d19455106fcf3af3f",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "580a7da169f5c58ad7587912926415de96ad746f3383e013a0d8055f88f18807",
+    "result_instructions": [
+      {
+        "id": "all-forward-lookup-zones-have-wins-forward-lookup-disabled-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "all-forward-lookup-zones-have-wins-forward-lookup-disabled-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "command-get-iswinsenabled-setting-each-forward-lookup-zone-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "The 'IsWinsEnabled' setting for each forward lookup zone",
+            "shell": "powershell"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "equals": "False",
+                    "values_found": "may_be_absent",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "All forward lookup zones have WINS forward lookup disabled"
+        },
+        "source_test_sha256": "03e5a88239583b00bbbf97a8da6b5eb439daacfcdbc9a7ac5f3051a37e67a964",
+        "test_id": "all-forward-lookup-zones-have-wins-forward-lookup-disabled-test"
+      }
+    ]
+  },
+  "provenance": {
+    "benchmark": "benchmark.ms_windows_server_dns",
+    "package": "ms_windows_server_dns.scapng",
+    "package_sha256": "82fdb4d0ea0bd614b799f2de595618a0511d31db600b25bdb5ab3568b28ec834",
+    "manifest_sha256": "19a7b47ebdf7213090ac0d797184abe0bf1f6206309ae38be4772fd8ff5a8bf3",
+    "rule": "SV-259377",
+    "rule_path": "rules/SV-259377-34371fdd79f6.json",
+    "assessment": "SV-259377.automated",
+    "assessment_path": "assessments/SV-259377.automated-a4392f709f9c.json",
+    "assessment_sha256": "9a21df4ccca0b1194dd1cef45142ff3f4ef4056cdf4c3252015c3d44c3888234",
+    "program_path": "programs/1db90c24e47a085a9c77a2e8e9591d8f08e911f96e83042e35fd09e7b606ad04.json",
+    "program_sha256": "739cd32eb7c14ceb9fe90fbb1becd625f7d5f7173adc57bef9909f999e76dc8a",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "case": "windows-22",
+    "platform": "ms_windows_server_dns",
+    "proof_method_sha256": "1a8efee3dc7d3a84fb74f08dbb25546a171f52345791ceb8f8031b4aeb088389",
+    "old_outcome": "UNVERIFIED_NOT_ATTEMPTED",
+    "source_zip": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "source_zip_sha256": "f674b67e74acbd3037093d50e33dc20765bd9d45a6c9ed2be5d463d009a6c6b8",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.zip",
+    "xml_member": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-signed.xml",
+    "xml_sha256": "17ea87e0c528072eef99c7a28e306d9351b5f4b00c7440b13c4bdf00c354d0ba",
+    "xccdf_rule": "xccdf_navy.navwar.niwcatlantic.scc.ms.dns_rule_SV-259377r961581_rule",
+    "xccdf_rule_sha256": "076b6572238c9e8a5dc1e364eec120842fe7b7cf2746db058b386af050450889",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259377"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.windows:def:259377"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.server:questionnaire:8301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:259377",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:def:259377",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "8",
+          "sha256": "4d4de3800fec053ca5fe733f85692442d94cfeedd26b6c5462e8602327c6c195"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25937701",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "95de4bb4e031c9a753998d52c43abe01d2ee484dbd22b946b7608a7b2135005d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:obj:25937702",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "8",
+          "sha256": "dcfe051ed2252af5e58c6d507f2059d7c9905f0a518a809e0598904e12a3a936"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:ste:25937701",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "8",
+          "sha256": "2864c0051c0dbd39c2ea36a70dfee49c23d899cd41daee8f5babaa93c1051a13"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:tst:25937701",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "8",
+          "sha256": "2fa0babf45cdacc7544f91c6c682f9463499f07dd4759101c5451d029f77ac78"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.windows:var:25937701",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "8",
+          "sha256": "43ccad681efdacea67cc4e6c1d3f12136ad71063c65a85cd0b5b673ccd21e613"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:259377",
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25937701",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25937701",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25937701",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25937701",
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25937701",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:25937701",
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:25937702",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:25937701",
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:25937701",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "925f19ca38f197c3aa73588fcf77f778b69cb20786c76a7e92e5f59d80cfa721",
+    "features": {
+      "source_nodes": 6,
+      "kinds": {
+        "definitions": 1,
+        "objects": 2,
+        "states": 1,
+        "tests": 1,
+        "variables": 1
+      },
+      "test_types": {
+        "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test": 1
+      },
+      "multi_state_tests": 0,
+      "constructs": {
+        "concat": 1,
+        "object_component": 1
+      }
+    },
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED"
+}
