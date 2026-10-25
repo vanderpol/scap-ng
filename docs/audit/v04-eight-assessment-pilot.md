@@ -8,6 +8,8 @@ PROVED_WITH_EXPLICIT_APPROVED_NORMALIZATION.** Exact packaged-graph coverage is
 **4/883 = 0.453001%**, with **879/883 still unverified**. This bounded static
 converter/compiler proof does not certify the six packages, a scanner, publisher
 trust, complete OVAL conformance or whole-Rule policy/applicability semantics.
+The four proofs cover 17 original Tests in complete selected automated-check
+closures; these are distinct from the earlier 37 standalone-Test evidence count.
 No production converter/compiler, schema, specification or release gate changed.
 No original source, migrated authoring or native package was regenerated or edited.
 
@@ -205,3 +207,27 @@ were removed, skipped or demoted. No full 883 sweep or six-STIG generation ran.
 No scanner, signing/trust or release-scope decision was made here. Issue writes
 remain blocked by the previously observed `Post "https://api.github.com/graphql":
 Forbidden`; this committed report is the #251 handoff without repeated attempts.
+
+
+## Published implementation and hosted checks
+
+Implementation and exact proof evidence:
+[63e75b2e1f9459fd9d107b4b855c45215a07dbfc](https://github.com/vanderpol/scap-ng/commit/63e75b2e1f9459fd9d107b4b855c45215a07dbfc)
+(normal, non-forced push to `main`, Refs #251). Changes are limited to two audit/
+comparison tools, nineteen tests and eight fixtures, the fast-CI test invocation,
+coverage/result inventories, operator documentation, changelog and reports.
+
+| Hosted workflow at the implementation SHA | Conclusion |
+| --- | --- |
+| [Current-design regression contracts](https://github.com/vanderpol/scap-ng/actions/runs/40153129528) | SUCCESS |
+| [Canonical authoring fast checks](https://github.com/vanderpol/scap-ng/actions/runs/40153129588) | SUCCESS |
+| [Markdown navigation and duplication](https://github.com/vanderpol/scap-ng/actions/runs/40153129551) | SUCCESS |
+| [Repository preservation and boundaries](https://github.com/vanderpol/scap-ng/actions/runs/40153129540) | SUCCESS |
+| [Commit issue reference](https://github.com/vanderpol/scap-ng/actions/runs/40153129535) | SUCCESS |
+| [Maintained rebaseline smoke regression](https://github.com/vanderpol/scap-ng/actions/runs/40153129603) | SUCCESS |
+
+Hosted conclusions are read from public GitHub Actions pages; detailed signed-in
+logs are unavailable through the blocked API. Exact numeric test counts above
+are from the recorded local runs. Historical/manual research workflows were not
+dispatched, reclassified or claimed as new passing checks. All six triggered workflows completed SUCCESS (checked 2026-10-25 02:09 UTC).
+This documentation-only follow-up records the terminal outcomes before handoff.
