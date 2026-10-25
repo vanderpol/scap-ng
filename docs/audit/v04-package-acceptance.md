@@ -136,8 +136,22 @@ Existing compiler/API verification is not substituted for the independent consum
 Source snapshot/specification prose still requires release-version reconciliation;
 an executable source snapshot is not a finalized interoperable specification.
 
-The candidate clean run after committing the fix is recorded in the publication
-follow-up. No final-release tag/assets or production signing identity are created.
+Candidate snapshot `90a1a90c9ef1a71f576cdee1916a6ed5e2f39013` passed **all 11
+steps**, including execution of the extracted snapshot's converter, validator,
+paired compiler, verifier API and independent consumer. The exact commands,
+working directory, Python/dependency versions and return codes are committed in
+[clean-environment evidence](v04-package-acceptance/clean-environment.json).
+The two independently built toolchain archives were byte-identical:
+`24c9b87558085b8bc8988ff39d938f148c45e018cd9b09120828f2ecdf9b9d90`
+(6,270 verified files). The family source SHA-256 is
+`6966982d66e004f77ceb9e5ccceb5161275a79729d4178f290f99efd3b8b84a7`;
+paired compiled bundle SHA-256 is
+`9d600e4753f85723109f4f43291c8bc81b9869e548107a2753a4aac81276cf80`.
+This is reproducibility at the recorded Git ref and Linux/Python wheel profile,
+not a cross-platform reproducibility claim. The original harness accidentally
+resolved the venv Python symlink to base Python; preserving the executable path
+fixed that harness failure. No final-release tag/assets or production signing
+identity were created.
 
 ## Commands and validation
 
@@ -166,10 +180,14 @@ python tools/run_current_tool_regressions.py --report /tmp/mandatory.json
 
 Supply the pinned source bindings from rebaseline CI for mandatory execution.
 Local full mandatory: **2,923 tests, zero failures/errors, one unchanged optional
-research-corpus skip**. Exact reviewed-snapshot selection: 2,911 methods; candidate:
+research-corpus skip**, repeated at candidate `90a1a90c9` in **133.558 s**. Exact reviewed-snapshot selection: 2,911 methods; candidate:
 2,923; **zero removed, twelve added**. Focused package/compiler/toolchain/bridge
 tests: **34 passed**; final consumer/validator/ledger subset: **12 passed**.
-Repository/Markdown and terminal hosted results follow after publication.
+Repository layout audit passed (34,242 baseline paths preserved). Markdown
+sample regressions: **4 passed**. The navigation audit still reports the same
+three pre-existing Board links to a removed heading; no new broken link was
+introduced. Historical research failures remain in their previously approved
+visible non-release partition; they were not removed, skipped or revived here.
 
 Remaining true release blockers: original-source/package semantic coverage,
 unverified constructs, intended whole-package coverage acceptance, release-grade
@@ -178,3 +196,35 @@ scanner/collector acceptance. No source or package pass in this report establish
 those separate gates. Issue writes remain blocked by
 `Post "https://api.github.com/graphql": Forbidden`; the committed report is the
 handoff without repeated permission attempts.
+
+
+## Published commits and hosted checks
+
+Normal, non-forced pushes to `main`:
+
+- [c5be32236ef25c9c0215815c11b70e5043967137](https://github.com/vanderpol/scap-ng/commit/c5be32236ef25c9c0215815c11b70e5043967137): independent consumer,
+  adversarial tests, ledger/audits, 0.4-only public-validator fix and fast-CI test
+  registration. Production converter/compiler and approved schemas unchanged.
+- [1567ba4ccba59f3bd1bd510996e976078091c1cc](https://github.com/vanderpol/scap-ng/commit/1567ba4ccba59f3bd1bd510996e976078091c1cc): LF CSV output and refreshed
+  ledger hashes; parsed rows unchanged.
+- [90a1a90c9ef1a71f576cdee1916a6ed5e2f39013](https://github.com/vanderpol/scap-ng/commit/90a1a90c9ef1a71f576cdee1916a6ed5e2f39013): preserve clean-venv executable
+  path; this is the tested candidate toolchain pin.
+
+Hosted implementation checks at `c5be32236`: [current contracts](https://github.com/vanderpol/scap-ng/actions/runs/40149007808),
+[canonical fast](https://github.com/vanderpol/scap-ng/actions/runs/40149007813),
+[Markdown](https://github.com/vanderpol/scap-ng/actions/runs/40149007855),
+[issue reference](https://github.com/vanderpol/scap-ng/actions/runs/40149007823) and
+[repository preservation](https://github.com/vanderpol/scap-ng/actions/runs/40149007824)
+all **SUCCESS**. Its [rebaseline run](https://github.com/vanderpol/scap-ng/actions/runs/40149007804)
+was **CANCELLED** by the subsequent normal push under existing concurrency policy.
+At `90a1a90c9`, [canonical fast](https://github.com/vanderpol/scap-ng/actions/runs/40149220787)
+and [issue reference](https://github.com/vanderpol/scap-ng/actions/runs/40149220791)
+are **SUCCESS**. The [replacement maintained regression run](https://github.com/vanderpol/scap-ng/actions/runs/40149220815)
+was **IN PROGRESS** at this report's preparation; its final state is checked separately
+before handoff. No untriggered/manual historical workflow is claimed as a fresh
+passing check.
+
+No new semantic decision was made. Recommended owner follow-up: decide the
+required original-source-to-exact-package proof coverage before release; retain
+unverified entries until source-backed proofs exist. Signing/trust policy and
+scanner acceptance still require their separate work and decisions.

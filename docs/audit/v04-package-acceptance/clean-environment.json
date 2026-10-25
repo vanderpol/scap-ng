@@ -1,0 +1,221 @@
+{
+  "status": "CLEAN_PINNED_PUBLIC_ENTRYPOINTS_PASS_NOT_SCANNER_OR_TRUST",
+  "source_commit": "90a1a90c9ef1a71f576cdee1916a6ed5e2f39013",
+  "toolchain_files": 6270,
+  "toolchain_sha256": "24c9b87558085b8bc8988ff39d938f148c45e018cd9b09120828f2ecdf9b9d90",
+  "repeat_toolchain_bytes_equal": true,
+  "source_xml_sha256": "6966982d66e004f77ceb9e5ccceb5161275a79729d4178f290f99efd3b8b84a7",
+  "bundle_sha256": "9d600e4753f85723109f4f43291c8bc81b9869e548107a2753a4aac81276cf80",
+  "consumer": {
+    "status": "INDEPENDENT_PACKAGE_CONSUMER_PASS",
+    "benchmark": "demo",
+    "bundle_sha256": "9d600e4753f85723109f4f43291c8bc81b9869e548107a2753a4aac81276cf80",
+    "documents": 4,
+    "programs": 1,
+    "tests": 1,
+    "shared_objects": 0,
+    "variables": 1,
+    "source_graph_sha256": "67e9cb0fe13906a3af6022d08d8db0d3efed45c4c1ed0dd994ef0931bce5746e",
+    "external_source_compared": true,
+    "scanner_evaluated": false,
+    "publisher_trust_verified": false
+  },
+  "validator_documents": 4,
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "distributions": {
+      "cryptography": "50.0.2",
+      "pip": "25.0.1",
+      "referencing": "0.37.0",
+      "jsonschema-specifications": "2025.9.1",
+      "typing_extensions": "4.16.0",
+      "lxml": "6.1.1",
+      "attrs": "26.1.0",
+      "cffi": "2.1.1",
+      "rpds-py": "2026.9.1",
+      "pycparser": "3.12",
+      "jsonschema": "4.25.1",
+      "PyYAML": "6.0.3"
+    }
+  },
+  "commands": [
+    {
+      "step": "environment",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-I",
+        "-c",
+        "import sys,json,importlib.metadata as m;assert sys.prefix!=sys.base_prefix;print(json.dumps({'python':sys.version,'distributions':{d.metadata['Name']:d.version for d in m.distributions()}}))"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "build-first",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/scap-ng/tools/build_versioned_toolchain.py",
+        "--repo",
+        "/workspace/scap-ng",
+        "--version",
+        "0.4.0",
+        "--ref",
+        "90a1a90c9",
+        "--output-dir",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/first"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "build-repeat",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/scap-ng/tools/build_versioned_toolchain.py",
+        "--repo",
+        "/workspace/scap-ng",
+        "--version",
+        "0.4.0",
+        "--ref",
+        "90a1a90c9",
+        "--output-dir",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/repeat"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "verify-toolchain",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/scap-ng/tools/build_versioned_toolchain.py",
+        "--verify",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/first/scap-ng-0.4.0-toolchain-90a1a90c9ef1.zip"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "verify-extracted-toolchain",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain/tools/build_versioned_toolchain.py",
+        "--verify",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/first/scap-ng-0.4.0-toolchain-90a1a90c9ef1.zip"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "convert",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain/tools/scap_converter_core.py",
+        "--source-xml",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout/original-family.xml",
+        "--definition-id",
+        "oval:org.mitre.oval.test:def:95",
+        "--assessment-id",
+        "clean-source-family-assessment",
+        "--output",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/family.json",
+        "--evidence",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/source-proof.json"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "wrap",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-I",
+        "-c",
+        "\nfrom pathlib import Path\nimport sys,json,yaml\nroot,out,assessment=map(Path,sys.argv[1:]);sys.path.insert(0,str(root/'tools'))\nimport test_v04_public_cli_smoke as smoke\nassert Path(smoke.__file__).is_relative_to(root)\ndocs=smoke.schema_valid_docs();native=json.loads(assessment.read_text())\ndocs['authoring/demo/assessments/a1.json']=native\ndocs['authoring/demo/rules/r1.json']['rule']['assessment_choices']['automated']['assessment']=native['assessment']['id']\ndocs['authoring/demo/applicability.json']={'applicability':{'id':'demo-applicability','conditions':{}}}\nout.mkdir();smoke.authoring_archives(docs,out)\nfor name,doc in docs.items():\n p=out/name.removesuffix('.json');p=p.with_suffix(p.suffix+'.yaml')\n if 'benchmark' in doc:p=p.with_name('benchmark.yaml')\n p.parent.mkdir(parents=True,exist_ok=True);p.write_text(yaml.safe_dump(doc))\nprint(json.dumps({'wrapper':'synthetic closed Benchmark/Rule/Assessment/catalog', 'helper':smoke.__file__}))\n",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/authoring",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/family.json"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "validate",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain/tools/validate_native_json_schemas.py",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/authoring/authoring",
+        "--schema-dir",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain/schema/v0.4.0",
+        "--report",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/validator.json"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "compile",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain/tools/v04_native_bundle_compiler.py",
+        "--json-archive",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/authoring/json.zip",
+        "--yaml-archive",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/authoring/yaml.zip",
+        "--output-dir",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/compiled",
+        "--report",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/compiler.json"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "existing-verifier",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-I",
+        "-c",
+        "\nfrom pathlib import Path\nimport sys,json\nroot,bundle=map(Path,sys.argv[1:]);sys.path.insert(0,str(root/'tools'))\nimport v04_native_bundle_compiler as c\nassert Path(c.__file__).is_relative_to(root)\nprint(json.dumps(c.verify_bundle(bundle.read_bytes())))\n",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/compiled/demo.scapng"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    },
+    {
+      "step": "independent-consumer",
+      "argv": [
+        "/workspace/.onboarding/package-acceptance/clean-venv/bin/python",
+        "-E",
+        "-s",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/extract/scap-ng-0.4.0-toolchain/tools/verify_v04_package_consumer.py",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/compiled/demo.scapng",
+        "--source-json",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/authoring/json.zip",
+        "--source-yaml",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/authoring/yaml.zip",
+        "--report",
+        "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/consumer.json"
+      ],
+      "cwd": "/workspace/.onboarding/package-acceptance/clean-candidate-fixed/outside-checkout",
+      "returncode": 0
+    }
+  ],
+  "scanner_evaluated": false,
+  "publisher_trust_verified": false
+}
