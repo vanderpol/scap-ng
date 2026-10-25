@@ -1,0 +1,79 @@
+assessment:
+  id: windows-server-2025-must-have-the-dow-root-certificate-authority-ca-ce-acebd595-assessment
+  version: 1
+  assessment_title: Windows Server 2025 must have the DoW Root Certificate Authority (CA) certificates installed in the Trusted Root Store.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    the-dod-root-ca-3-certificate-expiring-12-30-2029-is-installed-into-th-002645a5-test:
+      test_title: The DoD Root CA 3 Certificate expiring 12/30/2029 is installed into the Trusted Root Store.
+      capability: windows.registry
+      object:
+        set:
+          operator: union
+          operands:
+          - object:
+              set:
+                operator: union
+                operands:
+                - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Microsoft\SystemCertificates\Root\Certificates\D73CA91102A2204A36459ED32213B467D7CE97FB'}, name: {matches_regex: ^.+$}}
+                  filters: []
+                - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Microsoft\EnterpriseCertificates\Root\Certificates\D73CA91102A2204A36459ED32213B467D7CE97FB'}, name: {matches_regex: ^.+$}}
+                  filters: []
+            filters: []
+          - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Policies\Microsoft\SystemCertificates\Root\Certificates\D73CA91102A2204A36459ED32213B467D7CE97FB'}, name: {matches_regex: ^.+$}}
+            filters: []
+      require:
+        items_found: one_or_more
+      reported_elements: all
+    the-dod-root-ca-5-certificate-expiring-6-14-2041-is-installed-into-the-86bd7e60-test:
+      test_title: The DoD Root CA 5 Certificate expiring 6/14/2041 is installed into the Trusted Root Store.
+      capability: windows.registry
+      object:
+        set:
+          operator: union
+          operands:
+          - object:
+              set:
+                operator: union
+                operands:
+                - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Microsoft\SystemCertificates\Root\Certificates\4ECB5CC3095670454DA1CBD410FC921F46B8564B'}, name: {matches_regex: ^.+$}}
+                  filters: []
+                - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Microsoft\EnterpriseCertificates\Root\Certificates\4ECB5CC3095670454DA1CBD410FC921F46B8564B'}, name: {matches_regex: ^.+$}}
+                  filters: []
+            filters: []
+          - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Policies\Microsoft\SystemCertificates\Root\Certificates\4ECB5CC3095670454DA1CBD410FC921F46B8564B'}, name: {matches_regex: ^.+$}}
+            filters: []
+      require:
+        items_found: one_or_more
+      reported_elements: all
+    the-dod-root-ca-6-certificate-expiring-1-24-2053-is-installed-into-the-8757274f-test:
+      test_title: The DoD Root CA 6 Certificate expiring 1/24/2053 is installed into the Trusted Root Store.
+      capability: windows.registry
+      object:
+        set:
+          operator: union
+          operands:
+          - object:
+              set:
+                operator: union
+                operands:
+                - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Microsoft\SystemCertificates\Root\Certificates\D37ECF61C0B4ED88681EF3630C4E2FC787B37AEF'}, name: {matches_regex: ^.+$}}
+                  filters: []
+                - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Microsoft\EnterpriseCertificates\Root\Certificates\D37ECF61C0B4ED88681EF3630C4E2FC787B37AEF'}, name: {matches_regex: ^.+$}}
+                  filters: []
+            filters: []
+          - object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Policies\Microsoft\SystemCertificates\Root\Certificates\D37ECF61C0B4ED88681EF3630C4E2FC787B37AEF'}, name: {matches_regex: ^.+$}}
+            filters: []
+      require:
+        items_found: one_or_more
+      reported_elements: all
+  evaluate:
+    and:
+    - test: the-dod-root-ca-3-certificate-expiring-12-30-2029-is-installed-into-th-002645a5-test
+    - test: the-dod-root-ca-5-certificate-expiring-6-14-2041-is-installed-into-the-86bd7e60-test
+    - test: the-dod-root-ca-6-certificate-expiring-1-24-2053-is-installed-into-the-8757274f-test

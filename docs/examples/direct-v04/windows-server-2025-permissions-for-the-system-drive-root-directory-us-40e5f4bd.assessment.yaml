@@ -1,0 +1,56 @@
+assessment:
+  id: windows-server-2025-permissions-for-the-system-drive-root-directory-us-40e5f4bd-assessment
+  version: 1
+  assessment_title: 'Windows Server 2025 permissions for the system drive root directory (usually C:\) must conform to minimum requirements.'
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    network-access-let-everyone-permissions-apply-to-anonymous-users-is-se-17e67270-test:
+      test_title: 'Network access: Let Everyone permissions apply to anonymous users is set to ''Disabled'''
+      capability: windows.registry
+      object: {hive: {equals: local_machine}, key: {equals: 'SYSTEM\CurrentControlSet\Control\Lsa'}, name: {equals: everyoneincludesanonymous}}
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {equals: 0, datatype: integer, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    permissions-must-conform-to-minimum-requirements-43217de0-test:
+      test_title: Permissions must conform to minimum requirements.
+      capability: independent.shellcommand
+      object:
+        shell: powershell
+        command: 'icacls($env:SystemDrive + ''\'')'
+        pattern: ':'
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        and:
+        - fields:
+            exit_status: {equals: 0, datatype: integer, values_found: one_or_more, values_matching: every}
+        - fields:
+            stdout_line:
+              matches_regex:
+              - '(?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(F\)'
+              - '(?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(F\)'
+              - '(?i)BUILTIN\\Users:\(OI\)\(CI\)\(RX\)'
+              - '(?i)BUILTIN\\Users:\(CI\)\(AD\)'
+              - '(?i)BUILTIN\\Users:\(CI\)\(IO\)\(WD\)'
+              - '(?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)'
+              - '(?i)S-1-15-3-65536-1888954469-739942743-1668119174-2468466756-4239452838-1296943325-355587736-700089176:\(S,RD,X,RA\)'
+              value_match: one_or_more
+              values_found: one_or_more
+              values_matching: every
+        - fields:
+            stderr_line: {values_found: none}
+      reported_elements: all
+  evaluate:
+    and:
+    - test: network-access-let-everyone-permissions-apply-to-anonymous-users-is-se-17e67270-test
+    - test: permissions-must-conform-to-minimum-requirements-43217de0-test

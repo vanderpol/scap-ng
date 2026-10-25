@@ -1,0 +1,97 @@
+assessment:
+  id: the-windows-server-2025-required-legal-notice-must-be-configured-to-di-c6314f08-assessment
+  version: 1
+  assessment_title: The Windows Server 2025 required legal notice must be configured to display before console logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  shared_objects:
+    legal-notice-text-8db50cbc-object:
+      capability: windows.registry
+      hive: {equals: local_machine}
+      key: {equals: 'SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System'}
+      name: {equals: LegalNoticeText}
+      object_title: Legal notice text
+  tests:
+    the-required-legal-notice-must-be-configured-to-display-before-console-550df7b5-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 1
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: 'You are accessing a U.S. Government \(USG\) Information System \(IS\) that is provided for USG-authorized use only.', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-required-legal-notice-must-be-configured-to-display-before-console-2c0cb1e8-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 2
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: 'By using this IS \(which includes any device attached to this IS\), you consent to the following conditions:', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-required-legal-notice-must-be-configured-to-display-before-console-3f06f1f9-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 3
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: '-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct \(PM\), law enforcement \(LE\), and counterintelligence \(CI\) investigations.', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-required-legal-notice-must-be-configured-to-display-before-console-cf96678c-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 4
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: '-At any time, the USG may inspect and seize data stored on this IS.', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-required-legal-notice-must-be-configured-to-display-before-console-6cea137f-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 5
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: '-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-required-legal-notice-must-be-configured-to-display-before-console-f96446df-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 6
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: '-This IS includes security measures \(e.g., authentication and access controls\) to protect USG interests--not for your personal benefit or privacy.', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-required-legal-notice-must-be-configured-to-display-before-console-98d0e890-test:
+      test_title: The required legal notice must be configured to display before console logon - Message Content 7
+      capability: windows.registry
+      object: legal-notice-text-8db50cbc-object
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: '-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    and:
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-550df7b5-test
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-2c0cb1e8-test
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-3f06f1f9-test
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-cf96678c-test
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-6cea137f-test
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-f96446df-test
+    - test: the-required-legal-notice-must-be-configured-to-display-before-console-98d0e890-test

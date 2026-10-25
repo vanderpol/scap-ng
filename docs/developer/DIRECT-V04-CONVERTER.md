@@ -279,3 +279,50 @@ python tools/test_v04_direct_audit_policy.py -v
 This authorizes neither other singleton families nor production promotion.
 The evidence-ranked engineering ledger names the next bounded source census;
 whole dependency closure admission and independent proof remain required.
+
+## Local Objects and readable YAML
+
+`SourceModel.object_uses(component, root_id, kind)` walks one Assessment's actual
+dependency graph before conversion. Each reachable Test, Object, State or Variable
+is visited once; its outgoing acquisition edges are counted, including Set operands,
+Filter-State Variables and Variable Object extractions. Repeated references to one
+Test/Variable do not duplicate its acquisition. A source Object identity used once
+is private/inline; multiple uses share a named Object. Counts elsewhere in the
+Benchmark do not participate. Equal selector values never merge distinct source
+IDs. Cycles and unsupported dependencies still fail closed. Original IDs, hashes
+and scoped reference edges remain in the external trace/coverage, not native IDs.
+
+Private Test Objects inherit capability and omit redundant capability/title.
+Variable Objects retain their required capability. Shared Objects retain stable
+IDs, capability and a meaningful source comment; if the comment is generic, a
+title describes literal source selector facts rather than guessing purpose.
+System-source `kind: none` still omits Object and blocks invented acquisition.
+
+[v04_direct_yaml.py](../../tools/v04_direct_yaml.py) is the small presentation
+layer, separate from source conversion. It builds serialization-only flow-mapping
+hints and uses PyYAML's safe scalar handling. Simple flat Registry selector Objects
+are single-line; Sets, Filters, computed selectors and traversal remain multiline.
+`require` stays block-style and Boolean sequences retain their complete subtrees.
+JSON uses the ordinary native dictionary. No YAML text rewriting is performed.
+
+To change formatting, edit `compact_registry_object`/`presentation`, then run the
+style tests: node flow-style and line-boundary checks establish presentation,
+while parsed YAML/JSON equality checks structure and ambiguous strings/paths/regex
+scalar types. Do not change `predicate` or remove quantifiers to shorten YAML.
+Capability changes still follow the source/mapping/independent-proof procedure
+above; presentation policy cannot authorize a new acquisition or semantic default.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_authoring_style.py -v
+PYTHONPATH=tools python tools/v04_direct_authoring_examples.py --output /tmp/direct-authoring-examples
+```
+
+The second command regenerates six small actual output examples and their JSON
+peers/trace manifest, after proving and compiling the supported subset and the
+selected wrapper. Use a new output directory. The tracked
+[example navigation](../examples/direct-v04/README.md) is generated with that
+command, not maintained by hand. For a practical presentation-only edit, exclude
+regex selectors from `compact_registry_object`, add a source-backed regex case to
+the style test and verify it becomes multiline while parsed structure and original
+proof remain unchanged. Whole-subset original/compiled negative mutations remain
+in `test_v04_direct_benchmark`, `test_v04_direct_acceptance` and the audit-policy tests.

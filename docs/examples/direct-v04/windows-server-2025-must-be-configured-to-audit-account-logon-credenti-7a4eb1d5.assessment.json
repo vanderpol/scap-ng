@@ -1,0 +1,58 @@
+{
+  "assessment": {
+    "id": "windows-server-2025-must-be-configured-to-audit-account-logon-credenti-7a4eb1d5-assessment",
+    "version": 1,
+    "assessment_title": "Windows Server 2025 must be configured to audit Account Logon - Credential Validation successes.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "audit-credential-validation-is-set-to-success-31eb9332-test": {
+        "test_title": "'Audit Credential Validation' is set to 'Success'",
+        "capability": "windows.auditeventpolicysubcategories",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "credential_validation": {
+              "equals": "AUDIT_SUCCESS",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      },
+      "audit-credential-validation-is-set-to-success-and-failure-251fa97b-test": {
+        "test_title": "'Audit Credential Validation' is set to 'Success' and 'Failure'",
+        "capability": "windows.auditeventpolicysubcategories",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "credential_validation": {
+              "equals": "AUDIT_SUCCESS_FAILURE",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "or": [
+        {
+          "test": "audit-credential-validation-is-set-to-success-31eb9332-test"
+        },
+        {
+          "test": "audit-credential-validation-is-set-to-success-and-failure-251fa97b-test"
+        }
+      ]
+    }
+  }
+}
