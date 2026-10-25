@@ -208,7 +208,7 @@ def write_ledger(report, output):
               'source_tree_sha256', 'status', 'approved_normalization_required',
               'check_existence', 'check', 'state_operator', 'object_refs', 'state_refs', 'test_refs', 'definition_refs']
     with records.open('w', newline='') as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator='\n')
         writer.writeheader()
         for platform, source in report['sources'].items():
             for record in source['records']:
@@ -219,7 +219,7 @@ def write_ledger(report, output):
     migrations = output.with_name(output.stem + '-migrated-assessments.csv')
     with migrations.open('w', newline='') as stream:
         writer = csv.DictWriter(stream, fieldnames=['path', 'id', 'mode', 'provenance',
-                                                    'packaged_original_oval_equivalence'])
+                                                    'packaged_original_oval_equivalence'], lineterminator='\n')
         writer.writeheader()
         writer.writerows(report['assessment_migration_inventory'])
     summary = {**report, 'sources': {platform: {k: v for k, v in source.items() if k != 'records'}
