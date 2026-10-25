@@ -3,8 +3,10 @@
 2026-10-25. Started clean on current main
 `ce9eadca76e2d7b740c9888d6dd47088598da00b` after fetch/fast-forward check.
 [Owner scope and stop conditions](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6396984623).
-Implementation commit and terminal hosted CI will be recorded in the follow-up
-handoff below. No schema, normative specification, release gate, original
+Implementation commit:
+[`f851e3abb432e0853bbb15bde5ec68b163e7445e`](https://github.com/vanderpol/scap-ng/commit/f851e3abb432e0853bbb15bde5ec68b163e7445e).
+Portability follow-up and terminal hosted CI are recorded below. No schema,
+normative specification, release gate, original
 fixture, pinned archive, six-STIG bundle or proof-coverage ledger was changed.
 
 ## Engineering result
@@ -167,15 +169,16 @@ XSD work link `work/oval-5123/oval-schemas` to
 `third_party/scap-1.4-schemas/oval_5.12.3`. This test workspace is not committed.
 
 Baseline: **2,960 tests, 0 failures, 0 errors, 1 optional skip**. Final mandatory:
-**2,973 tests, 0 failures, 0 errors, the same 1 skip**. No tests removed, demoted,
-skipped or weakened. Eight new Object tests and five read-only decision tests.
+**2,974 tests, 0 failures, 0 errors, the same 1 skip**, after the portability
+follow-up (initial implementation: 2,973). No tests removed, demoted,
+skipped or weakened. Nine new Object tests and five read-only decision tests.
 The first development run exposed two obsolete Apache expectations and nine
 Registry/fixture errors; shared causes were corrected and the suite rerun.
 [mandatory-results.json](v04-object-processing/mandatory-results.json) preserves
 final counts and the exact preexisting optional original-corpus census skip.
 The 100-capability audit: **100 generated, zero failures**, 140 selectors,
 694 named predicates; complete report committed alongside the inventory.
-Final targeted suite: **88 tests, all passed**, using:
+Final targeted suite: **89 tests, all passed** (initial implementation: 88), using:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python -m unittest \
@@ -189,6 +192,52 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python -m unittest \
 The read-only decision packet's five tests were rerun after adding the exact
 source-text discrepancy: all passed. Terminal hosted checks are recorded in
 the handoff.
+
+## Hosted-CI follow-up and historical classification
+
+At the implementation SHA, hosted canonical fast checks, current-design
+regression, rebaseline smoke, draft schema, converter bridge and clean-extract
+smoke passed. Two additional workflows initially failed:
+
+- [Windows XML pilot](https://github.com/vanderpol/scap-ng/actions/runs/40191627191):
+  failed at the historical flat-Object projection/export step. Its environment
+  installs PyYAML/lxml, not jsonschema. The shared visitor's initial eager
+  validation imports introduced a new implicit dependency. Local cold-import
+  reproduction with jsonschema/referencing unavailable produced
+  `ModuleNotFoundError`; the portability correction makes validation imports
+  lazy, preserves mandatory validation, and adds a `python -S` visitor regression.
+  Full migration/inverse also passes with those imports explicitly forbidden.
+  The workflow now tracks the shared visitor path, so the correction is actually
+  exercised in hosted CI. No dependency failure is ignored or validation skipped.
+- [Proposed condition-fields proof](https://github.com/vanderpol/scap-ng/actions/runs/40191627161):
+  existing historical proposal tooling expects removed schema definition
+  `all_items_requirement`. Exact local error: `KeyError: 'all_items_requirement'`.
+  The workflow's five-module first step runs 54 tests with the **same four errors
+  on unchanged ce9eadca7 and the implementation**. This is not introduced by the
+  Object correction. The historical tests/workflow remain visible and unchanged;
+  no new schema alias or release-gate change is authorized here. Reproduce using
+  `python -m unittest test_v04_ci_integration test_validate_v04_fields_condition_preview test_build_v04_and_or_fields_candidate test_rename_v04_field_requirement_preview test_research_v04_oval_logic_scopes`
+  with `PYTHONPATH=tools`, on each pinned checkout.
+
+Public run/job pages expose step conclusions and the annotation
+`Process completed with exit code 1.`. The public raw-log request returned
+`curl: (22) The requested URL returned error: 404`; diagnoses above distinguish
+locally reproduced errors from unavailable hosted stack traces.
+
+An unrelated preexisting workflow also starts automatically when the public
+validator changes: [0.3 six-STIG publisher](https://github.com/vanderpol/scap-ng/actions/runs/40191627218).
+Its definition can create 0.3 release assets and post to #200. This task did not
+dispatch it, alter it or authorize a new 0.3 publication. On discovering that
+side effect during CI review, `gh run cancel 40191627218 --repo vanderpol/scap-ng`
+was attempted once. Cancellation was blocked before the request by exact error:
+
+`Get "https://api.github.com/repos/vanderpol/scap-ng/actions/runs/40191627218?exclude_pull_requests=true": Forbidden`
+
+**External permission/owner action:** inspect/cancel that unrelated publishing
+run and decide separately how to prevent automatic historical publication on
+ordinary validator changes. No gate was changed or bypassed here. No local
+six-STIG regeneration or replacement was performed. Terminal CI and any observed
+publication outcome will be stated explicitly in the final handoff.
 
 ## Decisions and handoff
 

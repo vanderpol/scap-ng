@@ -34,6 +34,15 @@ def closed(doc):
 
 
 class CanonicalObjectContractTests(unittest.TestCase):
+    def test_typed_visitor_does_not_require_optional_validation_dependencies(self):
+        # XML-export workflows historically need only PyYAML/lxml. Sharing the
+        # pure visitor must not introduce an implicit jsonschema dependency.
+        proc = subprocess.run([sys.executable, '-S', '-c',
+            "from v04_object_contract import object_sites; "
+            "assert len(list(object_sites({'tests': {'t': {'capability': 'windows.registry', 'object': {}}}}))) == 1"],
+            cwd=ROOT / 'tools', capture_output=True, text=True)
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+
     def test_pinned_nested_registry_rejected_with_exact_public_schema_path(self):
         doc = original()
         before = deepcopy(doc)

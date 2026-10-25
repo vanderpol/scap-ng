@@ -10,9 +10,6 @@ from functools import lru_cache
 import json
 from pathlib import Path
 
-from jsonschema import Draft202012Validator, ValidationError
-from referencing import Registry, Resource
-
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -110,6 +107,7 @@ def format_path(path):
 
 @lru_cache(maxsize=4)
 def resources(schema_dir):
+    from referencing import Resource
     store = {}
     for path in Path(schema_dir).rglob('*.json'):
         schema = json.loads(path.read_text())
@@ -123,6 +121,8 @@ def resources(schema_dir):
 
 @lru_cache(maxsize=400)
 def object_validator(capability, schema_dir):
+    from jsonschema import Draft202012Validator
+    from referencing import Registry, Resource
     mapping_path = Path(schema_dir) / 'capability-mappings/supported' / (str(capability) + '.json')
     # Never turn an untrusted capability into an arbitrary filesystem path.
     if not isinstance(capability, str) or '/' in capability or '\\' in capability or not mapping_path.is_file():
@@ -141,6 +141,7 @@ def object_validator(capability, schema_dir):
 
 def object_errors(document, schema_dir=None):
     """Yield JSON Schema ValidationErrors with exact original lexical paths."""
+    from jsonschema import ValidationError
     schema_dir = str(Path(schema_dir or ROOT / 'schema/v0.4.0').resolve())
     assessment = document.get('assessment')
     if not isinstance(assessment, dict) or (assessment.get('specification') or {}).get('version') != '0.4.0':
