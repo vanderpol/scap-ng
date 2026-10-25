@@ -35,6 +35,21 @@ D = '{http://scap.nist.gov/schema/scap/source/1.2}'
 HREF = '{http://www.w3.org/1999/xlink}href'
 
 
+def validate_json_files(inputs, report):
+    """Public validator API: its directory CLI discovers YAML files only."""
+    validators = build_validators(ROOT / 'schema/v0.4.0')
+    results = []
+    for path in sorted(inputs.rglob('*.json')):
+        document = json.loads(path.read_text())
+        kind, = document
+        errors = list(document_errors(validators[kind + '.schema.json'], document))
+        results.append({'path': str(path.relative_to(inputs)), 'kind': kind,
+                        'valid': not errors, 'errors': [str(error) for error in errors]})
+    assert len(results) == 6 and all(row['valid'] for row in results), results
+    report.write_text(json.dumps({'documents_checked': len(results), 'valid': len(results),
+                                 'invalid': 0, 'results': results}, indent=2) + '\n')
+
+
 def verify_original(root, documents, trace):
     """Independent XCCDF resolver plus unmodified original/native operand readers."""
     components = {node.get('id'): node[0] for node in root.findall(D + 'component')}
@@ -182,9 +197,13 @@ class DirectConverterAcceptance(unittest.TestCase):
                 inputs = directory / suffix
                 with zipfile.ZipFile(archive) as package:
                     package.extractall(inputs)
+                if suffix == 'json':
+                    validate_json_files(inputs, directory / 'json-validation.json')
+                    continue
                 process = subprocess.run([sys.executable, str(ROOT / 'tools/validate_native_json_schemas.py'), str(inputs),
                     '--schema-dir', str(ROOT / 'schema/v0.4.0'), '--report', str(directory / (suffix + '-validation.json'))], capture_output=True, text=True)
                 self.assertEqual(process.returncode, 0, process.stderr)
+                self.assertEqual(json.loads((directory / 'yaml-validation.json').read_text())['valid'], 6)
             process = subprocess.run([sys.executable, str(ROOT / 'tools/v04_native_bundle_compiler.py'),
                 '--json-archive', str(archives[0]), '--yaml-archive', str(archives[1]),
                 '--output-dir', str(directory / 'compiled'), '--report', str(directory / 'compilation.json')], capture_output=True, text=True)
@@ -468,8 +487,12 @@ def measure_and_verify(output):
         inputs = output / suffix
         with zipfile.ZipFile(archive) as package:
             package.extractall(inputs)
+        if suffix == 'json':
+            validate_json_files(inputs, output / 'json-validation.json')
+            continue
         subprocess.run([sys.executable, str(ROOT / 'tools/validate_native_json_schemas.py'), str(inputs),
                         '--schema-dir', str(ROOT / 'schema/v0.4.0'), '--report', str(output / (suffix + '-validation.json'))], check=True, stdout=subprocess.DEVNULL)
+        assert json.loads((output / 'yaml-validation.json').read_text())['valid'] == 6
     subprocess.run([sys.executable, str(ROOT / 'tools/v04_native_bundle_compiler.py'),
                     '--json-archive', str(output / 'json.zip'), '--yaml-archive', str(output / 'yaml.zip'),
                     '--output-dir', str(output / 'compiled'), '--report', str(output / 'compile.json')], check=True, stdout=subprocess.DEVNULL)

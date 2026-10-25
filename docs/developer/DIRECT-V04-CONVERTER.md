@@ -47,7 +47,8 @@ export PYTHONPATH=tools
 Use a new output directory: existing output is never overwritten. Inspect
 `authoring/direct-slice/assessments/*.yaml` beside `source-trace.json`.
 JSON and YAML serialize the same native dictionaries; metrics are separate.
-The subprocess test invokes the unchanged public validator on **each format**,
+The tests invoke the unchanged public validator API for JSON (its directory CLI
+discovers YAML only), assert six checked documents, use its CLI for YAML,
 packs separate JSON/YAML ZIPs, runs the unchanged compiler CLI, and launches the
 independent package consumer. It also checks exact program/source operands.
 
