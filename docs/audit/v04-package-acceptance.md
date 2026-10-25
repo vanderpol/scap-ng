@@ -64,6 +64,10 @@ can distinguish. Hash agreement is not publisher authentication.
 
 ## Original-source ledger and denominators
 
+This is the dated pre-pilot baseline. The [eight-Assessment pilot](v04-eight-assessment-pilot.md)
+provides the subsequent exact-package proof coverage overlay; standalone counts below
+remain distinct historical evidence.
+
 The [complete original declaration CSV](v04-package-acceptance/source-ledger-original-records.csv)
 contains **2,695 Definitions and 2,140 Tests**, scoped by source benchmark, XML
 member and OVAL component. Denominators include all original declarations,

@@ -1,0 +1,226 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844\" version=\"5\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>OL 9 local interactive user home directories defined in the /etc/passwd file must exist.</ns0:title>\n            <ns0:affected family=\"unix\">\n              <ns0:platform>Red Hat Enterprise Linux 8 and SLES 15</ns0:platform>\n            </ns0:affected>\n            <ns0:description>All Linux local interactive user home directories defined in the /etc/passwd file must exist.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401\" comment=\"Retrieve list of interactive user home directories.\" />\n          </ns0:criteria>\n        </ns0:definition>\n      </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401\" version=\"5\" comment=\"Confirm interactive user's home directories exist.\" check_existence=\"any_exist\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.rhel8:obj:27184401\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.rhel8:ste:27184401\" />\n        </ns1:shellcommand_test>\n      </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.rhel8:obj:27184401\" version=\"5\" comment=\"Retrieve array of users from passwd file with UID &gt;=1000 and 'nologin'.\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command>ls -d $(awk -F: '($3&gt;=1000)&amp;&amp;($7 !~ /nologin/){print $6}' /etc/passwd)</ns1:command>\n          <ns1:pattern operation=\"pattern match\" />\n        </ns1:shellcommand_object>\n      </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.rhel8:ste:27184401\" version=\"5\" comment=\"Check that no directories produce 'cannot access' errors.\">\n          <ns1:stderr_line check_existence=\"none_exist\" operation=\"pattern match\">.*</ns1:stderr_line>\n        </ns1:shellcommand_state>\n      </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844",
+  "assessment": {
+    "assessment_title": "OL 9 local interactive user home directories defined in the /etc/passwd file must exist.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "confirm-interactive-user-s-home-directories-exist-test"
+    },
+    "id": "SV-271844.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "confirm-interactive-user-s-home-directories-exist-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": "ls -d $(awk -F: '($3>=1000)&&($7 !~ /nologin/){print $6}' /etc/passwd)",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Retrieve array of users from passwd file with UID >=1000 and 'nologin'.",
+          "pattern": "",
+          "shell": "bash"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stderr_line": {
+                  "values_found": "none"
+                }
+              }
+            }
+          ],
+          "items_found": "may_be_absent",
+          "items_satisfying": "every"
+        },
+        "test_title": "Confirm interactive user's home directories exist."
+      }
+    },
+    "version": 5
+  },
+  "provenance": {
+    "case": 2,
+    "platform": "oracle_linux_9",
+    "selection_reason": "Source-specific absence; do not elevate archive exception",
+    "benchmark": "benchmark.oracle_linux_9",
+    "package": "oracle_linux_9.scapng",
+    "package_sha256": "61e3336499c27f2f0deb635ebecc68344c18adb923cfad6e6466ba4dcc712b4b",
+    "manifest_sha256": "36efb7fb6cc342d7f20bd917a75c46ebfd341300629c3c7941ee3d67e892b2f8",
+    "rule": "SV-271844",
+    "rule_path": "rules/SV-271844-1e728fb00032.json",
+    "assessment": "SV-271844.automated",
+    "assessment_path": "assessments/SV-271844.automated-e8d8fe2acdb1.json",
+    "assessment_sha256": "04134dc2914526c4e4f0480342d7de425d362f4e5213f5147df6ae3860e97215",
+    "program_path": "programs/e3363721216fdffe3c0b3dd6e885904ebd8a0781bca9abdb17c46bfc612dd44d.json",
+    "program_sha256": "1123f5c5afcf81654e838c1576e5573a0388b7bb69975b32d1346c1ce88fa5ab",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "authoring_path": "authoring/oracle_linux_9/assessments/automated/SV-271844.automated.json",
+    "source_zip": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+    "source_zip_sha256": "6733abd693380b43b2350c2692775e4ff902f895f16899db97b34fecf7fba74d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip",
+    "xml_member": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.xml",
+    "xml_sha256": "a1ebd18e378a28cba2f2479ceeb9813c4672e5083593f2d66e21379077e505e8",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-271844r1184222_rule",
+    "xccdf_rule_sha256": "3e3a4a2456fdc7b9fc0476bc1f5d2d057f8537ebda1a1e55b94fff85b20c2d97",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.ol9os:questionnaire:80301"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "5",
+          "sha256": "e4a8d309809278db0a65db19ed3bcd88823f8577851ed6ec12d71300eb3b2c54"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.rhel8:obj:27184401",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "5",
+          "sha256": "35bfa2c3252215f07437067836160b93af8a258e5d360dd09d3fe52e8f0bec30"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.rhel8:ste:27184401",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "5",
+          "sha256": "6a157df96f01dc0ee861e86350766a8bb74c093c8d74e4ad1876b381a97771a5"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "5",
+          "sha256": "8afa1a93d5de093509ac2cfb640765fcf25b4eea511c7d6c542865caaf81c6a0"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.rhel8:def:271844",
+          "oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401",
+          "oval:navy.navwar.niwcatlantic.scc.rhel8:obj:27184401",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.rhel8:tst:27184401",
+          "oval:navy.navwar.niwcatlantic.scc.rhel8:ste:27184401",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "69397f8346182543017dd583ed06a98cda27903a6ff839de943660c0065ccb60",
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED",
+  "compiled_program": {
+    "assessment_id": "SV-271844.automated",
+    "assessment_source_sha256": "afbd4ee1226ebcd57449a411795538f23f8230e1401064f850f9ea84c4eef010",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "ba7c5e1d5438bb82c984829f2a5e98ebd580b8cf676707706a862e11ec2ba81b",
+    "result_instructions": [
+      {
+        "id": "confirm-interactive-user-s-home-directories-exist-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "confirm-interactive-user-s-home-directories-exist-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": "ls -d $(awk -F: '($3>=1000)&&($7 !~ /nologin/){print $6}' /etc/passwd)",
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Retrieve array of users from passwd file with UID >=1000 and 'nologin'.",
+            "pattern": "",
+            "shell": "bash"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stderr_line": {
+                    "values_found": "none"
+                  }
+                }
+              }
+            ],
+            "items_found": "may_be_absent",
+            "items_satisfying": "every"
+          },
+          "test_title": "Confirm interactive user's home directories exist."
+        },
+        "source_test_sha256": "32d8c45f4c74daa14b376e0ff03f122b802512f4ef0f9295c28291523ba99a87",
+        "test_id": "confirm-interactive-user-s-home-directories-exist-test"
+      }
+    ]
+  }
+}

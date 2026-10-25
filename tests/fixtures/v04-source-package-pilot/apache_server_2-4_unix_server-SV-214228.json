@@ -1,0 +1,1286 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#independent\"><ns0:definitions><ns0:definition id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228\" version=\"2\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>The Apache web server must limit the number of allowed simultaneous session requests.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422801\" comment=\"Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf or included conf files\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422802\" comment=\"If the KeepAlive directive is defined in other loaded configuration files, verify it is configured to On\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422803\" comment=\"Verify that MaxKeepAliveRequests is defined and is configured to 100 or greater httpd.conf/apache2.conf or included conf files\" />\n            <ns0:criterion test_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422804\" comment=\"If the MaxKeepAliveRequests directive is defined in other loaded configuration files, verify it is configured to 100 or greater\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422801\" version=\"2\" comment=\"Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf or included conf files\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422801\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422801\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422802\" version=\"2\" comment=\"If the KeepAlive directive is defined in other loaded configuration files, verify it is configured to On\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422802\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422802\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422803\" version=\"2\" comment=\"Verify that MaxKeepAliveRequests is defined and is configured to 100 or greater httpd.conf/apache2.conf or included conf files\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422803\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422803\" />\n        </ns1:shellcommand_test>\n        <ns1:shellcommand_test id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422804\" version=\"2\" comment=\"If the MaxKeepAliveRequests directive is defined in other loaded configuration files, verify it is configured to 100 or greater\" check_existence=\"at_least_one_exists\" check=\"all\">\n          <ns1:object object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422804\" />\n          <ns1:state state_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422804\" />\n        </ns1:shellcommand_test>\n        </ns0:tests><ns0:objects><ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422801\" version=\"2\" comment=\"Gather all KeepAlive data from httpd and all Include conf files\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422809\" />\n          <ns1:pattern>.+</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422802\" version=\"2\" comment=\"Gather all KeepAlive data from all loaded conf files\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422808\" />\n          <ns1:pattern>.+</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422803\" version=\"2\" comment=\"Gather all MaxKeepAliveRequests data from httpd and all Include conf files\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422814\" />\n          <ns1:pattern>MaxKeepAliveRequests (\\d+)</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422804\" version=\"2\" comment=\"Gather all MaxKeepAliveRequests data from all loaded conf files\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422813\" />\n          <ns1:pattern>MaxKeepAliveRequests (\\d+)</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422810\" version=\"2\" comment=\"Gather unique apache http installation paths\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command>ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq</ns1:command>\n          <ns1:pattern>^\\/\\S+(\\/httpd|\\/apache2)\\s*</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422820\" version=\"2\" comment=\"Gather HTTPD_ROOT files via apachectl\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422802\" />\n          <ns1:pattern>HTTPD_ROOT</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422830\" version=\"2\" comment=\"Gather SERVER_CONFIG_FILE files via apachectl\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422803\" />\n          <ns1:pattern>SERVER_CONFIG_FILE</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422840\" version=\"2\" comment=\"Gather Include statements from httpd.conf\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422820\" />\n          <ns1:pattern>\\S+</ns1:pattern>\n        </ns1:shellcommand_object>\n        <ns1:shellcommand_object id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422850\" version=\"2\" comment=\"Gather all loaded config files\">\n          <ns1:shell>bash</ns1:shell>\n          <ns1:command var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422850\" />\n          <ns1:pattern> \\(</ns1:pattern>\n        </ns1:shellcommand_object>\n        </ns0:objects><ns0:states><ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422801\" version=\"2\" comment=\"KeepAlive is On\">\n          <ns1:stdout_line entity_check=\"all\" operation=\"pattern match\">\\s*KeepAlive On</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422802\" version=\"2\" comment=\"KeepAlive is On (if found)\">\n          <ns1:stdout_line check_existence=\"any_exist\" entity_check=\"all\" operation=\"pattern match\">\\s*KeepAlive On</ns1:stdout_line>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422803\" version=\"2\" comment=\"MaxKeepAliveRequests not less than 100\">\n          <ns1:subexpression entity_check=\"all\" datatype=\"int\" operation=\"greater than or equal\">100</ns1:subexpression>\n        </ns1:shellcommand_state>\n        <ns1:shellcommand_state id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422804\" version=\"2\" comment=\"MaxKeepAliveRequests is not less than 100 (if found)\">\n          <ns1:subexpression check_existence=\"any_exist\" entity_check=\"all\" datatype=\"int\" operation=\"greater than or equal\">100</ns1:subexpression>\n        </ns1:shellcommand_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801\" datatype=\"string\" version=\"2\" comment=\"Apache base install directories (unix)\">\n          <ns0:regex_capture pattern=\"(^\\/.+\\/)httpd|(^\\/.+/)apache2\">\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422810\" item_field=\"stdout_line\" />\n          </ns0:regex_capture>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422802\" datatype=\"string\" version=\"2\" comment=\"httpd_root to apachectl -V\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801\" />\n            <ns0:literal_component datatype=\"string\">apachectl -V | grep -i 'httpd_root'</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422803\" datatype=\"string\" version=\"2\" comment=\"server_config_file to apachectl -V\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801\" />\n            <ns0:literal_component datatype=\"string\">apachectl -V | grep -i 'server_config_file'</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804\" datatype=\"string\" version=\"2\" comment=\"Filepath to HTTPD_ROOT\">\n          <ns0:regex_capture pattern=\" -D HTTPD_ROOT=&quot;(.+)&quot;\">\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422820\" item_field=\"stdout_line\" />\n          </ns0:regex_capture>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422805\" datatype=\"string\" version=\"2\" comment=\"relative to SERVER_CONFIG_FILE\">\n          <ns0:regex_capture pattern=\" -D SERVER_CONFIG_FILE=&quot;(.+)&quot;\">\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422830\" item_field=\"stdout_line\" />\n          </ns0:regex_capture>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806\" datatype=\"string\" version=\"2\" comment=\"Filepath to http conf file\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804\" />\n            <ns0:literal_component datatype=\"string\">/</ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422805\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422808\" datatype=\"string\" version=\"2\" comment=\"shell command to check KeepAlive in all loaded conf files\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">grep -iHn '^\\s*KeepAlive' </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422809\" datatype=\"string\" version=\"2\" comment=\"shell command to check KeepAlive in httpd.conf and all Include conf files\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">grep -iHn '^\\s*KeepAlive' </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422810\" datatype=\"string\" version=\"2\" comment=\"Apache path to httpd or apache2\">\n          <ns0:regex_capture pattern=\"(^\\/.+\\/httpd|^\\/.+\\/apache2) \">\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422810\" item_field=\"stdout_line\" />\n          </ns0:regex_capture>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422813\" datatype=\"string\" version=\"2\" comment=\"shell command to check MaxKeepAliveRequests in all loaded conf files\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">grep -iHn '^\\s*MaxKeepAliveRequests' </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422814\" datatype=\"string\" version=\"2\" comment=\"shell command to check MaxKeepAliveRequests in httpd.conf and all Include conf files\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">grep -iHn '^\\s*MaxKeepAliveRequests' </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422820\" datatype=\"string\" version=\"2\" comment=\"shell command to check for all Include and Include Optional files\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">grep -iEHn '^\\s*Include\\s+|^\\s*IncludeOptional\\s+' </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422841\" datatype=\"string\" version=\"2\" comment=\"All included conf files from Include refernces in httd.conf\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804\" />\n            <ns0:literal_component datatype=\"string\">/</ns0:literal_component>\n            <ns0:regex_capture pattern=\"\\S+\\s+(\\S+)\\s*\">\n              <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422840\" item_field=\"stdout_line\" />\n            </ns0:regex_capture>\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422842\" datatype=\"string\" version=\"2\" comment=\"merged included conf files from Include refernces in httd.conf\">\n          <ns0:merge delimiter=\" \" sort=\"document\">\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422841\" />\n          </ns0:merge>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843\" datatype=\"string\" version=\"2\" comment=\"httpd.conf and merged included conf files from Include refernces in httd.conf\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806\" />\n            <ns0:literal_component> </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422842\" />\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422850\" datatype=\"string\" version=\"2\" comment=\"command to gather httpd/apache2 list of all loaded configuration files\">\n          <ns0:concat>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422810\" />\n            <ns0:literal_component datatype=\"string\"> -t -D DUMP_INCLUDES</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422851\" datatype=\"string\" version=\"2\" comment=\"All loaded configuration filepaths\">\n          <ns0:unique>\n            <ns0:regex_capture pattern=\"\\(.*\\) (/.*)\">\n              <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422850\" item_field=\"stdout_line\" />\n            </ns0:regex_capture>\n          </ns0:unique>\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852\" datatype=\"string\" version=\"2\" comment=\"Merged list of all loaded config files\">\n          <ns0:merge delimiter=\" \" sort=\"document\">\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422851\" />\n          </ns0:merge>\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+  "assessment": {
+    "assessment_title": "The Apache web server must limit the number of allowed simultaneous session requests.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test"
+        },
+        {
+          "test": "if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test"
+        },
+        {
+          "test": "verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test"
+        },
+        {
+          "test": "if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test"
+        }
+      ]
+    },
+    "id": "SV-214228.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "shared_objects": {
+      "gather-unique-apache-http-installation-paths-object": {
+        "capability": "independent.shellcommand",
+        "command": "ps -e -o command --no-headers | grep -e httpd -e apache2 | sort | uniq",
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false,
+        "object_title": "Gather unique apache http installation paths",
+        "pattern": "^\\/\\S+(\\/httpd|\\/apache2)\\s*",
+        "shell": "bash"
+      }
+    },
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "shell-command-check-keepalive-in-all-loaded-conf-files-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Gather all KeepAlive data from all loaded conf files",
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "matches_regex": "\\s*KeepAlive On",
+                  "values_found": "may_be_absent",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "If the KeepAlive directive is defined in other loaded configuration files, verify it is configured to On"
+      },
+      "if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "shell-command-check-maxkeepaliverequests-in-all-loaded-conf-files-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Gather all MaxKeepAliveRequests data from all loaded conf files",
+          "pattern": "MaxKeepAliveRequests (\\d+)",
+          "shell": "bash"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "subexpression": {
+                  "greater_than_or_equal": 100,
+                  "values_found": "may_be_absent",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "If the MaxKeepAliveRequests directive is defined in other loaded configuration files, verify it is configured to 100 or greater"
+      },
+      "verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "shell-command-check-keepalive-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Gather all KeepAlive data from httpd and all Include conf files",
+          "pattern": ".+",
+          "shell": "bash"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "stdout_line": {
+                  "matches_regex": "\\s*KeepAlive On",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf or included conf files"
+      },
+      "verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "shell-command-check-maxkeepaliverequests-in-httpd-conf-all-include-conf-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "object_title": "Gather all MaxKeepAliveRequests data from httpd and all Include conf files",
+          "pattern": "MaxKeepAliveRequests (\\d+)",
+          "shell": "bash"
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "subexpression": {
+                  "greater_than_or_equal": 100,
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Verify that MaxKeepAliveRequests is defined and is configured to 100 or greater httpd.conf/apache2.conf or included conf files"
+      }
+    },
+    "variables": {
+      "all-included-conf-files-from-include-refernces-in-httd-conf-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "variable": "filepath-httpd-root-variable"
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "/"
+              }
+            },
+            {
+              "regex_capture": {
+                "pattern": "\\S+\\s+(\\S+)\\s*",
+                "value": {
+                  "values": {
+                    "field": "stdout_line",
+                    "object": {
+                      "capability": "independent.shellcommand",
+                      "collect": {
+                        "command": {
+                          "variable": "shell-command-check-all-include-include-optional-files-variable"
+                        },
+                        "error_if_exit_status_not_0": false,
+                        "error_if_stderr_exists": false,
+                        "pattern": "\\S+",
+                        "shell": "bash"
+                      },
+                      "object_title": "Gather Include statements from httpd.conf"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "All included conf files from Include refernces in httd.conf"
+      },
+      "all-loaded-configuration-filepaths-variable": {
+        "datatype": "string",
+        "expression": {
+          "unique": {
+            "regex_capture": {
+              "pattern": "\\(.*\\) (/.*)",
+              "value": {
+                "values": {
+                  "field": "stdout_line",
+                  "object": {
+                    "capability": "independent.shellcommand",
+                    "collect": {
+                      "command": {
+                        "variable": "command-gather-httpd-apache2-list-all-loaded-configuration-files-variable"
+                      },
+                      "error_if_exit_status_not_0": false,
+                      "error_if_stderr_exists": false,
+                      "pattern": " \\(",
+                      "shell": "bash"
+                    },
+                    "object_title": "Gather all loaded config files"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "All loaded configuration filepaths"
+      },
+      "apache-base-install-directories-unix-variable": {
+        "datatype": "string",
+        "expression": {
+          "regex_capture": {
+            "pattern": "(^\\/.+\\/)httpd|(^\\/.+/)apache2",
+            "value": {
+              "values": {
+                "field": "stdout_line",
+                "object": "gather-unique-apache-http-installation-paths-object"
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Apache base install directories (unix)"
+      },
+      "apache-path-httpd-or-apache2-variable": {
+        "datatype": "string",
+        "expression": {
+          "regex_capture": {
+            "pattern": "(^\\/.+\\/httpd|^\\/.+\\/apache2) ",
+            "value": {
+              "values": {
+                "field": "stdout_line",
+                "object": "gather-unique-apache-http-installation-paths-object"
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Apache path to httpd or apache2"
+      },
+      "command-gather-httpd-apache2-list-all-loaded-configuration-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "variable": "apache-path-httpd-or-apache2-variable"
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": " -t -D DUMP_INCLUDES"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "command to gather httpd/apache2 list of all loaded configuration files"
+      },
+      "filepath-http-conf-file-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "variable": "filepath-httpd-root-variable"
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "/"
+              }
+            },
+            {
+              "variable": "relative-server-config-file-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "Filepath to http conf file"
+      },
+      "filepath-httpd-root-variable": {
+        "datatype": "string",
+        "expression": {
+          "regex_capture": {
+            "pattern": " -D HTTPD_ROOT=\"(.+)\"",
+            "value": {
+              "values": {
+                "field": "stdout_line",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "collect": {
+                    "command": {
+                      "variable": "httpd-root-apachectl-v-variable"
+                    },
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false,
+                    "pattern": "HTTPD_ROOT",
+                    "shell": "bash"
+                  },
+                  "object_title": "Gather HTTPD_ROOT files via apachectl"
+                }
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Filepath to HTTPD_ROOT"
+      },
+      "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "variable": "filepath-http-conf-file-variable"
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": " "
+              }
+            },
+            {
+              "variable": "merged-included-conf-files-from-include-refernces-in-httd-conf-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "httpd.conf and merged included conf files from Include refernces in httd.conf"
+      },
+      "httpd-root-apachectl-v-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "variable": "apache-base-install-directories-unix-variable"
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "apachectl -V | grep -i 'httpd_root'"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "httpd_root to apachectl -V"
+      },
+      "merged-included-conf-files-from-include-refernces-in-httd-conf-variable": {
+        "datatype": "string",
+        "expression": {
+          "merge": {
+            "delimiter": " ",
+            "order": "ascending",
+            "sort": "document",
+            "values": {
+              "variable": "all-included-conf-files-from-include-refernces-in-httd-conf-variable"
+            }
+          }
+        },
+        "kind": "local",
+        "title": "merged included conf files from Include refernces in httd.conf"
+      },
+      "merged-list-all-loaded-config-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "merge": {
+            "delimiter": " ",
+            "order": "ascending",
+            "sort": "document",
+            "values": {
+              "variable": "all-loaded-configuration-filepaths-variable"
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Merged list of all loaded config files"
+      },
+      "relative-server-config-file-variable": {
+        "datatype": "string",
+        "expression": {
+          "regex_capture": {
+            "pattern": " -D SERVER_CONFIG_FILE=\"(.+)\"",
+            "value": {
+              "values": {
+                "field": "stdout_line",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "collect": {
+                    "command": {
+                      "variable": "server-config-file-apachectl-v-variable"
+                    },
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false,
+                    "pattern": "SERVER_CONFIG_FILE",
+                    "shell": "bash"
+                  },
+                  "object_title": "Gather SERVER_CONFIG_FILE files via apachectl"
+                }
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "relative to SERVER_CONFIG_FILE"
+      },
+      "server-config-file-apachectl-v-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "variable": "apache-base-install-directories-unix-variable"
+            },
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "apachectl -V | grep -i 'server_config_file'"
+              }
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "server_config_file to apachectl -V"
+      },
+      "shell-command-check-all-include-include-optional-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "grep -iEHn '^\\s*Include\\s+|^\\s*IncludeOptional\\s+' "
+              }
+            },
+            {
+              "variable": "filepath-http-conf-file-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "shell command to check for all Include and Include Optional files"
+      },
+      "shell-command-check-keepalive-in-all-loaded-conf-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "grep -iHn '^\\s*KeepAlive' "
+              }
+            },
+            {
+              "variable": "merged-list-all-loaded-config-files-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "shell command to check KeepAlive in all loaded conf files"
+      },
+      "shell-command-check-keepalive-in-httpd-conf-all-include-conf-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "grep -iHn '^\\s*KeepAlive' "
+              }
+            },
+            {
+              "variable": "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "shell command to check KeepAlive in httpd.conf and all Include conf files"
+      },
+      "shell-command-check-maxkeepaliverequests-in-all-loaded-conf-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "grep -iHn '^\\s*MaxKeepAliveRequests' "
+              }
+            },
+            {
+              "variable": "merged-list-all-loaded-config-files-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "shell command to check MaxKeepAliveRequests in all loaded conf files"
+      },
+      "shell-command-check-maxkeepaliverequests-in-httpd-conf-all-include-conf-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": {
+                "datatype": "string",
+                "value": "grep -iHn '^\\s*MaxKeepAliveRequests' "
+              }
+            },
+            {
+              "variable": "httpd-conf-merged-included-conf-files-from-include-refernces-in-variable"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "shell command to check MaxKeepAliveRequests in httpd.conf and all Include conf files"
+      }
+    },
+    "version": 2
+  },
+  "provenance": {
+    "case": 6,
+    "platform": "apache_server_2-4_unix_server",
+    "selection_reason": "Configuration discovery and 18-variable function graph",
+    "benchmark": "benchmark.apache_server_2-4_unix_server",
+    "package": "apache_server_2-4_unix_server.scapng",
+    "package_sha256": "f0dc8f1a2f7b1fbdc3dcedc2709b8bc2cd9f4827e93bf9d751708e02b153bc4e",
+    "manifest_sha256": "5a74cf88d7adbd11629d0b53a91fb992410456d85bf4ddb7a8fe4557a85f963a",
+    "rule": "SV-214228",
+    "rule_path": "rules/SV-214228-ba2c2aef11d9.json",
+    "assessment": "SV-214228.automated",
+    "assessment_path": "assessments/SV-214228.automated-d325b7d3e9fd.json",
+    "assessment_sha256": "e66d91df73b6b90dfd708bce60abd5c2834a47fb8275bf103a59be7919bb763e",
+    "program_path": "programs/182469e3e92d41a29e4c252c3bf8ea3d4bc45ce922efcbdaf7830d82f8d1f1b9.json",
+    "program_sha256": "a74747d5b3a452a732ca9b9f93d42c2679ca28cb28cbba1a91400fd218b18734",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "authoring_path": "authoring/apache_server_2-4_unix_server/assessments/automated/SV-214228.automated.json",
+    "source_zip": "U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip",
+    "source_zip_sha256": "8894123788ba415373625eaecdbbd834f190668697803c3319393c11889f1b80",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.zip",
+    "xml_member": "U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-signed.xml",
+    "xml_sha256": "14f9e57f012d2d5538ada2eddc83704aac7571bc150a871ae6c69d8bcfb9943f",
+    "xccdf_rule": "xccdf_navy.navwar.niwcatlantic.scc.ms_rule_SV-214228r960735_rule",
+    "xccdf_rule_sha256": "2d6ffdcbbd14e6df25e0c3ed333fc0aa8668b20146ce951b12a3939de743570c",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-oval2.xml",
+            "name": "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.sql.server:questionnaire:101"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-oval2.xml",
+    "component_ref": "scap_navy.navwar.niwcatlantic.scc_cref_U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-oval2.xml",
+    "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-oval2.xml",
+    "definition": "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "2",
+          "sha256": "1745d8127238769d5504165b4e520780e6abbb2f3bc572e340e39a0f6a16e44c"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422801",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "8ad0c91d4586992751365b9ae157fa03b5161c075e97ea2dbf12cd1d1e0c87aa"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422802",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "7c6a9d2a7e504985ab115a0074f292ebb16686de5fac1b8d445d112958a1a830"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422803",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "05d5e313d63072cf7636a326cc6b12a9a6cb826bd99530f2ebad40ce520555d8"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422804",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "f42e87f2fcf23d5cc6d22879af859b1ab697cef378d6ee3ec1adc01908ca41c1"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422810",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "cb0bc4806618a5ee7b809a44281fd57a7a0c9a545cf427f08b086b202c71c15e"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422820",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "13882d7d0095f87ea45f5364c9fe951ea7c3850612154aefcb19f83ec3ed223a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422830",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "fb5100099539abaa8d90ee5e319a6c7d0fc3f2707e252c6a62c387bc3fcf55a4"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422840",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "def75b8312ddb1ffd48bbd1a05ea6d3ff9185a69bfe0882ae75a301046daa890"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422850",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_object",
+          "version": "2",
+          "sha256": "1068e6990bbf86c54226be76725b15a178cb1ae6bf92813e5e0e07150a11040d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422801",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "2",
+          "sha256": "b1903fca5bb073d7533854d121b25da2ea60b6a65d5000b8bb061f68975c884b"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422802",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "2",
+          "sha256": "04063480c5ec63faec0fe3232f40441612bc5f4f066f0d8063c8f717c89b4250"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422803",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "2",
+          "sha256": "1909a8a72364c233d8b0347da68a0558c7981529366e1e5c7c4665933ac3d87a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422804",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_state",
+          "version": "2",
+          "sha256": "83c4a0482a2e31763c45bb54172c2bac0ddee683f7ba216a04eb26cda270ef4a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422801",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "2",
+          "sha256": "fbfd2a6f69a723214d40bbbd878cd12a582aa121dae598775c5fd7a61591e8ca"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422802",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "2",
+          "sha256": "44cb53f9438839e8ebf9b3571f79272c98180f32876f6aafc8618cbaf4c36970"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422803",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "2",
+          "sha256": "1dda77b19e7cce07cf3f5faa4a3b8c7f6b9049e977d9c27f05ba2fc96a014506"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422804",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}shellcommand_test",
+          "version": "2",
+          "sha256": "201e63d89f34e55ce1539693240b91772b6688a48b6d6d4a9f6e19a902c42df9"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "cf78462ce63aaaab934451aa9eb56c1495097bf0fbcbc406af9eae2ed895ebf5"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422802",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "aa40e0fb6102ecb7e6bcca21d98c1617331ac5167ff1614ebbca34ff37dcce16"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422803",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "770b967489f37cf4b26f3fb0ea1f57066fbdb41d92349bef57686f8f7f56d9f6"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "03210e8200ed8a21edfd7b83bc8205d03cdaa2e5419bd949b9b746361cf36da3"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422805",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "6d2084ae1623423415abc29c6b038b27f270425c82a903429c0b037d701b2f0e"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "95f6ec4bd78d41235143a114a9e8b90d05b71f02565fc833ab99244a9929cc2d"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422808",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "94f7835f4b3df827eb2406a4fcacb3ff94572fb7811f0efb29fe33038a7ab48a"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422809",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "7e4a9e1c3d69b4b1106eb6b0a09573c0e5f5d5cb418d4346fbf352d45292ddc9"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422810",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "31f4628234c7d5e35e6076923b2b369de713a3535ce9c23b9f4a382d08184318"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422813",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "9f02b73cb0f49c5b8c3e10cec335827e11239b6b39b9accaeae3aa8d2648e58b"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422814",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "53491175ee5a293186ef67c4a35ea0b68dc2f9aae57a9ab20408966edc18dc71"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422820",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "104d9bd8522df65ba807e260f43930f1f809347240e54d195a65330ba3c54c2e"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422841",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "af1fdfc226bce85a9e4ff1bc6232ae27f1c02cf5e9c9623aa314179ace28c1ab"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422842",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "33c67c8d3e0601bead2e624c36141d7058841805df1c61575e21340722e35d5c"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "14f27438363939504968c05914bc4ffe0c5b3ccb0219dd99f4e915ac2ba37c89"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422850",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "e25f8781f4c6a4d66d9741fa6200abd7dfc2f4d09faa425e756b8b3ce19be7cd"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422851",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "f8a38a503143adf62457d9abcfcd298d8a7a64a550e2514e7af6a69a8742cac3"
+        },
+        {
+          "id": "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "4f283408436cf5902400cef3efd46d98bfe981f39f73cfe230c0390ecdbaa027"
+        }
+      ],
+      "edges": [
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422801",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422801",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422801",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422801",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422809",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422809",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422820",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422820",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422802",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422802",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422810",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422805",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422805",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422830",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422830",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422803",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422803",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422801",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422842",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422842",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422841",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422841",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422804",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422841",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422840",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422840",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422820",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422820",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422806",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422801",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422801",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422802",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422802",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422802",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422802",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422808",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422808",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422851",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422851",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422850",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422850",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422850",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422850",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422810",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422810",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422810",
+          "object_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422802",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422802",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422803",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422803",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422803",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422803",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422814",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422814",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422843",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422803",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422803",
+          "state"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:def:214228",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422804",
+          "criterion"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422804",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422804",
+          "object"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:obj:21422804",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422813",
+          "command"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422813",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:var:21422852",
+          "variable_component"
+        ],
+        [
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:tst:21422804",
+          "oval:navy.navwar.niwcatlantic.scc.unix.apache:ste:21422804",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "bccff32992b41c549aa0af3dc8c595df1ff9b82315ad8af9bc40b3c9b12ee333",
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED",
+  "compiled_program": {
+    "assessment_id": "SV-214228.automated",
+    "assessment_source_sha256": "be331631b4e7b5c132d8ac21ac3e5df3a46550fac640954b8a476650951ffcc9",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "064db50d1fb56cfaca1d3556352f790fc9e6d73138723a9024b77f828cff1c9e",
+    "result_instructions": [
+      {
+        "id": "verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "id": "verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          2
+        ]
+      },
+      {
+        "id": "if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          3
+        ]
+      },
+      {
+        "count": 4,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test",
+        "if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test",
+        "verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test",
+        "verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "shell-command-check-keepalive-in-all-loaded-conf-files-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Gather all KeepAlive data from all loaded conf files",
+            "pattern": ".+",
+            "shell": "bash"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "matches_regex": "\\s*KeepAlive On",
+                    "values_found": "may_be_absent",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "If the KeepAlive directive is defined in other loaded configuration files, verify it is configured to On"
+        },
+        "source_test_sha256": "2d538070c9a8a1fe1a7a69b08411b39bdf92134fcea86b17e91ab2986013ba48",
+        "test_id": "if-keepalive-directive-defined-in-other-loaded-configuration-files-verify-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "shell-command-check-maxkeepaliverequests-in-all-loaded-conf-files-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Gather all MaxKeepAliveRequests data from all loaded conf files",
+            "pattern": "MaxKeepAliveRequests (\\d+)",
+            "shell": "bash"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "subexpression": {
+                    "greater_than_or_equal": 100,
+                    "values_found": "may_be_absent",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "If the MaxKeepAliveRequests directive is defined in other loaded configuration files, verify it is configured to 100 or greater"
+        },
+        "source_test_sha256": "ea781df6ebf6e6c03cfa69b4c238b544b06f6def24ebd42daabb68a55ebfd9f0",
+        "test_id": "if-maxkeepaliverequests-directive-defined-in-other-loaded-configuration-files-verify-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "shell-command-check-keepalive-in-httpd-conf-all-include-conf-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Gather all KeepAlive data from httpd and all Include conf files",
+            "pattern": ".+",
+            "shell": "bash"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "stdout_line": {
+                    "matches_regex": "\\s*KeepAlive On",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Verify that KeepAlive directive is defined, and configured to On in httpd.conf/apache2.conf or included conf files"
+        },
+        "source_test_sha256": "1e56d3874fb166bd7fdca36dd9f20f0dc60a2cdc7b9f0c8e0b460de06fdabf0e",
+        "test_id": "verify-that-keepalive-directive-defined-configured-on-in-httpd-conf-test"
+      },
+      {
+        "capability": "independent.shellcommand",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "independent.shellcommand",
+          "object": {
+            "command": {
+              "variable": "shell-command-check-maxkeepaliverequests-in-httpd-conf-all-include-conf-variable"
+            },
+            "error_if_exit_status_not_0": false,
+            "error_if_stderr_exists": false,
+            "object_title": "Gather all MaxKeepAliveRequests data from httpd and all Include conf files",
+            "pattern": "MaxKeepAliveRequests (\\d+)",
+            "shell": "bash"
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "subexpression": {
+                    "greater_than_or_equal": 100,
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Verify that MaxKeepAliveRequests is defined and is configured to 100 or greater httpd.conf/apache2.conf or included conf files"
+        },
+        "source_test_sha256": "a31f31a9d0918d85d3022219b651a2a5fa29b86dcd02461107108e640ee85a37",
+        "test_id": "verify-that-maxkeepaliverequests-defined-configured-100-or-greater-httpd-conf-test"
+      }
+    ]
+  }
+}

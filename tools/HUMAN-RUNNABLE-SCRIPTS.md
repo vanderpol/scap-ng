@@ -1010,3 +1010,15 @@ python PATH_TO_SCRIPT.py --help
 ```
 
 If a script is not listed here and is not a test, assume it is an internal/importable helper until its human-use contract is documented.
+
+
+## Eight-Assessment original-source/package pilot (#251)
+
+`audit_v04_eight_assessment_pilot.py` reads eight fixed actual package Assessments
+and original SCAP inputs; it never starts the full 883-case audit or invokes the
+converter. It verifies pinned source ZIPs/catalog routes, complete OVAL closures,
+exact package operands and independent typed semantic terms. Unsupported syntax
+remains unverified. See [pilot commands, pins and proof limits](../docs/audit/v04-eight-assessment-pilot.md).
+Run `python tools/audit_v04_eight_assessment_pilot.py --help` for explicit input
+and output paths, and `PYTHONPATH=tools python tools/test_v04_source_package_semantics.py`
+for the portable positive/adversarial regressions. No scanner/trust claim is made.

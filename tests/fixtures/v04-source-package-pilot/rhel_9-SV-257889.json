@@ -1,0 +1,839 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#unix\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:230325\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>All the operating system local initialization files must have mode 0740 or less permissive.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.unix:tst:23032500\" />\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.unix:tst:23032501\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.rhel9os:def:257889\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>RHEL-09-232045 - All RHEL 9 local initialization files must have mode 0740 or less permissive.</ns0:title>\n            <ns0:affected family=\"unix\">\n              <ns0:platform>Red Hat Enterprise Linux 9</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Local initialization files are used to configure the user's shell environment upon logon. Malicious modification of these files could compromise accounts upon logon.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:230325\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:file_test id=\"oval:mil.disa.stig.unix:tst:23032500\" version=\"3\" check_existence=\"any_exist\" check=\"all\" comment=\"Local initialization files for non-system users have mode 0740 or less permissive.\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.unix:obj:23032500\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.unix:ste:20000020\" />\n        </ns1:file_test>\n        <ns1:file_test id=\"oval:mil.disa.stig.unix:tst:23032501\" version=\"2\" check=\"all\" comment=\"Local initialization files for root have mode 0740 or less permissive.\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.unix:obj:23032501\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.unix:ste:20000020\" />\n        </ns1:file_test>\n        </ns0:tests><ns0:objects><ns1:password_object id=\"oval:mil.disa.stig.unix:obj:20000016\" version=\"1\" comment=\"Users with an username\">\n          <ns1:username datatype=\"string\" operation=\"pattern match\">[\\w]+</ns1:username>\n        </ns1:password_object>\n        <ns1:file_object id=\"oval:mil.disa.stig.unix:obj:23032500\" version=\"4\" comment=\"local initialization files of non-system users.\">\n          <ns1:behaviors max_depth=\"1\" recurse=\"symlinks\" recurse_direction=\"down\" />\n          <ns1:path var_ref=\"oval:mil.disa.stig.defs:var:23032500\" var_check=\"at least one\" />\n          <ns1:filename operation=\"pattern match\">^\\.[^\\s\\.]+</ns1:filename>\n          <ns0:filter>oval:mil.disa.stig.unix:ste:20000021</ns0:filter>\n        </ns1:file_object>\n        <ns1:file_object id=\"oval:mil.disa.stig.unix:obj:23032501\" version=\"4\" comment=\"local initialization files of root user.\">\n          <ns1:behaviors max_depth=\"1\" recurse=\"symlinks\" recurse_direction=\"down\" />\n          <ns1:path var_ref=\"oval:mil.disa.stig.defs:var:23032501\" var_check=\"at least one\" />\n          <ns1:filename operation=\"pattern match\">^\\.[^\\s\\.]+</ns1:filename>\n          <ns0:filter>oval:mil.disa.stig.unix:ste:20000021</ns0:filter>\n        </ns1:file_object>\n        <ns1:password_object id=\"oval:mil.disa.stig.unix:obj:23032502\" version=\"1\" comment=\"only non-system users (uid&gt;999) home-dirs excluding root directory\">\n          <ns0:set set_operator=\"COMPLEMENT\">\n            <ns0:object_reference>oval:mil.disa.stig.unix:obj:20000016</ns0:object_reference>\n            <ns0:filter>oval:mil.disa.stig.unix:ste:20000017</ns0:filter>\n            <ns0:filter>oval:mil.disa.stig.unix:ste:23032500</ns0:filter>\n          </ns0:set>\n        </ns1:password_object>\n        <ns1:password_object id=\"oval:mil.disa.stig.unix:obj:23032503\" version=\"1\" comment=\"only root users (uid=0) home-dirs excluding root directory\">\n          <ns0:set set_operator=\"COMPLEMENT\">\n            <ns0:object_reference>oval:mil.disa.stig.unix:obj:20000016</ns0:object_reference>\n            <ns0:filter>oval:mil.disa.stig.unix:ste:20000018</ns0:filter>\n            <ns0:filter>oval:mil.disa.stig.unix:ste:23032500</ns0:filter>\n          </ns0:set>\n        </ns1:password_object>\n        </ns0:objects><ns0:states><ns1:password_state id=\"oval:mil.disa.stig.unix:ste:20000017\" version=\"1\" comment=\"only uids &lt; 1000\">\n          <ns1:user_id entity_check=\"all\" datatype=\"int\" operation=\"less than\">1000</ns1:user_id>\n        </ns1:password_state>\n        <ns1:password_state id=\"oval:mil.disa.stig.unix:ste:20000018\" version=\"1\" comment=\"only uids &gt; 0\">\n          <ns1:user_id entity_check=\"all\" datatype=\"int\" operation=\"greater than\">0</ns1:user_id>\n        </ns1:password_state>\n        <ns1:file_state id=\"oval:mil.disa.stig.unix:ste:20000020\" version=\"2\" comment=\"mode 0740 or less permissive\">\n          <ns1:suid datatype=\"boolean\">false</ns1:suid>\n          <ns1:sgid datatype=\"boolean\">false</ns1:sgid>\n          <ns1:sticky datatype=\"boolean\">false</ns1:sticky>\n          <ns1:gwrite datatype=\"boolean\">false</ns1:gwrite>\n          <ns1:gexec datatype=\"boolean\">false</ns1:gexec>\n          <ns1:oread datatype=\"boolean\">false</ns1:oread>\n          <ns1:owrite datatype=\"boolean\">false</ns1:owrite>\n          <ns1:oexec datatype=\"boolean\">false</ns1:oexec>\n        </ns1:file_state>\n        <ns1:file_state id=\"oval:mil.disa.stig.unix:ste:20000021\" version=\"1\">\n          <ns1:type>directory</ns1:type>\n        </ns1:file_state>\n        <ns1:password_state id=\"oval:mil.disa.stig.unix:ste:23032500\" version=\"1\" comment=\"root directory\">\n          <ns1:home_dir>/</ns1:home_dir>\n        </ns1:password_state>\n        </ns0:states><ns0:variables><ns0:local_variable id=\"oval:mil.disa.stig.defs:var:23032500\" version=\"2\" datatype=\"string\" comment=\"The home directories of non-system users.\">\n          <ns0:object_component object_ref=\"oval:mil.disa.stig.unix:obj:23032502\" item_field=\"home_dir\" />\n        </ns0:local_variable>\n        <ns0:local_variable id=\"oval:mil.disa.stig.defs:var:23032501\" version=\"2\" datatype=\"string\" comment=\"The home directory of the root user.\">\n          <ns0:object_component object_ref=\"oval:mil.disa.stig.unix:obj:23032503\" item_field=\"home_dir\" />\n        </ns0:local_variable>\n        </ns0:variables></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.rhel9os:def:257889",
+  "assessment": {
+    "assessment_title": "Linux local initialization files must have mode 0740 or less permissive.",
+    "class": "compliance",
+    "evaluate": {
+      "and": [
+        {
+          "test": "local-initialization-files-non-system-users-have-mode-0740-or-test"
+        },
+        {
+          "test": "local-initialization-files-root-have-mode-0740-or-less-permissive-test"
+        }
+      ]
+    },
+    "id": "ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive",
+    "mode": "automated",
+    "purpose": "assessment",
+    "shared_objects": {
+      "only-non-system-users-uid-999-home-dirs-excluding-root-object": {
+        "capability": "unix.password",
+        "object_title": "only non-system users (uid>999) home-dirs excluding root directory",
+        "set": {
+          "operands": [
+            {
+              "filters": [
+                {
+                  "exclude": {
+                    "user_id": {
+                      "less_than": 1000,
+                      "require": "at_least_one_exists_and_all_match"
+                    }
+                  }
+                },
+                {
+                  "exclude": {
+                    "home_dir": {
+                      "equals": "/",
+                      "require": "at_least_one_exists_and_all_match"
+                    }
+                  }
+                }
+              ],
+              "object": "users-username-object"
+            }
+          ],
+          "operator": "difference"
+        }
+      },
+      "only-root-users-uid-0-home-dirs-excluding-root-directory-object": {
+        "capability": "unix.password",
+        "object_title": "only root users (uid=0) home-dirs excluding root directory",
+        "set": {
+          "operands": [
+            {
+              "filters": [
+                {
+                  "exclude": {
+                    "user_id": {
+                      "greater_than": 0,
+                      "require": "at_least_one_exists_and_all_match"
+                    }
+                  }
+                },
+                {
+                  "exclude": {
+                    "home_dir": {
+                      "equals": "/",
+                      "require": "at_least_one_exists_and_all_match"
+                    }
+                  }
+                }
+              ],
+              "object": "users-username-object"
+            }
+          ],
+          "operator": "difference"
+        }
+      },
+      "users-username-object": {
+        "capability": "unix.password",
+        "object_title": "Users with an username",
+        "username": {
+          "matches_regex": "[\\w]+"
+        }
+      }
+    },
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "local-initialization-files-non-system-users-have-mode-0740-or-test": {
+        "capability": "unix.file",
+        "object": {
+          "directory": {
+            "from": "user.home_dir"
+          },
+          "filesystem": "all",
+          "filters": [
+            {
+              "exclude": {
+                "type": {
+                  "equals": "directory",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "for_each": {
+            "in": "only-non-system-users-uid-999-home-dirs-excluding-root-object",
+            "item": "user"
+          },
+          "name": {
+            "matches_regex": "^\\.[^\\s\\.]+"
+          },
+          "object_title": "local initialization files of non-system users.",
+          "traversal": {
+            "max_depth": 1,
+            "recurse": "symlinks"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "group_execute": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "group_write": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "other_execute": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "other_read": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "other_write": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "setgid": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "setuid": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "sticky": {
+                  "equals": false
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "may_be_absent",
+          "items_satisfying": "every"
+        },
+        "test_title": "Local initialization files for non-system users have mode 0740 or less permissive."
+      },
+      "local-initialization-files-root-have-mode-0740-or-less-permissive-test": {
+        "capability": "unix.file",
+        "object": {
+          "directory": {
+            "from": "user.home_dir"
+          },
+          "filesystem": "all",
+          "filters": [
+            {
+              "exclude": {
+                "type": {
+                  "equals": "directory",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ],
+          "for_each": {
+            "in": "only-root-users-uid-0-home-dirs-excluding-root-directory-object",
+            "item": "user"
+          },
+          "name": {
+            "matches_regex": "^\\.[^\\s\\.]+"
+          },
+          "object_title": "local initialization files of root user.",
+          "traversal": {
+            "max_depth": 1,
+            "recurse": "symlinks"
+          }
+        },
+        "reported_elements": "all",
+        "require": {
+          "and": [
+            {
+              "fields": {
+                "group_execute": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "group_write": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "other_execute": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "other_read": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "other_write": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "setgid": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "setuid": {
+                  "equals": false
+                }
+              }
+            },
+            {
+              "fields": {
+                "sticky": {
+                  "equals": false
+                }
+              }
+            }
+          ],
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "test_title": "Local initialization files for root have mode 0740 or less permissive."
+      }
+    },
+    "version": 1
+  },
+  "provenance": {
+    "case": 1,
+    "platform": "rhel_9",
+    "selection_reason": "Extended Definition; file/password Sets, Filters and for_each",
+    "benchmark": "benchmark.rhel_9",
+    "package": "rhel_9.scapng",
+    "package_sha256": "170b5013d90dbcb197e81b681eae5121ee923ab7c6b28a4f5784034059b5a809",
+    "manifest_sha256": "24ee4f9889df7f142717b61331acbdd525805e850e85744a5f3336a18bf7fff2",
+    "rule": "SV-257889",
+    "rule_path": "rules/SV-257889-6a6d0d0476c9.json",
+    "assessment": "ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive",
+    "assessment_path": "assessments/ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive-9b825b810ca2.json",
+    "assessment_sha256": "ef3636e77e66890b1dc16b1554f5521624862a7dbfd23f235d2e4b4a94354968",
+    "program_path": "programs/88342b0f9bf9fa0cd7f9c5e1b2c38a7317bcbc9e30801c5cbb3fb8abd539df61.json",
+    "program_sha256": "1461e33a14e35e5a1c1041eabee76518427c497506cbb5e9d9765106b26f5ee0",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "authoring_path": "authoring/shared/assessments/linux/other/initialization-files-0740-less-permissive.assessment.json",
+    "source_zip": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+    "source_zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.zip",
+    "xml_member": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-signed.xml",
+    "xml_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-257889r1184302_rule",
+    "xccdf_rule_sha256": "5e72aab1042c01fea2bba69e4a4571ba6195848f187e5a6bd5ff00546887090f",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+            "name": "oval:mil.disa.stig.rhel9os:def:257889"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+            "name": "oval:mil.disa.stig.rhel9os:def:257889"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.rhel9os:questionnaire:22101"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+    "definition": "oval:mil.disa.stig.rhel9os:def:257889",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:230325",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "79fd578ce7343984470c2341943c2fd01f561836261071dffccf02895dfcd635"
+        },
+        {
+          "id": "oval:mil.disa.stig.defs:var:23032500",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "4d101f0d39077c4938466f73427e0b01389ec1c1f1ea7502abeee003e04c2f2b"
+        },
+        {
+          "id": "oval:mil.disa.stig.defs:var:23032501",
+          "kind": "variables",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}local_variable",
+          "version": "2",
+          "sha256": "60b689d314c6c96e0eb9e865d6d34070f7bae970b53a05a58ded7c43ab9fb36d"
+        },
+        {
+          "id": "oval:mil.disa.stig.rhel9os:def:257889",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "bd82c8e58d7e4f617bd6b7e0d2ec1b62b83a5ba5b5204b2ac24ea8ce11eec273"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:obj:20000016",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_object",
+          "version": "1",
+          "sha256": "a27eee5f8fe83790d70f40903a80a373830875f77d51951adee6126bcb770e37"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:obj:23032500",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}file_object",
+          "version": "4",
+          "sha256": "2b07215e1fbf39a10c9e642cc91d9e9e9e31ac4b11926f1e8a21d0d83a9568cf"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:obj:23032501",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}file_object",
+          "version": "4",
+          "sha256": "f6445c597ed426db1bea7a93a1bcec413d66af9504e1be407a34970ddbcef6c2"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:obj:23032502",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_object",
+          "version": "1",
+          "sha256": "95dbef7958cea88954c34f66a9b6a069b2c96212c84c428db84e188458d931c7"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:obj:23032503",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_object",
+          "version": "1",
+          "sha256": "961b8351bcc4367331bc6f1d56e14f226250bd5575846f0bfad231f23dcaf625"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:ste:20000017",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_state",
+          "version": "1",
+          "sha256": "45619f899f23d262b39afddffd6fb9870c3c28cb00363a4b09b202a58aeed74a"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:ste:20000018",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_state",
+          "version": "1",
+          "sha256": "cb8dbf2e8d3ec50094deadb98c6519983a8f7aeaeaff75c40dba58d08755241a"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:ste:20000020",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}file_state",
+          "version": "2",
+          "sha256": "5ecaac569c82305ab1604f213679722383c6ac6583f5f6c8c3fa52eb3ab82423"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:ste:20000021",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}file_state",
+          "version": "1",
+          "sha256": "e0556a8f6c27ea4042536a9d4d920709d1d2a276e4354af7712b86045d506249"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:ste:23032500",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_state",
+          "version": "1",
+          "sha256": "caddca054ef0de7d15230dee520f8a3e8477598906ff3f698e64095e6988346d"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:tst:23032500",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}file_test",
+          "version": "3",
+          "sha256": "63d024b889dd41c371cdd466c5c305e5d916bae0694e1f3e7d68dbf80117e13b"
+        },
+        {
+          "id": "oval:mil.disa.stig.unix:tst:23032501",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}file_test",
+          "version": "2",
+          "sha256": "bfdc48be586a216af4732549ae9f19e008406db83feb461db2bd1aa84c9e8478"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.rhel9os:def:257889",
+          "oval:mil.disa.stig.defs:def:230325",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:230325",
+          "oval:mil.disa.stig.unix:tst:23032500",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.unix:tst:23032500",
+          "oval:mil.disa.stig.unix:obj:23032500",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032500",
+          "oval:mil.disa.stig.defs:var:23032500",
+          "path"
+        ],
+        [
+          "oval:mil.disa.stig.defs:var:23032500",
+          "oval:mil.disa.stig.unix:obj:23032502",
+          "object_component"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032502",
+          "oval:mil.disa.stig.unix:obj:20000016",
+          "object_reference"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032502",
+          "oval:mil.disa.stig.unix:ste:20000017",
+          "filter"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032502",
+          "oval:mil.disa.stig.unix:ste:23032500",
+          "filter"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032500",
+          "oval:mil.disa.stig.unix:ste:20000021",
+          "filter"
+        ],
+        [
+          "oval:mil.disa.stig.unix:tst:23032500",
+          "oval:mil.disa.stig.unix:ste:20000020",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:230325",
+          "oval:mil.disa.stig.unix:tst:23032501",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.unix:tst:23032501",
+          "oval:mil.disa.stig.unix:obj:23032501",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032501",
+          "oval:mil.disa.stig.defs:var:23032501",
+          "path"
+        ],
+        [
+          "oval:mil.disa.stig.defs:var:23032501",
+          "oval:mil.disa.stig.unix:obj:23032503",
+          "object_component"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032503",
+          "oval:mil.disa.stig.unix:obj:20000016",
+          "object_reference"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032503",
+          "oval:mil.disa.stig.unix:ste:20000018",
+          "filter"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032503",
+          "oval:mil.disa.stig.unix:ste:23032500",
+          "filter"
+        ],
+        [
+          "oval:mil.disa.stig.unix:obj:23032501",
+          "oval:mil.disa.stig.unix:ste:20000021",
+          "filter"
+        ],
+        [
+          "oval:mil.disa.stig.unix:tst:23032501",
+          "oval:mil.disa.stig.unix:ste:20000020",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "236a25b2a5a9c1494ab137ec286b0667f1363e9f98e116d41c19b9d364a3253d",
+    "outcome": "UNVERIFIABLE/UNSUPPORTED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED",
+  "compiled_program": {
+    "assessment_id": "ng.shared.linux-local-initialization-files-must-have-mode-0740-or-less-permissive",
+    "assessment_source_sha256": "fa71743db851e55ce0b1c46fa277dd11d6c76e43b029573275ff5d563ef83dd7",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "86f36f67c2f2f1ea214068fea8213b82c55baa4ddfb4af80d5abb1c4383319fa",
+    "result_instructions": [
+      {
+        "id": "local-initialization-files-non-system-users-have-mode-0740-or-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          0
+        ]
+      },
+      {
+        "id": "local-initialization-files-root-have-mode-0740-or-less-permissive-test",
+        "op": "read_test",
+        "path": [
+          "evaluate",
+          "all",
+          1
+        ]
+      },
+      {
+        "count": 2,
+        "op": "all",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "local-initialization-files-non-system-users-have-mode-0740-or-test",
+        "local-initialization-files-root-have-mode-0740-or-less-permissive-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "unix.file",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "unix.file",
+          "object": {
+            "directory": {
+              "from": "user.home_dir"
+            },
+            "filesystem": "all",
+            "filters": [
+              {
+                "exclude": {
+                  "type": {
+                    "equals": "directory",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "for_each": {
+              "in": "only-non-system-users-uid-999-home-dirs-excluding-root-object",
+              "item": "user"
+            },
+            "name": {
+              "matches_regex": "^\\.[^\\s\\.]+"
+            },
+            "object_title": "local initialization files of non-system users.",
+            "traversal": {
+              "max_depth": 1,
+              "recurse": "symlinks"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "group_execute": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "group_write": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "other_execute": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "other_read": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "other_write": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "setgid": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "setuid": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "sticky": {
+                    "equals": false
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "may_be_absent",
+            "items_satisfying": "every"
+          },
+          "test_title": "Local initialization files for non-system users have mode 0740 or less permissive."
+        },
+        "source_test_sha256": "3ae9795645a423d365aa76696e252f2bb7595289d2a76ecbd9e7ece0661c042e",
+        "test_id": "local-initialization-files-non-system-users-have-mode-0740-or-test"
+      },
+      {
+        "capability": "unix.file",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "unix.file",
+          "object": {
+            "directory": {
+              "from": "user.home_dir"
+            },
+            "filesystem": "all",
+            "filters": [
+              {
+                "exclude": {
+                  "type": {
+                    "equals": "directory",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ],
+            "for_each": {
+              "in": "only-root-users-uid-0-home-dirs-excluding-root-directory-object",
+              "item": "user"
+            },
+            "name": {
+              "matches_regex": "^\\.[^\\s\\.]+"
+            },
+            "object_title": "local initialization files of root user.",
+            "traversal": {
+              "max_depth": 1,
+              "recurse": "symlinks"
+            }
+          },
+          "reported_elements": "all",
+          "require": {
+            "and": [
+              {
+                "fields": {
+                  "group_execute": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "group_write": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "other_execute": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "other_read": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "other_write": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "setgid": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "setuid": {
+                    "equals": false
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "sticky": {
+                    "equals": false
+                  }
+                }
+              }
+            ],
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "test_title": "Local initialization files for root have mode 0740 or less permissive."
+        },
+        "source_test_sha256": "dfe421a10a61368d04d915b3946744e04fd1669255dcaf8c7554487192c20400",
+        "test_id": "local-initialization-files-root-have-mode-0740-or-less-permissive-test"
+      }
+    ]
+  }
+}

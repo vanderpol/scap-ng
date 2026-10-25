@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-25:** Added an independent eight-Assessment original-source/package
+  comparison pilot, source-pinned regression fixtures and proof-only coverage
+  overlay. Four exact graphs proved; four remain unverified. This does not
+  certify scanner execution or all 883 automated Assessments ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 ### Canonical authoring cleanup
 
 - **2026-10-24:** Added a source-pinned, reversible six-STIG review-archive

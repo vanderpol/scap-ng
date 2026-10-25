@@ -1,0 +1,324 @@
+{
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#windows\"><ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:253254\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>Domain-joined systems must use Windows Enterprise Edition 64-bit version.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.win:tst:25325400\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.windows11:def:253254\" version=\"2\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>WN11-00-000005 - Domain-joined systems must use Windows 11 Enterprise Edition 64-bit version.</ns0:title>\n            <ns0:affected family=\"windows\">\n              <ns0:platform>Microsoft Windows 11</ns0:platform>\n            </ns0:affected>\n            <ns0:description>Features such as Credential Guard use virtualization-based security to protect information that could be used in credential theft attacks if compromised. There are a number of system requirements that must be met in order for Credential Guard to be configured and enabled properly. Virtualization-based security and Credential Guard are only available with Windows 11 Enterprise 64-bit version.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:253254\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns1:registry_test id=\"oval:mil.disa.stig.win:tst:25325400\" version=\"2\" check=\"all\" state_operator=\"OR\" comment=\"EditionID is Enterprise or EnterpriseS\">\n          <ns1:object object_ref=\"oval:mil.disa.stig.win:obj:20000017\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:25325400\" />\n          <ns1:state state_ref=\"oval:mil.disa.stig.win:ste:20000018\" />\n        </ns1:registry_test>\n        </ns0:tests><ns0:objects><ns1:registry_object id=\"oval:mil.disa.stig.win:obj:20000017\" version=\"1\" comment=\"EditionID\">\n          <ns1:hive datatype=\"string\">HKEY_LOCAL_MACHINE</ns1:hive>\n          <ns1:key datatype=\"string\">SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion</ns1:key>\n          <ns1:name datatype=\"string\">EditionId</ns1:name>\n        </ns1:registry_object>\n        </ns0:objects><ns0:states><ns1:registry_state id=\"oval:mil.disa.stig.win:ste:20000018\" version=\"2\" comment=\"EditionID = EnterpriseS (reg_sz)\">\n          <ns1:type>reg_sz</ns1:type>\n          <ns1:value datatype=\"string\">EnterpriseS</ns1:value>\n        </ns1:registry_state>\n        <ns1:registry_state id=\"oval:mil.disa.stig.win:ste:25325400\" version=\"2\" comment=\"EditionID = Enterprise (reg_sz)\">\n          <ns1:type>reg_sz</ns1:type>\n          <ns1:value datatype=\"string\">Enterprise</ns1:value>\n        </ns1:registry_state>\n        </ns0:states></ns0:oval_definitions>",
+  "source_definition": "oval:mil.disa.stig.windows11:def:253254",
+  "assessment": {
+    "assessment_title": "WN11-00-000005 - Domain-joined systems must use Windows 11 Enterprise Edition 64-bit version.",
+    "class": "compliance",
+    "evaluate": {
+      "test": "editionid-enterprise-or-enterprises-test"
+    },
+    "id": "SV-253254.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "editionid-enterprise-or-enterprises-test": {
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+          },
+          "name": {
+            "equals": "EditionId"
+          },
+          "object_title": "EditionID"
+        },
+        "reported_elements": "all",
+        "require": {
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "string"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": "Enterprise"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "type": {
+                      "equals": "string"
+                    }
+                  }
+                },
+                {
+                  "fields": {
+                    "value": {
+                      "equals": "EnterpriseS"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "test_title": "EditionID is Enterprise or EnterpriseS"
+      }
+    },
+    "version": 2
+  },
+  "provenance": {
+    "case": 3,
+    "platform": "ms_windows_11",
+    "selection_reason": "Extended Definition; Enterprise/EnterpriseS State OR",
+    "benchmark": "benchmark.ms_windows_11",
+    "package": "ms_windows_11.scapng",
+    "package_sha256": "fd6e8a15ca48979650a289dc0a9476d0f2abf365ddf342f4a08bb685180d2a3e",
+    "manifest_sha256": "fac91dcce703272b6140603aef0d92a2f80c9ef83a5a0f25f824959b2f59ceea",
+    "rule": "SV-253254",
+    "rule_path": "rules/SV-253254-566b1a01b250.json",
+    "assessment": "SV-253254.automated",
+    "assessment_path": "assessments/SV-253254.automated-769eeb5a1f94.json",
+    "assessment_sha256": "87f71ce79332881460ed7de4594ed384d394190ef1639d4d53e9d12a2654c532",
+    "program_path": "programs/88cfa0684eb26447e610a431ccb9f39ddc3c2b0bfb7dea20c0e55fad62d3b8d4.json",
+    "program_sha256": "71063b5d9b1bf7bb3b1816baac22b6f523e9b479cf95621131646bf43e01c3aa",
+    "compiled_operands_and_result_plan_match_exact_packaged_source": true,
+    "authoring_path": "authoring/ms_windows_11/assessments/automated/SV-253254.automated.json",
+    "source_zip": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "source_zip_sha256": "e4b8d55b58aa80124bd0974977af4c7f7bde35c748e2940e02857419292d8c3d",
+    "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+    "source_path": "Current/U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "xml_member": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.xml",
+    "xml_sha256": "cfc5061d275235f6c5e0719cc384fb887f8624ae6e0dbac03f4a9cb3f43c06a5",
+    "xccdf_rule": "xccdf_mil.disa.stig_rule_SV-253254r991589_rule",
+    "xccdf_rule_sha256": "f7a8c2b1a907b599e9a88776254c4eceb0a6152b3d0c9527cd161332f1b9573e",
+    "all_xccdf_checks": [
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": ""
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253254"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://oval.mitre.org/XMLSchema/oval-definitions-5",
+          "selector": "automated"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+            "name": "oval:mil.disa.stig.windows11:def:253254"
+          }
+        ]
+      },
+      {
+        "attributes": {
+          "system": "http://scap.nist.gov/schema/ocil/2",
+          "selector": "manual"
+        },
+        "references": [
+          {
+            "href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-ocil.xml",
+            "name": "ocil:navy.navwar.niwcatlantic.scc.windows11:questionnaire:101"
+          }
+        ]
+      }
+    ],
+    "distinct_oval_checks": 1,
+    "catalog_href": "U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component_ref": "scap_mil.disa.stig_cref_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "component": "scap_mil.disa.stig_comp_U_MS_Windows_11_V2R10_STIG_SCAP_1-4_Benchmark-enhancedV18-oval.xml",
+    "definition": "oval:mil.disa.stig.windows11:def:253254",
+    "source_dependency_closure": {
+      "nodes": [
+        {
+          "id": "oval:mil.disa.stig.defs:def:253254",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "1",
+          "sha256": "1d8193f06b62532825a4369f270a914a6f905d338f09ecd3f92f38b181f44ab3"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:obj:20000017",
+          "kind": "objects",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_object",
+          "version": "1",
+          "sha256": "33562d46b8e6bcaf70135657c119e9a48607e45368bfc99fc0b841e994d0493a"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:20000018",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "2",
+          "sha256": "0db3921d5216c6c16a9ffcc9cace7cf67dd1e64027e7e89942ab82001fbb988e"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:ste:25325400",
+          "kind": "states",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_state",
+          "version": "2",
+          "sha256": "ad64d92b50120939b636ca8c3de3df3afaa0b7b952ba19b7557d851863564670"
+        },
+        {
+          "id": "oval:mil.disa.stig.win:tst:25325400",
+          "kind": "tests",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#windows}registry_test",
+          "version": "2",
+          "sha256": "bf6f9284a0b3c10f1844efa28beebe9e4441583696d465d2de6df3c6b9b89aa8"
+        },
+        {
+          "id": "oval:mil.disa.stig.windows11:def:253254",
+          "kind": "definitions",
+          "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+          "version": "2",
+          "sha256": "33df87876dd3e17219e10802bb86c585022876cdf98af9b636c53921722338ba"
+        }
+      ],
+      "edges": [
+        [
+          "oval:mil.disa.stig.windows11:def:253254",
+          "oval:mil.disa.stig.defs:def:253254",
+          "extend_definition"
+        ],
+        [
+          "oval:mil.disa.stig.defs:def:253254",
+          "oval:mil.disa.stig.win:tst:25325400",
+          "criterion"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325400",
+          "oval:mil.disa.stig.win:obj:20000017",
+          "object"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325400",
+          "oval:mil.disa.stig.win:ste:25325400",
+          "state"
+        ],
+        [
+          "oval:mil.disa.stig.win:tst:25325400",
+          "oval:mil.disa.stig.win:ste:20000018",
+          "state"
+        ]
+      ]
+    },
+    "closure_sha256": "3d675bda17e4ecf2222c9c9d91fb40f470aa5133b44da9554c3f3abedd6fe18b",
+    "outcome": "PROVED",
+    "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+    "normalizations_applied": []
+  },
+  "expected_outcome": "PROVED",
+  "compiled_program": {
+    "assessment_id": "SV-253254.automated",
+    "assessment_source_sha256": "4dd7f797ae97c815ce7a144936190fa15912dbc29609b0c64c3d49155a1db58d",
+    "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+    "result_expression_sha256": "3bc72df5ef8c9660bc2c9dd68bdb71c2a1155f283719efd12d7823c89df9d122",
+    "result_instructions": [
+      {
+        "id": "editionid-enterprise-or-enterprises-test",
+        "op": "read_test",
+        "path": [
+          "evaluate"
+        ]
+      }
+    ],
+    "result_requires": {
+      "dependencies": [],
+      "tests": [
+        "editionid-enterprise-or-enterprises-test"
+      ]
+    },
+    "scanner_evaluated": false,
+    "test_instructions": [
+      {
+        "capability": "windows.registry",
+        "opcode": "CHECK_ITEM_CONDITION",
+        "operands": {
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+            },
+            "name": {
+              "equals": "EditionId"
+            },
+            "object_title": "EditionID"
+          },
+          "reported_elements": "all",
+          "require": {
+            "field_requirement": {
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            },
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "or": [
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "string"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": "Enterprise"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "string"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": "EnterpriseS"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "test_title": "EditionID is Enterprise or EnterpriseS"
+        },
+        "source_test_sha256": "5cabc6797b4257e7759a2f4da6e9fb07dac306cefef0528f3dbc36a0013914fa",
+        "test_id": "editionid-enterprise-or-enterprises-test"
+      }
+    ]
+  }
+}
