@@ -40,12 +40,25 @@ validate 300 JSON/300 YAML documents and independently verify 149 programs.
 Empty/dynamic hives, State-level enum comparator changes and extra `all_exist`
 normalizations remain blocked. No unmatched-workload speedup is claimed.
 
-The next bounded objective is original user-rights proof. A completed read-only
-census finds 39 Rule closures with 79 Definitions, 53 Tests, 34 Objects, 18 States
-and one Variable; WMI record dependencies and a 45-value Variable/filter Object
-require independent treatment. Preserve the source's default `var_check: all`;
-do not silently change it to match an apparent policy intent. WMI (26) remains
-the next ranked source census. Counts overlap and never constitute admission.
+The [user-rights checkpoint](v04-direct-userright.md) is complete:
+`a2ce5fd94` → `c80f84c0a`, with actual examples in `718b10df1`.
+Of 39 original candidate closures, 34 independently prove and compile; five
+remain atomically blocked by WMI record dependencies. Global coverage advances
+to **183 proved / zero compiled-unproved / 108 blocked** of 291; all prior 149
+program hashes are preserved. **3,032** maintained tests pass with zero
+failures/errors and one unchanged skip; all five implementation-head workflows
+PASS. The published Variable/Filter case retains original `var_check: all` as
+`value_match: every`; it is never changed to match an apparent policy intent.
+Public gates validate 368 JSON/368 YAML documents and verify 183 programs.
+Authoring: 147 inline Test Objects, nine shared references to two named Objects,
+71 intentional no-Object Tests and 120 compact Registry Object sites. No schema,
+production converter/compiler or release gate changed. One issue-comment attempt
+returned `Post "https://api.github.com/graphql": Forbidden`; no retry was made.
+
+The next bounded objective is WMI record conversion/proof. There are 26 original
+candidate closures, including the five remaining user-rights cases. Named field
+boundaries, implicit string versus explicit integer datatypes, record matching,
+missing-member errors and collection evidence must remain intact.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
