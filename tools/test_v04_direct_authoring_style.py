@@ -9,7 +9,8 @@ import yaml
 from v04_direct_converter import AssessmentConverter, convert, convert_benchmark, load_mappings
 from v04_direct_scap_source import SourceModel, OVAL
 from v04_direct_yaml import authoring_yaml, compact_registry_object
-from v04_direct_authoring_examples import authoring_statistics, choose_examples, walk, DEPRECATED
+from v04_direct_authoring_examples import authoring_statistics, choose_examples, example_filename, walk, DEPRECATED
+from validate_native_json_schemas import classify
 from audit_v04_direct_benchmark import verify_original, verify_compiled
 from v04_native_bundle_compiler import build_bundle
 from v04_object_contract import object_sites
@@ -183,6 +184,8 @@ class DirectAuthoringStyle(unittest.TestCase):
         self.assertEqual(stats['shared_objects'], stats['multiply_used_named_objects'])
 
     def test_representatives_retain_independent_source_and_compiled_operand_proof(self):
+        for a in self.examples.values():
+            self.assertEqual(classify(Path(example_filename(a) + '.yaml')), ('assessment', 'assessment.schema.json'))
         selected = {a['id'] for a in self.examples.values()}
         rules = [b['source_rule'] for b in self.trace['rules'] if b['assessment'] in selected]
         docs, trace = convert(self.source, rules)

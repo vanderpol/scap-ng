@@ -79,6 +79,11 @@ def choose_examples(documents):
     return selected
 
 
+def example_filename(assessment):
+    """Keep the meaningful native name and the public CLI's document suffix."""
+    return assessment['id'].removesuffix('-assessment') + '.assessment'
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
@@ -113,7 +118,7 @@ def main():
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     for name, assessment in selected.items():
         document = {'assessment': assessment}
-        filename = assessment['id']
+        filename = example_filename(assessment)
         (args.output / (filename + '.json')).write_text(json.dumps(document, indent=2) + '\n')
         (args.output / (filename + '.yaml')).write_text(authoring_yaml(document))
         examples.append({'category': name, 'file': filename, 'title': assessment['assessment_title'],
