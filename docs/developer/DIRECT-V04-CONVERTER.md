@@ -195,8 +195,8 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-130 converted + 161 blocked, all 130 source-proved. The earlier 84/207 and 81/3
-results, plus the 87/204 architecture checkpoint, remain preserved in their dated
+149 converted + 142 blocked, all 149 source-proved. The earlier 84/207 and 81/3
+results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
 admit three additional Rules. These are not updates to the packaged
@@ -326,3 +326,34 @@ regex selectors from `compact_registry_object`, add a source-backed regex case t
 the style test and verify it becomes multiline while parsed structure and original
 proof remain unchanged. Whole-subset original/compiled negative mutations remain
 in `test_v04_direct_benchmark`, `test_v04_direct_acceptance` and the audit-policy tests.
+
+## Closed Registry hive selector relation
+
+The bounded hive increment admits literal Registry acquisition selectors using
+original `case insensitive equals`. The Object and Item domains in original OVAL
+5.12.3 contain six canonical hives plus an empty Variable/error placeholder.
+Across all 49 pairs, equality and case-insensitive equality have the same relation;
+the six real hives map one-to-one to the approved native enum. The producer uses
+the versioned capability crosswalk and checks domain case distinction. The
+independent reader separately reads/hashes the original Object/Item XSD domains,
+checks every pair, and derives native hive names from original tokens.
+
+Only nonempty literal acquisition operands are admitted. Empty/unknown/lowercase
+source tokens, dynamic hive operands, non-string datatypes, pattern selectors and
+State-level enum comparator changes remain blocked. Other string selector
+comparators (for example, Registry keys) retain their original operation. Source
+Object IDs, original selector attributes/value and the reason remain in external
+`selector_equivalences`; they are also independently recorded in each proof.
+No Test matching, error/incomplete/unknown evidence, Variable expansion or
+`all_exist` behavior changes. Native output equals the equivalent original
+`equals` spelling, including all collection and evaluation boundaries.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_registry_hive.py -v
+```
+
+Its five tests cover all 19 newly supported original Rules, all six controlled
+literal hives, the 49-pair domain proof, exact compilation and negative mutants.
+The browsable authoring examples remain pinned to their manifest's converter
+commit; run regeneration from that commit to reproduce their historical 130-Rule
+snapshot. Current `main` regeneration reports the larger supported subset.

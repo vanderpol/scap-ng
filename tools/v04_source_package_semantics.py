@@ -22,6 +22,8 @@ OPS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_r
        'less than': 'less_than', 'less than or equal': 'less_than_or_equal',
        'case insensitive equals': 'case_insensitive_equals'}
 META = {'id', 'version', 'comment'}
+REGISTRY_HIVES = frozenset('HKEY_' + name for name in (
+    'CLASSES_ROOT', 'CURRENT_CONFIG', 'CURRENT_USER', 'CURRENT_USER_LOCAL_SETTINGS', 'LOCAL_MACHINE', 'USERS'))
 
 
 class Unsupported(ValueError):
@@ -254,9 +256,9 @@ class Source:
                 need(name in ('hive', 'key', 'name'), 'registry selector')
                 value = self.entity(c, selector=True)
                 if name == 'hive':
-                    old = value['operand']['value']
-                    need(old == 'HKEY_LOCAL_MACHINE', 'registry hive proof unavailable')
-                    value['operand']['value'] = 'local_machine'
+                    old = value['operand'].get('value')
+                    need(isinstance(old, str) and old in REGISTRY_HIVES, 'registry hive proof unavailable')
+                    value['operand']['value'] = old.removeprefix('HKEY_').lower()
                 fields[name] = value
             else:
                 need(name in (('shell', 'command', 'pattern') if cap == 'independent.shellcommand'

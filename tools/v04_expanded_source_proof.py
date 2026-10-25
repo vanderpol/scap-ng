@@ -12,7 +12,7 @@ from functools import lru_cache
 import xml.etree.ElementTree as ET
 
 from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
-    boolean, compare, digest, keys, literal, local, need, xml_term)
+    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES)
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
@@ -67,10 +67,39 @@ def actual_items_evidence(status, items, *, claims_complete_success=False):
     return {'collection_status': status, 'item_statuses': list(items)}
 
 
+@lru_cache(maxsize=1)
+def original_registry_hive_contract():
+    """Independent finite relation proof from original Object AND Item domains.
+
+    Empty Item hives are error placeholders. They remain in the relation table;
+    no native empty hive or successful Item is manufactured. Collection flags
+    and entity statuses remain outside this literal-selector equivalence.
+    """
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    domains, hashes = {}, {}
+    for filename, type_name in (
+            ('windows-definitions-schema.xsd', 'EntityObjectRegistryHiveType'),
+            ('windows-system-characteristics-schema.xsd', 'EntityItemRegistryHiveType')):
+        path = ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3' / filename
+        root = ET.parse(path).getroot()
+        node = root.find(xs + 'complexType[@name="' + type_name + '"]')
+        need(node is not None, 'original Registry hive type unavailable')
+        domain = {e.get('value') for e in node.findall('.//' + xs + 'enumeration')}
+        need(domain == REGISTRY_HIVES | {''}, 'original Registry hive domain changed')
+        domains[type_name] = sorted(domain)
+        hashes[filename] = sha256(path.read_bytes()).hexdigest()
+    pairs = [(a, b) for a in domains['EntityObjectRegistryHiveType']
+             for b in domains['EntityItemRegistryHiveType']]
+    need(all((a == b) == (a.casefold() == b.casefold()) for a, b in pairs),
+         'Registry hive equality relation differs')
+    return {'domains': domains, 'literal_pairs_proved': len(pairs), 'source_xsd_sha256': hashes}
+
+
 class ExpandedSource(Source):
     def __init__(self, oval):
         super().__init__(oval)
         self.normalization_ids, self.normalizations = set(), []
+        self.selector_equivalences = {}
 
     def admit_pinned_rhel_normalization(self, definition, trace):
         raw = APPROVED_SOURCE.read_bytes()
@@ -201,6 +230,18 @@ class ExpandedSource(Source):
             finally:
                 self.active.remove(ident)
         if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
+            if cap == 'windows.registry':
+                value = super().object(ident)
+                hive = value['selectors'].get('hive')
+                if hive and hive['operation'] == 'case_insensitive_equals':
+                    contract = deepcopy(original_registry_hive_contract())
+                    need(hive['comparison_datatype'] == 'string', 'Registry hive comparison datatype')
+                    hive['operation'] = 'equals'
+                    entity = n.find('{' + OD + '#windows}hive')
+                    self.selector_equivalences[ident] = {'source_object': ident,
+                        'source_selector': {'tag': entity.tag, 'attributes': dict(entity.attrib), 'value': entity.text},
+                        'native_comparator': 'equals', 'domain_proof': contract}
+                return value
             if cap == 'independent.shellcommand':
                 # shellcommand.pattern is an intrinsic regex collector parameter
                 # (its 5.12.3 element documentation), not an equals selector.
@@ -416,6 +457,8 @@ class ExpandedNative(Native):
 
 def expanded_compare(source, definition, assessment):
     result = compare(source, definition, assessment, native_type=ExpandedNative)
+    if result['outcome'] == 'PROVED' and source.selector_equivalences:
+        result['selector_equivalences'] = list(source.selector_equivalences.values())
     if result['outcome'] == 'PROVED' and source.normalizations:
         for row in source.normalizations:
             row['native_test'] = result['test_bindings'][row['source_test']]

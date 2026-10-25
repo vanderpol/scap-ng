@@ -53,6 +53,7 @@ class AssessmentConverter:
         self.active, self.cache, self.used = set(), {}, {}
         self.tests, self.variables, self.shared_objects = {}, {}, {}
         self.object_uses = None
+        self.selector_equivalences = []
 
     def capability(self, element, kind):
         matches = [mapping for mapping in self.mappings if element.tag ==
@@ -181,6 +182,13 @@ class AssessmentConverter:
                 target = selectors.get(field, parameters.get(field))
                 ensure(target not in acquisition, 'duplicate Object field')
                 acquisition[target] = self.predicate(child, mapping, selector=True) if field in selectors else self.parameter(child)
+                if (field in selectors and child.get('operation') == 'case insensitive equals'
+                        and 'equals' in acquisition[target]):
+                    self.selector_equivalences.append({'source_object': element.get('id'),
+                        'source_selector': {'tag': child.tag, 'attributes': dict(child.attrib), 'value': child.text},
+                        'native_selector': target,
+                        'native_comparator': 'equals', 'reason': 'closed Registry hive domain equality',
+                        'source_contract': 'OVAL 5.12.3 EntityObjectRegistryHiveType/EntityItemRegistryHiveType'})
             for path, value in mapping.get('migration_crosswalk', {}).get('materialized_defaults', {}).items():
                 ensure(path.startswith('behaviors.'), 'unrecognized acquisition default')
                 acquisition[path.split('.')[1]] = value
@@ -345,8 +353,22 @@ class AssessmentConverter:
         value = self.operand(element)
         crosswalk = mapping['native'].get('selector_value_crosswalk' if selector else 'state_value_crosswalk', {}).get(local_name(element))
         if crosswalk:
-            ensure(operation == 'equals' and isinstance(value, str) and value in mapping['migration_crosswalk'][crosswalk], 'unsupported enum comparison/value')
-            value = mapping['migration_crosswalk'][crosswalk][value]
+            aliases = mapping['migration_crosswalk'][crosswalk]
+            if operation != 'equals':
+                # Original Object/Item hives are a closed, case-distinct domain.
+                # The independent XSD relation proof covers every pair (including
+                # the empty error placeholder). Only nonempty literal acquisition
+                # selectors are admitted; States and dynamic operands stay strict.
+                enumeration = mapping['native'].get('selector_value_enums', {}).get(local_name(element), [])
+                domain = {k: v for k, v in aliases.items() if v in enumeration}
+                ensure(selector and mapping['capability'] == 'windows.registry' and local_name(element) == 'hive'
+                       and operation == 'case insensitive equals' and element.get('datatype', 'string') == 'string'
+                       and not element.get('var_ref') and isinstance(value, str) and value in domain
+                       and len({k.casefold() for k in domain}) == len(domain)
+                       and len(set(domain.values())) == len(domain), 'unsupported enum comparison/value')
+                operation = 'equals'
+            ensure(isinstance(value, str) and value in aliases, 'unsupported enum comparison/value')
+            value = aliases[value]
         if not selector:
             native_field = mapping['native']['state_field_map'].get(local_name(element))
             enumeration = mapping['native'].get('state_value_enums', {}).get(native_field)
@@ -450,6 +472,8 @@ def convert_rule(source, source_id, mappings):
         'component': component, 'definition': definition, 'native_rule': rule_id, 'assessment': assessment_id,
         'dependencies': converter.used, 'omitted_checks': omitted_checks,
         'source_platforms': [child.get('idref') for child in rule.findall(f'{{{XCCDF}}}platform')]}
+    if converter.selector_equivalences:
+        binding['selector_equivalences'] = converter.selector_equivalences
     return documents, binding
 
 
