@@ -225,3 +225,31 @@ Signing/trust, scanner acceptance and release thresholds remain separate gates.
 Issue commenting remains blocked by the previously observed
 `Post "https://api.github.com/graphql": Forbidden`; the committed report is the
 #251 handoff without repeated attempts.
+
+
+## Published commits and terminal hosted CI
+
+Normal, non-forced pushes directly to `main`, all referencing #251:
+
+- [2ac5bb7a70131196a545b27ef4c2e8c201e1cede](https://github.com/vanderpol/scap-ng/commit/2ac5bb7a70131196a545b27ef4c2e8c201e1cede): immutable 8/8/8 manifest before comparisons.
+- [8717d081350809075b8c82dd402e70b1aef8a3de](https://github.com/vanderpol/scap-ng/commit/8717d081350809075b8c82dd402e70b1aef8a3de): independent proof-rule expansion, eighteen regression methods, 24 complete fixtures, additive fast-CI invocation, monotonic coverage and reports.
+- [6d5383bc69464aedacab857c6145d043fd651ed5](https://github.com/vanderpol/scap-ng/commit/6d5383bc69464aedacab857c6145d043fd651ed5): optional Unix RSS telemetry, import-without-resource guard and refreshed reproducible method/fixture evidence. All 91 focused tests passed again after this fix; source/native outcomes and coverage are unchanged.
+
+All five workflows triggered by the final implementation SHA `6d5383bc6`
+completed **SUCCESS** (checked 2026-10-25 10:26 UTC):
+
+| Workflow | Exact hosted run | Conclusion |
+| --- | --- | --- |
+| Maintained production regression | [40184501297](https://github.com/vanderpol/scap-ng/actions/runs/40184501297) | SUCCESS |
+| Canonical authoring fast checks | [40184501296](https://github.com/vanderpol/scap-ng/actions/runs/40184501296) | SUCCESS |
+| Current-design contracts | [40184501347](https://github.com/vanderpol/scap-ng/actions/runs/40184501347) | SUCCESS |
+| Markdown navigation | [40184501279](https://github.com/vanderpol/scap-ng/actions/runs/40184501279) | SUCCESS |
+| Commit issue references | [40184501240](https://github.com/vanderpol/scap-ng/actions/runs/40184501240) | SUCCESS |
+
+[Repository preservation and boundaries at `8717d0813`](https://github.com/vanderpol/scap-ng/actions/runs/40155609881)
+also completed **SUCCESS**; its path filters did not retrigger it for the telemetry
+fix. Hosted conclusions were read from public Actions pages. Numeric test counts
+above are the recorded local results; signed-in detailed logs remain unavailable
+through the blocked API. No held/manual/historical workflow was dispatched or
+represented as a fresh green check. This final documentation-only follow-up
+records terminal CI; no further semantic work or 883-case audit is begun.
