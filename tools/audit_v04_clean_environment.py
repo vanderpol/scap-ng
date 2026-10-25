@@ -124,6 +124,7 @@ if __name__ == '__main__':
     p.add_argument('--source', required=True, type=Path)
     p.add_argument('--evidence-dir', required=True, type=Path)
     a = p.parse_args()
-    result = run(a.repo.resolve(), a.ref, a.python.resolve(), a.source.resolve(), a.evidence_dir)
+    # Preserve the venv executable path: resolving its symlink selects base Python.
+    result = run(a.repo.resolve(), a.ref, a.python.absolute(), a.source.resolve(), a.evidence_dir)
     print(json.dumps({'status': result['status'], 'source_commit': result['source_commit'],
                       'toolchain_sha256': result['toolchain_sha256']}))
