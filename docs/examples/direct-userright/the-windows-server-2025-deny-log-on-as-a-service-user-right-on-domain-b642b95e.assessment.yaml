@@ -1,0 +1,40 @@
+assessment:
+  id: the-windows-server-2025-deny-log-on-as-a-service-user-right-on-domain-b642b95e-assessment
+  version: 1
+  assessment_title: The Windows Server 2025 "Deny log on as a service" user right on domain-joined member servers must be configured to prevent access from highly privileged domain accounts. No other groups or accounts must be assigned this right.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  shared_objects:
+    userright-userright-equals-se-deny-service-logon-name-18f5cb7b-object:
+      capability: windows.userright
+      userright: {equals: SE_DENY_SERVICE_LOGON_NAME}
+      object_title: 'Userright: userright equals ''SE_DENY_SERVICE_LOGON_NAME'''
+  tests:
+    deny-log-on-as-a-service-domain-admins-410fa81f-test:
+      test_title: Deny log on as a service - Domain Admins
+      capability: windows.userright
+      object: userright-userright-equals-se-deny-service-logon-name-18f5cb7b-object
+      require:
+        items_found: one_or_more
+        items_satisfying: one_or_more
+        fields:
+          trustee_name: {matches_regex: '^(?i)(.+\\)?Domain Admins$', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    deny-log-on-as-a-service-enterprise-admins-82db00c8-test:
+      test_title: Deny log on as a service - Enterprise Admins
+      capability: windows.userright
+      object: userright-userright-equals-se-deny-service-logon-name-18f5cb7b-object
+      require:
+        items_found: one_or_more
+        items_satisfying: one_or_more
+        fields:
+          trustee_name: {matches_regex: '^(?i)(.+\\)?Enterprise Admins$', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    and:
+    - test: deny-log-on-as-a-service-domain-admins-410fa81f-test
+    - test: deny-log-on-as-a-service-enterprise-admins-82db00c8-test

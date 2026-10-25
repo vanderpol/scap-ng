@@ -1,0 +1,71 @@
+{
+  "assessment": {
+    "id": "the-windows-server-2025-access-this-computer-from-the-network-user-rig-39c0aa50-assessment",
+    "version": 1,
+    "assessment_title": "The Windows Server 2025 \"Access this computer from the network\" user right must only be assigned to the Administrators, Authenticated Users, and Enterprise Domain Controllers groups on domain controllers.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "access-this-computer-from-the-network-administrators-authenticated-use-268a30a6-test": {
+        "test_title": "Access this computer from the network - Administrators, Authenticated Users, Enterprise Domain Controllers",
+        "capability": "windows.userright",
+        "object": {
+          "userright": {
+            "equals": "SE_NETWORK_LOGON_NAME"
+          }
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "fields": {
+                "trustee_name": {
+                  "equals": "",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "trustee_name": {
+                  "case_insensitive_equals": "Administrators",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "trustee_name": {
+                  "case_insensitive_equals": "Authenticated Users",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "trustee_name": {
+                  "case_insensitive_equals": "Enterprise Domain Controllers",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ]
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "test": "access-this-computer-from-the-network-administrators-authenticated-use-268a30a6-test"
+    }
+  }
+}
