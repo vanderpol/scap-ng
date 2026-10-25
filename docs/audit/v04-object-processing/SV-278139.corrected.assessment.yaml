@@ -1,0 +1,66 @@
+assessment:
+  assessment_title: Windows Server 2025 Active Directory SYSVOL directory must have the proper access control permissions.
+  class: compliance
+  evaluate:
+    test: permissions-conform-minimum-requirements-test
+  id: SV-278139.automated
+  mode: automated
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    permissions-conform-minimum-requirements-test:
+      capability: independent.shellcommand
+      object:
+        command:
+          variable: icacls-path-sysvol-directory-variable
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+        object_title: Run Icacls command against SYSVOL Directory
+        pattern: ':'
+        shell: cmd
+      reported_elements: all
+      require:
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        items_found: one_or_more
+        items_satisfying: every
+        and:
+        - fields: {exit_status: {equals: 0}}
+        - fields:
+            stderr_line:
+              values_found: none
+        - fields:
+            stdout_line:
+              datatype: string
+              matches_regex:
+              - (?i)NT AUTHORITY\\Authenticated Users:\(RX\)
+              - (?i)NT AUTHORITY\\Authenticated Users:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+              - (?i)BUILTIN\\Server Operators:\(RX\)
+              - (?i)BUILTIN\\Server Operators:\(OI\)\(CI\)\(IO\)\(GR,GE\)
+              - (?i)BUILTIN\\Administrators:\(M,WDAC,WO\)
+              - (?i)BUILTIN\\Administrators:\(OI\)\(CI\)\(IO\)\(F\)
+              - (?i)NT AUTHORITY\\SYSTEM:\(F\)
+              - (?i)NT AUTHORITY\\SYSTEM:\(OI\)\(CI\)\(IO\)\(F\)
+              - (?i)CREATOR OWNER:\(OI\)\(CI\)\(IO\)\(F\)
+              value_match: one_or_more
+      test_title: Permissions must conform to minimum requirements.
+  variables:
+    icacls-path-sysvol-directory-variable:
+      datatype: string
+      expression:
+        concat:
+        - literal:
+            datatype: string
+            value: 'icacls '
+        - regex_capture:
+            pattern: (^[a-zA-Z]:\\.+)\\sysvol
+            value:
+              values:
+                field: value
+                object: {capability: windows.registry, object_title: Filepath to SysVol, hive: {equals: local_machine}, key: {equals: SYSTEM\CurrentControlSet\Services\Netlogon\Parameters}, name: {equals: SysVol}}
+      kind: local
+      title: icacls and Path to SYSVOL directory
+  version: 1

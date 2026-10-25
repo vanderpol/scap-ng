@@ -219,6 +219,12 @@ def validate_docs(documents, validators):
     # from a string token. The native compiler must not silently accept Test
     # capabilities that have no reviewed version-local mapping.
     _validate_capability_identities(documents)
+    from v04_object_contract import object_errors
+    for path, doc in sorted(documents.items()):
+        failures = list(object_errors(doc))
+        if failures:
+            first = failures[0]
+            raise ValueError(f"{path}: native 0.4.0 Object schema failure: {first.message}")
     for path, doc in sorted(documents.items()):
         kind = next(iter(doc))
         failures = list(validators[kind].iter_errors(doc))

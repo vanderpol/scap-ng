@@ -61,6 +61,8 @@ def resolve_object(obj, cap, catalog, route, edits):
         # A native windows.cmdlet parameter named 'select' is under
         # legacy collect, not the generic Object select container.
         if wrapper == "select" and not fields["selectors"]:
+            if wrapper in fields["parameters"] and "noun" in obj:
+                continue  # Existing flat windows.cmdlet.select is acquisition data.
             raise ValueError(f"{route}: ambiguous or unsupported generic select")
         unknown = set(value) - fields[category]
         if unknown:
@@ -93,37 +95,9 @@ def object_nodes(assessment):
     are private even inside a named Object. Never search arbitrary records,
     selectors, Filters or Variable values for keys spelled `object`.
     """
-    def walk(obj, cap, route, private):
-        effective = obj.get("capability", cap)
-        yield obj, effective, route, private
-        if isinstance(obj.get("set"), dict):
-            yield from walk_set(obj["set"], effective, route + ("set",))
-
-    def walk_set(expression, cap, route):
-        operands = expression.get("operands")
-        if not isinstance(operands, list):
-            return
-        for i, operand in enumerate(operands):
-            if not isinstance(operand, dict):
-                continue
-            path = route + ("operands", i)
-            if isinstance(operand.get("object"), dict):
-                yield from walk(operand["object"], cap, path + ("object",), True)
-            if isinstance(operand.get("set"), dict):
-                yield from walk_set(operand["set"], cap, path + ("set",))
-
-    for section in ("objects", "shared_objects"):
-        library = assessment.get(section)
-        if isinstance(library, dict):
-            for name, obj in library.items():
-                if isinstance(obj, dict):
-                    yield from walk(obj, None, ("assessment", section, name), False)
-    tests = assessment.get("tests")
-    if isinstance(tests, dict):
-        for name, test in tests.items():
-            if isinstance(test, dict) and isinstance(test.get("object"), dict):
-                yield from walk(test["object"], test.get("capability"),
-                                ("assessment", "tests", name, "object"), True)
+    from v04_object_contract import object_sites
+    for site in object_sites(assessment):
+        yield site.node, site.capability, site.path, site.private
 
 
 def flatten_document(document, catalog):
@@ -202,11 +176,11 @@ def hybridize(node, key=None):
     simple_object = (key == "object" and
         any(isinstance(v, FlowMap) for name, v in mapped.items()
             if name != "object_title") and
-        all(name == "object_title" or isinstance(v, FlowMap)
+        all(name in {"object_title", "capability"} or isinstance(v, FlowMap)
             for name, v in mapped.items()))
     if comparator or simple_fields or simple_object:
         approx = len(json.dumps(mapped, ensure_ascii=False))
-        limit = 140 if simple_fields else 210 if simple_object else 90
+        limit = 140 if simple_fields else 320 if simple_object and node.get("capability") == "windows.registry" else 210 if simple_object else 90
         if approx <= limit:
             return FlowMap(mapped)
     return mapped
@@ -214,7 +188,7 @@ def hybridize(node, key=None):
 
 def dump_hybrid(document):
     source = yaml.dump(hybridize(document), Dumper=HybridDumper,
-                       sort_keys=False, allow_unicode=True, width=160)
+                       sort_keys=False, allow_unicode=True, width=1000)
     if yaml.safe_load(source) != document:
         raise ValueError("Hybrid YAML differs from its parsed JSON structure")
     return source

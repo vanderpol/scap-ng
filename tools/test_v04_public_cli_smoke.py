@@ -46,7 +46,7 @@ def schema_valid_docs():
             "evaluate": {"test": "file-mode-test"},
             "tests": {"file-mode-test": {
                 "test_title": "File mode is compliant", "capability": "unix.file",
-                "object": {"filepath": "/etc/example"},
+                "object": {"full_path": {"equals": "/etc/example"}, "filesystem": "all"},
                 "require": {"items_found": "one_or_more", "items_satisfying": "every",
                             "fields": {"mode": {"equals": "0600",
                                 "values_found": "one_or_more", "values_matching": "every"}}},

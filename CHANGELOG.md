@@ -6,6 +6,13 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-25:** Enforced the reviewed flat Object contract in public validation
+  and compiler preflight across Tests, shared Objects, Sets and nested Variable
+  acquisitions. Historical migration now flattens nested Objects reversibly;
+  current invalid authoring fails closed. Corrected explicit Registry hive
+  equality in the source-backed adapter
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-25:** Expanded independent Linux/Apache proof rules and attempted a
   fixed 24-identity Windows batch. Exact proof coverage advances from 4/883 to
   24/883, including one explicitly conditional RHEL normalization proof;

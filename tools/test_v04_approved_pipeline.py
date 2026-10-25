@@ -220,7 +220,7 @@ class ApprovedPipelineTests(unittest.TestCase):
         obj = test['object']
         self.assertIsInstance(obj, dict)
         self.assertNotIn('capability', obj)
-        self.assertEqual(obj['hive'], 'local_machine')
+        self.assertEqual(obj['hive'], {'equals': 'local_machine'})
         self.assertEqual(obj['key']['equals'], r'SOFTWARE\Microsoft\Windows NT\CurrentVersion')
         self.assertEqual(obj['name']['equals'], 'EditionId')
         expected = {'items_found': 'one_or_more', 'items_satisfying': 'every',

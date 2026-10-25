@@ -212,11 +212,9 @@ class EnterpriseRegistryStateTests(unittest.TestCase):
         objects = ET.SubElement(out, '{' + OD + '}objects')
         obj = ET.SubElement(objects, '{' + self.windows + '}registry_object', id='rebuilt-object')
         for field in ('hive', 'key', 'name'):
-            value = test['object'][field]
+            value = test['object'][field]['equals']
             if field == 'hive':
                 value = 'HKEY_LOCAL_MACHINE' if value == 'local_machine' else value
-            else:
-                value = value['equals']
             ET.SubElement(obj, '{' + self.windows + '}' + field, datatype='string').text = value
         states = ET.SubElement(out, '{' + OD + '}states')
         for index, branch in enumerate(req[outer]):

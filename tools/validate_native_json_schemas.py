@@ -112,6 +112,9 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
         )
         return
     yield from v.iter_errors(doc)
+    if v.schema.get('x-scap-ng-version') == '0.4.0':
+        from v04_object_contract import object_errors
+        yield from object_errors(doc)
     # New versioned capability contracts are checked even in skipped branches.
     assessment = doc.get("assessment")
     if isinstance(assessment, dict):

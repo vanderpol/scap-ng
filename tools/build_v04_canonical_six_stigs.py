@@ -40,6 +40,16 @@ def promote(doc, *, provenance=None, legacy_review=False):
     a=new.get("assessment")
     if not isinstance(a,dict) or a.get("mode")!="automated":
         return new,audit
+    if legacy_review:
+        # Explicit historical migration only. Current validation never repairs
+        # legacy Object wrappers, including those nested in Variable expressions.
+        from v04_flat_object_authoring import flatten_document, load_catalog, restore_document
+        migrated, object_proof = flatten_document(new, load_catalog(
+            Path(__file__).resolve().parents[1] / 'schema/v0.4.0/capability-mappings/supported'))
+        if restore_document(migrated, object_proof) != new:
+            raise ValueError('historical Object migration inverse failed')
+        new, a = migrated, migrated['assessment']
+        audit['object_wrappers_flattened'] += len(object_proof['edits'])
     if "evaluate" in a:
         migrated, ledger = migrate_evaluate(new)
         assert_inverse(new, migrated, ledger)

@@ -131,7 +131,10 @@ def direct_selectors(original_object, old_object, namespace, capability, mapping
                    and values[original_value] in mapping["native"]["selector_value_enums"][field]
                    and source_selectors[field] == values[original_value],
                    "registry enum selector/operation/value drift")
-            obj[renames[field]] = values[original_value]
+            # The reviewed 0.4 Object contract requires an explicit selector
+            # equality even for enumerated hive values. The attested 0.3
+            # lowering remains unchanged above.
+            obj[renames[field]] = {"equals": values[original_value]}
             continue
         ensure(source_selectors[field] == {
             "operation": old_operation, "datatype": "string", "value": original_value},

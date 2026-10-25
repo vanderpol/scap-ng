@@ -28,7 +28,7 @@ def sample():
             "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
             "evaluate": {"test": "t1"},
             "tests": {"t1": {"capability": "unix.file",
-                "object": {"filepath": "/etc/example"},
+                "object": {"full_path": {"equals": "/etc/example"}, "filesystem": "all"},
                 "require": {"items_found": "one_or_more", "items_satisfying": "every",
                             "fields": {"mode": {"equals": "0600",
                                 "values_found": "one_or_more", "values_matching": "every"}}}}}}},

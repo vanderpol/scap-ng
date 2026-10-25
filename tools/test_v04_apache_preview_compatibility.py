@@ -102,7 +102,9 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
         projected = native_schema_projection(self.sources)
         for path, source in self.sources.items():
             old, new = source['assessment'], projected[path]['assessment']
-            self.assertEqual(old.get('variables'), new.get('variables'))
+            flattened, inverse = flatten_document(source, self.catalog)
+            self.assertEqual(restore_document(flattened, inverse), source)
+            self.assertEqual(flattened['assessment'].get('variables'), new.get('variables'))
             self.assertEqual(list(old.get('shared_objects', {})), list(new.get('shared_objects', {})))
             if SHARED in old.get('shared_objects', {}):
                 original = old['shared_objects'][SHARED]
@@ -169,8 +171,7 @@ class ApachePreviewCompatibilityTests(unittest.TestCase):
             'select': {'fields': {'property': {'selection_match': 'every',
                                              'equals': 'tpmpresent,tpmready,tpmenabled'}}}},
                     require={'items_found': 'one_or_more'})
-        with self.assertRaisesRegex(ValueError, 'ambiguous'):
-            native_schema_projection(docs)
+        self.assertEqual(native_schema_projection(docs), docs)
         projected = native_schema_projection(docs, objects_flat=True)
         validate_docs(projected, self.validators)
         self.assertEqual(projected, docs)
