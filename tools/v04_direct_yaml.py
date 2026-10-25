@@ -36,6 +36,8 @@ def simple_mapping(value):
 
 def compact_registry_object(value, capability):
     """Only flat Registry selectors; do not hide Sets/Filters/traversal/Variables."""
+    if isinstance(value, dict):
+        capability = value.get('capability', capability)
     return (capability == 'windows.registry' and isinstance(value, dict) and
             set(value) <= {'hive', 'key', 'name', 'capability'} and
             all(simple_mapping(v) for k, v in value.items() if k != 'capability'))

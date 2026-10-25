@@ -132,9 +132,17 @@ class DirectAuthoringStyle(unittest.TestCase):
             self.assertEqual(yaml.safe_load(text), document)
             if 'assessment' not in document:
                 continue
+            tree = yaml.compose(text)
             for site in object_sites(document['assessment']):
                 if site.private and site.inherited:
                     self.assertNotIn('capability', site.node)
+                if site.private and compact_registry_object(site.node, site.capability):
+                    node = tree
+                    for part in site.path:
+                        node = node.value[part] if isinstance(part, int) else mapping_member(node, part)
+                    self.assertTrue(node.flow_style, site.path)
+                    self.assertEqual(node.start_mark.line, node.end_mark.line, site.path)
+                    count += 1
             node = mapping_member(yaml.compose(text), 'assessment')
             tests = mapping_member(node, 'tests')
             for key, native in document['assessment']['tests'].items():
@@ -144,8 +152,8 @@ class DirectAuthoringStyle(unittest.TestCase):
                     self.assertTrue(obj.flow_style)
                     self.assertEqual(obj.start_mark.line, obj.end_mark.line)
                     self.assertNotIn('capability', native['object'])
-                    count += 1
                 self.assertFalse(mapping_member(test, 'require').flow_style)
+        self.assertEqual(count, authoring_statistics(self.documents)['one_line_objects'])
         self.assertGreater(count, 50)
 
     def test_windows_paths_regex_empty_and_yaml_ambiguous_strings_keep_scalar_types(self):
