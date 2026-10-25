@@ -22,7 +22,9 @@ EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
 COMPARISONS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
-               'case insensitive equals': 'case_insensitive_equals', 'less than': 'less_than'}
+               'case insensitive equals': 'case_insensitive_equals', 'less than': 'less_than',
+               'greater than': 'greater_than', 'greater than or equal': 'greater_than_or_equal',
+               'less than or equal': 'less_than_or_equal'}
 SET_OPERATORS = {'UNION': 'union', 'INTERSECTION': 'intersection', 'COMPLEMENT': 'difference'}
 
 
@@ -304,6 +306,8 @@ class AssessmentConverter:
             return {'values_found': 'none'}
         operation = element.get('operation', 'equals')
         ensure(existence in EXISTENCE and operation in COMPARISONS, 'unsupported entity existence/comparator')
+        if operation in ('greater than', 'greater than or equal', 'less than or equal'):
+            ensure(element.get('datatype') == 'int', 'ordered comparison expansion requires integer source datatype')
         value = self.operand(element)
         crosswalk = mapping['native'].get('selector_value_crosswalk' if selector else 'state_value_crosswalk', {}).get(local_name(element))
         if crosswalk:

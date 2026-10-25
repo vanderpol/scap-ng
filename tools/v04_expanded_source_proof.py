@@ -159,6 +159,18 @@ class ExpandedSource(Source):
     def object(self, ident):
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
+        sets = n.findall('{' + OD + '}set')
+        if sets:
+            # SetType belongs to the common OVAL Object grammar, independent
+            # of collector family. Never fall back to leaf selector reading.
+            need(ident not in self.active, 'cyclic Object')
+            keys(n, META, 'Set Object')
+            need(len(n) == 1 and len(sets) == 1, 'Set mixed with leaf acquisition')
+            self.active.add(ident)
+            try:
+                return {'capability': cap, 'set': self.set_term(sets[0], cap)}
+            finally:
+                self.active.remove(ident)
         if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
             if cap == 'independent.shellcommand':
                 # shellcommand.pattern is an intrinsic regex collector parameter
@@ -304,8 +316,12 @@ class ExpandedNative(Native):
              'native Set operator/arity')
         operands = []
         for operand in n['operands']:
-            keys(operand, {'object', 'filters'}, 'Set operand')
-            obj = self.object(operand['object'], cap)
+            if 'set' in operand:
+                keys(operand, {'set'}, 'nested Set operand')
+                obj = {'capability': cap, 'set': self.set_term(operand['set'], cap)}
+            else:
+                keys(operand, {'object', 'filters'}, 'Set operand')
+                obj = self.object(operand['object'], cap)
             need(obj['capability'] == cap, 'Set family')
             operands.append({'object': obj, 'filters': self.filters(operand.get('filters', []))})
         return {'operator': 'identity' if len(operands) == 1 else n['operator'], 'operands': operands}
@@ -317,11 +333,11 @@ class ExpandedNative(Native):
         if 'collect' in n:
             keys(n, {'capability', 'collect', 'object_title'}, 'embedded Object')
             return self.object({**n['collect'], 'capability': cap})
-        if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
-            return super().object(n, cap)
         if 'set' in n:
             keys(n, {'set', 'capability', 'object_title'}, 'Set Object')
             return {'capability': cap, 'set': self.set_term(n['set'], cap)}
+        if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
+            return super().object(n, cap)
         allowed = {'unix.password': {'username'}, 'unix.file': {'directory', 'name', 'full_path', 'filesystem', 'traversal'},
                    'independent.textfilecontent54': {'directory', 'name', 'full_path', 'pattern', 'instance',
                       'filesystem', 'ignore_case', 'singleline', 'multiline', 'item_creation'}}[cap]
