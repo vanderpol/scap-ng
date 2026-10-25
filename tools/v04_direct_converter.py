@@ -17,7 +17,7 @@ from v04_direct_scap_source import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-CAPABILITIES = ('windows.registry', 'independent.shellcommand')
+CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -131,6 +131,11 @@ class AssessmentConverter:
         identifier = native_identifier(element, 'test')
         self.tests[identifier] = {'test_title': element.get('comment', ''), 'capability': mapping['capability'],
                                   'object': acquisition, 'require': requirement, 'reported_elements': 'all'}
+        if mapping['native'].get('test_source', {}).get('kind') == 'none':
+            # The version-local contract deliberately omits meaningless source
+            # singleton Objects. The source dependency remains in provenance.
+            ensure(acquisition == {}, 'singleton system source must have no acquisition parameters')
+            self.tests[identifier].pop('object')
         return {'test': identifier}
 
     def same_family(self, identifier, kind, mapping):
@@ -152,6 +157,9 @@ class AssessmentConverter:
     def convert_object(self, element):
         mapping = self.capability(element, 'object')
         acquisition = {'capability': mapping['capability']}
+        if mapping['native'].get('test_source', {}).get('kind') == 'none':
+            ensure(not len(element), 'singleton system source cannot have selectors, Sets or Filters')
+            return acquisition
         sets = element.findall(f'{{{OVAL}}}set')
         if sets:
             ensure(len(element) == 1, 'Set cannot mix with leaf acquisition or direct Filters')
@@ -259,6 +267,8 @@ class AssessmentConverter:
             ensure(not len(element), 'object_component has children')
             identifier = element.get('object_ref')
             mapping = self.capability(self.source.node(self.component_id, identifier, 'object'), 'object')
+            ensure(mapping['native'].get('test_source', {}).get('kind') != 'none',
+                   'singleton system source has no approved Variable Object acquisition')
             ensure(element.get('item_field') in mapping['native']['state_field_map'], 'unknown object_component field')
             return {'values': {'object': self.reference(identifier, 'object'),
                                'field': mapping['native']['state_field_map'][element.get('item_field')]}}
@@ -313,6 +323,13 @@ class AssessmentConverter:
         if crosswalk:
             ensure(operation == 'equals' and isinstance(value, str) and value in mapping['migration_crosswalk'][crosswalk], 'unsupported enum comparison/value')
             value = mapping['migration_crosswalk'][crosswalk][value]
+        if not selector:
+            native_field = mapping['native']['state_field_map'].get(local_name(element))
+            enumeration = mapping['native'].get('state_value_enums', {}).get(native_field)
+            if enumeration:
+                expected = value if isinstance(value, list) else [value]
+                ensure(all(isinstance(v, str) and v in enumeration for v in expected),
+                       'unsupported enum comparison/value')
         result = {COMPARISONS[operation]: value}
         if element.get('datatype', 'string') != 'string':
             result['datatype'] = 'integer' if element.get('datatype') == 'int' else element.get('datatype')

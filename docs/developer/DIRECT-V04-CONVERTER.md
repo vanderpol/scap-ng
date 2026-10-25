@@ -195,8 +195,9 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-87 converted + 204 blocked, all 87 source-proved. The earlier 84/207 and 81/3
-results remain preserved in their dated audit packet. Generic common Set proof
+130 converted + 161 blocked, all 130 source-proved. The earlier 84/207 and 81/3
+results, plus the 87/204 architecture checkpoint, remain preserved in their dated
+audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
 admit three additional Rules. These are not updates to the packaged
 883-Assessment ledger. Example coverage row (abridged):
@@ -251,3 +252,30 @@ path, validation bypass or claimed performance optimization was introduced.
 The measured hotspot is repeated JSON-Schema branching/`unevaluatedProperties`,
 not source parsing or mapping IO. Keep future optimization proposals distinct
 from proof/admission changes and require unchanged positive/negative outcomes.
+
+## Singleton-system capability sources
+
+The audit-policy increment uses the existing 0.4 contract
+`native.test_source.kind: none`. Its original OVAL Objects have no acquisition
+entities: the source is the current system, not a parameterized resource.
+`convert_object` requires the source Object to be empty; `convert_test` omits
+native `object` entirely. Source Object IDs/versions/hashes remain in the
+external dependency trace. Source selectors, Sets, Filters and Variable
+`object_component` acquisition are rejected for this source kind; no placeholder
+Object or new native acquisition syntax is invented.
+
+Only `windows.auditeventpolicysubcategories` is newly enabled. Its 43 complete
+original closures are independently verified. The independent reader obtains
+field/value/deprecation boundaries from the original pinned Windows OVAL XSD,
+not the converter's mapping. Literal enum constraints are checked after any
+approved value crosswalk; dynamic enum computations outside this tested bound
+remain unsupported. Unknown/deprecated fields, invalid original enums/types,
+changed native operands and meaningless native Objects are negative regressions.
+
+```bash
+python tools/test_v04_direct_audit_policy.py -v
+```
+
+This authorizes neither other singleton families nor production promotion.
+The evidence-ranked engineering ledger names the next bounded source census;
+whole dependency closure admission and independent proof remain required.

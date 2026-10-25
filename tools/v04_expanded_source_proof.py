@@ -8,6 +8,7 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 from pathlib import Path
+from functools import lru_cache
 import xml.etree.ElementTree as ET
 
 from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
@@ -24,6 +25,20 @@ APPROVED_SOURCE = ROOT / 'research/assessment-simplification/evidence/rhel_9/SV-
 APPROVED_SHA = '463b539c469c3302aa52c23fdca35814f40fd5fd7de31346964e1b4a97b5d8a9'
 APPROVED_DEF = 'oval:mil.disa.stig.defs:def:230413'
 DECISION = 'https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6388735943'
+AUDIT = 'windows.auditeventpolicysubcategories'
+
+
+@lru_cache(maxsize=1)
+def original_audit_contract():
+    """Independent field/value boundaries from original OVAL, not native mapping."""
+    schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    state = schema.find(xs + 'element[@name="auditeventpolicysubcategories_state"]')
+    fields = {e.get('name') for e in state.findall('.//' + xs + 'sequence/' + xs + 'element')
+              if not any(local(n) == 'deprecated_info' for n in e.iter())}
+    datatype = schema.find(xs + 'complexType[@name="EntityStateAuditType"]')
+    values = {e.get('value') for e in datatype.findall('.//' + xs + 'enumeration') if e.get('value')}
+    return fields, values
 
 
 def predicate_order(term):
@@ -81,6 +96,8 @@ class ExpandedSource(Source):
         self.item_schema_sha256 = sha256(schema.read_bytes()).hexdigest()
 
     def capability(self, n, suffix):
+        if n.tag == '{' + OD + '#windows}auditeventpolicysubcategories' + suffix:
+            return AUDIT
         return EXTRA.get(n.tag[1:].removesuffix(suffix)) or super().capability(n, suffix)
 
     def function(self, n):
@@ -109,6 +126,14 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == AUDIT:
+            fields, values = original_audit_contract()
+            for entity in self.get(ident, 'states'):
+                need(entity.tag == '{' + OD + '#windows}' + local(entity) and local(entity) in fields,
+                     'unknown/deprecated original audit field')
+                need(entity.get('datatype', 'string') == 'string', 'audit value datatype')
+                if not entity.get('var_ref'):
+                    need(entity.text in values, 'invalid original audit value')
         if cap == 'unix.file':
             need(all(local(c) in set(FILE_FIELDS) | {'type', 'sticky'} for c in self.get(ident, 'states')),
                  'file State field outside bounded proof rules')
@@ -159,6 +184,10 @@ class ExpandedSource(Source):
     def object(self, ident):
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
+        if cap == AUDIT:
+            keys(n, META, 'audit singleton Object')
+            need(not len(n), 'audit singleton has acquisition children')
+            return {'capability': cap, 'selectors': {}}
         sets = n.findall('{' + OD + '}set')
         if sets:
             # SetType belongs to the common OVAL Object grammar, independent
@@ -264,6 +293,20 @@ class ExpandedSource(Source):
 
 
 class ExpandedNative(Native):
+    def test(self, ident):
+        n = self.a['tests'][ident]
+        if n.get('capability') != AUDIT:
+            return super().test(ident)
+        n = self.reference('tests', ident)
+        keys(n, {'capability', 'test_title', 'reported_elements', 'require'}, 'audit native Test')
+        need(n.get('reported_elements') == 'all', 'audit reporting/evidence boundary')
+        requirement = n['require']
+        result = {'capability': AUDIT, 'object': {'capability': AUDIT, 'selectors': {}},
+                  'found': requirement['items_found']}
+        if set(requirement) != {'items_found'}:
+            result.update(matching=requirement['items_satisfying'], condition=self.condition(requirement))
+        return result
+
     def function(self, n):
         need(isinstance(n, dict) and len(n) == 1, 'function shape')
         op, v = next(iter(n.items()))
