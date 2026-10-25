@@ -50,66 +50,7 @@ def validate_json_files(inputs, report):
                                  'invalid': 0, 'results': results}, indent=2) + '\n')
 
 
-def verify_original(root, documents, trace):
-    """Independent XCCDF resolver plus unmodified original/native operand readers."""
-    components = {node.get('id'): node[0] for node in root.findall(D + 'component')}
-    stream, = root.findall(D + 'data-stream')
-    references = {node.get('id'): node for node in stream.iter(D + 'component-ref')}
-    checklist, = stream.findall(D + 'checklists/' + D + 'component-ref')
-    benchmark = components[checklist.get(HREF)[1:]]
-    parents = {child: parent for parent in benchmark.iter() for child in parent}
-    rules = {rule.get('id'): rule for rule in benchmark.iter(X + 'Rule')}
-    native_rules = {doc['rule']['id']: doc['rule'] for doc in documents.values() if 'rule' in doc}
-    assessments = {doc['assessment']['id']: doc['assessment'] for doc in documents.values() if 'assessment' in doc}
-    native_benchmark, = [doc['benchmark'] for doc in documents.values() if 'benchmark' in doc]
-    outcomes = []
-    for binding in trace['rules']:
-        assert binding['source_rule'] in rules, 'source Rule identity changed'
-        rule = rules[binding['source_rule']]
-        assert digest(xml_term(rule)) == binding['source_rule_sha256'], 'source Rule provenance changed'
-        checks = rule.findall(X + 'check')
-        defaults = [check for check in checks if not check.get('selector')]
-        assert len(defaults) == 1 and defaults[0].get('system') == OVAL, 'competing default check'
-        selected = []
-        omitted = []
-        for check in checks:
-            if check.get('system') == OVAL:
-                assert check.get('selector', '') in ('', 'automated'), 'conditional OVAL selector'
-                reference, = check.findall(X + 'check-content-ref')
-                selected.append((reference.get('href'), reference.get('name')))
-            else:
-                assert (check.get('system'), check.get('selector')) == (OCIL, 'manual'), 'competing non-OVAL alternative'
-                omitted.append({'system': OCIL, 'selector': 'manual', 'sha256': digest(xml_term(check))})
-        assert len(set(selected)) == 1 and omitted == binding['omitted_checks'], 'unreported check alternative'
-        href, definition = selected[0]
-        uri, = [node for node in checklist.iter() if node.get('name') == href and node.tag.endswith('}uri')]
-        component = references[uri.get('uri')[1:]].get(HREF)[1:]
-        assert (component, definition) == (binding['component'], binding['definition']), 'component-scoped href divergence'
-        source = ExpandedSource(components[component])
-        closure = source.closure(definition)
-        assert {node['id']: node['sha256'] for node in closure['nodes']} == {
-            identifier: info['sha256'] for identifier, info in binding['dependencies'].items()}, 'dependency closure changed'
-        assert native_rules[binding['native_rule']]['assessment_choices']['automated']['assessment'] == binding['assessment'], 'Rule/Assessment link changed'
-        result = expanded_compare(source, definition, assessments[binding['assessment']])
-        assert result['outcome'] == 'PROVED', 'operand divergence: ' + json.dumps(result)
-        outcomes.append(result)
-    assert native_benchmark['default_selection'] is True, 'default selection changed'
-    for profile in benchmark.findall(X + 'Profile'):
-        assert all(child.tag in (X + 'title', X + 'description', X + 'select') for child in profile), 'Profile refinement unsupported'
-        row, = [row for row in trace['profiles'] if row['source_id'] == profile.get('id')]
-        overrides = {child.get('idref'): child.get('selected') == 'true' for child in profile.findall(X + 'select')}
-        disabled = []
-        for binding in trace['rules']:
-            item, selected = rules[binding['source_rule']], True
-            while item is not benchmark:
-                selected = selected and overrides.get(item.get('id'), item.get('selected', 'true') == 'true')
-                item = parents[item]
-            assert row['selected'][binding['source_rule']] == selected, 'Profile trace changed'
-            if not selected:
-                disabled.append(binding['native_rule'])
-        native, = [p for p in native_benchmark['profiles'] if p['id'] == row['native_id']]
-        assert set(native['disabled_rules']) == set(disabled), 'Profile selection divergence'
-    return outcomes
+from audit_v04_direct_benchmark import verify_original
 
 
 def source_acquisition_terms(reader, identifier):

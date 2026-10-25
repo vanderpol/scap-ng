@@ -1,8 +1,8 @@
 # Maintaining the direct 0.4 experiment
 
-This is a two-Rule experiment, **not a production converter or full Benchmark
-migration**. Python 3.12 is used in CI. No model service is needed to run or edit
-the code. The two conversion modules are newly written; neither imports the
+This experiment inventories a complete Benchmark and emits a supported automated
+subset, **not a production converter or complete Benchmark/policy migration**. Python 3.12 is used in CI. No model service is needed to run or edit
+the code. The conversion and inventory modules are newly written; none imports the
 previous prototype, a production renderer, a 0.3 module, or an intermediate IR.
 The original signed fixture and unmodified public validators/compiler/proof
 readers are reused as data and external gates, not as conversion algorithms.
@@ -12,17 +12,22 @@ readers are reused as data and external gates, not as conversion algorithms.
 | File | Responsibility / important entry points |
 | --- | --- |
 | [v04_direct_scap_source.py](../../tools/v04_direct_scap_source.py) | `SourceModel(path, expected_sha256)` verifies ZIP bytes/CRC, parses one complete XML member once, and indexes IDs/references per component. `automated_check` resolves checklist-local catalog references and rejects unsupported check choices. `rule_selected` projects ancestor/Profile selection. |
-| [v04_direct_converter.py](../../tools/v04_direct_converter.py) | `AssessmentConverter.reference(id, kind)` is the single memoized recursive dependency visitor. `convert_object`, `set_expression`, `filter`, `convert_variable`, `predicate`, `convert_test`, and `criteria` produce current native dictionaries directly. `convert(source, two_rule_ids)` returns `(documents_by_relative_path, external_trace)` without writing files. `main` emits JSON/YAML and metrics. |
-| [test_v04_direct_converter.py](../../tools/test_v04_direct_converter.py) | `verify_original` independently resolves original XCCDF/OVAL, then uses existing independent operand readers. Unit tests cover published dependencies, controlled compositions, failures, public CLIs, and compiled operands. Measurement mode runs the same gates. |
+| [v04_direct_converter.py](../../tools/v04_direct_converter.py) | `AssessmentConverter.reference(id, kind)` is the single memoized recursive dependency visitor. `convert_object`, `set_expression`, `filter`, `convert_variable`, `predicate`, `convert_test`, and `criteria` produce current native dictionaries directly. `convert(source, rule_ids)` returns `(documents_by_relative_path, external_trace)` for a strict focused request. `convert_benchmark(source)` returns these plus complete coverage, isolating unsupported Rules. `main` emits JSON/YAML and metrics. |
+| [v04_direct_inventory.py](../../tools/v04_direct_inventory.py) | `SourceInventory` indexes dependency edges once, follows unsupported closures too, discovers all checks/selections, and counts/digests original nodes. It does not lower content. |
+| [audit_v04_direct_benchmark.py](../../tools/audit_v04_direct_benchmark.py) | Independently reconciles original checks/dependencies/Profiles, compares typed source terms, runs public package gates, verifies compiled operands and attaches proof levels. It cannot admit Rules. |
+| [test_v04_direct_converter.py](../../tools/test_v04_direct_converter.py) | Eleven retained focused tests, controlled compositions, failures, public CLIs and compiled operands; imports independent `verify_original` from the audit module. |
+| [test_v04_direct_benchmark.py](../../tools/test_v04_direct_benchmark.py) | Eight whole-inventory/admission/proof/public-gate regressions, including controlled faults and deterministic output. |
 
-Flow: pinned ZIP → XML tree and scoped indexes → selected source Rules →
+Flow: pinned ZIP → XML tree and scoped indexes → complete Rule inventory and
+automatic admission (or strict focused selection) →
 recursive OVAL references → native Assessments → labeled miniature Rule/Benchmark
 wrapper and projected Profiles → external validation/compiler/consumer checks.
 No source IDs control an algorithm branch; they locate input nodes or allocate
 stable native names. Source IDs, hashes and omitted content live in the trace.
 
 `UnsupportedSource` is a `ValueError` with a diagnostic. A failed dependency
-aborts the entire conversion. Discard a failed converter instance. Caches and
+aborts its Rule; a focused request fails entirely, while automatic admission
+records the blocked Rule and continues. Discard a failed converter instance. Caches and
 native declarations are explicit per-Assessment state; cached native values are
 copied before use. Source trees are read-only after indexing in normal use.
 Tests deliberately clone/mutate them for fault injection.
@@ -34,6 +39,7 @@ From repository root, in a disposable environment:
 ```bash
 python -m venv /tmp/direct-v04-venv
 /tmp/direct-v04-venv/bin/pip install PyYAML==6.0.3 jsonschema==4.25.1
+source /tmp/direct-v04-venv/bin/activate
 export PYTHONPATH=tools
 /tmp/direct-v04-venv/bin/python tools/v04_direct_converter.py \
   tests/fixtures/v04-direct-prototype/server2025-signed.zip \
@@ -47,6 +53,8 @@ export PYTHONPATH=tools
 Use a new output directory: existing output is never overwritten. Inspect
 `authoring/direct-slice/assessments/*.yaml` beside `source-trace.json`.
 JSON and YAML serialize the same native dictionaries; metrics are separate.
+`--rule` may be repeated any positive number of times; one unsupported Rule fails
+the focused request. There is no Rule-ID allowlist or two-Rule algorithm limit.
 The tests invoke the unchanged public validator API for JSON (its directory CLI
 discovers YAML only), assert six checked documents, use its CLI for YAML,
 packs separate JSON/YAML ZIPs, runs the unchanged compiler CLI, and launches the
@@ -107,7 +115,7 @@ the pinned Self-Assertion bindings/XSD link. Do not run the 65-source corpus.
   it does not traverse arbitrary records. Non-Boolean/collection evidence is
   never evaluated, erased or defaulted by the converter.
 
-Unsupported: other Rules/capabilities/functions, cross-datatype Variable casts,
+Unsupported: other capabilities/functions, cross-datatype Variable casts,
 records, explicit acquisition
 behaviors, Profile inheritance/refinement, CPE/platform execution, manual
 execution, full policy metadata/scoring/remediation. This is not source-wide
@@ -125,6 +133,85 @@ PYTHONPATH=tools python tools/test_v04_direct_converter.py --measure /tmp/direct
 ```
 
 Read `results.json`, `json-validation.json`, `yaml-validation.json` and
-`compile.json`; the actual generated bundle is under `compiled/`. Timings are
+`compile.json` for that focused measurement; the actual generated bundle is under `compiled/`. Timings are
 observations, not golden expectations. The engineering report distinguishes
 these fresh measurements from the previous prototype's preserved evidence.
+
+## Complete inventory and automatic admission
+
+Use the same pinned source/SHA above with **one** mode instead of `--rule`:
+
+```bash
+python tools/v04_direct_converter.py SOURCE.zip --sha256 SHA256 \
+  --inventory-only --output /tmp/direct-inventory
+python tools/v04_direct_converter.py SOURCE.zip --sha256 SHA256 \
+  --all-rules --output /tmp/direct-supported-subset
+```
+
+`SOURCE.zip` and `SHA256` stand for the exact fixture path/hash in the runnable
+example above, not new source downloads. Inventory mode emits no authoring.
+Automatic mode inventories every original Rule first, then uses the same generic
+recursive visitor for every unambiguous automated closure. `CAPABILITIES` is an
+implemented/tested support boundary; merely adding a mapping file never admits
+its capability. The full mapping catalog only supplies descriptive inventory
+names. Mixed-capability closures must satisfy every dependency.
+
+`coverage.json` and `coverage.md` are separate from executable authoring. Each
+original Rule has checks/selectors, source member/hash/fragment, all recursive
+OVAL IDs/hashes/reference edges, needed capabilities/constructs, source default
+and Profile selections, omissions, status, artifact paths and proof level.
+`summary` conserves the source denominator. Only `converted` Rules have native
+Rule/Assessment documents; `blocked` Rules have primary and contextual blockers.
+A zero-conversion run emits coverage/trace only, not an invalid empty package.
+All output titles identify a subset. Manual alternatives, platform execution,
+policy metadata/scoring/remediation remain explicitly outside the claim.
+
+Admission uses unchanged strict authoring/capability validation. A successful
+conversion is **`authoring_validated`**, not source-proved. Expected per-Rule
+failures are isolated; corrupt ZIP/hash/index/global invariants and unexpected
+programming exceptions abort the run. Blocked closures get cached per-node
+probes plus independent entity/function/filter/quantifier diagnostics; unknown
+capability internals are not interpreted. A future implementation may expose
+additional blockers, so the manifest does not claim an exhaustive unsupported
+standards conformance diagnosis. There is no fallback or approximate lowering.
+
+The independent audit (same minimal venv) measures three fresh public CLI runs
+per mode and verifies serialized content/paired compilation/consumer/operands:
+
+```bash
+python tools/audit_v04_direct_benchmark.py \
+  tests/fixtures/v04-direct-prototype/server2025-signed.zip \
+  --sha256 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0 \
+  --rule xccdf_mil.disa.stig_rule_SV-278139r1182083_rule \
+  --rule xccdf_mil.disa.stig_rule_SV-278080r1180946_rule \
+  --output /tmp/direct-whole-benchmark-evidence
+python tools/test_v04_direct_benchmark.py -v
+```
+
+The `--rule` arguments here select only the **focused comparison workload**;
+automatic admission always discovers the whole Benchmark. Output `evidence.json`
+contains timings, commands, hashes, public gate results and individual proofs.
+The audit's separate root `coverage.json/md` attaches `source_proved` only after
+original typed-term and exact compiled-operand checks; `compiled_unproved` retains
+explicit unsupported proof obligations. Producer coverage remains unchanged.
+For this pin: 291 original Rules = 84 converted + 207 blocked; 81 source-proved,
+three compiled-unproved Registry Set cases. These are not updates to the packaged
+883-Assessment ledger. Example coverage row (abridged):
+
+```json
+{"source_rule":"xccdf_mil.disa.stig_rule_SV-278139r1182083_rule",
+ "status":"converted", "proof_level":"source_proved",
+ "needed_capabilities":["independent.shellcommand","windows.registry"],
+ "blockers":[]}
+```
+
+To add a capability in a separately authorized phase: identify exact blocked
+source obligations; inspect the version-local mapping and original OVAL source;
+implement only missing generic behavior, with negative tests and independent
+operand proofs; then extend `CAPABILITIES` and rerun admission/audit. Never add a
+Rule ID or source hash branch. The small comparator example above is the current
+safe extension exercise; this phase adds no capability family or normalization.
+Generated coverage/evidence is regenerated by this audit command; do not edit
+proof counts by hand. `test_v04_direct_benchmark.py` also covers complete original
+inventory, deterministic runs, controlled zero/one/many/mixed admission,
+missing/cyclic references, Profile/semantic failures and manifest/program mutants.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fresh direct-0.4 experiment: pinned SCAP -> a labeled two-Rule fixture.
+"""Fresh direct-0.4 experiment: pinned SCAP -> an explicitly partial automated subset.
 
 Conversion uses current capability metadata, not old NG renderers or IRs.
 Public validation, compilation and independent proof are separate commands.
@@ -176,6 +176,7 @@ class AssessmentConverter:
         # Source identity, not payload equality, determines shared acquisitions.
         if self.source.object_references[self.component_id, element.get('id')] > 1:
             identifier = native_identifier(element, 'object')
+            acquisition['object_title'] = element.get('comment') or mapping['capability'] + ' acquisition'
             self.shared_objects[identifier] = acquisition
             return identifier
         return acquisition
@@ -320,41 +321,109 @@ class AssessmentConverter:
         return result
 
 
+def dependency_blockers(source, node, mappings):
+    """Probe independent obligations even when an earlier sibling failed.
+
+    Uses the same conversion primitives, never a second acceptance grammar.
+    Unsupported capability internals remain unidentified, not guessed support.
+    """
+    from v04_direct_inventory import issue
+    problems = []
+    component, identifier, kind = node['component'], node['id'], node['kind']
+    element = source.node(component, identifier, kind)
+
+    def probe(label, method, *args):
+        try:
+            method(*args)
+        except (UnsupportedSource, ValueError) as error:
+            problem = issue(blocker_category(str(error)), str(error), identifier, component)
+            problem['source_path'] = label
+            problems.append(problem)
+
+    visitor = AssessmentConverter(source, component, mappings)
+    probe('closure', visitor.reference, identifier, kind)
+    # Quantifier support is independent of which capability failed first.
+    if kind == 'test':
+        found = element.get('check_existence', 'at_least_one_exists')
+        probe('@check_existence', ensure, found in EXISTENCE, f'unsupported Test existence: {found}')
+    if kind in ('state', 'object'):
+        try:
+            mapping = visitor.capability(element, kind)
+        except UnsupportedSource:
+            return problems
+        for number, child in enumerate(element):
+            label, name = f'{child.tag}[{number}]', local_name(child)
+            if kind == 'state':
+                probe(label, visitor.predicate, child, mapping)
+            elif name in mapping['native'].get('selector_map', {}):
+                probe(label, visitor.predicate, child, mapping, True)
+            elif name in mapping['native'].get('collection_parameter_source_map', {}):
+                probe(label, visitor.parameter, child)
+            if child.tag == '{' + OVAL + '}filter':
+                probe(label, visitor.filter, child, mapping)
+            if child.tag == '{' + OVAL + '}set':
+                for nested in child.iter():
+                    if nested.tag == '{' + OVAL + '}set':
+                        probe(label, visitor.set_expression, nested, mapping)
+                    elif nested.tag == '{' + OVAL + '}filter':
+                        probe(label, visitor.filter, nested, mapping)
+    if kind == 'variable' and local_name(element) == 'local_variable':
+        for child in element.iter():
+            if child is not element:
+                probe(child.tag, visitor.function, child)
+    return problems
+
+
+def convert_rule(source, source_id, mappings):
+    """Convert one entire automated closure; failures leave no emitted artifacts."""
+    documents = {}
+    ensure(source_id in source.rules, f'source Rule not found: {source_id}')
+    rule = source.rules[source_id]
+    component, definition, omitted_checks = source.automated_check(rule)
+    converter = AssessmentConverter(source, component, mappings)
+    expression = converter.reference(definition, 'definition')
+    rule_id = native_identifier(rule, 'rule')
+    assessment_id = rule_id.removesuffix('-rule') + '-assessment'
+    title = rule.findtext(f'{{{XCCDF}}}title', '')
+    assessment = {'id': assessment_id, 'version': 1, 'assessment_title': title,
+        'mode': 'automated', 'class': source.node(component, definition, 'definition').get('class'),
+        'purpose': 'assessment', 'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
+        'tests': converter.tests, 'evaluate': expression}
+    for section in ('variables', 'shared_objects'):
+        if getattr(converter, section):
+            assessment[section] = getattr(converter, section)
+    documents[f'authoring/direct-slice/assessments/{assessment_id}.json'] = {'assessment': assessment}
+    # This is a compilation fixture, not a full Rule-policy renderer.
+    native_rule = {'id': rule_id, 'version': rule.findtext(f'{{{XCCDF}}}version', ''), 'title': title,
+        'severity': rule.get('severity', 'unknown'), 'role': 'full', 'weight': float(rule.get('weight', '1')),
+        'discussion': rule.findtext(f'{{{XCCDF}}}description', ''), 'rationale': None,
+        'extensions': {}, 'warnings': [], 'identifiers': [], 'references': [], 'requires': [], 'conflicts': [],
+        'applicability': [], 'parameters': {}, 'remediation': {}, 'organizational_input_requirements': {},
+        'assessment_choices': {'automated': {'assessment': assessment_id}}, 'default_assessment_choice': 'automated'}
+    documents[f'authoring/direct-slice/rules/{rule_id}.json'] = {'rule': native_rule}
+    binding = {'source_rule': source_id, 'source_rule_sha256': digest(xml_identity(rule)),
+        'component': component, 'definition': definition, 'native_rule': rule_id, 'assessment': assessment_id,
+        'dependencies': converter.used, 'omitted_checks': omitted_checks,
+        'source_platforms': [child.get('idref') for child in rule.findall(f'{{{XCCDF}}}platform')]}
+    return documents, binding
+
+
 def convert(source: SourceModel, rule_ids: list[str]):
-    """Return (native documents by relative path, external source trace); no I/O."""
-    ensure(len(rule_ids) == 2 and len(set(rule_ids)) == 2, 'exactly two distinct source Rules required')
+    """Strict focused API; any unsupported selection fails the entire request."""
+    ensure(rule_ids and len(set(rule_ids)) == len(rule_ids), 'distinct source Rules required')
     mappings = load_mappings()
-    documents, rule_trace, rule_links = {}, [], {}
+    documents, bindings = {}, []
     for source_id in rule_ids:
-        ensure(source_id in source.rules, f'source Rule not found: {source_id}')
-        rule = source.rules[source_id]
-        component, definition, omitted_checks = source.automated_check(rule)
-        converter = AssessmentConverter(source, component, mappings)
-        expression = converter.reference(definition, 'definition')
-        rule_id = native_identifier(rule, 'rule')
-        assessment_id = rule_id.removesuffix('-rule') + '-assessment'
-        title = rule.findtext(f'{{{XCCDF}}}title', '')
-        assessment = {'id': assessment_id, 'version': 1, 'assessment_title': title,
-            'mode': 'automated', 'class': source.node(component, definition, 'definition').get('class'),
-            'purpose': 'assessment', 'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
-            'tests': converter.tests, 'evaluate': expression}
-        for section in ('variables', 'shared_objects'):
-            if getattr(converter, section):
-                assessment[section] = getattr(converter, section)
-        documents[f'authoring/direct-slice/assessments/{assessment_id}.json'] = {'assessment': assessment}
-        # This is a compilation fixture, not a full Rule-policy renderer.
-        native_rule = {'id': rule_id, 'version': rule.findtext(f'{{{XCCDF}}}version', ''), 'title': title,
-            'severity': rule.get('severity', 'unknown'), 'role': 'full', 'weight': float(rule.get('weight', '1')),
-            'discussion': rule.findtext(f'{{{XCCDF}}}description', ''), 'rationale': None,
-            'extensions': {}, 'warnings': [], 'identifiers': [], 'references': [], 'requires': [], 'conflicts': [],
-            'applicability': [], 'parameters': {}, 'remediation': {}, 'organizational_input_requirements': {},
-            'assessment_choices': {'automated': {'assessment': assessment_id}}, 'default_assessment_choice': 'automated'}
-        documents[f'authoring/direct-slice/rules/{rule_id}.json'] = {'rule': native_rule}
-        rule_links[source_id] = rule_id
-        rule_trace.append({'source_rule': source_id, 'source_rule_sha256': digest(xml_identity(rule)),
-            'component': component, 'definition': definition, 'native_rule': rule_id, 'assessment': assessment_id,
-            'dependencies': converter.used, 'omitted_checks': omitted_checks,
-            'source_platforms': [child.get('idref') for child in rule.findall(f'{{{XCCDF}}}platform')]})
+        native, binding = convert_rule(source, source_id, mappings)
+        documents.update(native)
+        bindings.append(binding)
+    return assemble_subset(source, documents, bindings, mappings)
+
+
+def assemble_subset(source, documents, rule_trace, mappings):
+    """Project selection only over emitted Rules; an empty subset has no package."""
+    rule_ids = [row['source_rule'] for row in rule_trace]
+    rule_links = {row['source_rule']: row['native_rule'] for row in rule_trace}
     benchmark = source.benchmark
     ensure(all(source.rule_selected(source.rules[identifier]) for identifier in rule_ids), 'disabled source defaults unsupported')
     profiles, profile_trace = [], []
@@ -368,17 +437,18 @@ def convert(source: SourceModel, rule_ids: list[str]):
     wrapper = {'id': 'direct-slice', 'ng_schema_version': '0.4.0', 'use_case': 'compliance',
         'version': {'value': benchmark.findtext(f'{{{XCCDF}}}version', '')},
         'assessment_specifications': [{'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'}],
-        'title': [{'text': '[TWO-RULE PROTOTYPE SUBSET] ' + benchmark.findtext(f'{{{XCCDF}}}title', ''), 'language': 'en'}],
+        'title': [{'text': '[AUTOMATED PROTOTYPE SUBSET] ' + benchmark.findtext(f'{{{XCCDF}}}title', ''), 'language': 'en'}],
         'description': [{'text': benchmark.findtext(f'{{{XCCDF}}}description', ''), 'language': 'en'}],
         'language': benchmark.get('{http://www.w3.org/XML/1998/namespace}lang'),
         'status': [{'value': child.text, **child.attrib} for child in benchmark.findall(f'{{{XCCDF}}}status')],
-        'metadata': {'prototype_subset': True, 'omitted_rule_count': len(source.rules) - 2},
+        'metadata': {'prototype_subset': True, 'omitted_rule_count': len(source.rules) - len(rule_ids)},
         'notices': [], 'front_matter': [], 'rear_matter': [], 'references': [], 'text_blocks': [],
         'platform': {'id': 'fixture-platform', 'title': 'Compilation fixture; applicability not converted', 'applicability': {}},
         'applicability_catalog': 'fixture-applicability', 'scoring': [], 'parameters': [], 'default_selection': True,
         'groups': [], 'profiles': profiles, 'rules': list(rule_links.values())}
-    documents['authoring/direct-slice/benchmark.json'] = {'benchmark': wrapper}
-    documents['authoring/direct-slice/applicability.json'] = {'applicability': {'id': 'fixture-applicability', 'conditions': {}}}
+    if rule_ids:
+        documents['authoring/direct-slice/benchmark.json'] = {'benchmark': wrapper}
+        documents['authoring/direct-slice/applicability.json'] = {'applicability': {'id': 'fixture-applicability', 'conditions': {}}}
     trace = {'format': 'direct-converter-spike/1', 'source_zip_sha256': source.zip_sha256, 'source_xml_sha256': source.xml_sha256,
         'source_member': source.member, 'source_benchmark_component': source.benchmark_component,
         'component_hashes': source.component_hashes, 'rules': rule_trace, 'profiles': profile_trace,
@@ -392,27 +462,124 @@ def convert(source: SourceModel, rule_ids: list[str]):
     return documents, trace
 
 
+def blocker_category(message):
+    if 'unresolved' in message or 'cyclic' in message or 'wrong reference kind' in message:
+        return 'source-invalid'
+    if 'capability' in message:
+        return 'unsupported-capability'
+    if any(word in message for word in ('check selector', 'OVAL check', 'Profile', 'source default', 'non-OVAL', 'complex-check')):
+        return 'unsupported-selection'
+    return 'unsupported-construct'
+
+
+def convert_benchmark(source, *, inventory_only=False, timings=None):
+    """Inventory all Rules; isolate expected per-Rule failures and validate admission.
+
+    Native output is atomic per Rule. Diagnostic probes of blocked closures are
+    cached per source node; they never produce content or change admission.
+    Unexpected programming exceptions and global integrity faults propagate.
+    """
+    from v04_direct_inventory import SourceInventory, issue, summarize
+    started = time.perf_counter()
+    inventory = SourceInventory(source)
+    rows = inventory.rules()
+    inventory_counts = inventory.counts(rows)
+    measured = {'inventory': time.perf_counter() - started, 'conversion': 0.0,
+                'validation': 0.0, 'diagnostics': 0.0}
+    mappings = load_mappings()
+    documents, bindings, probes = {}, [], {}
+    if not inventory_only:
+        from validate_native_json_schemas import build_validators, document_errors
+        validators = build_validators(ROOT / 'schema/v0.4.0')
+        for row in rows:
+            blockers = list(row['inventory_problems'])
+            native, binding = {}, None
+            started = time.perf_counter()
+            try:
+                rule = source.rules[row['source_rule']]
+                ensure(source.rule_selected(rule), 'disabled source defaults unsupported')
+                native, binding = convert_rule(source, row['source_rule'], mappings)
+            except (UnsupportedSource, ValueError) as error:
+                blockers.append(issue(blocker_category(str(error)), str(error), row['source_rule']))
+            measured['conversion'] += time.perf_counter() - started
+            started = time.perf_counter()
+            if binding is not None:
+                for path, document in native.items():
+                    kind, = document
+                    for error in document_errors(validators[kind + '.schema.json'], document):
+                        blockers.append(issue('schema-semantic', f'{path}: {error.message}', row['source_rule']))
+            measured['validation'] += time.perf_counter() - started
+            started = time.perf_counter()
+            if blockers:
+                # Probe every dependency, including those beyond the first failed
+                # branch. Retain exact node IDs; never swallow unexpected errors.
+                for node in row['dependencies']:
+                    key = node['component'], node['id']
+                    if key not in probes:
+                        probes[key] = dependency_blockers(source, node, mappings)
+                    blockers.extend(probes[key])
+                # Distinct source contexts are kept even when diagnostics repeat.
+                row['blockers'] = list({digest(b): b for b in blockers}.values())
+                row['primary_blocker'] = row['blockers'][0]
+                row['status'] = 'blocked'
+            else:
+                documents.update(native)
+                bindings.append(binding)
+                row.update(status='converted', proof_level='authoring_validated', artifacts=sorted(native))
+            measured['diagnostics'] += time.perf_counter() - started
+    started = time.perf_counter()
+    documents, trace = assemble_subset(source, documents, bindings, mappings)
+    manifest = {'format': 'direct-benchmark-coverage/1', 'source_zip_sha256': source.zip_sha256,
+        'source_xml_sha256': source.xml_sha256, 'source_member': source.member,
+        'source_benchmark_component': source.benchmark_component,
+        'component_hashes': source.component_hashes, 'mode': 'inventory' if inventory_only else 'automatic',
+        'scope': 'Automated subset only; not complete Benchmark, manual, applicability or policy equivalence',
+        'proof_contract': 'Conversion emits authoring_validated only. Compilation and independent source proof are separate gates.',
+        'blocker_contract': 'All reference/selection inventory problems, conversion/schema diagnostics, dependency-node failures and independent supported entity/function/filter/quantifier obligations. Unsupported capability internals are not interpreted; further blockers may become discoverable only after implementation.',
+        'inventory': inventory_counts, 'summary': summarize(rows), 'rules': rows,
+        'coverage_promoted': False, 'scanner_evaluated': False}
+    measured['assembly'] = time.perf_counter() - started
+    if timings is not None:
+        timings.update(measured)
+    return documents, trace, manifest
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source', type=Path)
     parser.add_argument('--sha256', required=True)
-    parser.add_argument('--rule', action='append', required=True)
+    selection = parser.add_mutually_exclusive_group(required=True)
+    selection.add_argument('--rule', action='append', help='strict focused selection; repeatable')
+    selection.add_argument('--all-rules', action='store_true', help='inventory all, convert supported closures automatically')
+    selection.add_argument('--inventory-only', action='store_true', help='discover every Rule without conversion')
     parser.add_argument('--output', type=Path, required=True)
     arguments = parser.parse_args()
     ensure(not arguments.output.exists(), 'output exists; refusing overwrite')
     started = time.perf_counter()
     source = SourceModel(arguments.source, arguments.sha256)
     indexed = time.perf_counter()
-    documents, trace = convert(source, arguments.rule)
+    manifest = None
+    stages = {}
+    if arguments.rule:
+        documents, trace = convert(source, arguments.rule)
+    else:
+        documents, trace, manifest = convert_benchmark(source, inventory_only=arguments.inventory_only, timings=stages)
     converted = time.perf_counter()
     import yaml
+    arguments.output.mkdir(parents=True)
     for relative, document in documents.items():
         target = arguments.output / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(json.dumps(document, indent=2) + '\n')
         target.with_suffix('.yaml').write_text(yaml.safe_dump(document, sort_keys=False))
     (arguments.output / 'source-trace.json').write_text(json.dumps(trace, indent=2) + '\n')
+    if manifest is not None:
+        from v04_direct_inventory import coverage_markdown
+        (arguments.output / 'coverage.json').write_text(json.dumps(manifest, indent=2) + '\n')
+        (arguments.output / 'coverage.md').write_text(coverage_markdown(manifest))
     metrics = {'parse_index': indexed - started, 'conversion': converted - indexed}
+    if stages:
+        metrics['stages'] = stages
     try:
         import resource
         metrics['process_peak_rss_kib_linux'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
