@@ -24,30 +24,30 @@ shellcommand, Variable and multi-Test/nested logic shapes. No candidate was swap
 
 | Case | Platform | Rule / Assessment case | Outcome | Wall seconds | First obligation or result |
 | --- | --- | --- | --- | ---: | --- |
-| 01 | Windows 11 | SV-253259 | UNVERIFIABLE/UNSUPPORTED | 0.243 | all_exist outside exact approved source proof |
-| 02 | Windows 11 | SV-253261 | PROVED | 0.235 | Complete source/package/program match |
-| 03 | Windows 11 | SV-253263 | UNVERIFIABLE/UNSUPPORTED | 0.241 | datatype proof unavailable: version |
-| 04 | Windows 11 | SV-253266 | PROVED | 0.235 | Complete source/package/program match |
-| 05 | Windows 11 | SV-253274 | PROVED | 0.244 | Complete source/package/program match |
-| 06 | Windows 11 | SV-253394 | PROVED | 0.236 | Complete source/package/program match |
-| 07 | Windows 11 | SV-253401 | UNVERIFIABLE/UNSUPPORTED | 0.242 | Set/Filter/behavior collection proof unavailable: oval:mil.disa.stig.win:obj:25340100 |
-| 08 | Windows 11 | SV-253446 | PROVED | 0.237 | Complete source/package/program match |
-| 09 | Server 2025 | SV-277993 | PROVED | 0.336 | Complete source/package/program match |
-| 10 | Server 2025 | SV-277998 | PROVED | 0.639 | Complete source/package/program match |
-| 11 | Server 2025 | SV-278028 | UNVERIFIABLE/UNSUPPORTED | 0.268 | Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801; Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810; Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820; Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830 |
-| 12 | Server 2025 | SV-278104 | PROVED | 0.382 | Complete source/package/program match |
-| 13 | Server 2025 | SV-278139 | UNVERIFIABLE/UNSUPPORTED | 0.261 | native Object: unsupported keys ['select'] |
-| 14 | Server 2025 | SV-278146 | UNVERIFIABLE/UNSUPPORTED | 0.267 | Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601 |
-| 15 | Server 2025 | SV-278208 | UNVERIFIABLE/UNSUPPORTED | 0.302 | all_exist outside exact approved source proof |
-| 16 | Server 2025 | SV-278234 | PROVED | 0.275 | Complete source/package/program match |
-| 17 | DNS | SV-259334 | PROVED | 0.154 | Complete source/package/program match |
-| 18 | DNS | SV-259339 | PROVED | 0.148 | Complete source/package/program match |
-| 19 | DNS | SV-259346 | PROVED | 0.175 | Complete source/package/program match |
-| 20 | DNS | SV-259351 | PROVED | 0.147 | Complete source/package/program match |
-| 21 | DNS | SV-259360 | PROVED | 0.153 | Complete source/package/program match |
-| 22 | DNS | SV-259377 | PROVED | 0.154 | Complete source/package/program match |
-| 23 | DNS | SV-259381 | PROVED | 0.145 | Complete source/package/program match |
-| 24 | DNS | SV-259384 | PROVED | 0.147 | Complete source/package/program match |
+| 01 | Windows 11 | SV-253259 | UNVERIFIABLE/UNSUPPORTED | 0.231 | all_exist outside exact approved source proof |
+| 02 | Windows 11 | SV-253261 | PROVED | 0.224 | Complete source/package/program match |
+| 03 | Windows 11 | SV-253263 | UNVERIFIABLE/UNSUPPORTED | 0.221 | datatype proof unavailable: version |
+| 04 | Windows 11 | SV-253266 | PROVED | 0.221 | Complete source/package/program match |
+| 05 | Windows 11 | SV-253274 | PROVED | 0.257 | Complete source/package/program match |
+| 06 | Windows 11 | SV-253394 | PROVED | 0.234 | Complete source/package/program match |
+| 07 | Windows 11 | SV-253401 | UNVERIFIABLE/UNSUPPORTED | 0.228 | Set/Filter/behavior collection proof unavailable: oval:mil.disa.stig.win:obj:25340100 |
+| 08 | Windows 11 | SV-253446 | PROVED | 0.221 | Complete source/package/program match |
+| 09 | Server 2025 | SV-277993 | PROVED | 0.258 | Complete source/package/program match |
+| 10 | Server 2025 | SV-277998 | PROVED | 0.273 | Complete source/package/program match |
+| 11 | Server 2025 | SV-278028 | UNVERIFIABLE/UNSUPPORTED | 0.257 | Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802801; Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802810; Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802820; Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27802830 |
+| 12 | Server 2025 | SV-278104 | PROVED | 0.244 | Complete source/package/program match |
+| 13 | Server 2025 | SV-278139 | UNVERIFIABLE/UNSUPPORTED | 0.250 | native Object: unsupported keys ['select'] |
+| 14 | Server 2025 | SV-278146 | UNVERIFIABLE/UNSUPPORTED | 0.248 | Set/Filter/behavior collection proof unavailable: oval:navy.navwar.niwcatlantic.scc.windows:obj:27814601 |
+| 15 | Server 2025 | SV-278208 | UNVERIFIABLE/UNSUPPORTED | 0.249 | all_exist outside exact approved source proof |
+| 16 | Server 2025 | SV-278234 | PROVED | 0.248 | Complete source/package/program match |
+| 17 | DNS | SV-259334 | PROVED | 0.158 | Complete source/package/program match |
+| 18 | DNS | SV-259339 | PROVED | 0.140 | Complete source/package/program match |
+| 19 | DNS | SV-259346 | PROVED | 0.141 | Complete source/package/program match |
+| 20 | DNS | SV-259351 | PROVED | 0.149 | Complete source/package/program match |
+| 21 | DNS | SV-259360 | PROVED | 0.140 | Complete source/package/program match |
+| 22 | DNS | SV-259377 | PROVED | 0.142 | Complete source/package/program match |
+| 23 | DNS | SV-259381 | PROVED | 0.139 | Complete source/package/program match |
+| 24 | DNS | SV-259384 | PROVED | 0.148 | Complete source/package/program match |
 
 All native Assessment IDs here are the listed Rule ID plus `.automated`.
 [Results](v04-proof-expansion/results.json) retain exact Benchmark/Rule/Assessment
@@ -138,10 +138,13 @@ The [observed feature matrix](v04-proof-expansion/feature-coverage.csv) shows
 attempted/proved case counts and unresolved cases per construct, not complete
 language coverage. [Per-case measurements](v04-proof-expansion/results-performance.json)
 record wall/CPU seconds, source-node/Test counts and process high-water RSS.
-This run's 32-case loop took **8.083 s wall / 8.069 s CPU**;
-case median **0.243 s**, maximum
-**0.639 s**. RSS is process high-water,
-not per-case allocation. Measurements include package verification/source parsing,
+This run's 32-case loop took **6.965 s wall / 6.958 s CPU**;
+case median **0.230 s**, maximum
+**0.328 s**. RSS is process high-water,
+not per-case allocation. RSS is optional telemetry on platforms without the Unix
+`resource` module; proof-tool imports and comparisons do not require it. The
+import-without-resource guard and all 91 focused tests pass after this fix.
+Measurements include package verification/source parsing,
 exclude import/CI setup and scanner execution, and should not be extrapolated
 linearly to all 883. Timing is separated from deterministic proof evidence.
 
@@ -199,15 +202,10 @@ Deterministic evidence SHA-256:
 
 | Artifact | SHA-256 |
 | --- | --- |
-
-| results.json | `9a5d2e3663ba7f1dfab3fcf4869a7e54f292fa558e426441721ed0b198b8f4e2` |
-
+| results.json | `62581c5917af2cb618dc539bcf2fa0aea536503968190c2c3df6db662fb9c337` |
 | results-coverage.csv | `b30780d8c74ef65dd6626cdd28f1086727086f5e3e027c0d02b73f8152466a63` |
-
 | feature-coverage.csv | `7edad20381f35d76691eb231f5948cc3abf2d9b519be7b2c9ce1daebcdc585c2` |
-
-| fixtures-manifest.json | `923e68ffaa85924774b4979ad56cf74081dff19f31ec464f698c16a64972915d` |
-
+| fixtures-manifest.json | `17f8ce8d76b4545a01155562e98446263057070917a1622ff46fc899c21ec218` |
 | proof-rule-anchors.json | `929be7d4b193c9be0bbeb642e4058adbe6411361e9ad286f657b5c6e91a073cb` |
 
 ## Remaining blockers and next bounded increment

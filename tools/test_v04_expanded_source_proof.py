@@ -3,13 +3,16 @@
 from copy import deepcopy
 from hashlib import sha256
 import itertools
+import importlib.util
 import json
 from pathlib import Path
 import re
 import tempfile
+import sys
 import unittest
 import xml.etree.ElementTree as ET
 import zipfile
+from unittest.mock import patch
 
 from audit_v04_eight_assessment_pilot import verify_program
 from audit_v04_proof_expansion import manifest_rows, merge_coverage
@@ -54,6 +57,12 @@ class ExpandedSourceProofTests(unittest.TestCase):
                 self.assertEqual(closure['nodes'], f['provenance']['source_dependency_closure']['nodes'])
                 verify_program(f['assessment'], f['compiled_program'])
                 self.assertEqual(checked(f)['outcome'], f['expected_outcome'])
+        with patch.dict(sys.modules, {'resource': None}):
+            spec = importlib.util.spec_from_file_location('proof_without_resource',
+                ROOT / 'tools/audit_v04_proof_expansion.py')
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            self.assertIsNone(module.resource)
 
     def test_three_original_blockers_revisited_and_oracle_stays_unverified(self):
         for platform, rule, normalization, expected in (

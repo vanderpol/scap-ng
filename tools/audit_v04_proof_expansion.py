@@ -10,10 +10,14 @@ import csv
 from hashlib import sha256
 import json
 from pathlib import Path
-import resource
 import time
 import xml.etree.ElementTree as ET
 import zipfile
+
+try:
+    import resource
+except ImportError:  # Windows: RSS is optional telemetry, never a proof dependency.
+    resource = None
 
 from audit_v04_eight_assessment_pilot import BASE, ROOT, CASES, original, packaged
 from v04_expanded_source_proof import ExpandedSource, expanded_compare
@@ -157,7 +161,7 @@ def run(inputs, bundles, output, fixtures=None):
             record.update(outcome='UNVERIFIABLE/UNSUPPORTED', blocker=str(e))
         timings.append({'case': case, 'wall_seconds': time.perf_counter() - wall,
                         'cpu_seconds': time.process_time() - cpu,
-                        'process_peak_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
+                        'process_peak_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss if resource else None,
                         'source_nodes': record.get('features', {}).get('source_nodes'),
                         'compiled_tests': len(a['tests'])})
         if fixtures and frozen and source:
