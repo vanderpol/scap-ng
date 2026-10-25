@@ -1,0 +1,3390 @@
+{
+  "status": "EXPERIMENT_SUCCESS_BOUNDED_NOT_PRODUCTION_ACCEPTANCE",
+  "baseline": {
+    "commit": "bf9cfde96231e6c825c1faaf3d33c38951e9ecb2",
+    "schema_v040_git_tree": "54f4ab0c4e4226e7979378617d51dd4bfa85a8db",
+    "mandatory": {
+      "tests": 2974,
+      "failures": 0,
+      "errors": 0,
+      "skips": 1,
+      "successful": true,
+      "skipped_tests": [
+        {
+          "id": "test_full_pinned_original_oval_census_when_corpus_supplied (test_research_c_local_literal_inputs.LocalLiteralCollectionBindings.test_full_pinned_original_oval_census_when_corpus_supplied)",
+          "reason": "run original source corpus through dedicated C workflow"
+        }
+      ],
+      "diagnostics": []
+    },
+    "hosted_ci": [
+      {
+        "workflowName": "Commit issue reference",
+        "workflowFilePath": ".github/workflows/commit-issue-reference.yml",
+        "id": "40193055578",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40193055578"
+      },
+      {
+        "workflowName": "Repository preservation and current/archive boundaries",
+        "workflowFilePath": ".github/workflows/repository-boundaries.yml",
+        "id": "40193055600",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40193055600"
+      },
+      {
+        "workflowName": "Rebaseline smoke regression",
+        "workflowFilePath": ".github/workflows/rebaseline-smoke.yml",
+        "id": "40193055582",
+        "state": {
+          "status": "WORKFLOW_RUN_STATUS_COMPLETED",
+          "conclusion": "WORKFLOW_RUN_CONCLUSION_SUCCESS"
+        },
+        "runUrl": "https://github.com/vanderpol/scap-ng/actions/runs/40193055582"
+      }
+    ],
+    "known_failures_unchanged": [
+      "Historical proposed-fields workflow: four all_items_requirement KeyErrors, previously reproduced on 54 tests; not repaired/reclassified.",
+      "Five historical corpus Object predicate documents remain invalid after wrapper flattening; no rebaseline.",
+      "Windows SV-253259 / SV-278208 all_exist decisions and Oracle SV-271844 remain blocked/unverified."
+    ]
+  },
+  "source": {
+    "source": {
+      "file": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+      "zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+      "repository": "niwc-atlantic/scap-content-library",
+      "revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+      "source_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip"
+    },
+    "fixture": "server2025-signed.zip",
+    "zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "baseline": "bf9cfde96231e6c825c1faaf3d33c38951e9ecb2",
+    "rules": [
+      "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule",
+      "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule"
+    ],
+    "selection_reason": [
+      "Required nested Registry/object_component/regex_capture/concat/shellcommand dependency chain",
+      "First source-document-order medium-severity Rule resolving to one direct Registry Test/State, literal local-machine hive/key/name, only scalar equality type/value fields, no variables/sets/filters/behaviors, at_least_one_exists. Selected by original structure, not a conversion-ID branch."
+    ],
+    "trust": "Original signed ZIP bytes are pinned; this prototype does not verify publisher signature trust."
+  },
+  "environment": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "platform": "Linux-6.18.55-x86_64-with-glibc2.41",
+    "cpu_count": 5,
+    "dependencies": {
+      "PyYAML": "6.0.3",
+      "jsonschema": "4.25.1",
+      "referencing": "0.37.0",
+      "lxml": "6.1.1",
+      "cryptography": "50.0.2"
+    }
+  },
+  "correctness": {
+    "independent_original_source": [
+      {
+        "rule": "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule",
+        "outcome": "PROVED",
+        "closure_nodes": 7,
+        "comparison": {
+          "outcome": "PROVED",
+          "test_bindings": {
+            "oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901": "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test"
+          },
+          "comparisons": [
+            {
+              "source_test": "oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901",
+              "native_test": "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test",
+              "source_term": {
+                "capability": "independent.shellcommand",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "selectors": {
+                    "shell": {
+                      "datatype": "string",
+                      "value": "cmd"
+                    },
+                    "command": {
+                      "local": {
+                        "datatype": "string",
+                        "expression": {
+                          "concat": [
+                            {
+                              "literal": {
+                                "datatype": "string",
+                                "value": "icacls "
+                              }
+                            },
+                            {
+                              "regex_capture": {
+                                "pattern": "(^[a-zA-Z]:\\\\.+)\\\\sysvol",
+                                "value": {
+                                  "values": {
+                                    "object": {
+                                      "capability": "windows.registry",
+                                      "selectors": {
+                                        "hive": {
+                                          "operation": "equals",
+                                          "comparison_datatype": "string",
+                                          "operand": {
+                                            "datatype": "string",
+                                            "value": "local_machine"
+                                          }
+                                        },
+                                        "key": {
+                                          "operation": "equals",
+                                          "comparison_datatype": "string",
+                                          "operand": {
+                                            "datatype": "string",
+                                            "value": "SYSTEM\\CurrentControlSet\\Services\\Netlogon\\Parameters"
+                                          }
+                                        },
+                                        "name": {
+                                          "operation": "equals",
+                                          "comparison_datatype": "string",
+                                          "operand": {
+                                            "datatype": "string",
+                                            "value": "SysVol"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "field": "value"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "pattern": {
+                      "datatype": "string",
+                      "value": ":"
+                    },
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false
+                  }
+                },
+                "found": "one_or_more",
+                "matching": "every",
+                "condition": {
+                  "and": [
+                    {
+                      "field": "exit_status",
+                      "predicate": {
+                        "operation": "equals",
+                        "comparison_datatype": "integer",
+                        "operand": {
+                          "datatype": "integer",
+                          "value": 0
+                        },
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    },
+                    {
+                      "field": "stderr_line",
+                      "predicate": {
+                        "found": "none"
+                      }
+                    },
+                    {
+                      "field": "stdout_line",
+                      "predicate": {
+                        "operation": "matches_regex",
+                        "comparison_datatype": "string",
+                        "operand": {
+                          "constant_values": [
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\Authenticated Users:\\(RX\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Server Operators:\\(RX\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Server Operators:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Administrators:\\(M,WDAC,WO\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            }
+                          ]
+                        },
+                        "expected_matching": "one_or_more",
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    }
+                  ]
+                }
+              },
+              "native_term": {
+                "capability": "independent.shellcommand",
+                "object": {
+                  "capability": "independent.shellcommand",
+                  "selectors": {
+                    "shell": {
+                      "datatype": "string",
+                      "value": "cmd"
+                    },
+                    "command": {
+                      "local": {
+                        "datatype": "string",
+                        "expression": {
+                          "concat": [
+                            {
+                              "literal": {
+                                "datatype": "string",
+                                "value": "icacls "
+                              }
+                            },
+                            {
+                              "regex_capture": {
+                                "pattern": "(^[a-zA-Z]:\\\\.+)\\\\sysvol",
+                                "value": {
+                                  "values": {
+                                    "object": {
+                                      "capability": "windows.registry",
+                                      "selectors": {
+                                        "hive": {
+                                          "operation": "equals",
+                                          "comparison_datatype": "string",
+                                          "operand": {
+                                            "datatype": "string",
+                                            "value": "local_machine"
+                                          }
+                                        },
+                                        "key": {
+                                          "operation": "equals",
+                                          "comparison_datatype": "string",
+                                          "operand": {
+                                            "datatype": "string",
+                                            "value": "SYSTEM\\CurrentControlSet\\Services\\Netlogon\\Parameters"
+                                          }
+                                        },
+                                        "name": {
+                                          "operation": "equals",
+                                          "comparison_datatype": "string",
+                                          "operand": {
+                                            "datatype": "string",
+                                            "value": "SysVol"
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "field": "value"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "pattern": {
+                      "datatype": "string",
+                      "value": ":"
+                    },
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false
+                  }
+                },
+                "found": "one_or_more",
+                "matching": "every",
+                "condition": {
+                  "and": [
+                    {
+                      "field": "exit_status",
+                      "predicate": {
+                        "operation": "equals",
+                        "comparison_datatype": "integer",
+                        "operand": {
+                          "datatype": "integer",
+                          "value": 0
+                        },
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    },
+                    {
+                      "field": "stderr_line",
+                      "predicate": {
+                        "found": "none"
+                      }
+                    },
+                    {
+                      "field": "stdout_line",
+                      "predicate": {
+                        "operation": "matches_regex",
+                        "comparison_datatype": "string",
+                        "operand": {
+                          "constant_values": [
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\Authenticated Users:\\(RX\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Server Operators:\\(RX\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Server Operators:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Administrators:\\(M,WDAC,WO\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            },
+                            {
+                              "datatype": "string",
+                              "value": "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            }
+                          ]
+                        },
+                        "expected_matching": "one_or_more",
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    }
+                  ]
+                }
+              },
+              "term_sha256": "8243a0cd845f5723080757963660b77cdf4acf8d2362f97df9754075436e5329"
+            }
+          ],
+          "unsupported_obligations": [],
+          "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+          "normalizations_applied": []
+        }
+      },
+      {
+        "rule": "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule",
+        "outcome": "PROVED",
+        "closure_nodes": 5,
+        "comparison": {
+          "outcome": "PROVED",
+          "test_bindings": {
+            "oval:mil.disa.stig.win:tst:25335200": "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test"
+          },
+          "comparisons": [
+            {
+              "source_test": "oval:mil.disa.stig.win:tst:25335200",
+              "native_test": "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test",
+              "source_term": {
+                "capability": "windows.registry",
+                "object": {
+                  "capability": "windows.registry",
+                  "selectors": {
+                    "hive": {
+                      "operation": "equals",
+                      "comparison_datatype": "string",
+                      "operand": {
+                        "datatype": "string",
+                        "value": "local_machine"
+                      }
+                    },
+                    "key": {
+                      "operation": "equals",
+                      "comparison_datatype": "string",
+                      "operand": {
+                        "datatype": "string",
+                        "value": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization"
+                      }
+                    },
+                    "name": {
+                      "operation": "equals",
+                      "comparison_datatype": "string",
+                      "operand": {
+                        "datatype": "string",
+                        "value": "NoLockScreenSlideshow"
+                      }
+                    }
+                  }
+                },
+                "found": "one_or_more",
+                "matching": "every",
+                "condition": {
+                  "and": [
+                    {
+                      "field": "value",
+                      "predicate": {
+                        "operation": "equals",
+                        "comparison_datatype": "integer",
+                        "operand": {
+                          "datatype": "integer",
+                          "value": 1
+                        },
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    },
+                    {
+                      "field": "type",
+                      "predicate": {
+                        "operation": "equals",
+                        "comparison_datatype": "string",
+                        "operand": {
+                          "datatype": "string",
+                          "value": "dword"
+                        },
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    }
+                  ]
+                }
+              },
+              "native_term": {
+                "capability": "windows.registry",
+                "object": {
+                  "capability": "windows.registry",
+                  "selectors": {
+                    "hive": {
+                      "operation": "equals",
+                      "comparison_datatype": "string",
+                      "operand": {
+                        "datatype": "string",
+                        "value": "local_machine"
+                      }
+                    },
+                    "key": {
+                      "operation": "equals",
+                      "comparison_datatype": "string",
+                      "operand": {
+                        "datatype": "string",
+                        "value": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization"
+                      }
+                    },
+                    "name": {
+                      "operation": "equals",
+                      "comparison_datatype": "string",
+                      "operand": {
+                        "datatype": "string",
+                        "value": "NoLockScreenSlideshow"
+                      }
+                    }
+                  }
+                },
+                "found": "one_or_more",
+                "matching": "every",
+                "condition": {
+                  "and": [
+                    {
+                      "field": "value",
+                      "predicate": {
+                        "operation": "equals",
+                        "comparison_datatype": "integer",
+                        "operand": {
+                          "datatype": "integer",
+                          "value": 1
+                        },
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    },
+                    {
+                      "field": "type",
+                      "predicate": {
+                        "operation": "equals",
+                        "comparison_datatype": "string",
+                        "operand": {
+                          "datatype": "string",
+                          "value": "dword"
+                        },
+                        "found": "one_or_more",
+                        "matching": "every"
+                      }
+                    }
+                  ]
+                }
+              },
+              "term_sha256": "63108d3a8a7e4552874958e321a8d3f295d70f18a224ecafce5846af7884e944"
+            }
+          ],
+          "unsupported_obligations": [],
+          "proof_scope": "structural identity of typed collection/comparison/result terms; not scanner execution",
+          "normalizations_applied": []
+        }
+      }
+    ],
+    "public_validator_json": {
+      "documents_checked": 0,
+      "valid": 0,
+      "invalid": 0,
+      "unclassified_yaml": 0,
+      "unclassified_paths": [],
+      "results": []
+    },
+    "public_validator_yaml": {
+      "documents_checked": 6,
+      "valid": 6,
+      "invalid": 0,
+      "unclassified_yaml": 0,
+      "unclassified_paths": [],
+      "results": [
+        {
+          "path": "direct-slice/applicability.yaml",
+          "kind": "applicability",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.yaml",
+          "kind": "assessment",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.yaml",
+          "kind": "assessment",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "direct-slice/benchmark.yaml",
+          "kind": "benchmark",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.yaml",
+          "kind": "rule",
+          "valid": true,
+          "errors": []
+        },
+        {
+          "path": "direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.yaml",
+          "kind": "rule",
+          "valid": true,
+          "errors": []
+        }
+      ]
+    },
+    "public_compiler": {
+      "direct-slice": {
+        "benchmark": "direct-slice",
+        "documents": 6,
+        "programs": 2,
+        "scanner_evaluated": false,
+        "signature_verified": false,
+        "source_graph_sha256": "af8b22fbabe6a5c9a256500270823e00c418f54b60a62da8d58fdd8bb7daca48",
+        "status": "NATIVE_040_COMPILED_CONTENT_BUNDLE_NOT_SCANNER_TESTED",
+        "tests": 2
+      }
+    },
+    "independent_consumer": {
+      "status": "INDEPENDENT_PACKAGE_CONSUMER_PASS",
+      "benchmark": "direct-slice",
+      "bundle_sha256": "fecfd8ecea81f7cbb3b9007d1ed04cf2a84acd5deee6b28529689a2ed61d90b2",
+      "documents": 6,
+      "programs": 2,
+      "tests": 2,
+      "shared_objects": 0,
+      "variables": 1,
+      "source_graph_sha256": "af8b22fbabe6a5c9a256500270823e00c418f54b60a62da8d58fdd8bb7daca48",
+      "external_source_compared": true,
+      "scanner_evaluated": false,
+      "publisher_trust_verified": false
+    },
+    "negative_diagnostics": [
+      {
+        "mutation": "nested_registry_selector",
+        "diagnostic": "AssertionError: original operand divergence: {\"path\": \"$.tests.oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901.object.selectors.command.local.expression.concat[1].regex_capture.value.values.object.selectors.name.operand.value\", \"source\": \"SysVol\", \"package\": \"DifferentValue\"}"
+      },
+      {
+        "mutation": "variable_field",
+        "diagnostic": "AssertionError: original operand divergence: {\"path\": \"$.tests.oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901.object.selectors.command.local.expression.concat[1].regex_capture.value.values.field\", \"source\": \"value\", \"package\": \"key\"}"
+      },
+      {
+        "mutation": "quantifier",
+        "diagnostic": "AssertionError: original operand divergence: {\"path\": \"$.tests.oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901.matching\", \"source\": \"every\", \"package\": \"one_or_more\"}"
+      },
+      {
+        "mutation": "profile_selection",
+        "diagnostic": "AssertionError: Profile selection divergence: xccdf_mil.disa.stig_profile_CAT_I_Only"
+      },
+      {
+        "mutation": "legacy_select",
+        "diagnostic": "ValueError: authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json: native 0.4.0 Object schema failure: assessment.variables.icacls-and-path-to-sysvol-directory-62cfc32f-variable.expression.concat[1].regex_capture.value.values.object.select: obsolete generic Object select wrapper; explicit migration required"
+      }
+    ],
+    "focused_tests": {
+      "run": 10,
+      "failures": 0,
+      "errors": 0
+    },
+    "mandatory": {
+      "tests": 2984,
+      "failures": 0,
+      "errors": 0,
+      "skips": 1,
+      "successful": true,
+      "skipped_tests": [
+        {
+          "id": "test_full_pinned_original_oval_census_when_corpus_supplied (test_research_c_local_literal_inputs.LocalLiteralCollectionBindings.test_full_pinned_original_oval_census_when_corpus_supplied)",
+          "reason": "run original source corpus through dedicated C workflow"
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  "source_trace": {
+    "format": "direct-0.4-two-rule-prototype/1",
+    "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "source_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+    "source_benchmark_component": "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml",
+    "source_benchmark_id": "xccdf_mil.disa.stig_benchmark_MS_Windows_Server_2025_STIG",
+    "source_checklist_ref": "scap_mil.disa.stig_cref_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml",
+    "source_xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+    "component_hashes": {
+      "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-cpe-dictionary.xml": "b3d6ab81aad6273131dfd6e310103e7da4558a0cac6c9c3feaf9c3f57b588b68",
+      "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-xccdf.xml": "53cb672f8e81dcd7575a9308cc69cf19313ae09eecc5737e7d83d2cecfb19d9b",
+      "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml": "d387df37e8edc8c238c1fdbe12df942c28b6a4f1fdba95b6b0e65ac6d044e202",
+      "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-cpe-oval.xml": "24a15f6268a91311e3671872601d0519fd00ddfca52a6700746eefe77eecf46b",
+      "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml": "b7c21d762540474115f7aced66d951c8dca81f3fd809fff947eca65f209b8c90",
+      "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-ocil.xml": "59eab6fec5a7ccca494733d95c222aa701d46ecacac8807d3c624a7ad1ce1b9e"
+    },
+    "rules": [
+      {
+        "source_rule": "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule",
+        "source_rule_sha256": "ee2d15b4ef579869eff64f0122dd8938026a71aa99c39e6b6ebd0137569e0979",
+        "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml",
+        "definition": "oval:navy.navwar.niwcatlantic.scc.windows:def:278139",
+        "native_rule": "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule",
+        "assessment": "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment",
+        "dependencies": {
+          "oval:navy.navwar.niwcatlantic.scc.windows:def:278139": {
+            "kind": "definition",
+            "sha256": "186c7417a2ace510ed6471044453c0c7ca68c7f4d96ec75a537ac4b7a5098010",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          },
+          "oval:navy.navwar.niwcatlantic.scc.windows:tst:27813901": {
+            "kind": "test",
+            "sha256": "373d0e98c332d5656f5db890f1ae3e1aef5e7f7d98ad728bdfc1c0cbc143f892",
+            "native_id": "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test",
+            "representation": "named component"
+          },
+          "oval:navy.navwar.niwcatlantic.scc.windows:ste:27813901": {
+            "kind": "state",
+            "sha256": "953f9367991975c7610dbeb123dd35b46d82b686add2405bafac31366261c867",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          },
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27813901": {
+            "kind": "variable",
+            "sha256": "035036b0513c30e632a592c3dacb8f75575fea75b6b80d876cd0e38300fe3ad4",
+            "native_id": null,
+            "representation": "typed literal array; source var_check preserved at consumer"
+          },
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27813901": {
+            "kind": "object",
+            "sha256": "c40bd107a30c61f45cad6415010b93294f09167c1001039e07672c68c331b51a",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          },
+          "oval:navy.navwar.niwcatlantic.scc.windows:var:27813902": {
+            "kind": "variable",
+            "sha256": "cb79f896dd4fc7abd25f3f00413e5e00ca30355b8301465c79bab548fa48a90f",
+            "native_id": "icacls-and-path-to-sysvol-directory-62cfc32f-variable",
+            "representation": "named component"
+          },
+          "oval:navy.navwar.niwcatlantic.scc.windows:obj:27813902": {
+            "kind": "object",
+            "sha256": "b89bfc4cd40aee710d78734bf973ad1c8d7cfa15f7f3c3feb5a81b7bac39e1ae",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          }
+        },
+        "omitted_rule_children": [
+          "reference",
+          "platform",
+          "ident",
+          "fixtext",
+          "fix",
+          "check",
+          "check",
+          "check"
+        ],
+        "source_platforms": [
+          "#xccdf_mil.disa.stig_platform_Windows_DomainController"
+        ]
+      },
+      {
+        "source_rule": "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule",
+        "source_rule_sha256": "4e1444cf7983a53cd9cd1376e02398324c36fe5591519bddd46b9d8ae9142750",
+        "component": "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+        "definition": "oval:mil.disa.stig.windows2025:def:278080",
+        "native_rule": "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule",
+        "assessment": "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment",
+        "dependencies": {
+          "oval:mil.disa.stig.windows2025:def:278080": {
+            "kind": "definition",
+            "sha256": "b84a276417490d546b7c7b15148bd932ab5d8265e28b87141a233d23a4bdf026",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          },
+          "oval:mil.disa.stig.defs:def:253352": {
+            "kind": "definition",
+            "sha256": "1d4e08e1d5ff3589bfb961da5c8aa3402dc4d23874b0c804f90c168b9ba7341e",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          },
+          "oval:mil.disa.stig.win:tst:25335200": {
+            "kind": "test",
+            "sha256": "e172c106028dc3e7771b28581f2a83a27a7e6ed03a4596e461bc48e759333632",
+            "native_id": "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test",
+            "representation": "named component"
+          },
+          "oval:mil.disa.stig.win:ste:20000001": {
+            "kind": "state",
+            "sha256": "90b5e9925de1fc45f0bee457c995cc8f36bc22b26956ccbf3e9f89a5dd47549e",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          },
+          "oval:mil.disa.stig.win:obj:25335200": {
+            "kind": "object",
+            "sha256": "8afee6650bb7e3b92f50378b221f1d95bf42c86495964e244d55dbcb9cd5265b",
+            "native_id": null,
+            "representation": "inline dependency expression"
+          }
+        },
+        "omitted_rule_children": [
+          "reference",
+          "ident",
+          "fixtext",
+          "fix",
+          "check",
+          "check",
+          "check"
+        ],
+        "source_platforms": []
+      }
+    ],
+    "profiles": [
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-1_Classified",
+        "source_sha256": "71c18ee0a530a6e304e1749b87296d390b5c3ac6d67624c0c5a73c855828677f",
+        "native_id": "i-mission-critical-classified-74d33f7a-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-1_Public",
+        "source_sha256": "73553774a460e308f05d11b2008d00b31b1a26d7d958859e63a8e7468d0207be",
+        "native_id": "i-mission-critical-public-57b1d68d-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-1_Sensitive",
+        "source_sha256": "8c51fd5f60f7468f9785b40c7e0cbfc197fa8007049eb833a0547768f97a94c0",
+        "native_id": "i-mission-critical-sensitive-15a82c46-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-2_Classified",
+        "source_sha256": "7b65a5ca78a45e6221b24701df18ebcc114cb4d11139ec442229915f7b0194c9",
+        "native_id": "ii-mission-support-classified-089774bf-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-2_Public",
+        "source_sha256": "3525a4f0c55dfe4123e4b24aae21d9fd5aa6e2918c79d3e6149bd52248c7955e",
+        "native_id": "ii-mission-support-public-b9230488-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-2_Sensitive",
+        "source_sha256": "1a370eaf0d59054c0c8190e9a03d862d456fb70ef4295bc740127d8499497da6",
+        "native_id": "ii-mission-support-sensitive-53e5a3a7-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-3_Classified",
+        "source_sha256": "d5ee1c420406fb149ef628e7f0698603d6a12bc7092965aba3ed93e6baf6d080",
+        "native_id": "iii-administrative-classified-91c0545c-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-3_Public",
+        "source_sha256": "cff3e2ad4568299917296258e3dcfa9963d3cf6d569b141d2b49256610477294",
+        "native_id": "iii-administrative-public-fdfb1a33-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_MAC-3_Sensitive",
+        "source_sha256": "36d7cc92dce81bf43d6855bf743d082c27910dad18346e965c7b47d8876157c1",
+        "native_id": "iii-administrative-sensitive-6f4ab864-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_CAT_I_Only",
+        "source_sha256": "2d6baf16c6c17e5fb2f0e689713cc61a18040bce0369d87b29f547e883864888",
+        "native_id": "cat-i-only-663a4974-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": false
+        }
+      },
+      {
+        "source_id": "xccdf_mil.disa.stig_profile_Disable_Slow_Rules",
+        "source_sha256": "94bb781bb36af3e22c65d77b46942e5f564547cab23f10a5215e3d3333049771",
+        "native_id": "disable-slow-rules-3e2996ab-profile",
+        "selected": {
+          "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule": true,
+          "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule": true
+        }
+      }
+    ],
+    "source_benchmark_metadata": [
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}status",
+        [
+          [
+            "date",
+            "2026-08-26"
+          ]
+        ],
+        "accepted",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}title",
+        [],
+        "Microsoft Windows Server 2025 STIG SCAP Benchmark - NIWC Enhanced with Manual Questions",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}description",
+        [],
+        "This Security Technical Implementation Guide is published as a tool to improve the security of Department of War (DoW) information systems. The requirements are derived from the National Institute of Standards and Technology (NIST) 800-53 and related documents. Comments or proposed revisions to this document should be sent via email to the following address: disa.stig_spt@mail.mil.",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}notice",
+        [
+          [
+            "id",
+            "terms-of-use"
+          ],
+          [
+            "{http://www.w3.org/XML/1998/namespace}lang",
+            "en"
+          ]
+        ],
+        "Portions of this document were developed at Naval Information Warfare Center Atlantic by employees of the Federal Government in the course of their official duties. Pursuant to title 17 Section 105 of the United States Code this software is not subject to copyright protection and is in the public domain. The Government assumes no responsibility whatsoever for its use by other parties, and the software is provided \"AS IS\" without warranty or guarantee of any kind, express or implied, including, but not limited to, the warranties of merchantability and of fitness for a particular purpose. In no event shall the Government be liable for any claim, damages or other liability, whether in an action of contract, tort or other dealings in the software. The Government has no obligation hereunder to provide maintenance, support, updates, enhancements, or modifications. We would appreciate acknowledgement if the software is used. This software can be redistributed and/or modified freely provided that any derivative works bear some notice that they are derived from it, and any modified versions bear some notice that they have been modified.",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}front-matter",
+        [
+          [
+            "{http://www.w3.org/XML/1998/namespace}lang",
+            "en"
+          ]
+        ],
+        "This content stream was enhanced with OCIL manual questions derived from the STIG Manual by the NIWC SCC team.\nTimestamp: 2026-08-26T17:35:51.634841+00:00\nTool Version: 2.0\nSTIG Manual Version: 1\nSCAP Benchmark Version: 001.001\nTotal Rules: 291\nDISA Automated Rules: 225\nNIST Automated Rules: 0\nNIWC Automated Rules: 36\nManual rules added: 30",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}rear-matter",
+        [
+          [
+            "{http://www.w3.org/XML/1998/namespace}lang",
+            "en"
+          ]
+        ],
+        "This data is metadata to be used for the creation of CKL reports.\nversion:--:1\nclassification:--:UNCLASSIFIED\ncustomname:--:\nstigid:--:MS_Windows_Server_2025_STIG\ndescription:--:This Security Technical Implementation Guide is published as a tool to improve the security of Department of War (DoW) information systems. The requirements are derived from the National Institute of Standards and Technology (NIST) 800-53 and related documents. Comments or proposed revisions to this document should be sent via email to the following address: disa.stig_spt@mail.mil.\nfilename:--:U_MS_Windows_Server_2025_V1R3_STIG_Manual-xccdf.xml\nreleaseinfo:--:Release: 3 Benchmark Date: 10 Aug 2026\ntitle:--:Microsoft Windows Server 2025 Security Technical Implementation Guide\nuuid:--:\nnotice:--:\nsource:--:STIG.DOD.MIL",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}reference",
+        [
+          [
+            "href",
+            "https://cyber.mil"
+          ]
+        ],
+        null,
+        [
+          [
+            "{http://purl.org/dc/elements/1.1/}publisher",
+            [],
+            "DISA+NIWC",
+            []
+          ],
+          [
+            "{http://purl.org/dc/elements/1.1/}source",
+            [],
+            "STIG.DOD.MIL",
+            []
+          ]
+        ]
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}plain-text",
+        [
+          [
+            "id",
+            "release-info"
+          ]
+        ],
+        "Enhanced Content 001.001.1 Date: 2026-08-26, based on Release: 3 Benchmark Date: 10 Aug 2026",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}plain-text",
+        [
+          [
+            "id",
+            "generator"
+          ]
+        ],
+        "3.5.2",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}plain-text",
+        [
+          [
+            "id",
+            "conventionsVersion"
+          ]
+        ],
+        "1.10.0",
+        []
+      ],
+      [
+        "{http://cpe.mitre.org/language/2.0}platform-specification",
+        [],
+        null,
+        [
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_mil.disa.stig_platform_Windows_NotServerCore"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows Not Server Core Installation",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:mil.disa.stig.win:def:100006"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_mil.disa.stig_platform_Windows_DomainController"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows Domain Controller",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:mil.disa.stig.win:def:100005"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_mil.disa.stig_platform_Windows_MemberServer"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows Domain Member Server",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:mil.disa.stig.win:def:100004"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_mil.disa.stig_platform_Windows_StandaloneServer"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows Standalone Server",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:mil.disa.stig.win:def:100003"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_mil.disa.stig_platform_Windows_OpenSSH"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows OpenSSH",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:mil.disa.stig.win:def:100025"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_navy.navwar.niwcatlantic.scc_platform_StandaloneServer_or_MemberServer"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows Standalone Server or Domain Member Server",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:navy.navwar.niwcatlantic.scc.windows:def:102"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_navy.navwar.niwcatlantic.scc_platform_FTP"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "FTP is Installed",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "true"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:navy.navwar.niwcatlantic.scc.windows:def:201"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ],
+          [
+            "{http://cpe.mitre.org/language/2.0}platform",
+            [
+              [
+                "id",
+                "xccdf_navy.navwar.niwcatlantic.scc_platform_MemberServer_or_DomainController"
+              ]
+            ],
+            null,
+            [
+              [
+                "{http://cpe.mitre.org/language/2.0}title",
+                [],
+                "Windows Domain Member Server or Domain Controller",
+                []
+              ],
+              [
+                "{http://cpe.mitre.org/language/2.0}logical-test",
+                [
+                  [
+                    "negate",
+                    "false"
+                  ],
+                  [
+                    "operator",
+                    "AND"
+                  ]
+                ],
+                null,
+                [
+                  [
+                    "{http://cpe.mitre.org/language/2.0}check-fact-ref",
+                    [
+                      [
+                        "href",
+                        "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval2.xml"
+                      ],
+                      [
+                        "id-ref",
+                        "oval:navy.navwar.niwcatlantic.scc.windows:def:301"
+                      ],
+                      [
+                        "system",
+                        "http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                      ]
+                    ],
+                    null,
+                    []
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}platform",
+        [
+          [
+            "idref",
+            "cpe:/o:microsoft:windows_server_2025:-::~~~~x64~"
+          ]
+        ],
+        null,
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}version",
+        [],
+        "001.001.001",
+        []
+      ],
+      [
+        "{http://checklists.nist.gov/xccdf/1.2}metadata",
+        [],
+        null,
+        [
+          [
+            "{http://purl.org/dc/elements/1.1/}creator",
+            [],
+            "DISA",
+            []
+          ],
+          [
+            "{http://purl.org/dc/elements/1.1/}publisher",
+            [],
+            "DISA",
+            []
+          ],
+          [
+            "{http://purl.org/dc/elements/1.1/}contributor",
+            [],
+            "DISA",
+            []
+          ],
+          [
+            "{http://purl.org/dc/elements/1.1/}source",
+            [],
+            "STIG.DOD.MIL",
+            []
+          ]
+        ]
+      ]
+    ],
+    "omitted_rules": [
+      "xccdf_mil.disa.stig_rule_SV-277982r1181944_rule",
+      "xccdf_mil.disa.stig_rule_SV-277983r1180655_rule",
+      "xccdf_mil.disa.stig_rule_SV-277985r1182240_rule",
+      "xccdf_mil.disa.stig_rule_SV-277986r1182007_rule",
+      "xccdf_mil.disa.stig_rule_SV-277987r1212169_rule",
+      "xccdf_mil.disa.stig_rule_SV-277988r1182011_rule",
+      "xccdf_mil.disa.stig_rule_SV-277989r1181947_rule",
+      "xccdf_mil.disa.stig_rule_SV-277990r1182248_rule",
+      "xccdf_mil.disa.stig_rule_SV-277991r1181778_rule",
+      "xccdf_mil.disa.stig_rule_SV-277992r1182016_rule",
+      "xccdf_mil.disa.stig_rule_SV-277993r1212171_rule",
+      "xccdf_mil.disa.stig_rule_SV-277995r1180691_rule",
+      "xccdf_mil.disa.stig_rule_SV-277996r1182235_rule",
+      "xccdf_mil.disa.stig_rule_SV-277997r1182022_rule",
+      "xccdf_mil.disa.stig_rule_SV-277998r1180700_rule",
+      "xccdf_mil.disa.stig_rule_SV-277999r1180703_rule",
+      "xccdf_mil.disa.stig_rule_SV-278000r1182252_rule",
+      "xccdf_mil.disa.stig_rule_SV-278001r1211143_rule",
+      "xccdf_mil.disa.stig_rule_SV-278002r1181785_rule",
+      "xccdf_mil.disa.stig_rule_SV-278003r1182254_rule",
+      "xccdf_mil.disa.stig_rule_SV-278004r1182256_rule",
+      "xccdf_mil.disa.stig_rule_SV-278005r1182259_rule",
+      "xccdf_mil.disa.stig_rule_SV-278006r1182237_rule",
+      "xccdf_mil.disa.stig_rule_SV-278007r1181789_rule",
+      "xccdf_mil.disa.stig_rule_SV-278008r1211146_rule",
+      "xccdf_mil.disa.stig_rule_SV-278009r1211149_rule",
+      "xccdf_mil.disa.stig_rule_SV-278010r1180736_rule",
+      "xccdf_mil.disa.stig_rule_SV-278011r1182239_rule",
+      "xccdf_mil.disa.stig_rule_SV-278012r1181951_rule",
+      "xccdf_mil.disa.stig_rule_SV-278013r1256709_rule",
+      "xccdf_mil.disa.stig_rule_SV-278014r1182263_rule",
+      "xccdf_mil.disa.stig_rule_SV-278015r1180751_rule",
+      "xccdf_mil.disa.stig_rule_SV-278016r1181795_rule",
+      "xccdf_mil.disa.stig_rule_SV-278017r1256711_rule",
+      "xccdf_mil.disa.stig_rule_SV-278018r1180760_rule",
+      "xccdf_mil.disa.stig_rule_SV-278019r1180763_rule",
+      "xccdf_mil.disa.stig_rule_SV-278020r1180766_rule",
+      "xccdf_mil.disa.stig_rule_SV-278021r1180769_rule",
+      "xccdf_mil.disa.stig_rule_SV-278022r1180772_rule",
+      "xccdf_mil.disa.stig_rule_SV-278023r1182034_rule",
+      "xccdf_mil.disa.stig_rule_SV-278024r1182036_rule",
+      "xccdf_mil.disa.stig_rule_SV-278025r1182038_rule",
+      "xccdf_mil.disa.stig_rule_SV-278026r1180784_rule",
+      "xccdf_mil.disa.stig_rule_SV-278027r1181803_rule",
+      "xccdf_mil.disa.stig_rule_SV-278028r1182265_rule",
+      "xccdf_mil.disa.stig_rule_SV-278029r1256714_rule",
+      "xccdf_mil.disa.stig_rule_SV-278030r1182043_rule",
+      "xccdf_mil.disa.stig_rule_SV-278031r1182046_rule",
+      "xccdf_mil.disa.stig_rule_SV-278032r1180802_rule",
+      "xccdf_mil.disa.stig_rule_SV-278033r1180805_rule",
+      "xccdf_mil.disa.stig_rule_SV-278034r1180808_rule",
+      "xccdf_mil.disa.stig_rule_SV-278035r1180811_rule",
+      "xccdf_mil.disa.stig_rule_SV-278036r1256715_rule",
+      "xccdf_mil.disa.stig_rule_SV-278037r1180817_rule",
+      "xccdf_mil.disa.stig_rule_SV-278038r1180820_rule",
+      "xccdf_mil.disa.stig_rule_SV-278039r1180823_rule",
+      "xccdf_mil.disa.stig_rule_SV-278040r1180826_rule",
+      "xccdf_mil.disa.stig_rule_SV-278041r1180829_rule",
+      "xccdf_mil.disa.stig_rule_SV-278042r1182270_rule",
+      "xccdf_mil.disa.stig_rule_SV-278043r1180835_rule",
+      "xccdf_mil.disa.stig_rule_SV-278044r1182051_rule",
+      "xccdf_mil.disa.stig_rule_SV-278045r1180841_rule",
+      "xccdf_mil.disa.stig_rule_SV-278046r1211151_rule",
+      "xccdf_mil.disa.stig_rule_SV-278047r1180847_rule",
+      "xccdf_mil.disa.stig_rule_SV-278048r1180850_rule",
+      "xccdf_mil.disa.stig_rule_SV-278049r1180853_rule",
+      "xccdf_mil.disa.stig_rule_SV-278050r1180856_rule",
+      "xccdf_mil.disa.stig_rule_SV-278051r1180859_rule",
+      "xccdf_mil.disa.stig_rule_SV-278052r1180862_rule",
+      "xccdf_mil.disa.stig_rule_SV-278053r1180865_rule",
+      "xccdf_mil.disa.stig_rule_SV-278054r1180868_rule",
+      "xccdf_mil.disa.stig_rule_SV-278055r1180871_rule",
+      "xccdf_mil.disa.stig_rule_SV-278056r1180874_rule",
+      "xccdf_mil.disa.stig_rule_SV-278057r1180877_rule",
+      "xccdf_mil.disa.stig_rule_SV-278058r1180880_rule",
+      "xccdf_mil.disa.stig_rule_SV-278059r1180883_rule",
+      "xccdf_mil.disa.stig_rule_SV-278060r1180886_rule",
+      "xccdf_mil.disa.stig_rule_SV-278061r1180889_rule",
+      "xccdf_mil.disa.stig_rule_SV-278062r1180892_rule",
+      "xccdf_mil.disa.stig_rule_SV-278063r1180895_rule",
+      "xccdf_mil.disa.stig_rule_SV-278064r1180898_rule",
+      "xccdf_mil.disa.stig_rule_SV-278065r1180901_rule",
+      "xccdf_mil.disa.stig_rule_SV-278066r1180904_rule",
+      "xccdf_mil.disa.stig_rule_SV-278067r1180907_rule",
+      "xccdf_mil.disa.stig_rule_SV-278068r1180910_rule",
+      "xccdf_mil.disa.stig_rule_SV-278069r1180913_rule",
+      "xccdf_mil.disa.stig_rule_SV-278070r1180916_rule",
+      "xccdf_mil.disa.stig_rule_SV-278071r1180919_rule",
+      "xccdf_mil.disa.stig_rule_SV-278072r1180922_rule",
+      "xccdf_mil.disa.stig_rule_SV-278073r1180925_rule",
+      "xccdf_mil.disa.stig_rule_SV-278074r1180928_rule",
+      "xccdf_mil.disa.stig_rule_SV-278075r1180931_rule",
+      "xccdf_mil.disa.stig_rule_SV-278076r1180934_rule",
+      "xccdf_mil.disa.stig_rule_SV-278077r1180937_rule",
+      "xccdf_mil.disa.stig_rule_SV-278078r1180940_rule",
+      "xccdf_mil.disa.stig_rule_SV-278079r1180943_rule",
+      "xccdf_mil.disa.stig_rule_SV-278082r1180952_rule",
+      "xccdf_mil.disa.stig_rule_SV-278083r1180955_rule",
+      "xccdf_mil.disa.stig_rule_SV-278084r1180958_rule",
+      "xccdf_mil.disa.stig_rule_SV-278085r1180961_rule",
+      "xccdf_mil.disa.stig_rule_SV-278086r1180964_rule",
+      "xccdf_mil.disa.stig_rule_SV-278087r1182272_rule",
+      "xccdf_mil.disa.stig_rule_SV-278088r1180970_rule",
+      "xccdf_mil.disa.stig_rule_SV-278089r1180973_rule",
+      "xccdf_mil.disa.stig_rule_SV-278090r1182274_rule",
+      "xccdf_mil.disa.stig_rule_SV-278091r1182244_rule",
+      "xccdf_mil.disa.stig_rule_SV-278092r1182059_rule",
+      "xccdf_mil.disa.stig_rule_SV-278093r1180985_rule",
+      "xccdf_mil.disa.stig_rule_SV-278094r1180988_rule",
+      "xccdf_mil.disa.stig_rule_SV-278095r1180991_rule",
+      "xccdf_mil.disa.stig_rule_SV-278096r1180994_rule",
+      "xccdf_mil.disa.stig_rule_SV-278097r1180997_rule",
+      "xccdf_mil.disa.stig_rule_SV-278098r1181000_rule",
+      "xccdf_mil.disa.stig_rule_SV-278099r1181003_rule",
+      "xccdf_mil.disa.stig_rule_SV-278100r1181006_rule",
+      "xccdf_mil.disa.stig_rule_SV-278101r1181009_rule",
+      "xccdf_mil.disa.stig_rule_SV-278102r1181012_rule",
+      "xccdf_mil.disa.stig_rule_SV-278103r1181982_rule",
+      "xccdf_mil.disa.stig_rule_SV-278104r1181018_rule",
+      "xccdf_mil.disa.stig_rule_SV-278105r1181812_rule",
+      "xccdf_mil.disa.stig_rule_SV-278106r1211154_rule",
+      "xccdf_mil.disa.stig_rule_SV-278107r1181816_rule",
+      "xccdf_mil.disa.stig_rule_SV-278108r1181818_rule",
+      "xccdf_mil.disa.stig_rule_SV-278109r1182061_rule",
+      "xccdf_mil.disa.stig_rule_SV-278110r1182063_rule",
+      "xccdf_mil.disa.stig_rule_SV-278111r1182065_rule",
+      "xccdf_mil.disa.stig_rule_SV-278112r1181042_rule",
+      "xccdf_mil.disa.stig_rule_SV-278113r1181045_rule",
+      "xccdf_mil.disa.stig_rule_SV-278114r1181048_rule",
+      "xccdf_mil.disa.stig_rule_SV-278115r1181051_rule",
+      "xccdf_mil.disa.stig_rule_SV-278116r1181054_rule",
+      "xccdf_mil.disa.stig_rule_SV-278117r1181057_rule",
+      "xccdf_mil.disa.stig_rule_SV-278118r1182067_rule",
+      "xccdf_mil.disa.stig_rule_SV-278119r1181063_rule",
+      "xccdf_mil.disa.stig_rule_SV-278120r1181066_rule",
+      "xccdf_mil.disa.stig_rule_SV-278121r1181069_rule",
+      "xccdf_mil.disa.stig_rule_SV-278122r1182069_rule",
+      "xccdf_mil.disa.stig_rule_SV-278123r1181075_rule",
+      "xccdf_mil.disa.stig_rule_SV-278124r1181078_rule",
+      "xccdf_mil.disa.stig_rule_SV-278125r1181081_rule",
+      "xccdf_mil.disa.stig_rule_SV-278126r1181084_rule",
+      "xccdf_mil.disa.stig_rule_SV-278127r1181087_rule",
+      "xccdf_mil.disa.stig_rule_SV-278128r1181090_rule",
+      "xccdf_mil.disa.stig_rule_SV-278129r1181093_rule",
+      "xccdf_mil.disa.stig_rule_SV-278130r1181925_rule",
+      "xccdf_mil.disa.stig_rule_SV-278131r1181099_rule",
+      "xccdf_mil.disa.stig_rule_SV-278132r1181102_rule",
+      "xccdf_mil.disa.stig_rule_SV-278133r1182071_rule",
+      "xccdf_mil.disa.stig_rule_SV-278134r1182073_rule",
+      "xccdf_mil.disa.stig_rule_SV-278135r1182075_rule",
+      "xccdf_mil.disa.stig_rule_SV-278136r1182077_rule",
+      "xccdf_mil.disa.stig_rule_SV-278137r1182079_rule",
+      "xccdf_mil.disa.stig_rule_SV-278138r1182081_rule",
+      "xccdf_mil.disa.stig_rule_SV-278140r1182086_rule",
+      "xccdf_mil.disa.stig_rule_SV-278141r1182088_rule",
+      "xccdf_mil.disa.stig_rule_SV-278142r1182090_rule",
+      "xccdf_mil.disa.stig_rule_SV-278143r1182092_rule",
+      "xccdf_mil.disa.stig_rule_SV-278144r1182094_rule",
+      "xccdf_mil.disa.stig_rule_SV-278145r1182096_rule",
+      "xccdf_mil.disa.stig_rule_SV-278146r1182098_rule",
+      "xccdf_mil.disa.stig_rule_SV-278147r1192630_rule",
+      "xccdf_mil.disa.stig_rule_SV-278148r1192632_rule",
+      "xccdf_mil.disa.stig_rule_SV-278149r1182104_rule",
+      "xccdf_mil.disa.stig_rule_SV-278150r1211157_rule",
+      "xccdf_mil.disa.stig_rule_SV-278151r1182108_rule",
+      "xccdf_mil.disa.stig_rule_SV-278152r1211160_rule",
+      "xccdf_mil.disa.stig_rule_SV-278153r1182112_rule",
+      "xccdf_mil.disa.stig_rule_SV-278154r1182114_rule",
+      "xccdf_mil.disa.stig_rule_SV-278155r1182116_rule",
+      "xccdf_mil.disa.stig_rule_SV-278156r1182118_rule",
+      "xccdf_mil.disa.stig_rule_SV-278157r1182120_rule",
+      "xccdf_mil.disa.stig_rule_SV-278158r1182122_rule",
+      "xccdf_mil.disa.stig_rule_SV-278159r1182124_rule",
+      "xccdf_mil.disa.stig_rule_SV-278160r1256718_rule",
+      "xccdf_mil.disa.stig_rule_SV-278161r1256719_rule",
+      "xccdf_mil.disa.stig_rule_SV-278162r1211161_rule",
+      "xccdf_mil.disa.stig_rule_SV-278163r1182132_rule",
+      "xccdf_mil.disa.stig_rule_SV-278164r1182134_rule",
+      "xccdf_mil.disa.stig_rule_SV-278165r1182136_rule",
+      "xccdf_mil.disa.stig_rule_SV-278166r1182138_rule",
+      "xccdf_mil.disa.stig_rule_SV-278167r1182140_rule",
+      "xccdf_mil.disa.stig_rule_SV-278168r1182141_rule",
+      "xccdf_mil.disa.stig_rule_SV-278169r1182142_rule",
+      "xccdf_mil.disa.stig_rule_SV-278170r1182143_rule",
+      "xccdf_mil.disa.stig_rule_SV-278171r1182144_rule",
+      "xccdf_mil.disa.stig_rule_SV-278173r1182146_rule",
+      "xccdf_mil.disa.stig_rule_SV-278174r1182147_rule",
+      "xccdf_mil.disa.stig_rule_SV-278175r1182148_rule",
+      "xccdf_mil.disa.stig_rule_SV-278176r1256743_rule",
+      "xccdf_mil.disa.stig_rule_SV-278177r1182280_rule",
+      "xccdf_mil.disa.stig_rule_SV-278178r1182282_rule",
+      "xccdf_mil.disa.stig_rule_SV-278179r1182284_rule",
+      "xccdf_mil.disa.stig_rule_SV-278180r1182286_rule",
+      "xccdf_mil.disa.stig_rule_SV-278181r1182288_rule",
+      "xccdf_mil.disa.stig_rule_SV-278182r1182290_rule",
+      "xccdf_mil.disa.stig_rule_SV-278183r1182327_rule",
+      "xccdf_mil.disa.stig_rule_SV-278184r1182294_rule",
+      "xccdf_mil.disa.stig_rule_SV-278185r1182296_rule",
+      "xccdf_mil.disa.stig_rule_SV-278186r1182299_rule",
+      "xccdf_mil.disa.stig_rule_SV-278187r1182301_rule",
+      "xccdf_mil.disa.stig_rule_SV-278188r1182303_rule",
+      "xccdf_mil.disa.stig_rule_SV-278189r1182305_rule",
+      "xccdf_mil.disa.stig_rule_SV-278190r1182307_rule",
+      "xccdf_mil.disa.stig_rule_SV-278192r1256723_rule",
+      "xccdf_mil.disa.stig_rule_SV-278193r1256726_rule",
+      "xccdf_mil.disa.stig_rule_SV-278194r1256729_rule",
+      "xccdf_mil.disa.stig_rule_SV-278195r1181291_rule",
+      "xccdf_mil.disa.stig_rule_SV-278196r1181294_rule",
+      "xccdf_mil.disa.stig_rule_SV-278197r1182315_rule",
+      "xccdf_mil.disa.stig_rule_SV-278198r1182317_rule",
+      "xccdf_mil.disa.stig_rule_SV-278199r1181303_rule",
+      "xccdf_mil.disa.stig_rule_SV-278200r1181306_rule",
+      "xccdf_mil.disa.stig_rule_SV-278201r1181309_rule",
+      "xccdf_mil.disa.stig_rule_SV-278202r1181312_rule",
+      "xccdf_mil.disa.stig_rule_SV-278203r1181315_rule",
+      "xccdf_mil.disa.stig_rule_SV-278204r1182319_rule",
+      "xccdf_mil.disa.stig_rule_SV-278205r1181321_rule",
+      "xccdf_mil.disa.stig_rule_SV-278206r1181324_rule",
+      "xccdf_mil.disa.stig_rule_SV-278207r1181327_rule",
+      "xccdf_mil.disa.stig_rule_SV-278208r1181330_rule",
+      "xccdf_mil.disa.stig_rule_SV-278209r1181333_rule",
+      "xccdf_mil.disa.stig_rule_SV-278210r1181336_rule",
+      "xccdf_mil.disa.stig_rule_SV-278211r1181339_rule",
+      "xccdf_mil.disa.stig_rule_SV-278212r1181342_rule",
+      "xccdf_mil.disa.stig_rule_SV-278213r1181345_rule",
+      "xccdf_mil.disa.stig_rule_SV-278214r1181348_rule",
+      "xccdf_mil.disa.stig_rule_SV-278215r1181351_rule",
+      "xccdf_mil.disa.stig_rule_SV-278216r1181354_rule",
+      "xccdf_mil.disa.stig_rule_SV-278217r1181357_rule",
+      "xccdf_mil.disa.stig_rule_SV-278218r1181360_rule",
+      "xccdf_mil.disa.stig_rule_SV-278219r1181363_rule",
+      "xccdf_mil.disa.stig_rule_SV-278220r1181366_rule",
+      "xccdf_mil.disa.stig_rule_SV-278221r1181369_rule",
+      "xccdf_mil.disa.stig_rule_SV-278222r1181372_rule",
+      "xccdf_mil.disa.stig_rule_SV-278223r1181375_rule",
+      "xccdf_mil.disa.stig_rule_SV-278225r1182320_rule",
+      "xccdf_mil.disa.stig_rule_SV-278226r1181384_rule",
+      "xccdf_mil.disa.stig_rule_SV-278227r1181387_rule",
+      "xccdf_mil.disa.stig_rule_SV-278228r1181390_rule",
+      "xccdf_mil.disa.stig_rule_SV-278229r1181393_rule",
+      "xccdf_mil.disa.stig_rule_SV-278230r1181396_rule",
+      "xccdf_mil.disa.stig_rule_SV-278231r1181399_rule",
+      "xccdf_mil.disa.stig_rule_SV-278232r1182191_rule",
+      "xccdf_mil.disa.stig_rule_SV-278233r1182193_rule",
+      "xccdf_mil.disa.stig_rule_SV-278234r1182195_rule",
+      "xccdf_mil.disa.stig_rule_SV-278235r1182197_rule",
+      "xccdf_mil.disa.stig_rule_SV-278236r1182199_rule",
+      "xccdf_mil.disa.stig_rule_SV-278237r1182201_rule",
+      "xccdf_mil.disa.stig_rule_SV-278238r1182203_rule",
+      "xccdf_mil.disa.stig_rule_SV-278239r1182205_rule",
+      "xccdf_mil.disa.stig_rule_SV-278240r1182207_rule",
+      "xccdf_mil.disa.stig_rule_SV-278241r1182208_rule",
+      "xccdf_mil.disa.stig_rule_SV-278242r1182209_rule",
+      "xccdf_mil.disa.stig_rule_SV-278243r1182210_rule",
+      "xccdf_mil.disa.stig_rule_SV-278244r1182211_rule",
+      "xccdf_mil.disa.stig_rule_SV-278245r1182212_rule",
+      "xccdf_mil.disa.stig_rule_SV-278246r1182213_rule",
+      "xccdf_mil.disa.stig_rule_SV-278247r1182214_rule",
+      "xccdf_mil.disa.stig_rule_SV-278248r1182215_rule",
+      "xccdf_mil.disa.stig_rule_SV-278249r1182217_rule",
+      "xccdf_mil.disa.stig_rule_SV-278250r1182218_rule",
+      "xccdf_mil.disa.stig_rule_SV-278251r1182219_rule",
+      "xccdf_mil.disa.stig_rule_SV-278252r1182220_rule",
+      "xccdf_mil.disa.stig_rule_SV-278253r1182221_rule",
+      "xccdf_mil.disa.stig_rule_SV-278254r1182222_rule",
+      "xccdf_mil.disa.stig_rule_SV-278255r1182223_rule",
+      "xccdf_mil.disa.stig_rule_SV-278256r1182224_rule",
+      "xccdf_mil.disa.stig_rule_SV-278257r1182225_rule",
+      "xccdf_mil.disa.stig_rule_SV-278258r1182226_rule",
+      "xccdf_mil.disa.stig_rule_SV-278259r1182227_rule",
+      "xccdf_mil.disa.stig_rule_SV-278260r1182228_rule",
+      "xccdf_mil.disa.stig_rule_SV-278261r1182229_rule",
+      "xccdf_mil.disa.stig_rule_SV-278262r1182230_rule",
+      "xccdf_mil.disa.stig_rule_SV-279918r1181960_rule",
+      "xccdf_mil.disa.stig_rule_SV-279920r1181966_rule",
+      "xccdf_mil.disa.stig_rule_SV-279921r1181969_rule",
+      "xccdf_mil.disa.stig_rule_SV-279922r1181972_rule",
+      "xccdf_mil.disa.stig_rule_SV-279923r1181975_rule",
+      "xccdf_mil.disa.stig_rule_SV-285313r1211167_rule",
+      "xccdf_mil.disa.stig_rule_SV-285314r1256731_rule",
+      "xccdf_mil.disa.stig_rule_SV-285315r1256733_rule",
+      "xccdf_mil.disa.stig_rule_SV-285316r1211176_rule",
+      "xccdf_mil.disa.stig_rule_SV-285317r1211179_rule",
+      "xccdf_mil.disa.stig_rule_SV-285318r1211182_rule",
+      "xccdf_mil.disa.stig_rule_SV-285319r1212174_rule",
+      "xccdf_mil.disa.stig_rule_SV-285320r1256736_rule",
+      "xccdf_mil.disa.stig_rule_SV-285321r1211191_rule",
+      "xccdf_mil.disa.stig_rule_SV-285322r1211194_rule",
+      "xccdf_mil.disa.stig_rule_SV-285323r1211197_rule"
+    ],
+    "scope": "Assessment operands and subset Profile selection; miniature wrapper, NOT full XCCDF/policy conversion",
+    "unsupported": [
+      "other Rules",
+      "manual alternatives",
+      "CPE/platform execution",
+      "full remediation/scoring/Rule metadata",
+      "Sets/Filters/behaviors/shared Objects",
+      "all_exist",
+      "records",
+      "other capabilities/functions"
+    ],
+    "mapping_sha256": {
+      "windows.registry": "59f5a2fce1bc5c4eb9584c622b8b562ca02cb7c0675c00d8967e430631fa9491",
+      "independent.shellcommand": "528009fc2550ef7f9825f7d3a41093eb9f77f5809815bba70b6d2b1cdd8b0455"
+    },
+    "xml_parse_calls": 1,
+    "component_index_passes": 6,
+    "scanner_evaluated": false,
+    "coverage_promoted": false
+  },
+  "outputs": {
+    "workspace_base": "/workspace/.onboarding/direct-prototype",
+    "reproducible_files": {
+      "source-trace.json": "e0509f8ff58b40dcd4c2654f9519adb4fce36f2ee846a4034cb285577890fb4f",
+      "authoring/direct-slice/benchmark.yaml": "f11bd76533d4069de345cabed4a37004605c01433975c4c2b6da0d518084381a",
+      "authoring/direct-slice/applicability.yaml": "cfe4e4274edf47b4b7725bb6e5a1a05217bf4f5c2f5f0bebe95217fffd384b8d",
+      "authoring/direct-slice/applicability.json": "73e46e4538a1b7a0ec9632341887934f38bd7a374f0e49ed959590770f9abcc6",
+      "authoring/direct-slice/benchmark.json": "a30f79218f18c08a5e17befeca35b2895c64a5b04aa07609241bd8d5bb9a094e",
+      "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.json": "1775f7626132384709d8aa9aafd4a8aca267ce31b42d6a08f864f2a3cdb85db2",
+      "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.yaml": "d225c298ac578a4fb7e7bda7411d77177aaf6867f192f37b8bc5fcf192392090",
+      "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json": "4eb30798a7545c4c5ef8d8b304e32b86030a3919b5bf1c495063435c3d16b9ed",
+      "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.yaml": "fd88aafb9b06aaefad8f90b33ee4fc4bb0762fde8e80a31406e4aba8478d44fc",
+      "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.yaml": "da7720b1fc1a60a526ebca6b701db198403eac88cc5ab49a4d67f8ca564c94c8",
+      "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.json": "cd4ac59f51d1ce76a7555f1c1a3eeaa50ee0dbd1276e40ab190b6b079dfd07b8",
+      "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.json": "3681e7130ba36cbbdac697cfb425cab21e797bfe3bfb9cae688dffbd53ef9ec8",
+      "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.yaml": "588ef5b06d4d0134189d1d3dae0dbcebc06c1303e6c11f69b08e4d40a64715ea"
+    },
+    "authoring_documents": {
+      "authoring/direct-slice/applicability.json": {
+        "applicability": {
+          "id": "fixture-applicability",
+          "conditions": {}
+        }
+      },
+      "authoring/direct-slice/benchmark.json": {
+        "benchmark": {
+          "id": "direct-slice",
+          "version": {
+            "value": "001.001.001"
+          },
+          "ng_schema_version": "0.4.0",
+          "use_case": "compliance",
+          "assessment_specifications": [
+            {
+              "id": "scap-ng.pre-alpha.assessment",
+              "version": "0.4.0"
+            }
+          ],
+          "title": [
+            {
+              "text": "[TWO-RULE PROTOTYPE SUBSET] Microsoft Windows Server 2025 STIG SCAP Benchmark - NIWC Enhanced with Manual Questions",
+              "language": "en"
+            }
+          ],
+          "description": [
+            {
+              "text": "This Security Technical Implementation Guide is published as a tool to improve the security of Department of War (DoW) information systems. The requirements are derived from the National Institute of Standards and Technology (NIST) 800-53 and related documents. Comments or proposed revisions to this document should be sent via email to the following address: disa.stig_spt@mail.mil.",
+              "language": "en"
+            }
+          ],
+          "language": "en",
+          "status": [
+            {
+              "value": "accepted",
+              "date": "2026-08-26"
+            }
+          ],
+          "metadata": {
+            "prototype_subset": true,
+            "omitted_rule_count": 289
+          },
+          "notices": [],
+          "front_matter": [],
+          "rear_matter": [],
+          "references": [],
+          "text_blocks": [],
+          "platform": {
+            "id": "fixture-platform",
+            "title": "Compilation fixture; applicability not converted",
+            "applicability": {}
+          },
+          "applicability_catalog": "fixture-applicability",
+          "scoring": [],
+          "parameters": [],
+          "default_selection": true,
+          "groups": [],
+          "profiles": [
+            {
+              "id": "i-mission-critical-classified-74d33f7a-profile",
+              "title": "I - Mission Critical Classified",
+              "disabled_rules": []
+            },
+            {
+              "id": "i-mission-critical-public-57b1d68d-profile",
+              "title": "I - Mission Critical Public",
+              "disabled_rules": []
+            },
+            {
+              "id": "i-mission-critical-sensitive-15a82c46-profile",
+              "title": "I - Mission Critical Sensitive",
+              "disabled_rules": []
+            },
+            {
+              "id": "ii-mission-support-classified-089774bf-profile",
+              "title": "II - Mission Support Classified",
+              "disabled_rules": []
+            },
+            {
+              "id": "ii-mission-support-public-b9230488-profile",
+              "title": "II - Mission Support Public",
+              "disabled_rules": []
+            },
+            {
+              "id": "ii-mission-support-sensitive-53e5a3a7-profile",
+              "title": "II - Mission Support Sensitive",
+              "disabled_rules": []
+            },
+            {
+              "id": "iii-administrative-classified-91c0545c-profile",
+              "title": "III - Administrative Classified",
+              "disabled_rules": []
+            },
+            {
+              "id": "iii-administrative-public-fdfb1a33-profile",
+              "title": "III - Administrative Public",
+              "disabled_rules": []
+            },
+            {
+              "id": "iii-administrative-sensitive-6f4ab864-profile",
+              "title": "III - Administrative Sensitive",
+              "disabled_rules": []
+            },
+            {
+              "id": "cat-i-only-663a4974-profile",
+              "title": "CAT I Only",
+              "disabled_rules": [
+                "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule"
+              ]
+            },
+            {
+              "id": "disable-slow-rules-3e2996ab-profile",
+              "title": "Disable Slow Rules",
+              "disabled_rules": []
+            }
+          ],
+          "rules": [
+            "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule",
+            "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule"
+          ]
+        }
+      },
+      "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.json": {
+        "assessment": {
+          "id": "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment",
+          "version": 1,
+          "assessment_title": "Windows Server 2025 must prevent the display of slide shows on the lock screen.",
+          "mode": "automated",
+          "class": "compliance",
+          "purpose": "assessment",
+          "specification": {
+            "id": "scap-ng.pre-alpha.assessment",
+            "version": "0.4.0"
+          },
+          "tests": {
+            "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test": {
+              "capability": "windows.registry",
+              "object": {
+                "hive": {
+                  "equals": "local_machine"
+                },
+                "key": {
+                  "equals": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization"
+                },
+                "name": {
+                  "equals": "NoLockScreenSlideshow"
+                }
+              },
+              "require": {
+                "items_found": "one_or_more",
+                "items_satisfying": "every",
+                "and": [
+                  {
+                    "fields": {
+                      "type": {
+                        "equals": "dword",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "value": {
+                        "equals": 1,
+                        "datatype": "integer",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                ]
+              },
+              "reported_elements": "all",
+              "test_title": "Verifies 'Prevent enabling lock screen slide show' is set to 'Enabled'"
+            }
+          },
+          "evaluate": {
+            "test": "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test"
+          }
+        }
+      },
+      "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json": {
+        "assessment": {
+          "id": "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment",
+          "version": 1,
+          "assessment_title": "Windows Server 2025 Active Directory SYSVOL directory must have the proper access control permissions.",
+          "mode": "automated",
+          "class": "compliance",
+          "purpose": "assessment",
+          "specification": {
+            "id": "scap-ng.pre-alpha.assessment",
+            "version": "0.4.0"
+          },
+          "tests": {
+            "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test": {
+              "capability": "independent.shellcommand",
+              "object": {
+                "shell": "cmd",
+                "command": {
+                  "variable": "icacls-and-path-to-sysvol-directory-62cfc32f-variable"
+                },
+                "pattern": ":",
+                "error_if_exit_status_not_0": false,
+                "error_if_stderr_exists": false
+              },
+              "require": {
+                "items_found": "one_or_more",
+                "items_satisfying": "every",
+                "and": [
+                  {
+                    "fields": {
+                      "exit_status": {
+                        "equals": 0,
+                        "datatype": "integer",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "stdout_line": {
+                        "matches_regex": [
+                          "(?i)NT AUTHORITY\\\\Authenticated Users:\\(RX\\)",
+                          "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                          "(?i)BUILTIN\\\\Server Operators:\\(RX\\)",
+                          "(?i)BUILTIN\\\\Server Operators:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                          "(?i)BUILTIN\\\\Administrators:\\(M,WDAC,WO\\)",
+                          "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                          "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)",
+                          "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                          "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                        ],
+                        "value_match": "one_or_more",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "fields": {
+                      "stderr_line": {
+                        "values_found": "none"
+                      }
+                    }
+                  }
+                ]
+              },
+              "reported_elements": "all",
+              "test_title": "Permissions must conform to minimum requirements."
+            }
+          },
+          "evaluate": {
+            "test": "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test"
+          },
+          "variables": {
+            "icacls-and-path-to-sysvol-directory-62cfc32f-variable": {
+              "kind": "local",
+              "datatype": "string",
+              "expression": {
+                "concat": [
+                  {
+                    "literal": {
+                      "datatype": "string",
+                      "value": "icacls "
+                    }
+                  },
+                  {
+                    "regex_capture": {
+                      "pattern": "(^[a-zA-Z]:\\\\.+)\\\\sysvol",
+                      "value": {
+                        "values": {
+                          "object": {
+                            "capability": "windows.registry",
+                            "hive": {
+                              "equals": "local_machine"
+                            },
+                            "key": {
+                              "equals": "SYSTEM\\CurrentControlSet\\Services\\Netlogon\\Parameters"
+                            },
+                            "name": {
+                              "equals": "SysVol"
+                            }
+                          },
+                          "field": "value"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.json": {
+        "rule": {
+          "id": "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule",
+          "title": "Windows Server 2025 Active Directory SYSVOL directory must have the proper access control permissions.",
+          "version": "WN25-DC-000080",
+          "severity": "high",
+          "role": "full",
+          "weight": 10.0,
+          "discussion": "<VulnDiscussion>Improper access permissions for directory data files could allow unauthorized users to read, modify, or delete directory data.\n\nThe SYSVOL directory contains public files (to the domain) such as policies and logon scripts. Data in shared subdirectories are replicated to all domain controllers in a domain.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>",
+          "rationale": null,
+          "extensions": {},
+          "warnings": [],
+          "identifiers": [],
+          "references": [],
+          "requires": [],
+          "conflicts": [],
+          "applicability": [],
+          "parameters": {},
+          "remediation": {},
+          "organizational_input_requirements": {},
+          "assessment_choices": {
+            "automated": {
+              "assessment": "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment"
+            }
+          },
+          "default_assessment_choice": "automated"
+        }
+      },
+      "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.json": {
+        "rule": {
+          "id": "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule",
+          "title": "Windows Server 2025 must prevent the display of slide shows on the lock screen.",
+          "version": "WN25-CC-000010",
+          "severity": "medium",
+          "role": "full",
+          "weight": 10.0,
+          "discussion": "<VulnDiscussion>Slide shows displayed on the lock screen could display sensitive information to unauthorized personnel. Turning off this feature will limit access to the information to a logged-on user.</VulnDiscussion><FalsePositives></FalsePositives><FalseNegatives></FalseNegatives><Documentable>false</Documentable><Mitigations></Mitigations><SeverityOverrideGuidance></SeverityOverrideGuidance><PotentialImpacts></PotentialImpacts><ThirdPartyTools></ThirdPartyTools><MitigationControl></MitigationControl><Responsibility></Responsibility><IAControls></IAControls>",
+          "rationale": null,
+          "extensions": {},
+          "warnings": [],
+          "identifiers": [],
+          "references": [],
+          "requires": [],
+          "conflicts": [],
+          "applicability": [],
+          "parameters": {},
+          "remediation": {},
+          "organizational_input_requirements": {},
+          "assessment_choices": {
+            "automated": {
+              "assessment": "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment"
+            }
+          },
+          "default_assessment_choice": "automated"
+        }
+      }
+    },
+    "compiled_bundle": {
+      "file": "compiled/direct-slice.scapng",
+      "sha256": "fecfd8ecea81f7cbb3b9007d1ed04cf2a84acd5deee6b28529689a2ed61d90b2",
+      "bytes": 8590,
+      "programs": {
+        "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment": {
+          "sha256": "edf865bc7a94134453b7cb2e71abb2647753f9d59405e9d740cd5c2ad2399d4a",
+          "program": {
+            "assessment_id": "windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment",
+            "assessment_source_sha256": "be5652e3645d4ebab2e359cf6488fc3ac80e1a5d8e4c58c8328e688af188de00",
+            "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+            "result_expression_sha256": "52dfde3a8a3217b96c4effb85478144b0e8636e479e2f02e11da586a68a07441",
+            "result_instructions": [
+              {
+                "id": "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test",
+                "op": "read_test",
+                "path": [
+                  "evaluate"
+                ]
+              }
+            ],
+            "result_requires": {
+              "dependencies": [],
+              "tests": [
+                "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test"
+              ]
+            },
+            "scanner_evaluated": false,
+            "test_instructions": [
+              {
+                "capability": "independent.shellcommand",
+                "opcode": "CHECK_ITEM_CONDITION",
+                "operands": {
+                  "capability": "independent.shellcommand",
+                  "object": {
+                    "command": {
+                      "variable": "icacls-and-path-to-sysvol-directory-62cfc32f-variable"
+                    },
+                    "error_if_exit_status_not_0": false,
+                    "error_if_stderr_exists": false,
+                    "pattern": ":",
+                    "shell": "cmd"
+                  },
+                  "reported_elements": "all",
+                  "require": {
+                    "and": [
+                      {
+                        "fields": {
+                          "exit_status": {
+                            "datatype": "integer",
+                            "equals": 0,
+                            "values_found": "one_or_more",
+                            "values_matching": "every"
+                          }
+                        }
+                      },
+                      {
+                        "fields": {
+                          "stdout_line": {
+                            "matches_regex": [
+                              "(?i)NT AUTHORITY\\\\Authenticated Users:\\(RX\\)",
+                              "(?i)NT AUTHORITY\\\\Authenticated Users:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                              "(?i)BUILTIN\\\\Server Operators:\\(RX\\)",
+                              "(?i)BUILTIN\\\\Server Operators:\\(OI\\)\\(CI\\)\\(IO\\)\\(GR,GE\\)",
+                              "(?i)BUILTIN\\\\Administrators:\\(M,WDAC,WO\\)",
+                              "(?i)BUILTIN\\\\Administrators:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                              "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)",
+                              "(?i)NT AUTHORITY\\\\SYSTEM:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)",
+                              "(?i)CREATOR OWNER:\\(OI\\)\\(CI\\)\\(IO\\)\\(F\\)"
+                            ],
+                            "value_match": "one_or_more",
+                            "values_found": "one_or_more",
+                            "values_matching": "every"
+                          }
+                        }
+                      },
+                      {
+                        "fields": {
+                          "stderr_line": {
+                            "values_found": "none"
+                          }
+                        }
+                      }
+                    ],
+                    "items_found": "one_or_more",
+                    "items_satisfying": "every"
+                  },
+                  "test_title": "Permissions must conform to minimum requirements."
+                },
+                "source_test_sha256": "608062b3aa657c8f64a12da7a6e63c6277ecd0ad20f3a85c2388006f560f5aa1",
+                "test_id": "permissions-must-conform-to-minimum-requirements-e0bf9bc8-test"
+              }
+            ]
+          }
+        },
+        "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment": {
+          "sha256": "8cfea34d96cdfff031c48d0cbd063f75b3f358dd82c18239e3f059bb212d7d17",
+          "program": {
+            "assessment_id": "windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment",
+            "assessment_source_sha256": "130a25709f430e1f733694e8f8a5d45851e0e325d89db68a495247ad97c7bf50",
+            "format": "scap-ng-0.4.0-native-assessment-program/0.1",
+            "result_expression_sha256": "81be87018a7aeefa10d01b7ea15e2a9640133d00a5182b2ca5a7f279bea17acb",
+            "result_instructions": [
+              {
+                "id": "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test",
+                "op": "read_test",
+                "path": [
+                  "evaluate"
+                ]
+              }
+            ],
+            "result_requires": {
+              "dependencies": [],
+              "tests": [
+                "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test"
+              ]
+            },
+            "scanner_evaluated": false,
+            "test_instructions": [
+              {
+                "capability": "windows.registry",
+                "opcode": "CHECK_ITEM_CONDITION",
+                "operands": {
+                  "capability": "windows.registry",
+                  "object": {
+                    "hive": {
+                      "equals": "local_machine"
+                    },
+                    "key": {
+                      "equals": "SOFTWARE\\Policies\\Microsoft\\Windows\\Personalization"
+                    },
+                    "name": {
+                      "equals": "NoLockScreenSlideshow"
+                    }
+                  },
+                  "reported_elements": "all",
+                  "require": {
+                    "and": [
+                      {
+                        "fields": {
+                          "type": {
+                            "equals": "dword",
+                            "values_found": "one_or_more",
+                            "values_matching": "every"
+                          }
+                        }
+                      },
+                      {
+                        "fields": {
+                          "value": {
+                            "datatype": "integer",
+                            "equals": 1,
+                            "values_found": "one_or_more",
+                            "values_matching": "every"
+                          }
+                        }
+                      }
+                    ],
+                    "items_found": "one_or_more",
+                    "items_satisfying": "every"
+                  },
+                  "test_title": "Verifies 'Prevent enabling lock screen slide show' is set to 'Enabled'"
+                },
+                "source_test_sha256": "d607bedffa53480451de28f28bc890157ffa1c6af408df6e88098197b9dee5de",
+                "test_id": "verifies-prevent-enabling-lock-screen-slide-show-is-set-to-enabled-a63c69f0-test"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "public_commands": [
+      [
+        "/workspace/.onboarding/rebaseline-venv/bin/python",
+        "tools/validate_native_json_schemas.py",
+        "/workspace/.onboarding/direct-prototype/frozen-cli-0/authoring",
+        "--schema-dir",
+        "schema/v0.4.0",
+        "--report",
+        "/workspace/.onboarding/direct-prototype/public-validator.json"
+      ],
+      [
+        "/workspace/.onboarding/rebaseline-venv/bin/python",
+        "tools/v04_native_bundle_compiler.py",
+        "--json-archive",
+        "/workspace/.onboarding/direct-prototype/prototype.json.zip",
+        "--yaml-archive",
+        "/workspace/.onboarding/direct-prototype/prototype.yaml.zip",
+        "--output-dir",
+        "/workspace/.onboarding/direct-prototype/compiled",
+        "--report",
+        "/workspace/.onboarding/direct-prototype/public-compiler.json"
+      ],
+      [
+        "/workspace/.onboarding/rebaseline-venv/bin/python",
+        "tools/verify_v04_package_consumer.py",
+        "/workspace/.onboarding/direct-prototype/compiled/direct-slice.scapng",
+        "--source-json",
+        "/workspace/.onboarding/direct-prototype/prototype.json.zip",
+        "--source-yaml",
+        "/workspace/.onboarding/direct-prototype/prototype.yaml.zip"
+      ]
+    ]
+  },
+  "performance": {
+    "method": "Three fresh Python processes, one cold call and five warm calls each; then three standalone CLI processes, sequentially with no other task tests running. OS caches/host scheduling uncontrolled. Stage times exclude import startup; standalone wall includes imports and serialization. Compiler stage includes its mandatory preflight. RSS is Linux process high-water mark. Static inspection performed after RSS snapshot.",
+    "cold_stage_medians_seconds": {
+      "parse_index": 0.1414819140045438,
+      "conversion": 0.016304813005262986,
+      "public_validation": 0.4235338929865975,
+      "compiler_including_preflight": 0.3171888959914213
+    },
+    "warm_stage_medians_seconds": {
+      "parse_index": 0.1843709980021231,
+      "conversion": 0.01710258000821341,
+      "public_validation": 0.32428594800876454,
+      "compiler_including_preflight": 0.2523183989978861
+    },
+    "stage_runs": [
+      {
+        "cold_process_stage_call": {
+          "parse_index": 0.1414819140045438,
+          "conversion": 0.0159834910009522,
+          "public_validation": 0.4235338929865975,
+          "compiler_including_preflight": 0.3171888959914213
+        },
+        "warm_process_stage_calls": [
+          {
+            "parse_index": 0.16710522600624245,
+            "conversion": 0.016281579999485984,
+            "public_validation": 0.2986877889925381,
+            "compiler_including_preflight": 0.2563177659903886
+          },
+          {
+            "parse_index": 0.1843709980021231,
+            "conversion": 0.047585197011358105,
+            "public_validation": 0.2973475379985757,
+            "compiler_including_preflight": 0.2479439759918023
+          },
+          {
+            "parse_index": 0.18182615799014457,
+            "conversion": 0.017002241002046503,
+            "public_validation": 0.33382803200220224,
+            "compiler_including_preflight": 0.2488811689981958
+          },
+          {
+            "parse_index": 0.18436732799455058,
+            "conversion": 0.04360510599508416,
+            "public_validation": 0.30486656200082507,
+            "compiler_including_preflight": 0.2532358030002797
+          },
+          {
+            "parse_index": 0.1938335219892906,
+            "conversion": 0.016579723000177182,
+            "public_validation": 0.324323225999251,
+            "compiler_including_preflight": 0.2523183989978861
+          }
+        ],
+        "warm_medians": {
+          "parse_index": 0.18436732799455058,
+          "conversion": 0.017002241002046503,
+          "public_validation": 0.30486656200082507,
+          "compiler_including_preflight": 0.2523183989978861
+        },
+        "rss_high_water_kib_linux": 89132,
+        "profile_conversion": "         142745 function calls (139699 primitive calls) in 0.054 seconds\n\n   Ordered by: cumulative time\n   List reduced from 96 to 12 due to restriction <12>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.001    0.001    0.054    0.054 v04_direct_conversion_prototype.py:329(convert)\n       24    0.017    0.001    0.043    0.002 v04_direct_conversion_prototype.py:126(selected)\n     5834    0.008    0.000    0.012    0.000 v04_direct_conversion_prototype.py:46(attrs)\n    23666    0.006    0.000    0.009    0.000 v04_direct_conversion_prototype.py:34(local)\n  3068/39    0.004    0.000    0.005    0.000 v04_direct_conversion_prototype.py:42(term)\n    34982    0.005    0.000    0.005    0.000 {method 'get' of 'xml.etree.ElementTree.Element' objects}\n    23666    0.004    0.000    0.004    0.000 {method 'rsplit' of 'str' objects}\n       61    0.000    0.000    0.003    0.000 v04_direct_conversion_prototype.py:38(digest)\n       61    0.000    0.000    0.003    0.000 __init__.py:183(dumps)\n       61    0.000    0.000    0.003    0.000 encoder.py:183(encode)\n       27    0.003    0.000    0.003    0.000 encoder.py:205(iterencode)\n    34974    0.002    0.000    0.002    0.000 v04_direct_conversion_prototype.py:29(require)\n\n\n",
+        "bundle_sha256": "fecfd8ecea81f7cbb3b9007d1ed04cf2a84acd5deee6b28529689a2ed61d90b2",
+        "xml_parse_calls_per_model": 1,
+        "component_index_passes_per_model": 6,
+        "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+        "source_xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+        "instrumented_xml_calls_per_iteration": [
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 8
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          }
+        ],
+        "legacy_stage_timing": "NOT COMPARABLE: production whole-Benchmark SCAP processing versus a bounded two-Rule miniature; no speedup ratio claimed"
+      },
+      {
+        "cold_process_stage_call": {
+          "parse_index": 0.139788171989494,
+          "conversion": 0.016304813005262986,
+          "public_validation": 0.41430547799973283,
+          "compiler_including_preflight": 0.30212218199449126
+        },
+        "warm_process_stage_calls": [
+          {
+            "parse_index": 0.16349096399790142,
+            "conversion": 0.01647677599976305,
+            "public_validation": 0.2937342789955437,
+            "compiler_including_preflight": 0.2438613009871915
+          },
+          {
+            "parse_index": 0.17298174799361732,
+            "conversion": 0.042961704995832406,
+            "public_validation": 0.29328215899295174,
+            "compiler_including_preflight": 0.24960770799953025
+          },
+          {
+            "parse_index": 0.18391570598760154,
+            "conversion": 0.01695607199508231,
+            "public_validation": 0.32968357000208925,
+            "compiler_including_preflight": 0.2538739900046494
+          },
+          {
+            "parse_index": 0.18471745599526912,
+            "conversion": 0.049335685005644336,
+            "public_validation": 0.2929694789927453,
+            "compiler_including_preflight": 0.24540010599594098
+          },
+          {
+            "parse_index": 0.1883768450061325,
+            "conversion": 0.016528966996702366,
+            "public_validation": 0.32428594800876454,
+            "compiler_including_preflight": 0.246821838998585
+          }
+        ],
+        "warm_medians": {
+          "parse_index": 0.18391570598760154,
+          "conversion": 0.01695607199508231,
+          "public_validation": 0.2937342789955437,
+          "compiler_including_preflight": 0.246821838998585
+        },
+        "rss_high_water_kib_linux": 88396,
+        "profile_conversion": "         142745 function calls (139699 primitive calls) in 0.054 seconds\n\n   Ordered by: cumulative time\n   List reduced from 96 to 12 due to restriction <12>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.001    0.001    0.053    0.053 v04_direct_conversion_prototype.py:329(convert)\n       24    0.017    0.001    0.043    0.002 v04_direct_conversion_prototype.py:126(selected)\n     5834    0.008    0.000    0.012    0.000 v04_direct_conversion_prototype.py:46(attrs)\n    23666    0.006    0.000    0.010    0.000 v04_direct_conversion_prototype.py:34(local)\n  3068/39    0.004    0.000    0.005    0.000 v04_direct_conversion_prototype.py:42(term)\n    34982    0.005    0.000    0.005    0.000 {method 'get' of 'xml.etree.ElementTree.Element' objects}\n    23666    0.004    0.000    0.004    0.000 {method 'rsplit' of 'str' objects}\n       61    0.000    0.000    0.003    0.000 v04_direct_conversion_prototype.py:38(digest)\n       61    0.000    0.000    0.003    0.000 __init__.py:183(dumps)\n       61    0.000    0.000    0.003    0.000 encoder.py:183(encode)\n       27    0.003    0.000    0.003    0.000 encoder.py:205(iterencode)\n    34974    0.002    0.000    0.002    0.000 v04_direct_conversion_prototype.py:29(require)\n\n\n",
+        "bundle_sha256": "fecfd8ecea81f7cbb3b9007d1ed04cf2a84acd5deee6b28529689a2ed61d90b2",
+        "xml_parse_calls_per_model": 1,
+        "component_index_passes_per_model": 6,
+        "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+        "source_xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+        "instrumented_xml_calls_per_iteration": [
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 8
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          }
+        ],
+        "legacy_stage_timing": "NOT COMPARABLE: production whole-Benchmark SCAP processing versus a bounded two-Rule miniature; no speedup ratio claimed"
+      },
+      {
+        "cold_process_stage_call": {
+          "parse_index": 0.1417233230022248,
+          "conversion": 0.016464357991935685,
+          "public_validation": 0.45792370800336357,
+          "compiler_including_preflight": 0.33004988099855836
+        },
+        "warm_process_stage_calls": [
+          {
+            "parse_index": 0.20874164199631196,
+            "conversion": 0.01710258000821341,
+            "public_validation": 0.3445407969993539,
+            "compiler_including_preflight": 0.32955496398790274
+          },
+          {
+            "parse_index": 0.4253465999936452,
+            "conversion": 0.39742126800410915,
+            "public_validation": 0.4876062450057361,
+            "compiler_including_preflight": 0.2717097060085507
+          },
+          {
+            "parse_index": 0.18939261601190083,
+            "conversion": 0.01706951900268905,
+            "public_validation": 0.3327110760001233,
+            "compiler_including_preflight": 0.2481045749882469
+          },
+          {
+            "parse_index": 0.18043958299676888,
+            "conversion": 0.044272144994465634,
+            "public_validation": 0.300922509006341,
+            "compiler_including_preflight": 0.4481643909966806
+          },
+          {
+            "parse_index": 0.8758362130029127,
+            "conversion": 0.028912262001540512,
+            "public_validation": 0.36640304399770685,
+            "compiler_including_preflight": 0.40714732400374487
+          }
+        ],
+        "warm_medians": {
+          "parse_index": 0.20874164199631196,
+          "conversion": 0.028912262001540512,
+          "public_validation": 0.3445407969993539,
+          "compiler_including_preflight": 0.32955496398790274
+        },
+        "rss_high_water_kib_linux": 88648,
+        "profile_conversion": "         142745 function calls (139699 primitive calls) in 0.090 seconds\n\n   Ordered by: cumulative time\n   List reduced from 96 to 12 due to restriction <12>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.001    0.001    0.089    0.089 v04_direct_conversion_prototype.py:329(convert)\n       24    0.028    0.001    0.065    0.003 v04_direct_conversion_prototype.py:126(selected)\n     5834    0.013    0.000    0.018    0.000 v04_direct_conversion_prototype.py:46(attrs)\n    23666    0.008    0.000    0.013    0.000 v04_direct_conversion_prototype.py:34(local)\n  3068/39    0.009    0.000    0.012    0.000 v04_direct_conversion_prototype.py:42(term)\n       61    0.000    0.000    0.007    0.000 v04_direct_conversion_prototype.py:38(digest)\n    34982    0.006    0.000    0.006    0.000 {method 'get' of 'xml.etree.ElementTree.Element' objects}\n       61    0.000    0.000    0.006    0.000 __init__.py:183(dumps)\n       61    0.000    0.000    0.005    0.000 encoder.py:183(encode)\n    23666    0.005    0.000    0.005    0.000 {method 'rsplit' of 'str' objects}\n       27    0.005    0.000    0.005    0.000 encoder.py:205(iterencode)\n     8903    0.004    0.000    0.004    0.000 {built-in method builtins.sorted}\n\n\n",
+        "bundle_sha256": "fecfd8ecea81f7cbb3b9007d1ed04cf2a84acd5deee6b28529689a2ed61d90b2",
+        "xml_parse_calls_per_model": 1,
+        "component_index_passes_per_model": 6,
+        "source_zip_sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+        "source_xml_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+        "instrumented_xml_calls_per_iteration": [
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 8
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          },
+          {
+            "source_fromstring_calls": 1,
+            "shared_validator_xsd_parse_calls": 0
+          }
+        ],
+        "legacy_stage_timing": "NOT COMPARABLE: production whole-Benchmark SCAP processing versus a bounded two-Rule miniature; no speedup ratio claimed"
+      }
+    ],
+    "standalone_runs": [
+      {
+        "wall_seconds": 0.27894067000306677,
+        "metrics": {
+          "parse_index": 0.13671816399437375,
+          "conversion": 0.01618000800954178,
+          "process_peak_rss_kib_linux": 42568
+        },
+        "files": {
+          "source-trace.json": "e0509f8ff58b40dcd4c2654f9519adb4fce36f2ee846a4034cb285577890fb4f",
+          "authoring/direct-slice/benchmark.yaml": "f11bd76533d4069de345cabed4a37004605c01433975c4c2b6da0d518084381a",
+          "authoring/direct-slice/applicability.yaml": "cfe4e4274edf47b4b7725bb6e5a1a05217bf4f5c2f5f0bebe95217fffd384b8d",
+          "authoring/direct-slice/applicability.json": "73e46e4538a1b7a0ec9632341887934f38bd7a374f0e49ed959590770f9abcc6",
+          "authoring/direct-slice/benchmark.json": "a30f79218f18c08a5e17befeca35b2895c64a5b04aa07609241bd8d5bb9a094e",
+          "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.json": "1775f7626132384709d8aa9aafd4a8aca267ce31b42d6a08f864f2a3cdb85db2",
+          "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.yaml": "d225c298ac578a4fb7e7bda7411d77177aaf6867f192f37b8bc5fcf192392090",
+          "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json": "4eb30798a7545c4c5ef8d8b304e32b86030a3919b5bf1c495063435c3d16b9ed",
+          "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.yaml": "fd88aafb9b06aaefad8f90b33ee4fc4bb0762fde8e80a31406e4aba8478d44fc",
+          "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.yaml": "da7720b1fc1a60a526ebca6b701db198403eac88cc5ab49a4d67f8ca564c94c8",
+          "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.json": "cd4ac59f51d1ce76a7555f1c1a3eeaa50ee0dbd1276e40ab190b6b079dfd07b8",
+          "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.json": "3681e7130ba36cbbdac697cfb425cab21e797bfe3bfb9cae688dffbd53ef9ec8",
+          "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.yaml": "588ef5b06d4d0134189d1d3dae0dbcebc06c1303e6c11f69b08e4d40a64715ea"
+        }
+      },
+      {
+        "wall_seconds": 0.26674670600914396,
+        "metrics": {
+          "parse_index": 0.13636339399090502,
+          "conversion": 0.016351049998775125,
+          "process_peak_rss_kib_linux": 42568
+        },
+        "files": {
+          "source-trace.json": "e0509f8ff58b40dcd4c2654f9519adb4fce36f2ee846a4034cb285577890fb4f",
+          "authoring/direct-slice/benchmark.yaml": "f11bd76533d4069de345cabed4a37004605c01433975c4c2b6da0d518084381a",
+          "authoring/direct-slice/applicability.yaml": "cfe4e4274edf47b4b7725bb6e5a1a05217bf4f5c2f5f0bebe95217fffd384b8d",
+          "authoring/direct-slice/applicability.json": "73e46e4538a1b7a0ec9632341887934f38bd7a374f0e49ed959590770f9abcc6",
+          "authoring/direct-slice/benchmark.json": "a30f79218f18c08a5e17befeca35b2895c64a5b04aa07609241bd8d5bb9a094e",
+          "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.json": "1775f7626132384709d8aa9aafd4a8aca267ce31b42d6a08f864f2a3cdb85db2",
+          "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.yaml": "d225c298ac578a4fb7e7bda7411d77177aaf6867f192f37b8bc5fcf192392090",
+          "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json": "4eb30798a7545c4c5ef8d8b304e32b86030a3919b5bf1c495063435c3d16b9ed",
+          "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.yaml": "fd88aafb9b06aaefad8f90b33ee4fc4bb0762fde8e80a31406e4aba8478d44fc",
+          "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.yaml": "da7720b1fc1a60a526ebca6b701db198403eac88cc5ab49a4d67f8ca564c94c8",
+          "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.json": "cd4ac59f51d1ce76a7555f1c1a3eeaa50ee0dbd1276e40ab190b6b079dfd07b8",
+          "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.json": "3681e7130ba36cbbdac697cfb425cab21e797bfe3bfb9cae688dffbd53ef9ec8",
+          "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.yaml": "588ef5b06d4d0134189d1d3dae0dbcebc06c1303e6c11f69b08e4d40a64715ea"
+        }
+      },
+      {
+        "wall_seconds": 0.2646675720025087,
+        "metrics": {
+          "parse_index": 0.13399083900731057,
+          "conversion": 0.016079356995760463,
+          "process_peak_rss_kib_linux": 42648
+        },
+        "files": {
+          "source-trace.json": "e0509f8ff58b40dcd4c2654f9519adb4fce36f2ee846a4034cb285577890fb4f",
+          "authoring/direct-slice/benchmark.yaml": "f11bd76533d4069de345cabed4a37004605c01433975c4c2b6da0d518084381a",
+          "authoring/direct-slice/applicability.yaml": "cfe4e4274edf47b4b7725bb6e5a1a05217bf4f5c2f5f0bebe95217fffd384b8d",
+          "authoring/direct-slice/applicability.json": "73e46e4538a1b7a0ec9632341887934f38bd7a374f0e49ed959590770f9abcc6",
+          "authoring/direct-slice/benchmark.json": "a30f79218f18c08a5e17befeca35b2895c64a5b04aa07609241bd8d5bb9a094e",
+          "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.json": "1775f7626132384709d8aa9aafd4a8aca267ce31b42d6a08f864f2a3cdb85db2",
+          "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.yaml": "d225c298ac578a4fb7e7bda7411d77177aaf6867f192f37b8bc5fcf192392090",
+          "authoring/direct-slice/assessments/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-assessment.json": "4eb30798a7545c4c5ef8d8b304e32b86030a3919b5bf1c495063435c3d16b9ed",
+          "authoring/direct-slice/assessments/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-assessment.yaml": "fd88aafb9b06aaefad8f90b33ee4fc4bb0762fde8e80a31406e4aba8478d44fc",
+          "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.yaml": "da7720b1fc1a60a526ebca6b701db198403eac88cc5ab49a4d67f8ca564c94c8",
+          "authoring/direct-slice/rules/windows-server-2025-active-directory-sysvol-directory-must-have-the-pr-1ec1fc0c-rule.json": "cd4ac59f51d1ce76a7555f1c1a3eeaa50ee0dbd1276e40ab190b6b079dfd07b8",
+          "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.json": "3681e7130ba36cbbdac697cfb425cab21e797bfe3bfb9cae688dffbd53ef9ec8",
+          "authoring/direct-slice/rules/windows-server-2025-must-prevent-the-display-of-slide-shows-on-the-loc-da1e140a-rule.yaml": "588ef5b06d4d0134189d1d3dae0dbcebc06c1303e6c11f69b08e4d40a64715ea"
+        }
+      }
+    ],
+    "standalone_wall_median_seconds": 0.26674670600914396,
+    "legacy_comparison": "NOT COMPARABLE: production whole-Benchmark SCAP processing versus a bounded two-Rule miniature; no speedup ratio claimed"
+  },
+  "complexity": {
+    "prototype": {
+      "repository_modules": 1,
+      "physical_lines": 422,
+      "nonblank_noncomment_lines": 386,
+      "modules": {
+        "tools/v04_direct_conversion_prototype.py": {
+          "physical_lines": 422,
+          "nonblank_noncomment_lines": 386
+        }
+      },
+      "external_import_roots": [
+        "yaml"
+      ]
+    },
+    "production_reference": {
+      "repository_modules": 77,
+      "physical_lines": 26803,
+      "nonblank_noncomment_lines": 23840,
+      "modules": {
+        "tools/audit_v04_and_or_scope_projection.py": {
+          "physical_lines": 179,
+          "nonblank_noncomment_lines": 159
+        },
+        "tools/audit_v04_flat_object_names.py": {
+          "physical_lines": 96,
+          "nonblank_noncomment_lines": 80
+        },
+        "tools/audit_v04_original_oval_variable_test.py": {
+          "physical_lines": 159,
+          "nonblank_noncomment_lines": 142
+        },
+        "tools/audit_v04_synthetic_filter_unions.py": {
+          "physical_lines": 106,
+          "nonblank_noncomment_lines": 96
+        },
+        "tools/build_v04_canonical_six_stigs.py": {
+          "physical_lines": 359,
+          "nonblank_noncomment_lines": 330
+        },
+        "tools/capability_registry.py": {
+          "physical_lines": 61,
+          "nonblank_noncomment_lines": 52
+        },
+        "tools/check_current_authoring_contract.py": {
+          "physical_lines": 74,
+          "nonblank_noncomment_lines": 69
+        },
+        "tools/compare_v04_fresh_oval_import.py": {
+          "physical_lines": 64,
+          "nonblank_noncomment_lines": 54
+        },
+        "tools/convert_v04_oval_constant_variable_matrix.py": {
+          "physical_lines": 205,
+          "nonblank_noncomment_lines": 185
+        },
+        "tools/convert_v04_oval_family_constant_variable.py": {
+          "physical_lines": 166,
+          "nonblank_noncomment_lines": 156
+        },
+        "tools/convert_v04_oval_independent_variable_test.py": {
+          "physical_lines": 157,
+          "nonblank_noncomment_lines": 144
+        },
+        "tools/convert_v04_oval_variable_datatype_suite.py": {
+          "physical_lines": 208,
+          "nonblank_noncomment_lines": 188
+        },
+        "tools/flatten_v04_object_schema.py": {
+          "physical_lines": 160,
+          "nonblank_noncomment_lines": 132
+        },
+        "tools/generate_capability_schema.py": {
+          "physical_lines": 846,
+          "nonblank_noncomment_lines": 756
+        },
+        "tools/generate_capability_schema_v04.py": {
+          "physical_lines": 379,
+          "nonblank_noncomment_lines": 300
+        },
+        "tools/import_v04_oval_leaf_pilot.py": {
+          "physical_lines": 207,
+          "nonblank_noncomment_lines": 190
+        },
+        "tools/migrate_v04_additional_source_filters.py": {
+          "physical_lines": 156,
+          "nonblank_noncomment_lines": 138
+        },
+        "tools/migrate_v04_enum_selectors.py": {
+          "physical_lines": 128,
+          "nonblank_noncomment_lines": 105
+        },
+        "tools/migrate_v04_evaluate_and_or.py": {
+          "physical_lines": 94,
+          "nonblank_noncomment_lines": 78
+        },
+        "tools/migrate_v04_oval_proven_direct_filters.py": {
+          "physical_lines": 119,
+          "nonblank_noncomment_lines": 103
+        },
+        "tools/native_v03_authoring_codec.py": {
+          "physical_lines": 46,
+          "nonblank_noncomment_lines": 37
+        },
+        "tools/oval_result_truth_tables.py": {
+          "physical_lines": 511,
+          "nonblank_noncomment_lines": 409
+        },
+        "tools/oval_semantic_ir.py": {
+          "physical_lines": 1889,
+          "nonblank_noncomment_lines": 1672
+        },
+        "tools/reported_elements.py": {
+          "physical_lines": 225,
+          "nonblank_noncomment_lines": 192
+        },
+        "tools/research_04_compiled_authoring_macros.py": {
+          "physical_lines": 172,
+          "nonblank_noncomment_lines": 154
+        },
+        "tools/research_04_field_key_authoring.py": {
+          "physical_lines": 191,
+          "nonblank_noncomment_lines": 165
+        },
+        "tools/research_04_native_deep_content_census.py": {
+          "physical_lines": 270,
+          "nonblank_noncomment_lines": 242
+        },
+        "tools/research_04_one_grammar_proof.py": {
+          "physical_lines": 478,
+          "nonblank_noncomment_lines": 441
+        },
+        "tools/research_04_quantifier_aliases.py": {
+          "physical_lines": 129,
+          "nonblank_noncomment_lines": 117
+        },
+        "tools/research_04_rhel9_compact_preview.py": {
+          "physical_lines": 590,
+          "nonblank_noncomment_lines": 537
+        },
+        "tools/research_04_scoped_state_require.py": {
+          "physical_lines": 216,
+          "nonblank_noncomment_lines": 199
+        },
+        "tools/research_04_three_benchmark_quantifier.py": {
+          "physical_lines": 238,
+          "nonblank_noncomment_lines": 226
+        },
+        "tools/research_english_first_04_complex.py": {
+          "physical_lines": 504,
+          "nonblank_noncomment_lines": 479
+        },
+        "tools/research_english_first_04_evaluate.py": {
+          "physical_lines": 143,
+          "nonblank_noncomment_lines": 126
+        },
+        "tools/research_english_first_04_six_state.py": {
+          "physical_lines": 165,
+          "nonblank_noncomment_lines": 154
+        },
+        "tools/research_type_syntax_codec.py": {
+          "physical_lines": 251,
+          "nonblank_noncomment_lines": 221
+        },
+        "tools/scap14_rule_splitter.py": {
+          "physical_lines": 1095,
+          "nonblank_noncomment_lines": 979
+        },
+        "tools/scap_converter_core.py": {
+          "physical_lines": 681,
+          "nonblank_noncomment_lines": 611
+        },
+        "tools/scap_ng_roundtrip_v003/compare_oval_semantics.py": {
+          "physical_lines": 400,
+          "nonblank_noncomment_lines": 366
+        },
+        "tools/scap_ng_roundtrip_v003/native_assessment_to_oval.py": {
+          "physical_lines": 629,
+          "nonblank_noncomment_lines": 582
+        },
+        "tools/scap_upconvert_v003/assessment_oval_vocabulary.py": {
+          "physical_lines": 462,
+          "nonblank_noncomment_lines": 386
+        },
+        "tools/scap_upconvert_v003/build_rhel9_review_slice.py": {
+          "physical_lines": 2641,
+          "nonblank_noncomment_lines": 2398
+        },
+        "tools/scap_upconvert_v003/collection_graph.py": {
+          "physical_lines": 168,
+          "nonblank_noncomment_lines": 141
+        },
+        "tools/scap_upconvert_v003/conditional_modernization.py": {
+          "physical_lines": 420,
+          "nonblank_noncomment_lines": 357
+        },
+        "tools/scap_upconvert_v003/conversion_budget.py": {
+          "physical_lines": 93,
+          "nonblank_noncomment_lines": 74
+        },
+        "tools/scap_upconvert_v003/convert_collection_review.py": {
+          "physical_lines": 906,
+          "nonblank_noncomment_lines": 840
+        },
+        "tools/scap_upconvert_v003/embed_predicates.py": {
+          "physical_lines": 198,
+          "nonblank_noncomment_lines": 174
+        },
+        "tools/scap_upconvert_v003/foreach_modernization.py": {
+          "physical_lines": 417,
+          "nonblank_noncomment_lines": 368
+        },
+        "tools/scap_upconvert_v003/native_capability_mapping.py": {
+          "physical_lines": 841,
+          "nonblank_noncomment_lines": 744
+        },
+        "tools/test_v04_review_reference_graph.py": {
+          "physical_lines": 168,
+          "nonblank_noncomment_lines": 158
+        },
+        "tools/v04_a_authoring_graph_index.py": {
+          "physical_lines": 200,
+          "nonblank_noncomment_lines": 174
+        },
+        "tools/v04_a_benchmark_choice_version_closure.py": {
+          "physical_lines": 177,
+          "nonblank_noncomment_lines": 162
+        },
+        "tools/v04_a_benchmark_spec_migration_preview.py": {
+          "physical_lines": 174,
+          "nonblank_noncomment_lines": 160
+        },
+        "tools/v04_a_dataflow_index.py": {
+          "physical_lines": 249,
+          "nonblank_noncomment_lines": 215
+        },
+        "tools/v04_a_deterministic_research_container.py": {
+          "physical_lines": 222,
+          "nonblank_noncomment_lines": 198
+        },
+        "tools/v04_a_end_to_end_base_authoring.py": {
+          "physical_lines": 200,
+          "nonblank_noncomment_lines": 180
+        },
+        "tools/v04_a_lossless_ir.py": {
+          "physical_lines": 332,
+          "nonblank_noncomment_lines": 302
+        },
+        "tools/v04_a_lower_scoped_to_base.py": {
+          "physical_lines": 153,
+          "nonblank_noncomment_lines": 135
+        },
+        "tools/v04_a_specification_version_gate.py": {
+          "physical_lines": 128,
+          "nonblank_noncomment_lines": 111
+        },
+        "tools/v04_a_truth_plan.py": {
+          "physical_lines": 202,
+          "nonblank_noncomment_lines": 185
+        },
+        "tools/v04_all_exist_normalization.py": {
+          "physical_lines": 76,
+          "nonblank_noncomment_lines": 67
+        },
+        "tools/v04_canonical_requirement_oracle.py": {
+          "physical_lines": 226,
+          "nonblank_noncomment_lines": 200
+        },
+        "tools/v04_canonical_result_plan.py": {
+          "physical_lines": 144,
+          "nonblank_noncomment_lines": 127
+        },
+        "tools/v04_canonical_source_ir.py": {
+          "physical_lines": 331,
+          "nonblank_noncomment_lines": 291
+        },
+        "tools/v04_canonical_unsigned_package.py": {
+          "physical_lines": 322,
+          "nonblank_noncomment_lines": 284
+        },
+        "tools/v04_field_requirement.py": {
+          "physical_lines": 327,
+          "nonblank_noncomment_lines": 286
+        },
+        "tools/v04_flat_object_authoring.py": {
+          "physical_lines": 251,
+          "nonblank_noncomment_lines": 213
+        },
+        "tools/v04_native_bundle_compiler.py": {
+          "physical_lines": 379,
+          "nonblank_noncomment_lines": 339
+        },
+        "tools/v04_object_contract.py": {
+          "physical_lines": 175,
+          "nonblank_noncomment_lines": 151
+        },
+        "tools/v04_restore_missing_applicability.py": {
+          "physical_lines": 242,
+          "nonblank_noncomment_lines": 209
+        },
+        "tools/v04_source_verified_constant_variable_matrix.py": {
+          "physical_lines": 373,
+          "nonblank_noncomment_lines": 340
+        },
+        "tools/v04_source_verified_multitest_presence.py": {
+          "physical_lines": 154,
+          "nonblank_noncomment_lines": 145
+        },
+        "tools/v04_source_verified_multitest_states.py": {
+          "physical_lines": 128,
+          "nonblank_noncomment_lines": 119
+        },
+        "tools/v04_source_verified_object_presence.py": {
+          "physical_lines": 495,
+          "nonblank_noncomment_lines": 458
+        },
+        "tools/validate_generated_capability_semantics.py": {
+          "physical_lines": 1332,
+          "nonblank_noncomment_lines": 1141
+        },
+        "tools/validate_native_json_schemas.py": {
+          "physical_lines": 444,
+          "nonblank_noncomment_lines": 382
+        },
+        "tools/validate_v04_fields_condition_preview.py": {
+          "physical_lines": 307,
+          "nonblank_noncomment_lines": 260
+        }
+      },
+      "external_import_roots": [
+        "jsonschema",
+        "lxml",
+        "referencing",
+        "yaml"
+      ]
+    },
+    "qualification": "Static repository import closure, including deferred imports; excludes stdlib/third-party implementation lines. Production has much broader supported scope. No equal-feature complexity or speedup claim.",
+    "test_and_measurement_harness_physical_lines": 383,
+    "added_executable_modules": 2,
+    "end_to_end_harness_static_closure": {
+      "repository_modules": 60,
+      "physical_lines": 17000,
+      "nonblank_noncomment_lines": 15037,
+      "modules": {
+        "tools/audit_v04_and_or_scope_projection.py": {
+          "physical_lines": 179,
+          "nonblank_noncomment_lines": 159
+        },
+        "tools/audit_v04_eight_assessment_pilot.py": {
+          "physical_lines": 271,
+          "nonblank_noncomment_lines": 245
+        },
+        "tools/audit_v04_flat_object_names.py": {
+          "physical_lines": 96,
+          "nonblank_noncomment_lines": 80
+        },
+        "tools/audit_v04_synthetic_filter_unions.py": {
+          "physical_lines": 106,
+          "nonblank_noncomment_lines": 96
+        },
+        "tools/build_v04_canonical_six_stigs.py": {
+          "physical_lines": 359,
+          "nonblank_noncomment_lines": 330
+        },
+        "tools/capability_registry.py": {
+          "physical_lines": 61,
+          "nonblank_noncomment_lines": 52
+        },
+        "tools/flatten_v04_object_schema.py": {
+          "physical_lines": 160,
+          "nonblank_noncomment_lines": 132
+        },
+        "tools/generate_capability_schema.py": {
+          "physical_lines": 846,
+          "nonblank_noncomment_lines": 756
+        },
+        "tools/generate_capability_schema_v04.py": {
+          "physical_lines": 379,
+          "nonblank_noncomment_lines": 300
+        },
+        "tools/migrate_v04_additional_source_filters.py": {
+          "physical_lines": 156,
+          "nonblank_noncomment_lines": 138
+        },
+        "tools/migrate_v04_enum_selectors.py": {
+          "physical_lines": 128,
+          "nonblank_noncomment_lines": 105
+        },
+        "tools/migrate_v04_evaluate_and_or.py": {
+          "physical_lines": 94,
+          "nonblank_noncomment_lines": 78
+        },
+        "tools/migrate_v04_oval_proven_direct_filters.py": {
+          "physical_lines": 119,
+          "nonblank_noncomment_lines": 103
+        },
+        "tools/native_v03_authoring_codec.py": {
+          "physical_lines": 46,
+          "nonblank_noncomment_lines": 37
+        },
+        "tools/oval_result_truth_tables.py": {
+          "physical_lines": 511,
+          "nonblank_noncomment_lines": 409
+        },
+        "tools/reported_elements.py": {
+          "physical_lines": 225,
+          "nonblank_noncomment_lines": 192
+        },
+        "tools/research_04_compiled_authoring_macros.py": {
+          "physical_lines": 172,
+          "nonblank_noncomment_lines": 154
+        },
+        "tools/research_04_field_key_authoring.py": {
+          "physical_lines": 191,
+          "nonblank_noncomment_lines": 165
+        },
+        "tools/research_04_native_deep_content_census.py": {
+          "physical_lines": 270,
+          "nonblank_noncomment_lines": 242
+        },
+        "tools/research_04_one_grammar_proof.py": {
+          "physical_lines": 478,
+          "nonblank_noncomment_lines": 441
+        },
+        "tools/research_04_quantifier_aliases.py": {
+          "physical_lines": 129,
+          "nonblank_noncomment_lines": 117
+        },
+        "tools/research_04_rhel9_compact_preview.py": {
+          "physical_lines": 590,
+          "nonblank_noncomment_lines": 537
+        },
+        "tools/research_04_scoped_state_require.py": {
+          "physical_lines": 216,
+          "nonblank_noncomment_lines": 199
+        },
+        "tools/research_04_three_benchmark_quantifier.py": {
+          "physical_lines": 238,
+          "nonblank_noncomment_lines": 226
+        },
+        "tools/research_english_first_04_complex.py": {
+          "physical_lines": 504,
+          "nonblank_noncomment_lines": 479
+        },
+        "tools/research_english_first_04_evaluate.py": {
+          "physical_lines": 143,
+          "nonblank_noncomment_lines": 126
+        },
+        "tools/research_english_first_04_six_state.py": {
+          "physical_lines": 165,
+          "nonblank_noncomment_lines": 154
+        },
+        "tools/research_type_syntax_codec.py": {
+          "physical_lines": 251,
+          "nonblank_noncomment_lines": 221
+        },
+        "tools/scap_upconvert_v003/embed_predicates.py": {
+          "physical_lines": 198,
+          "nonblank_noncomment_lines": 174
+        },
+        "tools/scap_upconvert_v003/native_capability_mapping.py": {
+          "physical_lines": 841,
+          "nonblank_noncomment_lines": 744
+        },
+        "tools/test_v04_direct_conversion_prototype.py": {
+          "physical_lines": 383,
+          "nonblank_noncomment_lines": 354
+        },
+        "tools/test_v04_public_cli_smoke.py": {
+          "physical_lines": 135,
+          "nonblank_noncomment_lines": 118
+        },
+        "tools/test_v04_review_reference_graph.py": {
+          "physical_lines": 168,
+          "nonblank_noncomment_lines": 158
+        },
+        "tools/v04_a_authoring_graph_index.py": {
+          "physical_lines": 200,
+          "nonblank_noncomment_lines": 174
+        },
+        "tools/v04_a_benchmark_choice_version_closure.py": {
+          "physical_lines": 177,
+          "nonblank_noncomment_lines": 162
+        },
+        "tools/v04_a_benchmark_spec_migration_preview.py": {
+          "physical_lines": 174,
+          "nonblank_noncomment_lines": 160
+        },
+        "tools/v04_a_dataflow_index.py": {
+          "physical_lines": 249,
+          "nonblank_noncomment_lines": 215
+        },
+        "tools/v04_a_deterministic_research_container.py": {
+          "physical_lines": 222,
+          "nonblank_noncomment_lines": 198
+        },
+        "tools/v04_a_end_to_end_base_authoring.py": {
+          "physical_lines": 200,
+          "nonblank_noncomment_lines": 180
+        },
+        "tools/v04_a_lossless_ir.py": {
+          "physical_lines": 332,
+          "nonblank_noncomment_lines": 302
+        },
+        "tools/v04_a_lower_scoped_to_base.py": {
+          "physical_lines": 153,
+          "nonblank_noncomment_lines": 135
+        },
+        "tools/v04_a_specification_version_gate.py": {
+          "physical_lines": 128,
+          "nonblank_noncomment_lines": 111
+        },
+        "tools/v04_a_truth_plan.py": {
+          "physical_lines": 202,
+          "nonblank_noncomment_lines": 185
+        },
+        "tools/v04_all_exist_normalization.py": {
+          "physical_lines": 76,
+          "nonblank_noncomment_lines": 67
+        },
+        "tools/v04_canonical_requirement_oracle.py": {
+          "physical_lines": 226,
+          "nonblank_noncomment_lines": 200
+        },
+        "tools/v04_canonical_result_plan.py": {
+          "physical_lines": 144,
+          "nonblank_noncomment_lines": 127
+        },
+        "tools/v04_canonical_source_ir.py": {
+          "physical_lines": 331,
+          "nonblank_noncomment_lines": 291
+        },
+        "tools/v04_canonical_unsigned_package.py": {
+          "physical_lines": 322,
+          "nonblank_noncomment_lines": 284
+        },
+        "tools/v04_direct_conversion_prototype.py": {
+          "physical_lines": 422,
+          "nonblank_noncomment_lines": 386
+        },
+        "tools/v04_expanded_source_proof.py": {
+          "physical_lines": 365,
+          "nonblank_noncomment_lines": 330
+        },
+        "tools/v04_field_requirement.py": {
+          "physical_lines": 327,
+          "nonblank_noncomment_lines": 286
+        },
+        "tools/v04_flat_object_authoring.py": {
+          "physical_lines": 251,
+          "nonblank_noncomment_lines": 213
+        },
+        "tools/v04_native_bundle_compiler.py": {
+          "physical_lines": 379,
+          "nonblank_noncomment_lines": 339
+        },
+        "tools/v04_object_contract.py": {
+          "physical_lines": 175,
+          "nonblank_noncomment_lines": 151
+        },
+        "tools/v04_restore_missing_applicability.py": {
+          "physical_lines": 242,
+          "nonblank_noncomment_lines": 209
+        },
+        "tools/v04_source_package_semantics.py": {
+          "physical_lines": 512,
+          "nonblank_noncomment_lines": 460
+        },
+        "tools/validate_generated_capability_semantics.py": {
+          "physical_lines": 1332,
+          "nonblank_noncomment_lines": 1141
+        },
+        "tools/validate_native_json_schemas.py": {
+          "physical_lines": 444,
+          "nonblank_noncomment_lines": 382
+        },
+        "tools/validate_v04_fields_condition_preview.py": {
+          "physical_lines": 307,
+          "nonblank_noncomment_lines": 260
+        },
+        "tools/verify_v04_package_consumer.py": {
+          "physical_lines": 300,
+          "nonblank_noncomment_lines": 268
+        }
+      },
+      "external_import_roots": [
+        "jsonschema",
+        "referencing",
+        "yaml"
+      ]
+    },
+    "comparison_limit": "The 422-line new conversion core excludes unchanged shared validator/compiler/verification code, also present in the legacy reference closure. It is materially smaller only for this bounded scope; no equal-feature or entire-toolchain simplification claim."
+  },
+  "unchanged_production": {
+    "converter": true,
+    "compiler": true,
+    "schemas": true,
+    "ci_gates_and_historical_triggers": true,
+    "release_artifacts": true,
+    "editor": true
+  },
+  "code_file_sha256": {
+    "tools/v04_direct_conversion_prototype.py": "161baa21bdd42732bf7248d4ab09cd6a6f5851751f86a3d604f00e0a9d371095",
+    "tools/test_v04_direct_conversion_prototype.py": "0df1b8ca137548a12d5c7409ac5fe8c0ab82cecf126c93d31dfef10a54a9a34d"
+  },
+  "coverage_promoted": false,
+  "scanner_evaluated": false,
+  "go_no_go": "GO for review of the bounded direct approach; NO-GO for production replacement/full Benchmark conversion. Relative production speedup is not established.",
+  "reproduction_commands": [
+    [
+      "python",
+      "tools/v04_direct_conversion_prototype.py",
+      "tests/fixtures/v04-direct-prototype/server2025-signed.zip",
+      "--sha256",
+      "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+      "--rule",
+      "xccdf_mil.disa.stig_rule_SV-278139r1182083_rule",
+      "--rule",
+      "xccdf_mil.disa.stig_rule_SV-278080r1180946_rule",
+      "--output",
+      "/tmp/direct-slice"
+    ],
+    [
+      "python",
+      "tools/test_v04_direct_conversion_prototype.py",
+      "-v"
+    ],
+    [
+      "python",
+      "tools/test_v04_direct_conversion_prototype.py",
+      "--measure",
+      "/tmp/direct-measure.json"
+    ]
+  ],
+  "extra_checks": {
+    "repository_layout": "PASS, 0 failures",
+    "default_markdown_audit": "PASS (existing CI command; report-only link inventory)",
+    "optional_strict_current_scan": "3 preexisting missing anchors in unchanged Board discussion files; no broken links in new report",
+    "preexisting_anchor_findings": [
+      {
+        "source": "board/discussions/ASSESSMENT-VOCABULARY-ABCD-CLEAN.md",
+        "url": "https://github.com/vanderpol/scap-ng/blob/main/specification/examples/assessments.md#2-the-automated-check-embeds-its-expectation",
+        "target": "specification/examples/assessments.md",
+        "reason": "missing_heading",
+        "scope": "current"
+      },
+      {
+        "source": "board/discussions/ASSESSMENT-VOCABULARY-ABCD-SHARED.md",
+        "url": "https://github.com/vanderpol/scap-ng/blob/main/specification/examples/assessments.md#2-the-automated-check-embeds-its-expectation",
+        "target": "specification/examples/assessments.md",
+        "reason": "missing_heading",
+        "scope": "current"
+      },
+      {
+        "source": "board/discussions/ASSESSMENT-VOCABULARY-ABCD.md",
+        "url": "https://github.com/vanderpol/scap-ng/blob/main/specification/examples/assessments.md#2-the-automated-check-embeds-its-expectation",
+        "target": "specification/examples/assessments.md",
+        "reason": "missing_heading",
+        "scope": "current"
+      }
+    ]
+  }
+}
