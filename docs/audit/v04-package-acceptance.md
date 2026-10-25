@@ -220,9 +220,12 @@ was **CANCELLED** by the subsequent normal push under existing concurrency polic
 At `90a1a90c9`, [canonical fast](https://github.com/vanderpol/scap-ng/actions/runs/40149220787)
 and [issue reference](https://github.com/vanderpol/scap-ng/actions/runs/40149220791)
 are **SUCCESS**. The [replacement maintained regression run](https://github.com/vanderpol/scap-ng/actions/runs/40149220815)
-was **IN PROGRESS** at this report's preparation; its final state is checked separately
-before handoff. No untriggered/manual historical workflow is claimed as a fresh
-passing check.
+completed **SUCCESS** before handoff (checked 2026-10-25 01:10 UTC). No untriggered/manual historical workflow is claimed as a fresh
+passing check. The evidence/report publication commit
+[84f0c8fbe4a0f139246f58e34b2dcab5339a26e4](https://github.com/vanderpol/scap-ng/commit/84f0c8fbe4a0f139246f58e34b2dcab5339a26e4)
+also passed [Markdown](https://github.com/vanderpol/scap-ng/actions/runs/40149438084)
+and [issue-reference](https://github.com/vanderpol/scap-ng/actions/runs/40149438098)
+checks. The final follow-up only records these terminal outcomes.
 
 No new semantic decision was made. Recommended owner follow-up: decide the
 required original-source-to-exact-package proof coverage before release; retain
