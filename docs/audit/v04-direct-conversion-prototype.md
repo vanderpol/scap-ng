@@ -3,7 +3,7 @@
 **Experiment: SUCCESS for the slice. GO for review of the direct approach;
 NO-GO for production replacement. Relative production speedup is unproven.**
 [Owner scope](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6397760243).
-Baseline: `bf9cfde96231e6c825c1faaf3d33c38951e9ecb2`; implementation/CI below.
+Baseline: `bf9cfde96231e6c825c1faaf3d33c38951e9ecb2`.
 
 **Source/proof.** The complete signed Server 2025 ZIP is a
 [254,194-byte pinned fixture](../../tests/fixtures/v04-direct-prototype/provenance.json),
@@ -71,3 +71,11 @@ environment, source trace, native documents/programs, diagnostics and hashes.
 Actual outputs: `/workspace/.onboarding/direct-prototype/frozen-cli-0/`
 (six JSON, six YAML, source trace), `prototype.{json,yaml}.zip`, and
 `compiled/benchmark.direct-slice.scapng` under the same workspace base.
+
+**Terminal CI:** implementation
+[`e68581c56a2539db841b0d050db874b382edbe2d`](https://github.com/vanderpol/scap-ng/commit/e68581c56a2539db841b0d050db874b382edbe2d),
+**5/5 SUCCESS**: [maintained smoke](https://github.com/vanderpol/scap-ng/actions/runs/40198692298),
+[current regression](https://github.com/vanderpol/scap-ng/actions/runs/40198692329),
+[canonical fast](https://github.com/vanderpol/scap-ng/actions/runs/40198692284),
+[documentation](https://github.com/vanderpol/scap-ng/actions/runs/40198692285),
+[issue reference](https://github.com/vanderpol/scap-ng/actions/runs/40198692290).
