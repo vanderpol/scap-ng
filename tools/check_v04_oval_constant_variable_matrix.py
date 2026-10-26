@@ -8,19 +8,29 @@ adversarial meaning changes. Does not execute a scanner. Refs #248 #229 #232.
 from __future__ import annotations
 
 import argparse
+from v04_source_proof_contract import current_document, independent_export_view
 from copy import deepcopy
 import json
 from pathlib import Path
 
 import yaml
 
-from convert_v04_oval_constant_variable_matrix import CASES, convert
-from export_v04_oval_constant_variable_matrix import emit
+from convert_v04_oval_constant_variable_matrix import CASES, convert as _source_convert
+from export_v04_oval_constant_variable_matrix import emit as _source_emit
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from test_generate_capability_schema_v04 import materialize, validate
 from v04_canonical_source_ir import _schema_validators, validate_docs
 from v04_flat_object_authoring import dump_hybrid
 from validate_v04_oval_5123 import check
+
+
+def convert(*args, **kwargs):
+    source, proof = _source_convert(*args, **kwargs)
+    return current_document(source), proof
+
+
+def emit(document):
+    return _source_emit(independent_export_view(document))
 
 
 def must(ok, label):
@@ -70,10 +80,10 @@ def prove(original, schema_root, xsd_root, output, validators, capability_schema
         raise AssertionError("modified original OVAL Test was accepted")
 
     def reject_native(mutator, label):
-        changed = deepcopy(native)
+        changed = independent_export_view(native)
         mutator(changed["assessment"])
         try:
-            emit(changed)
+            emit(current_document(changed))
         except ValueError:
             return label
         raise AssertionError("unreviewed native change accepted: " + label)
@@ -84,7 +94,7 @@ def prove(original, schema_root, xsd_root, output, validators, capability_schema
         reject_native(lambda a: a["tests"].pop("source-1-test"),
                       "missing_Test"),
     ]
-    first = native["assessment"]["tests"]["source-1-test"]["states"][0]["value"]
+    first = independent_export_view(native)["assessment"]["tests"]["source-1-test"]["states"][0]["value"]
     if "value_match" in first:
         rejected.append(reject_native(lambda a: a["tests"]["source-1-test"][
             "states"][0]["value"].__setitem__("value_match", "unrecognized"),

@@ -8,6 +8,7 @@ Refs #248 #229 #232.
 from __future__ import annotations
 
 import argparse
+from v04_source_proof_contract import current_document, independent_export_view
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -35,7 +36,7 @@ ASSESSMENT_ID = "original-macos-systemsetup-two-field-assessment"
 NAME = "systemsetup-state-test"
 
 
-def source_to_native(raw):
+def _read_source_view(raw):
     require(sha256(raw).hexdigest() == SHA, "pinned original macOS systemsetup SHA")
     root = ET.fromstring(raw)
     require(root.tag == tag(OD, "oval_definitions"), "original OVAL namespace")
@@ -91,7 +92,7 @@ def source_to_native(raw):
     }}
 
 
-def native_to_oval(doc):
+def _export_source_view(doc):
     require(set(doc) == {"assessment"}, "native Assessment document")
     a = doc["assessment"]
     require(set(a) == {"id", "version", "assessment_title", "mode", "class",
@@ -147,6 +148,16 @@ def native_to_oval(doc):
     return ET.ElementTree(root)
 
 
+def source_to_native(raw):
+    source = _read_source_view(raw)
+    return current_document(source)
+
+
+def native_to_oval(doc):
+    view = independent_export_view(doc)
+    return _export_source_view(view)
+
+
 def prove(source, schema_root, xsd_root, output):
     source = Path(source)
     raw = source.read_bytes()
@@ -183,11 +194,11 @@ def prove(source, schema_root, xsd_root, output):
         pass
     else:
         raise AssertionError("accepted mutated original systemsetup threshold")
-    changed = deepcopy(doc)
+    changed = independent_export_view(doc)
     changed["assessment"]["tests"][NAME]["states"][0]["and"][1][
         "computername"]["matches_regex"] = ".*"
     try:
-        native_to_oval(changed)
+        native_to_oval(current_document(changed))
     except ValueError:
         pass
     else:

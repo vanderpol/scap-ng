@@ -139,10 +139,13 @@ def source_object_counts(node, *, filter_condition=False):
     for key, value in node.items():
         if key == 'require' and isinstance(value, str):
             out.update(field_pair(value))
-        elif key in ('value_match', 'selection_match'):
-            if value not in MATCH:
+        elif key in ('value_match', 'selection_match') and isinstance(value, str):
+            if value in MATCH:
+                out[key] = MATCH[value]
+            elif value in MATCH.values():
+                out[key] = value  # Explicit migrations may contain current subtrees.
+            else:
                 raise ValueError(f'unmapped source {key}: {value}')
-            out[key] = MATCH[value]
         elif filter_condition and key == 'state_fields_require':
             out['field_requirement'] = field_pair(value)
         else:

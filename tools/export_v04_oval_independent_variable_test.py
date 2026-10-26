@@ -152,12 +152,17 @@ def emit(document):
     return ET.ElementTree(root), definition_id
 
 
+def emit_current(document):
+    from v04_source_proof_contract import independent_export_view
+    return emit(independent_export_view(document))
+
+
 def main():
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--native", type=Path, required=True)
     cli.add_argument("--output", type=Path, required=True)
     args = cli.parse_args()
-    tree, _ = emit(json.loads(args.native.read_text()))
+    tree, _ = emit_current(json.loads(args.native.read_text()))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     tree.write(args.output, encoding="utf-8", xml_declaration=True)
 

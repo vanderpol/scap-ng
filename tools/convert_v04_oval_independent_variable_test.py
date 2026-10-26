@@ -138,13 +138,22 @@ def convert(raw):
     return {"assessment": assessment}, proof
 
 
+def convert_current(raw):
+    from v04_source_proof_contract import current_document
+    source, proof = convert(raw)
+    document = current_document(source)
+    proof['source_view_sha256'] = proof['native_assessment_sha256']
+    proof['native_assessment_sha256'] = sha256(canonical_json(document)).hexdigest()
+    return document, proof
+
+
 def main():
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--original", type=Path, required=True)
     cli.add_argument("--json", type=Path, required=True)
     cli.add_argument("--report", type=Path, required=True)
     args = cli.parse_args()
-    doc, proof = convert(args.original.read_bytes())
+    doc, proof = convert_current(args.original.read_bytes())
     for target in (args.json, args.report):
         target.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(doc, indent=2) + "\n")

@@ -82,12 +82,21 @@ def promote(doc, *, provenance=None, legacy_review=False):
         if provenance is not None:
             provenance[tid] = proof
     source_tests = doc['assessment'].get('tests') or {}
-    if any(isinstance(t.get('require'), str) or 'collected_items_require' in t
+    if legacy_review or any(isinstance(t.get('require'), str) or 'collected_items_require' in t
            for t in source_tests.values()):
         # Only source input enters this adapter. Canonical authoring is never repaired.
-        for section in ('shared_objects', 'variables'):
-            if section in a:
-                a[section] = source_object_counts(a[section])
+        # Use the same grammar-owned visitor as Object validation/flattening.
+        # A preview can have structured Tests but old Filter counts deep inside
+        # Variable acquisitions. Never interpret arbitrary literal records as
+        # predicates, and process each nested acquisition subtree only once.
+        roots = set()
+        for obj, _, route, _ in object_nodes(a):
+            if any(route[:length] in roots for length in range(1, len(route))):
+                continue
+            updated = source_object_counts(obj)
+            obj.clear()
+            obj.update(updated)
+            roots.add(route)
     return new,audit
 
 def recover(candidate,original, *, legacy_review=False):

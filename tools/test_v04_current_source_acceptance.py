@@ -60,6 +60,19 @@ class CurrentSourceAcceptance(unittest.TestCase):
         self.assertEqual(set(proof['operators']), {'union', 'intersection', 'difference'})
         self.assertGreaterEqual(proof['maximum_nesting'], 3)
 
+    def test_additional_original_mac_lockout_and_fixed_unknown_graphs(self):
+        for family in ('macos_diskinfo', 'macos_softwareupdate', 'macos_systemsetup',
+                       'windows_lockout', 'unknown'):
+            module = importlib.import_module('prove_v04_oval_' + family + '_source')
+            proof = module.prove(DATA / module.FILE, SCHEMA, XSD, self.output / family)
+            self.assertEqual(proof['native_assessment_schema'], 'PASS')
+            self.assertEqual(proof['original_root_semantic_graph'], 'PASS')
+        from prove_v04_oval_macos_statefree_source import prove
+        results = prove(DATA, SCHEMA, XSD, self.output / 'macos-statefree')
+        self.assertEqual(len(results), 3)
+        for proof in results.values():
+            self.assertEqual(proof['native_assessment_schema'], 'PASS')
+
     def test_bluetooth_actual_applicability_direct_filter_and_synthetic_union_negative(self):
         proof = self.bluetooth
         self.assertEqual(proof['outcome'], 'PROVED')
@@ -125,6 +138,36 @@ class CurrentSourceAcceptance(unittest.TestCase):
         test['field_requirements'][0]['path'].append('forged')
         with self.assertRaises(ValueError):
             decode_and_verify(altered)
+
+    def test_explicit_migration_covers_variable_object_filters_but_not_literal_records(self):
+        from build_v04_canonical_six_stigs import promote, recover
+        from v04_canonical_source_ir import validate_docs
+        from v04_object_contract import object_sites
+        source = json.loads((DATA / 'historical-sv278028.json').read_text())
+        with self.assertRaisesRegex(ValueError, 'Object schema failure'):
+            validate_docs({'authoring/historical.json': source}, validators())
+        current, _ = promote(source, legacy_review=True)
+        validate_docs({'authoring/current.json': current}, validators())
+        recover(current, source, legacy_review=True)
+        self.assertEqual(promote(current, legacy_review=True)[0], current)
+        targets = [site.node for site in object_sites(current['assessment'])
+                   if site.path[1] == 'variables' and 'set' in site.node]
+        self.assertTrue(targets)
+        changed = deepcopy(current)
+        target = next(site.node for site in object_sites(changed['assessment'])
+                      if site.path[1] == 'variables' and 'set' in site.node)
+        predicate = target['set']['operands'][0]['filters'][0]['include']['result']
+        self.assertEqual(predicate['values_matching'], 'every')
+        predicate['matches_regex'] = 'changed-original-filter'
+        with self.assertRaises(ValueError):
+            recover(changed, source, legacy_review=True)
+        literal = {'datatype': 'record', 'value': {'require': 'literal data',
+                   'value_match': 'literal data', 'object': {'collect': {'never': 'visit'}}}}
+        enriched = deepcopy(source)
+        enriched['assessment']['variables']['literal-metadata-variable'] = {
+            'kind': 'constant', 'datatype': 'record', 'expression': {'literal': literal}}
+        migrated, _ = promote(enriched, legacy_review=True)
+        self.assertEqual(migrated['assessment']['variables']['literal-metadata-variable']['expression']['literal'], literal)
 
 
 if __name__ == '__main__':

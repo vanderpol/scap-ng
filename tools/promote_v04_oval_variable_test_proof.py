@@ -14,8 +14,8 @@ from copy import deepcopy
 import yaml
 
 from v04_a_authoring_graph_index import canonical_json
-from convert_v04_oval_independent_variable_test import convert
-from export_v04_oval_independent_variable_test import emit
+from convert_v04_oval_independent_variable_test import convert_current as convert
+from export_v04_oval_independent_variable_test import emit_current as emit
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 
 PIN = "e3538595c5083b9c34d937a81d319234df9bbfaa"

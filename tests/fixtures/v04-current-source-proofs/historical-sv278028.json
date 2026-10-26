@@ -1,0 +1,305 @@
+{
+  "assessment": {
+    "assessment_title": "Windows Server 2025 FTP servers must be configured to prevent access to the system drive.",
+    "class": "compliance",
+    "evaluate": {
+      "all": [
+        {
+          "test": "if-site-includes-root-drive-this-finding-test"
+        },
+        {
+          "test": "if-site-includes-program-files-this-finding-test"
+        },
+        {
+          "test": "if-site-includes-program-files-x86-this-finding-test"
+        },
+        {
+          "test": "if-site-includes-windows-directory-this-finding-test"
+        }
+      ]
+    },
+    "id": "SV-278028.automated",
+    "mode": "automated",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "if-site-includes-program-files-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "program-files-variable"
+                  },
+                  "datatype": "string",
+                  "require": "at_least_one_exists_and_all_match",
+                  "value_match": "all"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes Program Files this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items": "none"
+        },
+        "test_title": "If the site includes Program Files this is a finding."
+      },
+      "if-site-includes-program-files-x86-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "program-files-x86-variable"
+                  },
+                  "datatype": "string",
+                  "require": "at_least_one_exists_and_all_match",
+                  "value_match": "all"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes Program Files(x86) this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items": "none"
+        },
+        "test_title": "If the site includes Program Files(x86) this is a finding."
+      },
+      "if-site-includes-root-drive-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "boot-drive-forward-slash-added-variable"
+                  },
+                  "datatype": "string",
+                  "require": "at_least_one_exists_and_all_match",
+                  "value_match": "all"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes root of the drive this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items": "none"
+        },
+        "test_title": "If the site includes root of the drive this is a finding."
+      },
+      "if-site-includes-windows-directory-this-finding-test": {
+        "capability": "independent.shellcommand",
+        "object": {
+          "command": {
+            "variable": "update-variable"
+          },
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false,
+          "filters": [
+            {
+              "include": {
+                "stdout_line": {
+                  "case_insensitive_equals": {
+                    "variable": "windows-directory-variable"
+                  },
+                  "datatype": "string",
+                  "require": "at_least_one_exists_and_all_match",
+                  "value_match": "all"
+                }
+              }
+            }
+          ],
+          "object_title": "If the site includes Windows Directory this is a finding.",
+          "pattern": "",
+          "shell": "powershell"
+        },
+        "reported_elements": "all",
+        "require": {
+          "items": "none"
+        },
+        "test_title": "If the site includes Windows Directory this is a finding."
+      }
+    },
+    "variables": {
+      "boot-drive-forward-slash-added-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "values": {
+                "field": "value",
+                "object": {
+                  "capability": "independent.environmentvariable58",
+                  "object_title": "Get boot drive",
+                  "select": {
+                    "name": {
+                      "equals": "SYSTEMDRIVE"
+                    },
+                    "pid": null
+                  }
+                }
+              }
+            },
+            {
+              "literal": "\\"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "Boot Drive with Forward Slash Added"
+      },
+      "program-files-variable": {
+        "datatype": "string",
+        "expression": {
+          "values": {
+            "field": "value",
+            "object": {
+              "capability": "independent.environmentvariable58",
+              "object_title": "Get the Program Files Directory",
+              "select": {
+                "name": {
+                  "equals": "PROGRAMFILES"
+                },
+                "pid": null
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Program Files"
+      },
+      "program-files-x86-variable": {
+        "datatype": "string",
+        "expression": {
+          "values": {
+            "field": "value",
+            "object": {
+              "capability": "independent.environmentvariable58",
+              "object_title": "Get the Program Files(x86) Directory",
+              "select": {
+                "name": {
+                  "equals": "PROGRAMFILES(X86)"
+                },
+                "pid": null
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Program Files(x86)"
+      },
+      "update-variable": {
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "literal": "Get-Website '"
+            },
+            {
+              "values": {
+                "field": "identifier",
+                "object": {
+                  "capability": "windows.appcmd",
+                  "object_title": "Get Website Bindings with filter applied for ones that include FTP",
+                  "set": {
+                    "operands": [
+                      {
+                        "filters": [
+                          {
+                            "include": {
+                              "result": {
+                                "matches_regex": "ftp",
+                                "require": "at_least_one_exists_and_all_match"
+                              }
+                            }
+                          }
+                        ],
+                        "object": {
+                          "capability": "windows.appcmd",
+                          "object_title": "Get Website Bindings with filter applied for ones that include FTP",
+                          "select": {
+                            "identifier": {
+                              "matches_regex": ".*"
+                            },
+                            "identifier_type": {
+                              "equals": "Site"
+                            },
+                            "parameter": {
+                              "equals": "bindings"
+                            }
+                          }
+                        }
+                      }
+                    ],
+                    "operator": "union"
+                  }
+                }
+              }
+            },
+            {
+              "literal": "' | Select-Object -ExpandProperty physicalPath"
+            }
+          ]
+        },
+        "kind": "local",
+        "title": "update"
+      },
+      "windows-directory-variable": {
+        "datatype": "string",
+        "expression": {
+          "values": {
+            "field": "value",
+            "object": {
+              "capability": "independent.environmentvariable58",
+              "object_title": "Get the Windows Directory",
+              "select": {
+                "name": {
+                  "equals": "WINDIR"
+                },
+                "pid": null
+              }
+            }
+          }
+        },
+        "kind": "local",
+        "title": "Windows Directory"
+      }
+    },
+    "version": 1
+  }
+}

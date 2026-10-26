@@ -72,8 +72,9 @@ def promote(previous, evidence_root):
     require(canonical_json(source_to_native(raw)) == canonical_json(native),
             "fresh original-XML-to-minimal-native conversion")
     require(set(native["assessment"]["tests"][NAME]) == {
-                "test_title", "capability"},
-            "no dummy existence, collection or State controls in fixed-result Test")
+                "test_title", "capability", "require"} and
+            native["assessment"]["tests"][NAME]["require"] == {"items_found": "one_or_more"},
+            "uniform structured requirement; no invented collection or State controls")
     regenerated, new_def = native_to_oval(native)
     require(new_def == NEW_DEF, "canonical regenerated Definition identity")
     expected = etree.fromstring(ET.tostring(regenerated.getroot(), encoding="utf-8"))
@@ -102,7 +103,7 @@ def promote(previous, evidence_root):
             proof.get("original_xml_sha256") == SHA and
             proof.get("scanner_parity") is False and
             proof.get("fixed_result") == "unknown" and
-            proof.get("native_control_fields") == ["test_title", "capability"] and
+            proof.get("native_control_fields") == ["test_title", "capability", "require"] and
             proof.get("source_mutation") == "REJECTED" and
             proof.get("extraneous_native_controls") == "REJECTED" and
             all(proof.get(k) == "PASS" for k in (

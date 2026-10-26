@@ -9,6 +9,7 @@ Refs #248 #229 #232.
 from __future__ import annotations
 
 import argparse
+from v04_source_proof_contract import current_document, independent_export_view
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -48,7 +49,7 @@ CASES = {
 }
 
 
-def source_to_native(raw, kind):
+def _read_source_view(raw, kind):
     case = CASES[kind]
     require(sha256(raw).hexdigest() == case["source_sha256"],
             "pinned original macOS " + kind + " SHA")
@@ -95,7 +96,7 @@ def source_to_native(raw, kind):
     }}
 
 
-def native_to_oval(doc, kind):
+def _export_source_view(doc, kind):
     case = CASES[kind]
     require(set(doc) == {"assessment"}, "single Assessment document")
     a = doc["assessment"]
@@ -141,6 +142,16 @@ def native_to_oval(doc, kind):
     return ET.ElementTree(root)
 
 
+def source_to_native(raw, kind):
+    source = _read_source_view(raw, kind)
+    return current_document(source)
+
+
+def native_to_oval(doc, kind):
+    view = independent_export_view(doc)
+    return _export_source_view(view, kind)
+
+
 def prove_one(kind, source, schema_root, xsd_root, output):
     case = CASES[kind]
     source = Path(source)
@@ -178,10 +189,10 @@ def prove_one(kind, source, schema_root, xsd_root, output):
         pass
     else:
         raise AssertionError("accepted original altered existence: " + kind)
-    changed = deepcopy(doc)
+    changed = independent_export_view(doc)
     changed["assessment"]["tests"][kind + "-exists-test"]["require"] = "none_exist"
     try:
-        native_to_oval(changed, kind)
+        native_to_oval(current_document(changed), kind)
     except ValueError:
         pass
     else:

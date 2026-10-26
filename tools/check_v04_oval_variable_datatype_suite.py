@@ -8,19 +8,29 @@ Refs #248 #229 #232.
 from __future__ import annotations
 
 import argparse
+from v04_source_proof_contract import current_document, independent_export_view
 from copy import deepcopy
 import json
 from pathlib import Path
 
 import yaml
 
-from convert_v04_oval_variable_datatype_suite import CASES, ENTITY_CASE, PIN, convert
-from export_v04_oval_variable_datatype_suite import emit
+from convert_v04_oval_variable_datatype_suite import CASES, ENTITY_CASE, PIN, convert as _source_convert
+from export_v04_oval_variable_datatype_suite import emit as _source_emit
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from test_generate_capability_schema_v04 import materialize, validate
 from v04_canonical_source_ir import _schema_validators, validate_docs
 from v04_flat_object_authoring import dump_hybrid
 from validate_v04_oval_5123 import check
+
+
+def convert(*args, **kwargs):
+    source, proof = _source_convert(*args, **kwargs)
+    return current_document(source), proof
+
+
+def emit(document):
+    return _source_emit(independent_export_view(document))
 
 
 def must(ok, reason):
@@ -89,20 +99,20 @@ def prove(source, validators, capability_schema, xsd_root, output):
     else:
         raise AssertionError("unsupported native Test semantics exported")
 
-    changed = deepcopy(native)
+    changed = independent_export_view(native)
     firstvar = changed["assessment"]["variables"]["source-1-variable"]
     firstvar["expression"]["literal"][0] += "-altered"
-    xml, altered_id = emit(changed)
+    xml, altered_id = emit(current_document(changed))
     altered = target / "mutated-variable.xml"
     xml.write(altered, encoding="utf-8", xml_declaration=True)
     must(not compare(source, altered, source_root=CASES[filename][0],
                      regenerated_root=altered_id, root_only=True)["equal"],
          "modified Variable literal must change original meaning")
 
-    changed = deepcopy(native)
+    changed = independent_export_view(native)
     changed["assessment"]["evaluate"] = invert_first_leaf(
         changed["assessment"]["evaluate"])
-    xml, altered_id = emit(changed)
+    xml, altered_id = emit(current_document(changed))
     altered = target / "mutated-criterion.xml"
     xml.write(altered, encoding="utf-8", xml_declaration=True)
     must(not compare(source, altered, source_root=CASES[filename][0],
@@ -110,32 +120,32 @@ def prove(source, validators, capability_schema, xsd_root, output):
          "modified Criterion negation must change original meaning")
     if provenance["source_datatype"] in {"ipv4_address", "ipv6_address"}:
         prefix = "ipv4_" if provenance["source_datatype"] == "ipv4_address" else "ipv6_"
-        changed = deepcopy(native)
+        changed = independent_export_view(native)
         subset = next(t["states"][0]["value"] for t in changed["assessment"]["tests"].values()
                       if prefix + "subset_of" in t["states"][0]["value"])
         subset[prefix + "superset_of"] = subset.pop(prefix + "subset_of")
-        xml, altered_id = emit(changed)
+        xml, altered_id = emit(current_document(changed))
         altered = target / "mutated-ip-subnet-operation.xml"
         xml.write(altered, encoding="utf-8", xml_declaration=True)
         must(not compare(source, altered, source_root=CASES[filename][0],
                          regenerated_root=altered_id, root_only=True)["equal"],
              "IP subset/superset direction must change original meaning")
-        changed = deepcopy(native)
+        changed = independent_export_view(native)
         changed["assessment"]["tests"]["source-1-test"]["require"] = (
             "at_least_one_exists_and_some_match")
         try:
-            emit(changed)
+            emit(current_document(changed))
         except ValueError:
             pass
         else:
             raise AssertionError("IP original all-check lowered as some-match")
     if filename == ENTITY_CASE:
-        changed = deepcopy(native)
+        changed = independent_export_view(native)
         first = changed["assessment"]["tests"]["source-1-test"]["states"][0]["value"]
         must(first["require"] == "at_least_one_exists_and_all_match",
              "entity_check first original all")
         first["require"] = "at_least_one_exists_and_some_match"
-        xml, altered_id = emit(changed)
+        xml, altered_id = emit(current_document(changed))
         altered = target / "mutated-entity-check.xml"
         xml.write(altered, encoding="utf-8", xml_declaration=True)
         must(not compare(source, altered, source_root=CASES[filename][0],

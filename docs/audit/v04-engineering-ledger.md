@@ -240,3 +240,13 @@ and the separate pinned archival job pass. A generator-trigger preflight also
 records ten older red workflows not triggered by that commit, including the
 immutable 4,001-document archive gate. Their obligations remain visible and
 must be reconciled before claiming a globally green generator prerequisite.
+
+The [generator-trigger reconciliation](v04-generator-trigger-reconciliation.md)
+retains nine more original-source obligations (21 Definitions / 182 Tests) and
+separates immutable 4,001-file archival validation from the already-approved
+4,012-document current review-format replay. No benchmark packages are rebuilt.
+The latter exposed missed Filter-count migration inside Variable acquisitions;
+the existing Object visitor now handles those explicit migrations without
+touching literal records. Forty-two focused tests and all source CLI gates pass;
+full maintained/hosted results are reconciled before generator work. No new fresh
+source all_exist normalization or deprecated-WMI admission is introduced.

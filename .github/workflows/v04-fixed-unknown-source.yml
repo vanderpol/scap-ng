@@ -1,4 +1,4 @@
-name: 0.4.0 fixed unknown Test minimal authoring and six-STIG compatibility
+name: 0.4.0 fixed unknown contract and current reviewed-authoring format validation
 on:
   push:
     branches: [main]
@@ -25,18 +25,40 @@ jobs:
         env:
           PYTHONPATH: tools
         run: python tools/test_v04_fixed_unknown_minimal.py
-      - name: Fetch pinned published 4,001-document YAML authoring release
+      - name: Fetch unchanged reviewed migration inputs (no source corpus conversion)
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          mkdir -p work
-          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261021 \
-            --pattern scap-ng-0.4.0-six-stigs.yaml.zip --dir work
-          echo '8922a818c388aa88a40329aee678ad078a0abf4d5475742ad96e0352fd175ef4  work/scap-ng-0.4.0-six-stigs.yaml.zip' | sha256sum -c -
-      - name: Validate all 4,001 unchanged published YAML documents under updated native schema
+          mkdir -p work/review-inputs
+          gh release download v0.4.0-six-stig-canonical-flat-authoring-20261022-restored \
+            --pattern scap-ng-0.4.0-six-stigs.json.zip \
+            --pattern scap-ng-0.4.0-six-stigs.yaml.zip --dir work/review-inputs
+          curl -fLsS 'https://raw.githubusercontent.com/niwc-atlantic/scap-content-library/8c8e5dff860af6b1290ee9273a282db24278f8d5/Current/U_Oracle_Linux_9_V1R4_STIG_SCAP_1-4_Benchmark-enhancedV5-signed.zip' -o work/review-inputs/oracle-original.zip
+      - name: Reproduce approved format-only migration with exact source exception pin
+        env:
+          PYTHONPATH: tools
+        run: |
+          python tools/migrate_v04_six_stig_review_archive.py \
+            --source-json work/review-inputs/scap-ng-0.4.0-six-stigs.json.zip \
+            --source-yaml work/review-inputs/scap-ng-0.4.0-six-stigs.yaml.zip \
+            --expected-json-sha256 f481ff109b1f6abfda2d7f115e3140f4e82429517e4adc8cf9de00733180d8f5 \
+            --expected-yaml-sha256 d7a989c66f32c8ea7af4c6e3355847da2d39d23b82366ce3f323cd71d4a6c5c1 \
+            --oracle-source-zip work/review-inputs/oracle-original.zip \
+            --out-json work/current-review.json.zip --out-yaml work/current-review.yaml.zip \
+            --report work/review-format-migration.json
+      - name: Validate all current documents, format parity and complete inventory
         env:
           PYTHONPATH: tools
         run: |
           python tools/test_v04_fixed_unknown_minimal.py \
-            --published-yaml-zip work/scap-ng-0.4.0-six-stigs.yaml.zip
+            --current-json-zip work/current-review.json.zip --current-yaml-zip work/current-review.yaml.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: v04-current-reviewed-authoring-format-validation
+          path: |
+            work/review-format-migration.json
+            work/current-review.json.zip
+            work/current-review.yaml.zip
+          if-no-files-found: error

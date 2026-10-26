@@ -69,7 +69,8 @@ def promote(previous, evidence_root):
             "native YAML/JSON Assessment graph identity")
     require(canonical_json(source_to_native(raw)) == canonical_json(native),
             "independently recomputed source/native Windows conversion")
-    test = native["assessment"]["tests"][NAME]
+    from v04_source_proof_contract import independent_export_view
+    test = independent_export_view(native)["assessment"]["tests"][NAME]
     require("object" not in test and len(test["states"][0]["and"]) == 4,
             "no false singleton Object and all four explicit source conditions")
     generated = native_to_oval(native)

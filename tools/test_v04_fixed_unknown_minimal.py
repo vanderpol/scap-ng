@@ -89,9 +89,41 @@ def verify_published_archive(zip_path):
             "runtime_parity_claimed": False}
 
 
+def verify_current_archives(json_path, yaml_path):
+    """Current format coverage, not original OVAL equivalence or a release build.
+
+    The 4,012-document reviewed migration is distinct from the immutable 4,001
+    October 21 archive. Keep counts/format parity explicit; never silently repair
+    input in this validator or claim whole-corpus original-source proof.
+    """
+    from collections import Counter
+    from v04_a_authoring_graph_index import read_authoring_archive
+    json_docs = read_authoring_archive(json_path, 'json')
+    yaml_docs = read_authoring_archive(yaml_path, 'yaml')
+    if len(json_docs) != 4012 or len(yaml_docs) != 4012:
+        raise ValueError('expected complete 4,012-document current review in both formats')
+    if json_docs != {name.removesuffix('.yaml') + '.json': doc for name, doc in yaml_docs.items()}:
+        raise ValueError('current review JSON/YAML native graphs differ')
+    validators = _schema_validators(ROOT / 'schema/v0.4.0')
+    validate_docs(json_docs, validators)
+    validate_docs(yaml_docs, validators)
+    kinds = Counter(next(iter(doc)) for doc in json_docs.values())
+    assessments = [doc['assessment'] for doc in json_docs.values() if 'assessment' in doc]
+    modes = Counter(a['mode'] for a in assessments)
+    if kinds != {'benchmark': 6, 'applicability': 6, 'rule': 1567, 'assessment': 2433} or modes != {
+            'automated': 883, 'manual': 1550}:
+        raise ValueError('current review inventory differs from accepted checkpoint')
+    return {'current_documents_per_format': 4012, 'yaml_json_parity': True,
+            'kinds': dict(kinds), 'assessment_modes': dict(modes),
+            'original_oval_equivalence_claimed': False, 'runtime_parity_claimed': False,
+            'benchmark_packages_built': 0}
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--published-yaml-zip", type=Path)
+    parser.add_argument('--current-json-zip', type=Path)
+    parser.add_argument('--current-yaml-zip', type=Path)
     args, unittest_args = parser.parse_known_args()
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(FixedUnknownSchema)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
@@ -99,3 +131,7 @@ if __name__ == "__main__":
         raise SystemExit(1)
     if args.published_yaml_zip:
         print(json.dumps(verify_published_archive(args.published_yaml_zip), sort_keys=True))
+    if args.current_json_zip or args.current_yaml_zip:
+        if not (args.current_json_zip and args.current_yaml_zip):
+            parser.error('both current-format archives are required')
+        print(json.dumps(verify_current_archives(args.current_json_zip, args.current_yaml_zip), sort_keys=True))

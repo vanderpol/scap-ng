@@ -10,6 +10,7 @@ Refs #248 #229 #232.
 from __future__ import annotations
 
 import argparse
+from v04_source_proof_contract import current_document, independent_export_view
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -46,7 +47,7 @@ def require(condition, message):
         raise ValueError("unreviewed original OVAL fixed-unknown source: " + message)
 
 
-def source_to_native(raw):
+def _read_source_view(raw):
     require(sha256(raw).hexdigest() == SHA, "pinned original XML SHA")
     root = ET.fromstring(raw)
     require(root.tag == tag(OD, "oval_definitions"), "Definitions XML namespace")
@@ -94,7 +95,7 @@ def source_to_native(raw):
     }}
 
 
-def native_to_oval(native):
+def _export_source_view(native):
     require(isinstance(native, dict) and set(native) == {"assessment"},
             "native Assessment root")
     a = native["assessment"]
@@ -134,6 +135,21 @@ def native_to_oval(native):
         "id": NEW_TEST, "version": "1", "comment": test["test_title"],
         "check_existence": "at_least_one_exists", "check": "at least one"})
     return ET.ElementTree(root), NEW_DEF
+
+
+def source_to_native(raw):
+    source = _read_source_view(raw)
+    # Original unknown_test inherits TestType's at_least_one_exists default.
+    # Fixed-result authoring still obeys the approved uniform require contract.
+    source['assessment']['tests'][next(iter(source['assessment']['tests']))]['require'] = {'items_found': 'one_or_more'}
+    return current_document(source)
+
+
+def native_to_oval(doc):
+    view = independent_export_view(doc)
+    test, = view['assessment']['tests'].values()
+    require(test.pop('require') == 'at_least_one_exists', 'original unknown existence default')
+    return _export_source_view(view)
 
 
 def prove(source, schema_root, xsd_root, output):
@@ -187,7 +203,7 @@ def prove(source, schema_root, xsd_root, output):
         "native_assessment_schema": "PASS", "native_capability_schema": "PASS",
         "yaml_json_graph_equivalence": "PASS", "oval_5123_xsd": "PASS",
         "original_root_semantic_graph": "PASS",
-        "fixed_result": "unknown", "native_control_fields": ["test_title", "capability"],
+        "fixed_result": "unknown", "native_control_fields": ["test_title", "capability", "require"],
         "source_mutation": "REJECTED", "extraneous_native_controls": "REJECTED",
         "scanner_parity": False,
     }

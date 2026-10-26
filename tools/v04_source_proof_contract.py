@@ -91,7 +91,7 @@ def _filter_view(condition):
     return {key: _predicate(value, None) for key, value in condition.items()}
 
 
-def independent_export_view(document):
+def independent_export_view(document, *, inline_capability=True):
     """Validate current input, then expose explicit counts to old reverse readers.
 
     Existing independent exporters retain their original source-shape assertions.
@@ -112,7 +112,8 @@ def independent_export_view(document):
             test['states'] = [_condition(requirement)]
         if isinstance(test.get('object'), dict):
             test['object'] = _object_view(test['object'])
-            test['object']['capability'] = test['capability']
+            if inline_capability:
+                test['object']['capability'] = test['capability']
     return result
 
 

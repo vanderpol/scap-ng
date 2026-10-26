@@ -17,8 +17,9 @@ import xml.etree.ElementTree as ET
 from lxml import etree
 import yaml
 
-from convert_v04_oval_constant_variable_matrix import CASES, PIN, convert
-from export_v04_oval_constant_variable_matrix import emit
+from convert_v04_oval_constant_variable_matrix import CASES, PIN
+from check_v04_oval_constant_variable_matrix import convert
+from check_v04_oval_constant_variable_matrix import emit
 from scap_ng_roundtrip_v003.compare_oval_semantics import compare
 from v04_a_authoring_graph_index import canonical_json
 

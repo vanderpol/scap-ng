@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
     paths:
+      - 'tools/v04_source_proof_contract.py'
+      - 'tools/test_v04_current_source_acceptance.py'
       - '.github/workflows/v04-oval-variable-value-roundtrip.yml'
       - 'tools/convert_v04_oval_independent_variable_test.py'
       - 'tools/export_v04_oval_independent_variable_test.py'
@@ -93,7 +95,7 @@ jobs:
           import json
           from pathlib import Path
           from validate_v04_oval_5123 import check
-          from export_v04_oval_independent_variable_test import emit
+          from export_v04_oval_independent_variable_test import emit_current as emit
           from scap_ng_roundtrip_v003.compare_oval_semantics import compare
           base=Path('work/oval-variable')
           doc=json.loads((base/'native-040.assessment.json').read_text())
@@ -123,8 +125,8 @@ jobs:
           import json
           from copy import deepcopy
           from pathlib import Path
-          from export_v04_oval_independent_variable_test import emit
-          from convert_v04_oval_independent_variable_test import convert
+          from export_v04_oval_independent_variable_test import emit_current as emit
+          from convert_v04_oval_independent_variable_test import convert_current as convert
           from scap_ng_roundtrip_v003.compare_oval_semantics import compare
           root=Path('work/oval-variable')
           source=json.loads((root/'native-040.assessment.json').read_text())
@@ -139,12 +141,12 @@ jobs:
                   kinds.append(kind)
               else:raise AssertionError(f'unapproved native semantic mutation: {kind}')
           reject('var_check',lambda a:a['tests']['first-to-second-variable-test'][
-              'states'][0]['value'].__setitem__('value_match','all'))
+              'require']['fields']['value'].__setitem__('value_match','every'))
           reject('test_check',lambda a:a['tests']['first-to-second-variable-test'].__setitem__(
-                  'require','none_exist'))
+                  'require',{'items_found':'none'}))
           reject('missing_pair',lambda a:a['tests'].pop('second-to-second-variable-test'))
           reject('swapped_state_ref',lambda a:a['tests']['first-to-second-variable-test'][
-              'states'][0]['value']['equals'].__setitem__('variable',first))
+              'require']['fields']['value']['equals'].__setitem__('variable',first))
           reject('lost_constant_value',lambda a:a['variables'][first][
               'expression']['literal'].pop())
           assert len(kinds)==5
