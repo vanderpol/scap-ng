@@ -1,0 +1,49 @@
+{
+  "assessment": {
+    "id": "windows-server-2025-ftp-servers-must-be-configured-to-prevent-anonymou-ac01c388-assessment",
+    "version": 1,
+    "assessment_title": "Windows Server 2025 FTP servers must be configured to prevent anonymous logons.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "ftp-servers-must-be-configured-to-prevent-anonymous-logons-34f592ce-test": {
+        "test_title": "FTP servers must be configured to prevent anonymous logons.",
+        "capability": "windows.appcmdlistconfig",
+        "object": {
+          "identifier_type": {
+            "equals": "Site"
+          },
+          "identifier": {
+            "matches_regex": ".*"
+          },
+          "section": {
+            "equals": "system.applicationHost/sites"
+          },
+          "parameter": {
+            "equals": "siteDefaults.ftpServer.security.authentication.anonymousAuthentication.enabled"
+          }
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "result": {
+              "equals": "false",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "test": "ftp-servers-must-be-configured-to-prevent-anonymous-logons-34f592ce-test"
+    }
+  }
+}
