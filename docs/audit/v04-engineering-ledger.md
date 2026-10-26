@@ -232,3 +232,11 @@ a deterministic record-field-index roundtrip defect; sorting that derived map
 index preserves source/Boolean semantics. Full maintained/hosted CI results will
 be reconciled before generator decoupling. Source coverage remains 249/0/42;
 neither the 883 ledger nor a full Benchmark release is promoted by these proofs.
+
+At `a3e30e27fc9e65a5fda331a88efaea984d12fc1d`, local and hosted maintained runs
+both pass **3,088 tests**, zero failures/errors and one existing skip; selected
+IDs and the hosted artifact digest match. Fifteen triggered current workflows
+and the separate pinned archival job pass. A generator-trigger preflight also
+records ten older red workflows not triggered by that commit, including the
+immutable 4,001-document archive gate. Their obligations remain visible and
+must be reconciled before claiming a globally green generator prerequisite.

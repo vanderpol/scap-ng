@@ -1,9 +1,12 @@
 # Current-source acceptance and historical preservation — #251
 
 BASE_SHA: `2e497980566ba8f3f35f73d8dc0f06c3a97b437b`. SCHEMA_VERSION: 0.4.0.
-Status: focused source/schema/compiler checks pass; complete maintained and hosted
-CI results are recorded at the final checkpoint. No generator decoupling is
-claimed before that prerequisite is green.
+RESULT_SHA: `a3e30e27fc9e65a5fda331a88efaea984d12fc1d`.
+The repaired six source workflows pass. Local and exact-head hosted maintained
+results: **3,088 tests, zero failures/errors, one existing skip**, with identical
+selected IDs and the hosted artifact SHA-256 independently verified. All **15
+triggered current workflows** and the separate archival reproduction passed.
+The [machine packet](v04-current-source-acceptance.json) records every run.
 
 **Bluetooth:** the October 21 archive remains unchanged at ZIP SHA-256
 `7a053e0aeaa866a3a019d76b6d35e441a4cdfc4c22fd0405c8b4dd29be645170` and
@@ -55,10 +58,19 @@ the original WMI57 record and still rejects a forged index. Deprecated scalar
 never translated into WMI57.
 
 Focused evidence: **seven new tests** and **31 related schema/converter/contract
-tests pass**. Historical Bluetooth CLI reproduction passes separately. Full-suite
-and exact-head CI outcomes are pending publication, not assumed green.
+tests pass**. Historical Bluetooth CLI and hosted reproduction pass separately.
 All approved normative schemas remain unchanged. No original input, release
 asset, source normalization or production converter behavior is changed.
+
+**Generator-trigger preflight:** ten other active source workflows have older red
+runs (nine additional source checks plus an immutable 4,001-YAML archive gate).
+These were not triggered by RESULT_SHA; they are not relabeled green or newly
+introduced failures. Their recorded run IDs/hashes remain in the machine packet.
+Reconcile these obligations before widening the generator change. Its full
+100-capability schema fingerprints have been captured, but generator decoupling
+has not started. No globally all-green prerequisite is claimed from only the
+triggered subset. The committed original XML fixtures retain their original
+whitespace as well as their exact SHA-256 values.
 
 Reproduce with the commands in the [fixture guide](../../tests/fixtures/v04-current-source-proofs/README.md).
 [`v04_source_proof_contract.py`](../../tools/v04_source_proof_contract.py) documents
