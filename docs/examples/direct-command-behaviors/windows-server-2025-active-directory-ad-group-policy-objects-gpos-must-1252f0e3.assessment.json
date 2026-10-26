@@ -1,0 +1,42 @@
+{
+  "assessment": {
+    "id": "windows-server-2025-active-directory-ad-group-policy-objects-gpos-must-1252f0e3-assessment",
+    "version": 1,
+    "assessment_title": "Windows Server 2025 Active Directory (AD) Group Policy Objects (GPOs) must have proper access control permissions.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "tests": {
+      "windows-server-active-directory-group-policy-objects-must-have-proper-4e26c316-test": {
+        "test_title": "Windows Server Active Directory Group Policy objects must have proper access control permissions.",
+        "capability": "independent.shellcommand",
+        "object": {
+          "shell": "powershell",
+          "command": "Import-Module ActiveDirectory; $a='^SYSTEM$|^Domain Admins$|^Enterprise Admins$|^Administrators$|^Enterprise Domain Controllers$|^CREATOR OWNER$'; $s='^Authenticated Users$|^Domain Computers$'; $results=foreach($gpo in (Get-ADObject -Filter \"objectClass -eq 'groupPolicyContainer'\" -SearchBase (Get-ADDomain).SystemsContainer -Properties displayName)){$acl = (Get-Acl -Path \"AD:\\$($gpo.DistinguishedName)\").Access; foreach($rule in $acl){$t = $rule.IdentityReference.Value.Split('\\')[-1]; if(-not $t -or $t -match $a -or $t -match $s){continue}else{\"GPO=$($gpo.displayName) | Status=FAIL | Reason=Unauthorized trustee $t holds explicit ACL entry on this GPO.\"}}}; if($results){$results}else{\"GPO=All GPOs | Status=PASS | Reason=Delegation secure.\"}",
+          "pattern": ".+",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": true
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "matches_regex": "Status=FAIL",
+              "values_found": "one_or_more",
+              "values_matching": "none"
+            }
+          }
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "test": "windows-server-active-directory-group-policy-objects-must-have-proper-4e26c316-test"
+    }
+  }
+}
