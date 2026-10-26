@@ -90,12 +90,16 @@ def capability_examples(documents, capability):
         and any(t['capability'] == capability for t in d['assessment']['tests'].values())]
     if not assessments:
         raise ValueError('no source-proved Assessments for capability: ' + capability)
-    selected = {'ordinary-acquisition': next(a for a in assessments if not a.get('shared_objects')
-        and not any(n.get('filters') for n in walk(a)))}
+    selected = {}
+    ordinary = [a for a in assessments if not a.get('shared_objects')
+                and not any(n.get('filters') for n in walk(a))]
+    if ordinary:
+        selected['ordinary-acquisition'] = ordinary[0]
     for label, predicate in (
             ('source-filter-variable', lambda a: any(n.get('filters') for n in walk(a))),
             ('shared-acquisition', lambda a: bool(a.get('shared_objects')))):
-        candidates = [a for a in assessments if predicate(a)]
+        candidates = [a for a in assessments if predicate(a)
+                      and a['id'] not in {chosen['id'] for chosen in selected.values()}]
         if candidates:
             selected[label] = candidates[0]
     return selected

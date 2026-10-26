@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-220 converted + 71 blocked, all 220 source-proved. The earlier 84/207 and 81/3
+228 converted + 63 blocked, all 228 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -505,3 +505,33 @@ original Rule coverage. The compiler preserves patterns and parameters; scanner
 execution or regex-engine conformance is not claimed. Follow the public pipeline
 above to regenerate the complete supported subset; authoring remains inline by
 default and complex patterns remain readable multiline Objects.
+
+
+## Windows file effective rights
+
+`windows.fileeffectiverights53` uses the existing selector, State, Variable, Set
+and Filter visitors. Leaf file acquisitions materialize original filesystem scope
+`all`, including full paths; Set wrappers leave scope on each operand. The bounded
+source contract supports full-path/SID and directory/name/SID acquisition. Names
+and path comparisons retain their source operations. Nilled selectors, traversal
+and explicit group/view behaviors remain unsupported rather than discarded.
+
+Original omitted group-selection behavior includes the selected group SID and
+does not expand its members (`include_group=true`, `resolve_group=false`). This
+matches the approved native direct-SID acquisition contract; no implicit group
+membership traversal is invented. The independent reader derives source State
+fields/types and group defaults from original XSD without importing producer
+mappings. Boolean State fields require explicit original `datatype="boolean"`;
+omission is rejected, never inferred from spelling or silently defaulted.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_file_rights.py -v
+```
+
+Five tests cover all eight actual closures, both path forms, positive/negative
+permission values, schema and YAML/JSON checks, default-exclude SID Filters,
+Variable matching, original Item cardinalities, invalid source types and group
+expansion, and a controlled two-path relative complement with ordered Filters on
+each operand. Swapping complement operands fails independent proof. Controlled
+derivatives are not extra original coverage. These are graph/operand/contract
+proofs, not Windows access-check execution or scanner parity.

@@ -19,7 +19,7 @@ from v04_direct_scap_source import (
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
                 'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy',
-                'windows.service', 'independent.textfilecontent54')
+                'windows.service', 'independent.textfilecontent54', 'windows.fileeffectiverights53')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -158,6 +158,13 @@ class AssessmentConverter:
                    field in mapping['native']['state_field_map'], 'unsupported State field/namespace')
             ensure(field not in seen, 'repeated State field outside bounded proof')
             seen.add(field)
+            if mapping['capability'] == 'windows.fileeffectiverights53':
+                types = tuple(mapping['native']['field_datatypes'][mapping['native']['state_field_map'][field]])
+                datatype = {('string',): 'string', ('boolean',): 'boolean'}.get(types)
+                # Original EntityStateBoolType requires explicit datatype;
+                # the String type permits the string default. Never infer bool.
+                ensure(datatype and child.get('datatype', 'string') == datatype,
+                       'file-rights State field requires original datatype ' + str(datatype))
             conditions.append({'fields': {mapping['native']['state_field_map'][field]:
                                           self.predicate(policy_entity(child, mapping), mapping)}})
         return logical_condition(element.get('operator', 'AND'), conditions)
@@ -205,6 +212,10 @@ class AssessmentConverter:
             if mapping['capability'] == 'independent.textfilecontent54':
                 from v04_direct_file_behaviors import file_behaviors
                 acquisition.update(file_behaviors(behaviors))
+            if mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal'):
+                # FileBehaviors defaults recurse_file_system to all, including
+                # exact full_path acquisition. Sets inherit it on each leaf.
+                acquisition.setdefault('filesystem', 'all')
             if filters:
                 acquisition['filters'] = filters
         # Source identity, not payload equality, determines shared acquisitions.

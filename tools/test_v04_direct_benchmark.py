@@ -43,8 +43,8 @@ class DirectBenchmarkAcceptance(unittest.TestCase):
     def test_complete_inventory_and_denominators_match_independent_original_reader(self):
         result = verify_inventory(self.source.root, self.coverage)
         self.assertEqual((result['original_rules'], result['original_profiles'], result['checks']), (291, 11, 843))
-        self.assertEqual(self.coverage['summary']['statuses'], {'blocked': 71, 'converted': 220})
-        self.assertEqual(len(self.trace['omitted_rules']), 71)
+        self.assertEqual(self.coverage['summary']['statuses'], {'blocked': 63, 'converted': 228})
+        self.assertEqual(len(self.trace['omitted_rules']), 63)
         self.assertEqual(self.source.parse_count, 1)
 
     def test_all_emitted_references_schemas_capabilities_and_shared_titles(self):
@@ -67,16 +67,16 @@ class DirectBenchmarkAcceptance(unittest.TestCase):
                     self.assertEqual(list(document_errors(validators[kind + '.schema.json'], document)), [])
                     for obj in document.get('assessment', {}).get('shared_objects', {}).values():
                         self.assertTrue(obj['object_title'])
-        self.assertEqual(len(self.documents), 442)
+        self.assertEqual(len(self.documents), 458)
         self.assertTrue(self.documents['authoring/direct-slice/benchmark.json']['benchmark']['metadata']['prototype_subset'])
 
     def test_every_claimed_proof_and_every_compiled_operand_including_original_pair(self):
         proofs = verify_original(self.source.root, self.documents, self.trace, require_proof=False)
-        self.assertEqual(sum(p['outcome'] == 'PROVED' for p in proofs), 220)
+        self.assertEqual(sum(p['outcome'] == 'PROVED' for p in proofs), 228)
         self.assertEqual(sum(p['outcome'] == 'UNVERIFIABLE/UNSUPPORTED' for p in proofs), 0)
-        self.assertEqual(len(verify_compiled(self.documents, self.bundle)), 220)
+        self.assertEqual(len(verify_compiled(self.documents, self.bundle)), 228)
         accepted = accepted_coverage(self.coverage, self.trace, proofs, verify_compiled(self.documents, self.bundle))
-        self.assertEqual(accepted['summary']['proof_levels'], {'none': 71, 'source_proved': 220})
+        self.assertEqual(accepted['summary']['proof_levels'], {'none': 63, 'source_proved': 228})
         wrong = deepcopy(proofs)
         wrong[0]['outcome'] = 'MISMATCH'
         with self.assertRaises(AssertionError):
@@ -185,7 +185,7 @@ class DirectBenchmarkAcceptance(unittest.TestCase):
                     for path, document in self.documents.items():
                         self.assertEqual(json.loads((output / path).read_text()), document)
                     gates, bundle = public_gates(output, directory / 'public-gates')
-                    self.assertEqual((gates['json_valid'], gates['yaml_valid']), (442, 442))
+                    self.assertEqual((gates['json_valid'], gates['yaml_valid']), (458, 458))
                     self.assertEqual(bundle.read_bytes(), self.bundle)
 
 

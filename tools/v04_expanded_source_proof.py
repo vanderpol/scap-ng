@@ -17,7 +17,8 @@ from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
          OD + '#independent}textfilecontent54': 'independent.textfilecontent54',
-         OD + '#windows}userright': 'windows.userright', OD + '#windows}service': 'windows.service'}
+         OD + '#windows}userright': 'windows.userright', OD + '#windows}service': 'windows.service',
+         OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights53'}
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
 FILE_FIELDS = {**NAMES, 'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
                'gexec': 'group_execute', 'oread': 'other_read', 'owrite': 'other_write',
@@ -154,6 +155,25 @@ def original_service_contract():
     return fields
 
 
+@lru_cache(maxsize=1)
+def original_file_rights_contract():
+    """Original typed rights and the non-expanding SID acquisition defaults."""
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
+    state = schema.find(xs + 'element[@name="fileeffectiverights53_state"]')
+    fields = {}
+    for field in state.findall('.//' + xs + 'sequence/' + xs + 'element'):
+        if any(local(n) == 'deprecated_info' for n in field.iter()):
+            continue
+        kind = field.get('type')
+        need(kind in ('oval-def:EntityStateStringType', 'oval-def:EntityStateBoolType'), 'unknown original rights type')
+        fields[field.get('name')] = 'string' if kind.endswith('StringType') else 'boolean'
+    behaviors = schema.find(xs + 'complexType[@name="FileEffectiveRights53Behaviors"]')
+    defaults = {n.get('name'): n.get('default') for n in behaviors.findall('.//' + xs + 'attribute')}
+    need(defaults == {'include_group': 'true', 'resolve_group': 'false'}, 'original direct-SID defaults changed')
+    return fields, defaults
+
+
 class ExpandedSource(Source):
     def __init__(self, oval):
         super().__init__(oval)
@@ -217,6 +237,13 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'windows.fileeffectiverights53':
+            contract, _ = original_file_rights_contract()
+            for entity in self.get(ident, 'states'):
+                name = local(entity)
+                need(entity.tag == '{' + OD + '#windows}' + name and name in contract,
+                     'unknown original file-rights State field')
+                need(entity.get('datatype', 'string') == contract[name], 'original rights field datatype')
         if cap == 'independent.textfilecontent54':
             allowed = {'filepath', 'path', 'filename', 'pattern', 'instance', 'text', 'subexpression'}
             need(all(c.tag == '{' + OD + '#independent}' + local(c) and local(c) in allowed
@@ -271,7 +298,8 @@ class ExpandedSource(Source):
         value = super().state(ident, cap)
         def rename(n):
             if 'field' in n:
-                names = FILE_FIELDS if cap == 'unix.file' else NAMES if cap == 'independent.textfilecontent54' else {}
+                names = FILE_FIELDS if cap == 'unix.file' else NAMES if cap in (
+                    'independent.textfilecontent54', 'windows.fileeffectiverights53') else {}
                 return {**n, 'field': names.get(n['field'], n['field'])}
             op, children = next(iter(n.items()))
             return {op: [rename(c) for c in children]}
@@ -347,6 +375,31 @@ class ExpandedSource(Source):
                              for v in constants), 'unknown/dynamic original user-right enum')
                 if filters:
                     value['filters'] = self.filters(filters, cap)
+                return value
+            finally:
+                self.active.remove(ident)
+        if cap == 'windows.fileeffectiverights53':
+            need(ident not in self.active, 'cyclic Object')
+            keys(n, META, 'file-rights Object')
+            original_file_rights_contract()
+            self.active.add(ident)
+            try:
+                fields = {}
+                fs = [c for c in n if c.tag == '{' + OD + '}filter']
+                for child in n:
+                    if child in fs:
+                        continue
+                    name = local(child)
+                    target = NAMES.get(name, name)
+                    need(child.tag == '{' + OD + '#windows}' + name and name in ('filepath', 'path', 'filename', 'trustee_sid')
+                         and target not in fields, 'unsupported original rights acquisition field')
+                    need(child.get('datatype', 'string') == 'string', 'rights selector datatype')
+                    fields[target] = self.entity(child, selector=True)
+                need(set(fields) in ({'full_path', 'trustee_sid'}, {'directory', 'name', 'trustee_sid'}),
+                     'rights path/SID acquisition required')
+                value = {'capability': cap, 'selectors': {**fields, 'filesystem': 'all'}}
+                if fs:
+                    value['filters'] = self.filters(fs, cap)
                 return value
             finally:
                 self.active.remove(ident)
@@ -541,6 +594,18 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
+        if cap == 'windows.fileeffectiverights53' and 'set' not in n:
+            allowed = {'full_path', 'directory', 'name', 'trustee_sid'}
+            keys(n, allowed | {'capability', 'object_title', 'filesystem', 'filters'}, 'native rights Object')
+            selectors = set(n) & allowed
+            need(selectors in ({'full_path', 'trustee_sid'}, {'directory', 'name', 'trustee_sid'})
+                 and 'filesystem' in n, 'native rights acquisition fields')
+            value = {'capability': cap, 'selectors': {
+                k: self.predicate(n[k], selector=True) for k in ('full_path', 'directory', 'name', 'trustee_sid') if k in n}}
+            value['selectors']['filesystem'] = n['filesystem']
+            if n.get('filters'):
+                value['filters'] = self.filters(n['filters'])
+            return value
         if cap in ('windows.userright', 'windows.service') and 'set' not in n:
             selector = 'userright' if cap == 'windows.userright' else 'service_name'
             keys(n, {'capability', 'object_title', selector, 'filters'}, 'native Windows scalar-selector Object')
