@@ -426,9 +426,9 @@ overlap by capability and are not added to each other as independent Rules.
 The two versioned mappings authorize `test_source.kind: none`; original OVAL
 Objects likewise describe the system as a whole and have no acquisition fields.
 `v04_direct_system_policy.policy_entity` checks the approved typed field contract
-and returns a copy with the original `EntityStateIntType`/`EntityStateBoolType`
-default datatype made explicit. It never edits original source nodes or guesses
-types from literal spelling. The independent proof reader separately derives
+and requires the original explicit `datatype` attributes: `EntityStateIntType`
+and `EntityStateBoolType` declare `use="required"` with fixed values, not omission
+defaults. It never edits original source nodes or guesses types from spelling. The independent proof reader separately derives
 field types and literal restrictions from original OVAL XSD, not this helper or
 the native mapping. Omitted `var_check` remains `all`/`value_match: every`.
 
@@ -445,8 +445,8 @@ PYTHONPATH=tools python tools/test_v04_direct_system_policy.py -v
 ```
 
 All seven original password-policy and three lockout-policy closures prove and
-compile. Controlled source derivatives additionally exercise typed defaults and
-constant-Variable quantifiers; they are regression evidence, not extra coverage.
+compile. Controlled source derivatives additionally exercise
+constant-Variable quantifiers and rejected datatype omissions; they are regression evidence, not extra coverage.
 To extend these contracts, inspect the original typed field and any Schematron
 restriction, update the small source adapter, and add both a source-derived
 positive and an independently rejected operand/quantifier mutation. Do not

@@ -56,28 +56,22 @@ class DirectSystemPolicyTests(unittest.TestCase):
                 self.assertNotIn('object', test)
                 self.assertIsInstance(test['require'], dict)
 
-    def test_original_typed_defaults_preserve_integer_boolean_and_exact_operands(self):
-        source = deepcopy(self.source)
-        for binding in self.trace['rules']:
-            for identifier, node in binding['dependencies'].items():
-                if node['kind'] == 'state':
-                    state = source.node(binding['component'], identifier, 'state')
-                    for entity in state:
-                        entity.attrib.pop('datatype', None)
-        docs, trace = convert(source, self.rules)
-        # Defaults come from EntityStateIntType/BoolType, not the generic string
-        # EntityAttributeGroup default or the lexical appearance of a value.
-        self.assertEqual(docs, self.docs)
-        verify_original(source.root, docs, trace)
-        verify_compiled(docs, build_bundle(docs)[0])
-        types = {n['datatype'] for d in docs.values() for n in walk(d) if 'datatype' in n}
+    def test_original_fixed_types_are_required_not_omission_defaults(self):
+        for field in ('min_passwd_len', 'password_complexity'):
+            source = deepcopy(self.source)
+            binding, state, entity = self.entity(source, field=field)
+            entity.attrib.pop('datatype')
+            with self.subTest(field=field), self.assertRaises(UnsupportedSource):
+                convert(source, [binding['source_rule']])
+            with self.assertRaises(ValueError):
+                ExpandedSource(source.components[binding['component']]).state(state.get('id'), 'windows.passwordpolicy')
+        types = {n['datatype'] for d in self.docs.values() for n in walk(d) if 'datatype' in n}
         self.assertTrue({'integer', 'boolean'} <= types)
 
     def test_constant_variable_original_var_check_default_and_explicit_alternative(self):
         for var_check, matching in ((None, 'every'), ('at least one', 'one_or_more')):
             source = deepcopy(self.source)
             binding, state, entity = self.entity(source)
-            entity.attrib.pop('datatype', None)
             entity.text = None
             identifier = 'oval:direct.policy.test:var:1'
             entity.set('var_ref', identifier)

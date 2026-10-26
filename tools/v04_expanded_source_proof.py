@@ -111,7 +111,7 @@ def original_userright_contract():
 
 @lru_cache(maxsize=2)
 def original_policy_contract(cap):
-    """Read typed fields and literal restrictions from original OVAL XSD."""
+    """Read required fixed types and literal restrictions from original OVAL."""
     need(cap in SYSTEM_POLICIES, 'unknown system policy')
     xs = '{http://www.w3.org/2001/XMLSchema}'
     root = ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3'
@@ -122,7 +122,9 @@ def original_policy_contract(cap):
     for field in state.findall('.//' + xs + 'sequence/' + xs + 'element'):
         typename = field.get('type').split(':')[-1]
         typed = core.find(xs + 'complexType[@name="' + typename + '"]')
-        datatype = typed.find('.//' + xs + 'attribute[@name="datatype"]').get('fixed')
+        attribute = typed.find('.//' + xs + 'attribute[@name="datatype"]')
+        need(attribute.get('use') == 'required', 'original policy type requirement changed')
+        datatype = attribute.get('fixed')
         need(datatype in ('int', 'boolean'), 'unknown original policy datatype')
         assertions = [n.get('test') for n in field.iter() if local(n) == 'assert']
         need(all(t == '(@var_ref and string-length(.)=0) or (number(.) >= 0)' for t in assertions),
@@ -196,22 +198,16 @@ class ExpandedSource(Source):
     def state(self, ident, cap):
         if cap in SYSTEM_POLICIES:
             original = self.get(ident, 'states')
-            replacement = deepcopy(original)
             contract = original_policy_contract(cap)
-            for entity in replacement:
+            for entity in original:
                 name = local(entity)
                 need(entity.tag == '{' + OD + '#windows}' + name and name in contract,
                      'unknown original policy State field')
                 datatype, nonnegative = contract[name]
-                need(entity.get('datatype', datatype) == datatype, 'original policy field datatype')
-                entity.set('datatype', datatype)
+                need(entity.get('datatype') == datatype, 'original policy requires explicit field datatype')
                 if nonnegative and not entity.get('var_ref'):
                     need(int(entity.text or '') >= 0, 'original policy literal range')
-            self.nodes[ident] = replacement
-            try:
-                return predicate_order(super().state(ident, cap))
-            finally:
-                self.nodes[ident] = original
+            return predicate_order(super().state(ident, cap))
         if cap == 'windows.userright':
             fields, values = original_userright_contract()
             for entity in self.get(ident, 'states'):
