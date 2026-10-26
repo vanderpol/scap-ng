@@ -93,11 +93,23 @@ remain exact. Authoring: 167 inline Test Objects, 36 references to 12 genuinely
 shared Objects, 85 no-Object Tests, 120 compact Registry Objects; deprecated keys
 zero. The final trace qualifies unsupported record constructs accurately.
 
-The next bounded objective is independent text-file acquisition/behavior support.
-Seven original OpenSSH Rule closures use full paths, integer instances, regex
-patterns and default/ignore-case behavior flags. Collection flags, capture types,
-item creation and filesystem scope must remain exact; unproved traversal/view
-behavior remains blocked.
+The [OpenSSH text-file checkpoint](v04-direct-textfile.md) is complete:
+`ca1ee36f3` → `4adfdbad9`; [actual YAML/JSON](../examples/direct-textfile/README.md)
+is pinned in `fd66890da`. All seven original candidate closures prove and compile;
+coverage advances to **220 proved / zero compiled-unproved / 71 blocked**. All
+213 previous program hashes remain unchanged. Public gates validate 442 JSON/442
+YAML documents and independently verify 220 programs. **3,052** maintained tests,
+zero failures/errors, one existing skip; 57 related tests pass; all five exact
+implementation-head workflows PASS. Regex flags/defaults, item creation,
+filesystem scope, capture types and original patterns remain exact. Unsupported
+Windows-view/traversal attributes fail closed. Authoring: 174 inline Test Objects,
+36 references to 12 genuinely shared Objects, 85 no-Object Tests and 120 compact
+Registry Objects; deprecated grammar zero.
+
+The next bounded objective is Windows file-effective-rights source proof. Eight
+original candidate closures need exact direct-SID selection/defaults, permission
+Booleans, full-path and directory/name acquisitions, Variables, Sets and ordered
+Filters. Explicit group-expansion behavior must not be silently discarded.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
