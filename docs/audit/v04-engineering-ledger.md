@@ -179,3 +179,15 @@ cases requires corrected pinned input or explicit owner review. Historical evide
 and mandatory gates remain intact. Issue commenting was previously Forbidden;
 committed reports remain the authorized GitHub handoff. No scheduled/automatic
 resumption, scanner acceptance, signing/trust or release readiness is claimed.
+
+The [100-capability generic architecture audit](v04-generic-capability-audit.md)
+classifies all mappings without enabling additional conversion: **60** flat-selector
+and **17** implicit-system shapes; **11** traversal, **7** collector-behavior,
+**3** remaining record/input and **2** special Test-source shapes. The **77/23**
+split is structural, not complete-capability certification. Current direct catalog
+remains 15; source coverage remains 249/0/42. Shared XSD/Schematron validation,
+datatypes/operators, records, traversal and consistent canonical metadata routing
+should replace per-capability procedural expansion. Seven historical traversal
+crosswalks say any where the approved common schema requires all; nineteen Object
+crosswalks retain old select/collect paths. No schema, mapping or converter was
+changed by this read-only audit; the CSV/machine packet preserve all 100 rows.
