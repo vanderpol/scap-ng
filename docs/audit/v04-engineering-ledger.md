@@ -55,10 +55,24 @@ Authoring: 147 inline Test Objects, nine shared references to two named Objects,
 production converter/compiler or release gate changed. One issue-comment attempt
 returned `Post "https://api.github.com/graphql": Forbidden`; no retry was made.
 
-The next bounded objective is WMI record conversion/proof. There are 26 original
-candidate closures, including the five remaining user-rights cases. Named field
-boundaries, implicit string versus explicit integer datatypes, record matching,
-missing-member errors and collection evidence must remain intact.
+The [WMI record checkpoint](v04-direct-wmi-records.md) is complete:
+`f9e3b0978` → `4087e4309`, with [actual WMI examples](../examples/direct-wmi/README.md)
+published in `e5bd741f9`. All **18** supported WMI closures independently prove
+and compile, completing all **39** user-rights candidates. Eight WMI closures
+remain blocked by unsupported capabilities or unapproved `all_exist`. Current
+coverage is **201 proved / zero compiled-unproved / 90 blocked** of 291; all
+183 prior program hashes are unchanged. **3,037 tests**, zero failures/errors,
+one unchanged skip; all five exact implementation-head hosted workflows PASS.
+Public paired gates validate 404 JSON/404 YAML documents and independently verify
+201 programs. Authoring remains local by default: 165 inline Test Objects, 36
+references to 12 genuinely shared Objects, 71 no-Object Tests and 120 compact
+Registry Object sites. Named record boundaries, original datatype distinctions
+and missing-member errors remain intact. No schema or release-gate changes.
+
+The next bounded objective is password/lockout-policy source proof. The original
+source has seven password-policy and three lockout-policy candidate closures;
+typed defaults, native no-Object contracts, original literal restrictions and
+Variable quantifiers must remain intact.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
