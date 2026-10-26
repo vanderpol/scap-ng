@@ -1,0 +1,29 @@
+assessment:
+  id: windows-server-2025-openssh-must-display-the-standard-mandatory-dow-no-455c400c-assessment
+  version: 1
+  assessment_title: Windows Server 2025 OpenSSH must display the Standard Mandatory DoW Notice and Consent Banner before granting remote access to the system via an OpenSSH logon.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    c-programdata-ssh-sshd-config-banner-filepath-dfc229d6-test:
+      test_title: 'C:\ProgramData\ssh\sshd_config:banner filepath'
+      capability: independent.textfilecontent54
+      object:
+        full_path:
+          case_insensitive_equals: 'C:\ProgramData\ssh\sshd_config'
+        pattern: {matches_regex: '(?i)^\s*(?!#)\s*banner\s+(?!(?i:none)(?:\s*(?:#.*)?)?$)([A-Za-z]:\\[^\s#]+)\s*(?:#.*)?$'}
+        instance: {greater_than_or_equal: 1, datatype: integer}
+        ignore_case: false
+        multiline: true
+        singleline: false
+        item_creation: all_object_elements_fullfilled
+        filesystem: all
+      require:
+        items_found: one_or_more
+      reported_elements: all
+  evaluate:
+    test: c-programdata-ssh-sshd-config-banner-filepath-dfc229d6-test
