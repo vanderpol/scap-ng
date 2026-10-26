@@ -27,6 +27,7 @@ APPROVED_SHA = '463b539c469c3302aa52c23fdca35814f40fd5fd7de31346964e1b4a97b5d8a9
 APPROVED_DEF = 'oval:mil.disa.stig.defs:def:230413'
 DECISION = 'https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6388735943'
 AUDIT = 'windows.auditeventpolicysubcategories'
+SYSTEM_POLICIES = frozenset({'windows.passwordpolicy', 'windows.lockoutpolicy'})
 
 
 @lru_cache(maxsize=1)
@@ -108,6 +109,28 @@ def original_userright_contract():
     return fields, values
 
 
+@lru_cache(maxsize=2)
+def original_policy_contract(cap):
+    """Read typed fields and literal restrictions from original OVAL XSD."""
+    need(cap in SYSTEM_POLICIES, 'unknown system policy')
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    root = ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3'
+    schema = ET.parse(root / 'windows-definitions-schema.xsd').getroot()
+    core = ET.parse(root / 'oval-definitions-schema.xsd').getroot()
+    state = schema.find(xs + 'element[@name="' + cap.split('.')[-1] + '_state"]')
+    fields = {}
+    for field in state.findall('.//' + xs + 'sequence/' + xs + 'element'):
+        typename = field.get('type').split(':')[-1]
+        typed = core.find(xs + 'complexType[@name="' + typename + '"]')
+        datatype = typed.find('.//' + xs + 'attribute[@name="datatype"]').get('fixed')
+        need(datatype in ('int', 'boolean'), 'unknown original policy datatype')
+        assertions = [n.get('test') for n in field.iter() if local(n) == 'assert']
+        need(all(t == '(@var_ref and string-length(.)=0) or (number(.) >= 0)' for t in assertions),
+             'unhandled original policy range assertion')
+        fields[field.get('name')] = (datatype, bool(assertions))
+    return fields
+
+
 class ExpandedSource(Source):
     def __init__(self, oval):
         super().__init__(oval)
@@ -138,6 +161,9 @@ class ExpandedSource(Source):
         self.item_schema_sha256 = sha256(schema.read_bytes()).hexdigest()
 
     def capability(self, n, suffix):
+        for cap in SYSTEM_POLICIES:
+            if n.tag == '{' + OD + '#windows}' + cap.split('.')[-1] + suffix:
+                return cap
         if n.tag == '{' + OD + '#windows}auditeventpolicysubcategories' + suffix:
             return AUDIT
         return EXTRA.get(n.tag[1:].removesuffix(suffix)) or super().capability(n, suffix)
@@ -168,6 +194,24 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap in SYSTEM_POLICIES:
+            original = self.get(ident, 'states')
+            replacement = deepcopy(original)
+            contract = original_policy_contract(cap)
+            for entity in replacement:
+                name = local(entity)
+                need(entity.tag == '{' + OD + '#windows}' + name and name in contract,
+                     'unknown original policy State field')
+                datatype, nonnegative = contract[name]
+                need(entity.get('datatype', datatype) == datatype, 'original policy field datatype')
+                entity.set('datatype', datatype)
+                if nonnegative and not entity.get('var_ref'):
+                    need(int(entity.text or '') >= 0, 'original policy literal range')
+            self.nodes[ident] = replacement
+            try:
+                return predicate_order(super().state(ident, cap))
+            finally:
+                self.nodes[ident] = original
         if cap == 'windows.userright':
             fields, values = original_userright_contract()
             for entity in self.get(ident, 'states'):
@@ -234,9 +278,9 @@ class ExpandedSource(Source):
     def object(self, ident):
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
-        if cap == AUDIT:
-            keys(n, META, 'audit singleton Object')
-            need(not len(n), 'audit singleton has acquisition children')
+        if cap in SYSTEM_POLICIES | {AUDIT}:
+            keys(n, META, 'system singleton Object')
+            need(not len(n), 'system singleton has acquisition children')
             return {'capability': cap, 'selectors': {}}
         sets = n.findall('{' + OD + '}set')
         if sets:
@@ -375,13 +419,14 @@ class ExpandedSource(Source):
 class ExpandedNative(Native):
     def test(self, ident):
         n = self.a['tests'][ident]
-        if n.get('capability') != AUDIT:
+        cap = n.get('capability')
+        if cap not in SYSTEM_POLICIES | {AUDIT}:
             return super().test(ident)
         n = self.reference('tests', ident)
-        keys(n, {'capability', 'test_title', 'reported_elements', 'require'}, 'audit native Test')
-        need(n.get('reported_elements') == 'all', 'audit reporting/evidence boundary')
+        keys(n, {'capability', 'test_title', 'reported_elements', 'require'}, 'system native Test')
+        need(n.get('reported_elements') == 'all', 'system reporting/evidence boundary')
         requirement = n['require']
-        result = {'capability': AUDIT, 'object': {'capability': AUDIT, 'selectors': {}},
+        result = {'capability': cap, 'object': {'capability': cap, 'selectors': {}},
                   'found': requirement['items_found']}
         if set(requirement) != {'items_found'}:
             result.update(matching=requirement['items_satisfying'], condition=self.condition(requirement))

@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-201 converted + 90 blocked, all 201 source-proved. The earlier 84/207 and 81/3
+211 converted + 80 blocked, all 211 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -264,7 +264,7 @@ external dependency trace. Source selectors, Sets, Filters and Variable
 `object_component` acquisition are rejected for this source kind; no placeholder
 Object or new native acquisition syntax is invented.
 
-Only `windows.auditeventpolicysubcategories` is newly enabled. Its 43 complete
+The first singleton increment enabled `windows.auditeventpolicysubcategories`. Its 43 complete
 original closures are independently verified. The independent reader obtains
 field/value/deprecation boundaries from the original pinned Windows OVAL XSD,
 not the converter's mapping. Literal enum constraints are checked after any
@@ -419,3 +419,35 @@ All 18 supported original WMI closures prove and compile; eight remain blocked
 by other unsupported capabilities or unapproved `all_exist` semantics. The
 five WMI-dependent user-rights closures are included in the 18. These counts
 overlap by capability and are not added to each other as independent Rules.
+
+
+## Password and lockout policies
+
+The two versioned mappings authorize `test_source.kind: none`; original OVAL
+Objects likewise describe the system as a whole and have no acquisition fields.
+`v04_direct_system_policy.policy_entity` checks the approved typed field contract
+and returns a copy with the original `EntityStateIntType`/`EntityStateBoolType`
+default datatype made explicit. It never edits original source nodes or guesses
+types from literal spelling. The independent proof reader separately derives
+field types and literal restrictions from original OVAL XSD, not this helper or
+the native mapping. Omitted `var_check` remains `all`/`value_match: every`.
+
+Literal `max_passwd_age`, `force_logoff` and `lockout_duration` must be nonnegative,
+as required by the original embedded Schematron. Variable-supplied values retain
+their Variable and comparison semantics; conversion does not evaluate them or
+turn unknown/error evidence into complete success. No additional range or unit
+normalization is invented. Unknown fields/types, invented selectors/Sets/Filters,
+Variable acquisitions from a singleton and dummy native Objects fail closed.
+Comparator-bearing or typed field absence remains outside this bounded proof.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_system_policy.py -v
+```
+
+All seven original password-policy and three lockout-policy closures prove and
+compile. Controlled source derivatives additionally exercise typed defaults and
+constant-Variable quantifiers; they are regression evidence, not extra coverage.
+To extend these contracts, inspect the original typed field and any Schematron
+restriction, update the small source adapter, and add both a source-derived
+positive and an independently rejected operand/quantifier mutation. Do not
+broaden `kind: none` to capabilities whose approved contract requires an Object.

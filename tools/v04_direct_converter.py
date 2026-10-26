@@ -18,7 +18,7 @@ from v04_direct_scap_source import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
-                'windows.userright', 'windows.wmi.query')
+                'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -148,6 +148,7 @@ class AssessmentConverter:
         ensure(self.capability(node, kind)['capability'] == mapping['capability'], f'{kind} capability mismatch: {identifier}')
 
     def convert_state(self, element):
+        from v04_direct_system_policy import policy_entity
         mapping = self.capability(element, 'state')
         conditions, seen = [], set()
         for child in element:
@@ -156,7 +157,8 @@ class AssessmentConverter:
                    field in mapping['native']['state_field_map'], 'unsupported State field/namespace')
             ensure(field not in seen, 'repeated State field outside bounded proof')
             seen.add(field)
-            conditions.append({'fields': {mapping['native']['state_field_map'][field]: self.predicate(child, mapping)}})
+            conditions.append({'fields': {mapping['native']['state_field_map'][field]:
+                                          self.predicate(policy_entity(child, mapping), mapping)}})
         return logical_condition(element.get('operator', 'AND'), conditions)
 
     def convert_object(self, element):
