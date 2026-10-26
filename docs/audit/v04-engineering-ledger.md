@@ -69,10 +69,20 @@ references to 12 genuinely shared Objects, 71 no-Object Tests and 120 compact
 Registry Object sites. Named record boundaries, original datatype distinctions
 and missing-member errors remain intact. No schema or release-gate changes.
 
-The next bounded objective is password/lockout-policy source proof. The original
-source has seven password-policy and three lockout-policy candidate closures;
-typed defaults, native no-Object contracts, original literal restrictions and
-Variable quantifiers must remain intact.
+The [password/lockout-policy checkpoint](v04-direct-system-policy.md) is complete:
+`e5bd741f9` → `88eaa0133` → corrected `740bc8039`. All seven password-policy and
+three lockout-policy original closures prove and compile; coverage advances to
+**211 proved / zero compiled-unproved / 80 blocked**. All prior 201 program hashes
+are unchanged. Public gates validate 424 JSON/424 YAML documents and verify 211
+programs. Initial local mandatory tests: **3,043**, zero failures/errors, one
+unchanged skip; corrected targeted tests 6/6; all five exact corrected-head hosted
+checks PASS. Internal review caught and corrected required fixed datatype
+attributes being mistaken for defaults; both readers now reject omissions. The
+actual original source already has explicit valid attributes, so all 424 generated
+documents are unchanged. No source normalization or schema modification.
+
+The next bounded objective is Windows service source proof. There are two actual
+candidate closures with different service-name comparisons and exact enum values.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
