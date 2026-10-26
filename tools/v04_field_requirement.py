@@ -302,7 +302,10 @@ def field_scopes(requirement):
         if 'field_requirement' in node:
             inherited = node['field_requirement']
             declared_at = [*path, 'field_requirement']
-        for name, predicate in node.get('fields', {}).items():
+        # Field maps have no evaluation order. Canonical JSON sorts their keys;
+        # keep this derived index stable when the source IR is decoded again.
+        # Boolean operand arrays and record boundaries retain their own order.
+        for name, predicate in sorted(node.get('fields', {}).items()):
             field_path = [*path, 'fields', name]
             if 'record' in predicate:
                 record = predicate['record']

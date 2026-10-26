@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Reproduce published Windows 11 Bluetooth direct-Filter 0.4.0 evidence.
 
+Historical consumer: run with the pinned schema/tool snapshot in
+v04-bluetooth-archive.yml. Current acceptance uses
+prove_v04_current_bluetooth_source.py and original SCAP instead of this archive.
+
 Reads the immutable published six-STIG source-preview ZIP, checks its manifest
 and exact Assessment digest, validates native generic/capability schemas,
 then exports this Assessment alone to OVAL 5.12.3 and checks the independent

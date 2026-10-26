@@ -221,3 +221,14 @@ versus current-derivative acceptance target needs explicit reconciliation before
 claiming all-green CI. No output, source proof, workflow gate or normative schema
 was changed by this documentation checkpoint. Generator decoupling is deferred
 until the owner's fully-green prerequisite is met.
+
+Owner-authorized follow-up: [current-source acceptance](v04-current-source-acceptance.md)
+preserves the Bluetooth archive under its historical contract and introduces a
+separate original-SCAP-derived current acceptance proof. Five source obligations
+retain their original pins, assertions, reverse proofs and negative controls.
+Seven new and 31 related focused tests pass, including current compilation,
+independent package operands and explicit deprecated-WMI rejection. WMI57 exposed
+a deterministic record-field-index roundtrip defect; sorting that derived map
+index preserves source/Boolean semantics. Full maintained/hosted CI results will
+be reconciled before generator decoupling. Source coverage remains 249/0/42;
+neither the 883 ledger nor a full Benchmark release is promoted by these proofs.

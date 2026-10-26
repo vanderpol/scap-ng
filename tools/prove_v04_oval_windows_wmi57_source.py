@@ -51,7 +51,7 @@ def assessment_id(number):
     return "original-windows-wmi57-" + str(number) + "-assessment"
 
 
-def parse_source(raw):
+def _read_source_view(raw):
     require(sha256(raw).hexdigest() == SHA, "pinned WMI57 original XML SHA")
     root = ET.fromstring(raw)
     require(root.tag == tag(OD, "oval_definitions"), "pinned WMI57 root namespace")
@@ -144,7 +144,7 @@ def parse_source(raw):
     return docs
 
 
-def native_to_oval(docs):
+def _export_source_view(docs):
     require(isinstance(docs, list) and len(docs) == len(SOURCES),
             "native five WMI57 Assessments")
     keyed = {}
@@ -265,6 +265,17 @@ def native_to_oval(docs):
     return ET.ElementTree(root)
 
 
+def parse_source(raw):
+    from v04_source_proof_contract import current_document
+    source = _read_source_view(raw)
+    return [current_document(doc) for doc in source]
+
+
+def native_to_oval(document):
+    from v04_source_proof_contract import independent_export_view
+    return _export_source_view([independent_export_view(doc) for doc in document])
+
+
 def prove(source, schema_root, xsd_root, output):
     source = Path(source)
     raw = source.read_bytes()
@@ -317,7 +328,7 @@ def prove(source, schema_root, xsd_root, output):
     changed = deepcopy(docs)
     next(d for d in changed if d["assessment"]["id"] == assessment_id(70))[
         "assessment"]["tests"]["wmi-query-test"]["require"] = (
-            "at_least_one_exists_and_all_match")
+            {"items_found": "one_or_more"})
     try:
         native_to_oval(changed)
     except ValueError:
@@ -336,6 +347,8 @@ def prove(source, schema_root, xsd_root, output):
         "source_wql_mutation": "REJECTED", "native_wql_mutation": "DETECTED",
         "native_none_exist_mutation": "REJECTED", "scanner_parity": False,
     }
+    from v04_source_proof_contract import compile_proofs
+    proof["current_compilation"] = compile_proofs(docs, out / "compiled")
     (out / "source-and-mapping-proof.json").write_text(
         json.dumps(proof, indent=2, sort_keys=True) + "\n")
     return proof

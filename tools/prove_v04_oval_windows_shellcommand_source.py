@@ -53,7 +53,7 @@ def old_id(kind, number):
     return OLD + kind + ":" + str(number)
 
 
-def source_to_native(raw):
+def _read_source_view(raw):
     require(sha256(raw).hexdigest() == SHA, "pinned original Windows shellcommand SHA")
     root = ET.fromstring(raw)
     require(root.tag == tag(OD, "oval_definitions"), "OVAL Definitions namespace")
@@ -155,7 +155,7 @@ def source_to_native(raw):
     }}
 
 
-def native_to_oval(doc):
+def _export_source_view(doc):
     require(set(doc) == {"assessment"}, "native shellcommand Assessment")
     a = doc["assessment"]
     require(set(a) == {"id", "version", "assessment_title", "mode", "class",
@@ -275,6 +275,16 @@ def native_to_oval(doc):
     return ET.ElementTree(root)
 
 
+def source_to_native(raw):
+    from v04_source_proof_contract import current_document
+    return current_document(_read_source_view(raw))
+
+
+def native_to_oval(document):
+    from v04_source_proof_contract import independent_export_view
+    return _export_source_view(independent_export_view(document))
+
+
 def prove(source, schema_root, xsd_root, output):
     source = Path(source)
     raw = source.read_bytes()
@@ -329,6 +339,8 @@ def prove(source, schema_root, xsd_root, output):
              "materialized_false_collector_defaults": "PASS",
              "source_local_variable_mutation": "REJECTED",
              "native_command_mutation": "DETECTED", "scanner_parity": False}
+    from v04_source_proof_contract import compile_proofs
+    proof["current_compilation"] = compile_proofs([doc], out / "compiled")
     (out / "source-and-mapping-proof.json").write_text(
         json.dumps(proof, indent=2, sort_keys=True) + "\n")
     return proof

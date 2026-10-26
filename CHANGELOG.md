@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Separated immutable Bluetooth archival reproduction from current original-SCAP
+  acceptance; restored current grammar in five source-proof workflows while
+  retaining their independent source assertions. Fixed deterministic indexing of
+  record fields across typed-source serialization
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-25:** Enforced the reviewed flat Object contract in public validation
   and compiler preflight across Tests, shared Objects, Sets and nested Variable
   acquisitions. Historical migration now flattens nested Objects reversibly;

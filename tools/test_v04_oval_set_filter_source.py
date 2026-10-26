@@ -98,8 +98,8 @@ def source_filter_filter_state(node, states, variables):
     var_name = "filter-path-var-" + var.get("id").rsplit(":", 1)[-1]
     native_filter = {action: {"directory": {
         "equals": {"variable": var_name},
-        "value_match": "one",
-        "require": "at_least_one_exists_and_all_match",
+        "value_match": "exactly_one",
+        "values_found": "one_or_more", "values_matching": "every",
     }}}
     return native_filter, (var_name, tuple(values))
 
@@ -171,7 +171,7 @@ def native_item_set(native_set, names, items):
             for filt in operand["filters"]:
                 action, state = next(iter(filt.items()))
                 selector = state["directory"]
-                require(selector["value_match"] == "one",
+                require(selector["value_match"] == "exactly_one",
                         "Source only-one var_check was lost")
                 values = names[selector["equals"]["variable"]]
                 match = {key for key in part if items[key] in values}
@@ -239,7 +239,7 @@ def prove(source, xsd_root, platform="windows"):
                        "filter_variable_count": len(names)})
         malformed = deepcopy(candidate)
         malformed["set"]["filters"] = [{"exclude": {"directory": {
-            "equals": "bad", "require": "at_least_one_exists_and_all_match"}}}]
+            "equals": "bad", "values_found": "one_or_more", "values_matching": "every"}}}]
         require(bool(validate(schema, "object", malformed)),
                 "Native post-operation Set Filter unexpectedly accepted")
     require(set(seen) == {"union", "intersection", "difference"},

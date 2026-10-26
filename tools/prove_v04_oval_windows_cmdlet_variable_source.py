@@ -44,7 +44,7 @@ VARS = {
 VAR_IDS = {name: NEW + "var:" + number for number, name in VARS.items()}
 
 
-def source_to_native(raw):
+def _read_source_view(raw):
     require(sha256(raw).hexdigest() == SHA, "original cmdlet source file SHA")
     root = ET.fromstring(raw)
     require(root.tag == tag(OD, "oval_definitions"), "OVAL Definitions root")
@@ -173,7 +173,7 @@ def source_to_native(raw):
     return docs
 
 
-def native_to_oval(docs):
+def _export_source_view(docs):
     require(isinstance(docs, list) and len(docs) == 3,
             "three native record Variable cmdlet Assessments")
     bynum = {}
@@ -334,6 +334,17 @@ def native_to_oval(docs):
     return ET.ElementTree(root)
 
 
+def source_to_native(raw):
+    from v04_source_proof_contract import current_document
+    source = _read_source_view(raw)
+    return [current_document(doc) for doc in source]
+
+
+def native_to_oval(document):
+    from v04_source_proof_contract import independent_export_view
+    return _export_source_view([independent_export_view(doc) for doc in document])
+
+
 def prove(source, schema_root, xsd_root, output):
     source = Path(source)
     raw = source.read_bytes()
@@ -396,6 +407,8 @@ def prove(source, schema_root, xsd_root, output):
         "native_local_literal_mutation": "DETECTED",
         "record_variable_links_preserved": "PASS", "scanner_parity": False,
     }
+    from v04_source_proof_contract import compile_proofs
+    proof["current_compilation"] = compile_proofs(docs, out / "compiled")
     (out / "source-and-mapping-proof.json").write_text(
         json.dumps(proof, sort_keys=True, indent=2) + "\n")
     return proof
