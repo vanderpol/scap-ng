@@ -81,8 +81,23 @@ attributes being mistaken for defaults; both readers now reject omissions. The
 actual original source already has explicit valid attributes, so all 424 generated
 documents are unchanged. No source normalization or schema modification.
 
-The next bounded objective is Windows service source proof. There are two actual
-candidate closures with different service-name comparisons and exact enum values.
+The [Windows service checkpoint](v04-direct-service.md) is complete:
+`740bc8039` → `fefbcc3a9`. Both actual source closures prove and compile; coverage
+advances to **213 proved / zero compiled-unproved / 78 blocked**. All previous
+211 program hashes are unchanged. Public gates validate 428 JSON/428 YAML
+documents and independently verify 213 programs. **3,047** maintained tests,
+zero failures/errors, one existing skip; 52 related tests and 15 final focused
+tests pass. All five exact implementation-head hosted workflows PASS. Source
+selector case semantics, API enum names and relative-COMPLEMENT/Filter boundaries
+remain exact. Authoring: 167 inline Test Objects, 36 references to 12 genuinely
+shared Objects, 85 no-Object Tests, 120 compact Registry Objects; deprecated keys
+zero. The final trace qualifies unsupported record constructs accurately.
+
+The next bounded objective is independent text-file acquisition/behavior support.
+Seven original OpenSSH Rule closures use full paths, integer instances, regex
+patterns and default/ignore-case behavior flags. Collection flags, capture types,
+item creation and filesystem scope must remain exact; unproved traversal/view
+behavior remains blocked.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
