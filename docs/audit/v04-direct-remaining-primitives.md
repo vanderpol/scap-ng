@@ -10,12 +10,12 @@ approved schema, production converter/compiler and mandatory gates are unchanged
 | Field | Verified result |
 | --- | --- |
 | BASE_SHA | `71a3af528` (current main; compare implementation `c117b06c8`) |
-| RESULT_SHA | Pending verified implementation commit |
+| RESULT_SHA | `c721ed0f6f8ce5fd66bc890f015afd5bb7ff08f2` |
 | SCHEMA_VERSION | 0.4.0; approved schema tree unchanged |
 | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | **249 / 0 / 42** of 291 original Windows Server 2025 Rules |
 | NEW CASES | SV-278027, SV-278028, SV-278197, SV-278198, SV-278240; complete original dependency closures |
 | AUTHORING | 249 Assessments / 357 Tests; **229 inline**, **43 shared references / 17 genuinely shared Objects**, **85 no-Object**, **128 compact Registry** sites; deprecated grammar zero |
-| TESTS / CI | **3,074** mandatory tests; zero failures/errors, one existing skip; 79 related tests PASS. Exact-head hosted CI pending push. |
+| TESTS / CI | **3,074** mandatory tests; zero failures/errors, one existing skip; 79 related tests PASS. All five exact `c721ed0f6` implementation workflows PASS. |
 | REGRESSIONS | 244 retained programs unchanged; one malformed-source admission withdrawn |
 | NEXT_ENGINEERING_OBJECTIVE | Resolve documented source/policy boundaries before admitting the affected Rules; retain fail-closed behavior |
 
@@ -40,13 +40,18 @@ ZIP/XML SHA-256 remain
 `2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0` /
 `52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440`.
 
-**Remaining frontier: 42 unique blocked Rules.** Thirty have competing check
-selection outside the current accepted subset; eight need unapproved original
+**Remaining frontier: 42 unique blocked Rules.** An independent original-XCCDF
+ZIP/XML census shows that thirty have **only OCIL** (default and manual), with no
+OVAL check to convert; eight need unapproved original
 Test-level `all_exist`; one uses unmapped legacy `user_test`; SV-278143 uses
 explicitly deprecated scalar WMI plus unsupported functions; SV-278008 has an
 original-source defect. SV-278031 has an omitted nil-record datatype. Categories
 are disjoint here; capability/message counts
-can overlap and must not be added as Rule counts.
+can overlap and must not be added as Rule counts. Thus **249/261 OVAL-bearing Rules
+(95.40%)** prove, while **249/291 total Rules (85.57%)** prove. The twelve remaining
+OVAL-bearing Rules retain their actual blockers; manual-only Rules are not invented
+as automated Assessments. The packet records all thirty original check/reference
+sets independently of the producer inventory.
 
 **Correction to the preceding checkpoint.** SV-278031's original cmdlet parameters
 are `xsi:nil="true"` without `datatype="record"`. Original Windows Schematron
@@ -69,6 +74,28 @@ regression keeps this Rule blocked. Choosing different acquisition semantics,
 dropping recursion, or normalizing this source needs explicit owner approval.
 No such repair is implemented. Legacy name-based user acquisition is not silently
 replaced by SID-based acquisition, nor scalar WMI by record WMI.
+
+The [sample navigation page](../examples/README.md) links actual generated YAML/JSON,
+published in `a5743a96a`, including the new [NTUSER](../examples/direct-ntuser/README.md) and
+[IIS configuration](../examples/direct-iis/README.md) cases. The publisher's capability
+flag selects consuming Tests, so the appcmd acquisition used only through a Variable
+is covered by source/compiled evidence rather than that sample-selection flag.
+
+Hosted [rebaseline smoke](https://github.com/vanderpol/scap-ng/actions/runs/40350495821),
+[current contracts](https://github.com/vanderpol/scap-ng/actions/runs/40350495813),
+[canonical checks](https://github.com/vanderpol/scap-ng/actions/runs/40350495939),
+[documentation](https://github.com/vanderpol/scap-ng/actions/runs/40350496126) and
+[issue references](https://github.com/vanderpol/scap-ng/actions/runs/40350495842)
+all pass on the implementation SHA. Local exact test counts and hosted success
+are separate evidence; report/example-only heads do not imply another full CI run.
+Markdown audit retains three known current Board links and 39 historical broken
+links, with no new broken links from these changes.
+
+Authoring remains local by default, with compact Registry presentation, genuine
+sharing, structured requirements and current Boolean grammar. The guide and
+focused tests support human reproduction and extension. The architecture can
+support further bounded increments; source-invalid admission remains an owner
+review gate, not a reason to change the language or force coverage.
 
 Run `PYTHONPATH=tools python tools/test_v04_direct_remaining_primitives.py -v`.
 The [developer guide](../developer/DIRECT-V04-CONVERTER.md) documents extension and

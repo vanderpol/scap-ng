@@ -645,3 +645,34 @@ original Schematron. SV-278031 omits that record attribute and is now blocked,
 correcting the earlier seven-candidate admission. A controlled explicitly typed
 derivative is tested but does not count as original coverage. See the
 [source counterexample](../audit/v04-source-invalid-cmdlet-nil.json).
+
+### Original check denominators
+
+All 30 Rules reported as competing check selections in this pin are OCIL-only;
+they contain no original automated OVAL check. There are 261 OVAL-bearing Rules,
+of which 249 currently prove. The 291-Rule denominator still matters for total
+Benchmark coverage. Neither denominator establishes full policy equivalence.
+Reproduce the original-source census independently of the converter:
+
+```bash
+python - <<'PY'
+import xml.etree.ElementTree as ET
+from zipfile import ZipFile
+with ZipFile('tests/fixtures/v04-direct-prototype/server2025-signed.zip') as source:
+    member, = (name for name in source.namelist() if name.endswith('.xml'))
+    root = ET.fromstring(source.read(member))
+x = '{http://checklists.nist.gov/xccdf/1.2}'
+benchmark, = (b for b in root.iter(x + 'Benchmark')
+              if b.get('id') == 'xccdf_mil.disa.stig_benchmark_MS_Windows_Server_2025_STIG')
+rules = list(benchmark.iter(x + 'Rule'))
+oval = 'http://oval.mitre.org/XMLSchema/oval-definitions-5'
+automated = sum(any(c.get('system') == oval for c in r.findall(x + 'check')) for r in rules)
+print({'rules': len(rules), 'oval_bearing': automated, 'no_oval': len(rules) - automated})
+PY
+```
+
+The example publisher's `--capability` filter selects consuming Test capabilities.
+It does not select capabilities acquired only inside Variables. The IIS appcmd
+Variable closure is proved and compiled in the audit evidence; use
+`windows.appcmdlistconfig` for the published IIS configuration representative.
+This selection limitation changes no converter admission or dependency processing.

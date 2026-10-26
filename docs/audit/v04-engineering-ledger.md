@@ -149,7 +149,9 @@ remain invalid. Authoring: 221 inline Test Objects, 43 references to 17 shared
 Objects, 85 no-Object Tests, 127 compact Registry sites; deprecated grammar zero.
 
 The [remaining Windows primitives checkpoint](v04-direct-remaining-primitives.md)
-is locally verified, with implementation push/CI reconciliation pending. Five new
+is complete: implementation `c721ed0f6` has all five exact-head hosted workflows
+PASS. [Actual IIS/NTUSER YAML/JSON](../examples/README.md) is published in
+`a5743a96a`. Five new
 actual source closures prove and compile: IIS appcmd/listconfig, current-process
 environment dependencies, NTUSER, and case-insensitive account-name inequality.
 One preceding admission is withdrawn: SV-278031 omits the original Schematron's
@@ -158,9 +160,11 @@ source; a controlled explicitly typed derivative proves but adds no coverage.
 The historical UEFI example/report is preserved and marked superseded.
 
 Current coverage is **249 proved / zero compiled-unproved / 42 blocked** of 291:
-30 competing-check selections, eight unapproved all_exist, one unmapped legacy
+30 OCIL-only Rules (no OVAL check), eight unapproved all_exist, one unmapped legacy
 user acquisition, one deprecated scalar-WMI/function closure, and two source-invalid
-cases (nil record and pattern-path recursion). All **244 retained** previous
+cases (nil record and pattern-path recursion). Independent original XML census
+finds **261 OVAL-bearing Rules**, with **249 proved / 12 blocked**; all 291 original
+Rules and 843 checks remain inventoried. All **244 retained** previous
 program hashes are unchanged. All 39 user-rights closures remain proved. Public
 gates validate **500 JSON/500 YAML** documents and independently verify 249 programs.
 **3,074** mandatory tests, zero failures/errors, one unchanged skip; 79 related
