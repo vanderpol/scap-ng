@@ -18,7 +18,7 @@ from v04_direct_scap_source import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
-                'windows.userright')
+                'windows.userright', 'windows.wmi.query')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -214,8 +214,10 @@ class AssessmentConverter:
         if comment and words(comment) not in generic:
             return comment
         details = []
+        described_fields = (mapping['native'].get('selector_map', {}).keys() |
+                            mapping['native'].get('collection_parameter_source_map', {}).keys())
         for child in element:
-            if local_name(child) in mapping['native'].get('selector_map', {}):
+            if local_name(child) in described_fields:
                 value = 'from a source Variable' if child.get('var_ref') else repr(child.text or '')
                 details.append(f'{local_name(child)} {child.get("operation", "equals")} {value}')
         ensure(details, 'shared acquisition has no source-grounded title')
@@ -339,9 +341,33 @@ class AssessmentConverter:
         ensure(isinstance(value, (str, dict)), 'array acquisition parameter unsupported')
         return value
 
-    def predicate(self, element, mapping, selector=False):
+    def record_predicate(self, element, mapping):
+        """Preserve a complete record before combining its named field results."""
+        attributes(element, {'datatype', 'operation', 'entity_check', 'check_existence'})
+        ensure(element.get('operation', 'equals') == 'equals', 'unsupported record comparator')
+        found = element.get('check_existence', 'at_least_one_exists')
+        matching = element.get('entity_check', 'all')
+        ensure(found in EXISTENCE and found != 'none_exist' and matching in MATCHING,
+               'record absence/quantifier outside bounded source proof')
+        ensure(len(element) and not (element.text or '').strip(), 'record requires named fields')
+        fields = {}
+        for child in element:
+            name = child.get('name')
+            ensure(child.tag == f'{{{OVAL}}}field' and name and name not in fields
+                   and not any('A' <= c <= 'Z' for c in name), 'invalid/duplicate original record field')
+            fields[name] = self.predicate(child, mapping, record_field=True)
+        # Member lookup is inside this record: missing required members remain
+        # errors. Field-value cardinality does not turn lookup failure into an
+        # empty successful record, or borrow a value from another record.
+        return {'record': {'records_found': EXISTENCE[found], 'records_matching': MATCHING[matching],
+                           'fields': fields}}
+
+    def predicate(self, element, mapping, selector=False, *, record_field=False):
+        if element.get('datatype') == 'record':
+            ensure(not selector and not record_field, 'nested/selector record outside source grammar')
+            return self.record_predicate(element, mapping)
         attributes(element, {'datatype', 'operation', 'var_ref', 'var_check'} |
-                   (set() if selector else {'entity_check', 'check_existence'}))
+                   ({'name', 'entity_check'} if record_field else set() if selector else {'entity_check', 'check_existence'}))
         ensure(not len(element), 'record/nested entity unsupported')
         existence = element.get('check_existence', 'at_least_one_exists')
         if existence == 'none_exist':

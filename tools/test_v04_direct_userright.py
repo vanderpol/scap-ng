@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import unittest
 import xml.etree.ElementTree as ET
+from unittest.mock import patch
 
 import yaml
 from v04_direct_scap_source import SourceModel, UnsupportedSource, OVAL
@@ -28,7 +29,10 @@ class DirectUserrightTests(unittest.TestCase):
     def setUpClass(cls):
         cls.source = SourceModel(ROOT / 'tests/fixtures/v04-direct-prototype' / PINS['fixture'], PINS['zip_sha256'])
         cls.rows = [r for r in SourceInventory(cls.source).rules() if CAP in r['needed_capabilities']]
-        cls.rules = [r['source_rule'] for r in cls.rows if set(r['needed_capabilities']) <= set(CAPABILITIES)]
+        # Retain the first checkpoint's capability-only boundary regression
+        # after the separate WMI increment enables the mixed closures.
+        cls.catalog = tuple(c for c in CAPABILITIES if c != 'windows.wmi.query')
+        cls.rules = [r['source_rule'] for r in cls.rows if set(r['needed_capabilities']) <= set(cls.catalog)]
         cls.docs, cls.trace = convert(cls.source, cls.rules)
         cls.by_assessment = {d['assessment']['id']: d['assessment'] for d in cls.docs.values() if 'assessment' in d}
 
@@ -44,7 +48,7 @@ class DirectUserrightTests(unittest.TestCase):
         self.assertEqual(len(blocked), 5)
         for row in blocked:
             self.assertIn('windows.wmi.query', row['needed_capabilities'])
-            with self.subTest(rule=row['source_rule']), self.assertRaisesRegex(UnsupportedSource, 'wmi57'):
+            with self.subTest(rule=row['source_rule']), patch('v04_direct_converter.CAPABILITIES', self.catalog), self.assertRaisesRegex(UnsupportedSource, 'wmi57'):
                 convert(self.source, [row['source_rule']])
             self.assertNotIn(row['source_rule'], {b['source_rule'] for b in self.trace['rules']})
 

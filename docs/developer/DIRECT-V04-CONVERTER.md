@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-183 converted + 108 blocked, all 183 source-proved. The earlier 84/207 and 81/3
+201 converted + 90 blocked, all 201 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -367,9 +367,11 @@ unsupported. Original trustee names/SIDs retain their string comparators and
 field quantifiers. The independent reader derives allowed fields and rights from
 original OVAL XSD, without importing the producer's capability mapping.
 
-Of 39 original candidate Rule closures, 34 independently prove and compile;
-five have WMI record dependencies and remain blocked atomically. No supported
-branch is published as an incomplete substitute for one of those Rules.
+The first user-rights checkpoint independently proved/compiled 34 of 39 original
+candidate closures. Five stayed atomically blocked by WMI records. The next
+WMI increment discharges those dependencies, so all 39 now prove/compile. The
+restricted-catalog regression still demonstrates that removing WMI support
+blocks every mixed closure instead of publishing an incomplete substitute.
 
 The original orphaned-SID check uses 45 constant rights, an include Filter and
 `none_exist`. Its omitted `var_check` means **all**, preserved as `value_match:
@@ -387,3 +389,33 @@ PYTHONPATH=tools python tools/v04_direct_authoring_examples.py --capability wind
 The example selection controls inspection only. Whole-source admission still
 walks every dependency and runs strict validation. Old example packets retain
 their pinned converter SHA; new generation records the current SHA and counts.
+
+## WMI records and named acquisition parameters
+
+`record_predicate` maps original `EntityStateRecordType` to the approved nested
+`record` wrapper: per-field comparisons stay inside one record, then
+`records_matching` combines records, and Test `items_satisfying` combines Items.
+It preserves original field names and explicit/implicit datatypes. Numeric-looking
+source strings remain strings; source integers become explicit `integer` values.
+Missing required record members remain errors under the existing record contract.
+Record comparators other than equality, duplicate/invalid source field names,
+record-level Variables, unsupported record absence and masking stay blocked.
+
+The original OVAL field-name restriction applies to imported XML only. The
+converter does not lowercase or rename an invalid source field to make it pass,
+and does not impose that restriction on native human authoring.
+
+WMI namespace/WQL are acquisition parameters, not comparison selectors. They
+use the existing parameter visitor. When an acquisition is genuinely shared,
+`object_title` now also describes source acquisition-parameter facts, giving an
+otherwise untitled shared query a meaningful title and stable native reference.
+It never invents a query purpose or adds a title to a private Object.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_wmi.py -v
+```
+
+All 18 supported original WMI closures prove and compile; eight remain blocked
+by other unsupported capabilities or unapproved `all_exist` semantics. The
+five WMI-dependent user-rights closures are included in the 18. These counts
+overlap by capability and are not added to each other as independent Rules.
