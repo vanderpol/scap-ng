@@ -1,5 +1,9 @@
 # Generic conversion architecture: all 100 mappings
 
+The [subsequent canonical metadata correction](v04-schema-converter-sync.md)
+removes the wrapper paths and stale filesystem spelling identified here. This
+audit and its file hashes describe their pinned baseline, not the corrected files.
+
 Read-only architecture audit under [#251](https://github.com/vanderpol/scap-ng/issues/251),
 against `dbaafd7337396573baa7c3b1019f3f7becbccc91`. No converter, approved schema,
 capability mapping, source fixture or release gate changed. Conversion coverage

@@ -191,3 +191,17 @@ should replace per-capability procedural expansion. Seven historical traversal
 crosswalks say any where the approved common schema requires all; nineteen Object
 crosswalks retain old select/collect paths. No schema, mapping or converter was
 changed by this read-only audit; the CSV/machine packet preserve all 100 rows.
+
+The [canonical metadata/schema synchronization checkpoint](v04-schema-converter-sync.md)
+is locally verified pending exact-head CI. Twenty-seven mapping metadata files
+now use flat Object paths and canonical filesystem scope. All 30 normative schema
+files, 100 generated validation structures, 500 authoring documents and 249 prior
+program hashes are unchanged. The real cmdlet select record remains valid and is
+explicitly tested alongside rejected generic wrappers. Source coverage is still
+249/0/42; no new capability is enabled. A schema/mapping-change workflow now
+regenerates contract data, checks targets and runs pinned source regressions.
+Missing source correspondence is reported, not guessed. Initial maintained run:
+3081 tests, one stale-citation failure, zero errors, one unchanged skip; both raw
+metadata anchors were rolled forward with previous hashes/revision preserved.
+The affected 18 proof tests and seven final contract tests pass; no assertion was
+relaxed. The old public schema-generator adaptation remains documented debt.

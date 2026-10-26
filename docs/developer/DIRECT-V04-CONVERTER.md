@@ -676,3 +676,51 @@ It does not select capabilities acquired only inside Variables. The IIS appcmd
 Variable closure is proved and compiled in the audit evidence; use
 `windows.appcmdlistconfig` for the published IIS configuration representative.
 This selection limitation changes no converter admission or dependency processing.
+
+## Schema changes and converter maintenance
+
+The approved 0.4 native schemas define the output contract. Reviewed source
+mappings define correspondence; original OVAL XSD and embedded Schematron define
+the input contract. A missing converter feature or mapping is not permission to
+alter the native language or invent a source normalization.
+
+Ordinary field changes should update schema/mapping data and fixtures, not add a
+capability-specific Python branch. The generic converter already reads selector
+and State-field maps at runtime; State fields become structured inline `require`.
+New datatypes, operators or acquisition semantics still require a shared handler
+and independent source proof before admission.
+
+The [schema/converter synchronization workflow](../../.github/workflows/v04-converter-schema-sync.yml)
+runs for 0.4 schema/mapping changes, original pinned OVAL schema changes and changes
+to its generator/checker. It refreshes **data**, validates canonical target paths,
+tests an ordinary field refresh, and runs pinned cmdlet/IIS/NTUSER source checks.
+Its `scap-ng-040-converter-contracts` artifact contains the current normative and
+generated schemas, field descriptors, fingerprints and unresolved source routes:
+
+```bash
+PYTHONPATH=tools python tools/v04_converter_contracts.py --output /tmp/v04-converter-contracts.json
+PYTHONPATH=tools python -m unittest -v test_v04_converter_contracts test_v04_direct_cmdlet test_v04_direct_remaining_primitives
+```
+
+`v04_converter_contracts.contract` validates one mapping against the maintained
+public native generator. `snapshot` assembles deterministic data for the current
+catalog. No generated Python, new conversion IR, bot branch or automatic semantic
+decision is involved. A bad target or obsolete wrapper path fails the check and
+retains a review artifact. Missing correspondence is reported, not guessed: the
+current `file.hash` algorithm lacks an explicit field route and remains a review
+item. This process does not enable additional capabilities or replace the full
+mandatory/source-proof gates. It does not regenerate the six-STIG corpus.
+
+Current metadata paths refer to flat Objects, such as `object.command` and
+`object.name`. The genuine cmdlet input is `object.select`, a nullable structured
+record; it must remain supported. Generic acquisition wrappers remain invalid.
+Regression tests validate both sides of this distinction.
+
+The public 0.4 schema generator still adapts the preceding generator internally;
+that legacy dependency is recorded technical debt, not a new direct-conversion
+stage. Removing it requires contract-parity verification, not another overlay or
+wholesale converter rewrite. Prefer shared XSD/Schematron validation and small
+construct handlers over additional capability-name branches. Profile validation
+before optimizing source parsing: the recorded 249-Rule checkpoint spent 0.16 s
+lowering versus 28.85 s validating, excluding authoring serialization. That single
+workload does not establish asymptotic scalability or a production speedup.
