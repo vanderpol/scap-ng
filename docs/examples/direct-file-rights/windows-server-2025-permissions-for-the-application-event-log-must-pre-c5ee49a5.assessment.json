@@ -1,0 +1,261 @@
+{
+  "assessment": {
+    "id": "windows-server-2025-permissions-for-the-application-event-log-must-pre-c5ee49a5-assessment",
+    "version": 1,
+    "assessment_title": "Windows Server 2025 permissions for the Application event log must prevent access by nonprivileged accounts.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "shared_objects": {
+      "path-application-evtx-d9f35284-object": {
+        "capability": "windows.registry",
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SYSTEM\\CurrentControlSet\\Services\\EventLog\\Application"
+        },
+        "name": {
+          "equals": "file"
+        },
+        "object_title": "path Application.evtx"
+      }
+    },
+    "variables": {
+      "strict-path-to-application-evtx-e35693b4-variable": {
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "regex_capture": {
+            "pattern": "^(.*)$",
+            "value": {
+              "values": {
+                "object": "path-application-evtx-d9f35284-object",
+                "field": "value"
+              }
+            }
+          }
+        }
+      },
+      "path-to-application-evtx-with-the-systemroot-environment-variable-repl-100e1710-variable": {
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "values": {
+                "object": {
+                  "capability": "windows.registry",
+                  "hive": {
+                    "equals": "local_machine"
+                  },
+                  "key": {
+                    "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                  },
+                  "name": {
+                    "equals": "SystemRoot"
+                  }
+                },
+                "field": "value"
+              }
+            },
+            {
+              "regex_capture": {
+                "pattern": "^%.*%(.*)$",
+                "value": {
+                  "values": {
+                    "object": "path-application-evtx-d9f35284-object",
+                    "field": "value"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "tests": {
+      "the-application-event-log-must-have-at-least-default-permissions-stric-dd01a78a-test": {
+        "test_title": "The Application event log must have at least default permissions. Strict Path",
+        "capability": "windows.fileeffectiverights53",
+        "object": {
+          "set": {
+            "operator": "union",
+            "operands": [
+              {
+                "object": {
+                  "full_path": {
+                    "case_insensitive_equals": {
+                      "variable": "strict-path-to-application-evtx-e35693b4-variable"
+                    },
+                    "value_match": "one_or_more"
+                  },
+                  "trustee_sid": {
+                    "matches_regex": ".*"
+                  },
+                  "filesystem": "all"
+                },
+                "filters": [
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-18",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-32-544",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-19",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "require": {
+          "items_found": "none"
+        },
+        "reported_elements": "all"
+      },
+      "the-application-event-log-registry-specified-location-must-have-the-sy-069280f6-test": {
+        "test_title": "The Application event log registry specified location must have the %SystemRoot% environment variable.",
+        "capability": "windows.registry",
+        "object": "path-application-evtx-d9f35284-object",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "value": {
+              "matches_regex": "^(?i)%SystemRoot%.*$",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      },
+      "the-application-event-log-must-have-at-least-default-permissions-built-a276c850-test": {
+        "test_title": "The Application event log must have at least default permissions. Built Path",
+        "capability": "windows.fileeffectiverights53",
+        "object": {
+          "set": {
+            "operator": "union",
+            "operands": [
+              {
+                "object": {
+                  "full_path": {
+                    "case_insensitive_equals": {
+                      "variable": "path-to-application-evtx-with-the-systemroot-environment-variable-repl-100e1710-variable"
+                    },
+                    "value_match": "one_or_more"
+                  },
+                  "trustee_sid": {
+                    "matches_regex": ".*"
+                  },
+                  "filesystem": "all"
+                },
+                "filters": [
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-18",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-32-544",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-19",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "require": {
+          "items_found": "none"
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "or": [
+        {
+          "and": [
+            {
+              "test": "the-application-event-log-must-have-at-least-default-permissions-stric-dd01a78a-test"
+            },
+            {
+              "not": {
+                "test": "the-application-event-log-registry-specified-location-must-have-the-sy-069280f6-test"
+              }
+            }
+          ]
+        },
+        {
+          "and": [
+            {
+              "test": "the-application-event-log-must-have-at-least-default-permissions-built-a276c850-test"
+            },
+            {
+              "test": "the-application-event-log-registry-specified-location-must-have-the-sy-069280f6-test"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

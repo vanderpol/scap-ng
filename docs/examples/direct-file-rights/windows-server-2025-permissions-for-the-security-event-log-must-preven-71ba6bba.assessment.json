@@ -1,0 +1,261 @@
+{
+  "assessment": {
+    "id": "windows-server-2025-permissions-for-the-security-event-log-must-preven-71ba6bba-assessment",
+    "version": 1,
+    "assessment_title": "Windows Server 2025 permissions for the Security event log must prevent access by nonprivileged accounts.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "shared_objects": {
+      "path-security-evtx-6eb25c90-object": {
+        "capability": "windows.registry",
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SYSTEM\\CurrentControlSet\\Services\\EventLog\\Security"
+        },
+        "name": {
+          "equals": "file"
+        },
+        "object_title": "path Security.evtx"
+      }
+    },
+    "variables": {
+      "strict-path-to-security-evtx-240c4aad-variable": {
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "regex_capture": {
+            "pattern": "^(.*)$",
+            "value": {
+              "values": {
+                "object": "path-security-evtx-6eb25c90-object",
+                "field": "value"
+              }
+            }
+          }
+        }
+      },
+      "path-to-security-evtx-with-the-systemroot-environment-variable-replace-676e22b5-variable": {
+        "kind": "local",
+        "datatype": "string",
+        "expression": {
+          "concat": [
+            {
+              "values": {
+                "object": {
+                  "capability": "windows.registry",
+                  "hive": {
+                    "equals": "local_machine"
+                  },
+                  "key": {
+                    "equals": "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
+                  },
+                  "name": {
+                    "equals": "SystemRoot"
+                  }
+                },
+                "field": "value"
+              }
+            },
+            {
+              "regex_capture": {
+                "pattern": "^%.*%(.*)$",
+                "value": {
+                  "values": {
+                    "object": "path-security-evtx-6eb25c90-object",
+                    "field": "value"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "tests": {
+      "the-security-event-log-must-have-at-least-default-permissions-strict-p-1b4c07d4-test": {
+        "test_title": "The Security event log must have at least default permissions. Strict Path",
+        "capability": "windows.fileeffectiverights53",
+        "object": {
+          "set": {
+            "operator": "union",
+            "operands": [
+              {
+                "object": {
+                  "full_path": {
+                    "case_insensitive_equals": {
+                      "variable": "strict-path-to-security-evtx-240c4aad-variable"
+                    },
+                    "value_match": "one_or_more"
+                  },
+                  "trustee_sid": {
+                    "matches_regex": ".*"
+                  },
+                  "filesystem": "all"
+                },
+                "filters": [
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-18",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-32-544",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-19",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "require": {
+          "items_found": "none"
+        },
+        "reported_elements": "all"
+      },
+      "the-security-event-log-registry-specified-location-must-have-the-syste-e8a187e4-test": {
+        "test_title": "The Security event log registry specified location must have the %SystemRoot% environment variable.",
+        "capability": "windows.registry",
+        "object": "path-security-evtx-6eb25c90-object",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "value": {
+              "matches_regex": "^(?i)%SystemRoot%.*$",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      },
+      "the-security-event-log-must-have-at-least-default-permissions-built-pa-cae01979-test": {
+        "test_title": "The Security event log must have at least default permissions. Built Path",
+        "capability": "windows.fileeffectiverights53",
+        "object": {
+          "set": {
+            "operator": "union",
+            "operands": [
+              {
+                "object": {
+                  "full_path": {
+                    "case_insensitive_equals": {
+                      "variable": "path-to-security-evtx-with-the-systemroot-environment-variable-replace-676e22b5-variable"
+                    },
+                    "value_match": "one_or_more"
+                  },
+                  "trustee_sid": {
+                    "matches_regex": ".*"
+                  },
+                  "filesystem": "all"
+                },
+                "filters": [
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-80-880578595-1860270145-482643319-2788375705-1540778122",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-18",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-32-544",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  },
+                  {
+                    "exclude": {
+                      "trustee_sid": {
+                        "equals": "S-1-5-19",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "require": {
+          "items_found": "none"
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "or": [
+        {
+          "and": [
+            {
+              "test": "the-security-event-log-must-have-at-least-default-permissions-strict-p-1b4c07d4-test"
+            },
+            {
+              "not": {
+                "test": "the-security-event-log-registry-specified-location-must-have-the-syste-e8a187e4-test"
+              }
+            }
+          ]
+        },
+        {
+          "and": [
+            {
+              "test": "the-security-event-log-must-have-at-least-default-permissions-built-pa-cae01979-test"
+            },
+            {
+              "test": "the-security-event-log-registry-specified-location-must-have-the-syste-e8a187e4-test"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
