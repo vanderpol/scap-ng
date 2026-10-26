@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-213 converted + 78 blocked, all 213 source-proved. The earlier 84/207 and 81/3
+220 converted + 71 blocked, all 220 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -474,3 +474,34 @@ controlled relative-COMPLEMENT Set whose include Filter applies to each operand
 before the operator. Repeated acquisition identity remains genuinely shared.
 Controlled derivatives establish reusable construct behavior, not extra original
 Rule coverage. Source proof and compilation do not establish scanner execution.
+
+
+## Independent text-file acquisition
+
+`independent.textfilecontent54` reuses generic flat selectors, field requirements
+and dependency visitors. `v04_direct_file_behaviors.file_behaviors` converts the
+bounded nonrecursive acquisition parameters independently of State comparisons:
+original optional defaults are `ignore_case: false`, `multiline: true`,
+`singleline: false`, `item_creation: all_object_elements_fullfilled` and
+filesystem scope `all`. Explicit flags override defaults. Original `defined`
+filesystem scope maps to the approved native `same`; other scopes retain their
+names. Item creation remains a collection boundary, never a field comparison.
+
+Unknown, duplicate or nonempty behaviors, explicit Windows-view behavior and
+traversal attributes fail closed. Do not silently discard them or widen this
+module's contract without original-source positives and negative mutations.
+The independent reader separately checks original attributes/defaults and typed
+terms; it does not import the new helper. Original patterns, backslashes,
+instances, capture datatypes and State Boolean structure remain exact.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_textfile.py -v
+```
+
+Five tests cover all seven actual OpenSSH closures, YAML/JSON structure equality,
+all eight Boolean-flag combinations, both item-creation modes, three filesystem
+scopes, invalid attributes and semantic mutations. Controlled derivatives add no
+original Rule coverage. The compiler preserves patterns and parameters; scanner
+execution or regex-engine conformance is not claimed. Follow the public pipeline
+above to regenerate the complete supported subset; authoring remains inline by
+default and complex patterns remain readable multiline Objects.

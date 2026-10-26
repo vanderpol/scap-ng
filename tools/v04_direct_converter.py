@@ -19,7 +19,7 @@ from v04_direct_scap_source import (
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
                 'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy',
-                'windows.service')
+                'windows.service', 'independent.textfilecontent54')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -176,11 +176,17 @@ class AssessmentConverter:
             selectors = mapping['native'].get('selector_map', {})
             parameters = mapping['native'].get('collection_parameter_source_map', {})
             filters = []
+            behaviors = None
             for child in element:
                 if child.tag == f'{{{OVAL}}}filter':
                     filters.append(self.filter(child, mapping))
                     continue
                 field = local_name(child)
+                if field == 'behaviors' and mapping['capability'] == 'independent.textfilecontent54':
+                    ensure(child.tag == f'{{{mapping["source"]["namespace"]}}}behaviors' and behaviors is None,
+                           'duplicate/foreign text-file behaviors')
+                    behaviors = child
+                    continue
                 ensure(child.tag.startswith(f'{{{mapping["source"]["namespace"]}}}') and
                        field in selectors.keys() | parameters.keys(), f'unsupported Object field: {field}')
                 target = selectors.get(field, parameters.get(field))
@@ -196,6 +202,9 @@ class AssessmentConverter:
             for path, value in mapping.get('migration_crosswalk', {}).get('materialized_defaults', {}).items():
                 ensure(path.startswith('behaviors.'), 'unrecognized acquisition default')
                 acquisition[path.split('.')[1]] = value
+            if mapping['capability'] == 'independent.textfilecontent54':
+                from v04_direct_file_behaviors import file_behaviors
+                acquisition.update(file_behaviors(behaviors))
             if filters:
                 acquisition['filters'] = filters
         # Source identity, not payload equality, determines shared acquisitions.
@@ -564,7 +573,8 @@ def assemble_subset(source, documents, rule_trace, mappings):
         'component_index_passes': len(source.components), 'mapping_sha256': {m['capability']: digest(m) for m in mappings},
         'scope': 'Automated Assessment/selection subset, not full Rule-policy or Benchmark conversion',
         'unsupported': ['other Rules', 'manual execution', 'CPE/platform execution', 'full Rule metadata/remediation/scoring',
-                        'behaviors', 'record-level Variables, nested records, record absence and masking',
+                        'other Object behaviors/traversal',
+                        'record-level Variables, nested records, record absence and masking',
                         'all_exist', 'other capabilities/functions'],
         'coverage_promoted': False, 'scanner_evaluated': False}
     return documents, trace

@@ -217,6 +217,10 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'independent.textfilecontent54':
+            allowed = {'filepath', 'path', 'filename', 'pattern', 'instance', 'text', 'subexpression'}
+            need(all(c.tag == '{' + OD + '#independent}' + local(c) and local(c) in allowed
+                     for c in self.get(ident, 'states')), 'unsupported original text-file State field')
         if cap == 'windows.service':
             contract = original_service_contract()
             for entity in self.get(ident, 'states'):
@@ -267,7 +271,8 @@ class ExpandedSource(Source):
         value = super().state(ident, cap)
         def rename(n):
             if 'field' in n:
-                return {**n, 'field': FILE_FIELDS.get(n['field'], n['field']) if cap == 'unix.file' else n['field']}
+                names = FILE_FIELDS if cap == 'unix.file' else NAMES if cap == 'independent.textfilecontent54' else {}
+                return {**n, 'field': names.get(n['field'], n['field'])}
             op, children = next(iter(n.items()))
             return {op: [rename(c) for c in children]}
         return predicate_order(rename(value))
@@ -380,7 +385,7 @@ class ExpandedSource(Source):
             need(len(n) == 1, 'Set mixed with selectors')
             value = {'capability': cap, 'set': self.set_term(sets[0], cap)}
         else:
-            fields, behaviors = {}, {}
+            fields, behaviors, seen_behaviors = {}, {}, False
             fs = [c for c in n if local(c) == 'filter']
             for c in n:
                 name = local(c)
@@ -388,7 +393,8 @@ class ExpandedSource(Source):
                     continue
                 need(c.tag.rsplit('}', 1)[0] == n.tag.rsplit('}', 1)[0], 'Object field namespace')
                 if name == 'behaviors':
-                    need(not behaviors, 'duplicate behaviors')
+                    need(not seen_behaviors and not len(c) and not (c.text or '').strip(), 'duplicate/nonempty behaviors')
+                    seen_behaviors = True
                     behaviors = dict(c.attrib)
                     continue
                 allowed = {'unix.password': {'username'}, 'unix.file': {'filepath', 'path', 'filename'},
@@ -409,12 +415,16 @@ class ExpandedSource(Source):
             elif cap == 'independent.textfilecontent54':
                 keys(behaviors, {'ignore_case', 'multiline', 'singleline', 'item_creation', 'recurse_file_system'},
                      'textfile behaviors')
-                fields['filesystem'] = behaviors.get('recurse_file_system', 'all')
+                scope = behaviors.get('recurse_file_system', 'all')
+                need(scope in ('all', 'local', 'defined'), 'unknown original filesystem scope')
+                fields['filesystem'] = {'all': 'all', 'local': 'local', 'defined': 'same'}[scope]
                 for name, default in (('ignore_case', 'false'), ('multiline', 'true'), ('singleline', 'false')):
                     v = behaviors.get(name, default)
                     need(v in ('true', 'false', '0', '1'), 'behavior boolean')
                     fields[name] = v in ('true', '1')
                 fields['item_creation'] = behaviors.get('item_creation', 'all_object_elements_fullfilled')
+                need(fields['item_creation'] in ('all_object_elements_fullfilled', 'filepath_exists'),
+                     'unknown original item_creation')
             value = {'capability': cap, 'selectors': fields}
             if fs:
                 value['filters'] = self.filters(fs, cap)
