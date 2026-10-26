@@ -20,7 +20,8 @@ CHECK = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none',
 OPS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
        'greater than': 'greater_than', 'greater than or equal': 'greater_than_or_equal',
        'less than': 'less_than', 'less than or equal': 'less_than_or_equal',
-       'case insensitive equals': 'case_insensitive_equals'}
+       'case insensitive equals': 'case_insensitive_equals',
+       'case insensitive not equal': 'case_insensitive_not_equal'}
 META = {'id', 'version', 'comment'}
 REGISTRY_HIVES = frozenset('HKEY_' + name for name in (
     'CLASSES_ROOT', 'CURRENT_CONFIG', 'CURRENT_USER', 'CURRENT_USER_LOCAL_SETTINGS', 'LOCAL_MACHINE', 'USERS'))
@@ -208,6 +209,8 @@ class Source:
             return {'found': 'none'}
         op = n.get('operation', 'equals')
         need(op in OPS, 'unproved operation: ' + op)
+        need(op != 'case insensitive not equal' or n.get('datatype', 'string') == 'string',
+             'case-insensitive inequality requires original string datatype')
         if n.get('datatype') == 'record':
             need(not selector and op == 'equals', 'record operation')
             need(all(local(c) == 'field' and c.get('name') for c in n), 'record children')

@@ -28,7 +28,14 @@ class DirectCmdletTests(unittest.TestCase):
     def setUpClass(cls):
         cls.source = SourceModel(ROOT / 'tests/fixtures/v04-direct-prototype' / PINS['fixture'], PINS['zip_sha256'])
         cls.rows = [r for r in SourceInventory(cls.source).rules() if CAP in r['needed_capabilities']]
-        cls.rules = [r['source_rule'] for r in cls.rows]
+        cls.rules, cls.blocked = [], []
+        for row in cls.rows:
+            try:
+                convert(cls.source, [row['source_rule']])
+            except UnsupportedSource as error:
+                cls.blocked.append((row, str(error)))
+            else:
+                cls.rules.append(row['source_rule'])
         cls.docs, cls.trace = convert(cls.source, cls.rules)
 
     def input_object(self, source):
@@ -37,11 +44,12 @@ class DirectCmdletTests(unittest.TestCase):
                           source.node(binding['component'], k, 'object').tag == W + 'cmdlet_object')
         return binding, source.node(binding['component'], identifier, 'object')
 
-    def test_seven_original_closures_validate_compile_prove_and_roundtrip_including_two_wmi(self):
-        self.assertEqual(len(self.rules), 7)
+    def test_six_original_closures_validate_compile_prove_and_roundtrip_including_two_wmi(self):
+        self.assertEqual(len(self.rows), 7)
+        self.assertEqual(len(self.rules), 6)
         self.assertEqual(sum('windows.wmi.query' in r['needed_capabilities'] for r in self.rows), 2)
-        self.assertEqual(len(verify_original(self.source.root, self.docs, self.trace)), 7)
-        self.assertEqual(len(verify_compiled(self.docs, build_bundle(self.docs)[0])), 7)
+        self.assertEqual(len(verify_original(self.source.root, self.docs, self.trace)), 6)
+        self.assertEqual(len(verify_compiled(self.docs, build_bundle(self.docs)[0])), 6)
         validators = build_validators(ROOT / 'schema/v0.4.0')
         for doc in self.docs.values():
             self.assertEqual(yaml.safe_load(authoring_yaml(doc)), doc)
@@ -49,6 +57,31 @@ class DirectCmdletTests(unittest.TestCase):
                 self.assertFalse(list(document_errors(validators['assessment.schema.json'], doc)))
         self.assertEqual(authoring_statistics(self.docs)['deprecated_grammar'], 0)
         self.assertTrue(any(n.get('equals') == '100' for d in self.docs.values() for n in walk(d)))
+
+    def test_original_nil_record_missing_required_datatype_is_not_silently_repaired(self):
+        from lxml import etree
+        self.assertEqual(len(self.blocked), 1)
+        row, error = self.blocked[0]
+        self.assertIn('invalid nil input datatype', error)
+        source = deepcopy(self.source)
+        component = next(n['component'] for n in row['dependencies'] if n['kind'] == 'object')
+        obj = next(source.node(n['component'], n['id'], 'object') for n in row['dependencies']
+                   if n['kind'] == 'object' and source.node(n['component'], n['id'], 'object').tag == W + 'cmdlet_object')
+        parameters = obj.find(W + 'parameters')
+        self.assertEqual(parameters.attrib, {NIL: 'true'})
+        schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
+        assertions = [a.get('test') for rule in schema.iter() if rule.tag.endswith('}rule') and
+                      rule.get('context') == 'win-def:cmdlet_object/win-def:parameters'
+                      for a in rule if a.tag.endswith('}assert')]
+        self.assertIn("@datatype='record'", assertions)
+        node = etree.fromstring(ET.tostring(parameters))
+        self.assertFalse(node.xpath("@datatype='record'"))
+        with self.assertRaises(ValueError): ExpandedSource(source.components[component]).object(obj.get('id'))
+        # An explicitly typed controlled derivative proves; it is not original coverage.
+        parameters.set('datatype', 'record')
+        docs, trace = convert(source, [row['source_rule']])
+        self.assertEqual(len(verify_original(source.root, docs, trace)), 1)
+        self.assertEqual(len(verify_compiled(docs, build_bundle(docs)[0])), 1)
 
     def test_null_module_constraints_and_capability_select_are_not_generic_wrappers(self):
         validators = build_validators(ROOT / 'schema/v0.4.0')
@@ -87,13 +120,14 @@ class DirectCmdletTests(unittest.TestCase):
         with self.assertRaises(AssertionError): verify_original(source.root, docs, trace)
 
     def test_invalid_nil_records_names_and_wildcard_inputs_fail_closed(self):
-        for mutation in ('nil-verb', 'nil-value', 'duplicate', 'uppercase', 'record-type', 'comparator', 'wildcard'):
+        for mutation in ('nil-verb', 'nil-value', 'nil-version-type', 'duplicate', 'uppercase', 'record-type', 'comparator', 'wildcard'):
             source = deepcopy(self.source)
             binding, obj = self.input_object(source)
             record = obj.find(W + 'parameters')
             if mutation == 'nil-verb':
                 verb = obj.find(W + 'verb'); verb.text = None; verb.set(NIL, 'true')
             elif mutation == 'nil-value': obj.find(W + 'module_id').text = 'not-empty'
+            elif mutation == 'nil-version-type': obj.find(W + 'module_version').attrib.pop('datatype')
             elif mutation == 'duplicate': record.append(deepcopy(record[0]))
             elif mutation == 'uppercase': record[0].set('name', 'UPPERCASE')
             elif mutation == 'record-type': record.set('datatype', 'string')

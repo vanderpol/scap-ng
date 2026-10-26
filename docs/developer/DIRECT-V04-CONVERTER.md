@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-245 converted + 46 blocked, all 245 source-proved. The earlier 84/207 and 81/3
+249 converted + 42 blocked, all 249 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -590,7 +590,7 @@ record visitor; acquisition records are never flattened into strings.
 PYTHONPATH=tools python tools/test_v04_direct_cmdlet.py -v
 ```
 
-All seven actual cmdlet closures prove and compile, including two WMI-dependent
+Six of seven actual cmdlet closures prove and compile, including two WMI-dependent
 Rules. Five tests cover actual input/result graphs, nulls, YAML/JSON, independent
 selection/value matching, invalid input records, wildcard/name/type errors and
 native operand mutations. The WMI suite retains its original 18/8 restricted-
@@ -602,3 +602,46 @@ at typed cmdlet Object sites, consistent with the unchanged canonical Object
 validator. A legacy selector-wrapper shape still fails schema validation and is
 reported as obsolete. No validator or approved grammar is weakened. Cmdlets are
 represented and compiled; no PowerShell command is executed by these tests.
+
+
+## Remaining approved Windows primitives
+
+The current catalog includes `windows.ntuser`, `windows.appcmd`,
+`windows.appcmdlistconfig` and `independent.environmentvariable58`. They use the
+same recursive Object/Variable/Set/Filter visitor; no Rule-ID switches exist.
+NTUSER materializes original `include_default=false` and
+`item_creation=key_and_name_exist`, preserving ordered exclusions. Source registry
+type labels retain their approved native crosswalk. IIS result `"false"` remains
+a string, not an inferred Boolean.
+
+Nullable selectors follow the versioned mapping. The original environment PID
+`xsi:nil=true` becomes native null selecting the Assessment tool's running process,
+not PID zero or an unscoped system environment. Source variable components with
+exactly one complete string constant can be folded into a typed scalar literal;
+multi-valued constants and cross-datatype cases still fail closed. Original
+constants and their identities remain in dependency provenance. Shell acquisition
+Filters remain on the original collected-object boundary, including Variable
+acquisitions; none are pushed into Test matching or reordered.
+
+Case-insensitive inequality retains the approved `case_insensitive_not_equal`
+operator and original strings. It is neither rewritten as case-sensitive inequality
+nor implemented by changing string case. Non-string source operands fail closed.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_remaining_primitives.py -v
+```
+
+Seven tests cover five actual complete closures, source optional defaults,
+current-process null PID, singleton/multi-value boundaries, NTUSER types/exclusions,
+IIS Filters/function order and case-insensitive inequality. A separate original
+source counterexample (SV-278008) combines pattern-matched paths with recursion
+attributes forbidden by original OVAL Schematron. It remains blocked; removing
+those attributes or weakening the native traversal guard is not an implementation
+fix. Explicit source normalization needs owner approval.
+
+Nil input types retain original source requirements: integer PID and module version
+require explicit datatypes; nil cmdlet records require `datatype: record` under
+original Schematron. SV-278031 omits that record attribute and is now blocked,
+correcting the earlier seven-candidate admission. A controlled explicitly typed
+derivative is tested but does not count as original coverage. See the
+[source counterexample](../audit/v04-source-invalid-cmdlet-nil.json).

@@ -20,14 +20,16 @@ ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
                 'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy',
                 'windows.service', 'independent.textfilecontent54', 'windows.fileeffectiverights53',
-                'windows.cmdlet')
+                'windows.cmdlet', 'windows.ntuser', 'windows.appcmd', 'windows.appcmdlistconfig',
+                'independent.environmentvariable58')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
 COMPARISONS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
                'case insensitive equals': 'case_insensitive_equals', 'less than': 'less_than',
                'greater than': 'greater_than', 'greater than or equal': 'greater_than_or_equal',
-               'less than or equal': 'less_than_or_equal'}
+               'less than or equal': 'less_than_or_equal',
+               'case insensitive not equal': 'case_insensitive_not_equal'}
 SET_OPERATORS = {'UNION': 'union', 'INTERSECTION': 'intersection', 'COMPLEMENT': 'difference'}
 
 
@@ -328,6 +330,13 @@ class AssessmentConverter:
         if operation == 'variable_component':
             attributes(element, {'var_ref'})
             value = self.reference(element.get('var_ref'), 'variable')
+            if isinstance(value, list):
+                variable = self.source.node(self.component_id, element.get('var_ref'), 'variable')
+                ensure(not len(element) and variable.get('datatype') == 'string' and len(value) == 1,
+                       'constant array function needs Cartesian proof')
+                # A complete one-value constant is a scalar function operand;
+                # no dynamic status or multi-value product boundary is erased.
+                return {'literal': {'datatype': 'string', 'value': value[0]}}
             ensure(not len(element) and isinstance(value, dict), 'constant array function needs Cartesian proof')
             return value
         if operation == 'object_component':
@@ -396,6 +405,19 @@ class AssessmentConverter:
                            'fields': fields}}
 
     def predicate(self, element, mapping, selector=False, *, record_field=False):
+        nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
+        if selector and nil in element.attrib:
+            attributes(element, {nil, 'datatype'})
+            field = mapping['native'].get('selector_map', {}).get(local_name(element))
+            ensure(field in mapping['native'].get('nullable_selectors', ()) and
+                   element.get(nil) in ('true', '1') and not len(element) and not (element.text or '').strip(),
+                   'unsupported nil selector')
+            datatype = 'int' if mapping['native']['field_datatypes'][field] == ['integer'] else 'string'
+            # Original EntityObjectIntType requires explicit datatype=int;
+            # EntityObjectStringType alone permits its omitted fixed string type.
+            ensure(element.get('datatype', 'string' if datatype == 'string' else None) == datatype,
+                   'nil selector datatype mismatch')
+            return None
         if element.get('datatype') == 'record':
             ensure(not selector and not record_field, 'nested/selector record outside source grammar')
             return self.record_predicate(element, mapping)
@@ -408,6 +430,8 @@ class AssessmentConverter:
             return {'values_found': 'none'}
         operation = element.get('operation', 'equals')
         ensure(existence in EXISTENCE and operation in COMPARISONS, 'unsupported entity existence/comparator')
+        if operation == 'case insensitive not equal':
+            ensure(element.get('datatype', 'string') == 'string', 'case-insensitive inequality requires string datatype')
         if operation in ('greater than', 'greater than or equal', 'less than or equal'):
             ensure(element.get('datatype') == 'int', 'ordered comparison expansion requires integer source datatype')
         value = self.operand(element)

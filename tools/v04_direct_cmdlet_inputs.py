@@ -20,7 +20,8 @@ def cmdlet_input(element, contract, compare_field, scalar_parameter):
                not len(element) and not (element.text or '').strip(), 'unsupported cmdlet nil input')
         expected = 'record' if contract.get('schema_ref') == 'object_record' else (
             'version' if local_name(element) == 'module_version' else 'string')
-        ensure(element.get('datatype', expected) == expected, 'invalid nil input datatype')
+        ensure(element.get('datatype', 'string' if expected == 'string' else None) == expected,
+               'invalid nil input datatype')
         return None
     if contract.get('schema_ref') != 'object_record':
         value = scalar_parameter(element)

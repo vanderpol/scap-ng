@@ -19,7 +19,15 @@ EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
          OD + '#independent}textfilecontent54': 'independent.textfilecontent54',
          OD + '#windows}userright': 'windows.userright', OD + '#windows}service': 'windows.service',
          OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights53',
-         OD + '#windows}cmdlet': 'windows.cmdlet'}
+         OD + '#windows}cmdlet': 'windows.cmdlet', OD + '#windows}ntuser': 'windows.ntuser',
+         OD + '#windows}appcmd': 'windows.appcmd', OD + '#windows}appcmdlistconfig': 'windows.appcmdlistconfig',
+         OD + '#independent}environmentvariable58': 'independent.environmentvariable58'}
+SCALAR_ACQUISITIONS = {
+    'windows.ntuser': ('key', 'name'),
+    'windows.appcmd': ('identifier_type', 'identifier', 'parameter'),
+    'windows.appcmdlistconfig': ('identifier_type', 'identifier', 'section', 'parameter'),
+    'independent.environmentvariable58': ('pid', 'name'),
+}
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
 FILE_FIELDS = {**NAMES, 'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
                'gexec': 'group_execute', 'oread': 'other_read', 'owrite': 'other_write',
@@ -302,6 +310,13 @@ class ExpandedSource(Source):
         value = super().state(ident, cap)
         def rename(n):
             if 'field' in n:
+                if cap == 'windows.ntuser' and n['field'] == 'type':
+                    aliases = {'reg_sz': 'string', 'reg_dword': 'dword', 'reg_dword_little_endian': 'dword'}
+                    operand = n['predicate']['operand']
+                    need(operand.get('datatype') == 'string' and operand.get('value') in aliases,
+                         'NTUSER type outside bounded independent mapping')
+                    n = deepcopy(n)
+                    n['predicate']['operand'] = literal('string', aliases[operand['value']])
                 names = FILE_FIELDS if cap == 'unix.file' else NAMES if cap in (
                     'independent.textfilecontent54', 'windows.fileeffectiverights53') else {}
                 return {**n, 'field': names.get(n['field'], n['field'])}
@@ -359,6 +374,36 @@ class ExpandedSource(Source):
             self.active.add(ident)
             try:
                 return {'capability': cap, 'set': self.set_term(sets[0], cap)}
+            finally:
+                self.active.remove(ident)
+        if cap in SCALAR_ACQUISITIONS:
+            need(ident not in self.active, 'cyclic Object')
+            keys(n, META, 'scalar acquisition Object')
+            self.active.add(ident)
+            try:
+                fields, fs = {}, []
+                nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
+                for child in n:
+                    if child.tag == '{' + OD + '}filter':
+                        fs.append(child); continue
+                    name = local(child)
+                    need(child.tag.rsplit('}', 1)[0] == n.tag.rsplit('}', 1)[0] and
+                         name in SCALAR_ACQUISITIONS[cap] and name not in fields, 'unknown/duplicate scalar selector')
+                    if nil in child.attrib:
+                        keys(child, {nil, 'datatype'}, 'nil scalar selector')
+                        need(cap == 'independent.environmentvariable58' and name == 'pid' and
+                             child.get(nil) in ('true', '1') and child.get('datatype') == 'int' and
+                             not len(child) and not (child.text or '').strip(), 'nil selector outside bounded proof')
+                        fields[name] = None
+                    else:
+                        fields[name] = self.entity(child, selector=True)
+                need(set(fields) == set(SCALAR_ACQUISITIONS[cap]), 'scalar acquisition fields')
+                if cap == 'windows.ntuser':
+                    fields.update(include_default=False, item_creation='key_and_name_exist')
+                value = {'capability': cap, 'selectors': fields}
+                if fs:
+                    value['filters'] = self.filters(fs, cap)
+                return value
             finally:
                 self.active.remove(ident)
         if cap == 'windows.cmdlet':
@@ -445,6 +490,9 @@ class ExpandedSource(Source):
                 # shellcommand.pattern is an intrinsic regex collector parameter
                 # (its 5.12.3 element documentation), not an equals selector.
                 n = deepcopy(n)
+                fs = n.findall('{' + OD + '}filter')
+                for f in fs:
+                    n.remove(f)
                 behaviors = n.findall('{' + OD + '#independent}behaviors')
                 need(len(behaviors) <= 1, 'duplicate command behaviors')
                 flags = {'error_if_exit_status_not_0': False, 'error_if_stderr_exists': False}
@@ -465,6 +513,8 @@ class ExpandedSource(Source):
                 try:
                     result = super().object(ident)
                     result['selectors'].update(flags)
+                    if fs:
+                        result['filters'] = self.filters(fs, cap)
                     return result
                 finally:
                     self.nodes[ident] = old
@@ -533,7 +583,8 @@ class ExpandedSource(Source):
             need(name not in ('verb', 'noun') and n.get(nil) in ('true', '1') and
                  not len(n) and not (n.text or '').strip(), 'invalid original nil input')
             datatype = 'record' if records else 'version' if name == 'module_version' else 'string'
-            need(n.get('datatype', datatype) == datatype, 'original nil datatype')
+            need(n.get('datatype', 'string' if datatype == 'string' else None) == datatype,
+                 'original nil datatype')
             return None
         if not records:
             term = self.entity(n, selector=True)
@@ -666,6 +717,24 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
+        if cap == 'independent.shellcommand' and 'set' not in n and 'filters' in n:
+            acquisition = deepcopy(n)
+            filters = acquisition.pop('filters')
+            result = super().object(acquisition, cap)
+            if filters:
+                result['filters'] = self.filters(filters)
+            return result
+        if cap in SCALAR_ACQUISITIONS and 'set' not in n:
+            allowed = set(SCALAR_ACQUISITIONS[cap])
+            defaults = {'include_default': False, 'item_creation': 'key_and_name_exist'} if cap == 'windows.ntuser' else {}
+            keys(n, allowed | set(defaults) | {'capability', 'object_title', 'filters'}, 'native scalar acquisition')
+            need(allowed | set(defaults) <= set(n), 'native scalar acquisition fields')
+            fields = {k: None if n[k] is None else self.predicate(n[k], selector=True) for k in sorted(allowed)}
+            fields.update({k: n[k] for k in defaults})
+            result = {'capability': cap, 'selectors': fields}
+            if n.get('filters'):
+                result['filters'] = self.filters(n['filters'])
+            return result
         if cap == 'windows.cmdlet' and 'set' not in n:
             allowed = {'module_name', 'module_id', 'module_version', 'verb', 'noun', 'parameters', 'select'}
             keys(n, allowed | {'capability', 'object_title', 'filters'}, 'native cmdlet Object')

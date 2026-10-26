@@ -1,5 +1,11 @@
 # Direct cmdlet input/result proof — 2026-10-26
 
+**Historical checkpoint, corrected by the [next source audit](v04-direct-remaining-primitives.md).**
+SV-278031 was admitted too permissively: its nil parameters omit the original
+Schematron-required record datatype. Current conversion blocks it; six of seven
+cmdlet closures remain admitted. The original 245/46 counts and five passing CI
+checks below describe this exact historical implementation, not current acceptance.
+
 Continued under [#251](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6401652271)
 after the [command-error checkpoint](v04-direct-command-behaviors.md). No approved
 schema, production converter/compiler, source fixture or release gate changed.

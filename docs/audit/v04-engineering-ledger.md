@@ -148,9 +148,30 @@ Capability-specific cmdlet select is validated as an input record; generic wrapp
 remain invalid. Authoring: 221 inline Test Objects, 43 references to 17 shared
 Objects, 85 no-Object Tests, 127 compact Registry sites; deprecated grammar zero.
 
-The next bounded objective is remaining approved scalar Windows primitives and
-case-insensitive inequality, with independent complete-closure proof. Original
-source-invalid recursion and explicitly deprecated scalar WMI remain blocked.
-These are engineering objectives, not observed scheduled or automatically resumed
-jobs. Historical evidence and mandatory gates remain intact. Issue commenting was
-previously Forbidden; committed reports are the authorized GitHub handoff.
+The [remaining Windows primitives checkpoint](v04-direct-remaining-primitives.md)
+is locally verified, with implementation push/CI reconciliation pending. Five new
+actual source closures prove and compile: IIS appcmd/listconfig, current-process
+environment dependencies, NTUSER, and case-insensitive account-name inequality.
+One preceding admission is withdrawn: SV-278031 omits the original Schematron's
+required datatype on nil cmdlet parameters. Both readers now reject that malformed
+source; a controlled explicitly typed derivative proves but adds no coverage.
+The historical UEFI example/report is preserved and marked superseded.
+
+Current coverage is **249 proved / zero compiled-unproved / 42 blocked** of 291:
+30 competing-check selections, eight unapproved all_exist, one unmapped legacy
+user acquisition, one deprecated scalar-WMI/function closure, and two source-invalid
+cases (nil record and pattern-path recursion). All **244 retained** previous
+program hashes are unchanged. All 39 user-rights closures remain proved. Public
+gates validate **500 JSON/500 YAML** documents and independently verify 249 programs.
+**3,074** mandatory tests, zero failures/errors, one unchanged skip; 79 related
+tests PASS. Authoring: 249 Assessments/357 Tests, 229 inline Test Objects, 43
+references to 17 genuinely shared Objects, 85 no-Object Tests, 128 compact Registry
+sites; deprecated grammar zero. This adds 100 source-proved Rules over reviewed
+`a2ce5fd94`, without changing the 883-Assessment package ledger.
+
+Source counterexamples retain original XML, IDs and SHA-256 references; neither
+source repair nor new normalization is applied. Restoring the source-invalid
+cases requires corrected pinned input or explicit owner review. Historical evidence
+and mandatory gates remain intact. Issue commenting was previously Forbidden;
+committed reports remain the authorized GitHub handoff. No scheduled/automatic
+resumption, scanner acceptance, signing/trust or release readiness is claimed.
