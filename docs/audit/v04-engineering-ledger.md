@@ -193,7 +193,7 @@ crosswalks retain old select/collect paths. No schema, mapping or converter was
 changed by this read-only audit; the CSV/machine packet preserve all 100 rows.
 
 The [canonical metadata/schema synchronization checkpoint](v04-schema-converter-sync.md)
-is locally verified pending exact-head CI. Twenty-seven mapping metadata files
+is reconciled at `ceb2e6aadd0c855aadf912841c81d2c7bc979703`. Twenty-seven mapping metadata files
 now use flat Object paths and canonical filesystem scope. All 30 normative schema
 files, 100 generated validation structures, 500 authoring documents and 249 prior
 program hashes are unchanged. The real cmdlet select record remains valid and is
@@ -205,3 +205,19 @@ Missing source correspondence is reported, not guessed. Initial maintained run:
 metadata anchors were rolled forward with previous hashes/revision preserved.
 The affected 18 proof tests and seven final contract tests pass; no assertion was
 relaxed. The old public schema-generator adaptation remains documented debt.
+
+The [exact-head CI reconciliation](v04-ceb2-ci-reconciliation.md) independently
+retrieved the hosted mandatory artifact: **3,081 run, 3,080 passed, one existing
+skip, zero failures/errors**, with its ZIP digest verified against GitHub.
+The final local maintained run independently matches all 3,081 selected test IDs,
+zero failures/errors and the same skip; public package/parity acceptance passes.
+All 18 hosted workflows completed: **12 success / six failure**. The six original
+Windows shellcommand, WMI57, cmdlet, cmdlet Variable, Set/Filter and published
+Bluetooth proofs fail on older native grammar at both unchanged `52efe1195` and
+`ceb2e6a`; exact authenticated hosted errors and baseline reproductions are recorded.
+They remain visible and unchanged. In particular, the immutable October 21
+Bluetooth package cannot validate unchanged against today's schema. Its historical
+versus current-derivative acceptance target needs explicit reconciliation before
+claiming all-green CI. No output, source proof, workflow gate or normative schema
+was changed by this documentation checkpoint. Generator decoupling is deferred
+until the owner's fully-green prerequisite is met.

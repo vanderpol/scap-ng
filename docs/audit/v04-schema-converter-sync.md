@@ -2,7 +2,7 @@
 
 Authority: [#251](https://github.com/vanderpol/scap-ng/issues/251).
 BASE_SHA: `52efe1195d2cee9318a3b8934476ad257e78e7c5`.
-RESULT_SHA: pending verified implementation commit.
+RESULT_SHA: `ceb2e6aadd0c855aadf912841c81d2c7bc979703`.
 SCHEMA_VERSION: 0.4.0. No normative schema, converter/compiler behavior or existing
 release gate is changed. The 883-Assessment package ledger is unchanged.
 
@@ -47,9 +47,19 @@ one existing skip: two stale native metadata citation hashes. Both citations wer
 refreshed with their original revisions/hashes retained; strict assertions are
 unchanged. The affected **18-test** proof suite and **seven** final contract tests
 pass; 34 related schema/source checks and the 100-capability generation audit pass.
-Exact-head hosted mandatory-suite reconciliation is pending. No failed check is
-hidden, skipped or relabeled as a pass.
-CI: pending implementation push.
+The final local maintained run and exact-head hosted mandatory artifact both
+confirm **3,081 run, zero failures or errors, one existing skip** (3,080 passed),
+with identical selected test IDs. The downloaded hosted ZIP digest matches
+GitHub's recorded SHA-256. No failed check is hidden, skipped or relabeled as a pass.
+CI: **12 successful / six failed / zero pending** at RESULT_SHA. The
+[mandatory rebaseline](https://github.com/vanderpol/scap-ng/actions/runs/40367741429),
+[schema synchronization](https://github.com/vanderpol/scap-ng/actions/runs/40367741273),
+current-design, canonical, shared-core, capability-generation and clean-extract
+checks passed. This is **not an all-green checkpoint**: six older source-proof
+consumers still emit or consume obsolete native grammar. All six reproduce at
+unchanged `52efe1195` and RESULT_SHA; authenticated hosted logs now independently
+confirm their failure diagnostics. The [complete reconciliation](v04-ceb2-ci-reconciliation.md)
+records all 18 runs, original source pins, exact errors and the remaining gate.
 
 **Maintainability and scale.** The active conversion/source/inventory/rendering
 core is 1,344 physical lines across eight modules; the initial retained experiment,
@@ -63,13 +73,17 @@ duplicated work. The recorded baseline spends about 0.16 s lowering versus
 run was concurrent with regressions, so its timings are not a speedup comparison.
 Neither result proves scaling to all capabilities or a whole corpus.
 
-NEXT_ENGINEERING_OBJECTIVE: remove legacy schema-generation coupling under exact
-contract parity, centralize source XSD/Schematron validation, and profile validator
-reuse before further capability-specific expansion. No replacement framework,
+NEXT_ENGINEERING_OBJECTIVE: reconcile the six source-proof consumers while
+preserving their original evidence and assertions. Removing legacy schema-generation
+coupling under exact contract parity remains conditional on the requested fully
+green checkpoint; that refactor has not started. Later shared work includes source
+XSD/Schematron validation and validator reuse. No replacement framework,
 scanner implementation, production replacement, signing or release is authorized
 by this checkpoint. See the [developer guide](../developer/DIRECT-V04-CONVERTER.md)
 for the regeneration command and module responsibilities.
 
-Issue commenting previously returned `Post "https://api.github.com/graphql": Forbidden`.
-The API-domain configuration draft is saved but has not been confirmed applied.
-The committed report remains the handoff; no repeated comment attempt was made.
+Earlier issue commenting returned `Post "https://api.github.com/graphql": Forbidden`.
+During this reconciliation, authenticated REST access to issue comments, exact-head
+Actions metadata, logs and the mandatory result artifact succeeded. Read access
+does not establish issue-write access; the final engineering handoff records the
+actual comment attempt separately.
