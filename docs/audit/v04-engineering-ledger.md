@@ -121,10 +121,26 @@ selection stays blocked. Authoring: 200 inline Test Objects, 39 references to
 deprecated grammar zero. The sample helper now handles complex-only selections
 and distinct roles without inventing ordinary examples or repeating a Rule.
 
-The next bounded objective is shell-command collection-error behavior. Ten actual
-pure-shell closures set `error_if_stderr_exists=true`. Both existing error flags
-must remain acquisition parameters with their original false defaults; collection
-error must never become an ordinary failed match or successful complete evidence.
+The [command collection-error checkpoint](v04-direct-command-behaviors.md) is complete:
+`083ec0e3e` → `fab566b2a`; [actual error-flag YAML/JSON](../examples/direct-command-behaviors/README.md)
+is pinned in `b9e6a7af3`. All ten actual closures prove and compile; coverage is
+**238 proved / zero compiled-unproved / 53 blocked**. All 228 previous program
+hashes remain unchanged. Public gates validate 478 JSON/478 YAML documents and
+verify 238 programs. **3,061** maintained tests, zero failures/errors, one existing
+skip; 66 related tests pass; all five exact implementation-head workflows PASS.
+True error flags remain collection controls; neighboring default flags stay false.
+Historical fixed case windows-14/SV-278146 now proves without changing its fixture
+or old manifest; the original reader remains unverifiable and a false-flag mutant
+mismatches. The 883-Assessment ledger is unchanged. Authoring: 211 inline Test
+Objects, 39 references to 15 shared Objects, 85 no-Object Tests, 127 compact Registry
+sites; deprecated grammar zero.
+
+The next bounded objective is cmdlet nullable/input-record source proof. Seven
+original candidates include two WMI dependencies. The approved capability-specific
+select parameter, null module constraints, selection_match and value_match scopes,
+record results and unsupported wildcards must remain distinct from generic
+wrappers or Test requirements. Deprecated scalar WMI remains blocked; it is not
+silently aliased to record-producing wmi57.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
