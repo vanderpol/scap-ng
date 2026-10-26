@@ -17,7 +17,7 @@ from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
          OD + '#independent}textfilecontent54': 'independent.textfilecontent54',
-         OD + '#windows}userright': 'windows.userright'}
+         OD + '#windows}userright': 'windows.userright', OD + '#windows}service': 'windows.service'}
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
 FILE_FIELDS = {**NAMES, 'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
                'gexec': 'group_execute', 'oread': 'other_read', 'owrite': 'other_write',
@@ -133,6 +133,27 @@ def original_policy_contract(cap):
     return fields
 
 
+@lru_cache(maxsize=1)
+def original_service_contract():
+    """Original service State fields and enum domains, without native mappings."""
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
+    state = schema.find(xs + 'element[@name="service_state"]')
+    fields = {}
+    types = {'oval-def:EntityStateStringType': 'string',
+             'oval-def:EntityStateIntType': 'int', 'oval-def:EntityStateBoolType': 'boolean'}
+    for field in state.findall('.//' + xs + 'sequence/' + xs + 'element'):
+        typename = field.get('type')
+        enums = set()
+        if typename not in types:
+            typed = schema.find(xs + 'complexType[@name="' + typename.split(':')[-1] + '"]')
+            restriction = typed.find(xs + 'simpleContent/' + xs + 'restriction')
+            need(restriction.get('base') == 'oval-def:EntityStateStringType', 'unhandled original service type')
+            enums = {n.get('value') for n in restriction.findall(xs + 'enumeration')}
+        fields[field.get('name')] = (types.get(typename, 'string'), enums)
+    return fields
+
+
 class ExpandedSource(Source):
     def __init__(self, oval):
         super().__init__(oval)
@@ -196,6 +217,19 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'windows.service':
+            contract = original_service_contract()
+            for entity in self.get(ident, 'states'):
+                name = local(entity)
+                need(entity.tag == '{' + OD + '#windows}' + name and name in contract,
+                     'unknown original service State field')
+                datatype, enums = contract[name]
+                need(entity.get('datatype', 'string') == datatype, 'original service field datatype')
+                if enums:
+                    operand = self.entity(entity)['operand']
+                    constants = operand.get('constant_values', [operand])
+                    need(all(v.get('datatype') == 'string' and v.get('value') in enums - {''}
+                             for v in constants), 'unknown/dynamic original service enum')
         if cap in SYSTEM_POLICIES:
             original = self.get(ident, 'states')
             contract = original_policy_contract(cap)
@@ -290,19 +324,22 @@ class ExpandedSource(Source):
                 return {'capability': cap, 'set': self.set_term(sets[0], cap)}
             finally:
                 self.active.remove(ident)
-        if cap == 'windows.userright':
+        if cap in ('windows.userright', 'windows.service'):
             need(ident not in self.active, 'cyclic Object')
-            keys(n, META, 'user-rights Object')
+            keys(n, META, 'Windows scalar-selector Object')
             self.active.add(ident)
             try:
-                entities = [c for c in n if c.tag == '{' + OD + '#windows}userright']
+                selector = 'userright' if cap == 'windows.userright' else 'service_name'
+                entities = [c for c in n if c.tag == '{' + OD + '#windows}' + selector]
                 filters = [c for c in n if c.tag == '{' + OD + '}filter']
-                need(len(entities) == 1 and len(n) == len(entities) + len(filters), 'user-rights acquisition shape')
-                value = {'capability': cap, 'selectors': {'userright': self.entity(entities[0], selector=True)}}
-                operand = value['selectors']['userright']['operand']
-                constants = operand.get('constant_values', [operand])
-                need(all(v.get('datatype') == 'string' and v.get('value') in original_userright_contract()[1]
-                         for v in constants), 'unknown/dynamic original user-right enum')
+                need(len(entities) == 1 and len(n) == len(entities) + len(filters), 'scalar acquisition shape')
+                need(entities[0].get('datatype', 'string') == 'string', 'Windows selector datatype')
+                value = {'capability': cap, 'selectors': {selector: self.entity(entities[0], selector=True)}}
+                if cap == 'windows.userright':
+                    operand = value['selectors'][selector]['operand']
+                    constants = operand.get('constant_values', [operand])
+                    need(all(v.get('datatype') == 'string' and v.get('value') in original_userright_contract()[1]
+                             for v in constants), 'unknown/dynamic original user-right enum')
                 if filters:
                     value['filters'] = self.filters(filters, cap)
                 return value
@@ -494,10 +531,11 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
-        if cap == 'windows.userright' and 'set' not in n:
-            keys(n, {'capability', 'object_title', 'userright', 'filters'}, 'native user-rights Object')
-            need('userright' in n, 'missing native user-right selector')
-            value = {'capability': cap, 'selectors': {'userright': self.predicate(n['userright'], selector=True)}}
+        if cap in ('windows.userright', 'windows.service') and 'set' not in n:
+            selector = 'userright' if cap == 'windows.userright' else 'service_name'
+            keys(n, {'capability', 'object_title', selector, 'filters'}, 'native Windows scalar-selector Object')
+            need(selector in n, 'missing native Windows selector')
+            value = {'capability': cap, 'selectors': {selector: self.predicate(n[selector], selector=True)}}
             if n.get('filters'):
                 value['filters'] = self.filters(n['filters'])
             return value

@@ -45,6 +45,8 @@ class DirectWmiTests(unittest.TestCase):
 
     def test_all_18_original_wmi_closures_prove_compile_and_complete_five_user_rights_rules(self):
         self.assertEqual((len(self.rows), len(self.rules), len(self.blocked)), (26, 18, 8))
+        self.assertNotIn('records', self.trace['unsupported'])
+        self.assertIn('record-level Variables, nested records, record absence and masking', self.trace['unsupported'])
         self.assertEqual(len(verify_original(self.source.root, self.docs, self.trace)), 18)
         self.assertEqual(len(verify_compiled(self.docs, build_bundle(self.docs)[0])), 18)
         self.assertTrue(all(any(s in error for s in ('all_exist', 'cmdlet', 'user_test')) for error in self.blocked.values()))

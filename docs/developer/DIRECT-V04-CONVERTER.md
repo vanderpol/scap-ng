@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-211 converted + 80 blocked, all 211 source-proved. The earlier 84/207 and 81/3
+213 converted + 78 blocked, all 213 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -451,3 +451,26 @@ To extend these contracts, inspect the original typed field and any Schematron
 restriction, update the small source adapter, and add both a source-derived
 positive and an independently rejected operand/quantifier mutation. Do not
 broaden `kind: none` to capabilities whose approved contract requires an Object.
+
+
+## Windows services
+
+`windows.service` reuses the generic selector, State, Variable, Set and Filter
+visitors. The two original Rules retain different service-name comparisons:
+`equals` and `case_insensitive_equals` are never merged. Start/current-state
+constants retain their exact original API names, without an enum crosswalk.
+The independent reader obtains service fields and enum domains directly from
+original OVAL XSD and checks native flat acquisition/require terms separately.
+Unknown or computed enum membership remains blocked; typed non-string fields
+need their required explicit original datatype attributes.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_service.py -v
+```
+
+Four focused tests cover both actual closures, exact public validation and
+compilation, selector/enum/quantifier mutants, invalid source fields and a
+controlled relative-COMPLEMENT Set whose include Filter applies to each operand
+before the operator. Repeated acquisition identity remains genuinely shared.
+Controlled derivatives establish reusable construct behavior, not extra original
+Rule coverage. Source proof and compilation do not establish scanner execution.

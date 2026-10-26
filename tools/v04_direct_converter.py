@@ -18,7 +18,8 @@ from v04_direct_scap_source import (
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
-                'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy')
+                'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy',
+                'windows.service')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -563,7 +564,8 @@ def assemble_subset(source, documents, rule_trace, mappings):
         'component_index_passes': len(source.components), 'mapping_sha256': {m['capability']: digest(m) for m in mappings},
         'scope': 'Automated Assessment/selection subset, not full Rule-policy or Benchmark conversion',
         'unsupported': ['other Rules', 'manual execution', 'CPE/platform execution', 'full Rule metadata/remediation/scoring',
-                        'behaviors', 'records', 'all_exist', 'other capabilities/functions'],
+                        'behaviors', 'record-level Variables, nested records, record absence and masking',
+                        'all_exist', 'other capabilities/functions'],
         'coverage_promoted': False, 'scanner_evaluated': False}
     return documents, trace
 

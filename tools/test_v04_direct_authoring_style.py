@@ -191,7 +191,7 @@ class DirectAuthoringStyle(unittest.TestCase):
                 if test['capability'] == 'windows.auditeventpolicysubcategories':
                     self.assertNotIn('object', test)
         stats = authoring_statistics(self.documents)
-        self.assertEqual((stats['assessments'], stats['tests'], stats['no_object_tests']), (211, 286, 85))
+        self.assertEqual((stats['assessments'], stats['tests'], stats['no_object_tests']), (213, 288, 85))
         self.assertEqual(stats['shared_objects'], stats['multiply_used_named_objects'])
 
     def test_representatives_retain_independent_source_and_compiled_operand_proof(self):
