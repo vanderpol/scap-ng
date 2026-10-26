@@ -13,7 +13,7 @@ from v04_direct_authoring_examples import authoring_statistics, choose_examples,
 from validate_native_json_schemas import classify
 from audit_v04_direct_benchmark import verify_original, verify_compiled
 from v04_native_bundle_compiler import build_bundle
-from v04_object_contract import object_sites
+from v04_object_contract import object_errors, object_sites
 
 ROOT = Path(__file__).resolve().parents[1]
 PINS = json.loads((ROOT / 'tests/fixtures/v04-direct-prototype/provenance.json').read_text())
@@ -184,14 +184,18 @@ class DirectAuthoringStyle(unittest.TestCase):
         for doc in self.documents.values():
             if 'assessment' not in doc:
                 continue
+            permitted_select = {id(s.node) for s in object_sites(doc['assessment']) if s.capability == 'windows.cmdlet'}
             for node in walk(doc['assessment']):
-                self.assertFalse(set(node) & DEPRECATED)
+                self.assertFalse(set(node) & (DEPRECATED - {'select'}))
+                if 'select' in node:
+                    self.assertIn(id(node), permitted_select)
+            self.assertFalse(list(object_errors(doc)))
             for test in doc['assessment']['tests'].values():
                 self.assertIsInstance(test['require'], dict)
                 if test['capability'] == 'windows.auditeventpolicysubcategories':
                     self.assertNotIn('object', test)
         stats = authoring_statistics(self.documents)
-        self.assertEqual((stats['assessments'], stats['tests'], stats['no_object_tests']), (238, 335, 85))
+        self.assertEqual((stats['assessments'], stats['tests'], stats['no_object_tests']), (245, 349, 85))
         self.assertEqual(stats['shared_objects'], stats['multiply_used_named_objects'])
 
     def test_representatives_retain_independent_source_and_compiled_operand_proof(self):

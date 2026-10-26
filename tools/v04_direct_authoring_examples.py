@@ -50,11 +50,20 @@ def authoring_statistics(documents):
         for test in assessment['tests'].values():
             counts['inline_objects' if isinstance(test.get('object'), dict) else
                    'shared_object_tests' if 'object' in test else 'no_object_tests'] += 1
+        cmdlet_objects = set()
         for site in object_sites(assessment):
+            if site.capability == 'windows.cmdlet':
+                cmdlet_objects.add(id(site.node))
             if site.private and compact_registry_object(site.node, site.capability):
                 counts['one_line_objects'] += 1
         for node in walk(assessment):
-            counts['deprecated_grammar'] += len(set(node) & DEPRECATED)
+            obsolete = set(node) & DEPRECATED
+            if id(node) in cmdlet_objects:
+                projection = node.get('select')
+                if projection is None or (isinstance(projection, dict) and 'fields' in projection and
+                                          set(projection) <= {'fields', 'redact_result'}):
+                    obsolete.discard('select')  # Reviewed collector record, never a generic wrapper.
+            counts['deprecated_grammar'] += len(obsolete)
     return {key: counts[key] for key in ('assessments', 'tests', 'inline_objects', 'shared_object_tests',
         'no_object_tests', 'shared_objects', 'multiply_used_named_objects', 'one_line_objects', 'deprecated_grammar')}
 

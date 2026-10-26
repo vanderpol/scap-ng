@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-238 converted + 53 blocked, all 238 source-proved. The earlier 84/207 and 81/3
+245 converted + 46 blocked, all 245 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -415,8 +415,9 @@ It never invents a query purpose or adds a title to a private Object.
 PYTHONPATH=tools python tools/test_v04_direct_wmi.py -v
 ```
 
-All 18 supported original WMI closures prove and compile; eight remain blocked
-by other unsupported capabilities or unapproved `all_exist` semantics. The
+The first WMI increment proves/compiles 18 original closures. Cmdlet support
+adds two complete mixed closures, bringing current WMI coverage to 20/26; six
+still require unsupported legacy behavior or unapproved `all_exist`. The
 five WMI-dependent user-rights closures are included in the 18. These counts
 overlap by capability and are not added to each other as independent Rules.
 
@@ -564,3 +565,40 @@ incorrect matching substitutions, collection evidence guards and invalid XML.
 The sample helper also selects an actual true-error-flag Assessment by emitted
 structure. Example selection never controls Rule admission. This preserves a
 collection contract; it is not a shell runner or scanner implementation.
+
+
+## Cmdlet invocation records and null constraints
+
+`v04_direct_cmdlet_inputs.cmdlet_input` translates the approved collection inputs.
+Source `xsi:nil=true` becomes native null only for a nullable parameter, preserving
+unconstrained module identity/version and absent invocation/select records. It
+never turns null into an empty string or an invented Object. Scalar collector
+inputs remain equality parameters. Read-only verb enums must be known literals;
+computed enum membership remains blocked.
+
+Input records use `fields` with explicit `selection_match`, separately from
+expected-value `value_match` and Test/State `values_found`/`values_matching`.
+Source entity_check/var_check defaults remain all/every in their separate scopes.
+Numeric-looking strings such as Select-Object first `"100"` stay strings. Original
+nil/record/type/operator/name constraints, field uniqueness and lowercase source
+names are checked without restricting native human authoring to lowercase.
+Unsupported wildcard selection, masks, parent record Variables and malformed
+inputs fail closed. Record result requirements reuse the existing structured
+record visitor; acquisition records are never flattened into strings.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_cmdlet.py -v
+```
+
+All seven actual cmdlet closures prove and compile, including two WMI-dependent
+Rules. Five tests cover actual input/result graphs, nulls, YAML/JSON, independent
+selection/value matching, invalid input records, wildcard/name/type errors and
+native operand mutations. The WMI suite retains its original 18/8 restricted-
+catalog boundary; the cmdlet and full-benchmark suites verify current expansion.
+
+The capability-specific Object `select` parameter is an approved input record,
+not the forbidden generic select wrapper. Authoring statistics now recognize it
+at typed cmdlet Object sites, consistent with the unchanged canonical Object
+validator. A legacy selector-wrapper shape still fails schema validation and is
+reported as obsolete. No validator or approved grammar is weakened. Cmdlets are
+represented and compiled; no PowerShell command is executed by these tests.

@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import unittest
 import xml.etree.ElementTree as ET
+from unittest.mock import patch
 
 from v04_direct_scap_source import SourceModel, UnsupportedSource, OVAL
 from v04_direct_converter import CAPABILITIES, convert
@@ -26,9 +27,13 @@ class DirectWmiTests(unittest.TestCase):
         cls.rows = [r for r in SourceInventory(cls.source).rules() if CAP in r['needed_capabilities']]
         cls.rules = []
         cls.blocked = {}
+        # Preserve the original WMI-only admission boundary. The separate
+        # cmdlet suite proves the additional complete mixed closures.
+        cls.catalog = tuple(c for c in CAPABILITIES if c != 'windows.cmdlet')
         for row in cls.rows:
             try:
-                convert(cls.source, [row['source_rule']])
+                with patch('v04_direct_converter.CAPABILITIES', cls.catalog):
+                    convert(cls.source, [row['source_rule']])
             except UnsupportedSource as error:
                 cls.blocked[row['source_rule']] = str(error)
             else:

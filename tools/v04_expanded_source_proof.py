@@ -12,13 +12,14 @@ from functools import lru_cache
 import xml.etree.ElementTree as ET
 
 from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
-    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES)
+    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK)
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
          OD + '#independent}textfilecontent54': 'independent.textfilecontent54',
          OD + '#windows}userright': 'windows.userright', OD + '#windows}service': 'windows.service',
-         OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights53'}
+         OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights53',
+         OD + '#windows}cmdlet': 'windows.cmdlet'}
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
 FILE_FIELDS = {**NAMES, 'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
                'gexec': 'group_execute', 'oread': 'other_read', 'owrite': 'other_write',
@@ -237,6 +238,9 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'windows.cmdlet':
+            need(all(c.tag == '{' + OD + '#windows}value' and c.get('datatype') == 'record'
+                     for c in self.get(ident, 'states')), 'cmdlet State outside bounded value-record proof')
         if cap == 'windows.fileeffectiverights53':
             contract, _ = original_file_rights_contract()
             for entity in self.get(ident, 'states'):
@@ -355,6 +359,27 @@ class ExpandedSource(Source):
             self.active.add(ident)
             try:
                 return {'capability': cap, 'set': self.set_term(sets[0], cap)}
+            finally:
+                self.active.remove(ident)
+        if cap == 'windows.cmdlet':
+            need(ident not in self.active, 'cyclic Object')
+            keys(n, META, 'cmdlet Object')
+            allowed = {'module_name', 'module_id', 'module_version', 'verb', 'noun', 'parameters', 'select'}
+            self.active.add(ident)
+            try:
+                fields, fs = {}, []
+                for child in n:
+                    if child.tag == '{' + OD + '}filter':
+                        fs.append(child); continue
+                    name = local(child)
+                    need(child.tag == '{' + OD + '#windows}' + name and name in allowed and name not in fields,
+                         'unknown/duplicate original cmdlet input')
+                    fields[name] = self.cmdlet_input(child)
+                need(set(fields) == allowed, 'missing original cmdlet input')
+                value = {'capability': cap, 'selectors': fields}
+                if fs:
+                    value['filters'] = self.filters(fs, cap)
+                return value
             finally:
                 self.active.remove(ident)
         if cap in ('windows.userright', 'windows.service'):
@@ -498,6 +523,39 @@ class ExpandedSource(Source):
         self.active.remove(ident)
         return value
 
+    def cmdlet_input(self, n):
+        """Independent original record-field selection versus expected matching."""
+        nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
+        name = local(n)
+        records = name in ('parameters', 'select')
+        if nil in n.attrib:
+            keys(n, {nil, 'datatype'}, 'cmdlet nil input')
+            need(name not in ('verb', 'noun') and n.get(nil) in ('true', '1') and
+                 not len(n) and not (n.text or '').strip(), 'invalid original nil input')
+            datatype = 'record' if records else 'version' if name == 'module_version' else 'string'
+            need(n.get('datatype', datatype) == datatype, 'original nil datatype')
+            return None
+        if not records:
+            term = self.entity(n, selector=True)
+            need(term['operation'] == 'equals' and term['comparison_datatype'] == 'string', 'cmdlet scalar input')
+            return term['operand']
+        keys(n, {'datatype', 'operation'}, 'cmdlet input record')
+        need(n.get('datatype') == 'record' and n.get('operation', 'equals') == 'equals' and
+             not (n.text or '').strip(), 'original input record type/comparator')
+        fields = {}
+        for child in n:
+            field = child.get('name')
+            need(child.tag == '{' + OD + '}field' and field and field not in fields and
+                 not any('A' <= c <= 'Z' for c in field), 'invalid/duplicate input record field')
+            check = child.get('entity_check', 'all')
+            need(check in CHECK, 'input record entity_check')
+            scalar = deepcopy(child)
+            scalar.attrib.pop('name'); scalar.attrib.pop('entity_check', None)
+            fields[field] = {'predicate': self.entity(scalar, selector=True), 'selection_matching': CHECK[check]}
+            if name == 'select':
+                need(fields[field]['predicate']['operand'] != literal('string', '*'), 'wildcard output selection')
+        return {'fields': fields}
+
     def test(self, ident):
         n = self.get(ident, 'tests')
         if n.get('check_existence') != 'all_exist':
@@ -608,6 +666,31 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
+        if cap == 'windows.cmdlet' and 'set' not in n:
+            allowed = {'module_name', 'module_id', 'module_version', 'verb', 'noun', 'parameters', 'select'}
+            keys(n, allowed | {'capability', 'object_title', 'filters'}, 'native cmdlet Object')
+            need(allowed <= set(n), 'missing native cmdlet input')
+            fields = {}
+            for name in sorted(allowed):
+                value = n[name]
+                if value is None:
+                    need(name not in ('verb', 'noun'), 'native required command identity')
+                    fields[name] = None
+                elif name in ('parameters', 'select'):
+                    keys(value, {'fields'}, 'native collector record')
+                    fields[name] = {'fields': {}}
+                    for field, predicate in value['fields'].items():
+                        scalar = deepcopy(predicate)
+                        selection = scalar.pop('selection_match', None)
+                        need(selection in CHECK.values(), 'missing native field selection matching')
+                        fields[name]['fields'][field] = {'predicate': self.predicate(scalar, selector=True),
+                                                        'selection_matching': selection}
+                else:
+                    fields[name] = self.operand(value)
+            result = {'capability': cap, 'selectors': fields}
+            if n.get('filters'):
+                result['filters'] = self.filters(n['filters'])
+            return result
         if cap == 'windows.fileeffectiverights53' and 'set' not in n:
             allowed = {'full_path', 'directory', 'name', 'trustee_sid'}
             keys(n, allowed | {'capability', 'object_title', 'filesystem', 'filters'}, 'native rights Object')

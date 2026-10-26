@@ -19,7 +19,8 @@ from v04_direct_scap_source import (
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
                 'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy',
-                'windows.service', 'independent.textfilecontent54', 'windows.fileeffectiverights53')
+                'windows.service', 'independent.textfilecontent54', 'windows.fileeffectiverights53',
+                'windows.cmdlet')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -199,7 +200,12 @@ class AssessmentConverter:
                        field in selectors.keys() | parameters.keys(), f'unsupported Object field: {field}')
                 target = selectors.get(field, parameters.get(field))
                 ensure(target not in acquisition, 'duplicate Object field')
-                acquisition[target] = self.predicate(child, mapping, selector=True) if field in selectors else self.parameter(child)
+                if mapping['capability'] == 'windows.cmdlet':
+                    from v04_direct_cmdlet_inputs import cmdlet_input
+                    acquisition[target] = cmdlet_input(child, mapping['native']['collection_parameters'][target],
+                        lambda entity: self.predicate(entity, mapping, selector=True), self.parameter)
+                else:
+                    acquisition[target] = self.predicate(child, mapping, selector=True) if field in selectors else self.parameter(child)
                 if (field in selectors and child.get('operation') == 'case insensitive equals'
                         and 'equals' in acquisition[target]):
                     self.selector_equivalences.append({'source_object': element.get('id'),
@@ -424,7 +430,7 @@ class AssessmentConverter:
             ensure(isinstance(value, str) and value in aliases, 'unsupported enum comparison/value')
             value = aliases[value]
         if selector:
-            field = mapping['native']['selector_map'].get(local_name(element))
+            field = mapping['native'].get('selector_map', {}).get(local_name(element))
             enumeration = mapping['native'].get('selector_value_enums', {}).get(field)
             if enumeration:
                 ensure(operation == 'equals', 'unsupported enum selector comparator')
