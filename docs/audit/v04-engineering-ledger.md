@@ -135,13 +135,22 @@ mismatches. The 883-Assessment ledger is unchanged. Authoring: 211 inline Test
 Objects, 39 references to 15 shared Objects, 85 no-Object Tests, 127 compact Registry
 sites; deprecated grammar zero.
 
-The next bounded objective is cmdlet nullable/input-record source proof. Seven
-original candidates include two WMI dependencies. The approved capability-specific
-select parameter, null module constraints, selection_match and value_match scopes,
-record results and unsupported wildcards must remain distinct from generic
-wrappers or Test requirements. Deprecated scalar WMI remains blocked; it is not
-silently aliased to record-producing wmi57.
-These are queued engineering objectives, not
-observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
-intact. Issue commenting was previously Forbidden; committed reports are the
-authorized GitHub handoff if that restriction persists.
+The [cmdlet checkpoint](v04-direct-cmdlet.md) is complete:
+`600fa14cb` → `c117b06c8`; [actual nullable/input-record YAML/JSON](../examples/direct-cmdlet/README.md)
+is pinned in `8967d7d8c`. All seven actual closures prove and compile, including
+two mixed WMI closures; coverage is **245 proved / zero compiled-unproved / 46
+blocked**. All 238 previous program hashes remain unchanged. Public gates validate
+492 JSON/492 YAML documents and verify 245 programs. **3,066** maintained tests,
+zero failures/errors, one unchanged skip; 71 related tests pass; all five exact
+implementation-head workflows PASS. Null module constraints, invocation field
+selection, expected-value cardinality and result records remain distinct.
+Capability-specific cmdlet select is validated as an input record; generic wrappers
+remain invalid. Authoring: 221 inline Test Objects, 43 references to 17 shared
+Objects, 85 no-Object Tests, 127 compact Registry sites; deprecated grammar zero.
+
+The next bounded objective is remaining approved scalar Windows primitives and
+case-insensitive inequality, with independent complete-closure proof. Original
+source-invalid recursion and explicitly deprecated scalar WMI remain blocked.
+These are engineering objectives, not observed scheduled or automatically resumed
+jobs. Historical evidence and mandatory gates remain intact. Issue commenting was
+previously Forbidden; committed reports are the authorized GitHub handoff.
