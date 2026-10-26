@@ -106,10 +106,25 @@ Windows-view/traversal attributes fail closed. Authoring: 174 inline Test Object
 36 references to 12 genuinely shared Objects, 85 no-Object Tests and 120 compact
 Registry Objects; deprecated grammar zero.
 
-The next bounded objective is Windows file-effective-rights source proof. Eight
-original candidate closures need exact direct-SID selection/defaults, permission
-Booleans, full-path and directory/name acquisitions, Variables, Sets and ordered
-Filters. Explicit group-expansion behavior must not be silently discarded.
+The [file-effective-rights checkpoint](v04-direct-file-rights.md) is complete:
+`95ce4e721` → `6d7fdc039`; [actual Set/Filter/Variable samples](../examples/direct-file-rights/README.md)
+are pinned in `97a151f08`. All eight original closures prove and compile;
+coverage advances to **228 proved / zero compiled-unproved / 63 blocked**. All
+220 previous program hashes remain unchanged. Public gates validate 458 JSON/458
+YAML documents and independently verify 228 programs. **3,057** maintained tests,
+zero failures/errors, one existing skip; 62 related tests and 20 final publication
+checks pass. All five exact implementation-head workflows PASS. SID selection,
+permission Booleans, Variables, path forms, Filters and relative-complement
+boundaries remain exact. Unsupported group expansion/view/traversal/nilled
+selection stays blocked. Authoring: 200 inline Test Objects, 39 references to
+15 genuinely shared Objects, 85 no-Object Tests, 127 compact Registry sites;
+deprecated grammar zero. The sample helper now handles complex-only selections
+and distinct roles without inventing ordinary examples or repeating a Rule.
+
+The next bounded objective is shell-command collection-error behavior. Ten actual
+pure-shell closures set `error_if_stderr_exists=true`. Both existing error flags
+must remain acquisition parameters with their original false defaults; collection
+error must never become an ordinary failed match or successful complete evidence.
 These are queued engineering objectives, not
 observed scheduled or automatically resumed jobs. Existing historical evidence and mandatory gates remain
 intact. Issue commenting was previously Forbidden; committed reports are the
