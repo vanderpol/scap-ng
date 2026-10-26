@@ -17,7 +17,7 @@ from unittest.mock import patch
 from audit_v04_eight_assessment_pilot import verify_program
 from audit_v04_proof_expansion import manifest_rows, merge_coverage
 from test_v04_source_package_semantics import fixture as pilot, consistently_rehash_program
-from v04_source_package_semantics import Unsupported, digest, local, xml_term
+from v04_source_package_semantics import Source, Unsupported, compare, digest, local, xml_term
 from v04_expanded_source_proof import (ExpandedSource, ExpandedNative, actual_items_evidence,
     expanded_compare, predicate_order, APPROVED_SHA, APPROVED_SOURCE)
 from oval_result_truth_tables import aggregate_operator, apply_filter_state_result, evaluate_collected_object_test
@@ -56,7 +56,22 @@ class ExpandedSourceProofTests(unittest.TestCase):
                 closure = source.closure(f['source_definition'])
                 self.assertEqual(closure['nodes'], f['provenance']['source_dependency_closure']['nodes'])
                 verify_program(f['assessment'], f['compiled_program'])
-                self.assertEqual(checked(f)['outcome'], f['expected_outcome'])
+                if row['case'] == 14:
+                    # Keep the historical pinned packet immutable. The newly
+                    # proved generic command controls discharge this old gap.
+                    self.assertEqual(f['provenance']['rule'], 'SV-278146')
+                    self.assertEqual(f['expected_outcome'], 'UNVERIFIABLE/UNSUPPORTED')
+                    original_reader = Source(ET.fromstring(f['source_xml']))
+                    self.assertEqual(compare(original_reader, f['source_definition'], f['assessment'],
+                                             native_type=ExpandedNative)['outcome'], f['expected_outcome'])
+                    self.assertEqual(checked(f)['outcome'], 'PROVED')
+                    mutant = deepcopy(f)
+                    test = next(t for t in mutant['assessment']['tests'].values()
+                                if t['object'].get('error_if_stderr_exists') is True)
+                    test['object']['error_if_stderr_exists'] = False
+                    self.assertEqual(checked(mutant)['outcome'], 'MISMATCH')
+                else:
+                    self.assertEqual(checked(f)['outcome'], f['expected_outcome'])
         with patch.dict(sys.modules, {'resource': None}):
             spec = importlib.util.spec_from_file_location('proof_without_resource',
                 ROOT / 'tools/audit_v04_proof_expansion.py')

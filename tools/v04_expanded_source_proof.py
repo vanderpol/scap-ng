@@ -420,13 +420,27 @@ class ExpandedSource(Source):
                 # shellcommand.pattern is an intrinsic regex collector parameter
                 # (its 5.12.3 element documentation), not an equals selector.
                 n = deepcopy(n)
+                behaviors = n.findall('{' + OD + '#independent}behaviors')
+                need(len(behaviors) <= 1, 'duplicate command behaviors')
+                flags = {'error_if_exit_status_not_0': False, 'error_if_stderr_exists': False}
+                if behaviors:
+                    behavior = behaviors[0]
+                    keys(behavior, set(flags), 'command behaviors')
+                    need(not len(behavior) and not (behavior.text or '').strip(), 'nonempty command behaviors')
+                    for name in flags:
+                        value = behavior.get(name, 'false')
+                        need(value in ('true', 'false', '1', '0'), 'invalid original command error flag')
+                        flags[name] = value in ('true', '1')
+                    n.remove(behavior)
                 for c in n:
                     if local(c) == 'pattern' and 'operation' not in c.attrib:
                         c.set('operation', 'pattern match')
                 old = self.nodes[ident]
                 self.nodes[ident] = n
                 try:
-                    return super().object(ident)
+                    result = super().object(ident)
+                    result['selectors'].update(flags)
+                    return result
                 finally:
                     self.nodes[ident] = old
             return super().object(ident)

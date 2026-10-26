@@ -97,7 +97,9 @@ def capability_examples(documents, capability):
         selected['ordinary-acquisition'] = ordinary[0]
     for label, predicate in (
             ('source-filter-variable', lambda a: any(n.get('filters') for n in walk(a))),
-            ('shared-acquisition', lambda a: bool(a.get('shared_objects')))):
+            ('shared-acquisition', lambda a: bool(a.get('shared_objects'))),
+            ('source-error-behavior', lambda a: any(n.get('error_if_stderr_exists') is True or
+                n.get('error_if_exit_status_not_0') is True for n in walk(a)))):
         candidates = [a for a in assessments if predicate(a)
                       and a['id'] not in {chosen['id'] for chosen in selected.values()}]
         if candidates:

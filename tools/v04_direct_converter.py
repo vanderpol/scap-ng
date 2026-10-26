@@ -189,9 +189,10 @@ class AssessmentConverter:
                     filters.append(self.filter(child, mapping))
                     continue
                 field = local_name(child)
-                if field == 'behaviors' and mapping['capability'] == 'independent.textfilecontent54':
+                if field == 'behaviors' and mapping['capability'] in (
+                        'independent.textfilecontent54', 'independent.shellcommand'):
                     ensure(child.tag == f'{{{mapping["source"]["namespace"]}}}behaviors' and behaviors is None,
-                           'duplicate/foreign text-file behaviors')
+                           'duplicate/foreign acquisition behaviors')
                     behaviors = child
                     continue
                 ensure(child.tag.startswith(f'{{{mapping["source"]["namespace"]}}}') and
@@ -212,6 +213,9 @@ class AssessmentConverter:
             if mapping['capability'] == 'independent.textfilecontent54':
                 from v04_direct_file_behaviors import file_behaviors
                 acquisition.update(file_behaviors(behaviors))
+            if mapping['capability'] == 'independent.shellcommand':
+                from v04_direct_command_behaviors import command_behaviors
+                acquisition.update(command_behaviors(behaviors))
             if mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal'):
                 # FileBehaviors defaults recurse_file_system to all, including
                 # exact full_path acquisition. Sets inherit it on each leaf.

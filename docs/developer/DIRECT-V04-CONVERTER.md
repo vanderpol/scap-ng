@@ -195,7 +195,7 @@ The audit's separate root `coverage.json/md` attaches `source_proved` only after
 original typed-term and exact compiled-operand checks; `compiled_unproved` retains
 explicit unsupported proof obligations. Producer coverage remains unchanged.
 Current architecture-acceptance checkpoint for this pin: 291 original Rules =
-228 converted + 63 blocked, all 228 source-proved. The earlier 84/207 and 81/3
+238 converted + 53 blocked, all 238 source-proved. The earlier 84/207 and 81/3
 results, plus the 87/204 architecture and 130/161 authoring checkpoints, remain preserved in their dated
 audit packets. Generic common Set proof
 now covers the three original Registry Set cases; integer ordered comparisons
@@ -535,3 +535,32 @@ expansion, and a controlled two-path relative complement with ordered Filters on
 each operand. Swapping complement operands fails independent proof. Controlled
 derivatives are not extra original coverage. These are graph/operand/contract
 proofs, not Windows access-check execution or scanner parity.
+
+
+## Shell collection error controls
+
+`v04_direct_command_behaviors.command_behaviors` preserves the approved Boolean
+acquisition parameters `error_if_exit_status_not_0` and `error_if_stderr_exists`.
+Original `ShellCommandBehaviors` declares both optional with default false.
+Explicit true requests collection-error evidence, not a failed ordinary matching
+condition. Each acquisition keeps its own flags; a neighboring default command
+must not inherit true. Script/shell/pattern strings remain unchanged and are never
+executed by conversion or these tests.
+
+The common Object visitor calls the helper for inline, shared, Variable and Set
+acquisitions. Unknown, duplicate, foreign or nonempty behavior nodes and invalid
+Boolean lexical values fail closed. The independent reader separately reads the
+original attributes; it neither imports the helper nor changes the original XML.
+Existing error/incomplete/not-collected evidence cannot become complete success.
+
+```bash
+PYTHONPATH=tools python tools/test_v04_direct_command_behaviors.py -v
+PYTHONPATH=tools python tools/v04_direct_authoring_examples.py --capability independent.shellcommand --output /tmp/direct-command-examples
+```
+
+Four tests cover ten actual closures, required native parameters, original
+optional/default declarations, all four flag combinations, changed/deleted flags,
+incorrect matching substitutions, collection evidence guards and invalid XML.
+The sample helper also selects an actual true-error-flag Assessment by emitted
+structure. Example selection never controls Rule admission. This preserves a
+collection contract; it is not a shell runner or scanner implementation.
