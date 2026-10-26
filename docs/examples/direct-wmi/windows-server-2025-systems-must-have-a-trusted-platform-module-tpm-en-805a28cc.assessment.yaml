@@ -1,0 +1,91 @@
+assessment:
+  id: windows-server-2025-systems-must-have-a-trusted-platform-module-tpm-en-805a28cc-assessment
+  version: 1
+  assessment_title: Windows Server 2025 systems must have a Trusted Platform Module (TPM) enabled and ready for use.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    tpm-isenabled-initialvalue-equals-true-da3740ba-test:
+      test_title: TPM IsEnabled_InitialValue equals True
+      capability: windows.wmi.query
+      object:
+        namespace: 'root\cimv2\security\microsofttpm'
+        query: SELECT IsEnabled_InitialValue FROM Win32_Tpm
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        or:
+        - fields:
+            result:
+              record:
+                records_found: one_or_more
+                records_matching: every
+                fields:
+                  isenabled_initialvalue: {equals: '1', values_found: one_or_more, values_matching: every}
+        - fields:
+            result:
+              record:
+                records_found: one_or_more
+                records_matching: every
+                fields:
+                  isenabled_initialvalue: {equals: '-1', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    tpm-isactivated-initialvalue-equals-true-973cabc8-test:
+      test_title: TPM IsActivated_InitialValue equals True
+      capability: windows.wmi.query
+      object:
+        namespace: 'root\cimv2\security\microsofttpm'
+        query: SELECT IsActivated_InitialValue FROM Win32_Tpm
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        or:
+        - fields:
+            result:
+              record:
+                records_found: one_or_more
+                records_matching: every
+                fields:
+                  isactivated_initialvalue: {equals: '1', values_found: one_or_more, values_matching: every}
+        - fields:
+            result:
+              record:
+                records_found: one_or_more
+                records_matching: every
+                fields:
+                  isactivated_initialvalue: {equals: '-1', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    tpm-isowned-initialvalue-equals-true-fbf8e11d-test:
+      test_title: TPM IsOwned_InitialValue equals True
+      capability: windows.wmi.query
+      object:
+        namespace: 'root\cimv2\security\microsofttpm'
+        query: SELECT IsOwned_InitialValue FROM Win32_Tpm
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        or:
+        - fields:
+            result:
+              record:
+                records_found: one_or_more
+                records_matching: every
+                fields:
+                  isowned_initialvalue: {equals: '1', values_found: one_or_more, values_matching: every}
+        - fields:
+            result:
+              record:
+                records_found: one_or_more
+                records_matching: every
+                fields:
+                  isowned_initialvalue: {equals: '-1', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    and:
+    - test: tpm-isenabled-initialvalue-equals-true-da3740ba-test
+    - test: tpm-isactivated-initialvalue-equals-true-973cabc8-test
+    - test: tpm-isowned-initialvalue-equals-true-fbf8e11d-test
