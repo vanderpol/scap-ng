@@ -1,81 +1,82 @@
-# Pinned SCAP 1.4 OVAL Test Content coverage — #251
+# Complete pinned OVAL Test Content coverage — #251
 
 BASE_SHA: `8834539967d1dcc5939bf90240e9e05bcf938b81` · SCHEMA_VERSION: `0.4.0`.
-RESULT_SHA and exact-head CI are recorded in the [machine report](v04-oval-test-corpus.json).
+RESULT_SHA, exact-head CI and artifact checksums are in the
+[machine report](v04-oval-test-corpus.json).
 
-The entire `OVAL-Community/SCAP-Self-Assertion` collection at
+The complete `OVAL-Community/SCAP-Self-Assertion` collection at
 `e3538595c5083b9c34d937a81d319234df9bbfaa` is inventoried, including ZIP-contained
-OVAL definitions and support/reference XML. All **154 original file blobs** were
-independently checked against the GitHub Git tree. The tracked [pin manifest](../../tests/fixtures/v04-oval-corpus-pin.json)
-hashes every file; changed, extra or missing inputs fail before conversion.
+OVAL and support XML. All **154 original file blobs** match the upstream Git tree.
+The [pin manifest](../../tests/fixtures/v04-oval-corpus-pin.json) hashes every file;
+missing, extra or changed inputs fail before conversion.
 
-**159 XML documents / 145 OVAL documents / 803 Tests**, with **168 Definitions,
-643 Objects, 611 States and 267 Variables**. Every Test has a file-scoped recursive
-dependency inventory; zero unresolved/wrong-kind/cyclic dependency diagnostics.
-Inventory follows unsupported nodes instead of stopping at the first capability.
-The other 14 XML documents are support/reference data, not silently dropped Tests.
+**159 XML documents / 145 OVAL documents / 803 Tests**, plus **168 Definitions,
+643 Objects, 611 States and 267 Variables**. Every Test has its complete file-scoped
+recursive reference graph; zero unresolved/wrong-kind/cyclic dependency diagnostics.
+The other 14 XML documents remain identified support/reference data. The collection
+contains 98 of 100 mapped identities; `independent.sql512` and
+`independent.yamlfilecontent` have no fixtures.
 
-The unchanged generic direct converter attempts all **190 Tests** belonging to
-its 15 enabled capabilities. **145 convert, 144 validate and compile, 127 pass
-independent source-term comparison**. Forty-five fail conversion, one generated
-identifier fails schema validation, six compiled cases exceed the proof reader,
-and eleven compiled comparisons differ. All **613 other Tests** are inventoried
-as mapped-but-not-enabled (608) or unmapped reference (5), without enabling them.
-This pass took **15.38 seconds** locally (including closure probes and proof checks).
+Two measurements prevent confusing generic potential with production admission:
 
-
-| Enabled capability | Tests | Converted | Valid / compiled | Source-proved |
+| Measurement | Test attempts | Converted | Valid / compiled | Source-proved |
 | --- | ---: | ---: | ---: | ---: |
-| independent.environmentvariable58 | 14 | 10 | 10 | 10 |
-| independent.shellcommand | 11 | 11 | 11 | 11 |
-| independent.textfilecontent54 | 21 | 2 | 2 | 2 |
-| windows.appcmd | 14 | 11 | 10 | 10 |
-| windows.appcmdlistconfig | 16 | 15 | 15 | 14 |
-| windows.auditeventpolicysubcategories | 1 | 0 | 0 | 0 |
-| windows.cmdlet | 6 | 3 | 3 | 3 |
-| windows.fileeffectiverights53 | 7 | 5 | 5 | 4 |
-| windows.lockoutpolicy | 1 | 0 | 0 | 0 |
-| windows.ntuser | 20 | 15 | 15 | 13 |
-| windows.passwordpolicy | 7 | 6 | 6 | 6 |
-| windows.registry | 15 | 10 | 10 | 0 |
-| windows.service | 5 | 5 | 5 | 5 |
-| windows.userright | 47 | 47 | 47 | 47 |
-| windows.wmi.query | 5 | 5 | 5 | 2 |
+| Existing enabled converter: 15 mappings | 190 | 145 | 144 | 127 |
+| Diagnostic generic visitor: 83 non-macOS mappings | 768 | 329 | 297 | 133 |
 
-The [machine report](v04-oval-test-corpus.json) lists every observed capability,
-exact unsupported diagnostics and per-Test affected counts, including independent
-closure blockers concealed by earlier failures. The full inventory artifact keeps
-all 803 Test closures, original node hashes/references, source/native mismatch
-terms and compiled-program hashes. The workflow uploads it rather than committing
-bulk generated content.
+The second pass supplies approved mapping metadata to the **same unchanged
+visitor**. It adds **zero conversion code, capability branches or production
+admissions**. All 81 represented non-macOS mappings are attempted. **65** produce
+at least one valid compiled case; **48** compile every available fixture Test;
+only **four** prove every fixture Test. These are fixture measurements, not
+certification of each capability's full OVAL language surface.
 
-Findings requiring follow-up, without manufacturing proof:
+**439** probes fail conversion; **32** produce authoring rejected by current
+schema/capability validation. Of **297** compiled probes, **153** exceed the
+independent proof reader, **11** differ in comparison terms, and **133** prove.
+No unexpected implementation exceptions occurred. Thirty macOS-specific Tests
+and five unmapped IOS/Junos Tests remain reference-only. All 43 Tests in the macOS
+directory are preserved; generic Unix/independent acquisitions in those files
+are measured without implementing any macOS capability. Experimental/deferred
+capabilities remain outside the supported-mapping probe.
 
-- One appcmd Variable with a punctuation-only source comment yields an invalid
-  identifier stem; schema validation rejects it. Exact original IDs are recorded.
-- Eight Registry source-reader comparisons retain original `HKEY_*` State values
-  while native uses its enum values; three WMI57 comparisons retain source `wql`
-  versus native `query`. These are diagnosed reader-term gaps, **not proofs of
-  equivalence or established converter semantic defects**. Six nil-selector cases
-  are explicitly unverifiable. No comparison normalization was added here.
-- Conversion blockers include unapproved `all_exist`, nonnegative policy limits,
-  unsupported behaviors/metadata fields, acquisition comparisons, Variable casts
-  and a Unix process58 dependency. Exact messages and counts remain visible.
+The full pass, including the separate configured baseline, took **56.70
+seconds** locally. The [machine report](v04-oval-test-corpus.json) gives successes,
+exact observed diagnostics, paths and denominators **by every capability**.
+After failure, each dependency is probed through its complete typed visitor;
+calling a scalar helper outside its real context could falsely flag supported
+cmdlet null inputs. The full hosted artifact retains all 803 closures, node hashes,
+references, compiled/authoring hashes, and complete mismatch terms.
 
-The 127 proofs span Windows (114), Unix (6), Linux (3), macOS (2) and Solaris (2).
-The last four groups exercise already-enabled platform-independent capabilities;
-they do not add macOS or other platform-specific capability support. All macOS
-43 Tests and all other out-of-scope material remain pinned regression/reference
-inputs. Existing separate macOS source proofs are retained.
+Findings remain visible:
 
-These are **synthetic single-Test Assessments**, not original XCCDF Rules or
-complete Definition proofs. They use the unmodified public schema/capability
-validator and maintained Assessment-program compiler; an independent consumer
-compares compiled operands. No complete Benchmark packages are built, no payload
-is executed, no external Variable is supplied, and no scanner result is claimed.
-An audit job completing means the measurement completed; it does not promote
-unsupported/unproved cases into acceptance. The 249/0/42 Windows Rule ledger,
-all source inputs, approved schemas and existing conversion outputs are unchanged.
+- The configured baseline's appcmd Test `oval:navy.navwar.niwcatlantic.scc.test:tst:102`
+  has a punctuation-only Variable comment, yielding invalid `-34d6e422-variable`.
+- Other diagnostic schema failures involve RPM materialized defaults and
+  process58/SID/update-search acquisition shapes. Nothing is silently repaired.
+- Eight Registry comparisons retain original `HKEY_*` State values in the source
+  reader versus native enums; three WMI57 comparisons retain `wql` versus native
+  `query`. These are diagnosed reader-term gaps, **not equivalence proofs or
+  established converter semantic defects**. Nil selectors and other unsupported
+  proof rules remain explicitly unproved.
+- The 34 Set-dependent Test closures are inventoried and attempted, but none
+  compiles through this visitor: first failures are unsupported Variable Object
+  `var_ref` (18), file acquisition `behaviors` (14), and `all_exist` (two).
+  This does not imply that Set conversion itself is missing.
+  Seventeen Filter-dependent closures yield eight compiled/two proved cases.
+  Exact per-node diagnostics and Variable/dependency counts remain in evidence.
+- Common observed blockers include Test-source shape, unapproved `all_exist`,
+  acquisition behaviors/parameters, datatypes and Variable functions. Complete
+  diagnostic strings are preserved rather than replacing them with generic labels.
+
+These are **synthetic single-Test Assessments**, not original XCCDF Rule,
+Definition, Profile or Benchmark proofs. The unmodified public validator checks
+schema/capability contracts; the maintained Assessment-program compiler and an
+independent consumer compare compiled operands. No full Benchmark packages,
+support payload execution, external Variable bindings or scanner results are
+claimed. The 249/0/42 Windows Rule ledger and 883-Assessment ledger are unchanged.
+Audit completion means measurement completed, not that unsupported/unproved
+probes passed acceptance. Existing mandatory source-proof obligations remain.
 
 Reproduce (Python 3.12; PyYAML 6.0.3, jsonschema 4.26.0, lxml 6.0.2):
 
@@ -88,21 +89,21 @@ python tools/audit_v04_oval_test_corpus.py \
   --output /tmp/oval-corpus-coverage.json
 ```
 
-Ten focused regressions cover real source conversion/compile/proof, complete
-inventory despite unsupported nodes, scoped IDs, broken/cyclic references,
-missing Variables, duplicate IDs, unbound collection input, ZIP payload safety,
-deprecated-WMI rejection and unproved-count separation. Hosted mandatory results
-and artifact links are finalized after the implementation push. The preceding
+Twelve focused regressions cover original conversion/compile/proof, complete
+inventory despite unsupported nodes, file-scoped IDs, broken/cyclic references,
+missing Variables, duplicate IDs, collection pin enforcement, ZIP payload safety,
+deprecated-WMI rejection, supported cmdlet nulls, unproved-count separation and
+metadata probing without production admission. Hosted results/artifacts are
+finalized after the implementation push. The preceding
 [source-gate checkpoint](v04-generator-trigger-reconciliation.md) is fully green.
 
-Maintenance: `OvalDocument` indexes each file once and reuses the converter's
-version-neutral reference methods; `closure` inventories every edge;
-`check_conversion` records distinct stages; `summarize` groups exact diagnostics.
-Change capability support in the converter only with its separate source-backed
-tests. Do not change this audit's admission list or normalize proof terms to raise
-counts. No new capability-specific converter branch or production change is made.
+Maintenance: `OvalDocument` indexes each source once; `closure` inventories every
+edge; `probe_mappings` selects approved diagnostic contracts; `check_conversion`
+records distinct stages; `summarize` groups exact diagnostics. Production still
+uses its unchanged `load_mappings` admission list. Never promote a probe merely
+because it compiles, or normalize proof terms to raise counts. All original
+source, schema and existing converter/compiler output is preserved.
 
-NEXT_ENGINEERING_OBJECTIVE: repair and independently test the identified generic
-identifier/proof-reader gaps, then resume parity-preserving native generator
-decoupling. Cross-platform source content now provides a repeatable fast breadth
-measurement before further capability expansion.
+NEXT_ENGINEERING_OBJECTIVE: use this fast breadth measurement while resuming
+parity-preserving native schema-generator decoupling; prioritize shared Test-source,
+acquisition-contract and independent-proof gaps before adding procedural branches.

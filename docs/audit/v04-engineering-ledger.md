@@ -260,11 +260,13 @@ isolated outside the repository while the owner-requested complete pinned OVAL
 Test Content coverage measurement is completed; no converter admission is expanded.
 
 The [complete OVAL Test Content coverage audit](v04-oval-test-corpus.md) inventories
-803 original Tests in 145 OVAL documents, including archived XML. All 154 collection
-file blobs match the pinned upstream Git tree. Of 190 enabled-capability Tests,
-144 validate/compile and 127 pass independent comparison. Seventeen compiled
-cases remain explicitly unproved; one other generated identifier fails schema
-validation. All 613 out-of-scope Tests remain inventoried/reference material.
-No enabled capability, schema, production converter or Windows Rule admission
-changes. Exact capability diagnostics and the reproducible corpus command are
-recorded with separate hosted measurement/mandatory evidence.
+803 Tests in 145 OVAL documents; all 154 file blobs match the upstream Git tree.
+The unchanged enabled 15-capability baseline remains 144 compiled / 127 proved
+of 190 attempts. A separate metadata-only generic probe passes all 83 approved
+non-macOS mappings (81 represented) to the same visitor: 768 attempts, 329 converted,
+297 schema-valid/compiled, 133 independently proved, 153 proof-unsupported and 11
+term mismatches. Thirty macOS-specific and five unmapped Tests stay reference-only.
+All 43 Tests in macOS source files remain pinned; generic Unix/independent cases
+there add no macOS capability implementation. No schema, production capability,
+source proof or Windows Rule admission changes. Exact errors, invalid authoring,
+closure inventory and hosted evidence are linked from the report.

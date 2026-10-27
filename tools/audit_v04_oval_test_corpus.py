@@ -2,7 +2,7 @@
 """Measure direct-converter coverage of pinned OVAL Test Content, without admission.
 
 Standalone OVAL documents have no XCCDF Rules. Each Test is therefore attempted
-in a clearly synthetic Assessment. No unsupported capability is enabled, and
+in a clearly synthetic Assessment. No production capability is enabled, and
 successful conversion, validation, compilation and source proof stay separate.
 """
 import argparse
@@ -14,7 +14,7 @@ import time
 import xml.etree.ElementTree as ET
 import zipfile
 
-from v04_direct_converter import AssessmentConverter, dependency_blockers, load_mappings
+from v04_direct_converter import AssessmentConverter, load_mappings
 from v04_direct_inventory import SourceInventory, node_kind
 from v04_direct_scap_source import OVAL, SourceModel, UnsupportedSource, digest, ensure, native_identifier
 
@@ -27,6 +27,21 @@ def file_inventory(directory):
     """Hash every collection file, including support payloads never executed here."""
     return {p.relative_to(directory).as_posix(): sha256(p.read_bytes()).hexdigest()
             for p in sorted(directory.rglob('*')) if p.is_file()}
+
+
+def probe_mappings():
+    """Approved contracts as diagnostic inputs, never production admission.
+
+    The owner excludes macOS capability expansion. Experimental/deferred sources
+    are absent from this version-local supported catalog and stay reference-only.
+    """
+    directory = ROOT / 'schema/v0.4.0/capability-mappings/supported'
+    mappings = []
+    for path in sorted(directory.glob('*.json')):
+        mapping = json.loads(path.read_text())
+        if not mapping['capability'].startswith('macos.'):
+            mappings.append(mapping)
+    return mappings
 
 
 def xml_documents(directory):
@@ -130,6 +145,10 @@ def check_conversion(visitor, identifier, validator):
     except (UnsupportedSource, ValueError) as error:
         result['diagnostics'].append({'stage': stage, 'message': str(error)})
         return result
+    except (KeyError, TypeError, AttributeError, IndexError, NotImplementedError) as error:
+        result['diagnostics'].append({'stage': stage, 'classification': 'implementation_error',
+                                     'message': f'{type(error).__name__}: {error}'})
+        return result
     # The independent reader has its own bounded proof rules. Do not broaden
     # them, substitute compiler output, or count unsupported proof as success.
     try:
@@ -167,13 +186,35 @@ def summarize(rows):
     return results
 
 
+def closure_blockers(source, component, nodes, dependencies, mappings):
+    """Probe complete typed nodes, never context-free scalar helper guesses.
+
+    A cmdlet input, for example, has its own approved nil handling. Calling the
+    generic parameter primitive directly would falsely report that input as
+    unsupported. Each failed node reports its first actual visitor diagnostic.
+    """
+    problems = []
+    for identifier in dependencies:
+        visitor = AssessmentConverter(source, component, mappings)
+        try:
+            visitor.reference(identifier, nodes[identifier]['kind'])
+        except (UnsupportedSource, ValueError) as error:
+            problems.append({'source_id': identifier, 'kind': nodes[identifier]['kind'], 'message': str(error)})
+        except (KeyError, TypeError, AttributeError, IndexError, NotImplementedError) as error:
+            problems.append({'source_id': identifier, 'kind': nodes[identifier]['kind'],
+                             'classification': 'implementation_error', 'message': f'{type(error).__name__}: {error}'})
+    return problems
+
+
 def audit(directory, pin_path=PIN):
     from validate_native_json_schemas import build_validators
     pin = json.loads(pin_path.read_text())
     actual = file_inventory(directory)
     ensure(actual == pin['files'], 'pinned collection mismatch (missing, extra or changed files)')
-    mappings = load_mappings()  # The existing admitted subset, not all mapped capabilities.
-    admitted = {m['capability'] for m in mappings}
+    configured = load_mappings()  # Preserve the actual enabled-converter baseline separately.
+    mappings = probe_mappings()
+    probe_capabilities = {m['capability'] for m in mappings}
+    enabled = {m['capability'] for m in configured}
     validator = build_validators(ROOT / 'schema/v0.4.0')['assessment.schema.json']
     started = time.perf_counter()
     documents, rows = [], []
@@ -197,34 +238,41 @@ def audit(directory, pin_path=PIN):
                 continue
             dependencies, problems = closure(nodes, identifier)
             capability = node['capability']
-            scope = ('in_scope' if capability in admitted else
-                     'mapped_not_enabled' if capability and not capability.startswith('{') else 'unmapped_reference')
+            scope = ('mapped_probe' if capability in probe_capabilities else
+                     'reference_only' if capability and not capability.startswith('{') else 'unmapped_reference')
             row = {'document': name, 'test': identifier, 'source_tag': node['tag'], 'capability': capability,
                    'scope': scope, 'dependencies': dependencies, 'inventory_problems': problems,
                    'converted': False, 'schema_valid': False, 'compiled': False,
                    'source_proof': 'NOT_RUN', 'diagnostics': []}
-            if scope == 'in_scope':
+            if capability in enabled:
+                baseline = AssessmentConverter(source, name, configured)
+                row['configured_baseline'] = check_conversion(baseline, identifier, validator)
+            if scope == 'mapped_probe':
                 visitor = AssessmentConverter(source, name, mappings)
                 row.update(check_conversion(visitor, identifier, validator))
-                # Probe every closure node, so the first failure cannot conceal
-                # independent unsupported constructs further down the graph.
-                blockers = []
-                for dependency in dependencies:
-                    blockers.extend(dependency_blockers(source, nodes[dependency], mappings))
-                row['dependency_blockers'] = blockers
+                # Failed Tests still probe every typed node. A successful full
+                # conversion already covers its closure; never second-guess it
+                # with a primitive called outside its real conversion context.
+                row['dependency_blockers'] = (closure_blockers(source, name, nodes, dependencies, mappings)
+                                               if not row['converted'] else [])
             else:
                 row['diagnostics'].append({'stage': 'scope', 'message':
-                    'capability not enabled in direct converter: ' + node['tag']})
+                    'reference-only capability (not probed): ' + node['tag']})
             rows.append(row)
     return {'format': 'scap-ng/direct-oval-test-coverage/1', 'pin': {k: v for k, v in pin.items() if k != 'files'},
             'collection_files': len(actual), 'xml_documents': len(documents),
             'oval_documents': sum(d['root'] == OVAL_ROOT for d in documents),
             'source_parse_count': len(documents), 'tests': len(rows), 'elapsed_seconds': time.perf_counter() - started,
-            'enabled_capabilities': sorted(admitted), 'summary': summarize(rows), 'documents': documents, 'cases': rows,
+            'enabled_capabilities': sorted(m['capability'] for m in configured),
+            'diagnostic_mapping_capabilities': sorted(probe_capabilities), 'summary': summarize(rows),
+            'configured_baseline_summary': summarize([{**row, **row['configured_baseline']}
+                for row in rows if 'configured_baseline' in row]),
+            'documents': documents, 'cases': rows,
             'limitations': ['Synthetic single-Test Assessments; no XCCDF/Profile or complete Definition proof',
                 'No scanner execution, external Variable binding or support payload execution',
                 'Compilation is maintained Assessment-program compilation, not full Benchmark packaging',
-                'No new capability support or conversion admission; independent proof failures remain visible']}
+                'Mapped probes are diagnostic only: no new capability support or conversion admission',
+                'Independent proof failures and implementation errors remain visible']}
 
 
 def main():

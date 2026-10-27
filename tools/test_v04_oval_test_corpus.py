@@ -6,7 +6,8 @@ import unittest
 import xml.etree.ElementTree as ET
 
 from audit_v04_oval_test_corpus import (OVAL_ROOT, OvalDocument, audit,
-    check_conversion, closure, file_inventory, summarize, xml_documents)
+    assessment_for, check_conversion, closure, closure_blockers, file_inventory,
+    probe_mappings, summarize, xml_documents)
 from v04_direct_converter import AssessmentConverter, load_mappings
 from v04_direct_inventory import SourceInventory
 from v04_direct_scap_source import UnsupportedSource
@@ -121,6 +122,23 @@ class CorpusCoverageTests(unittest.TestCase):
         self.assertEqual(summary['compiled'], 1)
         self.assertEqual(summary['source_proof'], {'MISMATCH': 1})
         self.assertNotIn('PROVED', summary['source_proof'])
+
+    def test_typed_closure_probe_retains_supported_cmdlet_nil_parameters(self):
+        root = ET.parse(SOURCE.with_name('win-def_cmdlet_test.xml')).getroot()
+        source = OvalDocument(root, 'cmdlet.xml')
+        nodes = {identifier: n for (_, identifier), n in SourceInventory(source).nodes.items()}
+        identifier = next(i for i, n in nodes.items() if n['kind'] == 'test')
+        assessment_for(AssessmentConverter(source, 'cmdlet.xml', self.mappings), identifier)
+        dependencies, _ = closure(nodes, identifier)
+        self.assertEqual(closure_blockers(source, 'cmdlet.xml', nodes, dependencies, self.mappings), [])
+
+    def test_metadata_probes_do_not_enable_mac_or_change_production_admission(self):
+        enabled = {m['capability'] for m in load_mappings()}
+        probes = {m['capability'] for m in probe_mappings()}
+        self.assertGreater(len(probes), len(enabled))
+        self.assertTrue(enabled < probes)
+        self.assertFalse(any(c.startswith(('macos.', 'esx.')) for c in probes))
+        self.assertEqual(enabled, {m['capability'] for m in load_mappings()})
 
 
 if __name__ == '__main__':
