@@ -1,7 +1,7 @@
 # Complete pinned OVAL Test Content coverage — #251
 
 BASE_SHA: `8834539967d1dcc5939bf90240e9e05bcf938b81` · SCHEMA_VERSION: `0.4.0`.
-RESULT_SHA, exact-head CI and artifact checksums are in the
+RESULT_SHA: `f2d68bf2032bdee7819be425b58ccd224ef7145f`. Exact-head CI and checksums are in the
 [machine report](v04-oval-test-corpus.json).
 
 The complete `OVAL-Community/SCAP-Self-Assertion` collection at
@@ -93,8 +93,14 @@ Twelve focused regressions cover original conversion/compile/proof, complete
 inventory despite unsupported nodes, file-scoped IDs, broken/cyclic references,
 missing Variables, duplicate IDs, collection pin enforcement, ZIP payload safety,
 deprecated-WMI rejection, supported cmdlet nulls, unproved-count separation and
-metadata probing without production admission. Hosted results/artifacts are
-finalized after the implementation push. The preceding
+metadata probing without production admission. **All six triggered exact-head workflows pass** at the implementation SHA.
+The downloaded [mandatory result](https://github.com/vanderpol/scap-ng/actions/runs/40433912422)
+reports **3,102 tests, zero failures/errors, one existing skip**; no previous
+maintained test IDs disappeared. The [corpus run](https://github.com/vanderpol/scap-ng/actions/runs/40433912398)
+took **36.9 seconds** and its [complete inventory artifact](https://github.com/vanderpol/scap-ng/actions/runs/40433912398/artifacts/12703361578)
+matches all local non-timing evidence. A post-restart run reproduces the same
+results in 52.7 seconds. Exact environment versions, archive/JSON hashes,
+all run links and selected-test digest are in the machine report. The preceding
 [source-gate checkpoint](v04-generator-trigger-reconciliation.md) is fully green.
 
 Maintenance: `OvalDocument` indexes each source once; `closure` inventories every

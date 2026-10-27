@@ -270,3 +270,13 @@ All 43 Tests in macOS source files remain pinned; generic Unix/independent cases
 there add no macOS capability implementation. No schema, production capability,
 source proof or Windows Rule admission changes. Exact errors, invalid authoring,
 closure inventory and hosted evidence are linked from the report.
+
+At corpus implementation `f2d68bf2032bdee7819be425b58ccd224ef7145f`, all six
+triggered hosted workflows pass. The downloaded maintained result reports
+**3,102 tests, zero failures/errors, one existing skip**, with every prior
+maintained identity retained. The complete hosted coverage artifact matches
+all local non-timing evidence. Twelve focused tests pass. Source inputs,
+schemas, converter/compiler/proof-reader files and production admission remain
+unchanged. Native-generator decoupling is still the next implementation objective;
+the isolated candidate has full dictionary parity for 100 generated contracts
+but is not integrated or claimed as completed.
