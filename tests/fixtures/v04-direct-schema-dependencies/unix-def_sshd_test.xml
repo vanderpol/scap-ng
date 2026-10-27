@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+                  xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-definitions-5#unix https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/unix-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-common-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-common-schema.xsd">
+  <generator>
+    <oval:schema_version>5.11.2</oval:schema_version>
+    <oval:timestamp>2009-08-07T17:25:07-05:00</oval:timestamp>
+    <terms_of_use>NOTE: MITRE Content may be modified from original by Arctic Wolf Networks, Inc. f/k/a Joval. Copyright (c) 2002-2012, The MITRE Corporation. All rights reserved. The contents of this file are subject to the license described in terms.txt.</terms_of_use>
+  </generator>
+  <definitions>
+    <definition id="oval:org.mitre.oval.test:def:963" version="1" class="compliance">
+      <metadata>
+        <title>Evaluate to true if the unix-def:sshd_test is properly supported</title>
+        <description>This definition is intended to evaluate to true if the interpreter properly supports unix-def:sshd_test.</description>
+      </metadata>
+      <criteria operator="AND">
+        <criterion comment="SSHD parameter Ciphers does not include weak cipher suites" test_ref="oval:org.mitre.oval.test:tst:492"/>
+        <criterion comment="SSHD parameter LogLevel is either VERBOSE or INFO" test_ref="oval:org.mitre.oval.test:tst:70"/>
+        <!-- criterion comment="SSHD parameter ClientAliveInterval is between 1 and 300" test_ref="oval:org.mitre.oval.test:tst:483"/ -->
+        <criterion comment="SSHD parameter ClientAliveCountMax is 3 or less" test_ref="oval:org.mitre.oval.test:tst:484"/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <sshd_test id="oval:org.mitre.oval.test:tst:492" version="1" comment="SSHD parameter Ciphers does not include weak cipher suites" check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:org.mitre.oval.test:obj:705"/>
+      <state state_ref="oval:org.mitre.oval.test:ste:423"/>
+    </sshd_test>
+    <sshd_test id="oval:org.mitre.oval.test:tst:70" version="1" comment="SSHD parameter LogLevel is either VERBOSE or INFO" check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:org.mitre.oval.test:obj:30"/>
+      <state state_ref="oval:org.mitre.oval.test:ste:314"/>
+    </sshd_test>
+    <sshd_test id="oval:org.mitre.oval.test:tst:483" version="1" comment="SSHD parameter ClientAliveInterval is between 1 and 300" check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:org.mitre.oval.test:obj:9171"/>
+      <state state_ref="oval:org.mitre.oval.test:ste:7841"/>
+      <state state_ref="oval:org.mitre.oval.test:ste:7842"/>
+    </sshd_test>
+    <sshd_test id="oval:org.mitre.oval.test:tst:484" version="1" comment="SSHD parameter ClientAliveCountMax is 3 or less" check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:org.mitre.oval.test:obj:9172"/>
+      <state state_ref="oval:org.mitre.oval.test:ste:7843"/>
+    </sshd_test>
+  </tests>
+  <objects>
+    <sshd_object id="oval:org.mitre.oval.test:obj:705" version="1" comment="This sshd_object represents an sshd_item with a name equal to 'ciphers'" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <filepath>/etc/ssh/sshd_config</filepath>
+      <name operation="case insensitive equals">ciphers</name>
+    </sshd_object>
+    <sshd_object id="oval:org.mitre.oval.test:obj:30" version="1" comment="This sshd_object represents an sshd_item with a name equal to 'loglevel'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <filepath xsi:nil="true"/>
+      <name operation="case insensitive equals">loglevel</name>
+    </sshd_object>
+    <sshd_object id="oval:org.mitre.oval.test:obj:9171" version="1" comment="This sshd_object represents an sshd_item with a name equal to 'clientaliveinterval'" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <filepath xsi:nil="true"/>
+      <name operation="case insensitive equals">clientaliveinterval</name>
+    </sshd_object>
+    <sshd_object id="oval:org.mitre.oval.test:obj:9172" version="1" comment="This sshd_object represents an sshd_item with a name equal to 'clientalivecountmax'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <filepath xsi:nil="true"/>
+      <name operation="case insensitive equals">clientalivecountmax</name>
+    </sshd_object>
+  </objects>
+  <states>
+    <sshd_state id="oval:org.mitre.oval.test:ste:423" version="1" comment="This state represents an sshd_item with acceptable cipher suites." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <value var_check="none exist" var_ref="oval:org.mitre.oal.test:var:1"/>
+    </sshd_state>
+    <sshd_state id="oval:org.mitre.oval.test:ste:314" version="1" comment="This state represents an sshd_item with a loglevel equal to either VERBOSE or INFO." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <value operation="pattern match">(VERBOSE|INFO)</value>
+    </sshd_state>
+    <sshd_state id="oval:org.mitre.oval.test:ste:7841" version="1" comment="This state represents an sshd_item with a clientaliveinterval greater than or equal to 1." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <value datatype="int" operation="greater than or equal">1</value>
+    </sshd_state>
+    <sshd_state id="oval:org.mitre.oval.test:ste:7842" version="1" comment="This state represents an sshd_item with a clientaliveinterval less than or equal to 300." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <value datatype="int" operation="less than or equal">300</value>
+    </sshd_state>
+    <sshd_state id="oval:org.mitre.oval.test:ste:7843" version="1" comment="This state represents an sshd_item with a clientalivecountmax less than or equal to 3." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <value datatype="int" operation="less than or equal">3</value>
+    </sshd_state>
+  </states>
+  <variables>
+    <constant_variable id="oval:org.mitre.oal.test:var:1" version="1" datatype="string" comment="Weak Ciphers">
+      <value>3des-cbc</value>
+      <value>aes128-cbc</value>
+      <value>aes192-cbc</value>
+      <value>aes256-cbc</value>
+      <value>arcfour</value>
+      <value>arcfour128</value>
+      <value>arcfour256</value>
+      <value>blowfish-cbc</value>
+      <value>cast128-cbc</value>
+      <value>rijndael-cbc@lysator.liu.se</value>
+    </constant_variable>
+  </variables>
+</oval_definitions>

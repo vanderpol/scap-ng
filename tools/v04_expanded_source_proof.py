@@ -178,20 +178,30 @@ def original_service_contract():
     return fields
 
 
-@lru_cache(maxsize=1)
-def original_file_rights_contract():
+@lru_cache(maxsize=2)
+def original_file_rights_contract(cap='windows.fileeffectiverights53'):
     """Original typed rights and the non-expanding SID acquisition defaults."""
     xs = '{http://www.w3.org/2001/XMLSchema}'
     schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
-    state = schema.find(xs + 'element[@name="fileeffectiverights53_state"]')
+    need(cap in ('windows.fileeffectiverights53', 'windows.regkeyeffectiverights53'), 'unknown direct-SID rights contract')
+    name = cap.split('.')[-1]
+    state = schema.find(xs + 'element[@name="' + name + '_state"]')
     fields = {}
     for field in state.findall('.//' + xs + 'sequence/' + xs + 'element'):
         if any(local(n) == 'deprecated_info' for n in field.iter()):
             continue
         kind = field.get('type')
+        if kind == 'win-def:EntityStateRegistryHiveType':
+            restriction = schema.find(xs + 'complexType[@name="EntityStateRegistryHiveType"]/' + xs + 'simpleContent/' + xs + 'restriction')
+            need(restriction.get('base') == 'oval-def:EntityStateStringType' and
+                 {n.get('value') for n in restriction.findall(xs + 'enumeration')} == REGISTRY_HIVES | {''},
+                 'original rights hive domain changed')
+            kind = 'oval-def:EntityStateStringType'
         need(kind in ('oval-def:EntityStateStringType', 'oval-def:EntityStateBoolType'), 'unknown original rights type')
         fields[field.get('name')] = 'string' if kind.endswith('StringType') else 'boolean'
-    behaviors = schema.find(xs + 'complexType[@name="FileEffectiveRights53Behaviors"]')
+    obj = schema.find(xs + 'element[@name="' + name + '_object"]')
+    typename = obj.find('.//' + xs + 'element[@name="behaviors"]').get('type').split(':')[-1]
+    behaviors = schema.find(xs + 'complexType[@name="' + typename + '"]')
     defaults = {n.get('name'): n.get('default') for n in behaviors.findall('.//' + xs + 'attribute')}
     need(defaults == {'include_group': 'true', 'resolve_group': 'false'}, 'original direct-SID defaults changed')
     return fields, defaults
@@ -370,7 +380,17 @@ class ExpandedSource(Source):
                 return {**n, 'field': names.get(n['field'], n['field'])}
             op, children = next(iter(n.items()))
             return {op: [rename(c) for c in children]}
-        return predicate_order(rename(value))
+        value = rename(value)
+        if cap == 'windows.wmi.query':
+            # Original WMI57 calls the collected query field wql. Native
+            # authoring uses query; this is the same field as in acquisition.
+            def query_name(term):
+                if 'field' in term:
+                    return {**term, 'field': 'query' if term['field'] == 'wql' else term['field']}
+                op, children = next(iter(term.items()))
+                return {op: [query_name(c) for c in children]}
+            value = query_name(value)
+        return predicate_order(value)
 
     def filters(self, nodes, cap):
         result = []
@@ -418,6 +438,8 @@ class ExpandedSource(Source):
                 return {'capability': cap, 'variable': self.variable((n[0].text or '').strip())}
             finally:
                 self.active.remove(ident)
+        if cap == 'windows.regkeyeffectiverights53':
+            original_file_rights_contract(cap)
         registered = scalar_proof.source_object(self, ident, cap)
         if registered is not None:
             return registered

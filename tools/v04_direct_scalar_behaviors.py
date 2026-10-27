@@ -34,7 +34,33 @@ def original_attributes(schema_path, object_name):
     name = declarations[0].get('type', '').split(':')[-1]
     declaration = schema.find(XS + 'complexType[@name="' + name + '"]')
     ensure(declaration is not None, 'original behavior type unavailable')
-    return {a.get('name'): dict(a.attrib) for a in declaration.findall(XS + 'attribute')}
+    def attributes_for(node, active):
+        name = node.get('name')
+        ensure(name not in active, 'cyclic original behavior inheritance')
+        result = {}
+        extension = node.find(XS + 'complexContent/' + XS + 'extension')
+        if extension is not None:
+            base = schema.find(XS + 'complexType[@name="' + extension.get('base').split(':')[-1] + '"]')
+            ensure(base is not None, 'unavailable original behavior base')
+            result.update(attributes_for(base, active | {name}))
+        result.update({a.get('name'): dict(a.attrib) for a in node.findall('.//' + XS + 'attribute')})
+        return result
+    return attributes_for(declaration, set())
+
+
+def split_behaviors(element, scalar_names, traversal_names):
+    """Validate the full source element once, then route disjoint attributes.
+
+    Neither handler may silently drop attributes owned by the other. Source
+    nodes stay immutable; required/default attributes are still read from XSD.
+    """
+    ensure(not set(scalar_names) & set(traversal_names), 'overlapping acquisition behavior routes')
+    if element is None:
+        return None, None
+    attributes(element, set(scalar_names) | set(traversal_names))
+    ensure(not len(element) and not (element.text or '').strip(), 'acquisition behaviors must have no content')
+    return tuple(ET.Element(element.tag, {k: v for k, v in element.attrib.items() if k in names})
+                 for names in (scalar_names, traversal_names))
 
 
 def scalar_behaviors(element, mapping):

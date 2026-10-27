@@ -10,6 +10,27 @@ ITEM_CREATION = {'all_object_elements_fullfilled', 'filepath_exists'}
 FILESYSTEMS = {'all': 'all', 'local': 'local', 'defined': 'same'}
 
 
+def hierarchy_behaviors(element, acquisition):
+    """Approved downward Registry traversal; group/view controls stay blocked."""
+    values = {} if element is None else element.attrib
+    if element is not None:
+        attributes(element, {'max_depth', 'recurse_direction'})
+        ensure(not len(element) and not (element.text or '').strip(), 'behaviors must have no content')
+    try:
+        depth = int(values.get('max_depth', '-1'))
+    except ValueError as error:
+        raise UnsupportedSource('invalid original hierarchy max_depth') from error
+    ensure(depth >= -1, 'original hierarchy max_depth must be -1 or nonnegative')
+    direction = values.get('recurse_direction', 'none')
+    ensure(direction in ('none', 'down'), 'unsupported/deprecated hierarchy recursion direction')
+    if direction == 'none':
+        return {}
+    key = acquisition.get('key')
+    ensure('key' in acquisition and (key is None or isinstance(key, dict) and 'equals' in key),
+           'hierarchy recursion requires an equality key or hive-root selector')
+    return {'traversal': {'max_depth': None if depth == -1 else depth}}
+
+
 def traversal_behaviors(element, acquisition, *, windows=False):
     """Translate shared FileBehaviors without changing a selector's meaning.
 
@@ -36,6 +57,21 @@ def traversal_behaviors(element, acquisition, *, windows=False):
     ensure(recurse in options, 'unsupported/deprecated original recurse value')
     scope = values.get('recurse_file_system', 'all')
     ensure(scope in FILESYSTEMS, 'unsupported original filesystem scope')
+    if windows:
+        # Keep the original Windows Schematron boundary: these attributes
+        # cannot be supplied on a pattern path, even if recursion would be
+        # ignored. Do not turn invalid original input into admitted authoring.
+        directory = acquisition.get('directory')
+        full_path = acquisition.get('full_path')
+        if directory is not None and 'equals' not in directory:
+            ensure(not set(values) & {'max_depth', 'recurse', 'recurse_direction'},
+                   'invalid original pattern-path recursion attributes')
+        if full_path is not None:
+            ensure(not set(values) & {'max_depth', 'recurse_direction'},
+                   'invalid original filepath recursion attributes')
+        selector = full_path if full_path is not None else directory
+        ensure(scope != 'defined' or isinstance(selector, dict) and 'equals' in selector,
+               'invalid original defined-filesystem pattern selection')
     result = {'filesystem': FILESYSTEMS[scope]}
     directory = acquisition.get('directory')
     if direction == 'down' and 'full_path' not in acquisition and isinstance(directory, dict) and 'equals' in directory:

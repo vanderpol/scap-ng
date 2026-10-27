@@ -1,0 +1,71 @@
+{
+  "format": "scap-ng/converter-schema-dependencies/1",
+  "base_sha": "041be96dfbe78a027ea29a86dbeaba4d18265485",
+  "owner_instruction": "2026-10-27 interim converter-only assignment; skip isolated schema cases and continue; no schema edits",
+  "source_repository": "OVAL-Community/SCAP-Self-Assertion",
+  "source_revision": "e3538595c5083b9c34d937a81d319234df9bbfaa",
+  "cases": [
+    {
+      "id": "file-hash-multi-algorithm-unix",
+      "category": "variable_collection_representation_limitation",
+      "capability": "file.hash",
+      "document": "unix/ind-def_filehash58_test_unix.xml",
+      "test_ids": [
+        "oval:org.mitre.oval.test:tst:305",
+        "oval:org.mitre.oval.test:tst:544",
+        "oval:org.mitre.oval.test:tst:354"
+      ],
+      "source_sha256": "fee16d02756928ee1606921370d244fdb4d8c700db2c706443583e86cb7d38cf",
+      "reason": "At base 041be96, hash_type had no multi-algorithm acquisition route. Schema owner supplied a selector route at d3132ae. Converter Variable/enum normalization and collector-domain proof remain deferred to the follow-up assignment; capability intentionally inactive.",
+      "counterexample": "tests/fixtures/v04-filehash-acquisition-conflict/ind-def_filehash58_test_unix.xml"
+    },
+    {
+      "id": "file-hash-multi-algorithm-windows",
+      "category": "variable_collection_representation_limitation",
+      "capability": "file.hash",
+      "document": "windows/ind-def_filehash58_test_windows.xml",
+      "test_ids": [
+        "oval:org.mitre.oval.test:tst:218",
+        "oval:org.mitre.oval.test:tst:1002",
+        "oval:org.mitre.oval.test:tst:48"
+      ],
+      "source_sha256": "ccd2569a6b5992d40ff84a5775b2f369e5134dbf9e4df583b272d34410e3e229",
+      "reason": "At base 041be96, hash_type had no multi-algorithm acquisition route. Schema owner supplied a selector route at d3132ae. Converter Variable/enum normalization and collector-domain proof remain deferred to the follow-up assignment; capability intentionally inactive.",
+      "counterexample": "tests/fixtures/v04-filehash-acquisition-conflict/ind-def_filehash58_test_unix.xml"
+    },
+    {
+      "id": "sshd-default-config-nil-path",
+      "category": "capability_schema_limitation",
+      "capability": "unix.sshd",
+      "document": "unix/unix-def_sshd_test.xml",
+      "test_ids": [
+        "oval:org.mitre.oval.test:tst:70",
+        "oval:org.mitre.oval.test:tst:483",
+        "oval:org.mitre.oval.test:tst:484"
+      ],
+      "source_sha256": "a39e832aec71f537ff18eeaac3b181c7f63d6dbe5c311a8d7221ce86258ec8f0",
+      "reason": "Original nullable filepath selects the default configuration; current mapping does not declare filepath nullable. Do not substitute a platform path.",
+      "counterexample": "tests/fixtures/v04-direct-schema-dependencies/unix-def_sshd_test.xml"
+    }
+  ],
+  "remaining_capabilities": {
+    "file.hash": "Schema-side selector correction preserved from d3132ae; converter integration intentionally deferred until follow-up assignment.",
+    "unix.sshd": "Three pinned nil-path cases depend on schema; remaining case has an invalid var_check lexical token in original source.",
+    "linux.rpmverifyfile": "All three pinned original cases use deprecated md5_differs; not repaired or admitted.",
+    "independent.sql512": "No original sql512 Test in pinned 803-Test collection; acquisition/record proof not established.",
+    "independent.yamlfilecontent": "No original yamlfilecontent Test in pinned 803-Test collection; YAML collection proof not established."
+  },
+  "anticipated_after_schema_baseline": [
+    "Review refreshed mapping/schema fingerprints and source correspondence; do not auto-refresh frozen proof hashes.",
+    "Integrate approved static Variable, literal-array and var_check contracts through shared operand/selector handlers.",
+    "Revisit file.hash and sshd source counterexamples; keep original graph/quantifier and error/incomplete boundaries.",
+    "Review process58 only under the follow-up assignment; preserve existing contract and eight original proofs now."
+  ],
+  "implemented_since_base": [
+    "linux.selinuxsecuritycontext",
+    "windows.file",
+    "independent.xmlfilecontent",
+    "windows.regkeyeffectiverights53"
+  ],
+  "schema_owner_revision": "d3132ae57432924f21d01a9b6ca2689d70f1b2f2"
+}

@@ -100,6 +100,36 @@ are explicitly identified and do not increase original-source coverage.
 
 ## Safely change a conversion rule
 
+The 2026-10-27 interim assignment separates converter work from the concurrent
+capability-mapping/schema audit. Keep mappings, generated contracts, generators,
+normative definitions, compiler/scanner implementations and 0.3 files unchanged.
+The direct visitor now routes XML item-creation and traversal behaviors through
+disjoint shared handlers. Independent proof reads file behaviors and nullable
+filenames from frozen identity contracts; it does not call conversion helpers.
+
+Unsupported cases are consolidated without admitting them:
+
+```bash
+PYTHONPATH=tools python tools/report_v04_conversion_gaps.py \
+  --corpus /tmp/oval-corpus.json --original-root ORIGINAL_OVAL_TEST_CONTENT \
+  --acceptance-root /tmp/direct-six --output /tmp/conversion-gaps.json
+```
+
+The report verifies the complete original collection pin, validates original
+closures, and distinguishes implementation gaps, reviewed schema limitations,
+Variable/collection limitations, unsupported operations, invalid/deprecated
+original source, and external infrastructure failures. Schema rejection alone
+does not establish a schema defect. Diagnostic-only conversions remain separate
+from enabled capabilities and verified primary packages. Optional
+`--external-failures` accepts an explicit JSON list of failures with `source`,
+`message` and `evidence_url`; infrastructure failures never become source failures.
+
+The [dependency register](../../tests/fixtures/v04-converter-schema-dependencies.json)
+pins specific source counterexamples and the remaining integration queue. A
+schema-dependent case is recorded and skipped while independent work continues.
+Once the schema owner's new baseline is published, review its changed contracts
+before implementing the follow-up assignment or refreshing proof fingerprints.
+
 Ordinary capability activation lives in
 [`v04_direct_capabilities.json`](../../tools/v04_direct_capabilities.json).
 The generic visitor reads the existing version-local mapping; adding a capability
@@ -803,8 +833,10 @@ public native generator. `snapshot` assembles deterministic data for the current
 catalog. No generated Python, new conversion IR, bot branch or automatic semantic
 decision is involved. A bad target or obsolete wrapper path fails the check and
 retains a review artifact. Missing correspondence is reported, not guessed: the
-current `file.hash` algorithm lacks an explicit acquisition route and remains a
-[source-backed owner decision](../audit/v04-filehash-acquisition-conflict.md).
+schema owner added the `file.hash` acquisition selector route in `d3132ae`;
+[its source-backed review packet](../audit/v04-filehash-acquisition-conflict.md)
+records the correction. Converter integration remains deferred to the follow-up
+assignment; a mapping refresh does not automatically enable support.
 This process does not enable additional capabilities or replace the full
 mandatory/source-proof gates. It does not regenerate the six-STIG corpus.
 

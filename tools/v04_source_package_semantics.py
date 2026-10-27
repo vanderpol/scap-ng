@@ -80,6 +80,27 @@ def literal(datatype, value):
     return {'datatype': datatype, 'value': value}
 
 
+def source_hierarchy(behavior, key):
+    values = {} if behavior is None else behavior.attrib
+    keys(values, {'max_depth', 'recurse_direction'}, 'original hierarchy behaviors')
+    depth = int(values.get('max_depth', '-1'))
+    direction = values.get('recurse_direction', 'none')
+    need(depth >= -1 and direction in ('none', 'down'), 'unproved/deprecated original hierarchy traversal')
+    if direction == 'none':
+        return {}
+    need(key is None or isinstance(key, dict) and key.get('operation') == 'equals', 'unproved hierarchy key context')
+    return {'traversal': {'max_depth': None if depth == -1 else depth, 'direction': 'down'}}
+
+
+def native_hierarchy(value):
+    keys(value, {'max_depth'}, 'native hierarchy traversal')
+    need(set(value) == {'max_depth'}, 'native hierarchy max_depth required')
+    depth = value['max_depth']
+    need(depth is None or isinstance(depth, int) and not isinstance(depth, bool) and depth >= 0,
+         'invalid native hierarchy max_depth')
+    return {**value, 'direction': 'down'}
+
+
 class Source:
     def __init__(self, oval):
         need(oval.tag == '{' + OD + '}oval_definitions', 'not original OVAL')
@@ -254,15 +275,28 @@ class Source:
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
         keys(n, META, 'Object')
-        need(not any(local(c) in ('set', 'filter', 'behaviors') for c in n),
+        need(not any(local(c) in ('set', 'filter') or local(c) == 'behaviors' and cap != 'windows.registry' for c in n),
              'Set/Filter/behavior collection proof unavailable: ' + ident)
         fields = {}
+        behaviors = [c for c in n if local(c) == 'behaviors']
+        need(len(behaviors) <= 1 and all(not len(c) and not (c.text or '').strip() for c in behaviors),
+             'duplicate/nonempty original hierarchy behaviors')
         for c in n:
             name = local(c)
             need(c.tag.rsplit('}', 1)[0] == n.tag.rsplit('}', 1)[0], 'Object field namespace')
+            if name == 'behaviors':
+                continue
             need(name not in fields, 'duplicate selector')
             if cap == 'windows.registry':
                 need(name in ('hive', 'key', 'name'), 'registry selector')
+                nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
+                if nil in c.attrib:
+                    keys(c, {nil, 'datatype'}, 'nil registry selector')
+                    need(name in ('key', 'name') and c.get(nil) in ('true', '1') and
+                         c.get('datatype', 'string') == 'string' and not len(c) and not (c.text or '').strip(),
+                         'invalid nil registry selector')
+                    fields[name] = None
+                    continue
                 value = self.entity(c, selector=True)
                 if name == 'hive':
                     old = value['operand'].get('value')
@@ -277,6 +311,8 @@ class Source:
                 need(value['operation'] == expected and value['comparison_datatype'] == 'string',
                      'collection parameter comparator/datatype')
                 fields['query' if name == 'wql' else name] = value['operand']
+        if cap == 'windows.registry':
+            fields.update(source_hierarchy(behaviors[0] if behaviors else None, fields.get('key')))
         if cap == 'independent.shellcommand':
             fields.setdefault('shell', literal('string', 'bash'))
             fields.update(error_if_exit_status_not_0=False, error_if_stderr_exists=False)
@@ -291,6 +327,11 @@ class Source:
         for c in n:
             need(c.tag.rsplit('}', 1)[0] == n.tag.rsplit('}', 1)[0], 'State field namespace')
             value = self.entity(c)
+            if cap == 'windows.registry' and local(c) == 'hive':
+                old = value['operand']
+                need(value['operation'] == 'equals' and old.get('datatype') == 'string' and
+                     old.get('value') in REGISTRY_HIVES, 'registry State hive proof unavailable')
+                value['operand'] = literal('string', old['value'].removeprefix('HKEY_').lower())
             if cap == 'windows.registry' and local(c) == 'type':
                 enums = {'reg_sz': 'string', 'reg_dword': 'dword', 'reg_dword_little_endian': 'dword'}
                 old = value['operand']
@@ -428,7 +469,7 @@ class Native:
             need(cap is None or result['capability'] == cap, 'native Object family mismatch')
             return result
         cap = n.get('capability', cap)
-        allowed = {'windows.registry': {'hive', 'key', 'name'},
+        allowed = {'windows.registry': {'hive', 'key', 'name', 'traversal'},
                    'independent.shellcommand': {'shell', 'command', 'pattern',
                       'error_if_exit_status_not_0', 'error_if_stderr_exists'},
                    'windows.wmi.query': {'namespace', 'query'}}
@@ -438,7 +479,11 @@ class Native:
         for k, v in n.items():
             if k in ('capability', 'object_title'):
                 continue
-            fields[k] = (self.predicate(v, selector=True) if cap == 'windows.registry' else
+            if cap == 'windows.registry' and k == 'traversal':
+                fields[k] = native_hierarchy(v)
+                continue
+            fields[k] = (None if cap == 'windows.registry' and k in ('key', 'name') and v is None else
+                         self.predicate(v, selector=True) if cap == 'windows.registry' else
                          v if k.startswith('error_if_') else self.operand(v))
         return {'capability': cap, 'selectors': fields}
 

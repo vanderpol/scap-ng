@@ -193,7 +193,7 @@ class AssessmentConverter:
         return logical_condition(element.get('operator', 'AND'), conditions)
 
     def convert_object(self, element):
-        from v04_direct_scalar_behaviors import behavior_routes, scalar_behaviors
+        from v04_direct_scalar_behaviors import behavior_routes, scalar_behaviors, split_behaviors
         mapping = self.capability(element, 'object')
         acquisition = {'capability': mapping['capability']}
         if mapping['native'].get('test_source', {}).get('kind') == 'variable':
@@ -222,7 +222,7 @@ class AssessmentConverter:
                 field = local_name(child)
                 if field == 'behaviors' and (mapping['capability'] in (
                         'independent.textfilecontent54', 'independent.shellcommand') or
-                        mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal') or
+                        mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal', 'hierarchy_traversal') or
                         behavior_routes(mapping)):
                     ensure(child.tag == f'{{{mapping["source"]["namespace"]}}}behaviors' and behaviors is None,
                            'duplicate/foreign acquisition behaviors')
@@ -249,8 +249,16 @@ class AssessmentConverter:
                 ensure(path.startswith('behaviors.'), 'unrecognized acquisition default')
                 source = path.split('.')[1]
                 acquisition[behavior_routes(mapping).get(source, source)] = value
+            scalar_part, traversal_part = behaviors, behaviors
+            if behavior_routes(mapping) and mapping['native'].get('traversal_definition') in (
+                    'file_traversal', 'windows_file_traversal', 'hierarchy_traversal'):
+                traversal_fields = ({'max_depth', 'recurse_direction'}
+                    if mapping['native']['traversal_definition'] == 'hierarchy_traversal' else
+                    {'max_depth', 'recurse', 'recurse_direction', 'recurse_file_system'})
+                scalar_part, traversal_part = split_behaviors(behaviors, behavior_routes(mapping),
+                    traversal_fields)
             if behavior_routes(mapping):
-                acquisition.update(scalar_behaviors(behaviors, mapping))
+                acquisition.update(scalar_behaviors(scalar_part, mapping))
             if mapping['capability'] == 'independent.textfilecontent54':
                 from v04_direct_file_behaviors import file_behaviors
                 acquisition.update(file_behaviors(behaviors))
@@ -262,9 +270,12 @@ class AssessmentConverter:
                 # exact full_path acquisition. Sets inherit it on each leaf.
                 if mapping['capability'] != 'independent.textfilecontent54':
                     from v04_direct_file_behaviors import traversal_behaviors
-                    acquisition.update(traversal_behaviors(behaviors, acquisition,
+                    acquisition.update(traversal_behaviors(traversal_part, acquisition,
                         windows=mapping['native']['traversal_definition'] == 'windows_file_traversal'))
                 acquisition.setdefault('filesystem', 'all')
+            if mapping['native'].get('traversal_definition') == 'hierarchy_traversal':
+                from v04_direct_file_behaviors import hierarchy_behaviors
+                acquisition.update(hierarchy_behaviors(traversal_part, acquisition))
             if filters:
                 acquisition['filters'] = filters
         # Source identity, not payload equality, determines shared acquisitions.
