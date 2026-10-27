@@ -27,7 +27,9 @@ def classify_failure(message, *, stage='conversion', validity=None, dependency=N
             raise ValueError('reviewed schema dependency has invalid category')
     elif any(token in message for token in ('Variable cast', 'unsupported var_check',
             'multi-component merge', 'multi-component unique', 'enum comparison/value',
-            'unproved entity existence', 'unproved aggregation')):
+            'unproved entity existence', 'unproved aggregation', 'alias-domain projection',
+            'acquisition parameter expansion', 'acquisition parameter requires an approved expansion rule',
+            'acquisition parameter var_check', 'complement acquisition parameter', 'matching enum consumer')):
         category, basis = VARIABLE, 'unrepresented Variable/collection obligation; no fallback attempted'
     elif any(token in message for token in ('unsupported entity existence/comparator',
             'ordered comparison', 'unsupported function', 'unsupported OVAL operation')):

@@ -34,6 +34,61 @@ native declarations are explicit per-Assessment state; cached native values are
 copied before use. Source trees are read-only after indexing in normal use.
 Tests deliberately clone/mutate them for fault injection.
 
+## Revised-schema integration (#251 / #255)
+
+The committed schema baseline `d3132ae57` is authoritative. The converter enables
+47 of the 51 mappings in the approved Independent/Linux/UNIX/Windows scope;
+there are 100 mappings globally. Enabling a name does not mean every source
+construct for that capability is implemented or executable.
+
+`predicate` translates static enum collections value by value, preserving order,
+duplicates and the consumer's `var_check` as `value_match`. Arrays and predicate
+Variable references always emit their explicit source datatype, including the
+implicit OVAL string type. `value_match`, observed `values_matching`, and Test
+`items_satisfying` remain separate. Compact scalar strings retain their existing
+form. A bare collector-parameter reference is typed by its parameter contract
+and Variable declaration; it is not a comparison predicate.
+
+`file.hash` uses the approved native `algorithm` Object selector and State field.
+The complete domain is `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`.
+Complement selection applies to that domain, rather than selecting one default
+algorithm or generating extra Tests. One acquisition and its original Item
+population remain intact. Static lists use the approved crosswalk; named runtime
+Variables are supported when their dependency graph projects the same algorithm
+domain, including Variable references and `unique` chains. The bijective rename
+commutes with those operations. Arbitrary runtime strings/external inputs still
+need an approved value-domain adapter; do not assume they already use native
+spellings or invent a function to rewrite them.
+
+The maintained `test_v04_filehash_acquisition_conflict` retains the schema-first
+test identities and now verifies original Tests 305, 544 and 354, all six
+algorithms/four quantifiers, duplicate values, original-source integrity, typed
+runtime projection graphs, compilation, independent terms and negative mutations.
+`test_v04_direct_typed_operands` revalidates all 39 Server 2025 user-rights Rules.
+The [datatype correction receipt](../audit/v04-converter-explicit-datatype-corrections-20261027.json)
+explains each of the 69 changed primary program hashes; all 1,010 proof identities
+are retained. Values, quantifiers and dependency graphs are unchanged.
+
+Use the read-only [acquisition review tool](../../tools/audit_v04_acquisition_parameters.py)
+for the 15 Variable-capable parameters in shellcommand, SQL512, cmdlet and WMI:
+
+```bash
+PYTHONPATH=tools python tools/audit_v04_acquisition_parameters.py \
+  --source-root ORIGINAL_OVAL_TEST_CONTENT --output /tmp/acquisition-review.json
+```
+
+It verifies the collection pin and records original declarations, Object IDs and
+Variable edges. A one-value constant can become a single invocation input for
+`all`, `at least one` or `only one`. Multiple constants and complement inputs
+remain unsupported. Existing named runtime inputs retain their established
+graph/operand proof scope; that is not independent proof of invocation
+multiplicity or scanner behavior. Nondefault runtime quantifiers cannot be
+silently discarded. Record members retain their existing `value_match` and
+`selection_match`; original whole-record `var_ref` remains prohibited.
+
+See the [integration handoff](../audit/v04-converter-revised-schemas-20261027.md)
+for current coverage, remaining source/design obligations and exact verification.
+
 ## Run and inspect
 
 For fast cross-platform breadth measurement, use the
@@ -150,7 +205,7 @@ with source-backed boundary tests. No Rule-ID branch is appropriate.
 `verify_v04_direct_scope.py` runs all six pinned original primary closures,
 records every unsupported Rule, and packages only independently proved output.
 Its [proof floor](../../tests/fixtures/v04-six-primary-proof-floor.json) retains
-1,004 Rule proofs and exact compiled-program hashes; losing a proof or changing
+1,010 Rule proofs and exact compiled-program hashes; losing a proof or changing
 a program fails the workflow. Additional proved Rules are allowed. Update this
 fixture only after examining an independently verified intentional change.
 Applicability remains a separately recorded obligation, not implied by this floor.

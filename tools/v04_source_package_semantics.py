@@ -310,7 +310,8 @@ class Source:
                 expected = 'matches_regex' if name == 'pattern' else 'equals'
                 need(value['operation'] == expected and value['comparison_datatype'] == 'string',
                      'collection parameter comparator/datatype')
-                fields['query' if name == 'wql' else name] = value['operand']
+                from v04_acquisition_source_proof import parameter_operand
+                fields['query' if name == 'wql' else name] = parameter_operand(value)
         if cap == 'windows.registry':
             fields.update(source_hierarchy(behaviors[0] if behaviors else None, fields.get('key')))
         if cap == 'independent.shellcommand':

@@ -264,6 +264,11 @@ class ExpandedSource(Source):
             if record:
                 need(field in record['fields'], 'unknown original scalar projection field')
                 value['values']['field'] = record['fields'][field]
+                if field in record.get('field_aliases', {}):
+                    # A generic string consumer cannot silently borrow the
+                    # native enum vocabulary; a checked enum consumer removes
+                    # this source marker only after proving the translation.
+                    value['values']['source_alias_domain'] = record['field_aliases'][field]
             elif capability == 'unix.file':
                 fields = {**FILE_FIELDS, 'type': 'type', 'sticky': 'sticky'}
                 need(field in fields, 'unknown original file projection field')
@@ -685,7 +690,8 @@ class ExpandedSource(Source):
         if not records:
             term = self.entity(n, selector=True)
             need(term['operation'] == 'equals' and term['comparison_datatype'] == 'string', 'cmdlet scalar input')
-            return term['operand']
+            from v04_acquisition_source_proof import parameter_operand
+            return parameter_operand(term)
         keys(n, {'datatype', 'operation'}, 'cmdlet input record')
         need(n.get('datatype') == 'record' and n.get('operation', 'equals') == 'equals' and
              not (n.text or '').strip(), 'original input record type/comparator')

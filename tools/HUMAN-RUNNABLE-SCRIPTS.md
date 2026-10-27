@@ -32,6 +32,14 @@ migration, scanner execution and production promotion remain separate.
 See the [developer guide](../docs/developer/DIRECT-V04-CONVERTER.md) for an exact
 pinned example, module responsibilities and human extension tests.
 
+The source-backed acquisition review inventories 15 Variable-capable parameters
+without executing commands/queries or enabling array expansion:
+
+```bash
+PYTHONPATH=tools python tools/audit_v04_acquisition_parameters.py \
+  --source-root ORIGINAL_OVAL_TEST_CONTENT --output /tmp/acquisition-review.json
+```
+
 The read-only consumer below imports no compiler code. Supply current-schema
 authoring, not an older review ZIP. It checks unsigned packages; publisher trust
 and scanner execution remain separate. The six-bundle audit additionally requires

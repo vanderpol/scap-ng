@@ -6,13 +6,23 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-27:** Integrated the revised `file.hash` algorithm selector into
+  direct conversion, including static lists, complement quantifiers and typed
+  named projection Variables. Emit explicit datatypes for array/Variable
+  predicates; retain all 39 Server 2025 user-rights Rules and individually
+  document expected program-hash corrections. Preserve singleton acquisition
+  inputs without introducing command/query array expansion. Scanner execution
+  and arbitrary runtime enum normalization remain separate obligations
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251),
+  [#255](https://github.com/vanderpol/scap-ng/issues/255)).
+
 - **2026-10-27:** Updated the pre-alpha `file.hash` capability mapping to
   represent OVAL multi-algorithm Object selection through the existing typed
   selector/value-match grammar, with Object/State enum crosswalks and pinned
   positive/negative schema tests. Audited all 100 capability mappings against
-  accepted 0.3/0.4 modernizations. Original `filehash58` converter admission
-  and scanner semantics remain unimplemented; separate explicit-array datatype
-  enforcement awaits coordinated converter support
+  accepted 0.3/0.4 modernizations. At that schema-only checkpoint, `filehash58` converter admission
+  and scanner semantics were unimplemented; explicit-array datatype enforcement
+  awaited coordinated converter support
   ([#255](https://github.com/vanderpol/scap-ng/issues/255)).
 
 - Extended direct conversion to seven ordinary capabilities and fixed unknown,

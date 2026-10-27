@@ -21,9 +21,37 @@ def source_alias(predicate, aliases):
     if not aliases:
         return predicate
     operand = predicate.get('operand', {})
-    need(predicate.get('operation') == 'equals' and operand.get('datatype') == 'string' and
-         operand.get('value') in aliases, 'unproved alias-domain comparison or Variable')
-    return {**predicate, 'operand': {**operand, 'value': aliases[operand['value']]}}
+    need(predicate.get('operation') in ('equals', 'not_equal'), 'unproved alias-domain comparison')
+    if predicate['operation'] == 'not_equal':
+        need(len(set(aliases.values())) == len(aliases), 'unproved non-bijective enum inequality')
+    def projected(term):
+        # This independent term already retains Object acquisition, filters,
+        # graph dependencies and local/unique boundaries. Only a projection of
+        # the SAME frozen alias domain can commute with its bijective rename.
+        if 'local' in term:
+            need(term['local'].get('datatype') == 'string', 'unproved enum Variable datatype')
+            return {'local': {**term['local'], 'expression': projected(term['local']['expression'])}}
+        if 'unique' in term:
+            return {'unique': projected(term['unique'])}
+        value = term.get('values', {})
+        obj = value.get('object', {})
+        record = contract(obj.get('capability'))
+        need(record is not None, 'unproved enum Variable collection')
+        source_fields = [k for k, v in record['fields'].items() if v == value.get('field')]
+        need(len(source_fields) == 1 and record.get('field_aliases', {}).get(source_fields[0]) == aliases,
+             'unproved enum Variable domain')
+        need(value.get('source_alias_domain') == aliases, 'unproved enum Variable source vocabulary')
+        return {'values': {k: v for k, v in value.items() if k != 'source_alias_domain'}}
+    if 'local' in operand:
+        need(len(set(aliases.values())) == len(aliases), 'unproved non-bijective enum Variable domain')
+        return {**predicate, 'operand': projected(operand)}
+    def rename(value):
+        need(value.get('datatype') == 'string' and value.get('value') in aliases,
+             'unproved alias-domain comparison or Variable')
+        return {**value, 'value': aliases[value['value']]}
+    renamed = ({'constant_values': [rename(v) for v in operand['constant_values']]}
+               if 'constant_values' in operand else rename(operand))
+    return {**predicate, 'operand': renamed}
 
 
 def source_traversal(behaviors, fields, kind):

@@ -59,6 +59,7 @@ class AssessmentConverter:
         self.source, self.component_id, self.mappings = source, component_id, mappings
         self.active, self.cache, self.used = set(), {}, {}
         self.tests, self.variables, self.shared_objects = {}, {}, {}
+        self.enum_projection_cache = {}
         self.object_uses = None
         self.selector_equivalences = []
 
@@ -374,6 +375,8 @@ class AssessmentConverter:
         Test sources and multivalue function inputs need a first-class Variable.
         No values, Cartesian products or collection statuses are evaluated here.
         """
+        ensure(not self.renamed_enum_projection(source_id),
+               'renamed enum projection requires a matching enum consumer')
         value = self.reference(source_id, 'variable')
         if isinstance(value, list):
             element = self.source.node(self.component_id, source_id, 'variable')
@@ -447,22 +450,99 @@ class AssessmentConverter:
         except ValueError as error:
             raise UnsupportedSource(f'invalid {datatype} literal: {text!r}') from error
 
-    def operand(self, element):
+    def operand(self, element, *, enum_aliases=None):
         if element.get('var_ref'):
             variable = self.source.node(self.component_id, element.get('var_ref'), 'variable')
             # Cross-datatype OVAL casts can produce error/unknown results; do
             # not silently infer a target type from a literal array's values.
             ensure(variable.get('datatype') == element.get('datatype', 'string'), 'Variable cast outside bounded proof')
+            if self.renamed_enum_projection(element.get('var_ref')):
+                ensure(enum_aliases is not None, 'renamed enum projection requires a matching enum consumer')
+                self.enum_variable(element.get('var_ref'), enum_aliases)
             return self.reference(element.get('var_ref'), 'variable')
         return self.literal(element.get('datatype', 'string'), element.text or '')
 
     def parameter(self, element):
-        attributes(element, {'datatype', 'operation', 'var_ref'})
+        attributes(element, {'datatype', 'operation', 'var_ref', 'var_check'})
         ensure(not len(element) and element.get('datatype', 'string') == 'string' and
                element.get('operation', 'equals') == 'equals', 'unsupported acquisition parameter comparison/type')
         value = self.operand(element)
+        if isinstance(value, list):
+            # One immutable value is a single invocation input. Multiple values
+            # need a source-backed acquisition rule, not an implicit fan-out.
+            ensure(len(value) == 1 and element.get('var_check', 'all') in ('all', 'at least one', 'only one'),
+                   'multivalue/complement acquisition parameter requires an approved expansion rule')
+            return value[0]
+        ensure('var_check' not in element.attrib or (element.get('var_ref') and
+               element.get('var_check') == 'all'), 'acquisition parameter var_check outside bounded proof')
         ensure(isinstance(value, (str, dict)), 'array acquisition parameter unsupported')
         return value
+
+    def renamed_enum_projection(self, identifier, active=None):
+        """Detect a renamed value domain before a generic string consumer.
+
+        Field-name projection also changes enum values. It is safe inside a
+        proved enum comparison, but not inside arbitrary string concatenation,
+        command parameters or direct Variable Tests without an inverse adapter.
+        Cache source facts only; consumer approval is checked on every use.
+        """
+        if identifier in self.enum_projection_cache:
+            return self.enum_projection_cache[identifier]
+        active = set() if active is None else active
+        ensure(identifier not in active, f'cyclic variable dependency: {identifier}')
+        active.add(identifier)
+        variable = self.source.node(self.component_id, identifier, 'variable')
+        renamed = False
+        for node in variable.iter():
+            if node.tag == f'{{{OVAL}}}variable_component':
+                renamed |= self.renamed_enum_projection(node.get('var_ref'), active)
+            elif node.tag == f'{{{OVAL}}}object_component':
+                obj = self.source.node(self.component_id, node.get('object_ref'), 'object')
+                mapping = self.capability(obj, 'object')
+                field = node.get('item_field')
+                crosswalk = mapping['native'].get('state_value_crosswalk', {}).get(field)
+                renamed |= bool(crosswalk)
+        active.remove(identifier)
+        self.enum_projection_cache[identifier] = renamed
+        return renamed
+
+    def enum_variable(self, identifier, aliases, active=None):
+        """Prove a runtime Variable already carries this native enum domain.
+
+        Renamed Item fields project native values, so a direct projection (or
+        reference/unique chain) needs no value rewriting. Arbitrary strings,
+        concatenation and external inputs do: accepting those would silently
+        compare different vocabularies. Keep them unsupported, not normalized
+        by an invented runtime function or an input convention.
+        """
+        active = set() if active is None else active
+        ensure(aliases and len(set(aliases.values())) == len(aliases),
+               'runtime enum Variable requires a bijective alias-domain projection')
+        ensure(identifier not in active, 'cyclic enum Variable')
+        active.add(identifier)
+        variable = self.source.node(self.component_id, identifier, 'variable')
+        ensure(local_name(variable) == 'local_variable' and variable.get('datatype') == 'string'
+               and len(variable) == 1, 'runtime enum Variable requires an approved alias-domain projection')
+
+        def expression(node):
+            name = local_name(node)
+            if name == 'variable_component':
+                return self.enum_variable(node.get('var_ref'), aliases, active)
+            if name == 'unique' and len(node) == 1:
+                return expression(node[0])
+            ensure(name == 'object_component',
+                   'runtime enum Variable requires an approved alias-domain projection')
+            obj = self.source.node(self.component_id, node.get('object_ref'), 'object')
+            mapping = self.capability(obj, 'object')
+            source_field = node.get('item_field')
+            crosswalk = mapping['native'].get('state_value_crosswalk', {}).get(source_field)
+            field = mapping['native']['state_field_map'].get(source_field)
+            domain = mapping['native'].get('state_value_enums', {}).get(field, [])
+            declared = mapping.get('migration_crosswalk', {}).get(crosswalk, {})
+            ensure(domain and {k: v for k, v in declared.items() if v in domain} == aliases,
+                   'runtime enum Variable requires an approved alias-domain projection')
+        expression(variable[0])
+        active.remove(identifier)
 
     def record_predicate(self, element, mapping):
         """Preserve a complete record before combining its named field results."""
@@ -515,11 +595,22 @@ class AssessmentConverter:
             ensure(element.get('datatype', 'string') == 'string', 'case-insensitive inequality requires string datatype')
         if operation in ('greater than', 'greater than or equal', 'less than or equal'):
             ensure(element.get('datatype') == 'int', 'ordered comparison expansion requires integer source datatype')
-        value = self.operand(element)
         crosswalk = mapping['native'].get('selector_value_crosswalk' if selector else 'state_value_crosswalk', {}).get(local_name(element))
+        field = mapping['native']['state_field_map'].get(local_name(element))
+        domain = mapping['native'].get('state_value_enums', {}).get(field, [])
+        enum_aliases = ({k: v for k, v in mapping['migration_crosswalk'][crosswalk].items() if v in domain}
+                        if crosswalk and operation in ('equals', 'not equal') else None)
+        value = self.operand(element, enum_aliases=enum_aliases)
+        native_enum_variable = False
         if crosswalk:
             aliases = mapping['migration_crosswalk'][crosswalk]
-            if operation != 'equals':
+            if operation == 'not equal' and not selector:
+                # Equality and inequality are invariant under a bijection of
+                # the complete enum domain. Lexical/regex operations are not.
+                renamed_domain = {k: v for k, v in aliases.items() if v in domain}
+                ensure(renamed_domain and len(set(renamed_domain.values())) == len(renamed_domain),
+                       'unsupported enum comparison/value')
+            elif operation != 'equals':
                 # Original Object/Item hives are a closed, case-distinct domain.
                 # The independent XSD relation proof covers every pair (including
                 # the empty error placeholder). Only nonempty literal acquisition
@@ -532,22 +623,34 @@ class AssessmentConverter:
                        and len({k.casefold() for k in domain}) == len(domain)
                        and len(set(domain.values())) == len(domain), 'unsupported enum comparison/value')
                 operation = 'equals'
-            ensure(isinstance(value, str) and value in aliases, 'unsupported enum comparison/value')
-            value = aliases[value]
+            # Static Variables retain their ordered values (including duplicates)
+            # and the consumer's independent var_check. A crosswalk renames each
+            # value; it must not turn the collection into OR or collapse it.
+            if isinstance(value, dict):
+                field = mapping['native']['state_field_map'].get(local_name(element))
+                domain = mapping['native'].get('state_value_enums', {}).get(field, [])
+                self.enum_variable(element.get('var_ref'), {k: v for k, v in aliases.items() if v in domain})
+                native_enum_variable = True
+            else:
+                expected = value if isinstance(value, list) else [value]
+                ensure(all(isinstance(v, str) and v in aliases for v in expected),
+                       'unsupported enum comparison/value')
+                renamed = [aliases[v] for v in expected]
+                value = renamed if isinstance(value, list) else renamed[0]
         if selector:
             field = mapping['native'].get('selector_map', {}).get(local_name(element))
             enumeration = mapping['native'].get('selector_value_enums', {}).get(field)
             if enumeration:
                 ensure(operation == 'equals', 'unsupported enum selector comparator')
                 expected = value if isinstance(value, list) else [value]
-                ensure(all(isinstance(v, str) and v in enumeration for v in expected),
+                ensure(native_enum_variable or all(isinstance(v, str) and v in enumeration for v in expected),
                        'enum selector requires known supported values')
         if not selector:
             native_field = mapping['native']['state_field_map'].get(local_name(element))
             enumeration = mapping['native'].get('state_value_enums', {}).get(native_field)
             if enumeration and operation != 'pattern match':
                 expected = value if isinstance(value, list) else [value]
-                ensure(all(isinstance(v, str) and v in enumeration for v in expected),
+                ensure(native_enum_variable or all(isinstance(v, str) and v in enumeration for v in expected),
                        'unsupported enum comparison/value')
             elif enumeration:
                 # Regex expected values need not be enum members. This path
@@ -555,8 +658,11 @@ class AssessmentConverter:
                 # above, rather than being applied to renamed native values.
                 ensure(element.get('datatype', 'string') == 'string', 'enum regex requires string datatype')
         result = {COMPARISONS[operation]: value}
-        if element.get('datatype', 'string') != 'string':
-            result['datatype'] = 'integer' if element.get('datatype') == 'int' else element.get('datatype')
+        datatype = element.get('datatype', 'string')
+        if datatype != 'string' or isinstance(value, (list, dict)):
+            # Typed collections/references are required by the accepted static
+            # Variable modernization, even when OVAL defaults to string.
+            result['datatype'] = 'integer' if datatype == 'int' else datatype
         if element.get('var_ref'):
             ensure(element.get('var_check', 'all') in MATCHING, 'unsupported var_check')
             result['value_match'] = MATCHING[element.get('var_check', 'all')]
