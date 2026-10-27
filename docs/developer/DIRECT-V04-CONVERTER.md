@@ -14,6 +14,8 @@ readers are reused as data and external gates, not as conversion algorithms.
 | [v04_direct_scap_source.py](../../tools/v04_direct_scap_source.py) | `SourceModel(path, expected_sha256)` verifies ZIP bytes/CRC, parses one complete XML member once, and indexes IDs/references per component. `automated_check` resolves checklist-local catalog references and rejects unsupported check choices. `rule_selected` projects ancestor/Profile selection. |
 | [v04_direct_converter.py](../../tools/v04_direct_converter.py) | `AssessmentConverter.reference(id, kind)` is the single memoized recursive dependency visitor. `convert_object`, `set_expression`, `filter`, `convert_variable`, `predicate`, `convert_test`, and `criteria` produce current native dictionaries directly. `convert(source, rule_ids)` returns `(documents_by_relative_path, external_trace)` for a strict focused request. `convert_benchmark(source)` returns these plus complete coverage, isolating unsupported Rules. `main` emits JSON/YAML and metrics. |
 | [v04_direct_inventory.py](../../tools/v04_direct_inventory.py) | `SourceInventory` indexes dependency edges once, follows unsupported closures too, discovers all checks/selections, and counts/digests original nodes. It does not lower content. |
+| [v04_direct_scalar_behaviors.py](../../tools/v04_direct_scalar_behaviors.py) | Routes ordinary acquisition attributes from reviewed mappings; reads required/default/fixed attributes from original XSD once. Traversal and command errors retain separate shared handlers. |
+| [verify_v04_direct_scope.py](../../tools/verify_v04_direct_scope.py) | `accept_source` is the shared verified-upgrade gate: original validity, source/native terms, compilation and independent package consumption. No lowering belongs here. |
 | [audit_v04_direct_benchmark.py](../../tools/audit_v04_direct_benchmark.py) | Independently reconciles original checks/dependencies/Profiles, compares typed source terms, runs public package gates, verifies compiled operands and attaches proof levels. It cannot admit Rules. |
 | [test_v04_direct_converter.py](../../tools/test_v04_direct_converter.py) | Eleven retained focused tests, controlled compositions, failures, public CLIs and compiled operands; imports independent `verify_original` from the audit module. |
 | [test_v04_direct_benchmark.py](../../tools/test_v04_direct_benchmark.py) | Eight whole-inventory/admission/proof/public-gate regressions, including controlled faults and deterministic output. |
@@ -69,6 +71,27 @@ The tests invoke the unchanged public validator API for JSON (its directory CLI
 discovers YAML only), assert six checked documents, use its CLI for YAML,
 packs separate JSON/YAML ZIPs, runs the unchanged compiler CLI, and launches the
 independent package consumer. It also checks exact program/source operands.
+
+For a verified upgrade, add `--verify` to the focused command above, or use:
+
+```bash
+python tools/v04_direct_converter.py \
+  tests/fixtures/v04-direct-prototype/server2025-signed.zip \
+  --sha256 2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0 \
+  --all-rules --verify --output /tmp/direct-verified-primary-subset
+```
+
+This is the existing converter's verified mode, not a production replacement or
+complete policy migration. It validates original OVAL closure assertions and
+deprecation, canonical authoring, independent typed terms, compiled operands and
+the independent package consumer. Only `PROVED` closures enter
+`primary-subset.scapng`; zero proved closures produce no package.
+`acceptance.json` accounts for every original Rule, with checks, dependencies,
+hashes and blockers (`NOT_SELECTED` for a focused request). `coverage.md` is its
+human-readable view; `source-trace.json` retains provenance. Applicability remains
+separately inventoried and unproved. Catalog failures are classified without
+repair. `--verify` requires `--rule` or `--all-rules`. Source integrity, unknown
+selections and existing output are fatal; blocked Rules remain isolated.
 
 The fixture's [provenance](../../tests/fixtures/v04-direct-prototype/provenance.json)
 pins the original repository/revision, ZIP and source Rule identities. The ZIP
@@ -167,6 +190,18 @@ the pinned Self-Assertion bindings/XSD link. Do not run the 65-source corpus.
   `PYTHONPATH=tools python -m unittest test_v04_direct_variables -v` for 21
   original cases plus controlled negative/aggregation boundaries. The nine
   original files and hashes live in `tests/fixtures/v04-direct-variables`.
+- UNIX file acquisition preserves nil filenames as `name: null`, filesystem scope,
+  permission-field identities and downward recursion. FileBehaviors default
+  recursion to none; depth/direction apply only to equality directory selectors,
+  per the original XSD. Full filepath and non-equality path acquisition retain
+  provenance without invented recursion. Upward recursion stays blocked. Run
+  `test_v04_direct_file_traversal` for 16 original file/Set Tests plus controlled
+  projection/recursion mutants.
+- Ordinary scalar behaviors use mapping routes and original XSD defaults. RPM
+  `filepaths=false` becomes `include_file_paths: false`, separately from matching.
+  The independent scalar contract freezes this identity/default. Run
+  `test_v04_direct_scalar_behaviors` for three original RPM Tests and negative
+  Boolean, namespace, duplicate and unknown-attribute boundaries.
 - Comparator-free absence requires the exact source absence form. Empty string
   equality is not removed. `all_exist` remains blocked.
 - Shared Objects preserve source identity, not payload deduplication. Set

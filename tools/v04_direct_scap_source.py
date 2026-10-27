@@ -50,6 +50,12 @@ def native_identifier(element, suffix, title=None):
     title = (title or element.get('comment') or element.findtext(f'{{{XCCDF}}}title') or
              element.findtext(f'{{{OVAL}}}metadata/{{{OVAL}}}title') or local_name(element))
     stem = re.sub('[^a-z0-9]+', '-', title.lower()).strip('-')[:70].rstrip('-')
+    if not stem:
+        # Some originals use punctuation-only comments. Keep a readable source
+        # descriptor instead of emitting an invalid digest-only native name.
+        values = ' '.join(c.text or '' for c in element if local_name(c) == 'value')
+        descriptor = local_name(element).replace('_', ' ') + ' ' + values
+        stem = re.sub('[^a-z0-9]+', '-', descriptor.lower()).strip('-')[:70].rstrip('-')
     return f'{stem}-{digest(element.get("id"))[:8]}-{suffix}'
 
 

@@ -99,9 +99,16 @@ class RemainingPrimitiveTests(unittest.TestCase):
         constant = next(source.node(binding['component'], k, 'variable') for k, v in binding['dependencies'].items()
                         if v['kind'] == 'variable' and source.node(binding['component'], k, 'variable').tag == O + 'constant_variable')
         ET.SubElement(constant, O + 'value').text = 'SECOND-VALUE'
-        with self.assertRaises(UnsupportedSource): convert(source, [binding['source_rule']])
+        docs, trace = convert(source, [binding['source_rule']])
+        verify_original(source.root, docs, trace)
+        verify_compiled(docs, build_bundle(docs)[0])
+        named = [v for d in docs.values() if 'assessment' in d
+                 for v in d['assessment'].get('variables', {}).values() if v['kind'] == 'constant']
+        self.assertTrue(any(v['expression']['literal'][-1] == 'SECOND-VALUE' for v in named))
         function = ET.Element(O + 'variable_component', var_ref=constant.get('id'))
-        with self.assertRaises(ValueError): ExpandedSource(source.components[binding['component']]).function(function)
+        term = ExpandedSource(source.components[binding['component']]).function(function)
+        self.assertEqual(term['constant_values'][-1], {'datatype': 'string', 'value': 'SECOND-VALUE'})
+        self.assertGreater(len(term['constant_values']), 1)
 
     def test_ntuser_defaults_type_and_ordered_exclusions_are_preserved(self):
         xs = '{http://www.w3.org/2001/XMLSchema}'

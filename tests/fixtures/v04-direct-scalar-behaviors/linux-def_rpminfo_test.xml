@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+                  xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-definitions-5#linux https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/linux-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-common-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-common-schema.xsd">
+  <generator>
+    <oval:product_name>Oval Test Content</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-06-10T12:05:51</oval:timestamp>
+    <terms_of_use>NOTE: MITRE Content may be modified from original by NIWC Atlantic. Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the license described in terms.txt.</terms_of_use>
+  </generator>
+  <definitions>
+    <definition id="oval:navy.navwar.niwcatlantic.scc.test:def:121" version="1" class="miscellaneous">
+      <metadata>
+        <title>Evaluate to true if the linux-def:rpminfo_test is properly supported</title>
+        <description>This definition is intended to evaluate to true if the interpreter properly supports the linux-def:rpminfo_test.</description>
+      </metadata>
+      <notes>
+        <note>It is important to note that the values used in this test definition are specific to a particular machine, and may not necessarily apply to your system. As a result, in order to have the definition return a result of 'true', you must either change these values to the ones found on your particular system, or you must configure your system to use these values.</note>
+      </notes>
+      <criteria operator="AND">
+        <criterion comment="Test that the rpminfo_object is supported with the name entity equal to some value." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:1" />
+        <criterion comment="Test that the rpminfo_object is supported with the name entity not equal to some value." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:2" />
+        <criterion comment="Test that the rpminfo_object is supported with the name entity matching some value." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:3" />
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <rpminfo_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:1" version="1" comment="Test that the rpminfo_object is supported with the name entity equal to some value." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:1" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:1" />
+    </rpminfo_test>
+    <rpminfo_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:2" version="1" comment="Test that the rpminfo_object is supported with the name entity equal to some value." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:2" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:2" />
+    </rpminfo_test>
+    <rpminfo_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:3" version="1" comment="Test that the rpminfo_object is supported with the name entity equal to some value." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:3" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:1" />
+    </rpminfo_test>
+  </tests>
+  <objects>
+    <rpminfo_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:1" version="1" comment="Retrieve an rpminfo_item with a name equal to 'gnome-session'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name>gnome-session</name>
+    </rpminfo_object>
+    <rpminfo_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:2" version="1" comment="Retrieve an rpminfo_item with a name not equal to 'gnome-session'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="not equal">gnome-session</name>
+      <oval-def:filter action="include">oval:navy.navwar.niwcatlantic.scc.test:ste:3</oval-def:filter>
+    </rpminfo_object>
+    <rpminfo_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:3" version="1" comment="Retrieve an rpminfo_item with a name matches to '^[Gg]nome.se[Ss]{2}ion$'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="pattern match">^[Gg]nome.se[Ss]{2}ion$</name>
+    </rpminfo_object>
+  </objects>
+  <states>
+    <rpminfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:1" version="1" comment="Confirm item name element contains 'gnome-session'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name>gnome-session</name>
+      <arch operation="pattern match">.+</arch>
+      <epoch operation="pattern match">.+</epoch>
+      <release operation="pattern match">.+</release>
+    </rpminfo_state>
+    <rpminfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:2" version="1" comment="Confirm item name element contains 'audit'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="pattern match">^[Aa]udit</name>
+      <arch operation="pattern match">.+</arch>
+      <epoch operation="pattern match">.+</epoch>
+      <release operation="pattern match">.+</release>
+    </rpminfo_state>
+    <rpminfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:3" version="1" comment="Filter used to include only the 'audit' package(s)." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="pattern match">^audit</name>
+      <arch operation="pattern match">.+</arch>
+      <epoch operation="pattern match">.+</epoch>
+      <release operation="pattern match">.+</release>
+    </rpminfo_state>
+  </states>
+</oval_definitions>

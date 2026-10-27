@@ -17,6 +17,21 @@ Python 3.12 is the maintained local baseline. Some packaging/signing experiments
 
 ## Independent 0.4 package acceptance (#251)
 
+The existing direct converter offers a source-verified upgrade mode:
+
+```bash
+python tools/v04_direct_converter.py ORIGINAL.zip --sha256 ORIGINAL_SHA256 \
+  --all-rules --verify --output /tmp/new-verified-primary-subset
+```
+
+Use a new output directory. Only independently proved primary OVAL closures are
+compiled into `primary-subset.scapng`. `acceptance.json`, `coverage.md` and
+`source-trace.json` account for all source Rules and explicit gaps. Use repeatable
+`--rule` instead of `--all-rules` for focused work. Applicability, full policy
+migration, scanner execution and production promotion remain separate.
+See the [developer guide](../docs/developer/DIRECT-V04-CONVERTER.md) for an exact
+pinned example, module responsibilities and human extension tests.
+
 The read-only consumer below imports no compiler code. Supply current-schema
 authoring, not an older review ZIP. It checks unsigned packages; publisher trust
 and scanner execution remain separate. The six-bundle audit additionally requires

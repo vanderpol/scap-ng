@@ -178,6 +178,7 @@ class AssessmentConverter:
         return logical_condition(element.get('operator', 'AND'), conditions)
 
     def convert_object(self, element):
+        from v04_direct_scalar_behaviors import behavior_routes, scalar_behaviors
         mapping = self.capability(element, 'object')
         acquisition = {'capability': mapping['capability']}
         if mapping['native'].get('test_source', {}).get('kind') == 'variable':
@@ -204,8 +205,10 @@ class AssessmentConverter:
                     filters.append(self.filter(child, mapping))
                     continue
                 field = local_name(child)
-                if field == 'behaviors' and mapping['capability'] in (
-                        'independent.textfilecontent54', 'independent.shellcommand'):
+                if field == 'behaviors' and (mapping['capability'] in (
+                        'independent.textfilecontent54', 'independent.shellcommand') or
+                        mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal') or
+                        behavior_routes(mapping)):
                     ensure(child.tag == f'{{{mapping["source"]["namespace"]}}}behaviors' and behaviors is None,
                            'duplicate/foreign acquisition behaviors')
                     behaviors = child
@@ -229,7 +232,10 @@ class AssessmentConverter:
                         'source_contract': 'OVAL 5.12.3 EntityObjectRegistryHiveType/EntityItemRegistryHiveType'})
             for path, value in mapping.get('migration_crosswalk', {}).get('materialized_defaults', {}).items():
                 ensure(path.startswith('behaviors.'), 'unrecognized acquisition default')
-                acquisition[path.split('.')[1]] = value
+                source = path.split('.')[1]
+                acquisition[behavior_routes(mapping).get(source, source)] = value
+            if behavior_routes(mapping):
+                acquisition.update(scalar_behaviors(behaviors, mapping))
             if mapping['capability'] == 'independent.textfilecontent54':
                 from v04_direct_file_behaviors import file_behaviors
                 acquisition.update(file_behaviors(behaviors))
@@ -239,6 +245,10 @@ class AssessmentConverter:
             if mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal'):
                 # FileBehaviors defaults recurse_file_system to all, including
                 # exact full_path acquisition. Sets inherit it on each leaf.
+                if mapping['capability'] != 'independent.textfilecontent54':
+                    from v04_direct_file_behaviors import traversal_behaviors
+                    acquisition.update(traversal_behaviors(behaviors, acquisition,
+                        windows=mapping['native']['traversal_definition'] == 'windows_file_traversal'))
                 acquisition.setdefault('filesystem', 'all')
             if filters:
                 acquisition['filters'] = filters
@@ -454,7 +464,7 @@ class AssessmentConverter:
         if selector and nil in element.attrib:
             attributes(element, {nil, 'datatype'})
             field = mapping['native'].get('selector_map', {}).get(local_name(element))
-            ensure(field in mapping['native'].get('nullable_selectors', ()) and
+            ensure(field in mapping['native'].get('nullable_selectors', ('name',)) and
                    element.get(nil) in ('true', '1') and not len(element) and not (element.text or '').strip(),
                    'unsupported nil selector')
             datatype = 'int' if mapping['native']['field_datatypes'][field] == ['integer'] else 'string'
@@ -765,11 +775,21 @@ def main():
     selection.add_argument('--rule', action='append', help='strict focused selection; repeatable')
     selection.add_argument('--all-rules', action='store_true', help='inventory all, convert supported closures automatically')
     selection.add_argument('--inventory-only', action='store_true', help='discover every Rule without conversion')
+    parser.add_argument('--verify', action='store_true',
+                        help='validate original closures, prove source terms and compile only the proved primary subset')
     parser.add_argument('--output', type=Path, required=True)
     arguments = parser.parse_args()
     ensure(not arguments.output.exists(), 'output exists; refusing overwrite')
+    ensure(not (arguments.verify and arguments.inventory_only), '--verify requires --rule or --all-rules')
     started = time.perf_counter()
-    source = SourceModel(arguments.source, arguments.sha256)
+    if arguments.verify:
+        from verify_v04_direct_scope import accept_source
+        report = accept_source(arguments.source, arguments.sha256, arguments.output, rule_ids=arguments.rule)
+        metrics = {'verified_upgrade_seconds': time.perf_counter() - started, 'outcomes': report['outcomes']}
+        (arguments.output / 'metrics.json').write_text(json.dumps(metrics, indent=2) + '\n')
+        print(json.dumps(metrics))
+        return
+    source = SourceModel(arguments.source, arguments.sha256, inventory_broken_references=not bool(arguments.rule))
     indexed = time.perf_counter()
     manifest = None
     stages = {}

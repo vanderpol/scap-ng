@@ -30,7 +30,11 @@ SCALAR_ACQUISITIONS = {
     'independent.environmentvariable58': ('pid', 'name'),
 }
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
-FILE_FIELDS = {**NAMES, 'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
+FILE_FIELDS = {**NAMES, 'group_id': 'owner_gid', 'user_id': 'owner_uid',
+               'a_time': 'access_time', 'c_time': 'change_time', 'm_time': 'modify_time',
+               'size': 'size', 'has_extended_acl': 'has_extended_acl',
+               'uread': 'owner_read', 'uwrite': 'owner_write', 'uexec': 'owner_execute', 'gread': 'group_read',
+               'suid': 'setuid', 'sgid': 'setgid', 'gwrite': 'group_write',
                'gexec': 'group_execute', 'oread': 'other_read', 'owrite': 'other_write',
                'oexec': 'other_execute'}
 APPROVED_SOURCE = ROOT / 'research/assessment-simplification/evidence/rhel_9/SV-258179/source-oval.xml'
@@ -243,6 +247,20 @@ class ExpandedSource(Source):
                 keys(n, {'object_ref', 'item_field'}, 'Variable value projection')
                 need(not len(n) and n.get('item_field') == 'value', 'Variable value projection field')
                 return self.object(n.get('object_ref'))['variable']
+            value = super().function(n)
+            capability = self.capability(obj, '_object')
+            record = scalar_proof.contract(capability)
+            field = n.get('item_field')
+            if record:
+                need(field in record['fields'], 'unknown original scalar projection field')
+                value['values']['field'] = record['fields'][field]
+            elif capability == 'unix.file':
+                fields = {**FILE_FIELDS, 'type': 'type', 'sticky': 'sticky'}
+                need(field in fields, 'unknown original file projection field')
+                value['values']['field'] = fields[field]
+            elif capability in ('independent.textfilecontent54', 'windows.fileeffectiverights53'):
+                value['values']['field'] = NAMES.get(field, field)
+            return value
         if name not in ('regex_capture', 'merge', 'unique'):
             value = super().function(n)
             # A one-valued typed constant component is exactly a literal,
@@ -585,16 +603,29 @@ class ExpandedSource(Source):
                 allowed = {'unix.password': {'username'}, 'unix.file': {'filepath', 'path', 'filename'},
                            'independent.textfilecontent54': {'filepath', 'path', 'filename', 'pattern', 'instance'}}[cap]
                 need(name in allowed and NAMES.get(name, name) not in fields, 'unproved/duplicate selector ' + name)
-                fields[NAMES.get(name, name)] = self.entity(c, selector=True)
+                nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
+                if cap == 'unix.file' and name == 'filename' and nil in c.attrib:
+                    keys(c, {nil, 'datatype'}, 'nil filename')
+                    need(c.get(nil) in ('true', '1') and c.get('datatype', 'string') == 'string' and
+                         not len(c) and not (c.text or '').strip(), 'invalid nil filename')
+                    fields['name'] = None
+                else:
+                    fields[NAMES.get(name, name)] = self.entity(c, selector=True)
             if cap == 'unix.file':
                 keys(behaviors, {'max_depth', 'recurse', 'recurse_direction', 'recurse_file_system'}, 'file behaviors')
-                need(behaviors.get('recurse_direction', 'none') == 'down', 'file recursion direction not downward')
+                direction = behaviors.get('recurse_direction', 'none')
+                need(direction in ('none', 'down'), 'unsupported/deprecated file recursion direction')
                 depth = int(behaviors.get('max_depth', -1))
+                need(depth >= -1, 'invalid original max_depth')
                 recurse = behaviors.get('recurse', 'symlinks and directories')
                 need(recurse in ('symlinks', 'directories', 'symlinks and directories'), 'deprecated/unproved recursion')
-                fields['traversal'] = {'max_depth': None if depth == -1 else depth,
-                    'recurse': 'symlinks_and_directories' if recurse == 'symlinks and directories' else recurse,
-                    'direction': 'down'}
+                if (direction == 'down' and 'full_path' not in fields and
+                        fields.get('directory', {}).get('operation') == 'equals'):
+                    fields['traversal'] = {'max_depth': None if depth == -1 else depth,
+                        'recurse': 'symlinks_and_directories' if recurse == 'symlinks and directories' else recurse,
+                        'direction': 'down'}
+                need(behaviors.get('recurse_file_system', 'all') in ('all', 'local', 'defined'),
+                     'invalid original filesystem scope')
                 fields['filesystem'] = {'all': 'all', 'local': 'local', 'defined': 'same'}[
                     behaviors.get('recurse_file_system', 'all')]
             elif cap == 'independent.textfilecontent54':
@@ -868,6 +899,8 @@ class ExpandedNative(Native):
                 fields[k] = {**v, 'direction': 'down'}
             elif k in ('filesystem', 'ignore_case', 'singleline', 'multiline', 'item_creation'):
                 fields[k] = v
+            elif cap == 'unix.file' and k == 'name' and v is None:
+                fields[k] = None
             elif isinstance(v, dict) and set(v) == {'from'}:
                 loop = n.get('for_each')
                 need(cap == 'unix.file' and loop and k == 'directory', 'unproved collection expansion')

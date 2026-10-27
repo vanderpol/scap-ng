@@ -25,6 +25,7 @@ Snapshot taken during the SCAP-NG 0.2.0 freeze/handoff reconciliation on 2026-10
 
 | Branch | Status | Purpose / relationship to main | Disposition |
 | --- | --- | --- | --- |
+| `work` (local recovery snapshot) | merged/stale | Failed-session checkout retained at `44254953b`; its implementation is already an ancestor of published `main`. Recovery resumed on `main` from `609da701f`, with no local-only commits. Refs #251 and #254. | Preserve the local ref; no remote branch, history rewrite or deletion was performed. |
 | `feature/optional-auto-map-groups` | merged/stale | Add opt-in `--auto-map-groups` normalization to conversion tools; default conversion remains faithful and does not invent grouping. Merged through PR #163 after focused, RHEL9 full-review, current-design, repository-boundary, and representative conversion gates passed. | Safe cleanup candidate after merge verification. |
 | `feature/stig-manual-conversion-audit-161` | merged/stale | Issue #161: strict conversion-audit artifact and nested legacy-XCCDF loss guard; validated with Cyber Exchange AD Forest V3R2 and Google Chrome V2R11. Merged through PR #162. | Safe cleanup candidate after merge verification. |\n| `feature/stig-manual-audit-outputs-159` | merged/stale | Issue #159: optional native-NG HTML and XLSX manual-audit outputs; merged through PR #160. | Safe cleanup candidate after merge verification. |
 | `assessment-reference-20261003` | merged/stale | Assessment reference documentation; fully behind main. | Safe cleanup candidate after freeze. |

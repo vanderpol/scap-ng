@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Added a verified mode to the existing direct conversion CLI, sharing original
+  closure validity/proof/compilation gates with the six-source regression and
+  packaging only independently proved primary subsets. Added shared file
+  traversal, scalar behavior routing and RPM proof boundaries
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Added shared direct Variable sources, named constant function collections and
   single-collection merge/unique conversion; inventory and independent proof
   now follow text Variable references without discarding unsupported predicates

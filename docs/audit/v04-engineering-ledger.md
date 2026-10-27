@@ -64,6 +64,22 @@ integer constants, all_exist, separate identity predicates, casts and unsupporte
 aggregation/source composition remain blocked. Original fixture hashes and
 reproduction instructions are in the developer guide; full gates pending.
 
+The shared traversal/scalar-behavior checkpoint adds UNIX file and RPM-info
+conversion, source-field projection aliases, original-XSD behavior defaults and
+the existing CLI's `--verify` mode. Six Variable tests, five file tests (16
+original cases), three scalar-behavior tests (three original cases), and two
+verified-CLI tests pass. The CLI packages only proved closures, independently
+consumes the package, inventories all Rule outcomes and refuses output overwrite.
+The retained singleton-function test now positively proves multivalue collections
+instead of expecting the formerly unsupported case to fail; its identity remains.
+
+**Owner boundary:** eight valid original process Tests fail an overlapping
+generated `oneOf` selector contract. The [concrete review packet](v04-process-selector-schema-conflict.md)
+and two passing review tests demonstrate current rejection and an isolated
+exact-alternative correction. Active schemas/generator are unchanged; no process
+admission. Owner decision is pending. Complete maintained regressions and
+exact-head six-source/corpus evidence are running before the terminal handoff.
+
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
 | --- | --- | --- | --- | --- | --- |
 | Architecture acceptance — complete | `284705ee6` / `840242a14` | Common Set proof; integer GT/GTE/LTE; public validation profiler | 87 / 0 / 204 of 291 | Zero; 3,008 tests, one unchanged skip; all five implementation checks PASS | Validation branching dominates; no optimization claimed. GO audit-policy source increment. |

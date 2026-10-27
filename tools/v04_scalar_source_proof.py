@@ -56,16 +56,31 @@ def source_leaf(reader, identifier, capability, record):
     if record['source_kind'] == 'none':
         need(not len(node), 'system source Object must be empty')
         return {'capability': capability, 'selectors': {}}
-    fields, filters = {}, []
+    fields, filters, behaviors = {}, [], None
     for child in node:
         if child.tag == '{' + OD + '}filter':
             filters.append(child)
+            continue
+        if child.tag == '{' + record['source']['namespace'] + '}behaviors':
+            need(record.get('behaviors') and behaviors is None and not len(child) and
+                 not (child.text or '').strip(), 'unsupported/duplicate scalar behaviors')
+            keys(child, record['behaviors'], 'original scalar behaviors')
+            behaviors = child
             continue
         name = local(child)
         need(child.tag == '{' + record['source']['namespace'] + '}' + name
              and name in record['selectors'] and name not in fields, 'unknown scalar source acquisition field')
         fields[name] = reader.entity(child, selector=True)
     result = {'capability': capability, 'selectors': {record['selectors'][k]: v for k, v in fields.items()}}
+    for name, specification in record.get('behaviors', {}).items():
+        value = behaviors.get(name) if behaviors is not None else None
+        if value is None:
+            value = specification['default']
+        else:
+            need(specification['type'] == 'boolean' and value in ('false', 'true', '0', '1'),
+                 'invalid original scalar Boolean behavior')
+            value = value in ('true', '1')
+        result['selectors'][specification['field']] = value
     if filters:
         result['filters'] = reader.filters(filters, capability)
     return result
@@ -97,9 +112,14 @@ def native_object(reader, node, capability):
         keys(node, {'capability', 'object_title', 'set'}, 'native scalar Set')
         return {'capability': capability, 'set': reader.set_term(node['set'], capability)}
     allowed = set(record['selectors'].values())
-    keys(node, allowed | {'capability', 'object_title', 'filters'}, 'native scalar Object')
+    behaviors = {s['field']: s for s in record.get('behaviors', {}).values()}
+    keys(node, allowed | behaviors.keys() | {'capability', 'object_title', 'filters'}, 'native scalar Object')
     result = {'capability': capability, 'selectors': {
         key: reader.predicate(value, selector=True) for key, value in node.items() if key in allowed}}
+    for name, specification in behaviors.items():
+        need(name in node and specification['type'] == 'boolean' and isinstance(node[name], bool),
+             'missing/invalid native scalar behavior')
+        result['selectors'][name] = node[name]
     if node.get('filters'):
         result['filters'] = reader.filters(node['filters'])
     return result

@@ -43,6 +43,111 @@ def verify_proof_floor(platform, evidence, baseline):
             raise ValueError(platform + ': previously proved compiled program changed: ' + rule)
 
 
+def accept_source(path, expected_sha256, destination, *, rule_ids=None,
+                  mappings=None, source_validator=None, validators=None, baseline=None):
+    """Verify one pinned source and package only independently proved closures.
+
+    The public converter CLI and six-source retention gate share this acceptance
+    path; conversion itself remains the existing recursive visitor. Unsupported
+    Rules produce diagnostics. Invalid input/global integrity errors propagate.
+    """
+    path = Path(path)
+    source = SourceModel(path, expected_sha256, inventory_broken_references=True)
+    selected = None if rule_ids is None else set(rule_ids)
+    if selected is not None and (not selected or len(selected) != len(rule_ids) or not selected <= source.rules.keys()):
+        raise UnsupportedSource('verified selection has duplicate, missing or unknown Rules')
+    destination.mkdir(parents=True, exist_ok=False)
+    pin = {'file': path.name, 'sha256': expected_sha256}
+    mappings = load_mappings() if mappings is None else mappings
+    source_validator = source_validator or SourceValidator(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3')
+    validators = validators or build_validators(ROOT / 'schema/v0.4.0')
+    inventory = SourceInventory(source)
+    with zipfile.ZipFile(path) as archive:
+        original = E.fromstring(archive.read(source.member), E.XMLParser(resolve_entities=False, no_network=True))
+    checks = {c.get('id'): source_validator.validate(c[0]) for c in original.findall(DS + 'component')
+              if c[0].tag == '{' + OVAL + '}oval_definitions'}
+    documents, bindings, cases = {}, [], []
+    for row in inventory.rules():
+        result = {'rule': row['source_rule'], 'required_capabilities': row['needed_capabilities'],
+                  'outcome': 'BLOCKED', 'proof_scope': 'primary OVAL',
+                  'source': row['source'], 'source_rule_sha256': row['source_rule_sha256'],
+                  'checks': row['checks'], 'dependencies': row['dependencies']}
+        if selected is not None and row['source_rule'] not in selected:
+            result['outcome'] = 'NOT_SELECTED'
+            cases.append(result)
+            continue
+        if not any(c['system'] == OVAL for c in row['checks']):
+            result['outcome'] = 'MANUAL_OCIL_ONLY'
+            cases.append(result)
+            continue
+        try:
+            if row['inventory_problems']:
+                raise UnsupportedSource(json.dumps(row['inventory_problems'], sort_keys=True))
+            validity = closure_validity(row['dependencies'], checks)
+            if validity['status'] != 'VALID' or any(i['kind'] == 'deprecated' for i in validity['issues']):
+                result['source_validity'] = validity
+                raise UnsupportedSource('original OVAL closure invalid/deprecated')
+            native, binding = convert_rule(source, row['source_rule'], mappings)
+            for document in native.values():
+                kind, = document
+                errors = list(document_errors(validators[kind + '.schema.json'], document))
+                if errors:
+                    raise ValueError('native schema: ' + errors[0].message)
+            assessment = next(d['assessment'] for d in native.values() if 'assessment' in d)
+            proof = expanded_compare(ExpandedSource(source.components[binding['component']]),
+                                     binding['definition'], assessment)
+            if proof['outcome'] != 'PROVED':
+                result.update(outcome=proof['outcome'], proof=proof)
+                cases.append(result)
+                continue
+            verify_program(assessment, compile_assessment_program(assessment))
+            documents.update(native)
+            bindings.append(binding)
+            result.update(outcome='PROVED', assessment=assessment['id'])
+        except (UnsupportedSource, ValueError) as error:
+            result['diagnostic'] = str(error)
+        cases.append(result)
+    documents, trace = assemble_subset(source, documents, bindings, mappings)
+    programs = []
+    consumer = {'status': 'NOT_RUN_NO_PROVED_CLOSURES'}
+    if bindings:
+        verify_original(source.root, documents, trace)
+        bundle, _ = build_bundle(documents)
+        programs = verify_compiled(documents, bundle)
+        (destination / 'primary-subset.scapng').write_bytes(bundle)
+        from verify_v04_package_consumer import verify
+        external = {(kind, document[kind]['id']): (relative, document)
+                    for relative, document in documents.items() for kind in document}
+        consumer = verify(destination / 'primary-subset.scapng', source=external)
+        for relative, document in documents.items():
+            target = destination / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(json.dumps(document, indent=2) + '\n')
+            target.with_suffix('.yaml').write_text(authoring_yaml(document))
+    own = {'source': pin, 'cases': cases, 'programs': programs, 'package_consumer': consumer,
+           'outcomes': dict(Counter(r['outcome'] for r in cases)),
+           'catalog_errors': source.catalog_errors,
+           'applicability': platform_inventory(source, inventory)}
+    if baseline is not None:
+        verify_proof_floor(path.name, own, baseline)
+    own.update(scope='Primary OVAL subset; applicability inventoried, not proved; no scanner acceptance',
+               format='scap-ng/direct-primary-upgrade/1', schema_version='0.4.0',
+               enabled_capabilities=[m['capability'] for m in mappings])
+    (destination / 'source-trace.json').write_text(json.dumps(trace, indent=2) + '\n')
+    (destination / 'acceptance.json').write_text(json.dumps(own, indent=2) + '\n')
+    lines = ['# Verified primary OVAL upgrade', '', own['scope'], '',
+             'Counts: `' + json.dumps(own['outcomes'], sort_keys=True) + '`.', '',
+             'Only PROVED closures enter primary-subset.scapng. Full source/check/dependency',
+             'hashes and exact blockers are in acceptance.json; applicability remains unproved.', '',
+             '| Source Rule | Outcome | Diagnostic |', '| --- | --- | --- |']
+    for case in cases:
+        detail = case.get('diagnostic') or json.dumps(case.get('proof', {}).get('unsupported_obligations', []))
+        detail = detail.replace('|', '\\|').replace('\n', ' ')
+        lines.append(f"| {case['rule']} | {case['outcome']} | {detail} |")
+    (destination / 'coverage.md').write_text('\n'.join(lines) + '\n')
+    return own
+
+
 def run(inputs, output):
     output.mkdir(parents=True, exist_ok=False)
     pins = json.loads((ROOT / 'tests/fixtures/v04-direct-six-sources.json').read_text())
@@ -54,68 +159,9 @@ def run(inputs, output):
               'scope': 'Primary OVAL only; applicability separately inventoried, not complete policy/scanner equivalence',
               'source_pin': pins, 'enabled_capabilities': [m['capability'] for m in mappings], 'sources': {}}
     for platform, pin in pins['sources'].items():
-        path = inputs / pin['file']
-        source = SourceModel(path, pin['sha256'], inventory_broken_references=True)
-        inventory = SourceInventory(source)
-        with zipfile.ZipFile(path) as archive:
-            original = E.fromstring(archive.read(source.member), E.XMLParser(resolve_entities=False, no_network=True))
-        checks = {c.get('id'): source_validator.validate(c[0]) for c in original.findall(DS + 'component')
-                  if c[0].tag == '{' + OVAL + '}oval_definitions'}
-        documents, bindings, cases = {}, [], []
-        for row in inventory.rules():
-            result = {'rule': row['source_rule'], 'required_capabilities': row['needed_capabilities'],
-                      'outcome': 'BLOCKED', 'proof_scope': 'primary OVAL'}
-            if not any(c['system'] == OVAL for c in row['checks']):
-                result['outcome'] = 'MANUAL_OCIL_ONLY'
-                cases.append(result)
-                continue
-            try:
-                if row['inventory_problems']:
-                    raise UnsupportedSource(json.dumps(row['inventory_problems'], sort_keys=True))
-                validity = closure_validity(row['dependencies'], checks)
-                if validity['status'] != 'VALID' or any(i['kind'] == 'deprecated' for i in validity['issues']):
-                    result['source_validity'] = validity
-                    raise UnsupportedSource('original OVAL closure invalid/deprecated')
-                native, binding = convert_rule(source, row['source_rule'], mappings)
-                for document in native.values():
-                    kind, = document
-                    errors = list(document_errors(validators[kind + '.schema.json'], document))
-                    if errors:
-                        raise ValueError('native schema: ' + errors[0].message)
-                assessment = next(d['assessment'] for d in native.values() if 'assessment' in d)
-                proof = expanded_compare(ExpandedSource(source.components[binding['component']]),
-                                         binding['definition'], assessment)
-                if proof['outcome'] != 'PROVED':
-                    result.update(outcome=proof['outcome'], proof=proof)
-                    cases.append(result)
-                    continue
-                verify_program(assessment, compile_assessment_program(assessment))
-                documents.update(native)
-                bindings.append(binding)
-                result.update(outcome='PROVED', assessment=assessment['id'])
-            except (UnsupportedSource, ValueError) as error:
-                result['diagnostic'] = str(error)
-            cases.append(result)
-        destination = output / platform
-        destination.mkdir()
-        documents, trace = assemble_subset(source, documents, bindings, mappings)
-        programs = []
-        if bindings:
-            verify_original(source.root, documents, trace)
-            bundle, _ = build_bundle(documents)
-            programs = verify_compiled(documents, bundle)
-            (destination / 'primary-subset.scapng').write_bytes(bundle)
-            for path, document in documents.items():
-                target = destination / path
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_text(json.dumps(document, indent=2) + '\n')
-                target.with_suffix('.yaml').write_text(authoring_yaml(document))
-        own = {'source': pin, 'cases': cases, 'programs': programs,
-               'outcomes': dict(Counter(r['outcome'] for r in cases)),
-               'catalog_errors': source.catalog_errors,
-               'applicability': platform_inventory(source, inventory)}
-        verify_proof_floor(platform, own, baseline['sources'][platform])
-        (destination / 'acceptance.json').write_text(json.dumps(own, indent=2) + '\n')
+        own = accept_source(inputs / pin['file'], pin['sha256'], output / platform,
+                            mappings=mappings, source_validator=source_validator, validators=validators,
+                            baseline=baseline['sources'][platform])
         report['sources'][platform] = {k: v for k, v in own.items() if k not in ('cases', 'applicability')}
         print(platform, json.dumps(own['outcomes']), flush=True)
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
