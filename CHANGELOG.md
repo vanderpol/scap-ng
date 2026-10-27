@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Inventoried all original six-STIG Rule and applicability dependencies against
+  pinned OVAL XSD/Schematron, separating source-invalid bindings from unsupported
+  conversion and preserving non-repairing candidate evidence
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Added a fast, hash-pinned inventory and direct-converter coverage audit of the
   complete SCAP 1.4 OVAL Test Content collection, preserving unsupported platforms
   and distinguishing conversion, validation, compilation and independent proof

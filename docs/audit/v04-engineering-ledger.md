@@ -5,6 +5,29 @@ This ledger records bounded engineering outcomes; it grants no production-releas
 signing/trust or scanner acceptance authority. No paid capacity is purchased or
 assumed available. No Goal/schedule/auto-resume state is claimed from unobserved UI.
 
+## Active assignment — complete the approved direct converter
+
+Owner scope: original Independent/Linux/UNIX/Windows OVAL 5.12.3 for the six
+representative STIGs. Continue across verified commits; no production release,
+normative redesign, macOS expansion or deprecated-WMI upgrading. Source-invalid
+and unresolved all_exist cases remain blocked. Current schema, original XSD/
+Schematron/XML and independent source/compiled operands are separate gates.
+
+Phase 1 [requirements](v04-six-source-requirements.md): all 1,567 original Rules,
+1,396 OVAL-bearing and 171 manual/OCIL-only; 2,140 declared Tests and 2,695
+Definitions. Exact dependencies, node-level source validity, applicability/CPE
+trees, missing capabilities and potential unlocks are inventoried. Apache/DNS
+have 63 broken primary catalog bindings; matching candidate graphs are evidence
+only and do not repair source. Eleven primary OVAL closures have original
+XSD/Schematron violations (including two among the already broken DNS bindings).
+No capability enabled or prior primary source proof changed by this inventory.
+
+Next specific action: integrate the isolated native schema-generator candidate
+only after import isolation, XML parse-count, mutation and full 100-contract
+parity regressions. Then prioritize universal OS guards and UNIX file collection,
+with shared functions/parameters, using the six-source and 803-Test corpora.
+The assignment remains active; Phase 1 is not completion of the converter.
+
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
 | --- | --- | --- | --- | --- | --- |
 | Architecture acceptance — complete | `284705ee6` / `840242a14` | Common Set proof; integer GT/GTE/LTE; public validation profiler | 87 / 0 / 204 of 291 | Zero; 3,008 tests, one unchanged skip; all five implementation checks PASS | Validation branching dominates; no optimization claimed. GO audit-policy source increment. |

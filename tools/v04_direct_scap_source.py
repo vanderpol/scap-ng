@@ -54,7 +54,8 @@ def native_identifier(element, suffix, title=None):
 
 
 class SourceModel:
-    def __init__(self, archive_path: Path, expected_sha256: str):
+    def __init__(self, archive_path: Path, expected_sha256: str, *, inventory_broken_references=False):
+        self.inventory_broken_references = inventory_broken_references
         archive = Path(archive_path).read_bytes()
         ensure(sha256(archive).hexdigest() == expected_sha256, 'source ZIP SHA-256 mismatch')
         self.zip_sha256 = expected_sha256
@@ -106,10 +107,19 @@ class SourceModel:
         self.benchmark_component = self.component_for_reference(self.checklist.get('id'))
         self.benchmark = self.components[self.benchmark_component]
         ensure(self.benchmark.tag == f'{{{XCCDF}}}Benchmark', 'checklist does not resolve to XCCDF 1.2')
-        self.catalog = {}
+        self.catalog, self.catalog_errors = {}, {}
         for uri in self.checklist.findall('.//{urn:oasis:names:tc:entity:xmlns:xml:catalog}uri'):
-            ensure(uri.get('name') not in self.catalog and uri.get('uri', '').startswith('#'), 'ambiguous/nonlocal catalog entry')
-            self.catalog[uri.get('name')] = self.component_for_reference(uri.get('uri')[1:])
+            ensure(uri.get('name') not in self.catalog and uri.get('name') not in self.catalog_errors
+                   and uri.get('uri', '').startswith('#'), 'ambiguous/nonlocal catalog entry')
+            try:
+                self.catalog[uri.get('name')] = self.component_for_reference(uri.get('uri')[1:])
+            except UnsupportedSource as error:
+                if not self.inventory_broken_references:
+                    raise
+                # Inventory may retain broken published bindings. Never guess a
+                # replacement component or place it in the executable catalog.
+                self.catalog_errors[uri.get('name')] = {'component_ref': uri.get('uri'),
+                                                       'message': str(error)}
         self.parents = {child: parent for parent in self.benchmark.iter() for child in parent}
         self.rules = {rule.get('id'): rule for rule in self.benchmark.iter(f'{{{XCCDF}}}Rule')}
 
