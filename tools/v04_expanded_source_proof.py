@@ -223,6 +223,8 @@ class ExpandedSource(Source):
         self.item_schema_sha256 = sha256(schema.read_bytes()).hexdigest()
 
     def capability(self, n, suffix):
+        if n.tag == '{' + OD + '#independent}variable' + suffix:
+            return 'variable.value'
         registered = scalar_proof.source_capability(n, suffix)
         if registered:
             return registered
@@ -235,13 +237,19 @@ class ExpandedSource(Source):
 
     def function(self, n):
         name = local(n)
+        if name == 'object_component':
+            obj = self.get(n.get('object_ref'), 'objects')
+            if obj.tag == '{' + OD + '#independent}variable_object':
+                keys(n, {'object_ref', 'item_field'}, 'Variable value projection')
+                need(not len(n) and n.get('item_field') == 'value', 'Variable value projection field')
+                return self.object(n.get('object_ref'))['variable']
         if name not in ('regex_capture', 'merge', 'unique'):
             value = super().function(n)
             # A one-valued typed constant component is exactly a literal,
             # with no dynamic status or aggregation boundary to erase.
             if name == 'variable_component' and 'constant_values' in value:
-                need(len(value['constant_values']) == 1, 'multi-value constant component needs independent Cartesian proof')
-                return {'literal': value['constant_values'][0]}
+                if len(value['constant_values']) == 1 and value['constant_values'][0]['datatype'] == 'string':
+                    return {'literal': value['constant_values'][0]}
             return value
         need(n.tag == '{' + OD + '}' + name, 'foreign function namespace')
         keys(n, {'pattern'} if name == 'regex_capture' else
@@ -255,10 +263,16 @@ class ExpandedSource(Source):
             need(len(values) == 1, 'multi-component unique proof not in this batch')
             return {'unique': values[0]}
         need(len(values) == 1, 'multi-component merge proof not in this batch')
+        need(n.get('sort', 'document') in ('document', 'lexical', 'numeric', 'natural') and
+             n.get('order', 'ascending') in ('ascending', 'descending'), 'original merge sort/order')
         return {'merge': {'delimiter': n.get('delimiter', ''), 'sort': n.get('sort', 'document'),
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'variable.value':
+            node = self.get(ident, 'states')
+            need(all(c.tag == '{' + OD + '#independent}value' for c in node),
+                 'separate Variable identity State predicate is not represented')
         registered = scalar_proof.source_state(self, ident, cap)
         if registered is not None:
             return predicate_order(registered)
@@ -376,6 +390,16 @@ class ExpandedSource(Source):
     def object(self, ident):
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
+        if cap == 'variable.value':
+            keys(n, META, 'original Variable source Object')
+            need(len(n) == 1 and n[0].tag == '{' + OD + '#independent}var_ref' and
+                 not n[0].attrib and not len(n[0]), 'Variable source must be one unmodified var_ref')
+            need(ident not in self.active, 'cyclic Variable source Object')
+            self.active.add(ident)
+            try:
+                return {'capability': cap, 'variable': self.variable((n[0].text or '').strip())}
+            finally:
+                self.active.remove(ident)
         registered = scalar_proof.source_object(self, ident, cap)
         if registered is not None:
             return registered
@@ -658,6 +682,16 @@ class ExpandedNative(Native):
     def test(self, ident):
         n = self.a['tests'][ident]
         cap = n.get('capability')
+        if cap == 'variable.value':
+            n = self.reference('tests', ident)
+            keys(n, {'capability', 'variable', 'test_title', 'reported_elements', 'require'}, 'Variable Test')
+            need(n.get('reported_elements') == 'all', 'Variable reporting/evidence boundary')
+            requirement = n['require']
+            result = {'capability': cap, 'object': {'capability': cap,
+                'variable': self.operand({'variable': n['variable']})}, 'found': requirement['items_found']}
+            if set(requirement) != {'items_found'}:
+                result.update(matching=requirement['items_satisfying'], condition=self.condition(requirement))
+            return result
         if cap not in SYSTEM_POLICIES | {AUDIT} and not scalar_proof.no_object(cap):
             return super().test(ident)
         n = self.reference('tests', ident)
@@ -669,6 +703,17 @@ class ExpandedNative(Native):
         if set(requirement) != {'items_found'}:
             result.update(matching=requirement['items_satisfying'], condition=self.condition(requirement))
         return result
+
+    def operand(self, value, datatype='string'):
+        if isinstance(value, dict) and set(value) == {'variable'}:
+            node = self.reference('variables', value['variable'])
+            if node.get('kind') == 'constant':
+                keys(node, {'kind', 'datatype', 'expression', 'title'}, 'native constant Variable')
+                keys(node['expression'], {'literal'}, 'native constant expression')
+                values = node['expression'].get('literal')
+                need(isinstance(values, list) and values, 'native constant values must be a nonempty array')
+                return {'constant_values': [literal(node['datatype'], v) for v in values]}
+        return super().operand(value, datatype)
 
     def function(self, n):
         need(isinstance(n, dict) and len(n) == 1, 'function shape')

@@ -55,6 +55,15 @@ through data only: 46 pinned focused Tests pass, complete configured corpus
 274 attempted / 227 compiled / 210 independently proved. Six-source retention
 and mandatory/hosted gates remain pending this implementation checkpoint.
 
+Scalar six-original local verification subsequently completed: **820 proved**,
+four additional closures (two RHEL, two Oracle); every original 816 proof/program
+passes retention. Windows 11/Server remain 218/249. Apache/DNS remain blocked
+by the original bindings. Next shared Variable increment passes six focused
+tests and the 29-test related suite: 21 original cases compile/prove; invalid
+integer constants, all_exist, separate identity predicates, casts and unsupported
+aggregation/source composition remain blocked. Original fixture hashes and
+reproduction instructions are in the developer guide; full gates pending.
+
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
 | --- | --- | --- | --- | --- | --- |
 | Architecture acceptance — complete | `284705ee6` / `840242a14` | Common Set proof; integer GT/GTE/LTE; public validation profiler | 87 / 0 / 204 of 291 | Zero; 3,008 tests, one unchanged skip; all five implementation checks PASS | Validation branching dominates; no optimization claimed. GO audit-policy source increment. |

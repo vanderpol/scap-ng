@@ -146,6 +146,10 @@ class AssessmentConverter:
             # singleton Objects. The source dependency remains in provenance.
             ensure(acquisition == {}, 'singleton system source must have no acquisition parameters')
             self.tests[identifier].pop('object')
+        elif mapping['native'].get('test_source', {}).get('kind') == 'variable':
+            ensure(set(acquisition) == {'variable'}, 'Variable Test source cannot carry acquisition modifiers')
+            self.tests[identifier]['variable'] = acquisition['variable']
+            self.tests[identifier].pop('object')
         return {'test': identifier}
 
     def same_family(self, identifier, kind, mapping):
@@ -176,6 +180,13 @@ class AssessmentConverter:
     def convert_object(self, element):
         mapping = self.capability(element, 'object')
         acquisition = {'capability': mapping['capability']}
+        if mapping['native'].get('test_source', {}).get('kind') == 'variable':
+            references = element.findall(f'{{{mapping["source"]["namespace"]}}}var_ref')
+            ensure(len(element) == len(references) == 1, 'Variable source requires one var_ref; Sets/Filters unsupported')
+            attributes(references[0], set())
+            ensure(not len(references[0]), 'Variable source var_ref has children')
+            acquisition['variable'] = self.named_variable((references[0].text or '').strip())
+            return acquisition
         if mapping['native'].get('test_source', {}).get('kind') == 'none':
             ensure(not len(element), 'singleton system source cannot have selectors, Sets or Filters')
             return acquisition
@@ -320,6 +331,24 @@ class AssessmentConverter:
                                       'expression': self.function(element[0])}
         return {'variable': identifier}
 
+    def named_variable(self, source_id):
+        """Keep constant collections named when a source/function consumes them.
+
+        Scalar predicate constants still use the existing inline-array form;
+        Test sources and multivalue function inputs need a first-class Variable.
+        No values, Cartesian products or collection statuses are evaluated here.
+        """
+        value = self.reference(source_id, 'variable')
+        if isinstance(value, list):
+            element = self.source.node(self.component_id, source_id, 'variable')
+            identifier = native_identifier(element, 'variable')
+            datatype = element.get('datatype')
+            self.variables[identifier] = {'kind': 'constant',
+                'datatype': 'integer' if datatype == 'int' else datatype,
+                'expression': {'literal': value}}
+            return identifier
+        return value['variable']
+
     def function(self, element):
         ensure(element.tag.startswith(f'{{{OVAL}}}'), 'function namespace mismatch')
         operation = local_name(element)
@@ -330,14 +359,15 @@ class AssessmentConverter:
                                 'value': self.literal(element.get('datatype', 'string'), element.text or '')}}
         if operation == 'variable_component':
             attributes(element, {'var_ref'})
+            ensure(not len(element), 'variable_component has children')
             value = self.reference(element.get('var_ref'), 'variable')
             if isinstance(value, list):
                 variable = self.source.node(self.component_id, element.get('var_ref'), 'variable')
-                ensure(not len(element) and variable.get('datatype') == 'string' and len(value) == 1,
-                       'constant array function needs Cartesian proof')
                 # A complete one-value constant is a scalar function operand;
                 # no dynamic status or multi-value product boundary is erased.
-                return {'literal': {'datatype': 'string', 'value': value[0]}}
+                if variable.get('datatype') == 'string' and len(value) == 1:
+                    return {'literal': {'datatype': 'string', 'value': value[0]}}
+                return {'variable': self.named_variable(element.get('var_ref'))}
             ensure(not len(element) and isinstance(value, dict), 'constant array function needs Cartesian proof')
             return value
         if operation == 'object_component':
@@ -345,15 +375,29 @@ class AssessmentConverter:
             ensure(not len(element), 'object_component has children')
             identifier = element.get('object_ref')
             mapping = self.capability(self.source.node(self.component_id, identifier, 'object'), 'object')
+            if mapping['native'].get('test_source', {}).get('kind') == 'variable':
+                ensure(element.get('item_field') == 'value', 'Variable source has only a value projection')
+                return {'variable': self.reference(identifier, 'object')['variable']}
             ensure(mapping['native'].get('test_source', {}).get('kind') != 'none',
                    'singleton system source has no approved Variable Object acquisition')
             ensure(element.get('item_field') in mapping['native']['state_field_map'], 'unknown object_component field')
             return {'values': {'object': self.reference(identifier, 'object'),
                                'field': mapping['native']['state_field_map'][element.get('item_field')]}}
-        ensure(operation in ('concat', 'regex_capture'), f'unsupported function: {operation}')
-        attributes(element, {'pattern'} if operation == 'regex_capture' else set())
+        ensure(operation in ('concat', 'regex_capture', 'merge', 'unique'), f'unsupported function: {operation}')
+        attributes(element, {'pattern'} if operation == 'regex_capture' else
+                   {'delimiter', 'sort', 'order'} if operation == 'merge' else set())
         ensure(len(element) and (operation != 'regex_capture' or (len(element) == 1 and 'pattern' in element.attrib)), 'function arity/pattern')
         values = [self.function(child) for child in element]
+        if operation in ('merge', 'unique'):
+            # Existing native aggregation consumes one collection expression.
+            # Do not invent a union grammar for multiple source components.
+            ensure(len(values) == 1, 'multiple aggregation components need an approved collection expression')
+            if operation == 'unique':
+                return {'unique': values[0]}
+            ensure(element.get('sort', 'document') in ('document', 'lexical', 'numeric', 'natural')
+                   and element.get('order', 'ascending') in ('ascending', 'descending'), 'unsupported merge sort/order')
+            return {'merge': {'delimiter': element.get('delimiter', ''), 'sort': element.get('sort', 'document'),
+                              'order': element.get('order', 'ascending'), 'values': values[0]}}
         return {'concat': values} if operation == 'concat' else {'regex_capture': {'pattern': element.get('pattern'), 'value': values[0]}}
 
     @staticmethod

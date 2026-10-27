@@ -155,6 +155,18 @@ the pinned Self-Assertion bindings/XSD link. Do not run the 65-source corpus.
   fail instead of being silently ignored.
 - Constants become typed arrays; `var_check` remains at the consumer. Item,
   observed-field and expected-value quantifiers are separate.
+- Variable Test sources and multivalue function operands keep constants as named
+  typed collections. `named_variable` materializes the existing constant grammar;
+  `variable.value` removes only an unmodified `variable_object/var_ref` indirection.
+  Text references participate in inventory, cycle detection and independent
+  original-source closure. Separate State identity predicates and Variable-source
+  Sets/Filters remain blocked. No values or status outcomes are evaluated.
+- Single-collection `merge` and `unique` preserve their operand graph; merge
+  delimiter/sort/order defaults are explicit. Multiple components remain blocked
+  rather than inventing a collection-union expression. Run
+  `PYTHONPATH=tools python -m unittest test_v04_direct_variables -v` for 21
+  original cases plus controlled negative/aggregation boundaries. The nine
+  original files and hashes live in `tests/fixtures/v04-direct-variables`.
 - Comparator-free absence requires the exact source absence form. Empty string
   equality is not removed. `all_exist` remains blocked.
 - Shared Objects preserve source identity, not payload deduplication. Set
@@ -165,7 +177,7 @@ the pinned Self-Assertion bindings/XSD link. Do not run the 65-source corpus.
   never evaluated, erased or defaulted by the converter.
 
 Unsupported: other capabilities/functions, cross-datatype Variable casts,
-records, explicit acquisition
+nested records and record-level Variables, unimplemented acquisition
 behaviors, Profile inheritance/refinement, CPE/platform execution, manual
 execution, full policy metadata/scoring/remediation. This is not source-wide
 XSD validation, signature verification, scanner acceptance, or a new

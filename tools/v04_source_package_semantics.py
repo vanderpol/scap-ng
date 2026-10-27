@@ -118,6 +118,8 @@ class Source:
                 if local(child) in ('filter', 'object_reference'):
                     refs.append(((child.text or '').strip(),
                                  'states' if local(child) == 'filter' else 'objects'))
+                if n.tag == '{' + OD + '#independent}variable_object' and child.tag == '{' + OD + '#independent}var_ref':
+                    refs.append(((child.text or '').strip(), 'variables'))
                 for ref, kind in refs:
                     self.get(ref, kind)
                     edges.append([ident, ref, local(child)])

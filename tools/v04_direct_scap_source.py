@@ -145,6 +145,8 @@ class SourceModel:
                 edges = [(child.get(attr), target) for attr, target in references.items() if attr in child.attrib]
                 if child.tag in (f'{{{OVAL}}}object_reference', f'{{{OVAL}}}filter'):
                     edges.append(((child.text or '').strip(), 'object' if local_name(child) == 'object_reference' else 'state'))
+                if node.tag == f'{{{OVAL}#independent}}variable_object' and child.tag == f'{{{OVAL}#independent}}var_ref':
+                    edges.append(((child.text or '').strip(), 'variable'))
                 for target, target_kind in edges:
                     if target_kind == 'object':
                         counts[target] += 1

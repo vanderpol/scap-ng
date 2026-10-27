@@ -53,6 +53,8 @@ class SourceInventory:
                     if descendant.tag in ('{' + OVAL + '}filter', '{' + OVAL + '}object_reference'):
                         edges.append({'id': (descendant.text or '').strip(),
                                       'kind': 'state' if local_name(descendant) == 'filter' else 'object'})
+                    if element.tag == '{' + OVAL + '#independent}variable_object' and descendant.tag == '{' + OVAL + '#independent}var_ref':
+                        edges.append({'id': (descendant.text or '').strip(), 'kind': 'variable'})
                 family = element.tag.rsplit('}', 1)[0][1:] if kind in ('test', 'object', 'state') else None
                 self.nodes[component, identifier] = {'id': identifier, 'component': component,
                     'kind': kind, 'tag': element.tag, 'sha256': digest(xml_identity(element)),

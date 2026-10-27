@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Added shared direct Variable sources, named constant function collections and
+  single-collection merge/unique conversion; inventory and independent proof
+  now follow text Variable references without discarding unsupported predicates
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Extended the existing direct converter to ten ordinary capability mappings
   using activation and independent proof data, with ten pinned original files
   and source/schema/compiler boundary regressions
