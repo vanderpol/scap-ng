@@ -41,8 +41,12 @@ visible; diagnostic compilation never admits unproved content. Twelve new focuse
 tests pass, including original-source, datatype/existence, namespace, selector,
 mapping-contract, proof-retention and compiled-operand mutations. A pinned floor
 fails CI if any of the 816 accepted proofs or programs is lost or altered;
-additional proved Rules are permitted. Maintained and exact-head hosted
-results are recorded after verification in the [machine report](v04-direct-capability-batch.json).
+additional proved Rules are permitted. At implementation `44254953b`, all ten
+triggered hosted workflows pass. [Mandatory CI](https://github.com/vanderpol/scap-ng/actions/runs/40495471292)
+passes **3,130 tests, zero failures/errors, one existing skip**. The local full
+run passed 3,129 tests; three missing-XSD-link skips passed in a supplemental run,
+as did the subsequently added retention test. Exact selection and both verified
+artifact digests are in the [machine report](v04-direct-capability-batch.json).
 
 DNS/Apache retain all 63 broken original catalog bindings. Source-invalid,
 deprecated WMI and unresolved `all_exist` cases stay blocked. Three Windows 11

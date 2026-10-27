@@ -30,9 +30,20 @@ ordinary capabilities without new capability-specific conversion algorithms.
 The first complete primary-source acceptance pass proves/compiles 816 closures;
 all 249 prior Server 2025 program hashes match. Applicability remains unproved,
 580 primary Rules remain blocked/unverified and 171 are manual/OCIL-only.
-Twelve focused tests pass; maintained/hosted verification is pending this batch.
-Next specific action: shared file collection/traversal and RPM metadata, using
-the six-source and 803-Test corpora. Preserve the new 816-proof/program floor.
+At `44254953b`, twelve focused tests and all ten hosted workflows pass. Hosted
+mandatory results: **3,130 tests, zero failures/errors, one existing skip**; both
+mandatory and six-source artifact digests are verified. All 816 primary proofs
+and exact programs pass hosted retention. Local maintained/supplemental details
+are in the linked report.
+
+Owner execution correction (2026-10-27): complete shared OVAL features using the
+pinned Test Content, then apply them across capabilities through mappings.
+Capability-specific implementation is justified only by demonstrated collection
+semantics; ordinary element names are data. Next specific action: batch the
+remaining ordinary scalar proof contracts, then shared Variable-source and
+aggregation (`merge`/`unique`) support, followed by file traversal and RPM scalar
+behavior routing. Use one documented upgrade entry point and preserve the
+816-proof/program floor. Do not turn each Test into an implementation project.
 The assignment remains active; Phase 1 is not completion of the converter.
 
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
