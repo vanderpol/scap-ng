@@ -1,5 +1,16 @@
 # Owner decision required: multi-algorithm hash acquisition
 
+> **2026-10-27 schema-first disposition (#255):** The owner subsequently
+> authorized a systematic 0.4 capability-mapping/schema correction, with Codex
+> continuing converter work separately. The resulting schema-review candidate
+> maps `hash_type` to the native `algorithm` selector and accepts explicit
+> literal-array / Variable-reference quantifiers over the six-algorithm domain.
+> [Full before/after, 100-capability audit and integration limits](v04-modernization-schema-reconciliation-20261027.md).
+> The original converter is **still inactive** for these cases; scanner and
+> source-result equivalence remain unproved. The investigation below is retained
+> verbatim as the conflict evidence at the earlier `041be96` checkpoint, not as
+> the updated candidate's mapping contract.
+
 2026-10-27 investigation under
 [#251](https://github.com/vanderpol/scap-ng/issues/251). Status: unresolved;
 `file.hash` stays inactive. The exact-alternative approval did not authorize

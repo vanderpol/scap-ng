@@ -6,6 +6,15 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-27:** Updated the pre-alpha `file.hash` capability mapping to
+  represent OVAL multi-algorithm Object selection through the existing typed
+  selector/value-match grammar, with Object/State enum crosswalks and pinned
+  positive/negative schema tests. Audited all 100 capability mappings against
+  accepted 0.3/0.4 modernizations. Original `filehash58` converter admission
+  and scanner semantics remain unimplemented; separate explicit-array datatype
+  enforcement awaits coordinated converter support
+  ([#255](https://github.com/vanderpol/scap-ng/issues/255)).
+
 - Extended direct conversion to seven ordinary capabilities and fixed unknown,
   preserving distinct logical and field/record controls, original source
   validity and all prior proof/program hashes

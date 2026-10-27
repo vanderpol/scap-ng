@@ -1,7 +1,7 @@
 {
   "format": "scap-ng-capability-mapping-0.2",
   "specification_version": "0.4.0",
-  "last_modified": "2026-10-08",
+  "last_modified": "2026-10-27",
   "capability": "file.hash",
   "source": {
     "language": "OVAL 5.12.3",
@@ -15,32 +15,36 @@
     "selector_map": {
       "filepath": "full_path",
       "path": "directory",
-      "filename": "name"
+      "filename": "name",
+      "hash_type": "algorithm"
     },
     "object_selector_alternatives": [
       [
-        "full_path"
+        "full_path",
+        "algorithm"
       ],
       [
         "directory",
-        "name"
+        "name",
+        "algorithm"
       ]
     ],
     "uses_file_traversal": true,
-    "collection_parameters": {
-      "algorithm": {
-        "type": "string",
-        "enum": [
-          "md5",
-          "sha1",
-          "sha224",
-          "sha256",
-          "sha384",
-          "sha512"
-        ],
-        "required": true,
-        "description": "Digest algorithm to compute for each selected file."
-      }
+    "selector_value_enums": {
+      "algorithm": [
+        "md5",
+        "sha1",
+        "sha224",
+        "sha256",
+        "sha384",
+        "sha512"
+      ]
+    },
+    "selector_value_crosswalk": {
+      "hash_type": "hash_algorithm"
+    },
+    "state_value_crosswalk": {
+      "hash_type": "hash_algorithm"
     },
     "state_field_map": {
       "filepath": "full_path",
@@ -110,6 +114,10 @@
     }
   },
   "semantic_validator_rules": [
+    {
+      "id": "file.hash.algorithm_collection_domain",
+      "rule": "The algorithm selector determines acquisition over the complete six-algorithm domain md5, sha1, sha224, sha256, sha384, sha512. A literal collection or Variable reference is evaluated with its explicit value_match; value_match none selects the complement within that domain, not an arbitrary default algorithm. Each selected algorithm produces an Item with its algorithm and digest, and source collection errors or incomplete evidence must not be treated as a complete empty selection."
+    },
     {
       "id": "file.hash.filter_state_capability",
       "rule": "Every Set filter State reference must resolve to capability file.hash."
