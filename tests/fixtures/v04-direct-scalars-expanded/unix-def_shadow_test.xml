@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+                  xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-definitions-5#unix https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/unix-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-common-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-common-schema.xsd">
+  <generator>
+    <oval:product_name>Oval Test Content</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-06-10T12:05:51</oval:timestamp>
+    <terms_of_use>NOTE: MITRE Content may be modified from original by NIWC Atlantic. Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the license described in terms.txt.</terms_of_use>
+  </generator>
+  <definitions>
+    <definition id="oval:navy.navwar.niwcatlantic.scc.test:def:334" version="2" class="miscellaneous">
+      <metadata>
+        <title>Evaluate to true if unix-def:shadow_test is properly supported</title>
+        <description>This definition is intended to evaluate to true if the interpreter properly supports unix-def:shadow_test.</description>
+      </metadata>
+      <notes>
+        <note>The OVAL Interpreter will probably need to be run as root to successfully evaluate this definition.</note>
+        <note>It is important to note that the values used in this test definition are specific to a particular machine, and may not necessarily apply to your system. As a result, in order to have the definition return a result of 'true', you must either change these values to the ones found on your particular system, or you must configure your system to use these values.</note>
+      </notes>
+      <criteria operator="AND">
+        <criterion comment="Test that the shadow test is supported with the username entity operation of 'equals'." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:1" />
+        <criterion comment="Test that the shadow test is supported with the username entity operation of 'note equal'." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:2" />
+        <criterion comment="Test that the shadow test is supported with the username entity operation of 'pattern match'." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:3" />
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <shadow_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:1" version="2" comment="This test checks if spwd::chg_lst for user 'root' is 0. or blank" check_existence="any_exist" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:1" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:1" />
+    </shadow_test>
+    <shadow_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:2" version="2" comment="This test checks if there is a non-root account with spwd::chg_lst > 0." check_existence="at_least_one_exists" check="at least one" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:2" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:2" />
+    </shadow_test>
+    <shadow_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:3" version="2" comment="This test checks if there is an account which does not start with 'r' with spwd::chg_lst > 0." check_existence="at_least_one_exists" check="at least one" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:3" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:3" />
+    </shadow_test>
+  </tests>
+  <objects>
+    <shadow_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:1" version="1" comment="The root account." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <username>root</username>
+    </shadow_object>
+    <shadow_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:2" version="1" comment="The non-root accounts." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <username operation="not equal">root</username>
+    </shadow_object>
+    <shadow_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:3" version="1" comment="The accounts which do not start with r." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <username operation="pattern match">^[^r]</username>
+    </shadow_object>
+  </objects>
+  <states>
+    <shadow_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:1" version="2" comment="The state of spwd::chg_lst greater than 0." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <chg_lst datatype="int" operation="greater than">0</chg_lst>
+    </shadow_state>
+    <shadow_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:2" version="2" comment="The state of spwd::chg_lst greater than 0." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <chg_lst datatype="int" operation="greater than">0</chg_lst>
+    </shadow_state>
+    <shadow_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:3" version="2" comment="The state of spwd::chg_lst greater than 0." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix">
+      <chg_lst datatype="int" operation="greater than">0</chg_lst>
+    </shadow_state>
+  </states>
+</oval_definitions>

@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Extended the existing direct converter to ten ordinary capability mappings
+  using activation and independent proof data, with ten pinned original files
+  and source/schema/compiler boundary regressions
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Enabled five metadata-driven direct-converter capabilities and independent
   scalar proof contracts; measured all six original primary-source subsets with
   816 proved/compiled closures while preserving all 249 Server 2025 program hashes

@@ -46,6 +46,15 @@ behavior routing. Use one documented upgrade entry point and preserve the
 816-proof/program floor. Do not turn each Test into an implementation project.
 The assignment remains active; Phase 1 is not completion of the converter.
 
+Recovery on 2026-10-27 found a clean checkout at `44254953b`, with no local-only
+implementation. Fast-forwarded to published evidence `609da701f`; preserved
+workspace scratch and both whitespace-only unreachable blobs. See the
+[recovery record](v04-recovery-2026-10-27.md). The next
+[ordinary scalar batch](v04-direct-scalar-expansion.md) enables ten mappings
+through data only: 46 pinned focused Tests pass, complete configured corpus
+274 attempted / 227 compiled / 210 independently proved. Six-source retention
+and mandatory/hosted gates remain pending this implementation checkpoint.
+
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
 | --- | --- | --- | --- | --- | --- |
 | Architecture acceptance — complete | `284705ee6` / `840242a14` | Common Set proof; integer GT/GTE/LTE; public validation profiler | 87 / 0 / 204 of 291 | Zero; 3,008 tests, one unchanged skip; all five implementation checks PASS | Validation branching dominates; no optimization claimed. GO audit-policy source increment. |

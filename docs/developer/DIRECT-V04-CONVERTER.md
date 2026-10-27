@@ -105,6 +105,17 @@ Run `PYTHONPATH=tools python -m unittest test_v04_direct_scalar_batch
 test_v04_direct_unix_password test_v04_direct_scope -v` for the small batch checks;
 the six-source workflow retains complete generated evidence and packages.
 
+The next ordinary batch adds Linux listening servers, SELinux Boolean/status,
+systemd dependencies, UNIX interface/shadow/symlink/uname and Windows group/user
+SID acquisitions through activation/proof data only. Its ten original files are
+under `tests/fixtures/v04-direct-scalars-expanded`; `provenance.json` records the
+upstream paths, revision and checksums. The files are unchanged source inputs.
+Run `PYTHONPATH=tools python -m unittest test_v04_direct_scalar_expansion -v`
+for original-XSD/Schematron validation, 46 source-Test conversions, compiled
+operands, independent terms and negative mutations. Additional UNIX fixtures
+in other upstream platform directories remain in the complete corpus audit;
+this does not add a macOS capability or execute a collector.
+
 First read the existing 0.4 mapping and pinned OVAL 5.12.3 declaration for the
 affected entity. `tools/v04_direct_capabilities.json` selects the supported catalog;
 `load_mappings` reads its **0.4** files. Selector/State field names, enum
