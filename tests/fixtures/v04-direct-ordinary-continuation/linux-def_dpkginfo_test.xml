@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5"
+                  xmlns:oval-def="http://oval.mitre.org/XMLSchema/oval-definitions-5"
+                  xsi:schemaLocation="http://oval.mitre.org/XMLSchema/oval-definitions-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-definitions-5#linux https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/linux-definitions-schema.xsd
+                    http://oval.mitre.org/XMLSchema/oval-common-5 https://raw.githubusercontent.com/OVAL-Community/OVAL/refs/tags/v5.12.3/oval-schemas/oval-common-schema.xsd">
+  <generator>
+    <oval:product_name>Oval Test Content</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-06-10T12:05:51</oval:timestamp>
+    <terms_of_use>NOTE: MITRE Content may be modified from original by NIWC Atlantic. Copyright (c) 2002-2011, The MITRE Corporation. All rights reserved. The contents of this file are subject to the license described in terms.txt.</terms_of_use>
+  </generator>
+  <definitions>
+    <definition id="oval:navy.navwar.niwcatlantic.scc.test:def:683" version="1" class="miscellaneous">
+      <metadata>
+        <title>Evaluate to true if the linux-def:dpkginfo_test is properly supported</title>
+        <description>This definition is intended to evaluate to true if the interpreter properly supports the linux-def:dpkginfo_test.</description>
+      </metadata>
+      <notes>
+        <note>It is important to note that the values used in this test definition are specific to a particular machine, and may not necessarily apply to your system. As a result, in order to have the definition return a result of 'true', you must either change these values to the ones found on your particular system, or you must configure your system to use these values.</note>
+      </notes>
+      <criteria operator="AND">
+        <criterion comment="Test that the dpkginfo_object is supported with the name entity equal to some value." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:1" />
+        <criterion comment="Test that the dpkginfo_object is supported with the name entity not equal to some value." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:2" />
+        <criterion comment="Test that the dpkginfo_object is supported with the name entity matching some regular expression." test_ref="oval:navy.navwar.niwcatlantic.scc.test:tst:3" />
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <dpkginfo_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:1" version="1" comment="Test that the dpkginfo_object is supported with the name entity equal to some value." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:1" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:1" />
+    </dpkginfo_test>
+    <dpkginfo_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:2" version="1" comment="Test that the dpkginfo_object is supported with the name entity not equal to some value." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:2" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:2" />
+    </dpkginfo_test>
+    <dpkginfo_test id="oval:navy.navwar.niwcatlantic.scc.test:tst:3" version="1" comment="Test that the dpkginfo_object is supported with the name entity matching some regular expression." check_existence="at_least_one_exists" check="all" xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <object object_ref="oval:navy.navwar.niwcatlantic.scc.test:obj:3" />
+      <state state_ref="oval:navy.navwar.niwcatlantic.scc.test:ste:3" />
+    </dpkginfo_test>
+  </tests>
+  <objects>
+    <dpkginfo_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:1" version="1" comment="Retrieve an dpkginfo_item with a name equal to 'libapt-pkg-dev'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name>dpkg</name>
+    </dpkginfo_object>
+    <dpkginfo_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:2" version="1" comment="Retrieve dpkginfo_items with names that are not equal to 'libapt-pkg-dev'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="not equal">dpkg</name>
+      <oval-def:filter action="include">oval:navy.navwar.niwcatlantic.scc.test:ste:4</oval-def:filter>
+    </dpkginfo_object>
+    <dpkginfo_object id="oval:navy.navwar.niwcatlantic.scc.test:obj:3" version="1" comment="Retrieve dpkginfo_items with names that match the regular expression '^libapt.pkg.dev$'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="pattern match">^d[pP]k[Gg]$</name>
+    </dpkginfo_object>
+  </objects>
+  <states>
+    <dpkginfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:1" version="1" comment="This state represents an dpkginfo_item that has a name equal to 'libapt-pkg-dev', and an arch, epoch, release, version, evr, and signature_keyid that match the regular expression '.*'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name>dpkg</name>
+      <arch operation="pattern match">.+</arch>
+      <epoch operation="pattern match">.*</epoch>
+      <release operation="pattern match">.*</release>
+      <version operation="pattern match">.*</version>
+      <evr datatype="evr_string" operation="greater than">0</evr>
+    </dpkginfo_state>
+    <dpkginfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:2" version="1" comment="This state represents dpkginfo_items that have a name not equal to 'libapt-pkg-dev', and an arch, epoch, release, version, evr, and signature_keyid that match the regular expression '.*'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="not equal">dpkg</name>
+      <arch operation="pattern match">.*</arch>
+      <epoch operation="pattern match">.*</epoch>
+      <release operation="pattern match">.*</release>
+      <version operation="pattern match">.*</version>
+    </dpkginfo_state>
+    <dpkginfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:3" version="1" comment="This state represents dpkginfo_items that have a name that matches the regular expression '^libapt.pkg.dev$', and an arch, epoch, release, version, evr, and signature_keyid that match the regular expression '.*'." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name operation="pattern match">^dpkg$</name>
+      <arch operation="pattern match">.*</arch>
+      <epoch operation="pattern match">.*</epoch>
+      <release operation="pattern match">.*</release>
+      <version operation="pattern match">.*</version>
+      <evr datatype="evr_string" operation="greater than">0</evr>
+    </dpkginfo_state>
+    <dpkginfo_state id="oval:navy.navwar.niwcatlantic.scc.test:ste:4" version="1" comment="Fitler out all other than 'apt' package to reduce noise." xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#linux">
+      <name>apt</name>
+    </dpkginfo_state>
+  </states>
+</oval_definitions>

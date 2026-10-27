@@ -15,6 +15,7 @@ CAPS = {OD + '#windows}registry': 'windows.registry',
         OD + '#independent}shellcommand': 'independent.shellcommand'}
 FOUND = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
          'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
+FIELD_FOUND = {**FOUND, 'all_exist': 'every'}
 CHECK = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none',
          'only one': 'exactly_one'}
 OPS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
@@ -207,7 +208,7 @@ class Source:
         keys(n, {'operation', 'datatype', 'var_ref', 'var_check', 'entity_check',
                  'check_existence', 'name'}, 'entity ' + local(n))
         found = n.get('check_existence', 'at_least_one_exists')
-        need(found in FOUND, 'unproved entity existence: ' + found)
+        need(found in FIELD_FOUND, 'unproved entity existence: ' + found)
         if not selector and found == 'none_exist':
             need(not len(n) and n.text is None and set(n.attrib) <= {'check_existence'},
                  'absence carries comparison/attributes; source-specific review required')
@@ -237,7 +238,7 @@ class Source:
             result['expected_matching'] = CHECK[n.get('var_check', 'all')]
         if not selector:
             need(n.get('entity_check', 'all') in CHECK, 'entity_check')
-            result.update(found=FOUND[found], matching=CHECK[n.get('entity_check', 'all')])
+            result.update(found=FIELD_FOUND[found], matching=CHECK[n.get('entity_check', 'all')])
         else:
             need(not set(n.attrib) & {'check_existence', 'entity_check'}, 'selector state attributes')
         return result

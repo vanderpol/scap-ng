@@ -12,7 +12,7 @@ from functools import lru_cache
 import xml.etree.ElementTree as ET
 
 from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
-    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK)
+    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK, FOUND)
 import v04_scalar_source_proof as scalar_proof
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -683,6 +683,14 @@ class ExpandedSource(Source):
 
     def test(self, ident):
         n = self.get(ident, 'tests')
+        capability = self.capability(n, '_test')
+        contract = scalar_proof.contract(capability)
+        if contract and contract.get('fixed_result'):
+            keys(n, META | {'check', 'check_existence', 'state_operator', 'deprecated'}, 'fixed-result Test')
+            need(n.get('deprecated', 'false') == 'false' and not len(n), 'fixed-result Test has source payload')
+            need(n.get('check') in CHECK and n.get('check_existence', 'at_least_one_exists') in set(FOUND) | {'all_exist'},
+                 'invalid original fixed-result controls')
+            return {'capability': capability, 'fixed_result': contract['fixed_result']}
         if n.get('check_existence') != 'all_exist':
             result = super().test(ident)
             if 'condition' in result:
@@ -713,6 +721,13 @@ class ExpandedNative(Native):
     def test(self, ident):
         n = self.a['tests'][ident]
         cap = n.get('capability')
+        contract = scalar_proof.contract(cap)
+        if contract and contract.get('fixed_result'):
+            n = self.reference('tests', ident)
+            keys(n, {'test_title', 'capability', 'require', 'reported_elements'}, 'fixed-result native Test')
+            need(n.get('require') == {'items_found': 'one_or_more'} and n.get('reported_elements', 'all') == 'all',
+                 'fixed-result native canonical requirement')
+            return {'capability': cap, 'fixed_result': contract['fixed_result']}
         if cap == 'variable.value':
             n = self.reference('tests', ident)
             keys(n, {'capability', 'variable', 'test_title', 'reported_elements', 'require'}, 'Variable Test')

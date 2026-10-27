@@ -23,6 +23,7 @@ ensure(SUPPORT['specification_version'] == '0.4.0' and len(CAPABILITIES) == len(
        'invalid direct capability activation registry')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
+FIELD_EXISTENCE = {**EXISTENCE, 'all_exist': 'every'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
 COMPARISONS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
                'case insensitive equals': 'case_insensitive_equals', 'less than': 'less_than',
@@ -42,9 +43,9 @@ def load_mappings():
 
 
 def logical_condition(operator, children):
-    ensure(operator in ('AND', 'OR') and children, f'unsupported/empty logical operator: {operator}')
+    ensure(operator in ('AND', 'OR', 'ONE', 'XOR') and children, f'unsupported/empty logical operator: {operator}')
     # A sole AND/OR operand preserves all six results; no two-valued rewrites.
-    return children[0] if len(children) == 1 else {operator.lower(): children}
+    return children[0] if len(children) == 1 and operator in ('AND', 'OR') else {operator.lower(): children}
 
 
 class AssessmentConverter:
@@ -115,6 +116,20 @@ class AssessmentConverter:
 
     def convert_test(self, element):
         mapping = self.capability(element, 'test')
+        if mapping['native'].get('fixed_result') is not None:
+            ensure(mapping['native']['fixed_result'] == 'unknown' and
+                   mapping['native'].get('test_source', {}).get('kind') == 'none' and not len(element),
+                   'unsupported fixed-result Test shape')
+            ensure(element.get('check') in MATCHING and
+                   element.get('check_existence', 'at_least_one_exists') in set(EXISTENCE) | {'all_exist'},
+                   'invalid fixed-result source controls')
+            # OVAL unknown_test always returns unknown; its required legacy
+            # count attributes do not govern that result. The approved native
+            # grammar still requires this uniform structured requirement.
+            identifier = native_identifier(element, 'test')
+            self.tests[identifier] = {'test_title': element.get('comment', ''), 'capability': mapping['capability'],
+                'require': {'items_found': 'one_or_more'}, 'reported_elements': 'all'}
+            return {'test': identifier}
         objects = element.findall(f'{{{mapping["source"]["namespace"]}}}object')
         ensure(len(objects) == 1, 'one Test Object required')
         conditions = []
@@ -444,7 +459,7 @@ class AssessmentConverter:
         ensure(element.get('operation', 'equals') == 'equals', 'unsupported record comparator')
         found = element.get('check_existence', 'at_least_one_exists')
         matching = element.get('entity_check', 'all')
-        ensure(found in EXISTENCE and found != 'none_exist' and matching in MATCHING,
+        ensure(found in FIELD_EXISTENCE and found != 'none_exist' and matching in MATCHING,
                'record absence/quantifier outside bounded source proof')
         ensure(len(element) and not (element.text or '').strip(), 'record requires named fields')
         fields = {}
@@ -456,7 +471,7 @@ class AssessmentConverter:
         # Member lookup is inside this record: missing required members remain
         # errors. Field-value cardinality does not turn lookup failure into an
         # empty successful record, or borrow a value from another record.
-        return {'record': {'records_found': EXISTENCE[found], 'records_matching': MATCHING[matching],
+        return {'record': {'records_found': FIELD_EXISTENCE[found], 'records_matching': MATCHING[matching],
                            'fields': fields}}
 
     def predicate(self, element, mapping, selector=False, *, record_field=False):
@@ -484,7 +499,7 @@ class AssessmentConverter:
             ensure(not selector and set(element.attrib) == {'check_existence'} and not element.text, 'comparator-bearing absence blocked')
             return {'values_found': 'none'}
         operation = element.get('operation', 'equals')
-        ensure(existence in EXISTENCE and operation in COMPARISONS, 'unsupported entity existence/comparator')
+        ensure(existence in FIELD_EXISTENCE and operation in COMPARISONS, 'unsupported entity existence/comparator')
         if operation == 'case insensitive not equal':
             ensure(element.get('datatype', 'string') == 'string', 'case-insensitive inequality requires string datatype')
         if operation in ('greater than', 'greater than or equal', 'less than or equal'):
@@ -536,7 +551,7 @@ class AssessmentConverter:
             result['value_match'] = MATCHING[element.get('var_check', 'all')]
         if not selector:
             ensure(element.get('entity_check', 'all') in MATCHING, 'unsupported entity_check')
-            result.update(values_found=EXISTENCE[existence], values_matching=MATCHING[element.get('entity_check', 'all')])
+            result.update(values_found=FIELD_EXISTENCE[existence], values_matching=MATCHING[element.get('entity_check', 'all')])
         return result
 
 
