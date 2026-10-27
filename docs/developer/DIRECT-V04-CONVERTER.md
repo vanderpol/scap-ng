@@ -34,6 +34,15 @@ Tests deliberately clone/mutate them for fault injection.
 
 ## Run and inspect
 
+For fast cross-platform breadth measurement, use the
+[complete pinned OVAL Test Content audit](../audit/v04-oval-test-corpus.md).
+`audit_v04_oval_test_corpus.py` indexes standalone OVAL files and ZIP members,
+follows each Test's complete dependency graph, and calls the existing visitor
+only for enabled capabilities. It does not add capability support or admit Rules.
+The full artifact separates conversion, schema, compiled operands and independent
+source proof; unsupported platforms stay reference material. Run its ten focused
+tests with `PYTHONPATH=tools python -m unittest test_v04_oval_test_corpus -v`.
+
 From repository root, in a disposable environment:
 
 ```bash

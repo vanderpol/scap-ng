@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Added a fast, hash-pinned inventory and direct-converter coverage audit of the
+  complete SCAP 1.4 OVAL Test Content collection, preserving unsupported platforms
+  and distinguishing conversion, validation, compilation and independent proof
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Separated immutable Bluetooth archival reproduction from current original-SCAP
   acceptance; restored current grammar in five source-proof workflows while
   retaining their independent source assertions. Fixed deterministic indexing of

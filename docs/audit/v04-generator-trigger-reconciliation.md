@@ -46,8 +46,13 @@ unmigrated input; no automatic repair was added to validation or compilation.
 
 Local results: **42 focused tests pass**, all additional source CLI gates pass,
 historical 4,001-document validation passes, and all 4,012 current documents pass
-in both formats with parsed parity. The complete maintained run and exact-head
-hosted outcomes are recorded at the final checkpoint before the generator change.
+in both formats with parsed parity. At implementation `8834539967d1dcc5939bf90240e9e05bcf938b81`, local and
+downloaded hosted maintained results agree: **3,090 tests, zero failures/errors,
+one existing skip**. All **24 triggered current workflows** passed, plus the
+separate opt-in archival check. [Mandatory run](https://github.com/vanderpol/scap-ng/actions/runs/40421935855);
+[all exact-head runs and artifact checksum](v04-generator-trigger-reconciliation.json).
+The current-source prerequisite is satisfied; this does not establish release
+readiness or original-source proof for the historical review migration.
 All normative schema hashes remain unchanged. No original archive, source XML,
 editor, scanner, corpus conversion, signing identity or release asset is changed.
 The historical all_exist diagnostics and accepted Oracle exception remain

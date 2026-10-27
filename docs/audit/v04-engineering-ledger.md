@@ -250,3 +250,21 @@ the existing Object visitor now handles those explicit migrations without
 touching literal records. Forty-two focused tests and all source CLI gates pass;
 full maintained/hosted results are reconciled before generator work. No new fresh
 source all_exist normalization or deprecated-WMI admission is introduced.
+
+At `8834539967`, both final local and downloaded hosted maintained results are
+**3,090 tests, zero failures/errors, one existing skip**. All 24 triggered current
+workflows and the separate opt-in archive job succeeded. Exact run IDs and the
+artifact digest are in the trigger-reconciliation packet. This satisfies the
+current-source CI prerequisite. The parity-preserving generator candidate remains
+isolated outside the repository while the owner-requested complete pinned OVAL
+Test Content coverage measurement is completed; no converter admission is expanded.
+
+The [complete OVAL Test Content coverage audit](v04-oval-test-corpus.md) inventories
+803 original Tests in 145 OVAL documents, including archived XML. All 154 collection
+file blobs match the pinned upstream Git tree. Of 190 enabled-capability Tests,
+144 validate/compile and 127 pass independent comparison. Seventeen compiled
+cases remain explicitly unproved; one other generated identifier fails schema
+validation. All 613 out-of-scope Tests remain inventoried/reference material.
+No enabled capability, schema, production converter or Windows Rule admission
+changes. Exact capability diagnostics and the reproducible corpus command are
+recorded with separate hosted measurement/mandatory evidence.
