@@ -77,12 +77,40 @@ are explicitly identified and do not increase original-source coverage.
 
 ## Safely change a conversion rule
 
+Ordinary capability activation lives in
+[`v04_direct_capabilities.json`](../../tools/v04_direct_capabilities.json).
+The generic visitor reads the existing version-local mapping; adding a capability
+does not require adding a dispatch function. Admission still requires original
+fixtures, independent source proof, current validation and compiled-operand checks.
+The [scalar proof contracts](../../tests/fixtures/v04-scalar-proof-contracts.json)
+freeze reviewed source/native field identities and mapping hashes independently of
+conversion. A mapping change must be reviewed against original XSD/XML before
+refreshing this evidence; do not automatically bless a changed hash.
+
+For example, to extend an ordinary scalar capability, add its approved mapping
+identity to activation data and its independently reviewed identity recipe to
+the proof contracts. Pin original Self-Assertion XML and positive/negative cases
+as in `test_v04_direct_scalar_batch.py`. If existing generic handlers cannot
+preserve the source construct, leave it blocked and implement a shared handler
+with source-backed boundary tests. No Rule-ID branch is appropriate.
+
+`verify_v04_direct_scope.py` runs all six pinned original primary closures,
+records every unsupported Rule, and packages only independently proved output.
+Its [proof floor](../../tests/fixtures/v04-six-primary-proof-floor.json) retains
+816 Rule proofs and exact compiled-program hashes; losing a proof or changing
+a program fails the workflow. Additional proved Rules are allowed. Update this
+fixture only after examining an independently verified intentional change.
+Applicability remains a separately recorded obligation, not implied by this floor.
+Run `PYTHONPATH=tools python -m unittest test_v04_direct_scalar_batch
+test_v04_direct_unix_password test_v04_direct_scope -v` for the small batch checks;
+the six-source workflow retains complete generated evidence and packages.
+
 First read the existing 0.4 mapping and pinned OVAL 5.12.3 declaration for the
-affected entity. `CAPABILITIES` selects the small supported catalog;
+affected entity. `tools/v04_direct_capabilities.json` selects the supported catalog;
 `load_mappings` reads its **0.4** files. Selector/State field names, enum
 crosswalks and acquisition defaults come from these mappings. Capability
 additions require proof of their missing datatype/acquisition behavior; merely
-adding a name to the tuple is not sufficient. Do not edit normative schemas or
+adding a name to the activation data is not sufficient. Do not edit normative schemas or
 production mappings as part of this spike.
 
 **Worked change included in this implementation:** supporting integer OVAL

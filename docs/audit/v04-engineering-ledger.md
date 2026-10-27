@@ -22,10 +22,17 @@ only and do not repair source. Eleven primary OVAL closures have original
 XSD/Schematron violations (including two among the already broken DNS bindings).
 No capability enabled or prior primary source proof changed by this inventory.
 
-Next specific action: integrate the isolated native schema-generator candidate
-only after import isolation, XML parse-count, mutation and full 100-contract
-parity regressions. Then prioritize universal OS guards and UNIX file collection,
-with shared functions/parameters, using the six-source and 803-Test corpora.
+Native schema-generator decoupling is complete at `b225b7eba`: all 100 generated
+contracts retain exact parity, all 31 triggered hosted checks pass, and mandatory
+regressions pass 3,118 tests with one existing skip and zero failures/errors.
+The [generic capability batch](v04-direct-capability-batch.md) enables five more
+ordinary capabilities without new capability-specific conversion algorithms.
+The first complete primary-source acceptance pass proves/compiles 816 closures;
+all 249 prior Server 2025 program hashes match. Applicability remains unproved,
+580 primary Rules remain blocked/unverified and 171 are manual/OCIL-only.
+Twelve focused tests pass; maintained/hosted verification is pending this batch.
+Next specific action: shared file collection/traversal and RPM metadata, using
+the six-source and 803-Test corpora. Preserve the new 816-proof/program floor.
 The assignment remains active; Phase 1 is not completion of the converter.
 
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
@@ -308,6 +315,6 @@ Native generation checkpoint: [report](v04-native-generator.md). Local full
 100-contract fingerprint parity, public import isolation/compilation, 803-case
 corpus hash/outcome parity, 33 focused tests and eight promotion checks pass.
 Active generation modules shrink from 1,188 to 487 nonblank/noncomment lines.
-No capability admission or normative schema changes. Hosted results pending
-implementation push. Next: enable and source-prove the already-generic UNIX
-password path, then shared acquisition/function support required by the matrix.
+No capability admission or normative schema changes in that checkpoint. All 31
+exact-head hosted workflows pass, including 3,118 mandatory tests with one skip.
+The subsequent five-capability batch and source-proof expansion are recorded above.

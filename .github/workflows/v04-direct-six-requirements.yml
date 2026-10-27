@@ -6,8 +6,18 @@ on:
     paths:
       - 'tools/inventory_v04_six_source_requirements.py'
       - 'tools/test_v04_six_source_requirements.py'
+      - 'tools/test_v04_direct_scalar_batch.py'
+      - 'tools/test_v04_direct_scope.py'
+      - 'tests/fixtures/v04-direct-scalars/**'
+      - 'tests/fixtures/v04-six-primary-proof-floor.json'
       - 'tools/oval_source_validation.py'
       - 'tools/v04_direct_*.py'
+      - 'tools/v04_direct_capabilities.json'
+      - 'tools/v04_scalar_source_proof.py'
+      - 'tools/v04_expanded_source_proof.py'
+      - 'tools/v04_source_package_semantics.py'
+      - 'tools/verify_v04_direct_scope.py'
+      - 'tests/fixtures/v04-scalar-proof-contracts.json'
       - 'tests/fixtures/v04-direct-six-sources.json'
       - 'schema/v0.4.0/capability-mappings/**'
       - 'third_party/scap-1.4-schemas/oval_5.12.3/**'
@@ -17,7 +27,7 @@ permissions:
 jobs:
   inventory:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,9 +56,11 @@ jobs:
           PYTHONDONTWRITEBYTECODE: '1'
         run: |
           test "$(git -C originals rev-parse HEAD)" = 8c8e5dff860af6b1290ee9273a282db24278f8d5
-          python -m unittest test_v04_six_source_requirements -v
+          python -m unittest test_v04_six_source_requirements test_v04_direct_scalar_batch test_v04_direct_scope -v
           python scap-ng/tools/inventory_v04_six_source_requirements.py \
             --inputs originals/Current --output evidence/requirements
+          python scap-ng/tools/verify_v04_direct_scope.py \
+            --inputs originals/Current --output evidence/primary-acceptance
       - uses: actions/upload-artifact@v4
         if: always()
         with:

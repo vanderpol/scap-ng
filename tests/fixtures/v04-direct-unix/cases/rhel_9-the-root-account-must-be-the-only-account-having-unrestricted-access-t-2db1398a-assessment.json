@@ -1,0 +1,72 @@
+{
+  "source_zip_sha256": "70aa6a16221df2c53b094b11b48b16aca1f6d7147c11123b655659ca7711dbb5",
+  "source_xml_sha256": "bc0f1c04e3371f52121a71ba3c8fc47095bdfe5356c90992ca232341d25538e4",
+  "component": "scap_mil.disa.stig_comp_U_RHEL_9_V2R9_STIG_SCAP_1-4_Benchmark-enhancedV13-oval.xml",
+  "rule": "xccdf_mil.disa.stig_rule_SV-258059r991589_rule",
+  "rule_sha256": "b8d92c5b4029f266b466b5794b27971f4129f9d7c398ccaff58c90c76ffdcbd8",
+  "title": "The root account must be the only account having unrestricted access to RHEL 9 system.",
+  "definition": "oval:mil.disa.stig.rhel9os:def:258059",
+  "closure": {
+    "nodes": [
+      {
+        "id": "oval:mil.disa.stig.defs:def:230534",
+        "kind": "definitions",
+        "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+        "version": "1",
+        "sha256": "5658ba832a287fdfee6b6051c8a53a747357f20b1866bfcca9eb6bc04884b791"
+      },
+      {
+        "id": "oval:mil.disa.stig.rhel9os:def:258059",
+        "kind": "definitions",
+        "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}definition",
+        "version": "3",
+        "sha256": "b0505a4e42fa4888a3ed85f0c171520e0d535ba871c62c32b1300b53ac1900a5"
+      },
+      {
+        "id": "oval:mil.disa.stig.unix:obj:23053400",
+        "kind": "objects",
+        "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_object",
+        "version": "1",
+        "sha256": "503f816836b1d07f19d9d00fd32cb8edc77841e888d081b0967223819d9f7d5f"
+      },
+      {
+        "id": "oval:mil.disa.stig.unix:ste:23053400",
+        "kind": "states",
+        "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_state",
+        "version": "1",
+        "sha256": "300e9a1ee8ff629df53882a65bc704655762a5dd2eb7f00d57e24f9204b9c6d9"
+      },
+      {
+        "id": "oval:mil.disa.stig.unix:tst:23053400",
+        "kind": "tests",
+        "type": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#unix}password_test",
+        "version": "1",
+        "sha256": "d925baab66e290b98789d671439f818cb5f37df05a29569c06663a0552397711"
+      }
+    ],
+    "edges": [
+      [
+        "oval:mil.disa.stig.rhel9os:def:258059",
+        "oval:mil.disa.stig.defs:def:230534",
+        "extend_definition"
+      ],
+      [
+        "oval:mil.disa.stig.defs:def:230534",
+        "oval:mil.disa.stig.unix:tst:23053400",
+        "criterion"
+      ],
+      [
+        "oval:mil.disa.stig.unix:tst:23053400",
+        "oval:mil.disa.stig.unix:obj:23053400",
+        "object"
+      ],
+      [
+        "oval:mil.disa.stig.unix:tst:23053400",
+        "oval:mil.disa.stig.unix:ste:23053400",
+        "state"
+      ]
+    ]
+  },
+  "source_xml": "<ns0:oval_definitions xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" xmlns:ns1=\"http://oval.mitre.org/XMLSchema/oval-common-5\" xmlns:ns2=\"http://oval.mitre.org/XMLSchema/oval-definitions-5#unix\"><ns0:generator>\n        <ns1:product_name>Security Content Tool 1.9.0</ns1:product_name>\n        <ns1:schema_version>5.11</ns1:schema_version>\n        <ns1:timestamp>2026-06-25T09:43:57</ns1:timestamp>\n      </ns0:generator>\n      <ns0:definitions><ns0:definition id=\"oval:mil.disa.stig.defs:def:230534\" version=\"1\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>The root account must be the only account having unrestricted access to the operating system system.</ns0:title>\n            <ns0:description />\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:criterion test_ref=\"oval:mil.disa.stig.unix:tst:23053400\" comment=\"Only the root account has a UID of zero.\" />\n          </ns0:criteria>\n        </ns0:definition>\n        <ns0:definition id=\"oval:mil.disa.stig.rhel9os:def:258059\" version=\"3\" class=\"compliance\">\n          <ns0:metadata>\n            <ns0:title>RHEL-09-411100 - The root account must be the only account having unrestricted access to RHEL 9 system.</ns0:title>\n            <ns0:affected family=\"unix\">\n              <ns0:platform>Red Hat Enterprise Linux 9</ns0:platform>\n            </ns0:affected>\n            <ns0:description>An account has root authority if it has a user identifier (UID) of \"0\". Multiple accounts with a UID of \"0\" afford more opportunity for potential intruders to guess a password for a privileged account. Proper configuration of sudo is recommended to afford multiple system administrators access to root privileges in an accountable manner.</ns0:description>\n          </ns0:metadata>\n          <ns0:criteria>\n            <ns0:extend_definition definition_ref=\"oval:mil.disa.stig.defs:def:230534\" />\n          </ns0:criteria>\n        </ns0:definition>\n        </ns0:definitions><ns0:tests><ns2:password_test id=\"oval:mil.disa.stig.unix:tst:23053400\" version=\"1\" check=\"all\" comment=\"Only the root account has a UID of zero.\">\n          <ns2:object object_ref=\"oval:mil.disa.stig.unix:obj:23053400\" />\n          <ns2:state state_ref=\"oval:mil.disa.stig.unix:ste:23053400\" />\n        </ns2:password_test>\n        </ns0:tests><ns0:objects><ns2:password_object id=\"oval:mil.disa.stig.unix:obj:23053400\" version=\"1\">\n          <ns2:username operation=\"not equal\">root</ns2:username>\n        </ns2:password_object>\n        </ns0:objects><ns0:states><ns2:password_state id=\"oval:mil.disa.stig.unix:ste:23053400\" version=\"1\">\n          <ns2:user_id datatype=\"int\" operation=\"not equal\">0</ns2:user_id>\n        </ns2:password_state>\n        </ns0:states></ns0:oval_definitions>",
+  "scope": "Complete original primary OVAL closure, not applicability or a fabricated source Rule"
+}

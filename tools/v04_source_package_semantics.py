@@ -172,7 +172,10 @@ class Source:
             value = {'constant_values': [literal(datatype, c.text or '') for c in n]}
         elif local(n) == 'local_variable':
             need(len(n) == 1, 'local Variable expression')
-            value = {'local': {'datatype': datatype, 'expression': self.function(n[0])}}
+            # OVAL int and the native integer spelling name the same primitive;
+            # retain the declaration/cast boundary rather than comparing labels.
+            value = {'local': {'datatype': 'integer' if datatype == 'int' else datatype,
+                               'expression': self.function(n[0])}}
         else:
             raise Unsupported('external/unhandled Variable: ' + ident)
         self.active.remove(ident)

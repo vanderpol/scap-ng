@@ -1,0 +1,33 @@
+assessment:
+  id: rhel-9-system-accounts-must-not-have-an-interactive-login-shell-b38b78df-assessment
+  version: 1
+  assessment_title: RHEL 9 system accounts must not have an interactive login shell.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    the-system-accounts-in-etc-passwd-use-sbin-nologin-9972d6cb-test:
+      test_title: The system accounts in /etc/passwd use /sbin/nologin.
+      capability: unix.password
+      object:
+        set:
+          operator: union
+          operands:
+          - object:
+              username: {matches_regex: .+}
+            filters:
+            - exclude:
+                user_id: {greater_than_or_equal: 1000, datatype: integer, values_found: one_or_more, values_matching: every}
+            - exclude:
+                user_id: {equals: 0, datatype: integer, values_found: one_or_more, values_matching: every}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          login_shell: {matches_regex: /sbin/nologin|/usr/sbin/nologin, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    test: the-system-accounts-in-etc-passwd-use-sbin-nologin-9972d6cb-test

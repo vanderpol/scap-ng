@@ -14,8 +14,11 @@ implementation, including annotations, constraints and reference targets. All
 803 pinned corpus cases, source/dependency hashes, authoring/program hashes and
 outcomes are unchanged. No capability is enabled or normative schema modified.
 Thirty-three focused tests and eight schema-promotion audit tests pass locally;
-exact-head hosted results are recorded after publication in the
-[machine report](v04-native-generator.json).
+at implementation `b225b7eba0ab53d4722348bd77017c30efc9705d`, all 31 triggered
+hosted workflows pass. The downloaded mandatory result confirms **3,118 tests,
+zero failures/errors and one existing skip**. Exact runs and verified artifact
+digest are in the [machine report](v04-native-generator.json), including
+[mandatory CI](https://github.com/vanderpol/scap-ng/actions/runs/40489065483).
 
 The active generation dependency path falls from **1,188 to 487 nonblank,
 noncomment lines**, counting the complete modules needed for generation.

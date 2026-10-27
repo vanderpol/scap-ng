@@ -17,11 +17,10 @@ from v04_direct_scap_source import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-CAPABILITIES = ('windows.registry', 'independent.shellcommand', 'windows.auditeventpolicysubcategories',
-                'windows.userright', 'windows.wmi.query', 'windows.passwordpolicy', 'windows.lockoutpolicy',
-                'windows.service', 'independent.textfilecontent54', 'windows.fileeffectiverights53',
-                'windows.cmdlet', 'windows.ntuser', 'windows.appcmd', 'windows.appcmdlistconfig',
-                'independent.environmentvariable58')
+SUPPORT = json.loads(Path(__file__).with_name('v04_direct_capabilities.json').read_text())
+CAPABILITIES = tuple(SUPPORT['enabled'])
+ensure(SUPPORT['specification_version'] == '0.4.0' and len(CAPABILITIES) == len(set(CAPABILITIES)),
+       'invalid direct capability activation registry')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
              'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
@@ -37,6 +36,8 @@ def load_mappings():
     mappings = [json.loads((ROOT / f'schema/v0.4.0/capability-mappings/supported/{name}.json').read_text())
                 for name in CAPABILITIES]
     ensure(all(mapping['specification_version'] == '0.4.0' for mapping in mappings), 'mapping version mismatch')
+    ensure(all(mapping['source']['namespace'].rsplit('#', 1)[-1] in ('independent', 'linux', 'unix', 'windows')
+               for mapping in mappings), 'capability outside approved direct-converter scope')
     return mappings
 
 
@@ -464,10 +465,15 @@ class AssessmentConverter:
         if not selector:
             native_field = mapping['native']['state_field_map'].get(local_name(element))
             enumeration = mapping['native'].get('state_value_enums', {}).get(native_field)
-            if enumeration:
+            if enumeration and operation != 'pattern match':
                 expected = value if isinstance(value, list) else [value]
                 ensure(all(isinstance(v, str) and v in enumeration for v in expected),
                        'unsupported enum comparison/value')
+            elif enumeration:
+                # Regex expected values need not be enum members. This path
+                # has no value crosswalk: alias-domain patterns remain blocked
+                # above, rather than being applied to renamed native values.
+                ensure(element.get('datatype', 'string') == 'string', 'enum regex requires string datatype')
         result = {COMPARISONS[operation]: value}
         if element.get('datatype', 'string') != 'string':
             result['datatype'] = 'integer' if element.get('datatype') == 'int' else element.get('datatype')

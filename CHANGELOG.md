@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Enabled five metadata-driven direct-converter capabilities and independent
+  scalar proof contracts; measured all six original primary-source subsets with
+  816 proved/compiled closures while preserving all 249 Server 2025 program hashes
+  and explicit source/applicability blockers
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Inventoried all original six-STIG Rule and applicability dependencies against
   pinned OVAL XSD/Schematron, separating source-invalid bindings from unsupported
   conversion and preserving non-repairing candidate evidence

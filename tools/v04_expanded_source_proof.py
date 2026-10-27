@@ -13,6 +13,7 @@ import xml.etree.ElementTree as ET
 
 from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
     boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK)
+import v04_scalar_source_proof as scalar_proof
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
@@ -38,6 +39,15 @@ APPROVED_DEF = 'oval:mil.disa.stig.defs:def:230413'
 DECISION = 'https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6388735943'
 AUDIT = 'windows.auditeventpolicysubcategories'
 SYSTEM_POLICIES = frozenset({'windows.passwordpolicy', 'windows.lockoutpolicy'})
+
+
+@lru_cache(maxsize=1)
+def original_password_fields():
+    """Identity-named password entities from the pinned original source XSD."""
+    schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/unix-definitions-schema.xsd').getroot()
+    xs = '{http://www.w3.org/2001/XMLSchema}'
+    declaration = schema.find(xs + 'element[@name="password_state"]')
+    return {n.get('name') for n in declaration.findall('.//' + xs + 'sequence/' + xs + 'element')}
 
 
 @lru_cache(maxsize=1)
@@ -213,6 +223,9 @@ class ExpandedSource(Source):
         self.item_schema_sha256 = sha256(schema.read_bytes()).hexdigest()
 
     def capability(self, n, suffix):
+        registered = scalar_proof.source_capability(n, suffix)
+        if registered:
+            return registered
         for cap in SYSTEM_POLICIES:
             if n.tag == '{' + OD + '#windows}' + cap.split('.')[-1] + suffix:
                 return cap
@@ -246,6 +259,9 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        registered = scalar_proof.source_state(self, ident, cap)
+        if registered is not None:
+            return predicate_order(registered)
         if cap == 'windows.cmdlet':
             need(all(c.tag == '{' + OD + '#windows}value' and c.get('datatype') == 'record'
                      for c in self.get(ident, 'states')), 'cmdlet State outside bounded value-record proof')
@@ -305,8 +321,8 @@ class ExpandedSource(Source):
             need(all(local(c) in set(FILE_FIELDS) | {'type', 'sticky'} for c in self.get(ident, 'states')),
                  'file State field outside bounded proof rules')
         if cap == 'unix.password':
-            need(all(local(c) in {'user_id', 'home_dir'} for c in self.get(ident, 'states')),
-                 'password State field outside bounded proof rules')
+            need(all(c.tag == '{' + OD + '#unix}' + local(c) and local(c) in original_password_fields()
+                     for c in self.get(ident, 'states')), 'unknown original password State field')
         value = super().state(ident, cap)
         def rename(n):
             if 'field' in n:
@@ -360,6 +376,9 @@ class ExpandedSource(Source):
     def object(self, ident):
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
+        registered = scalar_proof.source_object(self, ident, cap)
+        if registered is not None:
+            return registered
         if cap in SYSTEM_POLICIES | {AUDIT}:
             keys(n, META, 'system singleton Object')
             need(not len(n), 'system singleton has acquisition children')
@@ -639,7 +658,7 @@ class ExpandedNative(Native):
     def test(self, ident):
         n = self.a['tests'][ident]
         cap = n.get('capability')
-        if cap not in SYSTEM_POLICIES | {AUDIT}:
+        if cap not in SYSTEM_POLICIES | {AUDIT} and not scalar_proof.no_object(cap):
             return super().test(ident)
         n = self.reference('tests', ident)
         keys(n, {'capability', 'test_title', 'reported_elements', 'require'}, 'system native Test')
@@ -717,6 +736,9 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
+        registered = scalar_proof.native_object(self, n, cap)
+        if registered is not None:
+            return registered
         if cap == 'independent.shellcommand' and 'set' not in n and 'filters' in n:
             acquisition = deepcopy(n)
             filters = acquisition.pop('filters')
