@@ -734,3 +734,12 @@ construct handlers over additional capability-name branches. Profile validation
 before optimizing source parsing: the recorded 249-Rule checkpoint spent 0.16 s
 lowering versus 28.85 s validating, excluding authoring serialization. That single
 workload does not establish asymptotic scalability or a production speedup.
+
+## Native contract generation
+
+Current generation uses version-neutral `v04_capability_source.py`, direct native
+`v04_capability_native.py` and `generate_capability_schema_v04.py`. It constructs
+no older grammar and performs no wrapper flattening or version-string rewriting.
+The [native generator report](../audit/v04-native-generator.md) documents field
+refresh, source kinds, the full parity fixture and focused tests. Genuine cmdlet
+`select` remains metadata-defined; generic acquisition wrappers remain invalid.

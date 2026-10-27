@@ -78,5 +78,9 @@ from conversion and imports no historical converter.
 
 Next: finish deterministic native contract generation without the old generator,
 then implement shared collection/function support and independent proof rules
-according to this matrix. Full maintained and exact-head hosted outcomes are
-recorded at the verified implementation checkpoint; work continues meanwhile.
+according to this matrix. At `c1c124f58a45981a7cfe5678eb4206afd6baf75c`, all nine triggered workflows pass.
+The downloaded [mandatory result](https://github.com/vanderpol/scap-ng/actions/runs/40484866700)
+reports **3,111 tests, zero failures/errors, one existing skip**. The
+[hosted six-source inventory](https://github.com/vanderpol/scap-ng/actions/runs/40484867055)
+reproduces every local STIG summary. Artifact checksums and all CI links are in
+the machine matrix. Work continues with native generation and shared handlers.

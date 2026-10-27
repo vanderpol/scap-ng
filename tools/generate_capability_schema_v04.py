@@ -1,28 +1,21 @@
 #!/usr/bin/env python3
-"""Pre-alpha 0.4 generated native capability schemas (single authored grammar).
+"""Generate the reviewed native 0.4 capability contract directly from metadata.
 
-This adapter reuses the reviewed OVAL 5.12.3 source mapping/metadata extraction
-of the frozen 0.3 generator, and then creates an *independent version-local*
-0.4-only authored Test/Object/State contract. It DOES NOT change the old generator
-or any 0.3 schema, and never falls back to a 0.3 reference at validation time.
-
-Pending gates are documented in #228: exhaustive enum/datatype narrowing,
-WMI/cmdlet collector variants, and full 100-capability deep migration validation.
+Version-neutral OVAL XSD helpers supply field/type identities. Native surfaces
+and conditions are constructed once, with no historical grammar, wrapper
+flattening or previous-version reference rewriting. Generated-contract parity is
+covered by the full 100-capability fingerprint and semantic regression suites.
 """
 from __future__ import annotations
 
-from copy import deepcopy
 import argparse
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
-from flatten_v04_object_schema import flatten_schema
+from v04_capability_native import native_surface
 
-from generate_capability_schema import (
-    generate as generate_v03, direct_global, immediate_payload_elements,
-    source_datatypes,
-)
+from v04_capability_source import direct_global, immediate_payload_elements, source_datatypes
 
 VERSION = "0.4.0"
 ROOT_ID = f"https://scap-ng.dev/schema/v{VERSION}/"
@@ -59,9 +52,9 @@ def _field_expression(name: str, child: dict) -> dict:
     }
 
 
-def _generated_state_fields(mapping: dict, root: Path) -> tuple[dict, set]:
+def _generated_state_fields(mapping: dict, root: Path, document=None) -> tuple[dict, set]:
     source = mapping["source"]
-    document = ET.parse(root / source["definitions_schema"]).getroot()
+    document = document if document is not None else ET.parse(root / source["definitions_schema"]).getroot()
     state = direct_global(document, "element", source["state"])
     entities = immediate_payload_elements(state)
     overrides = mapping["native"].get("state_field_datatypes", {})
@@ -89,11 +82,11 @@ def _generated_state_fields(mapping: dict, root: Path) -> tuple[dict, set]:
     return fields, records
 
 
-def _selector_fields(mapping: dict, root: Path) -> dict:
+def _selector_fields(mapping: dict, root: Path, document=None) -> dict:
     source = mapping["source"]
     if not source.get("object"):
         return {}
-    document = ET.parse(root / source["definitions_schema"]).getroot()
+    document = document if document is not None else ET.parse(root / source["definitions_schema"]).getroot()
     obj = direct_global(document, "element", source["object"])
     native_to_source = {
         output: name for name, output in mapping["native"].get("selector_map", {}).items()
@@ -109,14 +102,7 @@ def _selector_fields(mapping: dict, root: Path) -> dict:
 def generate(mapping: dict, repo_root: Path) -> dict:
     if mapping.get("specification_version") != VERSION:
         raise ValueError("0.4 generator accepts only reviewed 0.4 source mappings")
-    old = deepcopy(mapping)
-    old["specification_version"] = "0.3.0"
-    # Extract reviewed XSD semantics through a pinned 0.3 code path. The result
-    # is NOT used directly and no 0.3 schema is referenced or packaged.
-    base = generate_v03(old, repo_root, schema_version="0.3.0")
-    result = json.loads(
-        json.dumps(base).replace("/v0.3.0/", "/v0.4.0/")
-    )
+    result, source_document = native_surface(mapping, repo_root)
     result["$id"] = (
         ROOT_ID + "generated/capabilities/" + mapping["capability"] + ".schema.json"
     )
@@ -133,38 +119,12 @@ def generate(mapping: dict, repo_root: Path) -> dict:
     # normal State predicates and paired requirements; they SHALL go through
     # the full common path below even though no Object schema exists.
     if mapping.get("native",{}).get("fixed_result") is not None:
-        old_test = defs["test"]
-        old_test["required"] = sorted(
-            set(old_test["required"]) - {
-                "existence", "match", "reported_elements"
-            }
-        )
-        # Fixed execution outcome does not exempt authored input from the
-        # approved uniform Test.require contract.
-        old_test['required'] = sorted(set(old_test['required']) | {'require'})
-        old_test["properties"]["require"] = {
-            "$ref": LANG + "#/$defs/test/properties/require"
-        }
-        old_test["properties"]["reported_elements"] = {
-            "$ref": ROOT_ID + "reported-elements.schema.json"
-        }
-        old_test["properties"].pop("existence",None)
-        old_test["properties"].pop("match",None)
-        # Fixed-result native capabilities have no authored Object or State
-        # predicate. Drop 0.3's legacy named State wrapper and do not provide
-        # a second authoring spelling through unused schema definitions.
-        defs.pop("state",None)
-        for name in ('states', 'state', 'states_match'):
-            old_test['properties'].pop(name, None)
-        old_test.setdefault('allOf', []).append({'$ref': LANG + '#/$defs/test'})
         return _qualify_refs(result)
 
-    native_selector_fields = _selector_fields(mapping,repo_root)
-    select = defs.get("object",{}).get("properties",{}).get("select")
-    if select is not None:
-        for name in list(select.get("properties", {})):
-            if name not in native_selector_fields:
-                raise ValueError(f"No source Object selector mapping for {name}")
+    native_selector_fields = _selector_fields(mapping,repo_root,source_document)
+    selector_properties = defs.get("object",{}).get("properties")
+    if selector_properties is not None:
+        for name in native_selector_fields:
             dtypes = native_selector_fields[name]
             selector = {
                 "allOf": [
@@ -200,12 +160,12 @@ def generate(mapping: dict, repo_root: Path) -> dict:
             # retain their original existence/absence meaning.
             if name in mapping["native"].get("nullable_selectors",["name"]):
                 selector = {"oneOf":[selector,{"type":"null"}]}
-            # Reuse only explicit 0.3 for_each binding as a distinct branch,
+            # Explicit for_each projection is a distinct branch,
             # never hide it as a default Object selector comparison.
             selector = {"oneOf":[selector,{
                 "$ref": COMMON + "#/$defs/foreach_selector_binding"
             }]}
-            select["properties"][name] = selector
+            selector_properties[name] = selector
 
     # Set operands MUST reuse the native version-local Object contract.
     # The generic common.set_expression validates structural operations but
@@ -273,13 +233,7 @@ def generate(mapping: dict, repo_root: Path) -> dict:
         obj.setdefault("allOf",[]).append({
             "not":{"required":["set","filters"]}
         })
-        # Approved 0.4 canonical Object shape: capabilities supply flat
-        # selector and acquisition keys without generic select/collect
-        # containers. Preserve native validation and Set/Filter constraints.
-        defs["object"] = flatten_schema(
-            obj, mapping["native"], capability=mapping["capability"])
-
-    state_fields, records = _generated_state_fields(mapping,repo_root)
+    state_fields, records = _generated_state_fields(mapping,repo_root,source_document)
     entries = []
     for name,dtypes in sorted(state_fields.items()):
         if name in records:
@@ -307,36 +261,6 @@ def generate(mapping: dict, repo_root: Path) -> dict:
                 for logical in LOGIC
             ],
         ]
-    }
-    # Named State wrappers belong to the legacy migration source, not the
-    # single normative 0.4 authored grammar.
-    defs.pop("state",None)
-
-    test = defs["test"]
-    required = set(test["required"]) - {"existence","match"}
-    required.add("require")
-    test["required"] = sorted(required)
-    test["properties"].pop("existence",None)
-    test["properties"].pop("match",None)
-    # Reuse the approved structured Item/field requirement grammar, without a
-    # generated-only spelling or legacy scalar requirement exception.
-    test["properties"]["require"] = {
-        "$ref": LANG + "#/$defs/test/properties/require"
-    }
-    for name in ('states', 'state', 'states_match', 'state_fields_require'):
-        test['properties'].pop(name, None)
-    if "object" in test["properties"]:
-        test["properties"]["object"] = {
-            "oneOf":[
-                {"$ref": COMMON + "#/$defs/object_reference"},
-                {"$ref": "#/$defs/object"},
-            ]
-        }
-    test.setdefault("allOf",[]).append({"$ref": LANG + "#/$defs/test"})
-    # This ensures source native fields are closed and Test grammar remains one
-    # representation instead of accepting old existence/match.
-    test["not"] = {
-        "anyOf":[{"required":["existence"]},{"required":["match"]}]
     }
     result["x-authoring-gate"] = (
         "Draft structural generation only; source enumeration and cross-field "

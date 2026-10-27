@@ -303,3 +303,11 @@ schemas, converter/compiler/proof-reader files and production admission remain
 unchanged. Native-generator decoupling is still the next implementation objective;
 the isolated candidate has full dictionary parity for 100 generated contracts
 but is not integrated or claimed as completed.
+
+Native generation checkpoint: [report](v04-native-generator.md). Local full
+100-contract fingerprint parity, public import isolation/compilation, 803-case
+corpus hash/outcome parity, 33 focused tests and eight promotion checks pass.
+Active generation modules shrink from 1,188 to 487 nonblank/noncomment lines.
+No capability admission or normative schema changes. Hosted results pending
+implementation push. Next: enable and source-prove the already-generic UNIX
+password path, then shared acquisition/function support required by the matrix.

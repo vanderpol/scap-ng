@@ -119,12 +119,15 @@ def document_errors(v, doc, *, allow_unpromoted_conversion_vocabulary=False):
     assessment = doc.get("assessment")
     if isinstance(assessment, dict):
         from capability_registry import draft_capabilities, load_mapping, mappings
-        from generate_capability_schema import generate
-        from reported_elements import generate_reporting_capability
         from referencing import Registry, Resource
 
         declared_version = (assessment.get("specification") or {}).get("version")
         modern_versions = {"0.2.0", "0.3.0"}
+        if declared_version in modern_versions:
+            # Current 0.4 uses its version-local acquisition contracts above.
+            # Do not load historical generators just to traverse current Tests.
+            from generate_capability_schema import generate
+            from reported_elements import generate_reporting_capability
         draft = (
             draft_capabilities(version=declared_version)
             if declared_version in modern_versions
