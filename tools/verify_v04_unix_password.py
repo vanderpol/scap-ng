@@ -48,7 +48,23 @@ def snapshot(source, binding, rule_id):
             'scope': 'Complete original primary OVAL closure, not applicability or a fabricated source Rule'}
 
 
-def run(inputs, output, fixtures=None):
+def verify_case_floor(expected, actual):
+    """Keep every original snapshot byte-identical; permit new proved closures."""
+    baseline = {p.relative_to(expected): p for p in expected.rglob('*.json')}
+    if not baseline:
+        raise ValueError('original closure retention baseline is empty')
+    generated = {p.relative_to(actual): p for p in actual.rglob('*.json')}
+    for name, path in baseline.items():
+        if name not in generated or generated[name].read_bytes() != path.read_bytes():
+            raise ValueError('original closure fixture lost or changed: ' + str(name))
+    return {'retained': len(baseline), 'additional': len(generated.keys() - baseline.keys())}
+
+
+def run(inputs, output, fixtures=None, retention_floor=None):
+    if retention_floor is not None and fixtures is None:
+        raise ValueError('closure retention requires --fixtures')
+    if fixtures is not None and fixtures.exists():
+        raise ValueError('fixture output exists; refusing overwrite')
     output.mkdir(parents=True, exist_ok=False)
     pins = json.loads((ROOT / 'tests/fixtures/v04-direct-six-sources.json').read_text())['sources']
     mappings = load_mappings()
@@ -110,6 +126,8 @@ def run(inputs, output, fixtures=None):
         report['platforms'][platform] = {'source': pin, 'rules': results, 'source_proved': len(proofs),
             'compiled': len(programs), 'programs': programs,
             'scope': 'Primary automated subset; original applicability remains separately inventoried/unproved'}
+    if retention_floor is not None:
+        report['original_closure_retention'] = verify_case_floor(retention_floor, fixtures)
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report
 
@@ -119,7 +137,8 @@ if __name__ == '__main__':
     parser.add_argument('--inputs', required=True, type=Path)
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--fixtures', type=Path)
+    parser.add_argument('--retention-floor', type=Path, help='require all pinned original closure snapshots unchanged')
     args = parser.parse_args()
-    report = run(args.inputs, args.output, args.fixtures)
+    report = run(args.inputs, args.output, args.fixtures, args.retention_floor)
     print(json.dumps({p: {'proved': r['source_proved'], 'compiled': r['compiled']}
                       for p, r in report['platforms'].items()}, indent=2))

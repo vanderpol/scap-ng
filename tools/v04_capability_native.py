@@ -56,8 +56,13 @@ def flat_object(mapping):
     properties.update({name: parameter_schema(spec) for name, spec in parameters.items()})
     variants = []
     if selectors:
-        variants = [{'required': sorted(fields | required_parameters),
-                     'not': {'required': ['set']}} for fields in alternatives]
+        for fields in alternatives:
+            excluded = selectors - fields
+            # Listed selector combinations are exact. Required-only oneOf
+            # branches overlap when one alternative contains another.
+            forbidden = ({'anyOf': [{'required': [name]} for name in sorted(excluded | {'set'})]}
+                         if excluded else {'required': ['set']})
+            variants.append({'required': sorted(fields | required_parameters), 'not': forbidden})
     elif parameters:
         direct = {'not': {'required': ['set']}}
         if required_parameters:

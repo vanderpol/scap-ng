@@ -73,12 +73,41 @@ consumes the package, inventories all Rule outcomes and refuses output overwrite
 The retained singleton-function test now positively proves multivalue collections
 instead of expecting the formerly unsupported case to fail; its identity remains.
 
-**Owner boundary:** eight valid original process Tests fail an overlapping
-generated `oneOf` selector contract. The [concrete review packet](v04-process-selector-schema-conflict.md)
-and two passing review tests demonstrate current rejection and an isolated
-exact-alternative correction. Active schemas/generator are unchanged; no process
-admission. Owner decision is pending. Complete maintained regressions and
-exact-head six-source/corpus evidence are running before the terminal handoff.
+**Owner decision, 2026-10-27: approved exact-alternative correction.** The
+[review packet](v04-process-selector-schema-conflict.md) records the valid original
+counterexample and dated authorization. `flat_object` retains `oneOf` and Set/direct
+restrictions while excluding absent selectors from each direct alternative.
+The [all-100 audit](v04-exact-selector-contracts.md) finds exactly ten explained
+Object-variant changes, 90 byte-identical contracts, zero unexpected differences,
+and unchanged Set branches. Only those ten parity hashes update. All eight original
+process Tests validate, compile and independently prove using ordinary activation
+and frozen scalar identities. **21 focused tests pass**. Normative schemas, source,
+mappings, compiler semantics and scanner behavior are unchanged. Fresh maintained,
+six-source and full pinned-corpus gates are running before commit/push; the earlier
+pre-correction full process retained the old generator and had one parity-lock
+failure, so it is not a passing corrected-tree run. Continue the approved queue
+after successful verification and publication, as explicitly authorized by owner.
+
+Verification is now PASS: **3,155 mandatory tests, zero failures/errors, one existing
+skip**, plus three separately passed new snapshot-retention guards. Selection
+reconciliation accounts for every one of **3,158 current identities**, none lost.
+The final six-original gate proves/compiles **1,001** primary closures (RHEL 269,
+Oracle 264, Windows 11 219, Server 249), independently consumes all four packages,
+and retains every original 816 program hash. The floor now protects all 1,001.
+395 primary cases remain blocked/unverified, 171 Rules are manual/OCIL-only,
+applicability stays unproved and Apache/DNS retain all 63 broken bindings.
+The full 803-Test audit reports **629 configured / 339 compiled / 318 proved**;
+the wider diagnostic visitor compiles 433, proving 318, with no schema-invalid
+converted cases. [Machine receipt](v04-recovery-resumption.json).
+
+At published `615cd6e49`, eight hosted workflows pass; the UNIX-password lane alone
+failed because a directory equality check rejected four additional proved closures.
+Its six pinned original snapshots are unchanged. The retention guard now requires
+all old bytes unchanged while allowing additional proved cases; empty baselines,
+tampering, removal and output overwrite fail. Local complete lane passes six
+retained/four additional. Corrected-head CI follows commit/push. Next bounded
+implementation: the reproduced seven ordinary mapping/proof recipes (28 original
+Test proofs, currently inactive), then remaining shared source forms/functions.
 
 | Checkpoint | BASE_SHA / RESULT_SHA | IMPLEMENTED | SOURCE_PROVED / COMPILED_UNPROVED / BLOCKED | REGRESSIONS / TESTS / CI | PERF / NEXT |
 | --- | --- | --- | --- | --- | --- |

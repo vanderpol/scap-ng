@@ -120,7 +120,7 @@ with source-backed boundary tests. No Rule-ID branch is appropriate.
 `verify_v04_direct_scope.py` runs all six pinned original primary closures,
 records every unsupported Rule, and packages only independently proved output.
 Its [proof floor](../../tests/fixtures/v04-six-primary-proof-floor.json) retains
-816 Rule proofs and exact compiled-program hashes; losing a proof or changing
+1,001 Rule proofs and exact compiled-program hashes; losing a proof or changing
 a program fails the workflow. Additional proved Rules are allowed. Update this
 fixture only after examining an independently verified intentional change.
 Applicability remains a separately recorded obligation, not implied by this floor.

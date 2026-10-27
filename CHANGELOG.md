@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- Corrected generated Object selector alternatives to remain mutually exclusive
+  under `oneOf`, preserving Set restrictions; reviewed all 100 contracts and
+  proved all eight original process Tests without dropping selectors
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - Added a verified mode to the existing direct conversion CLI, sharing original
   closure validity/proof/compilation gates with the six-source regression and
   packaging only independently proved primary subsets. Added shared file
