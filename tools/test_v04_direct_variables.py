@@ -10,6 +10,7 @@ from audit_v04_oval_test_corpus import OvalDocument, assessment_for, check_conve
 from v04_direct_converter import AssessmentConverter, load_mappings
 from v04_variable_function_migration import legacy_expression
 from v04_direct_scap_source import UnsupportedSource
+from v04_native_bundle_compiler import compile_assessment_program
 from v04_direct_inventory import SourceInventory
 from v04_expanded_source_proof import ExpandedSource, ExpandedNative
 from validate_native_json_schemas import build_validators
@@ -56,6 +57,13 @@ class DirectVariableTests(unittest.TestCase):
             self.assertEqual(legacy['evaluate'], canonical['evaluate'])
             source_terms = ExpandedSource(root).test(selected.get('id'))
             self.assertEqual(source_terms, ExpandedNative(canonical).test(canonical['evaluate']['test']))
+            legacy_program = compile_assessment_program(legacy)
+            canonical_program = compile_assessment_program(canonical)
+            self.assertEqual(legacy_program['test_instructions'], canonical_program['test_instructions'])
+            self.assertEqual(legacy_program['result_instructions'], canonical_program['result_instructions'])
+            self.assertEqual(legacy_program['result_requires'], canonical_program['result_requires'])
+            self.assertNotEqual(legacy_program['assessment_source_sha256'],
+                                canonical_program['assessment_source_sha256'])
             for key, variable in legacy.get('variables', {}).items():
                 with self.subTest(filename=filename, variable=key):
                     self.assertEqual(legacy_expression(canonical['variables'][key]['expression']),
