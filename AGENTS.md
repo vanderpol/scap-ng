@@ -62,6 +62,63 @@ This is a hard repository operating rule for ChatGPT, Codex, and other autonomou
 - If no owner decision is required, the default action is **continue executing**.
 - Completion claims SHALL describe the actual completed task and its verification state; partial progress SHALL be labeled as partial and SHALL NOT be used as a reason to end execution.
 
+## Persistent autonomous development workflow (owner decision 2026-10-28)
+
+This section implements the owner's standing authorization for routine
+implementation, testing, documentation, and direct issue-linked commits to
+`main` for previously approved tasks. It supplements the continuous execution
+rule and the validation ladder in `MAINTAINING.md`; it does not authorize new
+assessment semantics, releases, or changes to protected workflows.
+
+- Continue approved work without routine confirmation, including nondestructive
+  GitHub updates. Group related changes into coherent, independently useful
+  checkpoints rather than publishing every small edit.
+- Run focused tests after each logical change and affected capability and
+  benchmark regressions before committing implementation changes. Run the
+  complete maintained regression suite at integration checkpoints and before
+  declaring a milestone verified. The maintained suite and the release-only
+  65-benchmark corpus are different gates; the full-corpus invariant above
+  remains in force.
+- Inspect existing runs for the exact commit before dispatching tests. Reuse
+  their results; do not launch a duplicate full suite when an existing workflow
+  covers that commit. Pending, canceled, skipped, and unrun checks are not
+  passing checks. Investigate CI failures automatically and preserve the actual
+  counts, diagnostics, source SHA, run links, and limitations.
+- Do not cancel or supersede an active integration gate merely to publish the
+  next small checkpoint. With `cancel-in-progress` workflows, keep useful next
+  work local and batch its publication until the running gate completes.
+  Never change workflow concurrency, selection, required gates, or other
+  protected workflow behavior under routine testing authorization.
+- Profile existing regression evidence before proposing optimizations. Prefer
+  isolated processes for independent test groups and content-keyed immutable
+  caches. Preserve exact test identities, source validation, negative/mutant
+  coverage, failure propagation, and independent semantic readers. Demonstrate
+  equivalence before adopting execution changes; do not remove coverage to
+  obtain faster or greener results.
+- Maintain the durable [development checkpoint](docs/developer/AUTONOMOUS-PROGRESS.md)
+  at meaningful milestones and before foreseeable usage/session interruption.
+  Record the task/issue, last completed commit, last full-suite verification
+  commit and result, focused results since it, failures/blockers, next actions,
+  and decisions requiring owner approval. Identify local-only work and its
+  recovery location; keep large logs/artifacts outside Git and link durable CI
+  evidence. Record verification against exact SHAs, not a moving `main` label.
+- On restart, read the checkpoint and repository instructions, inspect the
+  checkout/status/local work and latest GitHub `main`, and inspect existing CI
+  before resuming. Preserve newer committed and uncommitted work. Compare
+  commits and evidence to avoid repeating completed work or duplicate commits.
+- Stop for owner direction only for unresolved normative assessment semantics,
+  significant architecture outside the approved design, destructive operations
+  or protected workflow changes, material scope expansion, or a genuine blocker
+  that cannot safely be resolved. Isolate an affected case and continue unrelated
+  authorized work when possible; a routine implementation choice is not a new
+  owner decision.
+- For the 0.4 converter, implementation and evidence remain under #251; schema
+  and normative contract dependencies remain under #255. Do not change schemas,
+  mappings, compiler semantics, or scanner/editor behavior under converter
+  authorization. Explicit, bounded owner exceptions remain bounded; the
+  two-annotation metadata correction at `f789583e6` grants no wider exception.
+
+
 ## Specification release invariant
 
 The `specification/` tree is release output, not an active research notebook.

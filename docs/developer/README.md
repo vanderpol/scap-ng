@@ -4,6 +4,10 @@
 links are part of the release toolchain, but they do not independently add
 normative requirements or establish scanner/runtime conformance.
 
+For ongoing approved work and recovery, use the
+[autonomous development checkpoint](AUTONOMOUS-PROGRESS.md) and the standing
+workflow in [AGENTS.md](../../AGENTS.md).
+
 | Area | Version-pinned source | Remaining work |
 | --- | --- | --- |
 | Core format and conformance | [Specification](../../specification/README.md), [conformance](../../specification/core/conformance.md) | Reconcile all approved 0.4 semantics at release promotion. |
