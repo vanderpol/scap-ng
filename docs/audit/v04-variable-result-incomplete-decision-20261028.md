@@ -32,3 +32,37 @@ The regression suite verifies those three shapes, retained earlier statuses, inv
 This is an additive status enum option for 0.4 result consumers; existing documents remain valid. Consumers that currently assume a closed status switch must recognize or reject `incomplete` explicitly, not silently map it to success. No production collector, converter or evaluator emission was altered. Full runtime conformance remains unproved.
 
 **Verification:** `PYTHONPATH=/tmp/scap-ng-schema-deps-20261028:tools python -m unittest test_v04_variable_result_incomplete test_v04_typed_operator_datatype_consistency test_v04_variable_function_expression_contract`; 18 tests passed locally on the proposed schema tree. Hosted CI at the published commit must be checked separately.
+
+## Second owner decision: internal cardinality consistency (2026-10-28)
+
+The owner subsequently approved rejecting unambiguous contradictions between
+`status`, `cardinality`, and the serialized `values` array (issue #255).
+Before this correction both of these contradictory records passed JSON Schema:
+
+```yaml
+id: v
+datatype: string
+status: zero_values
+cardinality: many
+values: [{datatype: string, status: exists, value: x}]
+item_refs: []
+```
+
+The identical array also passed with `status: complete` and
+`cardinality: zero`. Neither represents the claimed value population.
+
+The bounded correction enforces:
+
+1. `zero_values` requires exactly zero `values` entries and `cardinality: zero`.
+2. `complete` and `incomplete` require `cardinality: zero` for zero entries,
+   `one` for one entry, and `many` for two or more entries. For `incomplete`,
+   these remain **observed entry counts only**, not proof of total population.
+3. `error`, `unknown`, `not_evaluated`, and `not_applicable` are left unchanged:
+   no status-precedence or partial-failure assumptions are introduced.
+
+The constraint concerns serialized value-entry count, not uniqueness of scalar
+payloads: repeated values remain repeated entries. Further invariants about
+per-value `status`, redaction, mixed diagnostic values, and error propagation
+require separately source-backed acceptance. This schema rule is not a runtime
+evaluator. Positive/negative zero/one/many tests and non-success boundary
+regressions accompany the correction.

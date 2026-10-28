@@ -85,5 +85,32 @@
       "description": "Local Items consumed while producing this Variable, including intermediate extraction/filter/selection use."
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {"status": {"const": "zero_values"}},
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "cardinality": {"const": "zero"},
+          "values": {"maxItems": 0}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {"status": {"enum": ["complete", "incomplete"]}},
+        "required": ["status"]
+      },
+      "then": {
+        "oneOf": [
+          {"properties": {"cardinality": {"const": "zero"}, "values": {"maxItems": 0}}},
+          {"properties": {"cardinality": {"const": "one"}, "values": {"minItems": 1, "maxItems": 1}}},
+          {"properties": {"cardinality": {"const": "many"}, "values": {"minItems": 2}}}
+        ]
+      }
+    }
+  ],
   "additionalProperties": false
 }

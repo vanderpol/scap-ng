@@ -8,8 +8,9 @@ proposals are not listed as delivered features.
 
 - **2026-10-28:** Added an explicit `incomplete` Variable-result status to
   represent observed typed values without asserting a complete acquisition
-  population. This additive schema-only contract does not define function
-  result precedence or establish runtime evaluator conformance
+  population. Also reject contradictory `zero_values` and complete/incomplete
+  cardinality versus serialized values. These schema-only contracts do not
+  define function result precedence or establish runtime evaluator conformance
   ([#255](https://github.com/vanderpol/scap-ng/issues/255)).
 
 - **2026-10-28:** Connected Textfilecontent54 to the existing shared file

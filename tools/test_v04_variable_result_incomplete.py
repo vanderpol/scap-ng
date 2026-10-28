@@ -63,6 +63,36 @@ class IncompleteVariableResultSchemaTests(unittest.TestCase):
         """A schema-valid partial value set is not a computed count/unique result."""
         self.assertTrue(VALIDATOR.is_valid(result("incomplete", [observed("a")])))
 
+    def test_zero_values_requires_empty_stream_and_zero_cardinality(self):
+        good = result("zero_values", [])
+        self.assertTrue(VALIDATOR.is_valid(good))
+        for values, cardinality in (([observed("x")], "one"),
+                                    ([observed("x")], "many"),
+                                    ([], "many"), ([], "one")):
+            with self.subTest(values=len(values), cardinality=cardinality):
+                bad = result("zero_values", values)
+                bad["cardinality"] = cardinality
+                self.assertFalse(VALIDATOR.is_valid(bad))
+
+    def test_complete_and_incomplete_cardinality_matches_value_entries(self):
+        populations = ([], [observed("")], [observed("a"), observed("a")])
+        for status in ("complete", "incomplete"):
+            for values in populations:
+                expected = result(status, values)
+                self.assertTrue(VALIDATOR.is_valid(expected))
+                for wrong in ({"zero", "one", "many"} - {expected["cardinality"]}):
+                    with self.subTest(status=status, observed=len(values), wrong=wrong):
+                        bad = copy.deepcopy(expected)
+                        bad["cardinality"] = wrong
+                        self.assertFalse(VALIDATOR.is_valid(bad))
+
+    def test_non_success_status_aggregation_remains_unconstrained(self):
+        for status in ("error", "unknown", "not_evaluated", "not_applicable"):
+            bad_or_partial = result(status, [observed("x")])
+            bad_or_partial["cardinality"] = "zero"
+            with self.subTest(status=status):
+                self.assertTrue(VALIDATOR.is_valid(bad_or_partial))
+
 
 if __name__ == "__main__":
     unittest.main()
