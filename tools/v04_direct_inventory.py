@@ -73,27 +73,31 @@ class SourceInventory:
                              for p in self.source.benchmark.findall(X + 'Profile')]}
 
     def closure(self, component, identifier):
-        visited, active, found, problems = set(), [], [], []
-
-        def visit(identifier, expected):
+        visited, active, active_ids, found, problems = set(), [], set(), [], []
+        # Exit frames retain the active path until all ordered edges are examined.
+        pending = [(identifier, 'definition', False)]
+        while pending:
+            identifier, expected, exiting = pending.pop()
+            if exiting:
+                active.pop()
+                active_ids.remove(identifier)
+                continue
             key = component, identifier
-            if identifier in active:
+            if identifier in active_ids:
                 problems.append(issue('source-invalid', 'cyclic dependency: ' + ' -> '.join(active + [identifier]), identifier, component))
-                return
+                continue
             node = self.nodes.get(key)
             if node is None or node['kind'] != expected:
                 problems.append(issue('source-invalid', f'unresolved/wrong-kind {expected}: {identifier}', identifier, component))
-                return
+                continue
             if key in visited:
-                return
+                continue
             visited.add(key)
             found.append(node)
             active.append(identifier)
-            for edge in node['references']:
-                visit(edge['id'], edge['kind'])
-            active.pop()
-
-        visit(identifier, 'definition')
+            active_ids.add(identifier)
+            pending.append((identifier, expected, True))
+            pending.extend((edge['id'], edge['kind'], False) for edge in reversed(node['references']))
         return sorted(found, key=lambda node: node['id']), problems
 
     def rules(self):

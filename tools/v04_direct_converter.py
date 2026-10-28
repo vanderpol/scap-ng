@@ -66,6 +66,8 @@ class AssessmentConverter:
         self.enum_projection_cache = {}
         self.object_uses = None
         self.selector_equivalences = []
+        self.enum_variable_copies = {}
+        self.enum_variable_equivalences = []
 
     def capability(self, element, kind):
         matches = [mapping for mapping in self.mappings if element.tag ==
@@ -503,14 +505,17 @@ class AssessmentConverter:
         return renamed
 
     def enum_variable(self, identifier, aliases, active=None):
-        """Prove a runtime Variable already carries this native enum domain.
+        """Return a typed reference in this consumer's approved enum domain.
 
-        Renamed Item fields project native values, so a direct projection (or
-        reference/unique chain) needs no value rewriting. Arbitrary strings,
-        concatenation and external inputs do: accepting those would silently
-        compare different vocabularies. Keep them unsupported, not normalized
-        by an invented runtime function or an input convention.
+        Closed literal/reference/unique graphs get separate translated copies,
+        preserving their original generic string uses. Renamed Item fields
+        already project native values, so matching-domain runtime projections
+        need no rewriting. Arbitrary runtime strings and other functions still
+        require a source-preserving adapter; never invent an input convention.
         """
+        if not self.renamed_enum_projection(identifier):
+            from v04_direct_enum_variables import closed_enum_variable
+            return closed_enum_variable(self, identifier, aliases)
         active = set() if active is None else active
         ensure(aliases and len(set(aliases.values())) == len(aliases),
                'runtime enum Variable requires a bijective alias-domain projection')
@@ -539,6 +544,7 @@ class AssessmentConverter:
                    'runtime enum Variable requires an approved alias-domain projection')
         expression(variable[0])
         active.remove(identifier)
+        return {'variable': native_identifier(variable, 'variable')}
 
     def record_predicate(self, element, mapping):
         """Preserve a complete record before combining its named field results."""
@@ -625,7 +631,7 @@ class AssessmentConverter:
             if isinstance(value, dict):
                 field = mapping['native']['state_field_map'].get(local_name(element))
                 domain = mapping['native'].get('state_value_enums', {}).get(field, [])
-                self.enum_variable(element.get('var_ref'), {k: v for k, v in aliases.items() if v in domain})
+                value = self.enum_variable(element.get('var_ref'), {k: v for k, v in aliases.items() if v in domain})
                 native_enum_variable = True
             else:
                 expected = value if isinstance(value, list) else [value]
@@ -754,6 +760,8 @@ def convert_rule(source, source_id, mappings):
         'source_platforms': [child.get('idref') for child in rule.findall(f'{{{XCCDF}}}platform')]}
     if converter.selector_equivalences:
         binding['selector_equivalences'] = converter.selector_equivalences
+    if converter.enum_variable_equivalences:
+        binding['enum_variable_equivalences'] = converter.enum_variable_equivalences
     return documents, binding
 
 

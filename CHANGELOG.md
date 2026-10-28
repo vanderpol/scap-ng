@@ -6,6 +6,13 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Preserve closed enum Variable graphs through typed,
+  consumer-specific translations without changing their shared generic string
+  uses. Original registry Test 4000 now proves; all previous 512 corpus proofs
+  and program hashes remain unchanged. Make dependency inventory stack safe
+  while preserving source ordering and cycle diagnostics
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Extended shared direct conversion with approved typed
   version/EVR, binary and address comparisons plus integer bitwise operations.
   Original-source corpus term proofs increase from 406 to 512; all prior

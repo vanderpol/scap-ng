@@ -52,7 +52,7 @@ class DirectProofAliasTests(unittest.TestCase):
                 if result['compiled']:
                     self.assertEqual(result['source_proof'], 'PROVED', result)
                     count += 1
-            self.assertEqual(count, 14 if 'registry' in item['path'] else 5)
+            self.assertEqual(count, 15 if 'registry' in item['path'] else 5)
 
     def test_alias_proof_does_not_ignore_values_or_cardinality(self):
         for item, root in self.originals():
@@ -93,7 +93,7 @@ class DirectProofAliasTests(unittest.TestCase):
                 self.assertEqual(validity['status'], 'VALID', validity)
                 self.assertFalse(any(i['kind'] == 'deprecated' for i in validity['issues']))
                 proved += 1
-        self.assertEqual(proved, 24)
+        self.assertEqual(proved, 25)
 
     def test_hierarchy_depth_and_expansion_controls_are_not_discarded(self):
         changed = 0

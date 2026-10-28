@@ -69,6 +69,22 @@ The [datatype correction receipt](../audit/v04-converter-explicit-datatype-corre
 explains each of the 69 changed primary program hashes; all 1,010 proof identities
 are retained. Values, quantifiers and dependency graphs are unchanged.
 
+Closed string literal/reference/`unique` Variable graphs can also feed an enum
+consumer. [The shared handler](../../tools/v04_direct_enum_variables.py) creates
+typed copies for that enum domain, preserving duplicate values, dependency
+references and `unique` boundaries. Original declarations remain available to
+generic string consumers. `source-trace.json` records each copy's original
+Variable ID and exact approved alias map in `enum_variable_equivalences`.
+These are existing Variable expressions; no runtime adapter function or new
+authoring grammar is introduced. Unknown runtime strings, casts and other
+functions remain unsupported. The [graph review](../audit/v04-converter-enum-variable-graphs-20261028.md)
+records the original source proof and its bounded scope.
+
+Dependency inventory uses an explicit traversal stack. Deep, shared and cyclic
+graphs retain their complete dependency lists and ordered diagnostics without
+hitting Python's call-depth limit. This improves discovery only; conversion and
+independent proof retain their separate support boundaries.
+
 Use the read-only [acquisition review tool](../../tools/audit_v04_acquisition_parameters.py)
 for the 15 Variable-capable parameters in shellcommand, SQL512, cmdlet and WMI:
 
@@ -919,11 +935,9 @@ Current metadata paths refer to flat Objects, such as `object.command` and
 record; it must remain supported. Generic acquisition wrappers remain invalid.
 Regression tests validate both sides of this distinction.
 
-The public 0.4 schema generator still adapts the preceding generator internally;
-that legacy dependency is recorded technical debt, not a new direct-conversion
-stage. Removing it requires contract-parity verification, not another overlay or
-wholesale converter rewrite. Prefer shared XSD/Schematron validation and small
-construct handlers over additional capability-name branches. Profile validation
+Use the version-local mappings and native contract generator below as metadata
+authority. Contract updates require parity review. Prefer shared XSD/Schematron
+validation and small construct handlers over additional capability-name branches. Profile validation
 before optimizing source parsing: the recorded 249-Rule checkpoint spent 0.16 s
 lowering versus 28.85 s validating, excluding authoring serialization. That single
 workload does not establish asymptotic scalability or a production speedup.

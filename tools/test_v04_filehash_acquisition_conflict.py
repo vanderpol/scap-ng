@@ -233,6 +233,15 @@ class FileHashAcquisitionConflictTests(unittest.TestCase):
             if mutation == 'computed-string':
                 variable.tag = O + 'local_variable'; variable[:] = []
                 ET.SubElement(variable, O + 'literal_component', datatype='string').text = 'SHA-256'
+                # The closed literal now translates through a consumer-specific
+                # graph, rather than being confused with arbitrary runtime text.
+                result = check_conversion(self.visitor(root), root.find(O + 'tests')[0].get('id'), self.validator)
+                self.assertEqual(result['source_proof'], 'PROVED', result)
+                self.assertTrue(result['compiled_operands_verified'], result)
+                variable[:] = []
+                concat = ET.SubElement(variable, O + 'concat')
+                ET.SubElement(concat, O + 'literal_component').text = 'SHA-'
+                ET.SubElement(concat, O + 'literal_component').text = '256'
                 expected = 'approved alias-domain projection'
             elif mutation == 'pattern':
                 root.find(O + 'objects')[0].find(I + 'hash_type').set('operation', 'pattern match')

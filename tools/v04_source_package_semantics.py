@@ -92,6 +92,27 @@ def literal(datatype, value):
     return {'datatype': datatype, 'value': value}
 
 
+def closed_string_enum(term, aliases):
+    """Independently rename complete, closed string expressions only."""
+    need(isinstance(term, dict), 'closed enum term type')
+    if set(term) == {'datatype', 'value'}:
+        need(term['datatype'] == 'string' and term['value'] in aliases,
+             'unproved closed enum literal')
+        return {**term, 'value': aliases[term['value']]}
+    if set(term) == {'constant_values'}:
+        return {'constant_values': [closed_string_enum(v, aliases) for v in term['constant_values']]}
+    if set(term) == {'literal'}:
+        return {'literal': closed_string_enum(term['literal'], aliases)}
+    if set(term) == {'local'}:
+        value = term['local']
+        need(set(value) == {'datatype', 'expression'} and value['datatype'] == 'string',
+             'unproved closed enum Variable cast')
+        return {'local': {**value, 'expression': closed_string_enum(value['expression'], aliases)}}
+    if set(term) == {'unique'}:
+        return {'unique': closed_string_enum(term['unique'], aliases)}
+    raise Unsupported('unproved closed enum Variable graph')
+
+
 def source_hierarchy(behavior, key):
     values = {} if behavior is None else behavior.attrib
     keys(values, {'max_depth', 'recurse_direction'}, 'original hierarchy behaviors')
@@ -311,9 +332,8 @@ class Source:
                     continue
                 value = self.entity(c, selector=True)
                 if name == 'hive':
-                    old = value['operand'].get('value')
-                    need(isinstance(old, str) and old in REGISTRY_HIVES, 'registry hive proof unavailable')
-                    value['operand']['value'] = old.removeprefix('HKEY_').lower()
+                    value['operand'] = closed_string_enum(value['operand'],
+                        {v: v.removeprefix('HKEY_').lower() for v in REGISTRY_HIVES})
                 fields[name] = value
             else:
                 need(name in (('shell', 'command', 'pattern') if cap == 'independent.shellcommand'
@@ -341,10 +361,9 @@ class Source:
             need(c.tag.rsplit('}', 1)[0] == n.tag.rsplit('}', 1)[0], 'State field namespace')
             value = self.entity(c)
             if cap == 'windows.registry' and local(c) == 'hive':
-                old = value['operand']
-                need(value['operation'] == 'equals' and old.get('datatype') == 'string' and
-                     old.get('value') in REGISTRY_HIVES, 'registry State hive proof unavailable')
-                value['operand'] = literal('string', old['value'].removeprefix('HKEY_').lower())
+                need(value['operation'] == 'equals', 'registry State hive proof unavailable')
+                value['operand'] = closed_string_enum(value['operand'],
+                    {v: v.removeprefix('HKEY_').lower() for v in REGISTRY_HIVES})
             if cap == 'windows.registry' and local(c) == 'type':
                 enums = {'reg_sz': 'string', 'reg_dword': 'dword', 'reg_dword_little_endian': 'dword'}
                 old = value['operand']

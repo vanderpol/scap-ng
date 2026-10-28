@@ -24,15 +24,23 @@ def source_alias(predicate, aliases):
     need(predicate.get('operation') in ('equals', 'not_equal'), 'unproved alias-domain comparison')
     if predicate['operation'] == 'not_equal':
         need(len(set(aliases.values())) == len(aliases), 'unproved non-bijective enum inequality')
+    def rename(value):
+        need(value.get('datatype') == 'string' and value.get('value') in aliases,
+             'unproved alias-domain comparison or Variable')
+        return {**value, 'value': aliases[value['value']]}
     def projected(term):
-        # This independent term already retains Object acquisition, filters,
-        # graph dependencies and local/unique boundaries. Only a projection of
-        # the SAME frozen alias domain can commute with its bijective rename.
+        # Retain local/unique boundaries. Closed literals and a checked
+        # acquisition projection of this SAME frozen domain commute with
+        # its bijective rename; arbitrary string functions do not.
         if 'local' in term:
             need(term['local'].get('datatype') == 'string', 'unproved enum Variable datatype')
             return {'local': {**term['local'], 'expression': projected(term['local']['expression'])}}
         if 'unique' in term:
             return {'unique': projected(term['unique'])}
+        if 'literal' in term:
+            return {'literal': rename(term['literal'])}
+        if 'constant_values' in term:
+            return {'constant_values': [rename(v) for v in term['constant_values']]}
         value = term.get('values', {})
         obj = value.get('object', {})
         record = contract(obj.get('capability'))
@@ -45,10 +53,6 @@ def source_alias(predicate, aliases):
     if 'local' in operand:
         need(len(set(aliases.values())) == len(aliases), 'unproved non-bijective enum Variable domain')
         return {**predicate, 'operand': projected(operand)}
-    def rename(value):
-        need(value.get('datatype') == 'string' and value.get('value') in aliases,
-             'unproved alias-domain comparison or Variable')
-        return {**value, 'value': aliases[value['value']]}
     renamed = ({'constant_values': [rename(v) for v in operand['constant_values']]}
                if 'constant_values' in operand else rename(operand))
     return {**predicate, 'operand': renamed}
