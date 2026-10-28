@@ -70,6 +70,19 @@ class ExpandedSourceProofTests(unittest.TestCase):
                                 if t['object'].get('error_if_stderr_exists') is True)
                     test['object']['error_if_stderr_exists'] = False
                     self.assertEqual(checked(mutant)['outcome'], 'MISMATCH')
+                elif row['case'] == 3:
+                    # Preserve the immutable historical packet and its former
+                    # unsupported outcome. Approved typed-operator decoding now
+                    # discharges the version comparison obligation generically.
+                    self.assertEqual(f['provenance']['rule'], 'SV-253263')
+                    self.assertEqual(f['expected_outcome'], 'UNVERIFIABLE/UNSUPPORTED')
+                    self.assertEqual(checked(f)['outcome'], 'PROVED')
+                    mutant = deepcopy(f)
+                    test = next(iter(mutant['assessment']['tests'].values()))
+                    predicate = test['require']['and'][1]['fields']['value']
+                    predicate['greater_than_or_equal'] = predicate.pop('version_greater_than_or_equal')
+                    predicate['datatype'] = 'string'
+                    self.assertEqual(checked(mutant)['outcome'], 'MISMATCH')
                 else:
                     self.assertEqual(checked(f)['outcome'], f['expected_outcome'])
         with patch.dict(sys.modules, {'resource': None}):

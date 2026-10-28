@@ -11,7 +11,7 @@ from pathlib import Path
 from functools import lru_cache
 import xml.etree.ElementTree as ET
 
-from v04_source_package_semantics import (Source, Native, Unsupported, OD, META,
+from v04_source_package_semantics import (Source, Native, Unsupported, OD, META, OPS,
     boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK, FOUND)
 import v04_scalar_source_proof as scalar_proof
 
@@ -43,6 +43,18 @@ APPROVED_DEF = 'oval:mil.disa.stig.defs:def:230413'
 DECISION = 'https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6388735943'
 AUDIT = 'windows.auditeventpolicysubcategories'
 SYSTEM_POLICIES = frozenset({'windows.passwordpolicy', 'windows.lockoutpolicy'})
+
+# Independently frozen native type/operator identities; no converter imports.
+TYPED_FAMILIES = {
+    'binary': {'equals', 'not_equal'},
+    **{t: {'equals', 'not_equal', 'greater_than', 'greater_than_or_equal',
+           'less_than', 'less_than_or_equal'} for t in
+       ('version', 'rpm_evr', 'debian_evr', 'fileset_revision', 'ios_version')},
+    **{t: {'equals', 'not_equal', 'greater_than', 'greater_than_or_equal',
+           'less_than', 'less_than_or_equal', 'subset_of', 'superset_of'}
+       for t in ('ipv4', 'ipv6')},
+}
+TYPED_OPERATORS = {t + '_' + op: (t, op) for t, ops in TYPED_FAMILIES.items() for op in ops}
 
 
 @lru_cache(maxsize=1)
@@ -788,6 +800,21 @@ class ExpandedNative(Native):
                 need(isinstance(values, list) and values, 'native constant values must be a nonempty array')
                 return {'constant_values': [literal(node['datatype'], v) for v in values]}
         return super().operand(value, datatype)
+
+    def predicate(self, n, inherited=None, selector=False):
+        # Independently decode only the approved specialized operator families.
+        # The compiler keeps these authored operands intact; do not borrow a
+        # converter normalizer or infer an algorithm from a string's spelling.
+        need(isinstance(n, dict), 'native predicate type')
+        typed = [(*TYPED_OPERATORS[key], key) for key in set(n) & TYPED_OPERATORS.keys()]
+        if typed:
+            need(len(typed) == 1 and not set(n) & set(OPS.values()), 'mixed native typed comparisons')
+            datatype, operation, key = typed[0]
+            effective = {**(inherited or {}), **n}
+            need(effective.get('datatype', datatype) == datatype, 'conflicting native comparison datatype')
+            n = {**n, operation: n[key], 'datatype': datatype}
+            del n[key]
+        return super().predicate(n, inherited, selector)
 
     def function(self, n):
         need(isinstance(n, dict) and len(n) == 1, 'function shape')

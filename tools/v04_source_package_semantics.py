@@ -22,7 +22,9 @@ OPS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_r
        'greater than': 'greater_than', 'greater than or equal': 'greater_than_or_equal',
        'less than': 'less_than', 'less than or equal': 'less_than_or_equal',
        'case insensitive equals': 'case_insensitive_equals',
-       'case insensitive not equal': 'case_insensitive_not_equal'}
+       'case insensitive not equal': 'case_insensitive_not_equal',
+       'subset of': 'subset_of', 'superset of': 'superset_of',
+       'bitwise and': 'bitwise_and', 'bitwise or': 'bitwise_or'}
 META = {'id', 'version', 'comment'}
 REGISTRY_HIVES = frozenset('HKEY_' + name for name in (
     'CLASSES_ROOT', 'CURRENT_CONFIG', 'CURRENT_USER', 'CURRENT_USER_LOCAL_SETTINGS', 'LOCAL_MACHINE', 'USERS'))
@@ -66,8 +68,18 @@ def boolean(op, children):
     return {op: children}
 
 
+# Frozen source/native type identities for the independent term reader. Do not
+# import the converter's datatype table or comparison rendering implementation.
+TYPE_IDENTITIES = {'int': 'integer', 'evr_string': 'rpm_evr',
+                   'debian_evr_string': 'debian_evr', 'ipv4_address': 'ipv4',
+                   'ipv6_address': 'ipv6'}
+STRING_TYPES = frozenset({'string', 'binary', 'version', 'rpm_evr', 'debian_evr',
+                          'ipv4', 'ipv6', 'fileset_revision', 'ios_version'})
+
+
 def literal(datatype, value):
-    if datatype == 'string':
+    datatype = TYPE_IDENTITIES.get(datatype, datatype)
+    if datatype in STRING_TYPES:
         need(isinstance(value, str), 'string operand type')
     elif datatype in ('int', 'integer'):
         need(not isinstance(value, bool), 'integer operand type')
@@ -198,7 +210,7 @@ class Source:
             need(len(n) == 1, 'local Variable expression')
             # OVAL int and the native integer spelling name the same primitive;
             # retain the declaration/cast boundary rather than comparing labels.
-            value = {'local': {'datatype': 'integer' if datatype == 'int' else datatype,
+            value = {'local': {'datatype': TYPE_IDENTITIES.get(datatype, datatype),
                                'expression': self.function(n[0])}}
         else:
             raise Unsupported('external/unhandled Variable: ' + ident)
@@ -250,7 +262,7 @@ class Source:
             need(not len(n), 'scalar entity children')
             value = literal(n.get('datatype', 'string'), n.text or '')
         datatype = n.get('datatype', 'string')
-        result = {'operation': OPS[op], 'comparison_datatype': 'integer' if datatype == 'int' else datatype,
+        result = {'operation': OPS[op], 'comparison_datatype': TYPE_IDENTITIES.get(datatype, datatype),
                   'operand': value}
         if n.get('var_ref'):
             # EntityAttributeGroup documentation explicitly specifies 'all'

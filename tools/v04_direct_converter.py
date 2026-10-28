@@ -16,6 +16,8 @@ from v04_direct_scap_source import (
     local_name, native_identifier, xml_identity,
 )
 
+from v04_direct_datatypes import SOURCE_TYPES, SPECIAL_TYPES, native_datatype, literal, comparison
+
 ROOT = Path(__file__).resolve().parents[1]
 SUPPORT = json.loads(Path(__file__).with_name('v04_direct_capabilities.json').read_text())
 CAPABILITIES = tuple(SUPPORT['enabled'])
@@ -29,7 +31,9 @@ COMPARISONS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'm
                'case insensitive equals': 'case_insensitive_equals', 'less than': 'less_than',
                'greater than': 'greater_than', 'greater than or equal': 'greater_than_or_equal',
                'less than or equal': 'less_than_or_equal',
-               'case insensitive not equal': 'case_insensitive_not_equal'}
+               'case insensitive not equal': 'case_insensitive_not_equal',
+               'subset of': 'subset_of', 'superset of': 'superset_of',
+               'bitwise and': 'bitwise_and', 'bitwise or': 'bitwise_or'}
 SET_OPERATORS = {'UNION': 'union', 'INTERSECTION': 'intersection', 'COMPLEMENT': 'difference'}
 
 
@@ -356,7 +360,7 @@ class AssessmentConverter:
 
     def convert_variable(self, element):
         datatype = element.get('datatype')
-        ensure(datatype in ('string', 'int', 'boolean'), f'unsupported Variable datatype: {datatype}')
+        ensure(datatype in SOURCE_TYPES, f'unsupported Variable datatype: {datatype}')
         if local_name(element) == 'constant_variable':
             ensure(len(element) and all(child.tag == f'{{{OVAL}}}value' and not child.attrib and not len(child) for child in element), 'malformed constant Variable')
             # Immutable source constants become typed expected arrays. Keep the
@@ -364,7 +368,7 @@ class AssessmentConverter:
             return [self.literal(datatype, child.text or '') for child in element]
         ensure(local_name(element) == 'local_variable' and len(element) == 1, 'external/malformed Variable unsupported')
         identifier = native_identifier(element, 'variable')
-        self.variables[identifier] = {'kind': 'local', 'datatype': 'integer' if datatype == 'int' else datatype,
+        self.variables[identifier] = {'kind': 'local', 'datatype': native_datatype(datatype),
                                       'expression': self.function(element[0])}
         return {'variable': identifier}
 
@@ -383,7 +387,7 @@ class AssessmentConverter:
             identifier = native_identifier(element, 'variable')
             datatype = element.get('datatype')
             self.variables[identifier] = {'kind': 'constant',
-                'datatype': 'integer' if datatype == 'int' else datatype,
+                'datatype': native_datatype(datatype),
                 'expression': {'literal': value}}
             return identifier
         return value['variable']
@@ -394,7 +398,7 @@ class AssessmentConverter:
         if operation == 'literal_component':
             attributes(element, {'datatype'})
             ensure(not len(element), 'literal_component has children')
-            return {'literal': {'datatype': element.get('datatype', 'string'),
+            return {'literal': {'datatype': native_datatype(element.get('datatype', 'string')),
                                 'value': self.literal(element.get('datatype', 'string'), element.text or '')}}
         if operation == 'variable_component':
             attributes(element, {'var_ref'})
@@ -439,16 +443,8 @@ class AssessmentConverter:
                               'order': element.get('order', 'ascending'), 'values': values[0]}}
         return {'concat': values} if operation == 'concat' else {'regex_capture': {'pattern': element.get('pattern'), 'value': values[0]}}
 
-    @staticmethod
-    def literal(datatype, text):
-        ensure(datatype in ('string', 'int', 'boolean'), f'unsupported scalar datatype: {datatype}')
-        if datatype == 'boolean':
-            ensure(text in ('true', 'false', '1', '0'), 'invalid boolean literal')
-            return text in ('true', '1')
-        try:
-            return int(text) if datatype == 'int' else text
-        except ValueError as error:
-            raise UnsupportedSource(f'invalid {datatype} literal: {text!r}') from error
+    # Retained visitor API; lexical conversion has one reusable implementation.
+    literal = staticmethod(literal)
 
     def operand(self, element, *, enum_aliases=None):
         if element.get('var_ref'):
@@ -593,7 +589,7 @@ class AssessmentConverter:
         ensure(existence in FIELD_EXISTENCE and operation in COMPARISONS, 'unsupported entity existence/comparator')
         if operation == 'case insensitive not equal':
             ensure(element.get('datatype', 'string') == 'string', 'case-insensitive inequality requires string datatype')
-        if operation in ('greater than', 'greater than or equal', 'less than or equal'):
+        if operation in ('greater than', 'greater than or equal', 'less than or equal') and element.get('datatype', 'string') not in SPECIAL_TYPES:
             ensure(element.get('datatype') == 'int', 'ordered comparison expansion requires integer source datatype')
         crosswalk = mapping['native'].get('selector_value_crosswalk' if selector else 'state_value_crosswalk', {}).get(local_name(element))
         field = mapping['native']['state_field_map'].get(local_name(element))
@@ -657,12 +653,12 @@ class AssessmentConverter:
                 # has no value crosswalk: alias-domain patterns remain blocked
                 # above, rather than being applied to renamed native values.
                 ensure(element.get('datatype', 'string') == 'string', 'enum regex requires string datatype')
-        result = {COMPARISONS[operation]: value}
+        result = {comparison(element.get('datatype', 'string'), operation, COMPARISONS[operation]): value}
         datatype = element.get('datatype', 'string')
         if datatype != 'string' or isinstance(value, (list, dict)):
             # Typed collections/references are required by the accepted static
             # Variable modernization, even when OVAL defaults to string.
-            result['datatype'] = 'integer' if datatype == 'int' else datatype
+            result['datatype'] = native_datatype(datatype)
         if element.get('var_ref'):
             ensure(element.get('var_check', 'all') in MATCHING, 'unsupported var_check')
             result['value_match'] = MATCHING[element.get('var_check', 'all')]

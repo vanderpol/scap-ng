@@ -51,7 +51,7 @@ class DirectVariableTests(unittest.TestCase):
                         self.assertEqual(result['source_proof'], 'NOT_RUN', result)
             self.assertEqual(actual, item['proved'], item['path'])
             proved += actual
-        self.assertEqual(proved, 21)
+        self.assertEqual(proved, 24)
 
     def test_text_variable_reference_is_a_real_dependency_and_cycles_fail(self):
         root = self.original('oval-def_constant_variable.xml')

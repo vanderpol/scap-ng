@@ -53,7 +53,7 @@ class OrdinaryContinuationTests(unittest.TestCase):
             self.assertEqual(accepted, item['proved'])
             self.assertEqual(sorted(blocked), sorted(r['test'] for r in item['blocked_tests']))
             proved += accepted
-        self.assertEqual((total, proved), (32, 28))
+        self.assertEqual((total, proved), (32, 30))
 
     def test_every_proved_original_closure_passes_original_xsd_and_schematron(self):
         validator = SourceValidator(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3')
@@ -74,7 +74,7 @@ class OrdinaryContinuationTests(unittest.TestCase):
                     self.assertEqual(valid['status'], 'VALID', valid)
                     self.assertFalse(any(i['kind'] == 'deprecated' for i in valid['issues']))
                 checked += 1
-        self.assertEqual(checked, 28)
+        self.assertEqual(checked, 30)
 
     def test_reviewed_fields_and_behavior_defaults_match_original_declarations(self):
         for cap in self.pin['capabilities']:

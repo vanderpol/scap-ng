@@ -6,6 +6,13 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Extended shared direct conversion with approved typed
+  version/EVR, binary and address comparisons plus integer bitwise operations.
+  Original-source corpus term proofs increase from 406 to 512; all prior
+  identities remain, with one explained function datatype-label correction.
+  Two additional Windows 11 Rules pass the six-source primary gate
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-27:** Integrated the revised `file.hash` algorithm selector into
   direct conversion, including static lists, complement quantifiers and typed
   named projection Variables. Emit explicit datatypes for array/Variable

@@ -89,6 +89,25 @@ silently discarded. Record members retain their existing `value_match` and
 See the [integration handoff](../audit/v04-converter-revised-schemas-20261027.md)
 for current coverage, remaining source/design obligations and exact verification.
 
+## Shared specialized datatypes
+
+[`v04_direct_datatypes.py`](../../tools/v04_direct_datatypes.py) owns supported
+source/native type identities, lexical representation and comparison dispatch.
+Special string-based datatypes retain their lexical text and select the existing
+`version_*`, `rpm_evr_*`, `debian_evr_*`, binary/address and other approved typed
+operators. Integer bitwise comparisons retain their distinct comparison semantics.
+Do not infer package ordering from a capability name or use string ordering for
+an explicitly typed version. Float conversion is still unsupported here.
+
+The independent reader keeps its own frozen identities and rejects type/operator
+conflicts without importing this conversion module. Run
+`PYTHONPATH=tools python -m unittest test_v04_direct_special_datatypes -v` for
+114 pinned original Tests, source/XSD checks, complete dependencies, native
+validation, compilation, four-quantifier arrays/references and adversarial types.
+The [current checkpoint](../audit/v04-converter-special-datatypes-20261028.md)
+records 512 corpus term proofs and 1,012 primary Rule proofs. The preceding
+schema integration section is its historical 438469880 checkpoint.
+
 ## Run and inspect
 
 For fast cross-platform breadth measurement, use the
@@ -205,7 +224,7 @@ with source-backed boundary tests. No Rule-ID branch is appropriate.
 `verify_v04_direct_scope.py` runs all six pinned original primary closures,
 records every unsupported Rule, and packages only independently proved output.
 Its [proof floor](../../tests/fixtures/v04-six-primary-proof-floor.json) retains
-1,010 Rule proofs and exact compiled-program hashes; losing a proof or changing
+1,012 Rule proofs and exact compiled-program hashes; losing a proof or changing
 a program fails the workflow. Additional proved Rules are allowed. Update this
 fixture only after examining an independently verified intentional change.
 Applicability remains a separately recorded obligation, not implied by this floor.

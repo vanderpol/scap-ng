@@ -32,7 +32,8 @@ def classify_failure(message, *, stage='conversion', validity=None, dependency=N
             'acquisition parameter var_check', 'complement acquisition parameter', 'matching enum consumer')):
         category, basis = VARIABLE, 'unrepresented Variable/collection obligation; no fallback attempted'
     elif any(token in message for token in ('unsupported entity existence/comparator',
-            'ordered comparison', 'unsupported function', 'unsupported OVAL operation')):
+            'ordered comparison', 'unsupported function', 'unsupported OVAL operation',
+            'unsupported typed comparison', 'address operation requires', 'bitwise operation requires')):
         category, basis = OPERATION, 'explicit unsupported operation diagnostic'
     else:
         category, basis = IMPLEMENTATION, 'converter or independent proof obligation not implemented/established'
