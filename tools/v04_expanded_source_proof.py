@@ -681,11 +681,17 @@ class ExpandedSource(Source):
                 fields['filesystem'] = {'all': 'all', 'local': 'local', 'defined': 'same'}[
                     behaviors.get('recurse_file_system', 'all')]
             elif cap == 'independent.textfilecontent54':
-                keys(behaviors, {'ignore_case', 'multiline', 'singleline', 'item_creation', 'recurse_file_system'},
+                keys(behaviors, {'ignore_case', 'multiline', 'singleline', 'item_creation'} | scalar_proof.FILE_BEHAVIORS,
                      'textfile behaviors')
-                scope = behaviors.get('recurse_file_system', 'all')
-                need(scope in ('all', 'local', 'defined'), 'unknown original filesystem scope')
-                fields['filesystem'] = {'all': 'all', 'local': 'local', 'defined': 'same'}[scope]
+                need('full_path' not in fields or not set(behaviors) & {'max_depth', 'recurse_direction'},
+                     'invalid original textfile filepath recursion attributes')
+                directory = fields.get('directory')
+                need(directory is None or directory['operation'] == 'equals' or not set(behaviors) & {
+                     'max_depth', 'recurse_direction', 'recurse'}, 'invalid original textfile pattern-path recursion attributes')
+                selector = fields.get('full_path', directory)
+                need(behaviors.get('recurse_file_system') != 'defined' or selector['operation'] == 'equals',
+                     'invalid original textfile filesystem/pattern selection')
+                fields.update(scalar_proof.source_traversal(ET.Element('behaviors', behaviors), fields, 'file_traversal'))
                 for name, default in (('ignore_case', 'false'), ('multiline', 'true'), ('singleline', 'false')):
                     v = behaviors.get(name, default)
                     need(v in ('true', 'false', '0', '1'), 'behavior boolean')
@@ -1005,16 +1011,27 @@ class ExpandedNative(Native):
             return super().object(n, cap)
         allowed = {'unix.password': {'username'}, 'unix.file': {'directory', 'name', 'full_path', 'filesystem', 'traversal'},
                    'independent.textfilecontent54': {'directory', 'name', 'full_path', 'pattern', 'instance',
-                      'filesystem', 'ignore_case', 'singleline', 'multiline', 'item_creation'}}[cap]
+                      'filesystem', 'traversal', 'ignore_case', 'singleline', 'multiline', 'item_creation'}}[cap]
         keys(n, allowed | {'capability', 'object_title', 'filters', 'for_each'}, 'Object')
         fields = {}
         for k, v in n.items():
             if k in ('capability', 'object_title', 'filters', 'for_each'):
                 continue
             if k == 'traversal':
+                if cap == 'independent.textfilecontent54':
+                    need('directory' in n and self.predicate(n['directory'], selector=True)['operation'] == 'equals',
+                         'native textfile traversal requires an equality directory')
+                    need(isinstance(v, dict), 'native textfile traversal shape')
+                    depth = v.get('max_depth')
+                    need(set(v) == {'max_depth', 'recurse'} and
+                         (depth is None or type(depth) is int and depth >= 0) and
+                         v['recurse'] in ('directories', 'symlinks', 'symlinks_and_directories'),
+                         'native textfile traversal depth/recurse type')
                 keys(v, {'max_depth', 'recurse'}, 'traversal')
                 fields[k] = {**v, 'direction': 'down'}
             elif k in ('filesystem', 'ignore_case', 'singleline', 'multiline', 'item_creation'):
+                if cap == 'independent.textfilecontent54' and k in ('ignore_case', 'singleline', 'multiline'):
+                    need(type(v) is bool, 'native textfile Boolean behavior type')
                 fields[k] = v
             elif cap == 'unix.file' and k == 'name' and v is None:
                 fields[k] = None

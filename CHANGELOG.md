@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Connected Textfilecontent54 to the existing shared file
+  traversal contract while retaining regex flags, source path restrictions
+  and ordered Filters. Forty-three additional original Linux Rules now prove
+  and compile; all previous 1,012 primary program hashes are retained
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Enabled bounded RPM file-verification conversion through the
   existing mapped behavior engine, with one pinned nondeprecated OpenSCAP
   original Test. Preserve all eleven verification switches and their source

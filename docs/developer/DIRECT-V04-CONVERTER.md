@@ -1023,3 +1023,26 @@ OpenSCAP proof has its own denominator (1/1). The remaining inactive names are
 SSHD (original nil/default-path dependency) and SQL512 (original-source evidence
 missing). Function production activation and other #255/#218 obligations remain
 separate; no scanner-runtime equivalence is claimed.
+
+## Textfilecontent54 traversal integration (2026-10-28)
+
+The approved mapping already declares `file_traversal`; the converter now routes
+inherited FileBehaviors through the existing shared traversal handler. Regex
+flags/Item creation and traversal receive disjoint source attributes, validated
+before splitting. The original filesystem scope is retained. Depth -1 maps to
+null, downward traversal retains symlink/directory controls, and no traversal is
+emitted for original direction none. Unknown/deprecated attributes fail closed.
+
+[Original Object regressions](../../tests/fixtures/v04-direct-textfile-traversal/README.md)
+prove acquisition independently of Test existence. They deliberately leave the
+original `all_exist` Tests unsupported and do not count a constructed compiler
+wrapper as an original Test conversion. The source guards enforce original
+Schematron: filepath forbids depth/direction, a non-equality directory forbids
+recursion controls, and defined-filesystem scope requires equality selection.
+Native proof readers separately enforce Boolean flags and integer depth types.
+
+An older constructed filesystem-scope regression combined `defined` with a
+case-insensitive-equality filepath, which the original Schematron disallows.
+Its positive derivative now uses equality, and explicit negative cases cover
+both pattern-match and case-insensitive-equality violations. No original ZIP,
+source node, committed proof identity or accepted program is repaired or changed.

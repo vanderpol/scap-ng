@@ -7,6 +7,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 import yaml
+from lxml import etree
 
 from v04_direct_scap_source import SourceModel, UnsupportedSource, OVAL
 from v04_direct_inventory import SourceInventory
@@ -30,6 +31,26 @@ class DirectTextFileTests(unittest.TestCase):
         cls.source = SourceModel(ROOT / 'tests/fixtures/v04-direct-prototype' / PINS['fixture'], PINS['zip_sha256'])
         cls.rules = [r['source_rule'] for r in SourceInventory(cls.source).rules() if CAP in r['needed_capabilities']]
         cls.docs, cls.trace = convert(cls.source, cls.rules)
+        original = etree.parse(str(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd')).getroot()
+        cls.source_namespaces = {k: v for k, v in original.nsmap.items() if k}
+        cls.path_rules = [r for r in original.iter('{http://purl.oclc.org/dsdl/schematron}rule')
+                          if r.get('context', '').startswith(('ind-def:textfilecontent54_object/ind-def:filepath',
+                                                             'ind-def:textfilecontent54_object/ind-def:path'))]
+
+    def source_scope_violations(self, obj):
+        # Execute the exact original path/behavior assertions in their original
+        # context. Whole-source validity is a separate integration gate; do not
+        # revalidate a large unchanged datastream for each controlled parameter.
+        tree = etree.fromstring(ET.tostring(obj)).getroottree()
+        matched, failures = 0, []
+        for rule in self.path_rules:
+            for entity in tree.xpath('/' + rule.get('context'), namespaces=self.source_namespaces):
+                matched += 1
+                for assertion in rule.findall('{http://purl.oclc.org/dsdl/schematron}assert'):
+                    if not entity.xpath(assertion.get('test'), namespaces=self.source_namespaces):
+                        failures.append(' '.join(''.join(assertion.itertext()).split()))
+        self.assertGreater(matched, 0, 'original scoped Schematron was not exercised')
+        return failures
 
     def object(self, source):
         binding = self.trace['rules'][0]
@@ -79,13 +100,29 @@ class DirectTextFileTests(unittest.TestCase):
         for creation, scope in itertools.product(('all_object_elements_fullfilled', 'filepath_exists'), ('all', 'local', 'defined')):
             source = deepcopy(self.source)
             binding, obj = self.object(source)
+            if scope == 'defined':
+                # Original Schematron prohibits defined filesystem scope on
+                # a non-equality filepath. Use a source-valid controlled equality
+                # path; the original fixture itself remains unchanged.
+                obj.find(I + 'filepath').set('operation', 'equals')
             obj.insert(0, ET.Element(I + 'behaviors', item_creation=creation, recurse_file_system=scope))
+            self.assertFalse(self.source_scope_violations(obj))
             docs, trace = convert(source, [binding['source_rule']])
             verify_original(source.root, docs, trace)
             verify_compiled(docs, build_bundle(docs)[0])
             test = next(t for d in docs.values() if 'assessment' in d for t in d['assessment']['tests'].values())
             self.assertEqual(test['object']['item_creation'], creation)
             self.assertEqual(test['object']['filesystem'], 'same' if scope == 'defined' else scope)
+
+    def test_original_pattern_filepath_with_defined_scope_is_rejected(self):
+        for operation in ('pattern match', 'case insensitive equals'):
+            source = deepcopy(self.source); binding, obj = self.object(source)
+            obj.find(I + 'filepath').set('operation', operation)
+            obj.insert(0, ET.Element(I + 'behaviors', recurse_file_system='defined'))
+            self.assertTrue(any('recurse_file_system' in message for message in self.source_scope_violations(obj)))
+            with self.assertRaises(UnsupportedSource): convert(source, [binding['source_rule']])
+            with self.assertRaises(ValueError):
+                ExpandedSource(source.components[binding['component']]).object(obj.get('id'))
 
     def test_changed_flags_patterns_instances_and_capture_datatypes_fail_independent_proof(self):
         for mutation in ('ignore_case', 'multiline', 'singleline', 'item_creation', 'filesystem', 'pattern', 'instance', 'capture'):

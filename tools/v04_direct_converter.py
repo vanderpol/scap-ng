@@ -273,15 +273,19 @@ class AssessmentConverter:
             if behavior_routes(mapping):
                 acquisition.update(scalar_behaviors(scalar_part, mapping))
             if mapping['capability'] == 'independent.textfilecontent54':
-                from v04_direct_file_behaviors import file_behaviors
-                acquisition.update(file_behaviors(behaviors))
+                from v04_direct_file_behaviors import file_behaviors, textfile_path_controls
+                text_part, traversal_part = split_behaviors(behaviors,
+                    {'ignore_case', 'multiline', 'singleline', 'item_creation'},
+                    {'max_depth', 'recurse', 'recurse_direction', 'recurse_file_system'})
+                textfile_path_controls(traversal_part, acquisition)
+                acquisition.update(file_behaviors(text_part))
             if mapping['capability'] == 'independent.shellcommand':
                 from v04_direct_command_behaviors import command_behaviors
                 acquisition.update(command_behaviors(behaviors))
             if mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal'):
                 # FileBehaviors defaults recurse_file_system to all, including
                 # exact full_path acquisition. Sets inherit it on each leaf.
-                if mapping['capability'] != 'independent.textfilecontent54' and 'content' not in acquisition:
+                if 'content' not in acquisition:
                     from v04_direct_file_behaviors import traversal_behaviors
                     acquisition.update(traversal_behaviors(traversal_part, acquisition,
                         windows=mapping['native']['traversal_definition'] == 'windows_file_traversal'))

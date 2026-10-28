@@ -1,13 +1,28 @@
-"""Bounded text-file acquisition behaviors, separate from matching predicates.
+"""Shared file traversal and text regex behaviors, separate from predicates.
 
-Only the approved nonrecursive Textfilecontent54 contract is enabled here.
-Unknown traversal/view attributes fail closed rather than being discarded.
+Each handler receives its disjoint source attributes after complete validation.
+Unknown/deprecated traversal/view attributes fail closed rather than disappearing.
 """
 from v04_direct_scap_source import UnsupportedSource, attributes, ensure
 
 BOOLEAN_DEFAULTS = {'ignore_case': False, 'multiline': True, 'singleline': False}
 ITEM_CREATION = {'all_object_elements_fullfilled', 'filepath_exists'}
 FILESYSTEMS = {'all': 'all', 'local': 'local', 'defined': 'same'}
+
+
+def textfile_path_controls(element, acquisition):
+    """Preserve original Textfilecontent54 path/behavior Schematron boundaries."""
+    values = {} if element is None else element.attrib
+    full_path, directory = acquisition.get('full_path'), acquisition.get('directory')
+    if full_path is not None:
+        ensure(not set(values) & {'max_depth', 'recurse_direction'},
+               'invalid original textfile filepath recursion attributes')
+    if directory is not None and 'equals' not in directory:
+        ensure(not set(values) & {'max_depth', 'recurse_direction', 'recurse'},
+               'invalid original textfile pattern-path recursion attributes')
+    selector = full_path if full_path is not None else directory
+    ensure(values.get('recurse_file_system') != 'defined' or isinstance(selector, dict) and 'equals' in selector,
+           'invalid original textfile defined-filesystem pattern selection')
 
 
 def hierarchy_behaviors(element, acquisition):
