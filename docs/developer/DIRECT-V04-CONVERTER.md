@@ -37,7 +37,7 @@ Tests deliberately clone/mutate them for fault injection.
 ## Revised-schema integration (#251 / #255)
 
 The committed schema baseline `d3132ae57` is authoritative. The converter enables
-47 of the 51 mappings in the approved Independent/Linux/UNIX/Windows scope;
+48 of the 51 mappings in the approved Independent/Linux/UNIX/Windows scope;
 there are 100 mappings globally. Enabling a name does not mean every source
 construct for that capability is implemented or executable.
 
@@ -972,3 +972,34 @@ under #255 recommends one `function: {name, arguments, options}` envelope. It is
 unapproved and is not emitted. Nine remaining original function names stay
 unsupported; the existing four payload forms and all verified conversions are
 preserved while independent #251 work continues.
+
+## YAML acquisition checkpoint (2026-10-28)
+
+`independent.yamlfilecontent` reuses the mapped selector, record, Variable,
+Set/Filter and shared file-traversal engine. The small
+`v04_direct_yaml_records.py` module owns only original caret key decoding and
+YAML-specific acquisition guards. `v04_yaml_source_proof.py` independently
+reads the original/native contracts; it does not import the renderer.
+
+[Original OpenSCAP evidence](../../tests/fixtures/v04-direct-yaml/README.md)
+contains 51 source-valid Tests at upstream `099cd84a0fa23c0e5d748e4e577c900c9b280623`.
+45 convert/compile and have matching independent typed semantic terms. Three
+Tests using `split` and three requiring `object_component/@record_field` stay
+unsupported. This latter projection is different from existing State record
+fields containing Variable references. No dotted-path projection grammar is
+inferred from schema acceptance.
+
+These additional probe fixtures are counted separately from 803 Self-Assertion
+Tests and primary production Rules. The consolidated gap report includes their
+six blockers and independent coverage denominator. Native query text and typed
+operands are preserved; YAML parser/probe behavior, file access, offline roots,
+null and nonfinite numeric collection remain runtime verification obligations.
+Schema validity and compilation alone do not discharge those obligations.
+
+The newer owner handoff at `3b00b469727700e428f433d88c89b408669348f2`
+approves the canonical function direction and adds an isolated schema plus an
+opt-in migration probe for four supported families. See the
+[staged migration checkpoint](../audit/v04-canonical-variable-migration-checkpoint-20261028.md).
+The grouped proposal above remains historical decision evidence; production
+activation and the nine remaining functions are still deferred. YAML work
+preserves both default output and the opt-in probe.

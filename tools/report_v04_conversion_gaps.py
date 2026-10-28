@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Consolidate original six-source and OVAL conversion gaps, without admission."""
 import argparse
+from hashlib import sha256
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -14,6 +15,48 @@ from v04_conversion_diagnostics import classify_failure, summarize_failures
 
 ROOT = Path(__file__).resolve().parents[1]
 DEPENDENCIES = ROOT / 'tests/fixtures/v04-converter-schema-dependencies.json'
+
+
+def additional_source_failures(dependencies):
+    """Keep additional probe cohorts separate from STIG/Self-Assertion totals.
+
+    Receipts are diagnostic evidence, never an admission shortcut. Check source
+    bytes and original validity again before classifying a reported gap.
+    """
+    records, coverage = [], []
+    validator = SourceValidator(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3')
+    for cohort in dependencies.get('additional_source_cohorts', []):
+        directory = ROOT / cohort['fixture_directory']
+        pin = json.loads((directory / 'provenance.json').read_text())
+        validities = {}
+        for item in pin['files']:
+            raw = (directory / item['path']).read_bytes()
+            if sha256(raw).hexdigest() != item['sha256']:
+                raise ValueError('additional original source pin mismatch: ' + item['path'])
+            if item['path'].endswith('.xml'):
+                validities[item['path']] = validator.validate(etree.fromstring(raw))
+        cases = json.loads((directory / 'conversion-evidence.json').read_text())['cases']
+        valid_proved = 0
+        for case in cases:
+            validity = validities[case['source']]
+            valid = validity['status'] == 'VALID' and not any(i['kind'] == 'deprecated' for i in validity['issues'])
+            if valid and case['source_proof'] == 'PROVED':
+                valid_proved += 1
+                continue
+            dependency = dependency_for(case['source'], case['test'], {'cases': cohort.get('dependencies', [])})
+            diagnostics = case['diagnostics'] or [{'stage': 'source_proof', 'message': 'Original source proof unavailable'}]
+            records.append({'scope': 'additional_original_test', 'source': cohort['id'],
+                'source_pin': {'repository': pin['repository'], 'commit': pin['commit']},
+                'document': case['source'], 'test': case['test'], 'capability': pin['capability'],
+                'source_validity': validity, 'counterexample': str(directory.relative_to(ROOT) / case['source']),
+                'failures': [classify_failure(d['message'], stage=d['stage'], validity=validity,
+                                              dependency=dependency) for d in diagnostics]})
+        coverage.append({'id': cohort['id'], 'repository': pin['repository'], 'commit': pin['commit'],
+            'original_tests': len(cases), 'compiled': sum(c['compiled'] for c in cases),
+            'typed_term_proved': sum(c['source_proof'] == 'PROVED' for c in cases),
+            'source_valid_nondeprecated_and_term_proved': valid_proved,
+            'scope': 'Additional probe fixtures, excluded from Self-Assertion/production denominators; no runtime equivalence claim.'})
+    return records, coverage
 
 
 def dependency_for(document, test, dependencies):
@@ -115,6 +158,8 @@ def main():
     corpus = json.loads(args.corpus.read_text())
     validities = original_validities(args.original_root, corpus['cases'])
     records = corpus_failures(corpus, validities, dependencies)
+    additional, additional_coverage = additional_source_failures(dependencies)
+    records.extend(additional)
     if args.acceptance_root:
         for path in sorted(args.acceptance_root.glob('*/acceptance.json')):
             records.extend(acceptance_failures(json.loads(path.read_text()), path.parent.name))
@@ -131,6 +176,7 @@ def main():
                   'configured_compiled': sum(c['configured_baseline']['compiled'] for c in configured),
                   'configured_term_proved': sum(c['configured_baseline']['source_proof'] == 'PROVED' for c in configured),
                   'configured_original_valid_nondeprecated_and_term_proved': len(valid_proofs)},
+              'additional_source_coverage': additional_coverage,
               'summary': summarize_failures(records), 'cases': records}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + '\n')

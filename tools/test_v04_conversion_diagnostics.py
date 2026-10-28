@@ -8,12 +8,26 @@ import xml.etree.ElementTree as ET
 
 from v04_conversion_diagnostics import (classify_failure, summarize_failures,
     IMPLEMENTATION, SCHEMA, VARIABLE, OPERATION, SOURCE, EXTERNAL)
-from report_v04_conversion_gaps import corpus_failures, dependency_for, acceptance_failures
+from report_v04_conversion_gaps import corpus_failures, dependency_for, acceptance_failures, additional_source_failures
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class ConversionDiagnosticTests(unittest.TestCase):
+    def test_additional_original_yaml_cases_keep_separate_denominators_and_specific_blockers(self):
+        dependencies = json.loads((ROOT / 'tests/fixtures/v04-converter-schema-dependencies.json').read_text())
+        rows, coverage = additional_source_failures(dependencies)
+        self.assertEqual(len(coverage), 1)
+        self.assertEqual(coverage[0]['original_tests'], 51)
+        self.assertEqual(coverage[0]['compiled'], 45)
+        self.assertEqual(coverage[0]['source_valid_nondeprecated_and_term_proved'], 45)
+        self.assertEqual(len(rows), 6)
+        self.assertTrue(all(r['scope'] == 'additional_original_test' for r in rows))
+        summary = summarize_failures(rows)
+        self.assertEqual(summary['cases_by_category'][VARIABLE], 3)
+        self.assertEqual(summary['cases_by_category'][OPERATION], 3)
+        self.assertTrue(all(r['source_validity']['status'] == 'VALID' for r in rows))
+
     def test_six_failure_categories_have_evidence_and_retain_messages(self):
         cases = [({}, 'unsupported Object field: behaviors', IMPLEMENTATION),
                  ({'dependency': {'id': 'review', 'category': SCHEMA, 'reason': 'Pinned nil path'}}, 'unsupported nil selector', SCHEMA),

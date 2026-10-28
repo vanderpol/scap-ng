@@ -22,7 +22,8 @@ EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
          OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights53',
          OD + '#windows}cmdlet': 'windows.cmdlet', OD + '#windows}ntuser': 'windows.ntuser',
          OD + '#windows}appcmd': 'windows.appcmd', OD + '#windows}appcmdlistconfig': 'windows.appcmdlistconfig',
-         OD + '#independent}environmentvariable58': 'independent.environmentvariable58'}
+         OD + '#independent}environmentvariable58': 'independent.environmentvariable58',
+         OD + '#independent}yamlfilecontent': 'independent.yamlfilecontent'}
 SCALAR_ACQUISITIONS = {
     'windows.ntuser': ('key', 'name'),
     'windows.appcmd': ('identifier_type', 'identifier', 'parameter'),
@@ -314,6 +315,9 @@ class ExpandedSource(Source):
                           'order': n.get('order', 'ascending'), 'values': values[0]}}
 
     def state(self, ident, cap):
+        if cap == 'independent.yamlfilecontent':
+            from v04_yaml_source_proof import source_state
+            return predicate_order(source_state(self, ident))
         if cap == 'variable.value':
             node = self.get(ident, 'states')
             need(all(c.tag == '{' + OD + '#independent}value' for c in node),
@@ -445,6 +449,9 @@ class ExpandedSource(Source):
     def object(self, ident):
         n = self.get(ident, 'objects')
         cap = self.capability(n, '_object')
+        if cap == 'independent.yamlfilecontent':
+            from v04_yaml_source_proof import source_object
+            return source_object(self, ident)
         if cap == 'variable.value':
             keys(n, META, 'original Variable source Object')
             need(len(n) == 1 and n[0].tag == '{' + OD + '#independent}var_ref' and
@@ -910,6 +917,9 @@ class ExpandedNative(Native):
         if isinstance(n, str):
             return super().object(n, cap)
         cap = n.get('capability', cap)
+        if cap == 'independent.yamlfilecontent' and 'set' not in n:
+            from v04_yaml_source_proof import native_object
+            return native_object(self, n)
         registered = scalar_proof.native_object(self, n, cap)
         if registered is not None:
             return registered

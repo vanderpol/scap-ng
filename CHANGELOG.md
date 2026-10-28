@@ -6,6 +6,14 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Added bounded YAML acquisition and record conversion using
+  the existing mapping, with byte-pinned OpenSCAP sources: 45/51 original Tests
+  convert, compile and match independently decoded typed semantic terms.
+  Preserve native YAML key identity and report six unsupported closures without
+  inventing function or record-member projection syntax. This is converter
+  coverage, not scanner-runtime equivalence
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Added a read-only original Variable-function contract and
   transitive dependency audit, including XSD/Schematron facts and source-valid
   examples masked by earlier conversion blockers. No new function syntax is

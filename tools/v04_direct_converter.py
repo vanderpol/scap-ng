@@ -259,6 +259,9 @@ class AssessmentConverter:
                 ensure(path.startswith('behaviors.'), 'unrecognized acquisition default')
                 source = path.split('.')[1]
                 acquisition[behavior_routes(mapping).get(source, source)] = value
+            if mapping['capability'] == 'independent.yamlfilecontent':
+                from v04_direct_yaml_records import yaml_acquisition
+                yaml_acquisition(acquisition, behaviors)
             scalar_part, traversal_part = behaviors, behaviors
             if behavior_routes(mapping) and mapping['native'].get('traversal_definition') in (
                     'file_traversal', 'windows_file_traversal', 'hierarchy_traversal'):
@@ -278,11 +281,12 @@ class AssessmentConverter:
             if mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal'):
                 # FileBehaviors defaults recurse_file_system to all, including
                 # exact full_path acquisition. Sets inherit it on each leaf.
-                if mapping['capability'] != 'independent.textfilecontent54':
+                if mapping['capability'] != 'independent.textfilecontent54' and 'content' not in acquisition:
                     from v04_direct_file_behaviors import traversal_behaviors
                     acquisition.update(traversal_behaviors(traversal_part, acquisition,
                         windows=mapping['native']['traversal_definition'] == 'windows_file_traversal'))
-                acquisition.setdefault('filesystem', 'all')
+                if 'content' not in acquisition:
+                    acquisition.setdefault('filesystem', 'all')
             if mapping['native'].get('traversal_definition') == 'hierarchy_traversal':
                 from v04_direct_file_behaviors import hierarchy_behaviors
                 acquisition.update(hierarchy_behaviors(traversal_part, acquisition))
@@ -562,11 +566,16 @@ class AssessmentConverter:
         ensure(found in FIELD_EXISTENCE and found != 'none_exist' and matching in MATCHING,
                'record absence/quantifier outside bounded source proof')
         ensure(len(element) and not (element.text or '').strip(), 'record requires named fields')
-        fields = {}
+        fields, source_names = {}, set()
         for child in element:
             name = child.get('name')
-            ensure(child.tag == f'{{{OVAL}}}field' and name and name not in fields
+            ensure(child.tag == f'{{{OVAL}}}field' and name and name not in source_names
                    and not any('A' <= c <= 'Z' for c in name), 'invalid/duplicate original record field')
+            source_names.add(name)
+            if mapping['capability'] == 'independent.yamlfilecontent':
+                from v04_direct_yaml_records import yaml_record_key
+                name = yaml_record_key(name)
+                ensure(name not in fields, 'duplicate decoded YAML record key')
             fields[name] = self.predicate(child, mapping, record_field=True)
         # Member lookup is inside this record: missing required members remain
         # errors. Field-value cardinality does not turn lookup failure into an
