@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Independently prove eight previously compiled Windows
+  acquisition cases: nil selectors, NTUSER traversal and Item creation.
+  All 521 compiled corpus programs remain unchanged; source-valid/nondeprecated
+  proof coverage reaches 519/803 original Tests. This adds proof coverage,
+  not scanner implementation ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Preserve closed enum Variable graphs through typed,
   consumer-specific translations without changing their shared generic string
   uses. Original registry Test 4000 now proves; all previous 512 corpus proofs

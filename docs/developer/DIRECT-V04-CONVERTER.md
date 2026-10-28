@@ -80,6 +80,14 @@ authoring grammar is introduced. Unknown runtime strings, casts and other
 functions remain unsupported. The [graph review](../audit/v04-converter-enum-variable-graphs-20261028.md)
 records the original source proof and its bounded scope.
 
+The [Windows acquisition proof helper](../../tools/v04_windows_acquisition_source_proof.py)
+independently reads original NTUSER defaults and nil acquisition positions.
+Nil remains distinct from an empty string or missing selector. Traversal depth,
+`include_default` and `item_creation` remain separate acquisition facts. The
+[eight original-case receipt](../audit/v04-windows-acquisition-proofs-20261028.md)
+freezes their existing compiled hashes; this extension changes verification,
+not native collection or scanner implementation.
+
 Dependency inventory uses an explicit traversal stack. Deep, shared and cyclic
 graphs retain their complete dependency lists and ordered diagnostics without
 hitting Python's call-depth limit. This improves discovery only; conversion and

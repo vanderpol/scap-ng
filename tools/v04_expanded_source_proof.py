@@ -481,25 +481,27 @@ class ExpandedSource(Source):
             keys(n, META, 'scalar acquisition Object')
             self.active.add(ident)
             try:
-                fields, fs = {}, []
+                fields, fs, behaviors = {}, [], None
                 nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
                 for child in n:
                     if child.tag == '{' + OD + '}filter':
                         fs.append(child); continue
                     name = local(child)
+                    if cap == 'windows.ntuser' and child.tag == '{' + OD + '#windows}behaviors':
+                        need(behaviors is None, 'duplicate NTUSER behaviors')
+                        behaviors = child
+                        continue
                     need(child.tag.rsplit('}', 1)[0] == n.tag.rsplit('}', 1)[0] and
                          name in SCALAR_ACQUISITIONS[cap] and name not in fields, 'unknown/duplicate scalar selector')
                     if nil in child.attrib:
-                        keys(child, {nil, 'datatype'}, 'nil scalar selector')
-                        need(cap == 'independent.environmentvariable58' and name == 'pid' and
-                             child.get(nil) in ('true', '1') and child.get('datatype') == 'int' and
-                             not len(child) and not (child.text or '').strip(), 'nil selector outside bounded proof')
-                        fields[name] = None
+                        from v04_windows_acquisition_source_proof import nil_selector
+                        fields[name] = nil_selector(child, cap, name)
                     else:
                         fields[name] = self.entity(child, selector=True)
                 need(set(fields) == set(SCALAR_ACQUISITIONS[cap]), 'scalar acquisition fields')
                 if cap == 'windows.ntuser':
-                    fields.update(include_default=False, item_creation='key_and_name_exist')
+                    from v04_windows_acquisition_source_proof import ntuser_behaviors
+                    fields.update(ntuser_behaviors(behaviors, fields.get('key')))
                 value = {'capability': cap, 'selectors': fields}
                 if fs:
                     value['filters'] = self.filters(fs, cap)
@@ -564,7 +566,11 @@ class ExpandedSource(Source):
                     need(child.tag == '{' + OD + '#windows}' + name and name in ('filepath', 'path', 'filename', 'trustee_sid')
                          and target not in fields, 'unsupported original rights acquisition field')
                     need(child.get('datatype', 'string') == 'string', 'rights selector datatype')
-                    fields[target] = self.entity(child, selector=True)
+                    if '{http://www.w3.org/2001/XMLSchema-instance}nil' in child.attrib:
+                        from v04_windows_acquisition_source_proof import nil_selector
+                        fields[target] = nil_selector(child, cap, name)
+                    else:
+                        fields[target] = self.entity(child, selector=True)
                 need(set(fields) in ({'full_path', 'trustee_sid'}, {'directory', 'name', 'trustee_sid'}),
                      'rights path/SID acquisition required')
                 value = {'capability': cap, 'selectors': {**fields, 'filesystem': 'all'}}
@@ -895,10 +901,17 @@ class ExpandedNative(Native):
         if cap in SCALAR_ACQUISITIONS and 'set' not in n:
             allowed = set(SCALAR_ACQUISITIONS[cap])
             defaults = {'include_default': False, 'item_creation': 'key_and_name_exist'} if cap == 'windows.ntuser' else {}
-            keys(n, allowed | set(defaults) | {'capability', 'object_title', 'filters'}, 'native scalar acquisition')
+            keys(n, allowed | set(defaults) | {'capability', 'object_title', 'filters'} |
+                 ({'traversal'} if cap == 'windows.ntuser' else set()), 'native scalar acquisition')
             need(allowed | set(defaults) <= set(n), 'native scalar acquisition fields')
             fields = {k: None if n[k] is None else self.predicate(n[k], selector=True) for k in sorted(allowed)}
             fields.update({k: n[k] for k in defaults})
+            if cap == 'windows.ntuser':
+                need(isinstance(n['include_default'], bool) and
+                     n['item_creation'] in ('key_and_name_exist', 'every_ntuser'), 'native NTUSER collection parameters')
+                if 'traversal' in n:
+                    from v04_source_package_semantics import native_hierarchy
+                    fields['traversal'] = native_hierarchy(n['traversal'])
             result = {'capability': cap, 'selectors': fields}
             if n.get('filters'):
                 result['filters'] = self.filters(n['filters'])
@@ -934,8 +947,10 @@ class ExpandedNative(Native):
             selectors = set(n) & allowed
             need(selectors in ({'full_path', 'trustee_sid'}, {'directory', 'name', 'trustee_sid'})
                  and 'filesystem' in n, 'native rights acquisition fields')
+            need(all(n[k] is not None or k == 'name' for k in selectors), 'native nil rights selector')
             value = {'capability': cap, 'selectors': {
-                k: self.predicate(n[k], selector=True) for k in ('full_path', 'directory', 'name', 'trustee_sid') if k in n}}
+                k: None if n[k] is None else self.predicate(n[k], selector=True)
+                for k in ('full_path', 'directory', 'name', 'trustee_sid') if k in n}}
             value['selectors']['filesystem'] = n['filesystem']
             if n.get('filters'):
                 value['filters'] = self.filters(n['filters'])
