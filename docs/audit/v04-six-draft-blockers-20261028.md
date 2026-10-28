@@ -106,3 +106,19 @@ unique `(benchmark, source_rule)` identities, and count `primary_diagnostic`
 once per Rule. For secondary/capability breakdowns, deduplicate each Rule's
 messages or `needed_capabilities` before adding it to a counter. The JSON
 report provides the exact ledger digest and original per-benchmark messages.
+
+## Representative original Rules
+
+Reconciled directly from the published ledger during recovery; capability counts
+per primary class and full original Rule IDs are in the JSON report.
+
+| Primary message | Representative Rule | Benchmark |
+| --- | --- | --- |
+| Original OVAL closure invalid/deprecated | `xccdf_mil.disa.stig_rule_SV-253255r1210279_rule` | ms_windows_11 |
+| comparator-bearing absence blocked | `xccdf_mil.disa.stig_rule_SV-271844r1184222_rule` | oracle_linux_9 |
+| unresolved checklist catalog href: U_Apache_Server_2-4_UNIX_Server_V3R2_STIG_SCAP_1-4_Benchmark-enhancedV2-oval2.xml | `xccdf_navy.navwar.niwcatlantic.scc.ms_rule_SV-214228r960735_rule` | apache_server_2-4_unix_server |
+| unresolved checklist catalog href: U_MS_Windows_Server_DNS_V2R3_STIG_SCAP_1-4_Benchmark-enhancedV8-oval2.xml | `xccdf_navy.navwar.niwcatlantic.scc.ms.dns_rule_SV-259334r960735_rule` | ms_windows_server_dns |
+| unsupported Test existence: all_exist | `xccdf_mil.disa.stig_rule_SV-253259r1210282_rule` | ms_windows_11 |
+| unsupported acquisition parameter comparison/type | `xccdf_mil.disa.stig_rule_SV-271604r1091524_rule` | oracle_linux_9 |
+| unsupported function: count | `xccdf_mil.disa.stig_rule_SV-271832r1092208_rule` | oracle_linux_9 |
+| unsupported function: split | `xccdf_mil.disa.stig_rule_SV-271653r1091671_rule` | oracle_linux_9 |

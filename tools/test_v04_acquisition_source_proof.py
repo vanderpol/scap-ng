@@ -33,6 +33,60 @@ class AcquisitionInputProofTests(unittest.TestCase):
         assessment = assessment_for(self.visitor(self.root), ID)
         self.assertEqual(len(assessment['variables']), 2)
 
+    def test_explicit_intrinsic_regex_preserves_original_acquisition(self):
+        identifier = ID.rsplit(':', 1)[0] + ':1'
+        original = assessment_for(self.visitor(self.root), identifier)
+        root = deepcopy(self.root)
+        pattern = root.find(O + 'objects')[0].find(I + 'pattern')
+        pattern.set('operation', 'pattern match')
+        report = check_conversion(self.visitor(root), identifier, self.validator)
+        self.assertEqual(report['source_proof'], 'PROVED', report)
+        self.assertTrue(report['compiled_operands_verified'])
+        self.assertEqual(assessment_for(self.visitor(root), identifier), original)
+
+    def test_regex_admission_is_bounded_to_intrinsic_pattern(self):
+        identifier = ID.rsplit(':', 1)[0] + ':1'
+        for field in ('shell', 'command', 'pattern'):
+            for operation in ('not equal', 'case insensitive equals', 'pattern match'):
+                if field == 'pattern' and operation == 'pattern match':
+                    continue
+                with self.subTest(field=field, operation=operation):
+                    root = deepcopy(self.root)
+                    root.find(O + 'objects')[0].find(I + field).set('operation', operation)
+                    with self.assertRaisesRegex(ValueError, 'unsupported acquisition parameter'):
+                        assessment_for(self.visitor(root), identifier)
+
+    def test_regex_route_retains_datatype_attribute_and_mapping_guards(self):
+        identifier = ID.rsplit(':', 1)[0] + ':1'
+        for attribute, value in (('datatype', 'integer'), ('var_check', 'none satisfy'),
+                                 ('unexpected', 'true')):
+            with self.subTest(attribute=attribute):
+                root = deepcopy(self.root)
+                pattern = root.find(O + 'objects')[0].find(I + 'pattern')
+                pattern.set('operation', 'pattern match')
+                pattern.set(attribute, value)
+                with self.assertRaises(ValueError):
+                    assessment_for(self.visitor(root), identifier)
+        root = deepcopy(self.root)
+        root.find(O + 'objects')[0].find(I + 'pattern').set('operation', 'pattern match')
+        visitor = self.visitor(root)
+        for mapping in visitor.mappings:
+            if mapping['capability'] == 'independent.shellcommand':
+                mapping['native']['collection_parameter_source_operations']['pattern'] = ['equals']
+        with self.assertRaisesRegex(ValueError, 'unsupported acquisition parameter'):
+            assessment_for(visitor, identifier)
+
+    def test_regex_input_does_not_bypass_multivalue_or_complement_guards(self):
+        for values, check in ((['^a', '^b'], 'at least one'), (['^a'], 'none satisfy')):
+            with self.subTest(values=values, check=check):
+                root = self.constant(values, 'all')
+                obj = root.find(O + 'objects')[3]
+                ET.SubElement(obj, I + 'pattern', operation='pattern match',
+                              var_ref=root.find(O + 'variables')[1].get('id'),
+                              var_check=check)
+                with self.assertRaisesRegex(ValueError, 'approved expansion rule'):
+                    assessment_for(self.visitor(root), ID)
+
     def constant(self, values, check):
         root = deepcopy(self.root)
         variable = root.find(O + 'variables')[1]

@@ -247,7 +247,17 @@ class AssessmentConverter:
                     acquisition[target] = cmdlet_input(child, mapping['native']['collection_parameters'][target],
                         lambda entity: self.predicate(entity, mapping, selector=True), self.parameter)
                 else:
-                    acquisition[target] = self.predicate(child, mapping, selector=True) if field in selectors else self.parameter(child)
+                    if field in selectors:
+                        acquisition[target] = self.predicate(child, mapping, selector=True)
+                    else:
+                        operations = ('equals',)
+                        if mapping['capability'] == 'independent.shellcommand' and field == 'pattern':
+                            # This field already denotes a regex acquisition input,
+                            # not a predicate over the command or returned Items.
+                            operations = tuple(op for op in mapping['native'].get(
+                                'collection_parameter_source_operations', {}).get(field, ())
+                                if op in ('equals', 'pattern match'))
+                        acquisition[target] = self.parameter(child, operations=operations)
                 if (field in selectors and child.get('operation') == 'case insensitive equals'
                         and 'equals' in acquisition[target]):
                     self.selector_equivalences.append({'source_object': element.get('id'),
@@ -475,10 +485,10 @@ class AssessmentConverter:
             return self.reference(element.get('var_ref'), 'variable')
         return self.literal(element.get('datatype', 'string'), element.text or '')
 
-    def parameter(self, element):
+    def parameter(self, element, *, operations=('equals',)):
         attributes(element, {'datatype', 'operation', 'var_ref', 'var_check'})
         ensure(not len(element) and element.get('datatype', 'string') == 'string' and
-               element.get('operation', 'equals') == 'equals', 'unsupported acquisition parameter comparison/type')
+               element.get('operation', 'equals') in operations, 'unsupported acquisition parameter comparison/type')
         value = self.operand(element)
         if isinstance(value, list):
             # One immutable value is a single invocation input. Multiple values

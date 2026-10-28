@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Preserve explicitly declared shellcommand regex acquisition
+  inputs through the existing mapping. Seventeen additional original Linux
+  Rules prove and compile; all 1,055 preceding primary program hashes remain
+  unchanged. Unsupported invocation operations remain rejected
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Added an explicit `incomplete` Variable-result status to
   represent observed typed values without asserting a complete acquisition
   population. Also reject contradictory `zero_values` and complete/incomplete

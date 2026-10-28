@@ -7,7 +7,32 @@ Follow [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md). This is an engineering recovery
 index, not a release or scanner-conformance declaration.
 
-## Published code and completed verification
+## Recovery on 2026-10-28 (current workspace)
+
+- Recovered GitHub `main` at `4f1400471d54a2b1b2fa8e2fd6f7233a03118f8f`
+  by fast-forward; old local `work` at `a65aba621` is preserved. No dirty files
+  or local-only commits were discarded. The old recovery directory and stash
+  object `aa515185a8120ba1b1079cebd4a91fa4be6f8152` are absent here. The older
+  uncommitted enum/diagnostic batch described below is historical recovery
+  context, **not present in this workspace**. Reconstruct only after inspecting
+  current code and source-backed evidence; do not claim its tests were rerun.
+- Fetched the immutable evidence tag and checked its existing ZIP: 12,276,247
+  bytes, 4,301 files, all CRCs good, SHA-256 matches the published manifest.
+  Extracted ledger SHA-256 also matches the analysis report. All 341 primary
+  message counts and overlapping capability counts reconcile directly.
+- Recovery files and fresh focused/six-source evidence are under
+  `/workspace/recovery-20261028/`; large artifacts remain outside source Git.
+- Reconstructed only the bounded shellcommand intrinsic `pattern match`
+  converter route, consuming the already committed source-operation metadata.
+  Independent readers, schemas, mappings, compiler and workflows are unchanged.
+  Eight acquisition positive/negative tests and 44 focused/affected tests pass.
+  The affected six-source gate passes: 1,072 proved primary Rules (+17), 324
+  blocked automated, 171 manual; all 1,055 prior program hashes retained. See
+  [recovery receipt](../audit/v04-shellcommand-regex-recovery-20261028.md).
+  Exact-commit hosted integration remains pending; no fresh full maintained-suite
+  claim yet.
+
+## Published code and completed verification (previous checkpoint)
 
 - Latest synchronized source `main`: `c65a134b539558609ccf3bdc0600f38e411bbb2e`.
   All owner schema changes are preserved. The local converter batch remains
