@@ -37,7 +37,7 @@ Tests deliberately clone/mutate them for fault injection.
 ## Revised-schema integration (#251 / #255)
 
 The committed schema baseline `d3132ae57` is authoritative. The converter enables
-48 of the 51 mappings in the approved Independent/Linux/UNIX/Windows scope;
+49 of the 51 mappings in the approved Independent/Linux/UNIX/Windows scope;
 there are 100 mappings globally. Enabling a name does not mean every source
 construct for that capability is implemented or executable.
 
@@ -1003,3 +1003,23 @@ opt-in migration probe for four supported families. See the
 The grouped proposal above remains historical decision evidence; production
 activation and the nine remaining functions are still deferred. YAML work
 preserves both default output and the opt-in probe.
+
+## RPM file verification checkpoint (2026-10-28)
+
+The existing shared behavior engine also supports `linux.rpmverifyfile` using
+its approved mapping. A separately pinned, nondeprecated
+[original OpenSCAP Test](../../tests/fixtures/v04-direct-rpmverifyfile/README.md)
+now converts, validates, compiles and matches independent typed terms. The
+independent reader uses a frozen identity/default crosswalk, not converter
+helpers. All eleven switches are explicit native Booleans; omitted original
+switches retain their false defaults. `filedigest_differs` remains its original
+string outcome, including `not performed`; it is not a Boolean success flag.
+
+Activation is 49/51 approved-platform mappings (49/100 globally), with bounded
+construct support. The three original Self-Assertion `md5_differs` cases remain
+rejected; their source population moves into configured inventory because the
+capability name is enabled, without becoming accepted conversions. The added
+OpenSCAP proof has its own denominator (1/1). The remaining inactive names are
+SSHD (original nil/default-path dependency) and SQL512 (original-source evidence
+missing). Function production activation and other #255/#218 obligations remain
+separate; no scanner-runtime equivalence is claimed.

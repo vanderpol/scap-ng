@@ -11,6 +11,7 @@ from audit_v04_oval_test_corpus import OvalDocument, assessment_for, check_conve
 from audit_v04_eight_assessment_pilot import verify_program
 from oval_source_validation import SourceValidator
 from v04_direct_converter import AssessmentConverter, load_mappings
+from v04_converter_fixture_support import fixture_documents
 from v04_direct_inventory import SourceInventory
 from v04_direct_scap_source import UnsupportedSource, digest
 from v04_direct_yaml_records import yaml_record_key
@@ -43,33 +44,10 @@ class DirectYamlRecordsTests(unittest.TestCase):
         return ET.fromstring((FIXTURE / ('test_probes_yamlfilecontent_' + name + '.xml')).read_bytes())
 
     def compiled_roundtrip(self, assessment):
-        # Explicitly constructed packaging metadata. This is not an original
-        # SCAP Benchmark/Rule conversion or an additional production proof.
-        benchmark = {'id': 'yaml-integration-fixture', 'ng_schema_version': '0.4.0',
-            'use_case': 'compliance', 'version': {'value': '1'},
-            'assessment_specifications': [{'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'}],
-            'title': [{'text': 'Constructed YAML compilation fixture', 'language': 'en'}],
-            'description': [], 'language': 'en', 'status': [], 'metadata': {'constructed_wrapper': True},
-            'notices': [], 'front_matter': [], 'rear_matter': [], 'references': [], 'text_blocks': [],
-            'platform': {'id': 'fixture-platform', 'title': 'No platform claim', 'applicability': {}},
-            'applicability_catalog': 'fixture-applicability', 'scoring': [], 'parameters': [],
-            'default_selection': True, 'groups': [], 'profiles': [], 'rules': ['fixture-rule']}
-        rule = {'id': 'fixture-rule', 'version': '1', 'title': 'Constructed packaging wrapper',
-            'severity': 'unknown', 'role': 'full', 'weight': 1, 'discussion': '', 'rationale': None,
-            'extensions': {}, 'warnings': [], 'identifiers': [], 'references': [], 'requires': [],
-            'conflicts': [], 'applicability': [], 'parameters': {}, 'remediation': {},
-            'organizational_input_requirements': {},
-            'assessment_choices': {'automated': {'assessment': assessment['id']}},
-            'default_assessment_choice': 'automated'}
-        prefix = 'authoring/yaml-integration-fixture/'
-        documents = {prefix + 'benchmark.json': {'benchmark': benchmark},
-            prefix + 'rules/fixture-rule.json': {'rule': rule},
-            prefix + 'applicability.json': {'applicability': {'id': 'fixture-applicability', 'conditions': {}}},
-            prefix + 'assessments/original.json': {'assessment': assessment}}
-        compiled, _ = build_bundle(documents)
+        compiled, _ = build_bundle(fixture_documents(assessment))
         result = verify_bundle(compiled)
-        self.assertEqual(result['programs'], 1)
-        self.assertFalse(result['scanner_evaluated'])
+        self.assertEqual(result["programs"], 1)
+        self.assertFalse(result["scanner_evaluated"])
 
     def terms(self, root, ident='oval:0:tst:1'):
         visitor = self.visitor(root)

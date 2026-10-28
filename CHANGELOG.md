@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Enabled bounded RPM file-verification conversion through the
+  existing mapped behavior engine, with one pinned nondeprecated OpenSCAP
+  original Test. Preserve all eleven verification switches and their source
+  defaults; deprecated MD5 source constructs remain rejected
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Added bounded YAML acquisition and record conversion using
   the existing mapping, with byte-pinned OpenSCAP sources: 45/51 original Tests
   convert, compile and match independently decoded typed semantic terms.
