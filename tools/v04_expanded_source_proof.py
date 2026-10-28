@@ -825,6 +825,28 @@ class ExpandedNative(Native):
     def function(self, n):
         need(isinstance(n, dict) and len(n) == 1, 'function shape')
         op, v = next(iter(n.items()))
+        if op == 'function':
+            # Independent reader for the approved-direction envelope. Do not
+            # import the converter's migration routine: disagreement must
+            # remain detectable by source-term comparison.
+            need(isinstance(v, dict) and set(v) == {'name', 'arguments', 'options'},
+                 'canonical function envelope')
+            name, args, options = v['name'], v['arguments'], v['options']
+            need(isinstance(args, list) and isinstance(options, dict), 'canonical function arguments/options')
+            if name == 'concat':
+                need(len(args) >= 2 and not options, 'canonical concat arity/options')
+                return {'concat': [self.function(a) for a in args]}
+            if name == 'regex_capture':
+                need(len(args) == 1 and set(options) == {'pattern'}, 'canonical regex_capture arity/options')
+                return {'regex_capture': {'pattern': options['pattern'], 'value': self.function(args[0])}}
+            if name == 'unique':
+                need(len(args) == 1 and not options, 'canonical unique arity/options')
+                return {'unique': self.function(args[0])}
+            if name == 'merge':
+                need(len(args) == 1 and set(options) == {'delimiter', 'sort', 'order'},
+                     'canonical merge arity/options')
+                return {'merge': {**options, 'values': self.function(args[0])}}
+            raise ValueError(f'canonical function source proof unavailable: {name}')
         if op == 'literal' and not isinstance(v, dict):
             return {'literal': literal('string', v)}
         if op == 'regex_capture':

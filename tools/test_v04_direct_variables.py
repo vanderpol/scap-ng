@@ -54,6 +54,8 @@ class DirectVariableTests(unittest.TestCase):
                 canonical_variable_functions=True), selected.get('id'))
             self.assertEqual(legacy['tests'], canonical['tests'])
             self.assertEqual(legacy['evaluate'], canonical['evaluate'])
+            source_terms = ExpandedSource(root).test(selected.get('id'))
+            self.assertEqual(source_terms, ExpandedNative(canonical).test(canonical['evaluate']['test']))
             for key, variable in legacy.get('variables', {}).items():
                 with self.subTest(filename=filename, variable=key):
                     self.assertEqual(legacy_expression(canonical['variables'][key]['expression']),
