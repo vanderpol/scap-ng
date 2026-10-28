@@ -59,8 +59,11 @@ class AssessmentConverter:
     representation. `used` is external provenance; other containers are native
     declarations. Cached values are copied so a consumer cannot mutate a peer.
     """
-    def __init__(self, source, component_id, mappings):
+    def __init__(self, source, component_id, mappings, *, canonical_variable_functions=False):
         self.source, self.component_id, self.mappings = source, component_id, mappings
+        # Opt-in migration probe only. Production output and source-proof paths
+        # retain their current syntax until coordinated compiler migration.
+        self.canonical_variable_functions = canonical_variable_functions
         self.active, self.cache, self.used = set(), {}, {}
         self.tests, self.variables, self.shared_objects = {}, {}, {}
         self.enum_projection_cache = {}
@@ -370,8 +373,12 @@ class AssessmentConverter:
             return [self.literal(datatype, child.text or '') for child in element]
         ensure(local_name(element) == 'local_variable' and len(element) == 1, 'external/malformed Variable unsupported')
         identifier = native_identifier(element, 'variable')
+        expression = self.function(element[0])
+        if self.canonical_variable_functions:
+            from v04_variable_function_migration import canonical_expression
+            expression = canonical_expression(expression)
         self.variables[identifier] = {'kind': 'local', 'datatype': native_datatype(datatype),
-                                      'expression': self.function(element[0])}
+                                      'expression': expression}
         return {'variable': identifier}
 
     def named_variable(self, source_id):

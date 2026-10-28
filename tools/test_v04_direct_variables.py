@@ -8,6 +8,8 @@ import xml.etree.ElementTree as ET
 
 from audit_v04_oval_test_corpus import OvalDocument, assessment_for, check_conversion, closure
 from v04_direct_converter import AssessmentConverter, load_mappings
+from v04_variable_function_migration import legacy_expression
+from v04_direct_scap_source import UnsupportedSource
 from v04_direct_inventory import SourceInventory
 from v04_expanded_source_proof import ExpandedSource, ExpandedNative
 from validate_native_json_schemas import build_validators
@@ -33,6 +35,29 @@ class DirectVariableTests(unittest.TestCase):
 
     def convert(self, root, identifier):
         return assessment_for(AssessmentConverter(OvalDocument(root, 'original.xml'), 'original.xml', self.mappings), identifier)
+
+    def test_opt_in_canonical_function_lowering_retains_legacy_operands(self):
+        for filename in ('oval-def_concat_function.xml', 'oval-def_merge.xml'):
+            root = self.original(filename)
+            selected = None
+            for test in root.find(O + 'tests'):
+                try:
+                    legacy = self.convert(root, test.get('id'))
+                except UnsupportedSource:
+                    continue
+                if legacy.get('variables'):
+                    selected = test
+                    break
+            self.assertIsNotNone(selected, filename)
+            canonical = assessment_for(AssessmentConverter(
+                OvalDocument(root, 'original.xml'), 'original.xml', self.mappings,
+                canonical_variable_functions=True), selected.get('id'))
+            self.assertEqual(legacy['tests'], canonical['tests'])
+            self.assertEqual(legacy['evaluate'], canonical['evaluate'])
+            for key, variable in legacy.get('variables', {}).items():
+                with self.subTest(filename=filename, variable=key):
+                    self.assertEqual(legacy_expression(canonical['variables'][key]['expression']),
+                                     variable['expression'])
 
     def test_pinned_original_graphs_compile_and_prove_or_retain_exact_blockers(self):
         proved = 0
