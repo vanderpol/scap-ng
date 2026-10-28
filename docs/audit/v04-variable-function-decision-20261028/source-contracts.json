@@ -1,0 +1,1390 @@
+{
+  "authority": "Engineering evidence only; no proposed syntax is implemented.",
+  "format": "scap-ng/oval-function-contract-inventory/1",
+  "schema": {
+    "common_documentation": [
+      "Complex functions have been defined that help determine how to manipulate specific values. These functions can be nested together to form complex statements. Each function is designed to work on a specific type of data. If the data being worked on is not of the correct type, a cast should be attempted before reporting an error. For example, if a concat function includes a registry component that returns an integer, then the integer should be cast as a string in order to work with the concat function. Note that if the operation being applied to the variable by the calling entity is \"pattern match\", then all the functions are performed before the regular expression is evaluated. In short, the variable would produce a value as normal and then any pattern match operation would be performed. It is also important to note that when using these functions with sub-components that return a collection of values that the operation will be performed on the Cartesian product of the components and the result is also a collection of values. For example, assume a local_variable specifies the arithmetic function with an arithmetic_operation of \"add\" and has two sub-components under this function: the first component returns \"1\" and \"2\", and the second component returns \"3\" and \"4\" and \"5\". The local_variable element would be evaluated to have a collection of six values: 1+3, 1+4, 1+5, 2+3, 2+4, and 2+5. Please refer to the description of a specific function for more details about it."
+    ],
+    "enumerations": {
+      "ArithmeticEnumeration": {
+        "documentation": [
+          "The ArithmeticEnumeration simple type defines basic arithmetic operations. Currently add and multiply are defined."
+        ],
+        "line": 1101,
+        "values": [
+          "add",
+          "multiply"
+        ]
+      },
+      "DateTimeFormatEnumeration": {
+        "documentation": [
+          "The DateTimeFormatEnumeration simple type defines the different date-time formats that are understood by OVAL. Note that in some cases there are a few different possibilities within a given format. Each of these possibilities is unique though and can be distinguished from each other. The different formats are used to clarify the higher level structure of the date-time string being used.",
+          "The year_month_day value specifies date-time strings that follow the formats: 'yyyymmdd', 'yyyymmddThhmmss', 'yyyy/mm/dd hh:mm:ss', 'yyyy/mm/dd', 'yyyy-mm-dd hh:mm:ss', or 'yyyy-mm-dd'",
+          "The month_day_year value specifies date-time strings that follow the formats: 'mm/dd/yyyy hh:mm:ss', 'mm/dd/yyyy', 'mm-dd-yyyy hh:mm:ss', 'mm-dd-yyyy', 'NameOfMonth, dd yyyy hh:mm:ss' or 'NameOfMonth, dd yyyy', 'AbreviatedNameOfMonth, dd yyyy hh:mm:ss', or 'AbreviatedNameOfMonth, dd yyyy'",
+          "The day_month_year value specifies date-time strings that follow the formats: 'dd/mm/yyyy hh:mm:ss', 'dd/mm/yyyy', 'dd-mm-yyyy hh:mm:ss', or 'dd-mm-yyyy'",
+          "The win_filetime value specifies date-time strings that follow the windows file time format.",
+          "The seconds_since_epoch value specifies date-time values that represent the time in seconds since the UNIX epoch. The Unix epoch is the time 00:00:00 UTC on January 1, 1970.",
+          "The cim_datetime model is used by WMI and its value specifies date-time strings that follow the format: 'yyyymmddHHMMSS.mmmmmmsUUU', and alternatively 'yyyy-mm-dd HH:MM:SS:mmm' only when used in WMI Query Language queries."
+        ],
+        "line": 1162,
+        "values": [
+          "year_month_day",
+          "month_day_year",
+          "day_month_year",
+          "win_filetime",
+          "seconds_since_epoch",
+          "cim_datetime"
+        ]
+      },
+      "OrderEnumeration": {
+        "documentation": [
+          "The OrderEnumeration simple type defines the direction in which data should be sorted, and works to support the SortEnumeration. The OrderEnumeration has no impact on the SortEnumeration of 'document'.",
+          "Numbers: Arranged from smallest to largest, such as 0, 1, 2, 3, 4, 5, 6. Letters: Arranged alphabetically from A to Z",
+          "Numbers: Arranged from largest to smallest, such as 9, 8, 7, 6. Letters: Arranged alphabetically from Z to A"
+        ],
+        "line": 1145,
+        "values": [
+          "ascending",
+          "descending"
+        ]
+      },
+      "SortEnumeration": {
+        "documentation": [
+          "The SortEnumeration simple type defines basic sorting operations. Currently 'document', 'lexical', 'numeric' and 'natural' are defined.",
+          "No sorting is performed, the values will remain in the order they came in as, and match the order in which the referenced system characterics will appear in the OVAL results XML document.",
+          "Sort alphabetically, useful for pure string lists.",
+          "Sort numerically, useful for lists of numbers or lists of integers or floats, but will cause errors if string data is present.",
+          "Perform a 'natural' sort, refer to https://en.wikipedia.org/wiki/Natural_sort_order"
+        ],
+        "line": 1118,
+        "values": [
+          "document",
+          "lexical",
+          "numeric",
+          "natural"
+        ]
+      }
+    },
+    "function_group_line": 708,
+    "functions": {
+      "arithmetic": {
+        "arity": {
+          "maximum": "unbounded",
+          "minimum": 2
+        },
+        "attributes": [
+          {
+            "enumeration": [
+              "add",
+              "multiply"
+            ],
+            "name": "arithmetic_operation",
+            "type": "oval-def:ArithmeticEnumeration",
+            "use": "required"
+          }
+        ],
+        "documentation": [
+          "The arithmetic function takes two or more integer or float components and performs a basic mathematical function on them. The result of this function is a single integer or float unless one of the components returns a collection of values. In this case the specified arithmetic function would be performed multiple times and the end result would also be a collection of values for the local variable. For example assume a local_variable specifies the arithmetic function with an arithmetic_operation of \"add\" and has two sub-components under this function: the first component returns \"1\" and \"2\", and the second component returns \"3\" and \"4\" and \"5\". The local_variable element would be evaluated to be a collection of six values: 1+3, 1+4, 1+5, 2+3, 2+4, and 2+5.",
+          "Note that if both an integer and float components are used then the result is a float."
+        ],
+        "existing_visitor_subset": false,
+        "line": 729,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by an arithmetic function must have a datatype of float or int.",
+                "test": "@datatype='float' or @datatype='int'"
+              }
+            ],
+            "context": "oval-def:arithmetic/oval-def:literal_component",
+            "lets": [],
+            "line": 735
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the arithmetic function must have a datatype of float or int.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype='float' or ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype='int'"
+              }
+            ],
+            "context": "oval-def:arithmetic/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 738
+          }
+        ],
+        "type": "ArithmeticFunctionType"
+      },
+      "begin": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "name": "character",
+            "type": "xsd:string",
+            "use": "required"
+          }
+        ],
+        "documentation": [
+          "The begin function takes a single string component and defines a character (or string) that the component string should start with. The character attribute defines the specific character (or string). The character (or string) is only added to the component string if the component string does not already start with the specified character (or string). If the component string does not start with the specified character (or string) the entire character (or string) will be prepended to the component string.."
+        ],
+        "existing_visitor_subset": false,
+        "line": 750,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the begin function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:begin/oval-def:literal_component",
+            "lets": [],
+            "line": 755
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the begin function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:begin/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 758
+          }
+        ],
+        "type": "BeginFunctionType"
+      },
+      "concat": {
+        "arity": {
+          "maximum": "unbounded",
+          "minimum": 2
+        },
+        "attributes": [],
+        "documentation": [
+          "The concat function takes two or more components and concatenates them together to form a single string. The first component makes up the beginning of the resulting string and any following components are added to the end it. If one of the components returns multiple values then the concat function would be performed multiple times and the end result would be a collection of values for the local variable. For example assume a local variable has two sub-components: a basic component element returns the values \"abc\" and \"def\", and a literal component element that has a value of \"xyz\". The local_variable element would evaluate to a collection of two values, \"abcxyz\" and \"defxyz\". If one of the components does not exist, then the result of the concat operation should be does not exist."
+        ],
+        "existing_visitor_subset": true,
+        "line": 770,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the concat function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:concat/oval-def:literal_component",
+            "lets": [],
+            "line": 789
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the concat function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:concat/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 792
+          }
+        ],
+        "type": "ConcatFunctionType"
+      },
+      "count": {
+        "arity": {
+          "maximum": "unbounded",
+          "minimum": 1
+        },
+        "attributes": [],
+        "documentation": [
+          "The count function takes one or more components and returns the count of all of the values represented by the components. For example, assume that two variables exist, each with a single value. By applying the count function against two variable components that resolve to the two variables, the resulting local_variable would have a value of '2'. Additionally, if any of the components referenced by the count function evaluate to a collection of values, then those values are used in the count calculation. For example, assume that there are two components, one of which resolves to a single value, the other of which resolves to two values. If the count function is used to provide a count of these two components, the function will resolve to a local_variable with the values '3'."
+        ],
+        "existing_visitor_subset": false,
+        "line": 953,
+        "schematron": [],
+        "type": "CountFunctionType"
+      },
+      "end": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "name": "character",
+            "type": "xsd:string",
+            "use": "required"
+          }
+        ],
+        "documentation": [
+          "The end function takes a single string component and defines a character (or string) that the component string should end with. The character attribute defines the specific character (or string). The character (or string) is only added to the component string if the component string does not already end with the specified character (or string). If the desired end character is a string, then the entire end string must exist at the end if the component string. If the entire end string is not present then the entire end string is appended to the component string."
+        ],
+        "existing_visitor_subset": false,
+        "line": 803,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the end function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:end/oval-def:literal_component",
+            "lets": [],
+            "line": 808
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the end function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:end/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 811
+          }
+        ],
+        "type": "EndFunctionType"
+      },
+      "escape_regex": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [],
+        "documentation": [
+          "The escape_regex function takes a single string component and escapes all of the regular expression characters. If the string sub-component contains multiple values, then the escape_regex function will be applied to each individual value and return a multiple-valued result. For example, the string '(\\.test_string*)?' will evaluate to '\\(\\\\\\.test_string\\*\\)\\?'. The purpose for this is that many times, a component used in pattern match needs to be treated as a literal string and not a regular expression. For example, assume a basic component element that identifies a file path that is held in the Windows registry. This path is a string that might contain regular expression characters. These characters are likely not intended to be treated as regular expression characters and need to be escaped. This function allows a definition writer to mark convert the values of components to regular expression format.",
+          "Note that when using regular expressions, OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. The set of Perl metacharacters which must be escaped by this function is as follows, enclosed by single quotes: '^$\\.[](){}*+?|'. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html."
+        ],
+        "existing_visitor_subset": false,
+        "line": 823,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the escape_regex function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:escape_regex/oval-def:literal_component",
+            "lets": [],
+            "line": 829
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the escape_regex function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:escape_regex/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 832
+          }
+        ],
+        "type": "EscapeRegexFunctionType"
+      },
+      "glob_to_regex": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "default": "false",
+            "name": "glob_noescape",
+            "type": "xsd:boolean",
+            "use": "optional"
+          }
+        ],
+        "documentation": [
+          "The glob_to_regex function takes a single string component representing shell glob pattern and produces a single value that corresponds to result of a conversion of the original glob pattern into Perl 5's regular expression pattern. The glob_noescape attribute defines the way how the backslash ('\\') character should be interpreted. It defaults to 'false' meaning backslash should be interpreted as an escape character (backslash is allowed to be used as an escape character). If the glob_noescape attribute would be set to 'true' it instructs the glob_to_regex function to interpret the backslash ('\\') character as a literal, rather than as an escape character (backslash is *not* allowed to be used as an escape character). Refer to table with examples below to see the difference how a different boolean value of the 'glob_noescape' attribute will impact the output form of the resulting Perl 5's regular expression produced by glob_to_regex function.",
+          "Please note the glob_to_regex function will fail to perform the conversion and return an error when the provided string argument (to represent glob pattern) does not represent a syntactically correct glob pattern. For example given the 'a*b?[' as the argument to be converted, glob_to_regex would return an error since there's missing the corresponding closing bracket in the provided glob pattern argument.",
+          "Also, it is necessary to mention that the glob_to_regex function respects the default behaviour for the input glob pattern and output Perl 5's regular expression spaces. Namely this means that:",
+          "- glob_to_regex will respect the UNIX glob behavior when processing forward slashes, forward slash should be treated as a path separator and * or ? shall not match it,",
+          "- glob_to_regex will rule out matches having special meaning (for example '.' as a representation of the current working directory or '..' as a representation of the parent directory of the current working directory,",
+          "- glob_to_regex will rule out files or folders starting with '.' character (e.g. dotfiles) unless the respective glob pattern part itself starts with the '.' character,",
+          "- glob_to_regex will not perform case-sensitivity transformation (alphabetical characters will be copied from input glob pattern space to output Perl 5's regular expression pattern space intact). It is kept as a responsibility of the OVAL content author to provide input glob pattern argument in such case so the resulting Perl 5's regular expression pattern will match the expected pathname entries according to the case of preference,",
+          "- glob_to_regex will not perform any possible brace expansion. Therefore glob patterns like '{pat,pat,pat}' would be converted into Perl 5's regular expression syntax in the original un-expanded form (kept for any potential subsequent expansion to be performed by Perl 5's regular expression engine in the moment of the use of that resulting regular expression),",
+          "- glob_to_regex will not perform tilde ('~') character substitution to user name home directory pathname. The ('~') character will be passed to Perl 5's regular expression engine intact. If user name home directory pathname glob pattern behaviour is expected, the pathname of the user name home directory needs to be specified in the original input glob pattern already,",
+          "- glob_to_regex function will not perform any custom changes wrt to the ordering of items (perform any additional sorting of set of pathnames represented by the provided glob pattern argument)."
+        ],
+        "existing_visitor_subset": false,
+        "line": 961,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the glob_to_regex function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:glob_to_regex/oval-def:literal_component",
+            "lets": [],
+            "line": 1074
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the glob_to_regex function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:glob_to_regex/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 1077
+          }
+        ],
+        "type": "GlobToRegexFunctionType"
+      },
+      "merge": {
+        "arity": {
+          "maximum": "unbounded",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "default": "",
+            "name": "delimiter",
+            "type": "xsd:string",
+            "use": "optional"
+          },
+          {
+            "default": "document",
+            "enumeration": [
+              "document",
+              "lexical",
+              "numeric",
+              "natural"
+            ],
+            "name": "sort",
+            "type": "oval-def:SortEnumeration",
+            "use": "optional"
+          },
+          {
+            "default": "ascending",
+            "enumeration": [
+              "ascending",
+              "descending"
+            ],
+            "name": "order",
+            "type": "oval-def:OrderEnumeration",
+            "use": "optional"
+          }
+        ],
+        "documentation": [
+          "The merge function takes one or more components and merges them together into a single string value, optionally including a delimiter string. For example, if data from one registry reg_multi_sz value contains values of \"abc\" and \"def\", the merge function operated on those values would resolve to a string with the value of 'abcdef'. If an optional delimiter of ',' was used, the merge function would resolve to a value of 'abc,'def'."
+        ],
+        "existing_visitor_subset": true,
+        "line": 942,
+        "schematron": [],
+        "type": "MergeFunctionType"
+      },
+      "regex_capture": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "name": "pattern",
+            "type": "xsd:string"
+          }
+        ],
+        "documentation": [
+          "The regex_capture function captures a single substring from a single string component. If the string sub-component contains multiple values, then the regex_capture function will extract a substring from each value. The 'pattern' attribute provides a regular expression that should contain a single subexpression (using parentheses). For example, the pattern ^abc(.*)xyz$ would capture a substring from each of the string component's values if the value starts with abc and ends with xyz. In this case the subexpression would be all the characters that exist in between the abc and the xyz. Note that subexpressions match the longest possible substrings.",
+          "If the regular expression contains multiple capturing sub-patterns, only the first capture is used. If there are no capturing sub-patterns, the result for each target string must be the empty string. Otherwise, if the regular expression could match the target string in more than one place, only the first match (and its first capture) is used. If no matches are found in a target string, the result for that target must be the empty string.",
+          "Note that a quantified capturing sub-pattern does not produce multiple substrings. Standard regular expression semantics are such that if a capturing sub-pattern is required to match multiple times in order for the overall regular expression to match, the capture produced is the last substring to have matched the sub-pattern.",
+          "Note that when using regular expressions, OVAL supports a common subset of the regular expression character classes, operations, expressions and other lexical tokens defined within Perl 5's regular expression specification. If any of the Perl metacharacters are to be used literally, then they must be escaped. The set of metacharacters which must be escaped for this purpose is as follows, enclosed by single quotes: '^$\\.[](){}*+?|'. For more information on the supported regular expression syntax in OVAL see: http://oval.mitre.org/language/about/re_support_5.6.html."
+        ],
+        "existing_visitor_subset": true,
+        "line": 910,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the regex_capture function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:regex_capture/oval-def:literal_component",
+            "lets": [],
+            "line": 918
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the regex_capture function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:regex_capture/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 921
+          }
+        ],
+        "type": "RegexCaptureFunctionType"
+      },
+      "split": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "name": "delimiter",
+            "type": "xsd:string",
+            "use": "required"
+          }
+        ],
+        "documentation": [
+          "The split function takes a single string component and turns it into a collection of values based on a delimiter string. For example, assume that a basic component element returns the value \"a-b-c-d\" to the split function with the delimiter set to \"-\". The local_variable element would be evaluated to have four values \"a\", \"b\", \"c\", and \"d\". If the basic component returns a value that begins, or ends, with a delimiter, the local_variable element would contain empty string values at the beginning, or end, of the collection of values returned for that string component. For example, if the delimiter is \"-\", and the basic component element returns the value \"-a-a-\", the local_variable element would evaluate to a collection of four values \"\", \"a\", \"a\", and \"\". Likewise, if the basic component element returns a value that contains adjacent delimiters such as \"---\", the local_variable element would evaluate to a collection of four values \"\", \"\", \"\", and \"\". Lastly, if the basic component element used by the split function returnsa collection of values, then the split function is performed multiple times, and all of the results, from each of the split functions, are returned."
+        ],
+        "existing_visitor_subset": false,
+        "line": 843,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the split function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:split/oval-def:literal_component",
+            "lets": [],
+            "line": 849
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the split function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:split/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 852
+          }
+        ],
+        "type": "SplitFunctionType"
+      },
+      "substring": {
+        "arity": {
+          "maximum": "1",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "name": "substring_start",
+            "type": "xsd:int",
+            "use": "required"
+          },
+          {
+            "name": "substring_length",
+            "type": "xsd:int",
+            "use": "required"
+          }
+        ],
+        "documentation": [
+          "The substring function takes a single string component and produces a single value that contains a portion of the original string. The substring_start attribute defines the starting position in the original string. To include the first character of the string, the start position would be 1. A value less than 1 also means that the start position would be 1. If the substring_start attribute has value greater than the length of the original string an error should be reported. The substring_length attribute defines how many characters after, and including, the starting character to include. A substring_length value greater than the actual length of the string, or a negative value, means to include all of the characters after the starting character. For example, assume a basic component element that returns the value \"abcdefg\" with a substring_start value of 3 and a substring_length value of 2. The local_variable element would evaluate to have a single value of \"cd\". If the string component used by the substring function returns a collection of values, then the substring operation is performed multiple times and results in a collection of values for the component."
+        ],
+        "existing_visitor_subset": false,
+        "line": 864,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the substring function must have a datatype of string.",
+                "test": "not(@datatype) or @datatype='string'"
+              }
+            ],
+            "context": "oval-def:substring/oval-def:literal_component",
+            "lets": [],
+            "line": 870
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the substring function must have a datatype of string.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'"
+              }
+            ],
+            "context": "oval-def:substring/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 873
+          }
+        ],
+        "type": "SubstringFunctionType"
+      },
+      "time_difference": {
+        "arity": {
+          "maximum": "2",
+          "minimum": 1
+        },
+        "attributes": [
+          {
+            "default": "year_month_day",
+            "enumeration": [
+              "year_month_day",
+              "month_day_year",
+              "day_month_year",
+              "win_filetime",
+              "seconds_since_epoch",
+              "cim_datetime"
+            ],
+            "name": "format_1",
+            "type": "oval-def:DateTimeFormatEnumeration",
+            "use": "optional"
+          },
+          {
+            "default": "year_month_day",
+            "enumeration": [
+              "year_month_day",
+              "month_day_year",
+              "day_month_year",
+              "win_filetime",
+              "seconds_since_epoch",
+              "cim_datetime"
+            ],
+            "name": "format_2",
+            "type": "oval-def:DateTimeFormatEnumeration",
+            "use": "optional"
+          }
+        ],
+        "documentation": [
+          "The time_difference function calculates the difference in seconds between date-time values. If one component is specified, the values of that component are subtracted from the current time (UTC). The current time is the time at which the function is evaluated. If two components are specified, the value of the second component is subtracted from the value of the first component. If the component(s) contain a collection of values, the operation is performed multiple times on the Cartesian product of the component(s) and the result is also a collection of time difference values. For example, assume a local_variable specifies the time_difference function and has two sub-components under this function: the first component returns \"04/02/2009\" and \"04/03/2009\", and the second component returns \"02/02/2005\" and \"02/03/2005\" and \"02/04/2005\". The local_variable element would evaluate to a collection of six values: (ToSeconds(\"04/02/2009\") - ToSeconds(\"02/02/2005\")), (ToSeconds(\"04/02/2009\") - ToSeconds(\"02/03/2005\")), (ToSeconds(\"04/02/2009\") - ToSeconds(\"02/04/2005\")), (ToSeconds(\"04/03/2009\") - ToSeconds(\"02/02/2005\")), (ToSeconds(\"04/03/2009\") - ToSeconds(\"02/03/2005\")), and (ToSeconds(\"04/03/2009\") - ToSeconds(\"02/04/2005\")).",
+          "The date-time format of each component is determined by the two format attributes. The format1 attribute applies to the first component, and the format2 attribute applies to the second component. Valid values for the attributes are 'win_filetime', 'seconds_since_epoch', 'day_month_year', 'year_month_day', and 'month_day_year'. Please see the DateTimeFormatEnumeration for more information about each of these values. If an input value is not understood, the result is an error. If only one input is specified, specify the format with the format2 attribute, as the first input is considered to be the implied 'current time' input.",
+          "Note that the datatype associated with the components should be 'string' or 'int' depending on which date time format is specified. The result of this function though is always an integer."
+        ],
+        "existing_visitor_subset": false,
+        "line": 886,
+        "schematron": [
+          {
+            "assertions": [
+              {
+                "message": "A literal_component used by the time_difference function must have a datatype of string or int.",
+                "test": "not(@datatype) or @datatype='string' or @datatype='int'"
+              }
+            ],
+            "context": "oval-def:time_difference/oval-def:literal_component",
+            "lets": [],
+            "line": 894
+          },
+          {
+            "assertions": [
+              {
+                "message": "The variable referenced by the time_difference function must have a datatype of string or int.",
+                "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype='string' or ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype='int'"
+              }
+            ],
+            "context": "oval-def:time_difference/oval-def:variable_component",
+            "lets": [
+              {
+                "name": "var_ref",
+                "value": "@var_ref"
+              }
+            ],
+            "line": 897
+          }
+        ],
+        "type": "TimeDifferenceFunctionType"
+      },
+      "unique": {
+        "arity": {
+          "maximum": "unbounded",
+          "minimum": 1
+        },
+        "attributes": [],
+        "documentation": [
+          "The unique function takes one or more components and removes any duplicate value from the set of components. All components used in the unique function will be treated as strings. For example, assume that three components exist, one that contains a string value of 'foo', and two of which both resolve to the string value 'bar'. Applying the unique function to these three components resolves to a local_variable with two string values, 'foo' and 'bar'. Additionally, if any of the components referenced by the unique function evaluate to a collection of values, then those values are used in the unique calculation. For example, assume that there are two components, one of which resolves to a single string value, 'foo', the other of which resolves to two string values, 'foo' and 'bar'. If the unique function is used to remove duplicates from these two components, the function will resolve to a local_variable that is a collection of two string values, 'foo' and 'bar'."
+        ],
+        "existing_visitor_subset": true,
+        "line": 933,
+        "schematron": [],
+        "type": "UniqueFunctionType"
+      }
+    },
+    "global_variable_schematron": [
+      {
+        "assertions": [
+          {
+            "message": "- a var_ref has been supplied for the entity so no value should be provided",
+            "test": ".=''"
+          },
+          {
+            "message": "- inconsistent datatype between the variable and an associated var_ref",
+            "test": "( (not(@datatype)) and ('string' = ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype) ) or (@datatype = ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype)"
+          }
+        ],
+        "context": "oval-def:objects/*/*[@var_ref]|oval-def:objects/*/*/*[@var_ref]|oval-def:states/*/*[@var_ref]|oval-def:states/*/*/*[@var_ref]",
+        "lets": [
+          {
+            "name": "var_ref",
+            "value": "@var_ref"
+          }
+        ],
+        "line": 1294
+      },
+      {
+        "assertions": [
+          {
+            "message": "- The use of var_ref is prohibited when the datatype is 'record'.",
+            "test": "not(@var_ref)"
+          }
+        ],
+        "context": "oval-def:objects/*/*[@datatype='record']|oval-def:states/*/*[@datatype='record']",
+        "lets": [],
+        "line": 1363
+      }
+    ],
+    "path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+    "sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc"
+  },
+  "source_usage": {
+    "source_pin": {
+      "file_manifest_sha256": "6716516bafdbb1d93c761b68bda64a4f75062dd918132f5b7f3ee896008f5a20",
+      "path": "SCAP_1.4/OVAL_Test_Content",
+      "repository": "OVAL-Community/SCAP-Self-Assertion",
+      "revision": "e3538595c5083b9c34d937a81d319234df9bbfaa"
+    },
+    "summary": {
+      "arithmetic": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:644",
+            "variable": "oval:org.mitre.oval.test:var:247"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:17",
+            "variable": "oval:org.mitre.oval.test:var:24"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:774",
+            "variable": "oval:org.mitre.oval.test:var:572"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:211",
+            "variable": "oval:org.mitre.oval.test:var:693"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:51",
+            "variable": "oval:org.mitre.oval.test:var:184"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:178",
+            "variable": "oval:org.mitre.oval.test:var:201"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:970",
+            "variable": "oval:org.mitre.oval.test:var:278"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:74",
+            "variable": "oval:org.mitre.oval.test:var:129"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:674",
+            "variable": "oval:org.mitre.oval.test:var:589"
+          },
+          {
+            "document": "agnostic/oval-def_arithmetic_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:229",
+            "variable": "oval:org.mitre.oval.test:var:898"
+          }
+        ],
+        "example": {
+          "datatype": "int",
+          "document": "agnostic/oval-def_arithmetic_function.xml",
+          "function_excerpt": "<ns0:arithmetic xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" arithmetic_operation=\"add\">\n        <ns0:literal_component datatype=\"int\">1</ns0:literal_component>\n        <ns0:literal_component datatype=\"int\">1</ns0:literal_component>\n      </ns0:arithmetic>\n    ",
+          "sha256": "573351f7b8e8a685ec90596ba7d0d5f8842988c42fbd6e1a34cdc73dc38ec1f8",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:644",
+          "variable": "oval:org.mitre.oval.test:var:247",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:247\" version=\"1\" comment=\"Adding the integer 1 and the integer 1\" datatype=\"int\">\n      <ns0:arithmetic arithmetic_operation=\"add\">\n        <ns0:literal_component datatype=\"int\">1</ns0:literal_component>\n        <ns0:literal_component datatype=\"int\">1</ns0:literal_component>\n      </ns0:arithmetic>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 10,
+        "transitive_test_uses": 10
+      },
+      "begin": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_begin_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:35",
+            "variable": "oval:org.mitre.oval.test:var:826"
+          },
+          {
+            "document": "agnostic/oval-def_begin_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:209",
+            "variable": "oval:org.mitre.oval.test:var:398"
+          },
+          {
+            "document": "agnostic/oval-def_begin_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:446",
+            "variable": "oval:org.mitre.oval.test:var:916"
+          },
+          {
+            "document": "agnostic/oval-def_begin_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:101",
+            "variable": "oval:org.mitre.oval.test:var:427"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_begin_function.xml",
+          "function_excerpt": "<ns0:begin xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" character=\"a\">\n        <ns0:literal_component datatype=\"string\">pple</ns0:literal_component>\n      </ns0:begin>\n    ",
+          "sha256": "f7261105acebb72aaf0e62793b289a21867a7a1b13eba71ad7fa1fa93e58db57",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:35",
+          "variable": "oval:org.mitre.oval.test:var:826",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:826\" version=\"1\" comment=\"Applying the begin function with a character argument 'a' to the string 'pple'.\" datatype=\"string\">\n      <ns0:begin character=\"a\">\n        <ns0:literal_component datatype=\"string\">pple</ns0:literal_component>\n      </ns0:begin>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 4,
+        "transitive_test_uses": 4
+      },
+      "concat": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_concat_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:291",
+            "variable": "oval:org.mitre.oval.test:var:694"
+          },
+          {
+            "document": "agnostic/oval-def_concat_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:722",
+            "variable": "oval:org.mitre.oval.test:var:885"
+          },
+          {
+            "document": "agnostic/oval-def_concat_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:614",
+            "variable": "oval:org.mitre.oval.test:var:689"
+          },
+          {
+            "document": "agnostic/oval-def_concat_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:333",
+            "variable": "oval:org.mitre.oval.test:var:479"
+          },
+          {
+            "document": "macos/macos-def_keychain_test.xml",
+            "test": "oval:org.joval.test:tst:20002",
+            "variable": "oval:org.mitre.oval.test:var:730"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_concat_function.xml",
+          "function_excerpt": "<ns0:concat xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\">\n        <ns0:literal_component datatype=\"string\">abc</ns0:literal_component>\n        <ns0:literal_component datatype=\"string\">def</ns0:literal_component>\n      </ns0:concat>\n    ",
+          "sha256": "6e5beb1c5efd6b4646955e0fdb36c50a9845609b44fd27d2aef306f57a07d4ba",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:291",
+          "variable": "oval:org.mitre.oval.test:var:694",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:694\" version=\"1\" comment=\"Applying the concat function to the strings 'abc' and 'def'.\" datatype=\"string\">\n      <ns0:concat>\n        <ns0:literal_component datatype=\"string\">abc</ns0:literal_component>\n        <ns0:literal_component datatype=\"string\">def</ns0:literal_component>\n      </ns0:concat>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 4,
+        "transitive_test_uses": 5
+      },
+      "count": {
+        "case_identities": [],
+        "example": null,
+        "source_valid_nondeprecated_uses": 0,
+        "transitive_test_uses": 0
+      },
+      "end": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_end_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:138",
+            "variable": "oval:org.mitre.oval.test:var:944"
+          },
+          {
+            "document": "agnostic/oval-def_end_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:625",
+            "variable": "oval:org.mitre.oval.test:var:619"
+          },
+          {
+            "document": "agnostic/oval-def_end_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:814",
+            "variable": "oval:org.mitre.oval.test:var:600"
+          },
+          {
+            "document": "agnostic/oval-def_end_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:786",
+            "variable": "oval:org.mitre.oval.test:var:556"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_end_function.xml",
+          "function_excerpt": "<ns0:end xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" character=\"e\">\n        <ns0:literal_component datatype=\"string\">appl</ns0:literal_component>\n      </ns0:end>\n    ",
+          "sha256": "cbbc98cd2203a27ca10ca75316c0f0910cf5dfb29db8ef2ef52582e31823846b",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:138",
+          "variable": "oval:org.mitre.oval.test:var:944",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:944\" version=\"1\" comment=\"Applying the end function with a character argument 'e' to the string 'appl'.\" datatype=\"string\">\n      <ns0:end character=\"e\">\n        <ns0:literal_component datatype=\"string\">appl</ns0:literal_component>\n      </ns0:end>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 4,
+        "transitive_test_uses": 4
+      },
+      "escape_regex": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_escape_regex_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:546",
+            "variable": "oval:org.mitre.oval.test:var:780"
+          },
+          {
+            "document": "agnostic/oval-def_escape_regex_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:905",
+            "variable": "oval:org.mitre.oval.test:var:324"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_escape_regex_function.xml",
+          "function_excerpt": "<ns0:escape_regex xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\">\n        <ns0:literal_component datatype=\"string\">\\^.$|()[]{}*+?</ns0:literal_component>\n      </ns0:escape_regex>\n    ",
+          "sha256": "4e561d9ca7db1cfe33035e78d906b3860ce555a86f459c1e5132c6ba354b6433",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:546",
+          "variable": "oval:org.mitre.oval.test:var:780",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:780\" version=\"1\" comment=\"Applying the escape_regex function to the string '\\^.$|()[]{}*+?'.\" datatype=\"string\">\n      <ns0:escape_regex>\n        <ns0:literal_component datatype=\"string\">\\^.$|()[]{}*+?</ns0:literal_component>\n      </ns0:escape_regex>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 2,
+        "transitive_test_uses": 2
+      },
+      "glob_to_regex": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:1",
+            "variable": "oval:x:var:1"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:2",
+            "variable": "oval:x:var:2"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:3",
+            "variable": "oval:x:var:3"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:4",
+            "variable": "oval:x:var:4"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:5",
+            "variable": "oval:x:var:5"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:6",
+            "variable": "oval:x:var:6"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:7",
+            "variable": "oval:x:var:7"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:8",
+            "variable": "oval:x:var:8"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:9",
+            "variable": "oval:x:var:9"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:10",
+            "variable": "oval:x:var:10"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:11",
+            "variable": "oval:x:var:11"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:12",
+            "variable": "oval:x:var:12"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:13",
+            "variable": "oval:x:var:13"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:14",
+            "variable": "oval:x:var:14"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:15",
+            "variable": "oval:x:var:15"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:16",
+            "variable": "oval:x:var:16"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:17",
+            "variable": "oval:x:var:17"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:18",
+            "variable": "oval:x:var:18"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:19",
+            "variable": "oval:x:var:19"
+          },
+          {
+            "document": "agnostic/oval-def_globtoregex_test.xml",
+            "test": "oval:x:tst:20",
+            "variable": "oval:x:var:20"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_globtoregex_test.xml",
+          "function_excerpt": "<ns0:glob_to_regex xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\">\n        <ns0:literal_component datatype=\"string\">abcd</ns0:literal_component>\n      </ns0:glob_to_regex>\n    ",
+          "sha256": "fb061d16c22c204d5ea9e7cbdb6a9bfff530136f9af340dd5cd9870ebde3d587",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:x:tst:1",
+          "variable": "oval:x:var:1",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:x:var:1\" version=\"1\" comment=\"Applying the glob_to_regex function to the glob string.\" datatype=\"string\">\n      <ns0:glob_to_regex>\n        <ns0:literal_component datatype=\"string\">abcd</ns0:literal_component>\n      </ns0:glob_to_regex>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 20,
+        "transitive_test_uses": 20
+      },
+      "merge": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_merge.xml",
+            "test": "oval:navy.navwar.niwcatlantic.scc:tst:1",
+            "variable": "oval:navy.navwar.niwcatlantic.scc:var:1"
+          },
+          {
+            "document": "agnostic/oval-def_merge.xml",
+            "test": "oval:navy.navwar.niwcatlantic.scc:tst:2",
+            "variable": "oval:navy.navwar.niwcatlantic.scc:var:2"
+          },
+          {
+            "document": "agnostic/oval-def_merge.xml",
+            "test": "oval:navy.navwar.niwcatlantic.scc:tst:3",
+            "variable": "oval:navy.navwar.niwcatlantic.scc:var:3"
+          },
+          {
+            "document": "agnostic/oval-def_merge.xml",
+            "test": "oval:navy.navwar.niwcatlantic.scc:tst:4",
+            "variable": "oval:navy.navwar.niwcatlantic.scc:var:4"
+          }
+        ],
+        "example": {
+          "datatype": "int",
+          "document": "agnostic/oval-def_merge.xml",
+          "function_excerpt": "<ns0:merge xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" delimiter=\":\" sort=\"natural\">\n        <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc:obj:100\" item_field=\"value\" />\n      </ns0:merge>\n    ",
+          "sha256": "e9cf10371c2d41a3c92087a93f62f597043828d0914a21c5ab4314f03fd8a6ef",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:navy.navwar.niwcatlantic.scc:tst:1",
+          "variable": "oval:navy.navwar.niwcatlantic.scc:var:1",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" comment=\"merge integer variables, sorting naturally\" datatype=\"int\" id=\"oval:navy.navwar.niwcatlantic.scc:var:1\" version=\"1\">\n      <ns0:merge delimiter=\":\" sort=\"natural\">\n        <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc:obj:100\" item_field=\"value\" />\n      </ns0:merge>\n    </ns0:local_variable>\n\n\t"
+        },
+        "source_valid_nondeprecated_uses": 4,
+        "transitive_test_uses": 4
+      },
+      "regex_capture": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_regex_capture_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:265",
+            "variable": "oval:org.mitre.oval.test:var:637"
+          },
+          {
+            "document": "agnostic/oval-def_regex_capture_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:511",
+            "variable": "oval:org.mitre.oval.test:var:956"
+          },
+          {
+            "document": "agnostic/oval-def_regex_capture_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:108",
+            "variable": "oval:org.mitre.oval.test:var:1001"
+          },
+          {
+            "document": "agnostic/oval-def_regex_capture_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:242",
+            "variable": "oval:org.mitre.oval.test:var:890"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_regex_capture_function.xml",
+          "function_excerpt": "<ns0:regex_capture xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" pattern=\"(i..)+\">\n        <ns0:literal_component datatype=\"string\">mississippi</ns0:literal_component>\n      </ns0:regex_capture>\n    ",
+          "sha256": "97eb7a96b6d893b80277b0f0ae973884d736f8e4689992b93fa57fe0c5fa4c55",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:265",
+          "variable": "oval:org.mitre.oval.test:var:637",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:637\" version=\"1\" comment=\"A regex_capture object with pattern '(i..)+' applied to string 'mississippi'.\" datatype=\"string\">\n      <ns0:regex_capture pattern=\"(i..)+\">\n        <ns0:literal_component datatype=\"string\">mississippi</ns0:literal_component>\n      </ns0:regex_capture>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 4,
+        "transitive_test_uses": 4
+      },
+      "split": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_split_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:513",
+            "variable": "oval:org.mitre.oval.test:var:200"
+          },
+          {
+            "document": "agnostic/oval-def_split_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:217",
+            "variable": "oval:org.mitre.oval.test:var:966"
+          },
+          {
+            "document": "agnostic/oval-def_split_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:566",
+            "variable": "oval:org.mitre.oval.test:var:502"
+          },
+          {
+            "document": "agnostic/oval-def_split_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:479",
+            "variable": "oval:org.mitre.oval.test:var:83"
+          },
+          {
+            "document": "agnostic/oval-def_split_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:25",
+            "variable": "oval:org.mitre.oval.test:var:239"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_split_function.xml",
+          "function_excerpt": "<ns0:split xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" delimiter=\"-\">\n        <ns0:literal_component>a-a-a</ns0:literal_component>\n      </ns0:split>\n    ",
+          "sha256": "823114699db0b071d3b1b7a2393ee31a5f91d35847e3ab0ec5a032146af9a674",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:513",
+          "variable": "oval:org.mitre.oval.test:var:200",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:200\" version=\"1\" comment=\"a-a-a =&gt; 'a','a','a'\" datatype=\"string\">\n      <ns0:split delimiter=\"-\">\n        <ns0:literal_component>a-a-a</ns0:literal_component>\n      </ns0:split>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 5,
+        "transitive_test_uses": 5
+      },
+      "substring": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_substring_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:47",
+            "variable": "oval:org.mitre.oval.test:var:982"
+          },
+          {
+            "document": "agnostic/oval-def_substring_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:174",
+            "variable": "oval:org.mitre.oval.test:var:136"
+          },
+          {
+            "document": "agnostic/oval-def_substring_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:606",
+            "variable": "oval:org.mitre.oval.test:var:330"
+          },
+          {
+            "document": "agnostic/oval-def_substring_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:314",
+            "variable": "oval:org.mitre.oval.test:var:887"
+          },
+          {
+            "document": "agnostic/oval-def_substring_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:982",
+            "variable": "oval:org.mitre.oval.test:var:79"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_substring_function.xml",
+          "function_excerpt": "<ns0:substring xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" substring_start=\"3\" substring_length=\"2\">\n        <ns0:literal_component datatype=\"string\">abcdefg</ns0:literal_component>\n      </ns0:substring>\n    ",
+          "sha256": "892d18d9fa055cb59882b470a8e97e43c4069b968d4c136984b0692fcbd73e97",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:47",
+          "variable": "oval:org.mitre.oval.test:var:982",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:982\" version=\"1\" comment=\"Applying the substring function to the string 'abcdefg' with substring_start value 3 and substring_length value 2.\" datatype=\"string\">\n      <ns0:substring substring_start=\"3\" substring_length=\"2\">\n        <ns0:literal_component datatype=\"string\">abcdefg</ns0:literal_component>\n      </ns0:substring>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 5,
+        "transitive_test_uses": 5
+      },
+      "time_difference": {
+        "case_identities": [
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:817",
+            "variable": "oval:org.mitre.oval.test:var:248"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1085",
+            "variable": "oval:org.mitre.oval.test:var:426"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1078",
+            "variable": "oval:org.mitre.oval.test:var:318"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1021",
+            "variable": "oval:org.mitre.oval.test:var:655"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1095",
+            "variable": "oval:org.mitre.oval.test:var:703"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:682",
+            "variable": "oval:org.mitre.oval.test:var:734"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1015",
+            "variable": "oval:org.mitre.oval.test:var:901"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:845",
+            "variable": "oval:org.mitre.oval.test:var:299"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:570",
+            "variable": "oval:org.mitre.oval.test:var:845"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:146",
+            "variable": "oval:org.mitre.oval.test:var:623"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:402",
+            "variable": "oval:org.mitre.oval.test:var:930"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:161",
+            "variable": "oval:org.mitre.oval.test:var:301"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1139",
+            "variable": "oval:org.mitre.oval.test:var:335"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1059",
+            "variable": "oval:org.mitre.oval.test:var:533"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1087",
+            "variable": "oval:org.mitre.oval.test:var:561"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1049",
+            "variable": "oval:org.mitre.oval.test:var:78"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1072",
+            "variable": "oval:org.mitre.oval.test:var:681"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:370",
+            "variable": "oval:org.mitre.oval.test:var:303"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1155",
+            "variable": "oval:org.mitre.oval.test:var:918"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1016",
+            "variable": "oval:org.mitre.oval.test:var:154"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:187",
+            "variable": "oval:org.mitre.oval.test:var:169"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1183",
+            "variable": "oval:org.mitre.oval.test:var:204"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1168",
+            "variable": "oval:org.mitre.oval.test:var:379"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1178",
+            "variable": "oval:org.mitre.oval.test:var:21"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1134",
+            "variable": "oval:org.mitre.oval.test:var:624"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:191",
+            "variable": "oval:org.mitre.oval.test:var:532"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:427",
+            "variable": "oval:org.mitre.oval.test:var:799"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1066",
+            "variable": "oval:org.mitre.oval.test:var:799"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:434",
+            "variable": "oval:org.mitre.oval.test:var:96"
+          },
+          {
+            "document": "agnostic/oval-def_time_difference_function.xml",
+            "test": "oval:org.mitre.oval.test:tst:1040",
+            "variable": "oval:org.mitre.oval.test:var:802"
+          }
+        ],
+        "example": {
+          "datatype": "string",
+          "document": "agnostic/oval-def_time_difference_function.xml",
+          "function_excerpt": "<ns0:time_difference xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" format_1=\"year_month_day\" format_2=\"year_month_day\">\n        <ns0:literal_component>20090204T122343</ns0:literal_component>\n        <ns0:literal_component>20040204T054121</ns0:literal_component>\n      </ns0:time_difference>\n    ",
+          "sha256": "c7e974a0a14ba4c7b72807e46e8052527b34a6da3672ca916dd57e5b4c2fd056",
+          "source_validity": {
+            "issues": [],
+            "status": "VALID"
+          },
+          "test": "oval:org.mitre.oval.test:tst:817",
+          "variable": "oval:org.mitre.oval.test:var:248",
+          "variable_excerpt": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:org.mitre.oval.test:var:248\" version=\"1\" comment=\"A single time difference value that is equal to the difference between two year_month_day timedate values.\" datatype=\"string\">\n      <ns0:time_difference format_1=\"year_month_day\" format_2=\"year_month_day\">\n        <ns0:literal_component>20090204T122343</ns0:literal_component>\n        <ns0:literal_component>20040204T054121</ns0:literal_component>\n      </ns0:time_difference>\n    </ns0:local_variable>\n    "
+        },
+        "source_valid_nondeprecated_uses": 30,
+        "transitive_test_uses": 30
+      },
+      "unique": {
+        "case_identities": [],
+        "example": null,
+        "source_valid_nondeprecated_uses": 0,
+        "transitive_test_uses": 0
+      }
+    }
+  }
+}

@@ -958,3 +958,17 @@ no older grammar and performs no wrapper flattening or version-string rewriting.
 The [native generator report](../audit/v04-native-generator.md) documents field
 refresh, source kinds, the full parity fixture and focused tests. Genuine cmdlet
 `select` remains metadata-defined; generic acquisition wrappers remain invalid.
+
+## Original Variable-function contract inventory
+
+Use [the read-only audit](../../tools/audit_v04_variable_function_contracts.py)
+to extract original XSD/Schematron signatures, option defaults/enums and
+source-valid examples through complete Variable dependency closures. It sees
+functions masked by an earlier conversion blocker and refuses to overwrite
+existing output. This is engineering evidence, not conversion or evaluation.
+
+The [grouped function decision package](../audit/v04-variable-function-decision-20261028/README.md)
+under #255 recommends one `function: {name, arguments, options}` envelope. It is
+unapproved and is not emitted. Nine remaining original function names stay
+unsupported; the existing four payload forms and all verified conversions are
+preserved while independent #251 work continues.

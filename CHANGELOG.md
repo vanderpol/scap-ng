@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Added a read-only original Variable-function contract and
+  transitive dependency audit, including XSD/Schematron facts and source-valid
+  examples masked by earlier conversion blockers. No new function syntax is
+  enabled ([#251](https://github.com/vanderpol/scap-ng/issues/251),
+  [#255](https://github.com/vanderpol/scap-ng/issues/255)).
+
 - **2026-10-28:** Independently prove eight previously compiled Windows
   acquisition cases: nil selectors, NTUSER traversal and Item creation.
   All 521 compiled corpus programs remain unchanged; source-valid/nondeprecated
