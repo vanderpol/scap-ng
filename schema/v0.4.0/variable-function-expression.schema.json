@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.0/variable-function-expression.schema.json",
+  "title": "Approved-direction Variable function expression (migration contract)",
+  "description": "Isolated canonical contract for migration testing. Not yet referenced by assessment.schema.json; legacy expressions remain accepted until coordinated migration.",
+  "$ref": "#/$defs/expression",
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {"type": "object", "required": ["variable"], "properties": {"variable": {"type": "string", "minLength": 1}}, "additionalProperties": false},
+        {"type": "object", "required": ["literal"], "properties": {"literal": {"oneOf": [{"type": "string"}, {"type": "object", "required": ["datatype", "value"], "properties": {"datatype": {"type": "string", "minLength": 1}, "value": {"type": ["string", "number", "boolean"]}}, "additionalProperties": false}]}}, "additionalProperties": false},
+        {"type": "object", "required": ["values"], "properties": {"values": {"type": "object", "required": ["object", "field"], "properties": {"object": {"oneOf": [{"type": "string", "minLength": 1}, {"type": "object"}]}, "field": {"type": "string", "minLength": 1}}, "additionalProperties": false}}, "additionalProperties": false},
+        {"$ref": "#/$defs/function_call"}
+      ]
+    },
+    "function_call": {
+      "type": "object",
+      "required": ["function"],
+      "properties": {"function": {
+        "type": "object", "required": ["name", "arguments", "options"],
+        "properties": {
+          "name": {"enum": ["arithmetic", "begin", "end", "escape_regex", "glob_to_regex", "split", "substring", "time_difference", "count", "concat", "regex_capture", "unique", "merge"]},
+          "arguments": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/expression"}},
+          "options": {"type": "object"}
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {"if": {"properties": {"name": {"enum": ["arithmetic", "concat"]}}}, "then": {"properties": {"arguments": {"minItems": 2}}}},
+          {"if": {"properties": {"name": {"enum": ["begin", "end", "escape_regex", "glob_to_regex", "split", "substring", "regex_capture"]}}}, "then": {"properties": {"arguments": {"maxItems": 1}}}},
+          {"if": {"properties": {"name": {"const": "time_difference"}}}, "then": {"properties": {"arguments": {"maxItems": 2}}}},
+          {"if": {"properties": {"name": {"const": "arithmetic"}}}, "then": {"properties": {"options": {"type": "object", "required": ["arithmetic_operation"], "properties": {"arithmetic_operation": {"enum": ["add", "multiply"]}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"enum": ["begin", "end"]}}}, "then": {"properties": {"options": {"type": "object", "required": ["character"], "properties": {"character": {"type": "string"}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"const": "split"}}}, "then": {"properties": {"options": {"type": "object", "required": ["delimiter"], "properties": {"delimiter": {"type": "string"}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"const": "substring"}}}, "then": {"properties": {"options": {"type": "object", "required": ["substring_start", "substring_length"], "properties": {"substring_start": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647}, "substring_length": {"type": "integer", "minimum": -2147483648, "maximum": 2147483647}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"const": "glob_to_regex"}}}, "then": {"properties": {"options": {"type": "object", "properties": {"glob_noescape": {"type": "boolean"}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"const": "regex_capture"}}}, "then": {"properties": {"options": {"type": "object", "required": ["pattern"], "properties": {"pattern": {"type": "string"}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"const": "time_difference"}}}, "then": {"properties": {"options": {"type": "object", "properties": {"format_1": {"$ref": "#/$defs/time_format"}, "format_2": {"$ref": "#/$defs/time_format"}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"const": "merge"}}}, "then": {"properties": {"options": {"type": "object", "properties": {"delimiter": {"type": "string"}, "sort": {"enum": ["document", "lexical", "numeric", "natural"]}, "order": {"enum": ["ascending", "descending"]}}, "additionalProperties": false}}}},
+          {"if": {"properties": {"name": {"enum": ["escape_regex", "count", "concat", "unique"]}}}, "then": {"properties": {"options": {"type": "object", "maxProperties": 0}}}}
+        ]
+      }},
+      "additionalProperties": false
+    },
+    "time_format": {"enum": ["year_month_day", "month_day_year", "day_month_year", "win_filetime", "seconds_since_epoch", "cim_datetime"]}
+  }
+}
