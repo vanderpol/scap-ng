@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-28:** Added an explicit `incomplete` Variable-result status to
+  represent observed typed values without asserting a complete acquisition
+  population. This additive schema-only contract does not define function
+  result precedence or establish runtime evaluator conformance
+  ([#255](https://github.com/vanderpol/scap-ng/issues/255)).
+
 - **2026-10-28:** Connected Textfilecontent54 to the existing shared file
   traversal contract while retaining regex flags, source path restrictions
   and ordered Filters. Forty-three additional original Linux Rules now prove
