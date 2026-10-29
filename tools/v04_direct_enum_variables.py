@@ -3,6 +3,50 @@ from copy import deepcopy
 from v04_direct_scap_source import digest, ensure, native_identifier
 
 
+def validate_identity_enum_variable(visitor, name, domain):
+    """Validate closed string graphs without renaming values or declarations."""
+    active = set()
+    checked = set()
+
+    def literal(value):
+        ensure(isinstance(value, str) and value in domain,
+               'enum selector requires known supported values')
+
+    def expression(node):
+        if set(node) == {'literal'}:
+            value = node['literal']
+            ensure(isinstance(value, dict) and set(value) == {'datatype', 'value'}
+                   and value['datatype'] == 'string', 'enum selector Variable requires string literals')
+            literal(value['value'])
+        elif set(node) == {'variable'}:
+            variable(node['variable'])
+        elif set(node) == {'unique'}:
+            expression(node['unique'])
+        else:
+            ensure(False, 'enum selector Variable requires a closed literal/reference/unique graph')
+
+    def variable(identifier):
+        ensure(identifier not in active, 'cyclic enum selector Variable graph')
+        if identifier in checked:
+            return
+        active.add(identifier)
+        node = visitor.variables[identifier]
+        ensure(node['datatype'] == 'string', 'enum selector Variable requires string datatype')
+        if node['kind'] == 'constant':
+            ensure(set(node['expression']) == {'literal'} and
+                   isinstance(node['expression']['literal'], list), 'malformed enum constant Variable')
+            for value in node['expression']['literal']:
+                literal(value)
+        else:
+            ensure(node['kind'] == 'local', 'unsupported enum selector Variable kind')
+            expression(node['expression'])
+        active.remove(identifier)
+        checked.add(identifier)
+
+    ensure(bool(domain), 'enum selector requires a closed value domain')
+    variable(name)
+
+
 def closed_enum_variable(visitor, identifier, aliases):
     """Clone existing typed expressions; leave generic consumers unchanged.
 

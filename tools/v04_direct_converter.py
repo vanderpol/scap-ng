@@ -674,6 +674,11 @@ class AssessmentConverter:
             enumeration = mapping['native'].get('selector_value_enums', {}).get(field)
             if enumeration:
                 ensure(operation == 'equals', 'unsupported enum selector comparator')
+                if isinstance(value, dict) and not native_enum_variable and not crosswalk:
+                    from v04_direct_enum_variables import validate_identity_enum_variable
+                    ensure(set(value) == {'variable'}, 'unsupported enum selector operand')
+                    validate_identity_enum_variable(self, value['variable'], enumeration)
+                    native_enum_variable = True
                 expected = value if isinstance(value, list) else [value]
                 ensure(native_enum_variable or all(isinstance(v, str) and v in enumeration for v in expected),
                        'enum selector requires known supported values')

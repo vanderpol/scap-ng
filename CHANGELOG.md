@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Admit closed identity-domain enum Variable graphs in
+  selectors without changing names, graph structure or quantifiers. Two
+  original AppCmd/AppCmdListConfig conformance Tests now prove; all previous
+  521 conformance proofs and 1,072 primary production program hashes remain
+  unchanged ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-28:** Preserve explicitly declared shellcommand regex acquisition
   inputs through the existing mapping. Seventeen additional original Linux
   Rules prove and compile; all 1,055 preceding primary program hashes remain
