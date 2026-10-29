@@ -7,6 +7,33 @@ Read [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md) before resuming. This is a restart
 record, not a release/scanner-conformance declaration.
 
+## Owner report — observed source oddities and numeric-capture clarification
+
+The owner requested one actionable report of all observed oddity classes.
+[Source oddities report](../audit/v04-source-oddities-owner-report-20261029.md)
+contains 23 finding classes and suggestions for producer, standards and converter
+ownership. The companion PDF/HTML, CSV (3,024 distinct Rules, covering all 2,981
+residual automated blockers), detailed JSON and reconstruction driver are in the
+[report evidence](https://github.com/vanderpol/scap-ng-evidence/tree/v04-source-oddities-report-20261029/runs/v04-converter/2026-10-29-source-oddities-owner-report).
+The report joins existing pinned records; no corpus regeneration or source repair.
+
+Owner clarification: a regex capture yielding `5` can be interpreted as integer
+and used numerically. The original SV-215833 HTTP-timeout Variable
+`...:var:21583310`, regex `ip http timeout-policy idle (\d+)`, does exactly that
+and is explicitly excluded from the text-datatype concern. The concern is the
+separate intermediate chain 21583304/21583307/21583305, which splits, captures
+`timeout 5 0`, and merges text while declaring int. The later State pattern's
+inner numeric group does not change the earlier captured Variable value. Exact
+source excerpts and the report now distinguish these branches. No original or
+validator was changed, and no runtime failure/equivalence is inferred.
+
+User-delivery artifacts: `/workspace/reports/scap-ng-source-oddities-20261029/`
+and `/workspace/reports/scap-ng-source-oddities-20261029.zip`. Recovery generators
+are `/workspace/recovery-20261029-resume/build_owner_report.py` and
+`render_owner_report.py`. Source implementation remains the previously fully
+hosted-green `b70802028075850cf5f4397c50249813f86a7b14`; these changes are reporting
+only. Keep #251/#255 population/producer-extension/casting decisions distinct.
+
 ## Recovery checkpoint — DRAFT published; IOS XE reader integration
 
 Recovered 2026-10-29 from GitHub/source HEAD

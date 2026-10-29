@@ -68,6 +68,25 @@ requires each returned value to comply with the declared datatype or report an
 error. That gives a stronger content defect candidate than an integer count
 being formatted as a string.
 
+The owner correctly noted that a regex can extract `5`, which can then be used
+as an integer. This Rule contains exactly such a separate branch:
+
+```xml
+<local_variable id="...:var:21583310" datatype="int" ...>
+  <regex_capture pattern="ip http timeout-policy idle (\d+)">
+    <object_component object_ref="...:obj:21583311" item_field="global_command"/>
+  </regex_capture>
+</local_variable>
+```
+
+Its captured digit sequence is integer-representable and is compared numerically
+with 300. That branch is not the text-datatype concern. The concerning chain is
+21583304 (split configuration text), 21583307 (capture text after `exec-`) and
+21583305 (merge timeout text), all declared `int`. The inner `(5|4|3|2|1)` group
+belongs to the subsequent State regex used to match the merged text; it does
+not redefine the earlier Variable's captured output. Numeric captures should
+remain eligible for numeric operations; text captures require separate review.
+
 The split delimiter is also literally two characters, backslash and `n`
 (Unicode 92, 110), not a newline character in XML. OVAL documents split as using
 a delimiter string. Whether the intended source relied on scanner-specific
