@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:oval_definitions xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <ns0:generator>
+        <ns1:product_name>Security Content Tool 1.9.0</ns1:product_name>
+        <ns1:schema_version>5.11</ns1:schema_version>
+        <ns1:timestamp>2026-06-25T09:46:00</ns1:timestamp>
+      </ns0:generator>
+      <ns0:definitions>
+        <ns0:definition id="oval:mil.disa.stig.solaris11:def:79" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>Permissions on user home directories must be 750 or less permissive.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 11</ns0:platform>
+            </ns0:affected>
+            <ns0:description>Group-writable or world-writable user home directories may enable malicious users to steal or modify other users' data or to gain another user's system privileges.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria>
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:7900" comment="user home directory permissions are 750 or less permissive" />
+          </ns0:criteria>
+        </ns0:definition>
+        </ns0:definitions>
+      <ns0:tests>
+        <ns2:file_test id="oval:mil.disa.stig.solaris11:tst:7900" version="1" check_existence="any_exist" check="all" comment="user home directory permissions are 750 or less permissive">
+          <ns2:object object_ref="oval:mil.disa.stig.solaris11:obj:7900" />
+          <ns2:state state_ref="oval:mil.disa.stig.solaris11:ste:7500" />
+        </ns2:file_test>
+        </ns0:tests>
+      <ns0:objects>
+        <ns2:shadow_object id="oval:mil.disa.stig.solaris11:obj:7501" version="2" comment="all accounts">
+          <ns2:username datatype="string" operation="pattern match">.*</ns2:username>
+        </ns2:shadow_object>
+        <ns2:shadow_object id="oval:mil.disa.stig.solaris11:obj:7502" version="2" comment="all accounts with PS status">
+          <ns0:set set_operator="UNION">
+            <ns0:object_reference>oval:mil.disa.stig.solaris11:obj:7501</ns0:object_reference>
+            <ns0:filter>oval:mil.disa.stig.solaris11:ste:1802</ns0:filter>
+            <ns0:filter>oval:mil.disa.stig.solaris11:ste:1803</ns0:filter>
+            <ns0:filter>oval:mil.disa.stig.solaris11:ste:7501</ns0:filter>
+            <ns0:filter>oval:mil.disa.stig.solaris11:ste:7502</ns0:filter>
+          </ns0:set>
+        </ns2:shadow_object>
+        <ns2:password_object id="oval:mil.disa.stig.solaris11:obj:7503" version="1" comment="all accounts with PS status">
+          <ns2:username datatype="string" operation="equals" var_ref="oval:mil.disa.stig.solaris11:var:7500" var_check="at least one" />
+        </ns2:password_object>
+        <ns2:file_object id="oval:mil.disa.stig.solaris11:obj:7900" version="1" comment="account home directories">
+          <ns2:path operation="equals" var_ref="oval:mil.disa.stig.solaris11:var:7501" var_check="at least one" />
+          <ns2:filename operation="equals" xsi:nil="true" />
+        </ns2:file_object>
+        </ns0:objects>
+      <ns0:states>
+        <ns2:shadow_state id="oval:mil.disa.stig.solaris11:ste:1802" version="1" comment="Locked account">
+          <ns2:password datatype="string" operation="pattern match">^\*LK\*</ns2:password>
+        </ns2:shadow_state>
+        <ns2:shadow_state id="oval:mil.disa.stig.solaris11:ste:1803" version="1" comment="Login account">
+          <ns2:password datatype="string" operation="equals">NP</ns2:password>
+        </ns2:shadow_state>
+        <ns2:file_state id="oval:mil.disa.stig.solaris11:ste:7500" version="1" comment="750 or less permissive">
+          <ns2:gwrite datatype="boolean">false</ns2:gwrite>
+          <ns2:oread datatype="boolean">false</ns2:oread>
+          <ns2:owrite datatype="boolean">false</ns2:owrite>
+          <ns2:oexec datatype="boolean">false</ns2:oexec>
+        </ns2:file_state>
+        <ns2:shadow_state id="oval:mil.disa.stig.solaris11:ste:7501" version="1" comment="UP account status">
+          <ns2:password datatype="string" operation="equals">UP</ns2:password>
+        </ns2:shadow_state>
+        <ns2:shadow_state id="oval:mil.disa.stig.solaris11:ste:7502" version="1" comment="no password account status">
+          <ns2:password datatype="string" operation="pattern match">^$</ns2:password>
+        </ns2:shadow_state>
+        </ns0:states>
+      <ns0:variables>
+        <ns0:local_variable id="oval:mil.disa.stig.solaris11:var:7500" version="1" datatype="string" comment="user names for PS status accounts">
+          <ns0:object_component object_ref="oval:mil.disa.stig.solaris11:obj:7502" item_field="username" />
+        </ns0:local_variable>
+        <ns0:local_variable id="oval:mil.disa.stig.solaris11:var:7501" version="1" datatype="string" comment="home directories for PS status accounts">
+          <ns0:object_component object_ref="oval:mil.disa.stig.solaris11:obj:7503" item_field="home_dir" />
+        </ns0:local_variable>
+        </ns0:variables>
+    </ns0:oval_definitions>
+  

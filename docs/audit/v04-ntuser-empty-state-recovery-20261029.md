@@ -74,8 +74,11 @@ normative decision is inferred.
 - The maintained suite ran **3,279 tests: 3,278 passed, zero failures/errors,
   one existing skip**, in 1507.413 seconds on this local candidate. The
   receipt records the tested code/fixture/mapping hashes and skip identity.
-  Exact-commit hosted CI is pending publication; preceding hosted CI is not
-  represented as testing this correction.
+  All nine exact-commit workflows at `f141efb07603e72a3982ffda87489da8f0d5c74f`
+  subsequently passed. [Hosted maintained suite 40863822537](https://github.com/vanderpol/scap-ng/actions/runs/40863822537):
+  3,279 run / 3,278 passed, zero failures/errors, one skip, 1,139.313 seconds;
+  job 123413419074, artifact 12893188443. [Hosted six-source gate 40863826463](https://github.com/vanderpol/scap-ng/actions/runs/40863826463)
+  retains all 1,072 proofs; job 123413430092, artifact 12892323743.
 - Documentation audit reports no new broken links; an optional strict run
   reports three existing Board-discussion heading links and 39 historical
   links. The affected pages/targets are unchanged from the published base.

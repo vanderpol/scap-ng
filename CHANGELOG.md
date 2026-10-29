@@ -6,6 +6,11 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Accept explicit default equality on nil UNIX filenames while
+  retaining directory selection. Two original Solaris 11 SPARC/x86 home-directory
+  Rules pass independent static source/package checks; other nil comparators
+  remain rejected ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Preserve the existing NTUSER empty-State lexical comparison
   through constant Variables and ordered exclusion Filters. Two original
   Windows 10/Server 2016 Rules pass independent static source/package checks;

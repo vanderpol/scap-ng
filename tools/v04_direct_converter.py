@@ -600,7 +600,13 @@ class AssessmentConverter:
     def predicate(self, element, mapping, selector=False, *, record_field=False):
         nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
         if selector and nil in element.attrib:
-            attributes(element, {nil, 'datatype'})
+            allowed = {nil, 'datatype'}
+            # OVAL nil filename selects directory Items. Explicit default
+            # equality preserves that selection; other operations stay strict.
+            if mapping['capability'] == 'unix.file' and local_name(element) == 'filename':
+                allowed.add('operation')
+                ensure(element.get('operation', 'equals') == 'equals', 'unsupported nil filename comparator')
+            attributes(element, allowed)
             field = mapping['native'].get('selector_map', {}).get(local_name(element))
             ensure(field in mapping['native'].get('nullable_selectors', ('name',)) and
                    element.get(nil) in ('true', '1') and not len(element) and not (element.text or '').strip(),

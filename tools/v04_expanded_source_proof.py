@@ -659,7 +659,8 @@ class ExpandedSource(Source):
                 need(name in allowed and NAMES.get(name, name) not in fields, 'unproved/duplicate selector ' + name)
                 nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
                 if cap == 'unix.file' and name == 'filename' and nil in c.attrib:
-                    keys(c, {nil, 'datatype'}, 'nil filename')
+                    keys(c, {nil, 'datatype', 'operation'}, 'nil filename')
+                    need(c.get('operation', 'equals') == 'equals', 'nil filename comparator')
                     need(c.get(nil) in ('true', '1') and c.get('datatype', 'string') == 'string' and
                          not len(c) and not (c.text or '').strip(), 'invalid nil filename')
                     fields['name'] = None

@@ -9,6 +9,17 @@ record, not a release/scanner-conformance declaration.
 
 ## Last fully verified implementation
 
+`f141efb07603e72a3982ffda87489da8f0d5c74f` reconstructs NTUSER empty-State
+comparison operands for two original Windows 10/Server 2016 Rules. All nine
+exact-commit workflows passed. [Maintained run 40863822537](https://github.com/vanderpol/scap-ng/actions/runs/40863822537),
+job 123413419074: **3,279 run, 3,278 passed, zero failures/errors, one existing
+skip**, 1,139.313 seconds; artifact 12893188443. [Six-source run 40863826463](https://github.com/vanderpol/scap-ng/actions/runs/40863826463),
+job 123413430092, artifact 12892323743: all 1,072 primary proofs retained.
+All 523 preceding conformance four-hash records also retain parity. See its
+[receipt](../audit/v04-ntuser-empty-state-recovery-20261029.json). No scanner claim.
+
+### Preceding closed-enum verification
+
 `66a166bf282a377c233bc4a1ffd1ac43d0bd734c` adds the recovered closed identity
 enum selector route. All nine exact-commit workflows passed. Its maintained
 suite [40793748077](https://github.com/vanderpol/scap-ng/actions/runs/40793748077),
@@ -78,7 +89,44 @@ Publication/results are recorded in [#251 comment 6484065504](https://github.com
 The all-65 run was the owner-designated deliverable checkpoint, never a routine
 regression. Do not rerun it for ordinary converter changes.
 
-## Resumption integration — 2026-10-29
+## Current integration — explicit nil filename defaults
+
+This commit publishes the owner-approved next converter correction after all
+nine NTUSER gates finished. Two original Solaris 11 SPARC/x86 directory Rules
+pass selected source-validity/schema/independent-term/compilation/package gates.
+[Review packet](../audit/v04-nil-filename-defaults-20261029.md) and adjacent JSON
+record the original source pins and program hashes. **52 affected tests pass**;
+all 1,072 anchor programs, both preceding NTUSER programs and all 523 conformance
+four-hash records retain parity. Its own hosted integration gate is pending;
+do not report the preceding full suite as verification of this new code.
+No further implementation may supersede that active gate. The existing all-65
+DRAFT remains unchanged. No schema/mapping/compiler/scanner/editor or production
+all_exist behavior changed.
+
+Recovery root: `/workspace/recovery-20261029/`. New code and fixtures are in this
+commit; `nil-increment/` is the earlier isolated copy. `nil-six/`,
+`nil-conformance.json`, `nil-affected.log`, `solaris-narrow-selected/` and
+`ntuser-retained-under-nil/` preserve local evidence. No local integration gate
+is paused or left running. Owner-approved publication uses connected GitHub
+operations. Future approval requests must be consolidated to at most one batch
+every 30 minutes; existing approvals remain valid.
+
+## Remaining boundaries after this increment
+
+The bounded guard audit covers ten additional original primary closures: all eight
+nil cmdlet datatype cases are original Schematron INVALID (required record type
+is omitted), not candidates for silent repair. The two acquisition-primary
+cases are VALID/nondeprecated and stay blocked: .NET SV-225226's case-insensitive
+command operation, and Windows 10 SV-220812's version-typed module acquisition.
+The [nil filename packet](../audit/v04-nil-filename-defaults-20261029.md) gives the
+smallest examples/recommendation; adjacent JSON records all ten source pins and
+actual original errors. No schema, operation or datatype projection is chosen.
+Two Solaris Variable-source default-attribute cases still reach unsupported split.
+Other all_exist/population, import/export, aggregation/functions and float cases
+remain under their existing #255/#218 decisions. Continue only independently
+justified converter work; do not infer acceptance or repair invalid originals.
+
+## Preceding NTUSER recovery record — 2026-10-29
 
 GitHub `main` independently resolves to `7acdf6d6f0995be1f310a69491fa81f6d7916767`;
 local checkout was clean at that SHA. The previous recovery directory did not
@@ -90,8 +138,8 @@ checks pass; all 1,072 six-source program hashes and all 523 conformance
 four-hash records retain parity. Local maintained gate: **3,279 run, 3,278
 passed, zero failures/errors, one existing skip**, 1507.413 seconds. Exact
 implementation commit and hosted gates are recorded in #251; hosted verification
-is still pending at this integration. The preceding fully hosted-verified
-implementation remains `66a166bf2`.
+is still pending at this integration. This local record preceded the subsequently successful hosted verification
+recorded above.
 
 Recovery root is `/workspace/recovery-20261029/`: original ten SHA-256/Git-blob-verified
 ZIPs under `inputs/`, `selected/` for the two new Rules, `six-after/`, focused,
@@ -101,12 +149,11 @@ requiring permission before a GitHub commit. The owner approved committing and
 pushing this concrete NTUSER increment after the running checks pass. Publication proceeds through the connected GitHub API after that passing gate;
 the receipt records exact tested code/fixture hashes. No workflow is dispatched
 or superseded manually.
-Next isolated work is `nil-increment/`: two original-valid Solaris directory
+The subsequent isolated work was `nil-increment/`: two original-valid Solaris directory
 Rules prove after accepting explicit default equality on a nil UNIX filename.
-Five focused tests pass. Six-source/conformance probes are paused locally to
-prioritize the active NTUSER maintained suite; resume their processes after
-publication. This candidate is outside source Git and is not part of the
-NTUSER integration. Two other Solaris default-attribute cases still hit split.
+Five focused tests passed there. Those probes subsequently resumed and passed;
+the nil filename correction is now this integration. Two other Solaris
+default-attribute cases still hit split.
 
 
 ## Current bounded integration and recovery files
