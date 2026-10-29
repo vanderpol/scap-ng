@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Preserve the existing NTUSER empty-State lexical comparison
+  through constant Variables and ordered exclusion Filters. Two original
+  Windows 10/Server 2016 Rules pass independent static source/package checks;
+  all 1,072 preceding six-source programs retain their hashes
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Admit closed identity-domain enum Variable graphs in
   selectors without changing names, graph structure or quantifiers. Two
   original AppCmd/AppCmdListConfig conformance Tests now prove; all previous

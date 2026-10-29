@@ -78,6 +78,37 @@ Publication/results are recorded in [#251 comment 6484065504](https://github.com
 The all-65 run was the owner-designated deliverable checkpoint, never a routine
 regression. Do not rerun it for ordinary converter changes.
 
+## Resumption integration — 2026-10-29
+
+GitHub `main` independently resolves to `7acdf6d6f0995be1f310a69491fa81f6d7916767`;
+local checkout was clean at that SHA. The previous recovery directory did not
+survive. This integration publishes the reconstructed NTUSER work;
+[review and retention packet](../audit/v04-ntuser-empty-state-recovery-20261029.md).
+Both original Windows 10 SV-220955 and Server 2016 SV-225069 pass selected
+original-validity/schema/independent-term/compilation/package gates. 38 focused
+checks pass; all 1,072 six-source program hashes and all 523 conformance
+four-hash records retain parity. Local maintained gate: **3,279 run, 3,278
+passed, zero failures/errors, one existing skip**, 1507.413 seconds. Exact
+implementation commit and hosted gates are recorded in #251; hosted verification
+is still pending at this integration. The preceding fully hosted-verified
+implementation remains `66a166bf2`.
+
+Recovery root is `/workspace/recovery-20261029/`: original ten SHA-256/Git-blob-verified
+ZIPs under `inputs/`, `selected/` for the two new Rules, `six-after/`, focused,
+conformance and maintained logs, and reproduction scripts. Published all-65
+archive remains unchanged. Latest owner message is interpreted literally as
+requiring permission before a GitHub commit. The owner approved committing and
+pushing this concrete NTUSER increment after the running checks pass. Publication proceeds through the connected GitHub API after that passing gate;
+the receipt records exact tested code/fixture hashes. No workflow is dispatched
+or superseded manually.
+Next isolated work is `nil-increment/`: two original-valid Solaris directory
+Rules prove after accepting explicit default equality on a nil UNIX filename.
+Five focused tests pass. Six-source/conformance probes are paused locally to
+prioritize the active NTUSER maintained suite; resume their processes after
+publication. This candidate is outside source Git and is not part of the
+NTUSER integration. Two other Solaris default-attribute cases still hit split.
+
+
 ## Current bounded integration and recovery files
 
 The integration containing this checkpoint reconstructs the lost identity-domain

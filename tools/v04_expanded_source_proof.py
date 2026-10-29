@@ -12,7 +12,8 @@ from functools import lru_cache
 import xml.etree.ElementTree as ET
 
 from v04_source_package_semantics import (Source, Native, Unsupported, OD, META, OPS,
-    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK, FOUND)
+    boolean, compare, digest, keys, literal, local, need, xml_term, REGISTRY_HIVES, CHECK, FOUND,
+    closed_string_enum)
 import v04_scalar_source_proof as scalar_proof
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -390,12 +391,13 @@ class ExpandedSource(Source):
         def rename(n):
             if 'field' in n:
                 if cap == 'windows.ntuser' and n['field'] == 'type':
-                    aliases = {'reg_sz': 'string', 'reg_dword': 'dword', 'reg_dword_little_endian': 'dword'}
+                    # OVAL EntityStateRegistryTypeType permits the empty lexical
+                    # value; NTUSER's approved State domain preserves it exactly.
+                    # Keep this source reader independent of converter metadata.
+                    aliases = {'reg_sz': 'string', 'reg_dword': 'dword', 'reg_dword_little_endian': 'dword', '': ''}
                     operand = n['predicate']['operand']
-                    need(operand.get('datatype') == 'string' and operand.get('value') in aliases,
-                         'NTUSER type outside bounded independent mapping')
                     n = deepcopy(n)
-                    n['predicate']['operand'] = literal('string', aliases[operand['value']])
+                    n['predicate']['operand'] = closed_string_enum(operand, aliases)
                 names = FILE_FIELDS if cap == 'unix.file' else NAMES if cap in (
                     'independent.textfilecontent54', 'windows.fileeffectiverights53') else {}
                 return {**n, 'field': names.get(n['field'], n['field'])}

@@ -630,12 +630,18 @@ class AssessmentConverter:
         crosswalk = mapping['native'].get('selector_value_crosswalk' if selector else 'state_value_crosswalk', {}).get(local_name(element))
         field = mapping['native']['state_field_map'].get(local_name(element))
         domain = mapping['native'].get('state_value_enums', {}).get(field, [])
-        enum_aliases = ({k: v for k, v in mapping['migration_crosswalk'][crosswalk].items() if v in domain}
+        aliases = dict(mapping['migration_crosswalk'][crosswalk]) if crosswalk else {}
+        if (not selector and mapping['capability'] == 'windows.ntuser' and field == 'type'
+                and '' in domain and mapping['migration_crosswalk'].get('source_defect_corrections', {}).get(
+                    'legacy_empty_registry_type_state')):
+            # The approved State domain explicitly preserves this lexical value.
+            # It is not a new collected Item type or an absence predicate.
+            aliases[''] = ''
+        enum_aliases = ({k: v for k, v in aliases.items() if v in domain}
                         if crosswalk and operation in ('equals', 'not equal') else None)
         value = self.operand(element, enum_aliases=enum_aliases)
         native_enum_variable = False
         if crosswalk:
-            aliases = mapping['migration_crosswalk'][crosswalk]
             if operation == 'not equal' and not selector:
                 # Equality and inequality are invariant under a bijection of
                 # the complete enum domain. Lexical/regex operations are not.
