@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Publish the complete all-65 source-preserving stage-one DRAFT.
+  Activate the existing IOS XE line/global mappings with independent frozen
+  identity crosswalks: 38 additional original Rule closures retain their DRAFT
+  program hashes; no schema or scanner contract change
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Add an explicitly requested all-65 DRAFT builder that attempts
   existing approved mappings without requiring independent proof first. Preserve
   all originals/manual content and Rule outcomes, label unverified authoring,

@@ -42,7 +42,7 @@ def load_mappings():
                 for name in CAPABILITIES]
     ensure(all(mapping['specification_version'] == '0.4.0' for mapping in mappings), 'mapping version mismatch')
     ensure(all((mapping['source']['namespace'].rsplit('#', 1)[-1] in ('independent', 'linux', 'unix', 'windows') or
-                mapping['capability'] == 'solaris.smf')
+                mapping['capability'] in {'solaris.smf', 'iosxe.line', 'iosxe.global'})
                for mapping in mappings), 'capability outside approved direct-converter scope')
     return mappings
 

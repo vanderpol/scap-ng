@@ -7,7 +7,67 @@ Read [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md) before resuming. This is a restart
 record, not a release/scanner-conformance declaration.
 
-## Current priority — complete reviewable all-65 DRAFT first
+## Recovery checkpoint — DRAFT published; IOS XE reader integration
+
+Recovered 2026-10-29 from GitHub/source HEAD
+`0b2fdb2d392c5d80a4128d73ae4ac5ada573cf26`; both checkouts were clean.
+The previous workspace-only DRAFT/recovery directories were absent. Recovered all
+65 ZIP/Git-blob pins, 4,206 published proof hash pairs and 32 source exclusions;
+one necessary reconstruction with the existing pinned builder passed all original
+preservation, accounting, native schema, compilation and retained-hash checks.
+No frozen archive was overwritten and no routine full-corpus regression was run.
+
+**Stage one is published and independently downloaded:** evidence commit
+`57032484aa098d18fecf69fe186b2ef753473245`, immutable tag
+`v04-all-65-complete-draft-stage-one-20261029-0b2fdb2d3`.
+[Review/download](https://github.com/vanderpol/scap-ng-evidence/tree/57032484aa098d18fecf69fe186b2ef753473245/runs/v04-converter/2026-10-29-all-65-complete-draft-stage-one).
+Archive **81,003,351 bytes**, SHA-256
+`5338f760dbc043f6302bc7d65e65a130281c22549f9ea34f2a4e51f4921ff18c`.
+Published download checksum/ZIP CRC PASS. Counts match the previous completed
+report: 65 / 8,892 / 7,239 attempts / 4,206 retained static proofs / 52 UNVERIFIED
+native / 2,981 blocked automated / 1,653 manual. All 4,258 candidates compile.
+[#251 publication receipt](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6507303662).
+
+All nine hosted workflows at **`0b2fdb2d3`** passed. Maintained
+[40927089208](https://github.com/vanderpol/scap-ng/actions/runs/40927089208), job
+123635368063, artifact 12920644342: **3,308 run, 3,307 passed, zero failures/errors,
+one existing skip**, 603.717 seconds. Do not repeat that suite for this code.
+
+The current integration adds independent frozen identity crosswalks and direct
+admission for unchanged approved `iosxe.line`/`iosxe.global` mappings. **38**
+original Rule closures prove with all DRAFT authoring/program hashes retained;
+**66** source-pinned Tests pass, six new positive/negative regressions and 29
+other affected tests pass. All **1,072 six-source proofs/program hashes** retain
+parity. Fourteen existing SMF additions also independently replay with unchanged
+DRAFT hashes. Candidate total: **4,258 static primary proofs**, with all prior
+4,206 retained. The frozen DRAFT labels are unchanged. [Compact proof receipt](../audit/v04-iosxe-proof-recovery-20261029.json).
+Exact new-implementation hosted CI remains **PENDING at this commit**; inspect
+current #251 comments and exact-SHA Actions before dispatching anything.
+
+[Population/catalog investigation](../audit/v04-population-binding-resumption-20261029.md)
+is complete enough for owner decisions under #255. All **992** catalog failures
+across 21 sources have exact embedded Definitions and complete target chains,
+but foreign `ds:uri` elements have no standard XML Catalog URI semantics. They
+are XSD-permitted extensions, not evidence of absent content or a demonstrated
+standard resolver bug. No repair/admission is inferred. For **1,184** primary
+all_exist blockers, 589 have States, 115 Variable closures, 136 Sets/Filters
+(overlap); 577 simpler cases still require the collection contract. Eleven OVAL
+boundary vectors preserve zero/positive/partial/error/unknown/incomplete cases.
+No schema/compiler/scanner/oracle or prior proof meaning changed.
+
+Recovery: `/workspace/recovery-20261029-resume/` contains complete originals,
+DRAFT output, recovered baseline/exclusions, archive package driver, published
+download checksum, population/binding audit, independent stage-two proof records,
+six-source retention and focused logs. `stage-two/` is the superseded first
+IOS XE reader attempt (UNVERIFIABLE); use **`stage-two-verified/`** with the new
+crosswalks. Stage-two raw evidence is local pending the next consolidated evidence
+publication window; the compact source receipt contains all 52 identities/hashes.
+Preserve the at-least-30-minute publication cadence per repository. Next: inspect
+new exact-commit CI, publish the separate 52-proof checkpoint, finish any available
+existing-contract source investigations, and obtain #255 population/producer-
+compatibility decisions before unsupported lowering. Do not regenerate the DRAFT.
+
+## Preceding priority — complete reviewable all-65 DRAFT first
 
 Owner revised release strategy on 2026-10-29: publish a complete, reviewable
 all-65 DRAFT **before completing independent proof coverage**. Attempt every

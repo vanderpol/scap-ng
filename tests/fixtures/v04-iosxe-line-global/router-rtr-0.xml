@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:oval_definitions xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#iosxe">
+      <ns0:generator>
+        <ns1:product_name>Security Content Tool 1.8.0</ns1:product_name>
+        <ns1:schema_version>5.11</ns1:schema_version>
+        <ns1:timestamp>2026-03-23T07:05:31</ns1:timestamp>
+      </ns0:generator>
+      <ns0:definitions>
+        <ns0:definition id="oval:mil.disa.stig.cisco.iosxe:def:160" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>CISC-RT-000620 - The Cisco MPLS router must be configured to have TTL Propagation disabled.</ns0:title>
+            <ns0:affected family="ios">
+              <ns0:platform>Cisco IOS-XE</ns0:platform>
+            </ns0:affected>
+            <ns0:description>The head end of the label-switched path (LSP), the label edge router (LER) will decrement the IP packet's time-to-live (TTL) value by one and then copy the value to the MPLS TTL field. At each label-switched router (LSR) hop, the MPLS TTL value is decremented by one. The MPLS router that pops the label (either the penultimate LSR or the egress LER) will copy the packet's MPLS TTL value to the IP TTL field and decrement it by one.
+
+This TTL propagation is the default behavior. Because the MPLS TTL is propagated from the IP TTL, a traceroute will list every hop in the path, be it routed or label switched, thereby exposing core nodes. With TTL propagation disabled, LER decrements the IP packet's TTL value by one and then places a value of 255 in the packet's MPLS TTL field, which is then decremented by one as the packet passes through each LSR in the MPLS core. Because the MPLS TTL never drops to zero, none of the LSP hops triggers an ICMP TTL exceeded message, and consequently, these hops are not recorded in a traceroute. Hence, nodes within the MPLS core cannot be discovered by an attacker.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria>
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:16000" comment="no mpls ip propagate-ttl" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.cisco.iosxe:def:169" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>CISC-RT-000890 - The Cisco multicast Designated Router (DR) must be configured to set the shortest-path tree (SPT) threshold to infinity to minimalize source-group (S, G) state within the multicast topology where Any Source Multicast (ASM) is deployed.</ns0:title>
+            <ns0:affected family="ios">
+              <ns0:platform>Cisco IOS-XE</ns0:platform>
+            </ns0:affected>
+            <ns0:description>ASM can have many sources for the same groups (many-to-many). For many receivers, the path via the RP may not be ideal compared with the shortest path from the source to the receiver. By default, the last-hop router will initiate a switch from the shared tree to a source-specific SPT to obtain lower latencies. This is accomplished by the last-hop router sending an (S, G) Protocol Independent Multicast (PIM) Join toward S (the source).
+
+When the last-hop router begins to receive traffic for the group from the source via the SPT, it will send a PIM Prune message to the RP for the (S, G). The RP will then send a Prune message toward the source. The SPT switchover becomes a scaling issue for large multicast topologies that have many receivers and many sources for many groups because (S, G) entries require more memory than (*, G). Hence, it is imperative to minimize the amount of (S, G) state to be maintained by increasing the threshold that determines when the SPT switchover occurs.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria>
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:16900" comment="ip pim spt-threshold is set to inifinity or greater than 0" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.cisco.iosxe:def:173" version="2" class="compliance">
+          <ns0:metadata>
+            <ns0:title>CISC-RT-000950 - The Cisco Multicast Source Discovery Protocol (MSDP) router must be configured to use a loopback address as the source address when originating MSDP traffic.</ns0:title>
+            <ns0:affected family="ios">
+              <ns0:platform>Cisco IOS-XE</ns0:platform>
+            </ns0:affected>
+            <ns0:description>Using a loopback address as the source address offers a multitude of uses for security, access, management, and scalability of MSDP routers. It is easier to construct appropriate ingress filters for router management plane traffic destined to the network management subnet since the source addresses will be from the range used for loopback interfaces instead of a larger range of addresses used for physical interfaces. Log information recorded by authentication and syslog servers will record the router’s loopback address instead of the numerous physical interface addresses.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:17300" comment="The loopback interface is used as the source address for all MSDP packets generated by the router." />
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:17301" comment="The router is not a MSDP router" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.cisco.iosxe:def:178" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>CISC-RT-000750 - The Cisco PE router must be configured to ignore or drop all packets with any IP options.</ns0:title>
+            <ns0:affected family="ios">
+              <ns0:platform>Cisco IOS-XE</ns0:platform>
+            </ns0:affected>
+            <ns0:description>Packets with IP options are not fast-switched and therefore must be punted to the router processor. Hackers who initiate denial of service (DoS) attacks on routers commonly send large streams of packets with IP options. Dropping the packets with IP options reduces the load of IP options packets on the router. The end result is a reduction in the effects of the DoS attack on the router and on downstream routers.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:17800" comment="ip options drop" />
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:17801" comment="ip options ignore" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.cisco.iosxe:def:180" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>CISC-RT-000236 - The Cisco router must be configured to advertise a hop limit of at least 32 in Router Advertisement messages for IPv6 stateless auto-configuration deployments.</ns0:title>
+            <ns0:affected family="ios">
+              <ns0:platform>Cisco IOS-XE</ns0:platform>
+            </ns0:affected>
+            <ns0:description>The Neighbor Discovery protocol allows a hop limit value to be advertised by routers in a Router Advertisement message being used by hosts instead of the standardized default value. If a very small value was configured and advertised to hosts on the LAN segment, communications would fail due to the hop limit reaching zero before the packets sent by a host reached its destination.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria>
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:18000" comment="ipv6 hop-limit nn" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.cisco.iosxe:def:181" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>CISC-RT-000237 - The Cisco router must not be configured to use IPv6 Site Local Unicast addresses.</ns0:title>
+            <ns0:affected family="ios">
+              <ns0:platform>Cisco IOS-XE</ns0:platform>
+            </ns0:affected>
+            <ns0:description>As currently defined, site local addresses are ambiguous and can be present in multiple sites. The address itself does not contain any indication of the site to which it belongs. The use of site-local addresses has the potential to adversely affect network security through leaks, ambiguity, and potential misrouting as documented in section 2 of RFC3879. RFC3879 formally deprecates the IPv6 site-local unicast prefix FEC0::/10 as defined in RFC3513.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria>
+            <ns0:criterion test_ref="oval:mil.disa.stig.cisco.iosxe:tst:18100" negate="true" comment="FEC0::/10 IPv6 addresses are not defined" />
+          </ns0:criteria>
+        </ns0:definition>
+      </ns0:definitions>
+      <ns0:tests>
+        <ns2:line_test id="oval:mil.disa.stig.cisco.iosxe:tst:16000" version="1" check_existence="at_least_one_exists" check="all" comment="no mpls ip propagate-ttl">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:10900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:16000" />
+        </ns2:line_test>
+        <ns2:line_test id="oval:mil.disa.stig.cisco.iosxe:tst:16900" version="1" check_existence="at_least_one_exists" check="all" state_operator="OR" comment="ip pim spt-threshold is set to inifinity or greater than 0">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:10900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:16900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:16901" />
+        </ns2:line_test>
+        <ns2:global_test id="oval:mil.disa.stig.cisco.iosxe:tst:17300" version="1" check_existence="at_least_one_exists" check="all" comment="the loopback interface is used as the source address for all MSDP packets generated by the router.">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:17300" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:17300" />
+        </ns2:global_test>
+        <ns2:global_test id="oval:mil.disa.stig.cisco.iosxe:tst:17301" version="1" check_existence="none_exist" check="all" comment="The router does not function as a MSDP router.">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:17301" />
+        </ns2:global_test>
+        <ns2:line_test id="oval:mil.disa.stig.cisco.iosxe:tst:17800" version="1" check_existence="at_least_one_exists" check="all" comment="Check for ip options drop.">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:10900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:17800" />
+        </ns2:line_test>
+        <ns2:line_test id="oval:mil.disa.stig.cisco.iosxe:tst:17801" version="1" check_existence="at_least_one_exists" check="all" comment="Check for ip options ignore.">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:10900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:17801" />
+        </ns2:line_test>
+        <ns2:line_test id="oval:mil.disa.stig.cisco.iosxe:tst:18000" version="1" check_existence="at_least_one_exists" check="all" comment="Check for ip options drop.">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:10900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:18000" />
+        </ns2:line_test>
+        <ns2:line_test id="oval:mil.disa.stig.cisco.iosxe:tst:18100" version="1" check_existence="at_least_one_exists" check="all" comment="Check for ip options drop.">
+          <ns2:object object_ref="oval:mil.disa.stig.cisco.iosxe:obj:10900" />
+          <ns2:state state_ref="oval:mil.disa.stig.cisco.iosxe:ste:18100" />
+        </ns2:line_test>
+      </ns0:tests>
+      <ns0:objects>
+        <ns2:line_object id="oval:mil.disa.stig.cisco.iosxe:obj:10900" version="1" comment="show running-config">
+          <ns2:show_subcommand datatype="string">show running-config</ns2:show_subcommand>
+        </ns2:line_object>
+        <ns2:global_object id="oval:mil.disa.stig.cisco.iosxe:obj:17300" version="1" comment="all ip msdp peer X connect-source lines">
+          <ns2:global_command datatype="string" operation="pattern match">ip msdp peer \S+ connect-source \S+\d+(?:| remote-as \d+)</ns2:global_command>
+        </ns2:global_object>
+        <ns2:global_object id="oval:mil.disa.stig.cisco.iosxe:obj:17301" version="1" comment="ip msdp peer {ip address} remote-as {xx} lines">
+          <ns2:global_command datatype="string" operation="pattern match">ip msdp peer \S+ remote-as \d+</ns2:global_command>
+        </ns2:global_object>
+      </ns0:objects>
+      <ns0:states>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:16000" version="1" comment="no mpls ip propagate-ttl">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*no\s+mpls\s+ip\s+propagate\-ttl\s*[\r\n]</ns2:config_line>
+        </ns2:line_state>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:16900" version="1" comment="ip pim spt-threshold infinity">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*ip pim spt-threshold infinity[\r\n]</ns2:config_line>
+        </ns2:line_state>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:16901" version="1" comment="ip pim spt-threshold 1 or greater">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*ip pim spt-threshold [1-9]\d*[\r\n]</ns2:config_line>
+        </ns2:line_state>
+        <ns2:global_state id="oval:mil.disa.stig.cisco.iosxe:ste:17300" version="1" comment="ip msdp peer x.x.x.x connect-source Loopbackn remote-as nn">
+          <ns2:global_command datatype="string" operation="pattern match">ip msdp peer \S+ connect-source Loopback\d+(?:| remote-as \d+)</ns2:global_command>
+        </ns2:global_state>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:17800" version="1" comment="ip options drop">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*ip options drop[\r\n]</ns2:config_line>
+        </ns2:line_state>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:17801" version="1" comment="ip options ignore">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*ip options ignore[\r\n]</ns2:config_line>
+        </ns2:line_state>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:18000" version="1" comment="ipv6 hop-limit is 32 or greater">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*ipv6 hop\-limit (?:\d\d\d|3[2-9]|[4-9][0-9])[\r\n]</ns2:config_line>
+        </ns2:line_state>
+        <ns2:line_state id="oval:mil.disa.stig.cisco.iosxe:ste:18100" version="1" comment="FEC0::/10 IPv6 addresses">
+          <ns2:config_line datatype="string" operation="pattern match">[\r\n]\s*ipv6 address (?:[fF][eE](?:[cC][\dabcdefABCDEF]|[defDEF][\dabcdefABCDEF])\:[abcdefABCDEF\d\:]+|[fF][eE][cC]0\:\:\/10)\s*[\r\n]</ns2:config_line>
+        </ns2:line_state>
+      </ns0:states>
+    </ns0:oval_definitions>
+  

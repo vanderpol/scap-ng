@@ -78,8 +78,8 @@ class FullDraftTests(unittest.TestCase):
     def test_diagnostic_mapping_catalog_does_not_activate_production_admission(self):
         before={m['capability'] for m in load_mappings()}
         diagnostic={m['capability'] for m in diagnostic_mappings()}
-        self.assertIn('iosxe.line',diagnostic)
-        self.assertNotIn('iosxe.line',before)
+        self.assertIn('ios.line',diagnostic)
+        self.assertNotIn('ios.line',before)
         self.assertEqual(before,{m['capability'] for m in load_mappings()})
         self.assertTrue(before<diagnostic)
 
