@@ -9,8 +9,22 @@ record, not a release/scanner-conformance declaration.
 
 ## Last fully verified implementation
 
-`24889577233c6a75e739676adffe8f676a0f9f3b` implements the mapped shellcommand
-intrinsic regex correction. All nine exact-commit workflows passed.
+`66a166bf282a377c233bc4a1ffd1ac43d0bd734c` adds the recovered closed identity
+enum selector route. All nine exact-commit workflows passed. Its maintained
+suite [40793748077](https://github.com/vanderpol/scap-ng/actions/runs/40793748077),
+job `123185027830`, ran **3,273 tests: 3,272 passed, zero failures/errors, one
+existing skip**, in 1,132.409 seconds. Artifact `12863807377` retains exact test
+identities. Do not repeat that suite for this commit.
+
+The exact-commit [six-source gate 40793748148](https://github.com/vanderpol/scap-ng/actions/runs/40793748148),
+job `123185027661`, passed with the same 1,072 primary proofs and unchanged
+programs. Artifact `12862983307` retains the evidence. The separately published
+[static enum conformance checkpoint](https://github.com/vanderpol/scap-ng-evidence/tree/v04-identity-enum-static-verified-20261029-66a166bf2/runs/v04-converter/2026-10-29-identity-enum-static-verified-66a166bf2)
+contains all 523 proof hashes and actual generated authoring/program/typed-term
+excerpts for the two original additions; evidence commit `cdc0ed5`.
+
+The preceding `24889577233c6a75e739676adffe8f676a0f9f3b` implements the mapped
+shellcommand intrinsic regex correction. Its completed evidence is retained:
 
 - [Maintained suite 40788102371](https://github.com/vanderpol/scap-ng/actions/runs/40788102371),
   job `123166258986`: **3,268 run, 3,267 passed, zero failures/errors, one existing
@@ -81,10 +95,14 @@ validation without changing names, graphs or quantifiers. See the
   production Rules. No scanner execution claim.
 - Affected six-source gate preserves **all 1,072 current primary program hashes**
   and identical outcomes, as well as the checked-in 1,055-program floor.
-- Exact integration-commit hosted maintained/six-source gates are pending.
-  Do not use preceding `248895772` green CI as verification of this new code.
-- Keep subsequent useful work local while those gates run; never supersede or
-  cancel the active maintained suite for a small push.
+- Exact-commit hosted maintained and six-source gates both passed, as recorded
+  above. No duplicate full suite was dispatched.
+- Subsequent NTUSER empty-State work is isolated under `ntuser-candidate/` in
+  the recovery root, not published implementation. Two original Windows 10 /
+  Server 2016 Rules pass a focused validity/schema/independent-term/compilation/
+  package probe. The mapping already explicitly preserves this State lexical
+  value; finish positive/negative and retention checks before integration.
+  This is not a new collected Item type or a status-predicate rewrite.
 
 Current recovery root: `/workspace/recovery-20261028/`. It contains downloaded
 published archives, source pins/inputs, full DRAFT generation/finalizer scripts,
