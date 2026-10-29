@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:oval_definitions xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows">
+      <ns0:generator>
+        <ns1:product_name>Security Content Tool 1.4.1</ns1:product_name>
+        <ns1:schema_version>5.11</ns1:schema_version>
+        <ns1:timestamp>2025-07-01T06:19:48</ns1:timestamp>
+      </ns0:generator>
+      <ns0:definitions>
+        <ns0:definition id="oval:mil.disa.stig.chrome:def:240001" version="56054703" class="compliance">
+          <ns0:metadata>
+            <ns0:title>DTBC-0001 - Firewall traversal from remote host must be disabled</ns0:title>
+            <ns0:affected family="windows">
+              <ns0:platform>Microsoft Windows Vista</ns0:platform>
+              <ns0:platform>Microsoft Windows Server 2008</ns0:platform>
+              <ns0:platform>Microsoft Windows 7</ns0:platform>
+              <ns0:platform>Microsoft Windows Server 2008 R2</ns0:platform>
+              <ns0:platform>Microsoft Windows Server 2012 R2</ns0:platform>
+              <ns0:platform>Microsoft Windows Server 2012</ns0:platform>
+              <ns0:platform>Microsoft Windows 8</ns0:platform>
+              <ns0:platform>Microsoft Windows 8.1</ns0:platform>
+              <ns0:platform>Microsoft Windows 10</ns0:platform>
+              <ns0:product>Google Chrome</ns0:product>
+            </ns0:affected>
+            <ns0:description>Enables usage of STUN and relay servers when remote clients are trying to establish a connection to this machine. If this setting is enabled, then remote clients can discover and connect to this machines even if they are separated by a firewall. If this setting is disabled and outgoing UDP connections are filtered by the firewall, then this machine will only allow connections from client machines within the local network. If this policy is left not set the setting will be enabled.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="AND">
+            <ns0:criterion test_ref="oval:mil.disa.stig.chrome:tst:240001" comment="Registry check" />
+          </ns0:criteria>
+        </ns0:definition>
+        </ns0:definitions>
+      <ns0:tests>
+        <ns2:registry_test id="oval:mil.disa.stig.chrome:tst:240001" version="56054703" check_existence="at_least_one_exists" check="all" comment="Disable firewall traversal">
+          <ns2:object object_ref="oval:mil.disa.stig.chrome:obj:240001" />
+          <ns2:state state_ref="oval:mil.disa.stig.chrome:ste:240001" />
+        </ns2:registry_test>
+        </ns0:tests>
+      <ns0:objects>
+        <ns2:registry_object id="oval:mil.disa.stig.chrome:obj:240001" version="56054702">
+          <ns2:hive datatype="string" operation="equals">HKEY_LOCAL_MACHINE</ns2:hive>
+          <ns2:key datatype="string" operation="equals">SOFTWARE\Policies\Google\Chrome</ns2:key>
+          <ns2:name datatype="string" operation="equals">RemoteAccessHostFirewallTraversal</ns2:name>
+        </ns2:registry_object>
+        </ns0:objects>
+      <ns0:states>
+        <ns2:registry_state id="oval:mil.disa.stig.chrome:ste:240001" version="56054702">
+          <ns2:type datatype="string" operation="equals" var_ref="oval:mil.disa.stig.chrome:var:10" var_check="at least one" />
+          <ns2:value datatype="string" operation="equals" var_ref="oval:mil.disa.stig.chrome:var:1" var_check="at least one" />
+        </ns2:registry_state>
+        </ns0:states>
+      <ns0:variables>
+        <ns0:constant_variable id="oval:mil.disa.stig.chrome:var:1" version="56054702" datatype="string" comment="The value of the registry entry">
+          <ns0:value>0</ns0:value>
+        </ns0:constant_variable>
+        <ns0:constant_variable id="oval:mil.disa.stig.chrome:var:10" version="56054702" datatype="string" comment="The type of the registry entry">
+          <ns0:value>reg_dword</ns0:value>
+        </ns0:constant_variable>
+        </ns0:variables>
+    </ns0:oval_definitions>

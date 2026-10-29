@@ -590,7 +590,26 @@ class ExpandedSource(Source):
                 self.active.remove(ident)
         if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
             if cap == 'windows.registry':
-                value = super().object(ident)
+                # Leaf Registry Filters also constrain Object projections used
+                # by Variables. Read them in source order, at collection scope.
+                fs = n.findall('{' + OD + '}filter')
+                need(all(not len(f) for f in fs), 'Registry Filter children unsupported')
+                original = self.nodes[ident]
+                if fs:
+                    leaf = deepcopy(n)
+                    for f in leaf.findall('{' + OD + '}filter'):
+                        leaf.remove(f)
+                    self.nodes[ident] = leaf
+                try:
+                    value = super().object(ident)
+                finally:
+                    self.nodes[ident] = original
+                if fs:
+                    self.active.add(ident)
+                    try:
+                        value['filters'] = self.filters(fs, cap)
+                    finally:
+                        self.active.remove(ident)
                 hive = value['selectors'].get('hive')
                 if hive and hive['operation'] == 'case_insensitive_equals':
                     contract = deepcopy(original_registry_hive_contract())
@@ -932,7 +951,7 @@ class ExpandedNative(Native):
         registered = scalar_proof.native_object(self, n, cap)
         if registered is not None:
             return registered
-        if cap == 'independent.shellcommand' and 'set' not in n and 'filters' in n:
+        if cap in ('independent.shellcommand', 'windows.registry') and 'set' not in n and 'filters' in n:
             acquisition = deepcopy(n)
             filters = acquisition.pop('filters')
             result = super().object(acquisition, cap)

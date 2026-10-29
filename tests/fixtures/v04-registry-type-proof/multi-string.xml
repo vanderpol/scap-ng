@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:oval_definitions xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows">
+      <ns0:generator>
+        <ns1:product_name>repotool</ns1:product_name>
+        <ns1:schema_version>5.10</ns1:schema_version>
+        <ns1:timestamp>2023-10-01T16:11:38</ns1:timestamp>
+      </ns0:generator>
+      <ns0:definitions>
+        <ns0:definition id="oval:mil.disa.fso.windows:def:4582" version="2" class="compliance">
+          <ns0:metadata>
+            <ns0:title>Remotely Accessible Registry Paths</ns0:title>
+            <ns0:affected family="windows">
+              <ns0:platform>Microsoft Windows Server 2012</ns0:platform>
+            </ns0:affected>
+            <ns0:reference source="DISA" ref_id="3339" ref_url="http://iase.disa.mil/stigs/SRR/index.html" />
+            <ns0:reference ref_url="http://cce.mitre.org" source="CCE" ref_id="CCE-23899-8" />
+            <ns0:description>Unauthorized registry paths must not be remotely accessible.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:criterion test_ref="oval:mil.disa.fso.windows:tst:458200" comment="Verifies 'Network access: Remotely accessible registry paths' is configured to contain authorized registry paths" />
+            <ns0:criterion test_ref="oval:mil.disa.fso.windows:tst:458201" comment="Verifies 'Network access: Remotely accessible registry paths' is configured with no entries" />
+            <ns0:criterion test_ref="oval:mil.disa.fso.windows:tst:458202" comment="Verifies 'Network access: Remotely accessible registry paths' is not configured" />
+          </ns0:criteria>
+        </ns0:definition>
+        </ns0:definitions>
+      <ns0:tests>
+        <ns2:registry_test id="oval:mil.disa.fso.windows:tst:458200" version="1" comment="'Network access: Remotely accessible registry paths' is configured to contain authorized registry paths" check_existence="at_least_one_exists" check="all">
+          <ns2:object object_ref="oval:mil.disa.fso.windows:obj:458200" />
+          <ns2:state state_ref="oval:mil.disa.fso.windows:ste:458200" />
+        </ns2:registry_test>
+        <ns2:registry_test id="oval:mil.disa.fso.windows:tst:458201" version="1" comment="'Network access: Remotely accessible registry paths' is configured to contain no entries" check_existence="at_least_one_exists" check="all">
+          <ns2:object object_ref="oval:mil.disa.fso.windows:obj:458200" />
+          <ns2:state state_ref="oval:mil.disa.fso.windows:ste:462100" />
+        </ns2:registry_test>
+        <ns2:registry_test id="oval:mil.disa.fso.windows:tst:458202" version="1" comment="'Network access: Remotely accessible registry paths' is is not configured" check_existence="none_exist" check="all">
+          <ns2:object object_ref="oval:mil.disa.fso.windows:obj:458200" />
+        </ns2:registry_test>
+        </ns0:tests>
+      <ns0:objects>
+        <ns2:registry_object id="oval:mil.disa.fso.windows:obj:458200" version="1">
+          <ns2:hive datatype="string">HKEY_LOCAL_MACHINE</ns2:hive>
+          <ns2:key datatype="string">System\CurrentControlSet\Control\SecurePipeServers\Winreg\AllowedExactPaths</ns2:key>
+          <ns2:name datatype="string">Machine</ns2:name>
+        </ns2:registry_object>
+        </ns0:objects>
+      <ns0:states>
+        <ns2:registry_state id="oval:mil.disa.fso.windows:ste:458200" version="1" comment="Value matches ^((System\\CurrentControlSet\\Control\\ProductOptions)|(System\\CurrentControlSet\\Control\\Server Applications)|(Software\\Microsoft\\Windows NT\\CurrentVersion))$">
+          <ns2:type>reg_multi_sz</ns2:type>
+          <ns2:value operation="pattern match" entity_check="all">^((System\\CurrentControlSet\\Control\\ProductOptions)|(System\\CurrentControlSet\\Control\\Server Applications)|(Software\\Microsoft\\Windows NT\\CurrentVersion)|())$</ns2:value>
+        </ns2:registry_state>
+        <ns2:registry_state id="oval:mil.disa.fso.windows:ste:462100" version="2" comment="Reg_Multi_Sz type and blank value">
+          <ns2:type>reg_multi_sz</ns2:type>
+          <ns2:value datatype="string" operation="pattern match" entity_check="none satisfy">.+</ns2:value>
+        </ns2:registry_state>
+        </ns0:states>
+      </ns0:oval_definitions>

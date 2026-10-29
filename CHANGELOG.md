@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Extend independent source readers for existing Registry type
+  constant arrays, multi-string equality and filtered Registry projections.
+  Thirty-five additional original compiled candidates compare with unchanged
+  authoring/program hashes; no converter or schema change
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Independently validate and prove 845 previously compiled,
   unproved original Windows primary Rules in bounded batches. Frozen authoring
   and program hashes are retained; published evidence includes original

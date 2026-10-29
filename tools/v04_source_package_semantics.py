@@ -365,11 +365,23 @@ class Source:
                 value['operand'] = closed_string_enum(value['operand'],
                     {v: v.removeprefix('HKEY_').lower() for v in REGISTRY_HIVES})
             if cap == 'windows.registry' and local(c) == 'type':
-                enums = {'reg_sz': 'string', 'reg_dword': 'dword', 'reg_dword_little_endian': 'dword'}
+                enums = {'reg_sz': 'string', 'reg_dword': 'dword',
+                         'reg_dword_little_endian': 'dword', 'reg_multi_sz': 'multi_string'}
                 old = value['operand']
-                need(old.get('datatype') == 'string' and old.get('value') in enums,
-                     'registry type proof unavailable')
-                value['operand'] = literal('string', enums[old['value']])
+                if set(old) == {'constant_values'}:
+                    # Retain the constant's ordered values and independent
+                    # var_check; never replace its quantifier with an OR.
+                    need(value['operation'] == 'equals' and value['comparison_datatype'] == 'string'
+                         and old['constant_values'] and all(v.get('datatype') == 'string'
+                         and v.get('value') in enums for v in old['constant_values']),
+                         'registry type proof unavailable')
+                    value['operand'] = closed_string_enum(old, enums)
+                else:
+                    need(old.get('datatype') == 'string' and old.get('value') in enums,
+                         'registry type proof unavailable')
+                    need(old['value'] != 'reg_multi_sz' or value['operation'] == 'equals',
+                         'registry multi_string proof requires equality')
+                    value['operand'] = literal('string', enums[old['value']])
             fields.append({'field': local(c), 'predicate': value})
         return boolean(n.get('operator', 'AND').lower(), fields)
 

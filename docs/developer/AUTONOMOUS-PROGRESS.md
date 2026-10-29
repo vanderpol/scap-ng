@@ -15,7 +15,7 @@ and pushes are authorized; **batch commits and pushes at most once per 30 minute
 without routine approval questions. Unavoidable platform prompts belong to that
 publication window. Continue successful batches; do not stop at a checkpoint.
 
-Published: **845 new primary proofs / 845 attempted / 2,293 pending**
+Published: **3,095 new primary proofs / 3,138 attempted / 0 pending**
 from the original cohort. The prior 1,076 primary proofs and 523 conformance
 four-hash records are retained. [Cumulative index and exact evidence links](../audit/v04-compiled-proof-expansion-20261029.md).
 No production code changed; exact-code CI at `10f4e35b3` is reused. No duplicate
@@ -31,6 +31,32 @@ code while publication is held for the next 30-minute window. Inspect logs and
 receipts before resuming; never overwrite a completed run directory. The current
 assignment is proof expansion, not an authorization to resolve the earlier
 acquisition-contract decisions or change schemas/scanner/0.5.
+
+## Current Registry-reader integration
+
+All 3,138 original compiled/unproved candidates have been assessed. The published
+first pass independently proves 3,095, preserving all frozen authoring/program
+pairs. Seven original-invalid and one deprecated case stay rejected; 35 cases
+expose independent-reader limits, not new schema/compiler contracts.
+
+This integration corrects those existing Registry type/filter readers. **61
+focused tests pass**, including eight original-backed tests. Final selected
+acceptance proves all **35** target Rules with unchanged frozen authoring/program
+hashes. Both corrected readers retain all **3,095** preceding new primary proof
+hashes and all **523** conformance four-hash records. Its own exact-code hosted
+integration is pending after publication; do not supersede that gate or claim the
+older 3,284-test CI as verification of the reader change.
+
+[Reader packet](../audit/v04-registry-reader-proof-expansion-20261029.md) gives
+three original closures, scope, rejected alternatives, positive/negative/mutant
+and cycle evidence. Recovery files: `batch-007/`, `registry-retention.json`,
+`registry-conformance.json`, and `registry-focused-verified.log` under
+`/workspace/proof-expansion-20261029/`. The rejected intermediate `batch-005/`
+IIS result is superseded by `batch-007/`; do not promote intermediate results.
+After hosted gates pass, publish the final 35-proof run and deduplicated cohort
+index in the next permitted 30-minute publication window. Do not regenerate the
+frozen all-65 archive. Schemas, mappings, converter/compiler, scanner/editor,
+protected workflows and #255 contracts remain unchanged.
 
 ## Last fully verified implementation
 
