@@ -9,6 +9,22 @@ record, not a release/scanner-conformance declaration.
 
 ## Last fully verified implementation
 
+`10f4e35b331c622c14f6e3aa2bd4aa8981c810c1` admits explicit default equality on
+nil UNIX filenames for two original Solaris 11 SPARC/x86 Rules. All nine
+exact-commit workflows passed. [Maintained run 40867417638](https://github.com/vanderpol/scap-ng/actions/runs/40867417638),
+job 123425584553: **3,284 run, 3,283 passed, zero failures/errors, one existing
+skip**, 1143.910 seconds; artifact 12895541852.
+[Six-source run 40867417851](https://github.com/vanderpol/scap-ng/actions/runs/40867417851),
+job 123425584157, artifact 12894249637, retains all 1,072 primary proofs.
+All 523 conformance four-hash records and both preceding NTUSER program hashes
+also retain parity. These increments add four independently source-proved original
+Rules outside the six anchors; they do not regenerate or relabel the frozen
+all-65 DRAFT. [Receipt](../audit/v04-nil-filename-defaults-20261029.json) includes
+actual generated Object/require excerpts. This is static verification only.
+Do not repeat the maintained suite for this exact implementation.
+
+### Preceding NTUSER verification
+
 `f141efb07603e72a3982ffda87489da8f0d5c74f` reconstructs NTUSER empty-State
 comparison operands for two original Windows 10/Server 2016 Rules. All nine
 exact-commit workflows passed. [Maintained run 40863822537](https://github.com/vanderpol/scap-ng/actions/runs/40863822537),
@@ -89,27 +105,31 @@ Publication/results are recorded in [#251 comment 6484065504](https://github.com
 The all-65 run was the owner-designated deliverable checkpoint, never a routine
 regression. Do not rerun it for ordinary converter changes.
 
-## Current integration — explicit nil filename defaults
+## Completed guard increments and recovery state
 
-This commit publishes the owner-approved next converter correction after all
-nine NTUSER gates finished. Two original Solaris 11 SPARC/x86 directory Rules
-pass selected source-validity/schema/independent-term/compilation/package gates.
-[Review packet](../audit/v04-nil-filename-defaults-20261029.md) and adjacent JSON
-record the original source pins and program hashes. **52 affected tests pass**;
-all 1,072 anchor programs, both preceding NTUSER programs and all 523 conformance
-four-hash records retain parity. Its own hosted integration gate is pending;
-do not report the preceding full suite as verification of this new code.
-No further implementation may supersede that active gate. The existing all-65
-DRAFT remains unchanged. No schema/mapping/compiler/scanner/editor or production
-all_exist behavior changed.
+The NTUSER and nil UNIX filename increments are published and fully hosted-green.
+The working implementation is `10f4e35b3`; subsequent verification receipt and
+checkpoint changes are documentation only. No implementation CI is pending or
+paused. No local-only implementation remains. The two receipts contain original
+source ZIP/blob pins, dependency identities, negative/mutant evidence, exact
+program hashes and actual generated Object/require excerpts for all four additions.
+The old all-65 DRAFT is unchanged. Schemas, mappings, specification, compiler,
+scanner/editor, protected workflows and production all_exist remain unchanged.
 
-Recovery root: `/workspace/recovery-20261029/`. New code and fixtures are in this
-commit; `nil-increment/` is the earlier isolated copy. `nil-six/`,
-`nil-conformance.json`, `nil-affected.log`, `solaris-narrow-selected/` and
-`ntuser-retained-under-nil/` preserve local evidence. No local integration gate
-is paused or left running. Owner-approved publication uses connected GitHub
-operations. Future approval requests must be consolidated to at most one batch
-every 30 minutes; existing approvals remain valid.
+Recovery root: `/workspace/recovery-20261029/`. It retains thirteen SHA-256/Git-blob
+verified original ZIPs under `inputs/`, source validation audits, `selected/`,
+`solaris-narrow-selected/`, `ntuser-retained-under-nil/`, both six-source gates,
+full conformance reports and focused/maintained logs. The discarded compiler-test
+negative XML inputs were moved out of source Git into
+`maintained-generated-negative-fixtures/`; no generated artifacts remain dirty
+in the source checkout. Earlier isolated copies are diagnostic recovery only,
+not source authority. No scanner results or verified toolchain release are claimed.
+
+Owner approved both converter publications. Verification documentation is part of
+those approved increments; do not ask again for the same work. Future GitHub
+approval requests must be consolidated to at most one batch every 30 minutes.
+Further converter admission for the documented acquisition cases needs the
+existing #255 source operation/datatype clarification; do not silently choose it.
 
 ## Remaining boundaries after this increment
 
@@ -156,9 +176,9 @@ the nil filename correction is now this integration. Two other Solaris
 default-attribute cases still hit split.
 
 
-## Current bounded integration and recovery files
+## Historical closed-enum recovery record (superseded above)
 
-The integration containing this checkpoint reconstructs the lost identity-domain
+The preceding enum integration reconstructed the lost identity-domain
 closed enum selector behavior only; it does not claim recovery of the original
 uncommitted diagnostic patch. It adds existing literal/reference/unique graph
 validation without changing names, graphs or quantifiers. See the
@@ -182,7 +202,9 @@ validation without changing names, graphs or quantifiers. See the
   value; finish positive/negative and retention checks before integration.
   This is not a new collected Item type or a status-predicate rewrite.
 
-Current recovery root: `/workspace/recovery-20261028/`. It contains downloaded
+The previous session used `/workspace/recovery-20261028/`; that directory did not
+survive this restart. The active recovery root is `/workspace/recovery-20261029/`
+as recorded above. The previous root contained downloaded
 published archives, source pins/inputs, full DRAFT generation/finalizer scripts,
 large conformance reports, both six-source gates and focused logs. The isolated
 `enum-candidate/` has the pre-integration experiment; current source Git is the
@@ -194,7 +216,7 @@ Old local `work` at `a65aba621` is preserved, with no local-only commits lost.
 Earlier restart history remains in the
 [preceding checkpoint](https://github.com/vanderpol/scap-ng/blob/24889577233c6a75e739676adffe8f676a0f9f3b/docs/developer/AUTONOMOUS-PROGRESS.md).
 
-## Next priorities and decision boundaries
+## Earlier backlog priorities (current boundaries recorded above)
 
 - The [original 341-blocker report](../audit/v04-six-draft-blockers-20261028.md)
   remains the immutable-cohort analysis: 232 all_exist, 63 catalog bindings,

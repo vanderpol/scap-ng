@@ -58,8 +58,13 @@ are unchanged. This is existing 0.4 UNIX file conversion, not 0.5 Windows work.
 - The preceding NTUSER integration `f141efb07` finished all nine hosted gates
   successfully before this publication (3,279 maintained tests; zero failures,
   one existing skip). These base results are not full-suite verification of
-  this new increment. Its own exact-commit hosted gate follows publication;
-  no duplicate full maintained suite was dispatched.
+  this new increment. All nine exact-commit workflows at `10f4e35b3` have now
+  passed. [Maintained run 40867417638](https://github.com/vanderpol/scap-ng/actions/runs/40867417638):
+  **3,284 run, 3,283 passed, zero failures/errors, one existing skip**,
+  1143.910 seconds; job 123425584553, artifact 12895541852.
+  [Six-source run 40867417851](https://github.com/vanderpol/scap-ng/actions/runs/40867417851),
+  job 123425584157, artifact 12894249637, retains all 1,072 primary proofs.
+  No duplicate full maintained suite was dispatched.
 
 The original all-65 DRAFT archive is unchanged. Only the two selected Solaris
 Rules were converted for new original-source evidence. Large outputs and logs
@@ -116,3 +121,9 @@ per-parameter source-operation/datatype admission and independent proof
 obligations. No new mapping or assessment meaning is inferred in this increment.
 Population/all_exist, import/export, aggregation, unsupported functions and float
 contracts likewise remain at their documented decision boundaries.
+
+
+The JSON receipt includes actual generated Object/require excerpts for both
+new original Rules, rather than relying only on descriptions of their output.
+The exact implementation remains `10f4e35b331c622c14f6e3aa2bd4aa8981c810c1`;
+subsequent receipt/checkpoint edits do not change converter or proof code.

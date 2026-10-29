@@ -119,3 +119,8 @@ an untyped nil `parameters` input and typed nil `module_version`; this does not
 authorize changing the record/default or module-version acquisition contract.
 Float, functions, aggregation/population and import/export remain under their
 existing decisions/#255. Unknown or invalid originals remain fail-closed.
+
+
+The JSON receipt now also retains actual generated Object/require excerpts for
+both original Rules. They come from the independently accepted selected packages;
+original IDs, ordered Filters, empty operands and require fields are unmodified.
