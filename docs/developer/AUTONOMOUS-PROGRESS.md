@@ -41,8 +41,14 @@ other affected tests pass. All **1,072 six-source proofs/program hashes** retain
 parity. Fourteen existing SMF additions also independently replay with unchanged
 DRAFT hashes. Candidate total: **4,258 static primary proofs**, with all prior
 4,206 retained. The frozen DRAFT labels are unchanged. [Compact proof receipt](../audit/v04-iosxe-proof-recovery-20261029.json).
-Exact new-implementation hosted CI remains **PENDING at this commit**; inspect
-current #251 comments and exact-SHA Actions before dispatching anything.
+Exact implementation **`b70802028075850cf5f4397c50249813f86a7b14`** is now
+hosted-green: all nine workflows passed. Maintained
+[40947935428](https://github.com/vanderpol/scap-ng/actions/runs/40947935428), job
+123708112106, artifact 12931846286: **3,314 run / 3,313 passed / zero failures
+or errors / one existing skip**, 1188.663 seconds. Six-source
+[40947935273](https://github.com/vanderpol/scap-ng/actions/runs/40947935273), job
+123708111193, artifact 12931430305, retains all 1,072 anchor proofs.
+Do not rerun this maintained suite for unchanged implementation.
 
 [Population/catalog investigation](../audit/v04-population-binding-resumption-20261029.md)
 is complete enough for owner decisions under #255. All **992** catalog failures
@@ -60,12 +66,24 @@ DRAFT output, recovered baseline/exclusions, archive package driver, published
 download checksum, population/binding audit, independent stage-two proof records,
 six-source retention and focused logs. `stage-two/` is the superseded first
 IOS XE reader attempt (UNVERIFIABLE); use **`stage-two-verified/`** with the new
-crosswalks. Stage-two raw evidence is local pending the next consolidated evidence
-publication window; the compact source receipt contains all 52 identities/hashes.
-Preserve the at-least-30-minute publication cadence per repository. Next: inspect
-new exact-commit CI, publish the separate 52-proof checkpoint, finish any available
-existing-contract source investigations, and obtain #255 population/producer-
-compatibility decisions before unsupported lowering. Do not regenerate the DRAFT.
+crosswalks. Separate [52-proof evidence checkpoint](https://github.com/vanderpol/scap-ng-evidence/tree/v04-stage-two-52-static-verified-20261029-b70802028/runs/v04-converter/2026-10-29-stage-two-52-static-proofs-b70802028)
+retains full original/native term comparisons, packages and all 52 unchanged
+DRAFT hash pairs. The compact source receipt contains all identities/hashes.
+The stage-one DRAFT archive and its labels remain unchanged. Evidence commit:
+`5b1b027623cd454b263aa60e16122bba503566a9`.
+Preserve the at-least-30-minute publication cadence per repository. The additional 39 source investigations yield 13 INVALID and 26 VALID
+closures; six have deprecated WMI content (three also invalid). Thus 23 are
+valid/nondeprecated, with existing comparator-absence, ordered-float, field
+crosswalk and split/function boundaries still unresolved; no extra admission.
+Owner-requested [IOS XE content report](../audit/v04-iosxe-content-investigation-20261029.md)
+distinguishes four Schematron failures from semantic content defects: concat
+integer casting conflicts with the same OVAL schema's casting prose, while
+SV-215833 has stronger text-as-int and literal-backslash delimiter concerns.
+All four occur in NIWC's enhanced oval2 component; DISA-origin attribution is
+unestablished. No source or validator was repaired. Next: obtain #255 population,
+producer-extension and function-casting decisions, pin corrected source where
+required, and continue independently justified converter work. No unsupported
+lowering or DRAFT regeneration.
 
 ## Preceding priority — complete reviewable all-65 DRAFT first
 

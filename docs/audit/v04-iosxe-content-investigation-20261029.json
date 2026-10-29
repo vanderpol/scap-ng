@@ -1,0 +1,214 @@
+{
+  "source_pin": {
+    "file": "U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "repository_path": "Current/U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-signed.zip",
+    "git_blob_sha": "4bc3edb276ba15ffe86cafbbeace50bc5fa2c542",
+    "sha256": "82e2d4bf65abc53bb6da01874944c555efae51dbc98d80e6e42423d1025e7efa",
+    "bytes": 56381
+  },
+  "source_revision": "8c8e5dff860af6b1290ee9273a282db24278f8d5",
+  "source_schema": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+  "source_schema_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+  "function_group_documentation": [
+    "Complex functions have been defined that help determine how to manipulate specific values. These functions can be nested together to form complex statements. Each function is designed to work on a specific type of data. If the data being worked on is not of the correct type, a cast should be attempted before reporting an error. For example, if a concat function includes a registry component that returns an integer, then the integer should be cast as a string in order to work with the concat function. Note that if the operation being applied to the variable by the calling entity is \"pattern match\", then all the functions are performed before the regular expression is evaluated. In short, the variable would produce a value as normal and then any pattern match operation would be performed. It is also important to note that when using these functions with sub-components that return a collection of values that the operation will be performed on the Cartesian product of the components and the result is also a collection of values. For example, assume a local_variable specifies the arithmetic function with an arithmetic_operation of \"add\" and has two sub-components under this function: the first component returns \"1\" and \"2\", and the second component returns \"3\" and \"4\" and \"5\". The local_variable element would be evaluated to have a collection of six values: 1+3, 1+4, 1+5, 2+3, 2+4, and 2+5. Please refer to the description of a specific function for more details about it."
+  ],
+  "cases": [
+    {
+      "rule": "xccdf_mil.disa.stig.cisco_rule_SV-215807r1186318_rule",
+      "title": "The Cisco router must be configured to limit the number of concurrent management sessions to an organization-defined number.",
+      "source_rule_sha256": "d5418eb2dfd624735febfd59286792f79356b4aff421fec49badf71a742f4762",
+      "original_validity": {
+        "status": "INVALID",
+        "issues": [
+          {
+            "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "validator": "Schematron",
+            "kind": "invalid",
+            "message": "The variable referenced by the concat function must have a datatype of string.",
+            "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'",
+            "location": "/*[local-name()='oval_definitions' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variables' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='local_variable' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][2]/*[local-name()='concat' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variable_component' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']",
+            "source_id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21580709"
+          }
+        ]
+      },
+      "source_excerpts": [
+        {
+          "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+          "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21580709",
+          "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21580709\" datatype=\"string\" version=\"18\" comment=\"Regex to match all vty lines to session-limit\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">((?s)\\nline vty \\d.+\\n.*?session\\-limit \\d){</ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21580720\" />\n            <ns0:literal_component datatype=\"string\">,}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>",
+          "referenced_variables": [
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21580720",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21580720\" version=\"18\" comment=\"Number of vty's on the system\" datatype=\"int\">\n          <ns0:count>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21580720\" item_field=\"global_command\" />\n          </ns0:count>\n        </ns0:local_variable>"
+            }
+          ]
+        }
+      ],
+      "classification": "Schematron rejection; function-cast prose conflict requires standards review",
+      "native_admitted": false
+    },
+    {
+      "rule": "xccdf_mil.disa.stig.cisco_rule_SV-215812r1137875_rule",
+      "title": "The Cisco router must be configured to enforce approved authorizations for controlling the flow of management information within the device based on control policies.",
+      "source_rule_sha256": "a2008c662f87ac6dfca1569522730598a4782db8dbb48db522ed28df0ead818d",
+      "original_validity": {
+        "status": "INVALID",
+        "issues": [
+          {
+            "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "validator": "Schematron",
+            "kind": "invalid",
+            "message": "The variable referenced by the concat function must have a datatype of string.",
+            "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'",
+            "location": "/*[local-name()='oval_definitions' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variables' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='local_variable' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][3]/*[local-name()='concat' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variable_component' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']",
+            "source_id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581201"
+          },
+          {
+            "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "validator": "Schematron",
+            "kind": "invalid",
+            "message": "The variable referenced by the concat function must have a datatype of string.",
+            "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'",
+            "location": "/*[local-name()='oval_definitions' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variables' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='local_variable' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][5]/*[local-name()='concat' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variable_component' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][2]",
+            "source_id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581203"
+          }
+        ]
+      },
+      "source_excerpts": [
+        {
+          "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+          "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581201",
+          "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581201\" datatype=\"string\" version=\"18\" comment=\"Regex to match all vty lines to login authentication\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">((?s)\\nline vty \\d+ \\d+.*?\\n access-class \\S+? in\\n.+){</ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581220\" />\n            <ns0:literal_component datatype=\"string\">}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>",
+          "referenced_variables": [
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581220",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581220\" version=\"18\" comment=\"Number of vty's on the system\" datatype=\"int\">\n          <ns0:count>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21581220\" item_field=\"global_command\" />\n          </ns0:count>\n        </ns0:local_variable>"
+            }
+          ]
+        },
+        {
+          "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+          "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581203",
+          "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581203\" datatype=\"string\" version=\"18\" comment=\"Regex to verify the same acces-class is applied to all VTY lines\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">((?s)\\nline vty \\d+ \\d+.*?\\n access-class </ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581221\" />\n            <ns0:literal_component datatype=\"string\"> in\\n.+){</ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581220\" />\n            <ns0:literal_component datatype=\"string\">}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>",
+          "referenced_variables": [
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581221",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581221\" datatype=\"string\" version=\"18\" comment=\"Name of access-class applied to the first VTY (if present)\">\n          <ns0:regex_capture pattern=\"(?s)\\nline vty \\d \\d\\n.*? access-class (\\S+) in\\n\">\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21581201\" item_field=\"config_line\" />\n          </ns0:regex_capture>\n        </ns0:local_variable>"
+            },
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581220",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21581220\" version=\"18\" comment=\"Number of vty's on the system\" datatype=\"int\">\n          <ns0:count>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21581220\" item_field=\"global_command\" />\n          </ns0:count>\n        </ns0:local_variable>"
+            }
+          ]
+        }
+      ],
+      "classification": "Schematron rejection; function-cast prose conflict requires standards review",
+      "native_admitted": false
+    },
+    {
+      "rule": "xccdf_mil.disa.stig.cisco_rule_SV-215833r961068_rule",
+      "title": "The Cisco router must be configured to terminate all network connections associated with device management after five minutes of inactivity.",
+      "source_rule_sha256": "cbbcf23a161a09c442266482d4701ec2d0fa5f1777ba8248400a5e9c97d283b4",
+      "original_validity": {
+        "status": "INVALID",
+        "issues": [
+          {
+            "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "validator": "Schematron",
+            "kind": "invalid",
+            "message": "The variable referenced by the concat function must have a datatype of string.",
+            "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'",
+            "location": "/*[local-name()='oval_definitions' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variables' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='local_variable' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][12]/*[local-name()='concat' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variable_component' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']",
+            "source_id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583306"
+          },
+          {
+            "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "validator": "Schematron",
+            "kind": "invalid",
+            "message": "The variable referenced by the regex_capture function must have a datatype of string.",
+            "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'",
+            "location": "/*[local-name()='oval_definitions' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variables' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='local_variable' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][10]/*[local-name()='regex_capture' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variable_component' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']",
+            "source_id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583307"
+          }
+        ]
+      },
+      "source_excerpts": [
+        {
+          "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+          "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583306",
+          "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583306\" datatype=\"string\" version=\"18\" comment=\"Regex to match all exec-timeout lines\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">(timeout (5|4|3|2|1) 0\\s*){</ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583301\" />\n            <ns0:literal_component datatype=\"string\">}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>",
+          "referenced_variables": [
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583301",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583301\" version=\"18\" comment=\"Number of line and vty's on the system\" datatype=\"int\">\n          <ns0:count>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21583302\" item_field=\"global_command\" />\n          </ns0:count>\n        </ns0:local_variable>"
+            }
+          ]
+        },
+        {
+          "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+          "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583307",
+          "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583307\" version=\"18\" comment=\"Regex capture timeout lines\" datatype=\"int\">\n          <ns0:regex_capture pattern=\"\\s+exec-(.*)\">\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583304\" />\n          </ns0:regex_capture>\n        </ns0:local_variable>",
+          "referenced_variables": [
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583304",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21583304\" version=\"18\" comment=\"Split the configuration into separate lines\" datatype=\"int\">\n          <ns0:split delimiter=\"\\n\">\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21583303\" item_field=\"config_line\" />\n          </ns0:split>\n        </ns0:local_variable>"
+            }
+          ]
+        }
+      ],
+      "classification": "probable textual Variable datatype defect plus function-cast/Schematron conflict",
+      "native_admitted": false
+    },
+    {
+      "rule": "xccdf_mil.disa.stig.cisco_rule_SV-215854r1156415_rule",
+      "title": "The Cisco router must be configured to use at least two authentication servers for the purpose of authenticating users prior to granting administrative access.",
+      "source_rule_sha256": "5390f856c9a4d9ccf6285e6ac465b4991d72153f66762b5000691303517d77d3",
+      "original_validity": {
+        "status": "INVALID",
+        "issues": [
+          {
+            "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+            "validator": "Schematron",
+            "kind": "invalid",
+            "message": "The variable referenced by the concat function must have a datatype of string.",
+            "test": "ancestor::oval-def:oval_definitions/oval-def:variables/*[@id=$var_ref]/@datatype = 'string'",
+            "location": "/*[local-name()='oval_definitions' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variables' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='local_variable' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5'][15]/*[local-name()='concat' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']/*[local-name()='variable_component' and namespace-uri()='http://oval.mitre.org/XMLSchema/oval-definitions-5']",
+            "source_id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21585409"
+          }
+        ]
+      },
+      "source_excerpts": [
+        {
+          "component": "scap_navy.navwar.niwcatlantic.scc_comp_U_Cisco_IOS-XE_Router_NDM_V3R5_STIG_SCAP_1-4_Benchmark-enhancedV18-oval2.xml",
+          "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21585409",
+          "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21585409\" datatype=\"string\" version=\"18\" comment=\"Regex to match all vty lines to login authentication\">\n          <ns0:concat>\n            <ns0:literal_component datatype=\"string\">((?s)\\nline vty \\d.+\\n.*? login authentication LOGIN_AUTHENTICATION.+){</ns0:literal_component>\n            <ns0:variable_component var_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21585420\" />\n            <ns0:literal_component datatype=\"string\">,}</ns0:literal_component>\n          </ns0:concat>\n        </ns0:local_variable>",
+          "referenced_variables": [
+            {
+              "id": "oval:navy.navwar.niwcatlantic.scc.iosxe:var:21585420",
+              "xml": "<ns0:local_variable xmlns:ns0=\"http://oval.mitre.org/XMLSchema/oval-definitions-5\" id=\"oval:navy.navwar.niwcatlantic.scc.iosxe:var:21585420\" version=\"18\" comment=\"Number of vty's on the system\" datatype=\"int\">\n          <ns0:count>\n            <ns0:object_component object_ref=\"oval:navy.navwar.niwcatlantic.scc.iosxe:obj:21585420\" item_field=\"global_command\" />\n          </ns0:count>\n        </ns0:local_variable>"
+            }
+          ]
+        }
+      ],
+      "classification": "Schematron rejection; function-cast prose conflict requires standards review",
+      "native_admitted": false
+    }
+  ],
+  "sv_215833_split_delimiter": {
+    "value": "\\n",
+    "length": 2,
+    "unicode_codepoints": [
+      92,
+      110
+    ],
+    "interpretation": "Literal backslash+n in XML; not a newline. OVAL split specifies a delimiter string; source-specific scanner behavior untested."
+  },
+  "other_categories": {
+    "router_proved_static": 38,
+    "router_ntp_count_converter_limit": 1,
+    "switch_foreign_catalog_namespace": 37
+  },
+  "runtime_evidence": false,
+  "source_repairs": false,
+  "attribution": "All four failures occur in NIWC navy-prefixed enhanced oval2 component; DISA-origin attribution not established."
+}
