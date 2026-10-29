@@ -17,6 +17,14 @@ Python 3.12 is the maintained local baseline. Some packaging/signing experiments
 
 ## Independent 0.4 package acceptance (#251)
 
+For the owner-requested complete **DRAFT first / independent verification second**
+deliverable, use `tools/build_v04_full_draft.py` with the explicit
+`--acknowledge-full-corpus-deliverable` flag. The
+[all-65 DRAFT guide](../docs/developer/ALL65-DRAFT-REVIEW.md) records exact inputs,
+commands, source/manual preservation, unverified labels and finalization audits.
+This designated corpus deliverable is never a routine regression, and does not
+change the strict verified upgrade below.
+
 The existing direct converter offers a source-verified upgrade mode:
 
 ```bash

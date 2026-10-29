@@ -8,6 +8,29 @@ deprecation declarations and explicit support overrides. No conversion archive
 was regenerated. The [machine-readable reconciliation](v04-release-readiness-20261029.json)
 retains exact original Rule representatives and primary messages.
 
+## Stage-one complete DRAFT checkpoint
+
+The revised owner strategy is DRAFT publication first, independent verification
+second. A new distinct source-preserving all-65 DRAFT now accounts for all 8,892
+Rules and every automated attempt: **4,206 retained published static proofs + 52
+structurally valid unverified native candidates + 2,981 explicitly blocked
+automated Rules + 1,653 manual/OCIL-only preserved Rules**. All 4,258 native
+candidates compile; original Rule/manual components and the prior proof floor
+pass the preservation/hash audit. Final verified-release requirements are unchanged.
+[Review/reproduction guide](../developer/ALL65-DRAFT-REVIEW.md).
+
+Current DRAFT primary blocked dispositions: **1,630** existing #255 contract
+cases, **992** catalog bindings, **151** effectively deprecated originals,
+**137** sqlext exceptions, **32** recorded invalid/deprecated original closures,
+and **39** further converter/source investigations. The contract bucket contains
+1,184 all_exist, 381 import/export, 30 aggregation, 33 function cases (15 split,
+15 count, three substring) and two acquisition cases. Gate ordering exposes one
+count blocker and prioritizes one additional original deprecation; secondary
+blockers still overlap. These are not promised unlocks. The detailed older
+published-proof overlay below remains a dated baseline, not new proof promotion.
+The unproved automated total remains **3,033** until stage-two promotion: 52
+native candidates plus 2,981 blocked cases. No scanner-runtime claim is made.
+
 ## Current coverage, before the pending SMF integration
 
 All **8,892** original Rules reconcile: **4,206** independently proved primary

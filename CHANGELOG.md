@@ -6,6 +6,13 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Add an explicitly requested all-65 DRAFT builder that attempts
+  existing approved mappings without requiring independent proof first. Preserve
+  all originals/manual content and Rule outcomes, label unverified authoring,
+  reject known-invalid/deprecated sources and retain published proof hashes;
+  strict verified-upgrade admission is unchanged
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Activate the existing Solaris SMF identity mapping in the
   direct converter and independent scalar readers. Fourteen original SPARC/x86
   Rules and three original conformance Tests prove locally; previous hashes are

@@ -879,7 +879,7 @@ def blocker_category(message):
     return 'unsupported-construct'
 
 
-def convert_benchmark(source, *, inventory_only=False, timings=None):
+def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=None):
     """Inventory all Rules; isolate expected per-Rule failures and validate admission.
 
     Native output is atomic per Rule. Diagnostic probes of blocked closures are
@@ -893,7 +893,7 @@ def convert_benchmark(source, *, inventory_only=False, timings=None):
     inventory_counts = inventory.counts(rows)
     measured = {'inventory': time.perf_counter() - started, 'conversion': 0.0,
                 'validation': 0.0, 'diagnostics': 0.0}
-    mappings = load_mappings()
+    mappings = load_mappings() if mappings is None else mappings
     documents, bindings, probes = {}, [], {}
     if not inventory_only:
         from validate_native_json_schemas import build_validators, document_errors

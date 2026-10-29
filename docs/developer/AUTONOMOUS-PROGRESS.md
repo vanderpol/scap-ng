@@ -7,45 +7,76 @@ Read [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md) before resuming. This is a restart
 record, not a release/scanner-conformance declaration.
 
-## Current integration — real coverage and release blockers
+## Current priority — complete reviewable all-65 DRAFT first
 
-Latest owner direction: recover real STIG coverage, preserve the baseline, and
-identify exactly what prevents the 0.4 release. Source `main` was independently
-verified at `7070e7990` before this increment; no newer work was overwritten.
+Owner revised release strategy on 2026-10-29: publish a complete, reviewable
+all-65 DRAFT **before completing independent proof coverage**. Attempt every
+automated conversion regardless of available independent readers. Preserve all
+original Rules and manual content; include structurally valid unverified native
+candidates with explicit labels, and retain unsupported/invalid blockers. Never
+fabricate executable Assessments. Independent verification follows as stage two;
+strict verified-upgrade/final-release validation is unchanged.
 
-This integration activates only the existing `solaris.smf` mapping through the
-generic converter and independent scalar identity contract. **37 affected tests
-pass**, including seven new original-backed regressions. Actual production-code
-acceptance proves **14** original Solaris 11 Rules (seven SPARC, seven x86);
-their original Rule/dependency identities match the frozen DRAFT. All **3,130**
-preceding cohort proof/source/native-term/authoring hashes and all **523**
-conformance four-hash records retain parity. Three additional original SMF
-conformance Tests prove: **526/716 configured**, separately counted from Rules.
+[Operator contract and exact command](ALL65-DRAFT-REVIEW.md). The new builder
+uses all existing approved mappings diagnostically without activating unproved
+production admission. No schema/mapping/compiler/scanner/editor/#255 change.
+The original frozen all-65 archive remains immutable; a new unique DRAFT revision
+is the expressly authorized full-corpus deliverable, not a routine regression.
 
-Own exact-commit hosted maintained/six-source integration is pending publication.
-Do not supersede that active gate or claim the older suite verifies new code.
-Published baseline stays **4,206** primary static proofs until this integration
-and durable evidence pass; the candidate total is **4,220**. Schemas, mappings,
-compiler, scanner/editor, protected workflows and #255 contracts are unchanged.
+Generation and the complete preservation/ledger/hash audit have finished:
+**65 benchmarks, 8,892 original Rules, all 7,239 automated attempts**, 4,206
+exact-hash retained published static proofs, **52 structurally valid UNVERIFIED
+native candidates**, 2,981 explicitly blocked automated Rules, and 1,653
+manual/OCIL-only Rules preserved. All 4,258 native candidates compile with checked
+operands; complete originals/manual content remain separate from native partial
+Rule-policy wrappers. Every Rule ID and original component was independently
+reconciled against its preserved original ZIP. No fabricated blocked/manual
+Assessment is present. All 65 ZIP pins and all 4,206 source/authoring/program
+baseline hashes retain parity.
 
-[SMF source-backed review packet](../audit/v04-solaris-smf-activation-20261029.md).
-[Exact release-blocker reconciliation](../audit/v04-release-readiness-20261029.md):
-all 8,892 original Rules reconcile, with 3,033 automated unproved at the published
-baseline. Primary buckets are 1,630 blocked-contract, 992 catalog binding,
-150 effectively deprecated Test type, 137 nonstandard sqlext, 96 converter/reader
-investigation and 28 known original-invalid/deprecated cases. Secondary blockers
-overlap; these are not guaranteed unlock counts. The 14 SMF cases are among 96.
-The report separates full migration from clean toolchain-release gates and a
-deliberately scoped subset prerelease. It does not authorize release or schema work.
+The nine DRAFT regression tests pass in scoped runs; the existing eight-test
+representative benchmark/API/CLI suite also passes (17 distinct checks). No
+all-65 regression was added to normal CI. Exact new-builder hosted integration
+follows this commit; this DRAFT is not labeled a verified release.
 
-Recovery: `/workspace/coverage-next-20261029/` contains `smf-final/`, complete
-conformance output/retention, the 3,130-proof retention log, frozen-ledger overlay,
-and selected original Rule hashes. Next: let exact-code integration finish,
-publish durable SMF evidence and update these counts, then investigate the next
-source-valid existing-mapping cases. Forty-three IOS XE line/global candidates
-are selected but not yet source-validated; do not count them. Reuse exact-commit
-CI and do not regenerate the frozen all-65 archive. Commits/pushes are consolidated
-at least 30 minutes apart without routine owner approval questions.
+Publication is the unique
+[complete stage-one DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/main/runs/v04-converter/2026-10-29-all-65-complete-draft-stage-one),
+with immutable archive/ledger/checksum links recorded in #251 after upload. Do not
+wait for complete independent proof coverage before publication. The earlier
+47 MB frozen all-65 archive remains unchanged.
+
+Recovery `/workspace/full-draft-20261029/`: `all-65-draft/`, `generation.log`,
+`proof-baseline.json` (4,206 records including original ZIP SHA-256),
+`known-invalid-final.json` (32 source exclusions), final reporting/preservation
+auditor, `RUN-STATE.json`, and the original driver snapshot. Reporting was
+normalized after generation without rerunning conversion. Four additional IOS XE
+invalid originals were already blocked; their precise validity diagnostics are
+retained. `package_draft.py` packages the review with the exact new code commit.
+Publish DRAFT, then continue stage-two independent verification in bounded batches;
+strict verified-upgrade/final-release requirements stay unchanged.
+
+### Preceding Solaris integration is green
+
+`87417fb21ddcab8b9405a17987821fc6e5701111`: all nine exact-commit workflows pass.
+[Maintained run 40914906704](https://github.com/vanderpol/scap-ng/actions/runs/40914906704),
+job 123592419747, artifact 12916930695: **3,299 run / 3,298 passed / zero
+failures or errors / one existing skip**, 609.640 seconds.
+[Six-source gate 40914906671](https://github.com/vanderpol/scap-ng/actions/runs/40914906671),
+job 123592418648, artifact 12916286651: all 1,072 anchor proofs retained.
+Fourteen actual Solaris Rules pass selected primary acceptance; all 3,130 prior
+cohort hashes and 523 prior conformance four-hash records retain parity. Three
+SMF conformance Tests additionally prove: 526/716 configured of 803 originals.
+Durable SMF proof promotion can follow DRAFT publication; do not let it block
+stage one. The DRAFT's carried published proof baseline remains 4,206.
+
+Recovery `/workspace/coverage-next-20261029/` retains SMF evidence, exact CI,
+release-readiness overlay and a diagnostic IOS XE probe: 38/43 prove locally,
+four original-invalid/deprecated and one count-function blocker. IOS XE is not
+activated in strict production admission; further proof expansion is deferred
+until DRAFT publication. [Release-blocker report](../audit/v04-release-readiness-20261029.md)
+retains the measured unresolved contracts and source-remediation debt. No new
+normative answer is inferred. Commit/push windows remain at least 30 minutes
+apart without routine owner approval questions.
 
 ## Completed assignment — compiled-cohort proof expansion
 
