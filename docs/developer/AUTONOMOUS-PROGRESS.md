@@ -7,58 +7,48 @@ Read [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md) before resuming. This is a restart
 record, not a release/scanner-conformance declaration.
 
-## Active assignment — compiled-cohort proof expansion
+## Completed assignment — compiled-cohort proof expansion
 
-Latest owner direction authorizes autonomous bounded source-proof expansion of
-the 3,138 frozen compiled/unproved candidates under #251. Routine scoped commits
-and pushes are authorized; **batch commits and pushes at most once per 30 minutes**,
-without routine approval questions. Unavoidable platform prompts belong to that
-publication window. Continue successful batches; do not stop at a checkpoint.
+**3,130 independently proved / 3,138 assessed / zero pending**, across all 32
+benchmarks in the frozen candidate cohort. Seven invalid originals and one
+deprecated original remain explicitly rejected; every valid, nondeprecated
+candidate is proved. The prior 1,076 primary proofs and all 523 conformance
+four-hash records remain retained. Total primary static proofs: **4,206**.
+[Cumulative index, exact evidence and eight exclusions](../audit/v04-compiled-proof-expansion-20261029.md).
 
-Published: **3,095 new primary proofs / 3,138 attempted / 0 pending**
-from the original cohort. The prior 1,076 primary proofs and 523 conformance
-four-hash records are retained. [Cumulative index and exact evidence links](../audit/v04-compiled-proof-expansion-20261029.md).
-No production code changed; exact-code CI at `10f4e35b3` is reused. No duplicate
-maintained suite or frozen all-65 regeneration. Original-invalid/deprecated or
-unverifiable cases stay rejected; #255 contracts remain blocked.
+Final [35-Rule evidence](https://github.com/vanderpol/scap-ng-evidence/tree/42979846586581a431dfc4dc6727709a303d53e6/runs/v04-converter/2026-10-29-compiled-proof-batch-005-5e847f826) binds the exact published reader implementation
+to original source pins, unchanged frozen authoring/program hashes and all
+retention records. The retries supersede 35 first-pass reader limits; they do
+not enlarge the original denominator. No all-65 regeneration was performed.
+The complete 0.4.0 release and scanner runtime remain separate claims.
 
-Recovery root `/workspace/proof-expansion-20261029/`: `run_batch.py` orchestrates
-the existing verified upgrader and independent readers, `batch-00N/` retains
-full local evidence, `published-runs.json` records immutable evidence commits,
-and `update_progress.py` rebuilds the cumulative index. Original ZIPs are in
-`/workspace/recovery-20261029/inputs/`. Next local batches continue on unchanged
-code while publication is held for the next 30-minute window. Inspect logs and
-receipts before resuming; never overwrite a completed run directory. The current
-assignment is proof expansion, not an authorization to resolve the earlier
-acquisition-contract decisions or change schemas/scanner/0.5.
+Routine scoped commits/pushes are authorized without further approval, in
+consolidated windows **at least 30 minutes apart**. Assignment completion does
+not authorize #255 contracts, source repair, schema/mapping/compiler changes,
+scanner/editor work or 0.5. Existing larger draft blockers remain unresolved.
+Recommendation for the eight exclusions: preserve rejection until corrected
+upstream inputs are pinned and validated. No new owner decision is needed for
+that disposition.
 
-## Current Registry-reader integration
-
-All 3,138 original compiled/unproved candidates have been assessed. The published
-first pass independently proves 3,095, preserving all frozen authoring/program
-pairs. Seven original-invalid and one deprecated case stay rejected; 35 cases
-expose independent-reader limits, not new schema/compiler contracts.
-
-This integration corrects those existing Registry type/filter readers. **61
-focused tests pass**, including eight original-backed tests. Final selected
-acceptance proves all **35** target Rules with unchanged frozen authoring/program
-hashes. Both corrected readers retain all **3,095** preceding new primary proof
-hashes and all **523** conformance four-hash records. Its own exact-code hosted
-integration is pending after publication; do not supersede that gate or claim the
-older 3,284-test CI as verification of the reader change.
-
-[Reader packet](../audit/v04-registry-reader-proof-expansion-20261029.md) gives
-three original closures, scope, rejected alternatives, positive/negative/mutant
-and cycle evidence. Recovery files: `batch-007/`, `registry-retention.json`,
-`registry-conformance.json`, and `registry-focused-verified.log` under
-`/workspace/proof-expansion-20261029/`. The rejected intermediate `batch-005/`
-IIS result is superseded by `batch-007/`; do not promote intermediate results.
-After hosted gates pass, publish the final 35-proof run and deduplicated cohort
-index in the next permitted 30-minute publication window. Do not regenerate the
-frozen all-65 archive. Schemas, mappings, converter/compiler, scanner/editor,
-protected workflows and #255 contracts remain unchanged.
+Recovery root `/workspace/proof-expansion-20261029/`: `batch-008/` is the final
+exact-commit replay; `published-runs.json` records five immutable evidence runs;
+`reader-integration-ci.json` binds hosted gates; prior retention and complete
+conformance evidence remain alongside them. Inputs remain under
+`/workspace/recovery-20261029/inputs/`. Earlier local batch-005/006/007 results
+are superseded by batch-008; do not promote them or rerun this completed cohort.
 
 ## Last fully verified implementation
+
+All eight path-selected workflows at `5e847f8268697f7555a442256c06f5bfa48f4676` passed. [Maintained run 40904268977](https://github.com/vanderpol/scap-ng/actions/runs/40904268977), job 123554611774, artifact 12910359527: **3,292 run / 3,291 passed / zero failures and errors / one existing skip**, 619.389 seconds. [Six-source gate 40904268774](https://github.com/vanderpol/scap-ng/actions/runs/40904268774), job 123554610454, artifact 12910957628: all **1,072** original anchor proofs retained. The Bluetooth workflow was not path-selected by these reader-only edits; its unchanged original-source acceptance CLI also passes locally, and its regression tests are included in the maintained suite.
+
+The corrected independent Registry readers pass 61 focused tests, all 35 final
+target originals, retention of 3,095 preceding new proof hashes and 523
+conformance records. Four preceding guard additions remain proved with unchanged published
+program hashes. [Reader packet](../audit/v04-registry-reader-proof-expansion-20261029.md).
+Do not repeat the maintained suite for this exact implementation.
+
+### Preceding Solaris verification
+
 
 `10f4e35b331c622c14f6e3aa2bd4aa8981c810c1` admits explicit default equality on
 nil UNIX filenames for two original Solaris 11 SPARC/x86 Rules. All nine

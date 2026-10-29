@@ -58,18 +58,15 @@ converter/compiler, scanner/editor or protected workflow is modified.
   authoring audit also retains all 3,095 frozen authoring digests. All **523**
   preceding conformance four-hash records remain unchanged; coverage stays 523/713
   configured Tests (803 original Tests), separate from production Rules.
-- Exact integration maintained/six-source CI follows publication. Older green
-  CI is not claimed to verify this reader correction. No duplicate suite is
-  dispatched, no 65-benchmark archive is regenerated, and no runtime equivalence
-  is claimed.
+- All eight path-selected workflows at `5e847f8268697f7555a442256c06f5bfa48f4676` passed. [Maintained run 40904268977](https://github.com/vanderpol/scap-ng/actions/runs/40904268977), job 123554611774, artifact 12910359527: **3,292 run / 3,291 passed / zero failures and errors / one existing skip**, 619.389 seconds. [Six-source gate 40904268774](https://github.com/vanderpol/scap-ng/actions/runs/40904268774), job 123554610454, artifact 12910957628: all **1,072** original anchor proofs retained. The Bluetooth workflow was not path-selected by these reader-only edits; its unchanged original-source acceptance CLI also passes locally, and its regression tests are included in the maintained suite. No duplicate maintained suite or frozen archive regeneration was performed.
 
 An initial focused run exposed the native reader's corresponding Filter omission;
 both independent sides were corrected rather than stripping source Filters.
 Source trees are restored after temporary leaf reading, and cycle guards retain
 collection/Variable dependency boundaries.
 
-Local evidence is under `/workspace/proof-expansion-20261029/`: `batch-007/`
-contains the final 35 accepted original Rules, `registry-retention.json` ties
+Local evidence is under `/workspace/proof-expansion-20261029/`: `batch-008/`
+contains the exact-published-commit replay of all 35 accepted original Rules, `registry-retention.json` ties
 3,095 retained proofs to both exact reader file hashes, and
 `registry-conformance.json` retains the complete pinned conformance probe.
 
@@ -83,3 +80,5 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tools python -m unittest \
 Pending #255 contracts remain blocked. The residual eight original source
 invalidity/deprecation cases are explicit input exclusions, not conversion bugs
 silently repaired by this change.
+
+Final durable [35-Rule evidence and retention records](https://github.com/vanderpol/scap-ng-evidence/tree/42979846586581a431dfc4dc6727709a303d53e6/runs/v04-converter/2026-10-29-compiled-proof-batch-005-5e847f826). The completed distinct cohort is **3,130 proved, seven invalid, one deprecated, zero pending**.

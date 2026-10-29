@@ -12,8 +12,9 @@ proposals are not listed as delivered features.
   authoring/program hashes; no converter or schema change
   ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
 
-- **2026-10-29:** Independently validate and prove 845 previously compiled,
-  unproved original Windows primary Rules in bounded batches. Frozen authoring
+- **2026-10-29:** Complete independent source-proof coverage for 3,130 of the
+  3,138 previously compiled/unproved original Rules across 32 benchmarks; seven
+  invalid and one deprecated original remain explicitly excluded. Frozen authoring
   and program hashes are retained; published evidence includes original
   validity, typed terms, mutation checks and accepted subset packages
   ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
