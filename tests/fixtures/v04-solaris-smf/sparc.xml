@@ -1,0 +1,159 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:oval_definitions xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#unix" xmlns:ns3="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:ns4="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent">
+      <ns0:generator>
+        <ns1:product_name>Security Content Tool 1.9.0</ns1:product_name>
+        <ns1:schema_version>5.11</ns1:schema_version>
+        <ns1:timestamp>2026-06-25T09:46:00</ns1:timestamp>
+      </ns0:generator>
+      <ns0:definitions>
+        <ns0:definition id="oval:mil.disa.fso.solaris11:def:297" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>All .Xauthority files must have mode 0600 or less permissive.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 10</ns0:platform>
+            </ns0:affected>
+            <ns0:description>.Xauthority files ensure that the user is authorized to access that specific X Windows host. Excessive permissions may permit unauthorized modification of these files, which could lead to denial of service to authorized access or allow unauthorized access to be obtained.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="AND" negate="false" comment="All .Xauthority files must have mode 0600 or less permissive">
+            <ns0:criterion test_ref="oval:mil.disa.fso.solaris11:tst:29700" comment=".Xauthority files must have mode 0600 or less permissive" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.solaris11:def:45" version="3" class="compliance">
+          <ns0:metadata>
+            <ns0:title>All .Xauthority files must have mode 0600 or less permissive.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 11 (SunOS 5.11)</ns0:platform>
+            </ns0:affected>
+            <ns0:description>All .Xauthority files ensure the user is authorized to access the specific X Windows host. Excessive permissions may permit unauthorized modification.Xauthority files ensure that the user is authorized to access that specific X Windows host. Excessive permissions may permit unauthorized modification of these files, which could lead to denial of service to authorized access or allow unauthorized access to be obtained.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:extend_definition definition_ref="oval:mil.disa.stig.solaris11:def:138" negate="true" comment="Pass if XWindows is not in use." />
+            <ns0:extend_definition definition_ref="oval:mil.disa.fso.solaris11:def:297" comment=".Xauthority files for each user must be 0600 or less permissive." />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.solaris11:def:54" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>The default umask for FTP users must be 077.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 11 (SunOS 5.11)</ns0:platform>
+            </ns0:affected>
+            <ns0:description>Setting a very secure default value for umask ensures that users make a conscious choice about their file permissions.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:5400" comment="Check to see if the FTP service is listed under the SMF." />
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:5401" comment="FTP umask value must be set to 077." />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.solaris11:def:59" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>Login services for serial ports must be disabled.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 11</ns0:platform>
+            </ns0:affected>
+            <ns0:description>Login services should not be enabled on any serial ports that are not strictly required to support the mission of the system. This action can be safely performed even when console access is provided using a serial port.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="AND">
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:5900" comment="svc:/system/console-login:terma is disabled" />
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:5901" comment="svc:/system/console-login:termb is disabled" />
+          </ns0:criteria>
+        </ns0:definition>
+        <ns0:definition id="oval:mil.disa.stig.solaris11:def:138" version="2" class="compliance">
+          <ns0:metadata>
+            <ns0:title>Solaris 11 XWindows Check.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 11 (SunOS 5.11)</ns0:platform>
+            </ns0:affected>
+            <ns0:description>XWindows is being run by the system, using CDM or XDM as a proxy.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:13800" comment="Check to see if CDM is being run by the system." />
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:13801" comment="Check to see if XDM is being run by the system." />
+          </ns0:criteria>
+        </ns0:definition>
+        </ns0:definitions>
+      <ns0:tests>
+        <ns2:file_test id="oval:mil.disa.fso.solaris11:tst:29700" version="1" check_existence="any_exist" check="all" comment=".Xauthority files must have mode 0600 or less permissive">
+          <ns2:object object_ref="oval:mil.disa.fso.solaris11:obj:29701" />
+          <ns2:state state_ref="oval:mil.disa.fso.solaris11:ste:29700" />
+        </ns2:file_test>
+        <ns3:smf_test id="oval:mil.disa.stig.solaris11:tst:5400" version="1" check_existence="none_exist" check="all" comment="Check to see if the FTP service is listed under the SMF.">
+          <ns3:object object_ref="oval:mil.disa.stig.solaris11:obj:5400" />
+        </ns3:smf_test>
+        <ns4:textfilecontent54_test id="oval:mil.disa.stig.solaris11:tst:5401" version="2" check_existence="at_least_one_exists" check="all" comment="FTP umask value must be set to 077.">
+          <ns4:object object_ref="oval:mil.disa.stig.solaris11:obj:5401" />
+          <ns4:state state_ref="oval:mil.disa.stig.solaris11:ste:5400" />
+        </ns4:textfilecontent54_test>
+        <ns3:smf_test id="oval:mil.disa.stig.solaris11:tst:5900" version="1" check_existence="at_least_one_exists" check="all" comment="svc:/system/console-login:terma is disabled">
+          <ns3:object object_ref="oval:mil.disa.stig.solaris11:obj:5900" />
+          <ns3:state state_ref="oval:mil.disa.stig.solaris11:ste:1700" />
+        </ns3:smf_test>
+        <ns3:smf_test id="oval:mil.disa.stig.solaris11:tst:5901" version="1" check_existence="at_least_one_exists" check="all" comment="svc:/system/console-login:termb is disabled">
+          <ns3:object object_ref="oval:mil.disa.stig.solaris11:obj:5901" />
+          <ns3:state state_ref="oval:mil.disa.stig.solaris11:ste:1700" />
+        </ns3:smf_test>
+        <ns3:smf_test id="oval:mil.disa.stig.solaris11:tst:13800" version="2" check_existence="at_least_one_exists" check="all" comment="Check to see if XWindows is being run by the system, using CDM.">
+          <ns3:object object_ref="oval:mil.disa.stig.solaris11:obj:13800" />
+          <ns3:state state_ref="oval:mil.disa.stig.solaris11:ste:13800" />
+        </ns3:smf_test>
+        <ns3:smf_test id="oval:mil.disa.stig.solaris11:tst:13801" version="1" check_existence="at_least_one_exists" check="all" comment="Check to see if XWindows is being run by the system, using XDM.">
+          <ns3:object object_ref="oval:mil.disa.stig.solaris11:obj:13801" />
+          <ns3:state state_ref="oval:mil.disa.stig.solaris11:ste:13800" />
+        </ns3:smf_test>
+        </ns0:tests>
+      <ns0:objects>
+        <ns2:password_object id="oval:mil.disa.fso.solaris11:obj:29700" version="1" comment="All usernames">
+          <ns2:username datatype="string" operation="pattern match">.*</ns2:username>
+        </ns2:password_object>
+        <ns2:file_object id="oval:mil.disa.fso.solaris11:obj:29701" version="1" comment=".Xauthority file location">
+          <ns2:path datatype="string" operation="equals" var_ref="oval:mil.disa.fso.solaris11:var:29700" var_check="at least one" />
+          <ns2:filename datatype="string" operation="equals">.Xauthority</ns2:filename>
+        </ns2:file_object>
+        <ns3:smf_object id="oval:mil.disa.stig.solaris11:obj:5400" version="1" comment="SMF listing of FTP service.">
+          <ns3:fmri datatype="string" operation="equals">svc://localhost/network/ftp:default</ns3:fmri>
+        </ns3:smf_object>
+        <ns4:textfilecontent54_object id="oval:mil.disa.stig.solaris11:obj:5401" version="2" comment="Umask ID string in The (/etc/proftpd.conf) file.">
+          <ns4:filepath>/etc/proftpd.conf</ns4:filepath>
+          <ns4:pattern datatype="string" operation="pattern match">^\s*Umask\s+(\S+)\s*$</ns4:pattern>
+          <ns4:instance datatype="int" operation="greater than or equal">1</ns4:instance>
+        </ns4:textfilecontent54_object>
+        <ns3:smf_object id="oval:mil.disa.stig.solaris11:obj:5900" version="1" comment="svc:/system/console-login:terma">
+          <ns3:fmri datatype="string" operation="equals">svc://localhost/system/console-login:terma</ns3:fmri>
+        </ns3:smf_object>
+        <ns3:smf_object id="oval:mil.disa.stig.solaris11:obj:5901" version="1" comment="svc:/system/console-login:termb">
+          <ns3:fmri datatype="string" operation="equals">svc://localhost/system/console-login:termb</ns3:fmri>
+        </ns3:smf_object>
+        <ns3:smf_object id="oval:mil.disa.stig.solaris11:obj:13800" version="1" comment="The gdm graphical-login.">
+          <ns3:fmri datatype="string" operation="equals">svc://localhost/application/graphical-login/gdm:default</ns3:fmri>
+        </ns3:smf_object>
+        <ns3:smf_object id="oval:mil.disa.stig.solaris11:obj:13801" version="1" comment="The xdm graphical-login.">
+          <ns3:fmri datatype="string" operation="equals">svc://localhost/application/graphical-login/xdm:default</ns3:fmri>
+        </ns3:smf_object>
+        </ns0:objects>
+      <ns0:states>
+        <ns2:file_state id="oval:mil.disa.fso.solaris11:ste:29700" version="2" comment="Permission 0600">
+          <ns2:suid entity_check="all" datatype="boolean" operation="equals">false</ns2:suid>
+          <ns2:sgid entity_check="all" datatype="boolean" operation="equals">false</ns2:sgid>
+          <ns2:uexec entity_check="all" datatype="boolean" operation="equals">false</ns2:uexec>
+          <ns2:gread entity_check="all" datatype="boolean" operation="equals">false</ns2:gread>
+          <ns2:gwrite entity_check="all" datatype="boolean" operation="equals">false</ns2:gwrite>
+          <ns2:gexec entity_check="all" datatype="boolean" operation="equals">false</ns2:gexec>
+          <ns2:oread entity_check="all" datatype="boolean" operation="equals">false</ns2:oread>
+          <ns2:owrite entity_check="all" datatype="boolean" operation="equals">false</ns2:owrite>
+          <ns2:oexec entity_check="all" datatype="boolean" operation="equals">false</ns2:oexec>
+        </ns2:file_state>
+        <ns3:smf_state id="oval:mil.disa.stig.solaris11:ste:1700" version="1" comment="Disabled state">
+          <ns3:service_state datatype="string" operation="equals">DISABLED</ns3:service_state>
+        </ns3:smf_state>
+        <ns4:textfilecontent54_state id="oval:mil.disa.stig.solaris11:ste:5400" version="1" comment="077 state for umask.">
+          <ns4:subexpression datatype="string" operation="equals">077</ns4:subexpression>
+        </ns4:textfilecontent54_state>
+        <ns3:smf_state id="oval:mil.disa.stig.solaris11:ste:13800" version="2" comment="gdm graphical-login is online.">
+          <ns3:service_state datatype="string" operation="equals">ONLINE</ns3:service_state>
+        </ns3:smf_state>
+      </ns0:states>
+      <ns0:variables>
+        <ns0:local_variable id="oval:mil.disa.fso.solaris11:var:29700" version="1" datatype="string" comment="User Home Directories">
+          <ns0:object_component object_ref="oval:mil.disa.fso.solaris11:obj:29700" item_field="home_dir" />
+        </ns0:local_variable>
+        </ns0:variables>
+    </ns0:oval_definitions>

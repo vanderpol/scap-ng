@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:oval_definitions xmlns:ns0="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:ns1="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ns2="http://oval.mitre.org/XMLSchema/oval-definitions-5#solaris" xmlns:ns3="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent">
+      <ns0:generator>
+        <ns1:product_name>Security Content Tool 1.9.0</ns1:product_name>
+        <ns1:schema_version>5.11</ns1:schema_version>
+        <ns1:timestamp>2026-06-25T09:46:33</ns1:timestamp>
+      </ns0:generator>
+      <ns0:definitions>
+        <ns0:definition id="oval:mil.disa.stig.solaris11:def:54" version="1" class="compliance">
+          <ns0:metadata>
+            <ns0:title>The default umask for FTP users must be 077.</ns0:title>
+            <ns0:affected family="unix">
+              <ns0:platform>Oracle Solaris 11 (SunOS 5.11)</ns0:platform>
+            </ns0:affected>
+            <ns0:description>Setting a very secure default value for umask ensures that users make a conscious choice about their file permissions.</ns0:description>
+          </ns0:metadata>
+          <ns0:criteria operator="OR">
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:5400" comment="Check to see if the FTP service is listed under the SMF." />
+            <ns0:criterion test_ref="oval:mil.disa.stig.solaris11:tst:5401" comment="FTP umask value must be set to 077." />
+          </ns0:criteria>
+        </ns0:definition>
+        </ns0:definitions>
+      <ns0:tests>
+        <ns2:smf_test id="oval:mil.disa.stig.solaris11:tst:5400" version="1" check_existence="none_exist" check="all" comment="Check to see if the FTP service is listed under the SMF.">
+          <ns2:object object_ref="oval:mil.disa.stig.solaris11:obj:5400" />
+        </ns2:smf_test>
+        <ns3:textfilecontent54_test id="oval:mil.disa.stig.solaris11:tst:5401" version="2" check_existence="at_least_one_exists" check="all" comment="FTP umask value must be set to 077.">
+          <ns3:object object_ref="oval:mil.disa.stig.solaris11:obj:5401" />
+          <ns3:state state_ref="oval:mil.disa.stig.solaris11:ste:5400" />
+        </ns3:textfilecontent54_test>
+        </ns0:tests>
+      <ns0:objects>
+        <ns2:smf_object id="oval:mil.disa.stig.solaris11:obj:5400" version="1" comment="SMF listing of FTP service.">
+          <ns2:fmri datatype="string" operation="equals">svc://localhost/network/ftp:default</ns2:fmri>
+        </ns2:smf_object>
+        <ns3:textfilecontent54_object id="oval:mil.disa.stig.solaris11:obj:5401" version="2" comment="Umask ID string in The (/etc/proftpd.conf) file.">
+          <ns3:filepath>/etc/proftpd.conf</ns3:filepath>
+          <ns3:pattern datatype="string" operation="pattern match">^\s*Umask\s+(\S+)\s*$</ns3:pattern>
+          <ns3:instance datatype="int" operation="greater than or equal">1</ns3:instance>
+        </ns3:textfilecontent54_object>
+        </ns0:objects>
+      <ns0:states>
+        <ns3:textfilecontent54_state id="oval:mil.disa.stig.solaris11:ste:5400" version="1" comment="077 state for umask.">
+          <ns3:subexpression datatype="string" operation="equals">077</ns3:subexpression>
+        </ns3:textfilecontent54_state>
+        </ns0:states>
+      </ns0:oval_definitions>

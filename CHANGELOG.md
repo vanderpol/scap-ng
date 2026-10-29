@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Activate the existing Solaris SMF identity mapping in the
+  direct converter and independent scalar readers. Fourteen original SPARC/x86
+  Rules and three original conformance Tests prove locally; previous hashes are
+  retained. Exact-commit integration follows publication
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Extend independent source readers for existing Registry type
   constant arrays, multi-string equality and filtered Registry projections.
   Thirty-five additional original compiled candidates compare with unchanged

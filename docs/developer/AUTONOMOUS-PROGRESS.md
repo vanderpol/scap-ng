@@ -7,6 +7,46 @@ Read [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md) before resuming. This is a restart
 record, not a release/scanner-conformance declaration.
 
+## Current integration — real coverage and release blockers
+
+Latest owner direction: recover real STIG coverage, preserve the baseline, and
+identify exactly what prevents the 0.4 release. Source `main` was independently
+verified at `7070e7990` before this increment; no newer work was overwritten.
+
+This integration activates only the existing `solaris.smf` mapping through the
+generic converter and independent scalar identity contract. **37 affected tests
+pass**, including seven new original-backed regressions. Actual production-code
+acceptance proves **14** original Solaris 11 Rules (seven SPARC, seven x86);
+their original Rule/dependency identities match the frozen DRAFT. All **3,130**
+preceding cohort proof/source/native-term/authoring hashes and all **523**
+conformance four-hash records retain parity. Three additional original SMF
+conformance Tests prove: **526/716 configured**, separately counted from Rules.
+
+Own exact-commit hosted maintained/six-source integration is pending publication.
+Do not supersede that active gate or claim the older suite verifies new code.
+Published baseline stays **4,206** primary static proofs until this integration
+and durable evidence pass; the candidate total is **4,220**. Schemas, mappings,
+compiler, scanner/editor, protected workflows and #255 contracts are unchanged.
+
+[SMF source-backed review packet](../audit/v04-solaris-smf-activation-20261029.md).
+[Exact release-blocker reconciliation](../audit/v04-release-readiness-20261029.md):
+all 8,892 original Rules reconcile, with 3,033 automated unproved at the published
+baseline. Primary buckets are 1,630 blocked-contract, 992 catalog binding,
+150 effectively deprecated Test type, 137 nonstandard sqlext, 96 converter/reader
+investigation and 28 known original-invalid/deprecated cases. Secondary blockers
+overlap; these are not guaranteed unlock counts. The 14 SMF cases are among 96.
+The report separates full migration from clean toolchain-release gates and a
+deliberately scoped subset prerelease. It does not authorize release or schema work.
+
+Recovery: `/workspace/coverage-next-20261029/` contains `smf-final/`, complete
+conformance output/retention, the 3,130-proof retention log, frozen-ledger overlay,
+and selected original Rule hashes. Next: let exact-code integration finish,
+publish durable SMF evidence and update these counts, then investigate the next
+source-valid existing-mapping cases. Forty-three IOS XE line/global candidates
+are selected but not yet source-validated; do not count them. Reuse exact-commit
+CI and do not regenerate the frozen all-65 archive. Commits/pushes are consolidated
+at least 30 minutes apart without routine owner approval questions.
+
 ## Completed assignment — compiled-cohort proof expansion
 
 **3,130 independently proved / 3,138 assessed / zero pending**, across all 32

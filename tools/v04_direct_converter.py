@@ -41,7 +41,8 @@ def load_mappings():
     mappings = [json.loads((ROOT / f'schema/v0.4.0/capability-mappings/supported/{name}.json').read_text())
                 for name in CAPABILITIES]
     ensure(all(mapping['specification_version'] == '0.4.0' for mapping in mappings), 'mapping version mismatch')
-    ensure(all(mapping['source']['namespace'].rsplit('#', 1)[-1] in ('independent', 'linux', 'unix', 'windows')
+    ensure(all((mapping['source']['namespace'].rsplit('#', 1)[-1] in ('independent', 'linux', 'unix', 'windows') or
+                mapping['capability'] == 'solaris.smf')
                for mapping in mappings), 'capability outside approved direct-converter scope')
     return mappings
 
