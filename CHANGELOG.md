@@ -6,6 +6,12 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Independently validate and prove 845 previously compiled,
+  unproved original Windows primary Rules in bounded batches. Frozen authoring
+  and program hashes are retained; published evidence includes original
+  validity, typed terms, mutation checks and accepted subset packages
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251)).
+
 - **2026-10-29:** Accept explicit default equality on nil UNIX filenames while
   retaining directory selection. Two original Solaris 11 SPARC/x86 home-directory
   Rules pass independent static source/package checks; other nil comparators

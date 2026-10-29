@@ -7,6 +7,31 @@ Read [AGENTS.md](../../AGENTS.md), [MAINTAINING.md](../../MAINTAINING.md), and
 [branch policy](../../BRANCH-MANAGEMENT.md) before resuming. This is a restart
 record, not a release/scanner-conformance declaration.
 
+## Active assignment — compiled-cohort proof expansion
+
+Latest owner direction authorizes autonomous bounded source-proof expansion of
+the 3,138 frozen compiled/unproved candidates under #251. Routine scoped commits
+and pushes are authorized; **batch commits and pushes at most once per 30 minutes**,
+without routine approval questions. Unavoidable platform prompts belong to that
+publication window. Continue successful batches; do not stop at a checkpoint.
+
+Published: **845 new primary proofs / 845 attempted / 2,293 pending**
+from the original cohort. The prior 1,076 primary proofs and 523 conformance
+four-hash records are retained. [Cumulative index and exact evidence links](../audit/v04-compiled-proof-expansion-20261029.md).
+No production code changed; exact-code CI at `10f4e35b3` is reused. No duplicate
+maintained suite or frozen all-65 regeneration. Original-invalid/deprecated or
+unverifiable cases stay rejected; #255 contracts remain blocked.
+
+Recovery root `/workspace/proof-expansion-20261029/`: `run_batch.py` orchestrates
+the existing verified upgrader and independent readers, `batch-00N/` retains
+full local evidence, `published-runs.json` records immutable evidence commits,
+and `update_progress.py` rebuilds the cumulative index. Original ZIPs are in
+`/workspace/recovery-20261029/inputs/`. Next local batches continue on unchanged
+code while publication is held for the next 30-minute window. Inspect logs and
+receipts before resuming; never overwrite a completed run directory. The current
+assignment is proof expansion, not an authorization to resolve the earlier
+acquisition-contract decisions or change schemas/scanner/0.5.
+
 ## Last fully verified implementation
 
 `10f4e35b331c622c14f6e3aa2bd4aa8981c810c1` admits explicit default equality on
