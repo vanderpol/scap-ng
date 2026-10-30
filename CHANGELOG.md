@@ -6,6 +6,7 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-30:** Publish a separate [human-readable 65-stream 0.4 authoring review](https://github.com/vanderpol/scap-ng-evidence/releases/tag/v04-human-readable-review-20261030-ab5cddd) with short STIG folders and SV-ID filenames, preserving the full native/proof floor; previous normalized technical ZIP remains immutable (Refs #263).
 - **2026-10-30:** Refresh public 0.4 downloads/Assessment example navigation, separating the original all-65 source DRAFT, human-oriented samples, and **internal-only normalized layout prototype** while explicitly retaining prior six-STIG checkpoints and pre-alpha proof limits ([#262](https://github.com/vanderpol/scap-ng/issues/262)).
 
 - **2026-10-30:** Add opt-in native-library maintenance with non-destructive

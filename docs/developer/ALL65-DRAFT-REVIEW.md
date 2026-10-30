@@ -1,6 +1,6 @@
 # Complete all-65 DRAFT first; independent verification second
 
-**Current download navigation (October 30):** [0.4.0 downloads and Assessment samples](../releases/0.4.0-downloads-and-samples.md) separates the revised original-source DRAFT from a 13,754-file **internal layout/CLI prototype**, which the owner has rejected as a public-ready authoring tree ([#263](https://github.com/vanderpol/scap-ng/issues/263)). This document retains older stage-one DRAFT reproduction instructions; neither package is the approved final public authoring layout.
+**Current download navigation (October 30):** [0.4.0 downloads and Assessment samples](../releases/0.4.0-downloads-and-samples.md) separates the [new human-readable 65-stream native YAML review](https://github.com/vanderpol/scap-ng-evidence/releases/download/v04-human-readable-review-20261030-ab5cddd/scap-ng-0.4.0-human-readable-authoring-review.zip), revised original-source DRAFT, and a 13,754-file **internal layout/CLI prototype**, which the owner has rejected as a public-ready authoring tree ([#263](https://github.com/vanderpol/scap-ng/issues/263)). This document retains older stage-one DRAFT reproduction instructions. The new v2 ZIP is the approved **authoring review layout**, not an approved final `v0.4.0` release.
 
 Current revision authority: [#260 owner tasking](https://github.com/vanderpol/scap-ng/issues/260#issuecomment-6510844015).
 The revised candidate builder enables bounded warning-based drafting without

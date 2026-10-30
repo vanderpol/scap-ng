@@ -1,6 +1,6 @@
 # Windows 11 — SCAP-NG 0.4.0 authoring review
 
-This is a **historical six-STIG file-layout walkthrough**. For the full all-65 source DRAFT, internal normalized-layout experiment, and smaller current examples, start at the [0.4.0 downloads and samples index](../../../docs/releases/0.4.0-downloads-and-samples.md).
+This is a **historical six-STIG file-layout walkthrough**. For the [current human-readable 65-stream authoring ZIP](https://github.com/vanderpol/scap-ng-evidence/releases/download/v04-human-readable-review-20261030-ab5cddd/scap-ng-0.4.0-human-readable-authoring-review.zip), full original-source DRAFT, archived internal layout experiment, and smaller current examples, start at the [0.4.0 downloads and samples index](../../../docs/releases/0.4.0-downloads-and-samples.md).
 
 Open the [earlier approved six-STIG sample release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and inspect `authoring/ms_windows_11/` from the [YAML](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.yaml.zip) or [JSON](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.json.zip) ZIP. It contains source-backed Rules, Assessments, and shared Assessments in one verified cross-reference graph.
 

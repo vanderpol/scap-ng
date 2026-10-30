@@ -1,0 +1,24 @@
+assessment:
+  id: rhel-9-must-not-respond-to-internet-control-message-protocol-icmp-echo-f34a8562-assessment
+  version: 1
+  assessment_title: RHEL 9 must not respond to Internet Control Message Protocol (ICMP) echoes sent to a broadcast address.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    net-ipv4-icmp-echo-ignore-broadcasts-is-set-to-1-in-kernel-ee7dbd22-test:
+      test_title: net.ipv4.icmp_echo_ignore_broadcasts is set to 1 in kernel
+      capability: unix.sysctl
+      object:
+        name: {equals: net.ipv4.icmp_echo_ignore_broadcasts}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          value: {equals: 1, datatype: integer, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    test: net-ipv4-icmp-echo-ignore-broadcasts-is-set-to-1-in-kernel-ee7dbd22-test

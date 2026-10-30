@@ -2,6 +2,8 @@
 
 **Current authoring samples: 0.4.0 pre-alpha.** Start with the policy: a **Benchmark** identifies what is covered, a **Rule** says what is required, and an **Assessment** explains how to check it.
 
+**[Browse two exact native 0.4 Rule/Assessment YAML pairs in GitHub](../../docs/examples/current-human-review/README.md)** (RHEL 9 and Windows 11, no ZIP needed).
+
 **Current all-65 source and smaller Assessment downloads:** [0.4.0 downloads and Assessment samples index](../../docs/releases/0.4.0-downloads-and-samples.md).
 
 **Earlier canonical six-STIG YAML/JSON review ZIPs (historical):** [immutable October 21 source-only release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261021) (includes independent validation reports and six unsigned source packages). The earlier [October 20 immutable YAML/JSON pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) predates the approved flat-Object regeneration. [Assessment examples](assessments.md).
@@ -14,7 +16,7 @@ A Benchmark's `rules` list refers to logical Rule IDs; a Rule's `assessment_choi
 
 In that earlier six-STIG 0.4.0 sample set, **all six Benchmarks declare the exact reachable automated Assessment specification at version 0.4.0**, rather than carrying obsolete 0.3.0 declarations. Original source files, version-declaration changes, hashes and reversible source transformations are preserved in the workflow evidence.
 
-For internal testing of the unapproved normalized-layout prototype, open its extracted `content/` tree as described in the [download index](../../docs/releases/0.4.0-downloads-and-samples.md). For historical six-STIG sample walkthroughs, start with `authoring/rhel_9/` or `authoring/ms_windows_server_2025/`, open a Rule under `rules/`, follow its `assessment_choices` logical ID to the matching Assessment, and then read its `tests` and `evaluate`.
+For current real authoring samples, use the [human-readable 65-stream library](https://github.com/vanderpol/scap-ng-evidence/releases/download/v04-human-readable-review-20261030-ab5cddd/scap-ng-0.4.0-human-readable-authoring-review.zip). For historical internal testing of the older normalized-layout prototype, open its extracted `content/` tree as described in the [download index](../../docs/releases/0.4.0-downloads-and-samples.md). For historical six-STIG sample walkthroughs, start with `authoring/rhel_9/` or `authoring/ms_windows_server_2025/`, open a Rule under `rules/`, follow its `assessment_choices` logical ID to the matching Assessment, and then read its `tests` and `evaluate`.
 
 An Assessment's **Test** owns the collection capability and expected outcomes. Inline `object` describes what to collect. `require` describes the expected Item population and matching values. More complex content retains Variables, Sets, Filters, nested record predicates and explicit logic.
 

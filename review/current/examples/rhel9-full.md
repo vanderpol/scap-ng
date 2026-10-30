@@ -1,6 +1,6 @@
 # RHEL 9 — SCAP-NG 0.4.0 authoring review
 
-This is a **historical six-STIG file-layout walkthrough**. For the full 65-stream source DRAFT, internal normalized-layout experiment, and focused examples, start at the [0.4.0 downloads and samples index](../../../docs/releases/0.4.0-downloads-and-samples.md).
+This is a **historical six-STIG file-layout walkthrough**. For the [current human-readable 65-stream authoring ZIP](https://github.com/vanderpol/scap-ng-evidence/releases/download/v04-human-readable-review-20261030-ab5cddd/scap-ng-0.4.0-human-readable-authoring-review.zip), full original-source DRAFT, archived internal layout experiment, and focused examples, start at the [0.4.0 downloads and samples index](../../../docs/releases/0.4.0-downloads-and-samples.md).
 
 Use the [earlier 0.4.0 six-STIG sample release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and open `authoring/rhel_9/` in either the [YAML](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.yaml.zip) or [JSON](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.json.zip) archive. The Benchmark, its Rules, automated/manual Assessments and reusable shared Assessments are part of the same verified 4,001-document source graph.
 

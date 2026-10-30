@@ -2,7 +2,9 @@
 
 ## Human-readable layout v2 (#263) — owner-approved path policy
 
-The earlier #261 `content/` ZIP is an **internal technical prototype**, not the
+The [current immutable human-readable 65-stream review ZIP](https://github.com/vanderpol/scap-ng-evidence/releases/download/v04-human-readable-review-20261030-ab5cddd/scap-ng-0.4.0-human-readable-authoring-review.zip)
+is the owner-approved **pre-alpha authoring layout**. The earlier #261
+`content/` ZIP remains an **internal technical prototype**, not the
 human-facing authoring layout. The approved [#263 review](https://github.com/vanderpol/scap-ng/issues/263)
 uses 0.3-style short Benchmark directories, original SV-IDs as imported
 filenames, separate `assessments/automated/` and `assessments/manual/`, and no
@@ -35,8 +37,8 @@ python tools/scap_ng_library_cli.py search /path/to/human-readable-v2/authoring 
 For 0.4 the older `export-draft` command still reproduces #261's **v1**
 checkpoint. `reflow-layout` is the separately reviewed v2 path operation.
 Its generated catalog/SQLite cache live in `metadata/`, durable provenance
-sidecars in `records/`, and only native YAML in `authoring/`. Do not publish
-v2 as a release or claim scanner equivalence based on layout checks.
+sidecars in `records/`, and only native YAML in `authoring/`. The public v2 download is a separate **review pre-release**, not a final
+`v0.4.0` release; no scanner equivalence follows from layout checks.
 
 Workstream [#261](https://github.com/vanderpol/scap-ng/issues/261), advancing
 O2/O4/O7/O8; downstream integration

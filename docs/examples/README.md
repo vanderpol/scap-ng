@@ -1,5 +1,7 @@
 # Generated SCAP-NG 0.4.0 authoring samples
 
+**[Browse two real current-layout Rule/Assessment YAML pairs in GitHub](current-human-review/README.md)** — RHEL 9 `unix.sysctl` and Windows 11 `windows.registry`, copied byte-for-byte from the verified 65-stream human-readable review.
+
 These small, pinned samples come from original Windows Server 2025 SCAP 1.4
 source through the isolated direct converter. Each directory links actual YAML
 and structurally equivalent JSON, source provenance, and validation, compilation
@@ -7,7 +9,7 @@ and independent source-comparison evidence. They represent automated subsets,
 not a complete Benchmark, six-STIG release or scanner-runtime equivalence.
 For the complete 65-stream DRAFT and separately identified **internal layout prototype**,
 smaller pinned candidate examples, and historical six-STIG ZIPs, use the
-[0.4.0 downloads and Assessment samples index](../releases/0.4.0-downloads-and-samples.md).
+[0.4.0 downloads and Assessment samples index](../releases/0.4.0-downloads-and-samples.md), including the [current all-65 human-readable authoring ZIP](https://github.com/vanderpol/scap-ng-evidence/releases/download/v04-human-readable-review-20261030-ab5cddd/scap-ng-0.4.0-human-readable-authoring-review.zip).
 
 - [Nested Sets, Filters, Variables and genuinely shared Objects](direct-file-rights/README.md).
 - [NTUSER with ordered exclusion Filters and inline Registry acquisition](direct-ntuser/README.md).
