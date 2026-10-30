@@ -265,6 +265,14 @@ class ExpandedSource(Source):
 
     def function(self, n):
         name = local(n)
+        if name == 'count':
+            # OVAL CountFunctionType aggregates all values of one or more
+            # components. Keep the aggregation and every operand boundary;
+            # never substitute a collected Item count or evaluate flags here.
+            need(n.tag == '{' + OD + '}count', 'foreign count function namespace')
+            keys(n, set(), 'function count')
+            need(len(n) >= 1, 'count requires components')
+            return {'count': [self.function(c) for c in n]}
         if name == 'object_component':
             obj = self.get(n.get('object_ref'), 'objects')
             if obj.tag == '{' + OD + '#independent}variable_object':
@@ -871,6 +879,9 @@ class ExpandedNative(Native):
             if name == 'concat':
                 need(len(args) >= 2 and not options, 'canonical concat arity/options')
                 return {'concat': [self.function(a) for a in args]}
+            if name == 'count':
+                need(len(args) >= 1 and not options, 'canonical count arity/options')
+                return {'count': [self.function(a) for a in args]}
             if name == 'regex_capture':
                 need(len(args) == 1 and set(options) == {'pattern'}, 'canonical regex_capture arity/options')
                 return {'regex_capture': {'pattern': options['pattern'], 'value': self.function(args[0])}}

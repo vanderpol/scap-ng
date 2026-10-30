@@ -1,5 +1,52 @@
 # Autonomous development checkpoint
 
+## Active #251/#255 — bounded independent source validation (2026-10-30)
+
+Owner instruction: continue pinned-original 0.4 independent validation, leaving
+#264/#265/#266 contracts and all immutable libraries/hashes unchanged.
+Recovered live published main `b450d150f25d92a9391b1fbb192e4c9f064f04dc`, clean,
+with its four triggered workflows passing; fast-forwarded local main.
+Read all three pending issue bodies and latest compaction/sample notes. Current
+schema remains authoritative; no purpose-context or authoring migration here.
+
+Completed eleven fixed original Rule closure validations against six exact
+NIWC-distributed ZIPs: 4 typed-term PROVED, 4 all_exist unsupported, 1 invalid
+and 2 deprecated. Three separate proof records lie outside frozen 4,258 floor
+(Apache SV-214228/SV-214251, IOS-XE SV-215838); RHEL SV-257851 is a retained
+control. All eight native authoring/program hashes unchanged, schema/independent
+program operand checks PASS. No corpus status change, export or rebaseline.
+Count reader now retains exact source/canonical-native aggregation components,
+projection, duplicates and integer cast; no function/flag execution is added.
+Fixtures and manifest: `tests/fixtures/v04-independent-validation/` (eleven
+node-exact slices with full-component validation observations, ~183 KB).
+Tool: `tools/audit_v04_bounded_source_validation.py`; --originals rejoined all
+source nodes and replayed XSD/Schematron against pinned original components.
+Full reports/logs: `/workspace/validation-v04-20261030/`.
+[Source findings and precise review hold](../audit/v04-independent-validation-20261030.md).
+
+DISA: one deprecated .NET WMI Object (SV-225230), no invalid assertion in this
+sample. NIWC: two input-type Schematron failures in SV-215833, one deprecated
+WMI Object in SV-278143. Attribution follows original OVAL node IDs, not XCCDF
+or distributor. Numeric text capture to integer 5 remains valid; whole timeout
+configuration text is a different intermediate type.
+
+Genuine semantic/review hold: existing reference helper reports UNKNOWN for
+SV-278021's all_exist +check=all with incomplete collection and one false Item;
+pinned OVAL Results TestType exception 3a literally requires FALSE. This work
+records both interpretations and the source hash, without changing that helper,
+its old tests, native result semantics or approved contracts. Resolve ordered
+existence versus incomplete exceptions under #255 before all_exist promotion.
+Independent count proofs do not rely on this conflicting vector.
+
+Focused integration: 59 selected /56 passed /3 source-checkout-location skips,
+10.357s, zero failures/errors; separate operator fixture bound explicitly to
+vendored pinned OVAL schemas: 4/4 PASS, zero skips. Twelve new tests include
+count mutants, namespace/hash/accounting guards, logic/cardinality/error/unknown
+boundaries and the explicit reference-model discrepancy. Implementation ready
+for issue-linked commit and automatic maintained CI; reuse exact-SHA runs,
+do not duplicate/cancel them. Publish a compact separate proof-evidence run
+and #251/#255 handoff after observing the gate. No broader corpus work needed.
+
 ## Completed #261 — native library layout / editor-callable maintenance
 
 Published implementation HEAD: `ff69d46b36e05e45074a5e7f43bf2ef3cf464ddf`.

@@ -1076,3 +1076,13 @@ frozen manifest hash, keeps unsupported outcomes visible, enforces monotonic
 See [commands, source-rule citations and outcomes](../docs/audit/v04-proof-expansion.md).
 Run `PYTHONPATH=tools python tools/test_v04_expanded_source_proof.py` for the
 source-backed status, normalization and internally consistent forgery negatives.
+
+
+## Eleven-rule independent source validation (#251/#255)
+
+`audit_v04_bounded_source_validation.py --output NEW_REPORT.json` checks eleven
+fixed original-node fixtures and existing native programs. Optional
+`--originals PINNED_ZIP_DIR` rejoins the six exact original archives and replays
+XSD/Schematron validation. It never converts or edits a corpus. It reports
+DISA/NIWC findings separately and retains unresolved all_exist/reference-model
+boundaries. See [results, source citations and review hold](../docs/audit/v04-independent-validation-20261030.md).

@@ -1,0 +1,197 @@
+{
+  "source_rule": "xccdf_mil.disa.stig_rule_SV-278023r1182034_rule",
+  "source_definition": "oval:mil.disa.stig.windows2025:def:278023",
+  "component": "scap_mil.disa.stig_comp_U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-oval.xml",
+  "source_zip": {
+    "file": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "repository_path": "Current/U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.zip",
+    "git_blob_sha": "f6ba90413cd8a6ab3f9f5acc82603d9b52aca9cf",
+    "sha256": "2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0",
+    "bytes": 254194
+  },
+  "source_xml_member": "U_MS_Windows_Server_2025_V1R1_STIG_SCAP_1-4_Benchmark-enhancedV1-signed.xml",
+  "source_member_sha256": "52b7918ea577095cb1c130589e5061c52ef4b12370ebb4ce84d2dfba68757440",
+  "source_rule_sha256": "16e919cb477c14bf08964d6d29138484b88562912325c8393dc9887d1fc61616",
+  "source_node_hashes": {
+    "oval:mil.disa.stig.defs:def:253286": "cbc5824dfa50d56639c1cd2712061e416a1e71fc90d61604f2d684ba0ee545c4",
+    "oval:mil.disa.stig.defs:def:253287": "9898406df919606eea82ce3216cac2c9fa7f94ab13842198d105ee49f0962f02",
+    "oval:mil.disa.stig.defs:def:253288": "972db5cbf17f98b192074c23d12b4cac8c9cc38a3b509a1a6c5519b4b0a8dd6c",
+    "oval:mil.disa.stig.win:obj:25328600": "0b460cf24d942c0f39abf6c3ce9c60bde5a1228711ed65d1be88dbc3579f4b3c",
+    "oval:mil.disa.stig.win:obj:25328700": "6b2f39d4799835e752013c848e6505dc3f43fba7498ff85c6dc2c9ffe044fcf8",
+    "oval:mil.disa.stig.win:obj:25328800": "9d224cc26c4961f7f55ae9c7c77103fc05c032d781f6c2b99d2d15683b21989f",
+    "oval:mil.disa.stig.win:ste:20000000": "f87f4b20af2264c5bfae8f17965ef3219c6bdc59d10dec4cb3dd7b1bb8a73c07",
+    "oval:mil.disa.stig.win:ste:20000004": "08de56756c9a7ab6846d076fd786ebdc6d3adec2f1eeac5fc1c45d89501a346d",
+    "oval:mil.disa.stig.win:ste:25328600": "8246aa2012783a3c73ac68268d728a1f1aa5fab47402dca9e20e7e567b64d54c",
+    "oval:mil.disa.stig.win:tst:25328600": "701706f6342acaa5aaf63dd99cd5792cfee637a33e590a926c88128f4b8bd172",
+    "oval:mil.disa.stig.win:tst:25328700": "31ee62afc0a1c2c29dc7a2a3259d468109d208bcf0670247398b69419e36688f",
+    "oval:mil.disa.stig.win:tst:25328800": "ab665ca7b58b1732c1c3db4106a716b77378f6aea56a123b2c1c6207062dae4e",
+    "oval:mil.disa.stig.windows2025:def:278023": "fb8b3f8d6ac7590bc356e7e5a75d2778a494064f137f1d49954084cd6f00a820"
+  },
+  "original_component_validity": {
+    "status": "VALID",
+    "issues": []
+  },
+  "native": {
+    "assessment": {
+      "id": "windows-server-2025-must-not-have-the-server-message-block-smb-v1-prot-0c61e3af-assessment",
+      "version": 1,
+      "assessment_title": "Windows Server 2025 must not have the Server Message Block (SMB) v1 protocol installed.",
+      "mode": "automated",
+      "class": "compliance",
+      "purpose": "assessment",
+      "specification": {
+        "id": "scap-ng.pre-alpha.assessment",
+        "version": "0.4.0"
+      },
+      "tests": {
+        "smb-1-0-cifs-file-sharing-support-feature-is-not-installed-427e97eb-test": {
+          "test_title": "'SMB 1.0/CIFS File Sharing Support' feature is not installed",
+          "capability": "windows.wmi.query",
+          "object": {
+            "namespace": "root\\cimv2",
+            "query": "SELECT installstate FROM win32_optionalfeature WHERE name = 'SMB1Protocol'"
+          },
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "fields": {
+              "result": {
+                "record": {
+                  "records_found": "one_or_more",
+                  "records_matching": "every",
+                  "fields": {
+                    "installstate": {
+                      "equals": "2",
+                      "values_found": "one_or_more",
+                      "values_matching": "one_or_more"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "reported_elements": "all"
+        },
+        "configure-smbv1-server-is-set-to-disabled-0d20b30b-test": {
+          "test_title": "'Configure SMBv1 Server' is set to 'Disabled'",
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SYSTEM\\CurrentControlSet\\Services\\LanmanServer\\Parameters"
+            },
+            "name": {
+              "equals": "SMB1"
+            }
+          },
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "dword",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "equals": 0,
+                    "datatype": "integer",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ]
+          },
+          "reported_elements": "all"
+        },
+        "configure-smbv1-client-driver-is-set-to-enabled-with-disable-driver-re-57080af6-test": {
+          "test_title": "'Configure SMBv1 client driver' is set to 'Enabled' with 'Disable driver (recommended)' selected for 'Configure MrxSmb10 driver'",
+          "capability": "windows.registry",
+          "object": {
+            "hive": {
+              "equals": "local_machine"
+            },
+            "key": {
+              "equals": "SYSTEM\\CurrentControlSet\\Services\\mrxsmb10"
+            },
+            "name": {
+              "equals": "Start"
+            }
+          },
+          "require": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every",
+            "and": [
+              {
+                "fields": {
+                  "type": {
+                    "equals": "dword",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              },
+              {
+                "fields": {
+                  "value": {
+                    "equals": 4,
+                    "datatype": "integer",
+                    "values_found": "one_or_more",
+                    "values_matching": "every"
+                  }
+                }
+              }
+            ]
+          },
+          "reported_elements": "all"
+        }
+      },
+      "evaluate": {
+        "or": [
+          {
+            "test": "smb-1-0-cifs-file-sharing-support-feature-is-not-installed-427e97eb-test"
+          },
+          {
+            "and": [
+              {
+                "or": [
+                  {
+                    "test": "smb-1-0-cifs-file-sharing-support-feature-is-not-installed-427e97eb-test"
+                  },
+                  {
+                    "test": "configure-smbv1-server-is-set-to-disabled-0d20b30b-test"
+                  }
+                ]
+              },
+              {
+                "or": [
+                  {
+                    "test": "smb-1-0-cifs-file-sharing-support-feature-is-not-installed-427e97eb-test"
+                  },
+                  {
+                    "test": "configure-smbv1-client-driver-is-set-to-enabled-with-disable-driver-re-57080af6-test"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "authoring_sha256": "745fd8370a2ae3ac38495dc843376b6a0679dc89f7851e64d9d9a46e02c85b9e",
+  "program_sha256": "902bc604042eccd38a94320a0bd376d466cedfa0d91a0be39ffcb3cf3f618ce7",
+  "frozen_status": "CONVERTED_UNVERIFIED",
+  "already_in_frozen_proof_floor": false,
+  "expected_outcome": "UNVERIFIABLE/UNSUPPORTED",
+  "source_slice_sha256": "e3d2f59579fe5bb7a909d2f9e1cf004ee2782d54933f43af390bd2346a2c3dd0"
+}

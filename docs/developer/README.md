@@ -11,6 +11,9 @@ For ongoing approved work and recovery, use the
 [autonomous development checkpoint](AUTONOMOUS-PROGRESS.md) and the standing
 workflow in [AGENTS.md](../../AGENTS.md).
 
+For the bounded independent source-proof checkpoint, see
+[eleven-rule results and reference-model review hold](../audit/v04-independent-validation-20261030.md).
+
 For native library maintenance and editor subprocess integration, use the
 [0.4 layout/index/analyze/check/apply contract](NATIVE-LIBRARY.md). It preserves
 the frozen #260 candidate and performs no automatic shared-Assessment promotion.

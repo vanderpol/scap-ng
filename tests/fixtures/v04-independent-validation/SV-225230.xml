@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='utf-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><generator>
+        <oval:product_name>Security Content Tool 1.9.0</oval:product_name>
+        <oval:schema_version>5.11</oval:schema_version>
+        <oval:timestamp>2026-06-29T03:22:50</oval:timestamp>
+      </generator>
+      <definitions><definition id="oval:mil.disa.fso.dotnet:def:9" version="3" class="compliance">
+          <metadata>
+            <title>APPNET0062</title>
+            <affected family="windows">
+              <platform>Microsoft Windows 10</platform>
+              <platform>Microsoft Windows Server 2012</platform>
+              <platform>Microsoft Windows Server 2016</platform>
+              <platform>Microsoft Windows Server 2019</platform>
+            </affected>
+            <description>The .NET CLR must be configured to use FIPS approved encryption modules.</description>
+          </metadata>
+          <criteria>
+            <criterion test_ref="oval:mil.disa.fso.dotnet:tst:900" comment="Verifies application configiguration files are configured to use FIPS approved encryption modules"/>
+            <criterion test_ref="oval:mil.disa.fso.dotnet:tst:901" comment="Verifies machine configiguration files are configured to use FIPS approved encryption modules"/>
+          </criteria>
+        </definition>
+        </definitions><tests><xmlfilecontent_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.fso.dotnet:tst:900" version="3" check_existence="any_exist" check="all" comment="Application configiguration files are configured to use FIPS approved encryption modules">
+          <object object_ref="oval:mil.disa.fso.dotnet:obj:900"/>
+          <state state_ref="oval:mil.disa.fso.dotnet:ste:900"/>
+        </xmlfilecontent_test>
+        <xmlfilecontent_test xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.fso.dotnet:tst:901" version="2" check_existence="any_exist" check="all" comment="Machine configiguration files are configured to use FIPS approved encryption modules">
+          <object object_ref="oval:mil.disa.fso.dotnet:obj:901"/>
+          <state state_ref="oval:mil.disa.fso.dotnet:ste:900"/>
+        </xmlfilecontent_test>
+        </tests><objects><xmlfilecontent_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.fso.dotnet:obj:900" version="4" comment="*.exe.config enforceFIPSPolicy/@enabled">
+          <filepath datatype="string" operation="equals" var_ref="oval:mil.disa.fso.dotnet:var:903" var_check="at least one"/>
+          <xpath datatype="string" operation="equals">count(/configuration/runtime/enforceFIPSPolicy/@enabled) = 0 or /configuration/runtime/enforceFIPSPolicy/@enabled = "true"</xpath>
+        </xmlfilecontent_object>
+        <xmlfilecontent_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.fso.dotnet:obj:901" version="2" comment="machine.config enforceFIPSPolicy/@enabled">
+          <behaviors max_depth="-1" recurse_direction="down"/>
+          <path datatype="string" operation="equals" var_ref="oval:mil.disa.fso.dotnet:var:900" var_check="at least one"/>
+          <filename datatype="string" operation="case insensitive equals">machine.config</filename>
+          <xpath datatype="string" operation="equals">count(/configuration/runtime/enforceFIPSPolicy/@enabled) = 0 or /configuration/runtime/enforceFIPSPolicy/@enabled = "true"</xpath>
+        </xmlfilecontent_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:902" version="3" comment="All *.exe.config files">
+          <behaviors max_depth="-1" recurse_direction="down"/>
+          <path datatype="string" operation="equals" var_ref="oval:mil.disa.fso.windows:var:439700" var_check="at least one"/>
+          <filename datatype="string" operation="pattern match">^.*\.[Ee][Xx][Ee]\.[Cc][Oo][Nn][Ff][Ii][Gg]$</filename>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:903" version="4" comment="*.exe.config files without WinSxS and LCU">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="COMPLEMENT">
+            <object_reference>oval:mil.disa.fso.dotnet:obj:902</object_reference>
+            <object_reference>oval:mil.disa.fso.dotnet:obj:908</object_reference>
+          </set>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:904" version="3" comment="WinSxS *.exe.config files">
+          <behaviors max_depth="-1" recurse_direction="down"/>
+          <path datatype="string" operation="equals" var_ref="oval:mil.disa.fso.dotnet:var:902" var_check="at least one"/>
+          <filename datatype="string" operation="pattern match">^.*\.[Ee][Xx][Ee]\.[Cc][Oo][Nn][Ff][Ii][Gg]$</filename>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:905" version="3" comment="C:\Windows.old\Windows\WinSxS *.exe.config files">
+          <behaviors max_depth="-1" recurse_direction="down"/>
+          <path datatype="string" operation="equals">C:\Windows.Old\Windows\WinSxS</path>
+          <filename datatype="string" operation="pattern match">^.*\.[Ee][Xx][Ee]\.[Cc][Oo][Nn][Ff][Ii][Gg]$</filename>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:906" version="2" comment="excluded WinSxS *.exe.config files">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.fso.dotnet:obj:904</object_reference>
+            <object_reference>oval:mil.disa.fso.dotnet:obj:905</object_reference>
+          </set>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:907" version="1" comment="servicing\LCU *.exe.config files">
+          <behaviors max_depth="-1" recurse_direction="down"/>
+          <path datatype="string" operation="equals" var_ref="oval:mil.disa.fso.dotnet:var:904" var_check="at least one"/>
+          <filename datatype="string" operation="pattern match">^.*\.[Ee][Xx][Ee]\.[Cc][Oo][Nn][Ff][Ii][Gg]$</filename>
+        </file_object>
+        <file_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.dotnet:obj:908" version="1" comment="excluded WinSxS and LCU *.exe.config files">
+          <set xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" set_operator="UNION">
+            <object_reference>oval:mil.disa.fso.dotnet:obj:906</object_reference>
+            <object_reference>oval:mil.disa.fso.dotnet:obj:907</object_reference>
+          </set>
+        </file_object>
+        <registry_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.windows:obj:388601" version="2" comment="System Root Directory Registry Object">
+          <hive datatype="string">HKEY_LOCAL_MACHINE</hive>
+          <key datatype="string">SOFTWARE\Microsoft\Windows NT\CurrentVersion</key>
+          <name datatype="string">SystemRoot</name>
+        </registry_object>
+        <wmi_object xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#windows" id="oval:mil.disa.fso.windows:obj:439702" version="1" comment="All 'Local Disk' Volumes">
+          <namespace datatype="string">root\cimv2</namespace>
+          <wql datatype="string">SELECT name FROM win32_logicaldisk WHERE drivetype=3</wql>
+        </wmi_object>
+      </objects><states><xmlfilecontent_state xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" id="oval:mil.disa.fso.dotnet:ste:900" version="2" comment="enforceFIPSPolicy/@enabled = false">
+          <value_of datatype="boolean" operation="equals">true</value_of>
+        </xmlfilecontent_state>
+        </states><variables><local_variable id="oval:mil.disa.fso.dotnet:var:900" version="1" datatype="string" comment=".NET config directory">
+          <concat>
+            <object_component object_ref="oval:mil.disa.fso.windows:obj:388601" item_field="value"/>
+            <variable_component var_ref="oval:mil.disa.fso.dotnet:var:901"/>
+          </concat>
+        </local_variable>
+        <constant_variable id="oval:mil.disa.fso.dotnet:var:901" version="1" datatype="string" comment=".NET config path components">
+          <value>\Microsoft.NET\Framework\v4.0.30319\Config</value>
+          <value>\Microsoft.NET\Framework64\v4.0.30319\Config</value>
+        </constant_variable>
+        <local_variable id="oval:mil.disa.fso.dotnet:var:902" version="5" datatype="string" comment="WinSXS directory">
+          <concat>
+            <end character="\">
+              <object_component object_ref="oval:mil.disa.fso.windows:obj:388601" item_field="value"/>
+            </end>
+            <literal_component>WinSxS</literal_component>
+          </concat>
+        </local_variable>
+        <local_variable id="oval:mil.disa.fso.dotnet:var:903" version="2" datatype="string" comment="exe.config files, filtered">
+          <object_component object_ref="oval:mil.disa.fso.dotnet:obj:903" item_field="filepath"/>
+        </local_variable>
+        <local_variable id="oval:mil.disa.fso.dotnet:var:904" version="1" datatype="string" comment="LCU directory">
+          <concat>
+            <end character="\">
+              <object_component object_ref="oval:mil.disa.fso.windows:obj:388601" item_field="value"/>
+            </end>
+            <literal_component>servicing\LCU</literal_component>
+          </concat>
+        </local_variable>
+        <local_variable id="oval:mil.disa.fso.windows:var:439700" version="1" datatype="string" comment="All 'local disk' volumes, in X:\ format">
+          <end character="\">
+            <object_component object_ref="oval:mil.disa.fso.windows:obj:439702" item_field="result"/>
+          </end>
+        </local_variable>
+      </variables></oval_definitions>
