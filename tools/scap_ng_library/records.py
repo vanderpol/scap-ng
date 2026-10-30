@@ -15,6 +15,8 @@ def original_records(root, *, scope=None, query='', status=None, limit=100):
         if path.is_symlink() or not path.resolve().is_relative_to(folder.resolve()):
             raise ValueError('record file escapes provenance area')
         record=json.loads(path.read_text())
+        original_zip=record['original_ledger'].get('original_zip',{}).get('file','')
+        archive_stream=original_zip.removesuffix('.zip') if original_zip else record['source_stream']
         mappings={m['source_path']:m for m in record.get('native_path_mapping',[]) if m['kind']=='assessment'}
         for n,row in enumerate(record['original_ledger']['rules']):
             label=row.get('title','');ident=row['source_rule'];current=row['conversion_status']
@@ -31,7 +33,7 @@ def original_records(root, *, scope=None, query='', status=None, limit=100):
                 'original_native_assessment_id':target['id'] if target else None,
                 'source_rule_sha256':row.get('source_rule_sha256'),
                 'source_artifact':record['source_artifact'],
-                'archive_member':'all-65-revised-draft/'+record['source_stream']+'/'+row.get('preserved_original_rule',''),
+                'archive_member':'all-65-revised-draft/'+archive_stream+'/'+row.get('preserved_original_rule',''),
                 'proof_scope':'original frozen source record; not a proof promotion of current edits'})
             if len(result)>=limit:return result
     return result

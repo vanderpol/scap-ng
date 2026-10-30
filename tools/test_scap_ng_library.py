@@ -74,6 +74,7 @@ class NativeLibraryTests(unittest.TestCase):
         matches=original_records(self.content,status='MANUAL_OCIL_ONLY_PRESERVED')
         self.assertEqual(len(matches),3)
         self.assertTrue(all(not m['editable_native_document'] and m['original_native_assessment_id'] is None for m in matches))
+        self.assertTrue(all(m['archive_member'].startswith('all-65-revised-draft/U_') for m in matches))
         lib=self.library();rows=lib.search(kind='assessment',status='CONVERTED_UNVERIFIED')
         self.assertEqual(len(rows),1);self.assertTrue(json.loads(rows[0]['warnings']))
         with self.assertRaises(ValueError):original_records(self.content,scope='../escape')
