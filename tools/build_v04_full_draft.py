@@ -115,6 +115,9 @@ def render_review(source, target, rows, components):
                        '<a href="'+escape(str(Path(row['assessment_path']).with_suffix('.yaml')))+'">YAML</a></p>']
         if row.get('primary_blocker'):
             chunks += ['<pre>'+escape(json.dumps(row['primary_blocker'],indent=2))+'</pre>']
+        if row.get('conversion_warnings'):
+            chunks += ['<p>CONVERTED_UNVERIFIED compatibility warnings:</p><pre>'+
+                       escape(json.dumps(row['conversion_warnings'],indent=2))+'</pre>']
         chunks += ['</details>']
     chunks += ['<h2>Preserved source components, including OCIL/manual content</h2><ul>']
     chunks += ['<li><a href="'+escape(v['path'])+'">'+escape(k+' '+v['root_tag'])+'</a></li>' for k,v in components.items()]
@@ -130,7 +133,7 @@ def build_one(job):
     ensure(sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()==pin['git_blob_sha'], 'source Git blob drift')
     target = Path(output)/pin['file'].removesuffix('.zip')
     target.mkdir()
-    source = SourceModel(source_path,pin['sha256'],inventory_broken_references=True)
+    source = SourceModel(source_path,pin['sha256'],inventory_broken_references=True,draft_compatibility=True)
     source.archive_name = pin['file']
     components = preserve_source(source,source_path,target)
     mappings = diagnostic_mappings()
@@ -164,9 +167,14 @@ def build_one(job):
                 compiled_rules.add(row['source_rule'])
             previous = baseline.get(pin['file']+'!'+row['source_rule'])
             if previous:
+                ensure(not row.get('conversion_warnings'), 'unverified warning cannot inherit a published proof')
                 ensure(all(row.get(k)==previous[k] for k in ['source_rule_sha256','authoring_sha256','program_sha256']),
                        'published proof/hash baseline drift: '+row['source_rule'])
                 row.update(draft_status='RETAINED_PUBLISHED_STATIC_PRIMARY_PROOF',independent_source_proof='RETAINED_EXACT_HASH_EVIDENCE')
+        row['conversion_status'] = (
+            'CONVERTED_VERIFIED' if row['draft_status']=='RETAINED_PUBLISHED_STATIC_PRIMARY_PROOF' else
+            'CONVERTED_UNVERIFIED' if row['draft_status']=='CONVERTED_SCHEMA_VALID_UNVERIFIED' else
+            'BLOCKED' if automated else 'MANUAL_OCIL_ONLY_PRESERVED')
     # Diagnostic executable packages contain only actually compiled candidates.
     compiled_docs = {p:d for p,d in docs.items() if any(p in r.get('artifacts',[]) for r in coverage['rules'] if r['source_rule'] in compiled_rules)}
     compiled_docs, _ = assemble_subset(source,compiled_docs,[b for b in trace['rules'] if b['source_rule'] in compiled_rules],mappings)

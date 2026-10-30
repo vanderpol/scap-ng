@@ -1,5 +1,11 @@
 # SCAP-NG Content Author Guide
 
+For reproducible 0.4.0 source conversion and worked CLI commands, use the
+[candidate operator guide](../releases/0.4.0-rc.md). The candidate ledger
+separates compiled/static-proved native content, unverified native drafts,
+blocked originals and preserved manual content. Review source-trace warnings
+before reusing generated content. A compiled draft is not a scanner result.
+
 **Status: 0.4.0 pre-alpha draft.** This is a short introduction to the current authoring model, not a substitute for the [versioned schema](../../schema/v0.4.0/README.md) or [specification](../../specification/README.md). Track corrections and review questions in [#252](https://github.com/vanderpol/scap-ng/issues/252).
 
 ## 1. Start with the policy

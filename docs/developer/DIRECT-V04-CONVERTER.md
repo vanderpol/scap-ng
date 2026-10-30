@@ -1,5 +1,16 @@
 # Maintaining the direct 0.4 experiment
 
+Current owner-authorized candidate path: [operator guide](../releases/0.4.0-rc.md)
+and [#260](https://github.com/vanderpol/scap-ng/issues/260#issuecomment-6510844015).
+`--draft` opts into exact catalog compatibility, Test-only `all_exist`, bounded
+expected-state export bindings and explicitly unproved function expressions.
+`--compile` independently checks generated package structure/operands.
+`--verify` retains strict independent source proof and cannot combine with
+`--draft`. New warning-bearing candidates cannot inherit old proof hashes.
+Per-Rule failures remain isolated under `--all-rules`; original signed sources
+are never modified. The release-only all-65 builder uses existing reviewed
+mappings diagnostically; normal CLI capability activation remains explicit.
+
 This experiment inventories a complete Benchmark and emits a supported automated
 subset, **not a production converter or complete Benchmark/policy migration**. Python 3.12 is used in CI. No model service is needed to run or edit
 the code. The conversion and inventory modules are newly written; none imports the

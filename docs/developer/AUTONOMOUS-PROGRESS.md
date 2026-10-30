@@ -1,5 +1,36 @@
 # Autonomous development checkpoint
 
+## Active release-candidate task — #260 owner tasking
+
+Authority: [owner comment 6510844015](https://github.com/vanderpol/scap-ng/issues/260#issuecomment-6510844015),
+which supersedes earlier narrow checkpoint restrictions where they conflict.
+Prepare the complete usable pre-alpha candidate; final release/tag still needs
+owner approval. Recovered published main `4d78f700a4a555b474b38c230d7199e6e1a6bf21`.
+Draft-only catalog/Test-all_exist/bounded export/function/aggregation support is
+implemented without changing normative schemas/compiler/scanner or strict proof.
+26 focused tests and 61 affected integration tests PASS (844.786s); the added
+int32 function boundary check passes all 7 function/binding tests. The intentional
+65-STIG build finalized: 4,258 verified +2,559 unverified native, 422 automated
+blocked, 1,653 manual; all 6,817 native candidates compile and all 4,258 accepted
+hash pairs are retained. See docs/audit/v04-draft-recovery-20261030.json.
+Exact-SHA hosted CI, clean-extract acceptance and publication remain pending.
+
+Recovery root: `/workspace/rc-v040-20261029/`. Contains exact 4,258-proof baseline
+(4,206 old +52 subsequently proved), 48 recorded original-invalid/deprecated
+exclusions, hash-pinned dependency wheelhouse and test/build logs. Corpus output
+`all-65-draft/` preserves completed per-source work. Check processes and logs
+before resuming; never regenerate a completed corpus. Original pins/ZIPs remain
+in `/workspace/recovery-20261029-resume/`. Earlier immutable archives and proof
+receipts remain untouched. The pinned Linux/Python3.12 dependency download passed.
+
+Next: commit the passing code/docs and completed branch audit as a candidate
+on main, capture exact-SHA CI, build deterministic source archive, clean-extract
+offline install and original Linux/Windows/shared/warning/negative CLI gates.
+Publish revised DRAFT and candidate/decision packet in evidence; add bounded
+0.4 samples to sample-data; update #251/#255/#260. No final release/tag.
+Source tree has no project-wide license grant: record the gap for owner decision,
+preserve original notices and dependency licenses, never invent a license.
+
 Updated: 2026-10-29. Task: [converter #251](https://github.com/vanderpol/scap-ng/issues/251).
 Execution order: [owner comment 6477986104](https://github.com/vanderpol/scap-ng/issues/251#issuecomment-6477986104).
 Schema/normative dependencies: [#255](https://github.com/vanderpol/scap-ng/issues/255).

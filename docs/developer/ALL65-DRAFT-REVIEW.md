@@ -1,5 +1,14 @@
 # Complete all-65 DRAFT first; independent verification second
 
+Current revision authority: [#260 owner tasking](https://github.com/vanderpol/scap-ng/issues/260#issuecomment-6510844015).
+The revised candidate builder enables bounded warning-based drafting without
+changing strict independent proof. Ledgers now add disjoint `conversion_status`
+values and overlapping warning counts while retaining historical `draft_status`
+fields for comparison. Exact 4,258 accepted source/authoring/program hash pairs
+are preserved. Earlier archives remain immutable. The revised candidate's
+download/checksum/cohort recovery ledger is linked from #251/#260; the original
+stage-one description below remains historical reproduction evidence.
+
 Owner direction, 2026-10-29, under [#251](https://github.com/vanderpol/scap-ng/issues/251):
 publish a complete, reviewable DRAFT before completing proof coverage. Attempt
 every automated conversion irrespective of proof availability. Preserve every

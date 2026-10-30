@@ -6,6 +6,15 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-29:** Add opt-in, warning-admitted exact NIWC catalog resolution,
+  Test-level `all_exist` drafting, bounded typed check-export bindings and
+  existing function/aggregation expression preservation. Separate native
+  conversion from independent proof, retain strict verification and frozen
+  hashes, and prepare reproducible candidate installation/package guidance
+  ([#251](https://github.com/vanderpol/scap-ng/issues/251),
+  [#255](https://github.com/vanderpol/scap-ng/issues/255),
+  [#260](https://github.com/vanderpol/scap-ng/issues/260)).
+
 - **2026-10-29:** Publish the complete all-65 source-preserving stage-one DRAFT.
   Activate the existing IOS XE line/global mappings with independent frozen
   identity crosswalks: 38 additional original Rule closures retain their DRAFT

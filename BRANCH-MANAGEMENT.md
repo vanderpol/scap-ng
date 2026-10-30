@@ -21,6 +21,18 @@ This file is the durable registry for every non-`main` branch in `vanderpol/scap
 
 ## Current branch register
 
+Release-candidate audit 2026-10-29 (#260): fetched all 36 remote branch heads;
+compared their ahead/behind counts to source `4d78f700a`. Fifteen non-main
+branches have divergent historical commits; existing rows below classify them
+as superseded or already merged through PRs. No wholesale merge is warranted.
+Two previously omitted historical names are explicitly registered below. The
+machine-readable audit is retained with candidate evidence. No branch deleted.
+
+| Branch | Status | Purpose / relationship to main | Disposition |
+| --- | --- | --- | --- |
+| `handoff-v020-branch-discipline` | historical/superseded | `1754c402a`; one old AGENTS branch-policy commit, 5,094 commits behind recovered main. Current main already contains the stronger branch registry policy. | Preserve history; do not merge obsolete AGENTS file. |
+| `research/for-each-audit-20261006` | hold/deferred | `47eac54d8`; 110 historical research commits, 4,649 behind recovered main; scoped iteration/Variable audit scripts and conclusions, not accepted 0.4 release implementation. | Preserve research; no wholesale merge or normative promotion under #260. |
+
 Snapshot taken during the SCAP-NG 0.2.0 freeze/handoff reconciliation on 2026-10-04.
 
 | Branch | Status | Purpose / relationship to main | Disposition |

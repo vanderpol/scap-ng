@@ -1,5 +1,13 @@
 # Current 0.4 converter and compiler developer runbook
 
+**Current release-candidate entry point:** [0.4.0 operator guide](../releases/0.4.0-rc.md).
+Use `tools/v04_direct_converter.py` for original signed SCAP ZIPs, with strict
+`--verify` or warning-admitted `--draft --compile`. It emits native YAML/JSON,
+source traces and separate proof/compile status. The independent package reader
+is `tools/verify_v04_package_consumer.py`. The older shared-converter commands
+below remain bounded reproduction/upgrade paths; they are not the coverage
+statement for the current direct SCAP converter.
+
 **Scope: October 23, 2026 pre-alpha integration checkpoint.** The supported
 paths below are a bounded subset. No published full OVAL coverage or scanner
 conformance is claimed.

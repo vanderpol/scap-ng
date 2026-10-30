@@ -1,5 +1,13 @@
 # Versioned SCAP-NG toolchain releases
 
+Current preparation instructions: [0.4.0 candidate guide](0.4.0-rc.md).
+The signed-SCAP entry point is `tools/v04_direct_converter.py`; independent
+source proof and package verification are separate entry points. The candidate
+includes a hash-pinned dependency lock and published matching offline wheels.
+See [license inventory](0.4.0-LICENSE-INVENTORY.md). Descriptions of the shared
+0.3-derived leaf converter below refer to that narrower retained tool, not to
+the newer direct converter's coverage. No final release/tag before owner approval.
+
 This is the release-process contract for **tools and their documentation**,
 separate from releases of authoring samples and compiled `.scapng` content.
 The [maintenance process](../../MAINTAINING.md) continues to govern review,

@@ -1,5 +1,13 @@
 # SCAP-NG Application Developer Guide
 
+The [0.4.0 candidate guide](../releases/0.4.0-rc.md) documents actual converter,
+compiler, independent package reader and clean offline environment entry points.
+Warning-admitted catalog/`all_exist`/binding/function drafts carry separate proof
+status. A package-reader PASS checks structure, references and operands; it does
+not settle source equivalence or live scanner behavior. In particular, a positive
+Item is no evidence that missing expected targets or incomplete/error/unknown
+collection can be treated as an ordinary verified PASS.
+
 **Status: Draft — Needs Review (SCAP-NG 0.4.0 pre-alpha).** The current language, schemas, and implementation evidence are not a completed scanner-conformance standard. This guide explains the documented SCAP-NG application contracts for any developer or AI-assisted implementation workflow. Detailed implementation requirements are a separate, optional level; this guide does not authorize implementation or define new language behavior. Open wording and behavior questions are tracked in [#49](https://github.com/vanderpol/scap-ng/issues/49) and [#252](https://github.com/vanderpol/scap-ng/issues/252).
 
 ## 1. What an implementation consumes and produces

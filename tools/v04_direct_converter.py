@@ -72,6 +72,8 @@ class AssessmentConverter:
         self.selector_equivalences = []
         self.enum_variable_copies = {}
         self.enum_variable_equivalences = []
+        self.conversion_warnings = []
+        self.bound_exports, self.inputs, self.policy_parameters, self.input_bindings = {}, {}, {}, {}
 
     def capability(self, element, kind):
         matches = [mapping for mapping in self.mappings if element.tag ==
@@ -153,8 +155,9 @@ class AssessmentConverter:
                 self.same_family(child.get('state_ref'), 'state', mapping)
                 conditions.append(self.reference(child.get('state_ref'), 'state'))
         found = element.get('check_existence', 'at_least_one_exists')
-        ensure(found in EXISTENCE, f'unsupported Test existence: {found}')
-        requirement = {'items_found': EXISTENCE[found]}
+        draft_all_exist = found == 'all_exist' and getattr(self.source, 'draft_compatibility', False)
+        ensure(found in EXISTENCE or draft_all_exist, f'unsupported Test existence: {found}')
+        requirement = {'items_found': 'one_or_more' if draft_all_exist else EXISTENCE[found]}
         if conditions:
             ensure(element.get('check') in MATCHING and found != 'none_exist', 'unsupported Test matching/absence combination')
             requirement.update(items_satisfying=MATCHING[element.get('check')])
@@ -167,6 +170,10 @@ class AssessmentConverter:
         identifier = native_identifier(element, 'test')
         self.tests[identifier] = {'test_title': element.get('comment', ''), 'capability': mapping['capability'],
                                   'object': acquisition, 'require': requirement, 'reported_elements': 'all'}
+        if draft_all_exist:
+            from v04_draft_compatibility import all_exist_warning
+            self.conversion_warnings.append(all_exist_warning(self.source, self.component_id, element,
+                self.source.node(self.component_id, object_id, 'object'), identifier))
         if mapping['native'].get('test_source', {}).get('kind') == 'none':
             # The version-local contract deliberately omits meaningless source
             # singleton Objects. The source dependency remains in provenance.
@@ -385,6 +392,9 @@ class AssessmentConverter:
     def convert_variable(self, element):
         datatype = element.get('datatype')
         ensure(datatype in SOURCE_TYPES, f'unsupported Variable datatype: {datatype}')
+        if local_name(element)=='external_variable' and getattr(self.source,'draft_compatibility',False):
+            from v04_draft_inputs import external_input
+            return external_input(self,element)
         if local_name(element) == 'constant_variable':
             ensure(len(element) and all(child.tag == f'{{{OVAL}}}value' and not child.attrib and not len(child) for child in element), 'malformed constant Variable')
             # Immutable source constants become typed expected arrays. Keep the
@@ -418,6 +428,7 @@ class AssessmentConverter:
                 'datatype': native_datatype(datatype),
                 'expression': {'literal': value}}
             return identifier
+        ensure('variable' in value, 'Assessment Input cannot replace a named runtime Variable source')
         return value['variable']
 
     def function(self, element):
@@ -432,6 +443,8 @@ class AssessmentConverter:
             attributes(element, {'var_ref'})
             ensure(not len(element), 'variable_component has children')
             value = self.reference(element.get('var_ref'), 'variable')
+            ensure(not isinstance(value,dict) or 'input' not in value,
+                   'Assessment Input function composition requires a supported typed expression')
             if isinstance(value, list):
                 variable = self.source.node(self.component_id, element.get('var_ref'), 'variable')
                 # A complete one-value constant is a scalar function operand;
@@ -454,11 +467,43 @@ class AssessmentConverter:
             ensure(element.get('item_field') in mapping['native']['state_field_map'], 'unknown object_component field')
             return {'values': {'object': self.reference(identifier, 'object'),
                                'field': mapping['native']['state_field_map'][element.get('item_field')]}}
+        if operation in ('count','split','substring') and getattr(self.source,'draft_compatibility',False):
+            from v04_variable_function_migration import canonical_expression
+            allowed={'count':set(),'split':{'delimiter'},'substring':{'substring_start','substring_length'}}[operation]
+            attributes(element,allowed)
+            ensure(len(element)>=1 and (operation=='count' or len(element)==1),'invalid function arity')
+            ensure(set(element.attrib)==allowed,'missing function option')
+            options={k:int(v) if operation=='substring' else v for k,v in element.attrib.items()}
+            ensure(operation!='substring' or all(-2147483648 <= v <= 2147483647 for v in options.values()),
+                   'substring option outside committed int32 contract')
+            expression={'function':{'name':operation,'arguments':[
+                self.function(c) if local_name(c) in ('count','split','substring') else
+                canonical_expression(self.function(c)) for c in element], 'options':options}}
+            self.conversion_warnings.append({'code':'variable_function_unproved','source_function':operation,
+                'source_expression_sha256':digest(xml_identity(element)), 'source_options':dict(element.attrib),
+                'message':'Existing canonical function contract preserved structurally; independent function/runtime parity unproved.',
+                'independent_static_proof':'UNPROVED','scanner_runtime':'NOT_RUN'})
+            return expression
         ensure(operation in ('concat', 'regex_capture', 'merge', 'unique'), f'unsupported function: {operation}')
         attributes(element, {'pattern'} if operation == 'regex_capture' else
                    {'delimiter', 'sort', 'order'} if operation == 'merge' else set())
         ensure(len(element) and (operation != 'regex_capture' or (len(element) == 1 and 'pattern' in element.attrib)), 'function arity/pattern')
         values = [self.function(child) for child in element]
+        if (operation in ('merge', 'unique') and len(values) > 1
+                and getattr(self.source, 'draft_compatibility', False)):
+            from v04_variable_function_migration import canonical_expression
+            options = {} if operation == 'unique' else {
+                'delimiter': element.get('delimiter', ''), 'sort': element.get('sort', 'document'),
+                'order': element.get('order', 'ascending')}
+            ensure(operation != 'merge' or (options['sort'] in ('document', 'lexical', 'numeric', 'natural')
+                   and options['order'] in ('ascending', 'descending')), 'unsupported merge sort/order')
+            self.conversion_warnings.append({'code': 'multiple_aggregation_unproved',
+                'source_function': operation, 'source_expression_sha256': digest(xml_identity(element)),
+                'source_options': dict(element.attrib), 'source_component_count': len(values),
+                'message': 'Ordered components retained in existing canonical function arguments; independent aggregation parity unproved.',
+                'independent_static_proof': 'UNPROVED', 'scanner_runtime': 'NOT_RUN'})
+            return {'function': {'name': operation, 'arguments': [canonical_expression(v) for v in values],
+                                 'options': options}}
         if operation in ('merge', 'unique'):
             # Existing native aggregation consumes one collection expression.
             # Do not invent a union grammar for multiple source components.
@@ -647,6 +692,8 @@ class AssessmentConverter:
         enum_aliases = ({k: v for k, v in aliases.items() if v in domain}
                         if crosswalk and operation in ('equals', 'not equal') else None)
         value = self.operand(element, enum_aliases=enum_aliases)
+        if isinstance(value,dict) and 'input' in value:
+            ensure(not selector and not crosswalk,'Assessment Input acquisition/enum projection outside supported expected-value binding')
         native_enum_variable = False
         if crosswalk:
             if operation == 'not equal' and not selector:
@@ -746,7 +793,9 @@ def dependency_blockers(source, node, mappings):
     # Quantifier support is independent of which capability failed first.
     if kind == 'test':
         found = element.get('check_existence', 'at_least_one_exists')
-        probe('@check_existence', ensure, found in EXISTENCE, f'unsupported Test existence: {found}')
+        probe('@check_existence', ensure, found in EXISTENCE or
+              (found == 'all_exist' and getattr(source, 'draft_compatibility', False)),
+              f'unsupported Test existence: {found}')
     if kind in ('state', 'object'):
         try:
             mapping = visitor.capability(element, kind)
@@ -782,6 +831,9 @@ def convert_rule(source, source_id, mappings):
     rule = source.rules[source_id]
     component, definition, omitted_checks = source.automated_check(rule)
     converter = AssessmentConverter(source, component, mappings)
+    if getattr(source,'draft_compatibility',False):
+        from v04_draft_inputs import check_exports
+        converter.bound_exports=check_exports(source,rule)
     expression = converter.reference(definition, 'definition')
     rule_id = native_identifier(rule, 'rule')
     assessment_id = rule_id.removesuffix('-rule') + '-assessment'
@@ -792,6 +844,8 @@ def convert_rule(source, source_id, mappings):
     for section in ('shared_objects', 'variables'):
         if getattr(converter, section):
             assessment[section] = getattr(converter, section)
+    if converter.inputs:
+        assessment['inputs']=converter.inputs
     assessment.update(tests=converter.tests, evaluate=expression)
     documents[f'authoring/direct-slice/assessments/{assessment_id}.json'] = {'assessment': assessment}
     # This is a compilation fixture, not a full Rule-policy renderer.
@@ -802,6 +856,8 @@ def convert_rule(source, source_id, mappings):
         'applicability': [], 'parameters': {}, 'remediation': {}, 'organizational_input_requirements': {},
         'assessment_choices': {'automated': {'assessment': assessment_id}}, 'default_assessment_choice': 'automated'}
     documents[f'authoring/direct-slice/rules/{rule_id}.json'] = {'rule': native_rule}
+    if converter.input_bindings:
+        native_rule['assessment_choices']['automated']['inputs']=converter.input_bindings
     binding = {'source_rule': source_id, 'source_rule_sha256': digest(xml_identity(rule)),
         'component': component, 'definition': definition, 'native_rule': rule_id, 'assessment': assessment_id,
         'dependencies': converter.used, 'omitted_checks': omitted_checks,
@@ -810,6 +866,22 @@ def convert_rule(source, source_id, mappings):
         binding['selector_equivalences'] = converter.selector_equivalences
     if converter.enum_variable_equivalences:
         binding['enum_variable_equivalences'] = converter.enum_variable_equivalences
+    warnings = list(converter.conversion_warnings)
+    for check in rule.findall(f'{{{XCCDF}}}check'):
+        if check.get('system') != OVAL:
+            continue
+        for reference in check.findall(f'{{{XCCDF}}}check-content-ref'):
+            warning = getattr(source, 'catalog_warnings', {}).get(reference.get('href'))
+            if warning:
+                warnings.append({**warning, 'definition': definition,
+                    'definition_sha256': digest(xml_identity(source.node(component, definition, 'definition')))})
+    if warnings:
+        binding['conversion_warnings'] = list({digest(w): w for w in warnings}.values())
+        binding['source_variable_context'] = {k: v for k, v in converter.used.items() if v['kind'] == 'variable'}
+        binding['independent_static_proof_eligible'] = False
+        binding['conversion_status'] = 'CONVERTED_UNVERIFIED'
+    if converter.policy_parameters:
+        binding['policy_parameters']=converter.policy_parameters
     return documents, binding
 
 
@@ -851,6 +923,13 @@ def assemble_subset(source, documents, rule_trace, mappings):
         'platform': {'id': 'fixture-platform', 'title': 'Compilation fixture; applicability not converted', 'applicability': {}},
         'applicability_catalog': 'fixture-applicability', 'scoring': [], 'parameters': [], 'default_selection': True,
         'groups': [], 'profiles': profiles, 'rules': list(rule_links.values())}
+    parameters={}
+    for binding in rule_trace:
+        for key,value in binding.get('policy_parameters',{}).items():
+            ensure(key not in parameters or parameters[key]==value,'conflicting publisher Parameter binding')
+            parameters[key]=value
+    if parameters:
+        wrapper['parameters']=[parameters[key] for key in sorted(parameters)]
     if rule_ids:
         documents['authoring/direct-slice/benchmark.json'] = {'benchmark': wrapper}
         documents['authoring/direct-slice/applicability.json'] = {'applicability': {'id': 'fixture-applicability', 'conditions': {}}}
@@ -894,7 +973,7 @@ def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=No
     measured = {'inventory': time.perf_counter() - started, 'conversion': 0.0,
                 'validation': 0.0, 'diagnostics': 0.0}
     mappings = load_mappings() if mappings is None else mappings
-    documents, bindings, probes = {}, [], {}
+    documents, bindings, probes, accepted_parameters = {}, [], {}, {}
     if not inventory_only:
         from validate_native_json_schemas import build_validators, document_errors
         validators = build_validators(ROOT / 'schema/v0.4.0')
@@ -906,6 +985,9 @@ def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=No
                 rule = source.rules[row['source_rule']]
                 ensure(source.rule_selected(rule), 'disabled source defaults unsupported')
                 native, binding = convert_rule(source, row['source_rule'], mappings)
+                for key, parameter in binding.get('policy_parameters', {}).items():
+                    ensure(key not in accepted_parameters or accepted_parameters[key] == parameter,
+                           'conflicting Benchmark Parameter binding: '+key)
             except (UnsupportedSource, ValueError) as error:
                 blockers.append(issue(blocker_category(str(error)), str(error), row['source_rule']))
             measured['conversion'] += time.perf_counter() - started
@@ -931,8 +1013,13 @@ def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=No
                 row['status'] = 'blocked'
             else:
                 documents.update(native)
+                accepted_parameters.update(binding.get('policy_parameters', {}))
                 bindings.append(binding)
-                row.update(status='converted', proof_level='authoring_validated', artifacts=sorted(native))
+                row.update(status='converted', proof_level='authoring_validated', artifacts=sorted(native),
+                           conversion_status='CONVERTED_UNVERIFIED')
+                if binding.get('conversion_warnings'):
+                    row['conversion_warnings'] = binding['conversion_warnings']
+                    row['independent_static_proof_eligible'] = False
             measured['diagnostics'] += time.perf_counter() - started
     started = time.perf_counter()
     documents, trace = assemble_subset(source, documents, bindings, mappings)
@@ -961,10 +1048,16 @@ def main():
     selection.add_argument('--inventory-only', action='store_true', help='discover every Rule without conversion')
     parser.add_argument('--verify', action='store_true',
                         help='validate original closures, prove source terms and compile only the proved primary subset')
+    parser.add_argument('--draft', action='store_true',
+                        help='allow warning-admitted catalog/all_exist drafts; never independent verification')
+    parser.add_argument('--compile', action='store_true',
+                        help='compile generated authoring and independently check package structure/operands; no semantic-proof claim')
     parser.add_argument('--output', type=Path, required=True)
     arguments = parser.parse_args()
     ensure(not arguments.output.exists(), 'output exists; refusing overwrite')
     ensure(not (arguments.verify and arguments.inventory_only), '--verify requires --rule or --all-rules')
+    ensure(not (arguments.verify and arguments.draft), '--draft and --verify are separate admission modes')
+    ensure(not (arguments.compile and arguments.inventory_only), '--compile requires conversion')
     started = time.perf_counter()
     if arguments.verify:
         from verify_v04_direct_scope import accept_source
@@ -973,7 +1066,8 @@ def main():
         (arguments.output / 'metrics.json').write_text(json.dumps(metrics, indent=2) + '\n')
         print(json.dumps(metrics))
         return
-    source = SourceModel(arguments.source, arguments.sha256, inventory_broken_references=not bool(arguments.rule))
+    source = SourceModel(arguments.source, arguments.sha256, inventory_broken_references=not bool(arguments.rule),
+                         draft_compatibility=arguments.draft)
     indexed = time.perf_counter()
     manifest = None
     stages = {}
@@ -994,6 +1088,17 @@ def main():
         from v04_direct_inventory import coverage_markdown
         (arguments.output / 'coverage.json').write_text(json.dumps(manifest, indent=2) + '\n')
         (arguments.output / 'coverage.md').write_text(coverage_markdown(manifest))
+    if arguments.compile and documents:
+        from v04_native_bundle_compiler import build_bundle
+        from verify_v04_package_consumer import verify
+        raw, _ = build_bundle(documents)
+        package = arguments.output / 'CONVERTED_UNVERIFIED.scapng'
+        package.write_bytes(raw)
+        external = {(kind, doc[kind]['id']): (path, doc)
+                    for path, doc in documents.items() for kind in doc}
+        checked = verify(package, source=external)
+        checked.update(independent_static_proof='NOT_ESTABLISHED_BY_COMPILATION', conversion_status='CONVERTED_UNVERIFIED')
+        (arguments.output / 'package-verification.json').write_text(json.dumps(checked, indent=2)+'\n')
     metrics = {'parse_index': indexed - started, 'conversion': converted - indexed}
     if stages:
         metrics['stages'] = stages

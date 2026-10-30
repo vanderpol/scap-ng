@@ -59,11 +59,16 @@ def finalize_source(target,pin,baseline,known=None):
             else:
                 ensure(assessment['id'] not in programs,'uncompiled candidate packaged as executable')
             if key in baseline:
+                ensure(not row.get('conversion_warnings'),'warning-admitted content cannot inherit verified proof')
                 ensure(all(row[k]==baseline[key][k] for k in ['source_rule_sha256','authoring_sha256','program_sha256']),
                        'retained baseline drift')
                 ensure(row['draft_status']=='RETAINED_PUBLISHED_STATIC_PRIMARY_PROOF','lost proof label')
                 row.update(proof_level='source_proved',original_source_validation='RETAINED_PUBLISHED_EXACT_INPUT_HASH_EVIDENCE')
                 retained.add(key)
+        row['conversion_status'] = (
+            'CONVERTED_VERIFIED' if key in retained else
+            'CONVERTED_UNVERIFIED' if row.get('assessment_path') else
+            'BLOCKED' if row['conversion_attempted'] else 'MANUAL_OCIL_ONLY_PRESERVED')
     actual_native={p.name for p in (target/'authoring/direct-slice/assessments').glob('*.json')}
     ensure(expected_native==actual_native,'unaccounted or fabricated native Assessment')
     ledger['initial_conversion_summary']=ledger.get('initial_conversion_summary',ledger['summary'])
@@ -72,6 +77,7 @@ def finalize_source(target,pin,baseline,known=None):
     (target/'ledger.json').write_text(json.dumps(ledger,indent=2,ensure_ascii=False)+'\n')
     s=json.loads((target/'summary.json').read_text())
     s['statuses']=dict(Counter(r['draft_status'] for r in rows))
+    s['conversion_statuses']=dict(Counter(r['conversion_status'] for r in rows))
     (target/'summary.json').write_text(json.dumps(s,indent=2)+'\n')
     return rows,s,retained
 
@@ -85,7 +91,7 @@ def finalize(output, source_pins, baseline, known=None):
     known={} if known is None else known
     columns=['benchmark','source_rule','draft_status','conversion_attempted','original_source_validation',
              'independent_source_proof','compile_status','has_manual_source','primary_blocker','blockers',
-             'preserved_original_rule','assessment_path']
+             'preserved_original_rule','assessment_path','conversion_status','conversion_warnings']
     ensure(len(pins)==65,'exact 65-source pins required')
     for pin in pins:
         target=output/pin['file'].removesuffix('.zip')
@@ -143,5 +149,8 @@ def finalize(output, source_pins, baseline, known=None):
                   'other_converter_or_source_investigation')
         blocked[category]+=1
     summary['blocked_primary_dispositions']=dict(blocked)
+    summary['conversion_statuses']=dict(Counter(r['conversion_status'] for r in compact))
+    summary['overlapping_warning_rules']=dict(Counter(code for row in compact
+        for code in {w['code'] for w in row.get('conversion_warnings') or []}))
     (output/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     return summary

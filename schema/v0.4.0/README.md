@@ -2,6 +2,18 @@
 
 **Pre-alpha schema review candidate**, not an accepted release, OVAL Board ratification, or scanner conformance. Historical 0.3.0 schemas remain [archived](../../archive/0.3.0/README.md).
 
+**Current candidate implementation (#260):** use the committed version-local
+schemas and [candidate guide](../../docs/releases/0.4.0-rc.md). The direct
+converter and native compiler interoperate on a bounded automated subset.
+Opt-in draft compatibility admits exact NIWC catalog extensions and Test-level
+`all_exist` with provenance warnings; it does not change schemas, field/record
+existence, compiler or scanner contracts. Inline/shared Objects, Test-level
+`capability`, canonical `require`, explicit existence/matching and
+`and`/`or`/`one`/`xor` remain current. The isolated Variable function migration
+schema is a draft expression contract, not a completed normative migration.
+Older dated paragraphs below describe their historical review checkpoint;
+current conversion counts and proof status come from the candidate ledger.
+
 **2026-10-27 schema-first modernization reconciliation ([#255](https://github.com/vanderpol/scap-ng/issues/255)):** `file.hash` now proposes a required, enum-constrained Object `algorithm` **selector** rather than a scalar acquisition parameter, preserving OVAL multi-algorithm and `none satisfy` acquisition through the existing typed-array/Variable `value_match` grammar. The source-to-native hash spelling crosswalk is shared by the Object and State fields. This is a mapping/generated-contract candidate: current direct conversion remains explicitly inactive for original filehash58 multi-value cases, and scanner collection over the six-algorithm domain remains unproved. The [100-capability modernization audit](../../docs/audit/v04-modernization-schema-reconciliation-20261027.md) also records a separate existing mismatch between documented explicit datatype on arrays and current converter output. A strict common-schema datatype requirement has **not** been promoted ahead of the coordinated converter change, because doing so would invalidate currently source-proved Windows user-rights content.
 
 **2026-10-24 schema-only review candidate:** Automated Tests use `require: {items_found: ..., items_satisfying: ..., fields: ...}` (or Item-presence-only `require: {items_found: ...}`). Fields with comparisons use `values_found`/`values_matching`; record wrappers with comparisons use `records_found`/`records_matching`. The single absence-only spelling is `{values_found: none}` for an individual field or `{records_found: none}` for a record wrapper, without matching counts, comparator, or unrelated attributes. Such absence overrides a shared field requirement; it cannot be authored through a duplicate inherited `field_requirement` pair. No separate `state`/`states`/`states_match` or scalar legacy shorthand. `evaluate` accepts `and`/`or`/`one`/`xor`. Inline and referenced shared Objects are both valid. The new absence-only schema rules are **pending owner diff review**; converter/compiler migration and scanner-level six-state proof are separate subsequent gates.

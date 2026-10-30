@@ -36,6 +36,14 @@ COMMON_REQUIRED = (
     "tools/scap_ng_content_compiler.py",
 )
 CURRENT_REQUIRED = (
+    "tools/v04_direct_converter.py",
+    "tools/v04_draft_compatibility.py",
+    "tools/v04_draft_inputs.py",
+    "tools/verify_v04_package_consumer.py",
+    "tools/verify_v04_direct_scope.py",
+    "docs/releases/0.4.0-rc.md",
+    "docs/releases/0.4.0-LICENSE-INVENTORY.md",
+    "docs/audit/v04-package-acceptance/requirements-linux-py312.lock",
     "docs/developer/README.md",
     "docs/developer/CONVERTER-COMPILER-RUNBOOK.md",
     "docs/releases/TOOLCHAIN-RELEASES.md",
@@ -137,16 +145,19 @@ def build(repo: Path, out: Path, version: str, *, ref: str = "HEAD", current: bo
         "operator_guide": "tools/HUMAN-RUNNABLE-SCRIPTS.md",
         "snapshot_kind": "current_release_candidate" if current else "historical_tag_source_reconstruction",
         "entrypoints": {
-            **({"current_0_4_oval_converter_proven_leaf_subset": "tools/scap_converter_core.py",
+            **({"current_0_4_scap_converter": "tools/v04_direct_converter.py",
+                "current_0_4_independent_source_verifier": "tools/verify_v04_direct_scope.py",
+                "current_0_4_independent_package_verifier": "tools/verify_v04_package_consumer.py",
+                "shared_0_4_oval_converter_proven_leaf_subset": "tools/scap_converter_core.py",
                 "current_native_0_4_compiler": "tools/v04_native_bundle_compiler.py"}
                if current else {}),
             "historical_0_3_conversion_engine": "tools/scap_upconvert_v003/convert_full_review.py",
             "version_independent_oval_ir": "tools/oval_semantic_ir.py",
         },
         "known_gaps": ([
-            "The shared 0.3-derived 0.4 importer currently proves only two leaf shapes, not full OVAL conversion.",
+            "Direct SCAP conversion remains a bounded automated subset; draft compatibility is independently unproved.",
             "This source snapshot is not an approved interoperable release or a conformance result.",
-            "Publisher identity/trust, runtime semantic parity and dependency locking require separate gates.",
+            "Publisher identity/trust and scanner-runtime parity remain separate gates; see candidate dependency and license inventory.",
         ] if current else [
             "Historical tag source is preserved unchanged; modern developer guides were not present at this tag.",
             "This is a reconstructed source archive, not a replacement for historical published assets.",

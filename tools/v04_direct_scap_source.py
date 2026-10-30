@@ -60,8 +60,10 @@ def native_identifier(element, suffix, title=None):
 
 
 class SourceModel:
-    def __init__(self, archive_path: Path, expected_sha256: str, *, inventory_broken_references=False):
+    def __init__(self, archive_path: Path, expected_sha256: str, *, inventory_broken_references=False,
+                 draft_compatibility=False):
         self.inventory_broken_references = inventory_broken_references
+        self.draft_compatibility = draft_compatibility
         archive = Path(archive_path).read_bytes()
         ensure(sha256(archive).hexdigest() == expected_sha256, 'source ZIP SHA-256 mismatch')
         self.zip_sha256 = expected_sha256
@@ -113,8 +115,11 @@ class SourceModel:
         self.benchmark_component = self.component_for_reference(self.checklist.get('id'))
         self.benchmark = self.components[self.benchmark_component]
         ensure(self.benchmark.tag == f'{{{XCCDF}}}Benchmark', 'checklist does not resolve to XCCDF 1.2')
-        self.catalog, self.catalog_errors = {}, {}
-        for uri in self.checklist.findall('.//{urn:oasis:names:tc:entity:xmlns:xml:catalog}uri'):
+        self.catalog, self.catalog_errors, self.catalog_warnings = {}, {}, {}
+        if self.draft_compatibility:
+            from v04_draft_compatibility import resolve_draft_catalog
+            self.catalog, self.catalog_errors, self.catalog_warnings = resolve_draft_catalog(self)
+        for uri in ([] if self.draft_compatibility else self.checklist.findall('.//{urn:oasis:names:tc:entity:xmlns:xml:catalog}uri')):
             ensure(uri.get('name') not in self.catalog and uri.get('name') not in self.catalog_errors
                    and uri.get('uri', '').startswith('#'), 'ambiguous/nonlocal catalog entry')
             try:
@@ -195,8 +200,13 @@ class SourceModel:
             ensure(selector in ('', 'automated'), f'unsupported OVAL check selector: {selector}')
             ensure(selector not in selectors, 'duplicate OVAL selector unsupported')
             selectors.append(selector)
-            ensure(len(check) == 1 and check[0].tag == f'{{{XCCDF}}}check-content-ref', 'OVAL check imports/exports unsupported')
-            reference = check[0]
+            references = check.findall(f'{{{XCCDF}}}check-content-ref')
+            if self.draft_compatibility:
+                ensure(len(references)==1 and all(c.tag in {f'{{{XCCDF}}}check-export',f'{{{XCCDF}}}check-content-ref'}
+                       for c in check), 'OVAL check-import/result binding or complex check unsupported')
+            else:
+                ensure(len(check) == 1 and check[0].tag == f'{{{XCCDF}}}check-content-ref', 'OVAL check imports/exports unsupported')
+            reference = references[0]
             attributes(reference, {'href', 'name'})
             ensure(reference.get('href') in self.catalog, 'unresolved checklist catalog href')
             choices.append((self.catalog[reference.get('href')], reference.get('name')))
