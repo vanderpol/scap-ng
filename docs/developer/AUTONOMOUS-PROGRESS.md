@@ -15,6 +15,34 @@ blocked, 1,653 manual; all 6,817 native candidates compile and all 4,258 accepte
 hash pairs are retained. See docs/audit/v04-draft-recovery-20261030.json.
 Exact-SHA hosted CI, clean-extract acceptance and publication remain pending.
 
+First implementation candidate `a08c9beb9dcf781a726adbdf05676f5ae2e57309`
+completed all 15 hosted workflows green. Maintained run `40985824360`, artifact
+`12947931615`: 3,331 selected, 3,330 passed, zero failures/errors, one recorded
+optional full-source-census skip. Six-source run `40985824393` passed. No old
+proof changed. A fresh offline 11-dependency environment installed successfully
+and passed pip check. Exact-ref toolchain replay is byte-identical.
+
+The new release walkthrough initially supplied directories to the independent
+reader's ZIP arguments and treated a deliberately unproved negative as a
+package-reader failure. Both invocation/assertion defects are fixed; the
+corrected seven-case gate PASS includes original Linux, original Windows/shared
+Object, three warning cases, incompatible source and synthetic ambiguous
+catalog rejection. These changes affect release tooling/docs, not corpus
+conversion. Commit them as the final candidate, then repeat exact-SHA clean
+extraction and use the automatically triggered CI; do not duplicate full suites.
+
+Evidence commit `829f543835e5dd1f005e15dc121aef7a5bfcbe69` is published. The
+completed DRAFT ZIP is `/workspace/rc-v040-20261029/publication/all-65-revised-draft.zip`,
+108,003,966 bytes, SHA256
+`a09ee9a13cdfeeb1b8599eab61308e935a19b99eb62eadafd32002d13d90f8bd`.
+Its 37,283 payload files passed CRC and every recorded digest. Prerelease
+`v04-revised-all65-draft-20261030-a08c9beb9` was created, but uploads.github.com
+rejected asset upload with HTTP401 while Git push succeeds. Do not imply the
+release asset exists. Use an explicit bounded ordinary-Git storage fallback
+with archive parts/checksums and update manifest/README/issue links accordingly.
+Source/specification license remains undecided (owner replied "unsure"); never
+invent a license or publish final 0.4.0. Finish all available candidate work.
+
 Recovery root: `/workspace/rc-v040-20261029/`. Contains exact 4,258-proof baseline
 (4,206 old +52 subsequently proved), 48 recorded original-invalid/deprecated
 exclusions, hash-pinned dependency wheelhouse and test/build logs. Corpus output

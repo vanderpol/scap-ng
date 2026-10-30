@@ -41,16 +41,20 @@ def run_gate(output, *, require_extracted=False):
         checked=report if draft else report.get('package_consumer')
         if proved is not None and report['outcomes'].get('PROVED',0)!=proved:
             raise ValueError('unexpected proved count: '+name)
-        if checked:
+        if checked and proved != 0:
             if checked['status']!='INDEPENDENT_PACKAGE_CONSUMER_PASS' or checked['scanner_evaluated']:
                 raise ValueError('independent package gate failed: '+name)
         if draft:
             trace=json.loads((target/'source-trace.json').read_text())
             if not all(r.get('conversion_warnings') and not r['independent_static_proof_eligible'] for r in trace['rules']):
                 raise ValueError('warning draft lost proof separation')
+            for suffix in ['json','yaml']:
+                with zipfile.ZipFile(target/('authoring-'+suffix+'.zip'),'w',compression=zipfile.ZIP_DEFLATED) as archive:
+                    for path in sorted((target/'authoring').rglob('*.'+suffix)):
+                        archive.writestr(path.relative_to(target).as_posix(),path.read_bytes())
             execution['independent_reader']=command([ROOT/'tools/verify_v04_package_consumer.py',
-                target/'CONVERTED_UNVERIFIED.scapng','--source-json',target/'authoring',
-                '--source-yaml',target/'authoring','--report',target/'independent-package.json'],name+'-reader.log')
+                target/'CONVERTED_UNVERIFIED.scapng','--source-json',target/'authoring-json.zip',
+                '--source-yaml',target/'authoring-yaml.zip','--report',target/'independent-package.json'],name+'-reader.log')
         reports.append({'name':name,'source_sha256':pin,'draft':draft,'execution':execution,
                         'outcomes':report.get('outcomes'),'package_consumer':checked})
         return report
@@ -61,7 +65,7 @@ def run_gate(output, *, require_extracted=False):
     convert('linux-static',fixture/al['file'],al['sha256'],['xccdf_mil.disa.stig_rule_SV-273996r1119976_rule'],proved=1)
     server=ROOT/'tests/fixtures/v04-direct-prototype/server2025-signed.zip'
     server_pin='2f46264b5fa21c8a033236121794ebe372314bf7458dac0aca4f81179fe7ece0'
-    from v04_direct_scap_source import SourceModel, DS
+    from v04_direct_scap_source import SourceModel, DS, OVAL, XCCDF
     source=SourceModel(server,server_pin)
     rules=[next(r for r in source.rules if '_SV-'+n+'r' in r) for n in ['278139','278001','278031']]
     windows=convert('windows-static-shared',server,server_pin,rules[:2],proved=2)
@@ -77,8 +81,12 @@ def run_gate(output, *, require_extracted=False):
     # Deliberately modified negative fixture; never describe it as signed original.
     original=SourceModel(fixture/ad['file'],ad['sha256'],draft_compatibility=True)
     root=deepcopy(original.root)
-    catalog=root.find('.//{urn:oasis:names:tc:entity:xmlns:xml:catalog}catalog')
-    extension=next(n for n in catalog if n.tag=='{'+DS+'}uri')
+    check=next(c for c in original.rules['xccdf_navy.navwar.niwcatlantic.scc.ms_rule_SV-243466r959010_rule']
+               .findall('{'+XCCDF+'}check') if c.get('system')==OVAL)
+    href=check.find('{'+XCCDF+'}check-content-ref').get('href')
+    catalog=next(c for c in root.iter('{urn:oasis:names:tc:entity:xmlns:xml:catalog}catalog')
+                 if any(n.get('name')==href for n in c))
+    extension=next(n for n in catalog if n.tag=='{'+DS+'}uri' and n.get('name')==href)
     catalog.append(deepcopy(extension))
     negative=output/'synthetic-duplicate-catalog.zip'
     with zipfile.ZipFile(fixture/ad['file']) as before, zipfile.ZipFile(negative,'w') as after:
@@ -88,6 +96,8 @@ def run_gate(output, *, require_extracted=False):
         '--rule','xccdf_navy.navwar.niwcatlantic.scc.ms_rule_SV-243466r959010_rule',
         '--draft','--compile','--output',output/'must-not-exist'],'ambiguous-catalog-negative.log',expected=1)
     if (output/'must-not-exist').exists():raise ValueError('ambiguous catalog emitted native output')
+    if 'catalog' not in (output/'ambiguous-catalog-negative.log').read_text().lower():
+        raise ValueError('negative failed outside catalog resolution')
     reports.append({'name':'synthetic-ambiguous-catalog-negative','execution':execution})
     report={'status':'PASS','source_root':str(ROOT),'python':sys.version,'extracted':not (ROOT/'.git').exists(),
             'cases':reports,'scanner_runtime':'NOT_RUN','publisher_trust':'NOT_VERIFIED'}
