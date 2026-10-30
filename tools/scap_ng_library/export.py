@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import time
 import zipfile
+import xml.etree.ElementTree as ET
 
 import yaml
 
@@ -16,6 +17,20 @@ from .index import Library
 
 DRAFT_SHA = 'a09ee9a13cdfeeb1b8599eab61308e935a19b99eb62eadafd32002d13d90f8bd'
 DRAFT_LOCATOR = 'https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download'
+
+
+def original_stream_title(stream, ledger, checked_bytes):
+    """Read presentation metadata from the one preserved source Benchmark."""
+    components=stream/'source-preservation/components.json'
+    if not components.is_file():return 'Original-only source records'
+    entries=json.loads(checked_bytes(components))
+    selected=entries.get(ledger.get('source_benchmark_component'))
+    if not selected:raise ValueError('preserved Benchmark metadata binding is missing')
+    node=ET.fromstring(checked_bytes(stream/selected['path']))
+    namespace='{http://checklists.nist.gov/xccdf/1.2}'
+    if node.tag!=namespace+'Benchmark':raise ValueError('preserved title target is not the selected Benchmark')
+    label=node.find(namespace+'title')
+    return ''.join(label.itertext()) if label is not None else 'Original-only source records'
 
 
 def export_draft(source, output, *, full_corpus=False, validate_schema=True, source_archive=None):
@@ -79,7 +94,7 @@ def export_draft(source, output, *, full_corpus=False, validate_schema=True, sou
                 # A wholly manual/blocked stream has no fabricated native tree.
                 # Its immutable source identity stays in records, not editable IDs.
                 scope = 'preserved-original-'+digest(ledger.get('original_zip',stream.name))[:12]
-                label = 'Original-only stream; no native Benchmark emitted'
+                label = original_stream_title(stream,ledger,checked_bytes)
             by_rule = {r['source_rule']:r for r in rows}
             if len(by_rule)!=len(rows):raise ValueError('duplicate original Rule identity')
             by_assessment = {}
@@ -141,7 +156,8 @@ def export_draft(source, output, *, full_corpus=False, validate_schema=True, sou
             if trace.exists():
                 record.with_name(scope+'.source-trace.json').write_bytes(checked_bytes(trace))
             catalogs.append({'scope':scope,'native_benchmark_id':benchmarks[0]['id'] if benchmarks else None,
-                'title':label,'original_rules':len(rows),'native_assessments':len(by_assessment)})
+                'title':label,'original_rules':len(rows),'native_assessments':len(by_assessment),
+                'conversion_statuses':dict(Counter(r['conversion_status'] for r in rows))})
         report = index.check()
         if report['status']!='PASS':raise ValueError('export reference validation failed: '+str(report['diagnostics'][:5]))
         if full_corpus:
@@ -168,6 +184,7 @@ def export_draft(source, output, *, full_corpus=False, validate_schema=True, sou
                 'Manual/blocked sources are records linked to original artifact, not native placeholders']}
         (stage/'metadata/export-receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
         index.close()
+        if output.exists():raise ValueError('destination appeared during export; refusing replacement')
         stage.rename(output)
         return receipt
     except BaseException:

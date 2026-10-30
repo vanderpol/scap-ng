@@ -105,6 +105,7 @@ def edges(doc):
     """Yield typed ID links; no relative-path or newest-version fallback."""
     kind, body = next(iter(doc.items()))
     result = []
+    def segment(value):return str(value).replace('~','~0').replace('/','~1')
     def add(target_kind, ident, field, version=None, purpose=None):
         result.append({'kind': target_kind, 'id': ident, 'field': field,
                        'version': version, 'purpose': purpose})
@@ -121,18 +122,18 @@ def edges(doc):
         if body.get('default_assessment_choice') not in choices:
             raise ValueError('undeclared Rule default choice')
         for label, choice in choices.items():
-            add('assessment', choice.get('assessment'), '/rule/assessment_choices/'+label,
+            add('assessment', choice.get('assessment'), '/rule/assessment_choices/'+segment(label),
                 choice.get('expected_version'))
     if kind == 'applicability':
         for label, condition in (body.get('conditions') or {}).items():
-            add('assessment', condition.get('assessment'), '/applicability/conditions/'+label,
+            add('assessment', condition.get('assessment'), '/applicability/conditions/'+segment(label),
                 condition.get('expected_version'), 'applicability')
     if kind == 'assessment':
         for label, dep in (body.get('dependencies') or {}).items():
             ident = dep.get('assessment')
             if dep.get('expected_id', ident) != ident:
                 raise ValueError('dependency expected_id differs from logical target')
-            add('assessment', ident, '/assessment/dependencies/'+label,
+            add('assessment', ident, '/assessment/dependencies/'+segment(label),
                 dep.get('expected_version'), dep.get('purpose'))
     for edge in result:
         if not isinstance(edge['id'], str) or not edge['id'] or any(s in edge['id'] for s in ('/', '\\')):
@@ -150,6 +151,15 @@ def validate(doc):
     from v04_canonical_unsigned_package import _package_validators
     validate_docs({'native.yaml': doc}, _package_validators())
     kind, body = next(iter(doc.items()))
+    if kind=='assessment':
+        stack=[body]
+        while stack:
+            value=stack.pop()
+            if isinstance(value,dict):
+                if isinstance(value.get('input'),str) and value['input'] not in (body.get('inputs') or {}):
+                    raise ValueError('unresolved declared Assessment Input: '+value['input'])
+                stack.extend(value.values())
+            elif isinstance(value,list):stack.extend(value)
     if kind == 'assessment' and body.get('mode') == 'automated':
         from v04_native_bundle_compiler import compile_assessment_program
         return digest(compile_assessment_program(body))

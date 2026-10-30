@@ -2,6 +2,48 @@
 
 ## Active #261 — native library layout / editor-callable maintenance
 
+Delivery acceptance completed after engine checkpoint
+`03ddc6beda8dcda5ff57439b0c3d7a2d12763d1b`: exact pinned source archive admitted,
+all 65 streams /8,892 original Rules retained, 6,817 compiled Assessment
+program hashes and 4,258 accepted proof triples unchanged. All **13,754 native
+YAML files remain byte-identical**; only paths change. Native kinds: 60 Benchmarks,
+60 applicability catalogs, 6,817 Rules, 6,817 Assessments. Five original-only
+streams stay in records with exact original publisher titles, no placeholders.
+Counts: 4,258 verified /2,559 unverified /422 blocked /1,653 manual. Max/median
+paths 215/187 ->138/122 chars. One intentional export: 705.84s, 279,924 KiB peak.
+No source conversion or OVAL proof replay. Completed output:
+`/workspace/library-v04-261/normalized-all65/`; never regenerate it routinely.
+
+Actual cached scope search 0.059s and one-document check 0.574s (one parse,
+173,004 KiB peak). Synthetic 100-stream /10,100-document index: search0.012s,
+incremental0.433s, one parse, 82,256 KiB peak. Separate advisory census: 404 exact
+ID-neutral structural groups, 100 near pairs examined, zero promotions/unused
+Assessment docs. RHEL9/Server2025 compile + independent package consumer PASS:
+415+257 unchanged programs; 20+18 shared Objects. See task work-root JSON logs.
+
+Final hardening since first checkpoint: cached status search, lazy original
+record queries, persistent edit/error recovery, disposable index restoration
+from durable sidecars, Rule/Assessment proof demotion on edits, Benchmark file
+rename ownership, cancellation/rollback, Input/Parameter/policy reference checks,
+native kind dispatch independent of `catalog.yaml` filename. 44 focused +old
+normalizer tests PASS (8.915s), repository layout check PASS. Current final
+implementation is ready to commit; then capture its automatically triggered
+maintained CI once while packaging the completed review candidate. Do not
+rerun all-65 conversion/export. The completed acceptance came from engine
+03ddc6bed; subsequent changes add editor/provenance/transaction hardening and
+generated title/status metadata without changing a single native YAML byte.
+Actual normalized RHEL9 and Server2025 compilation/independent-consumer PASS,
+415+257 programs unchanged. Wrapper source namespace adaptation was required
+for the existing independent reader's authoring-archive interface; reader and
+compiler were not changed. Separate reuse census at task root, no promotions.
+
+First checkpoint maintained run `41039515793` and representative Board conversion
+`41039515618` PASS. Older #214 0.3 preview `41039515609` failed in its unchanged
+renderer/schema stage before invoking the normalizer (1,567 source rejects).
+Its renderer/schema/driver bytes match recovered baseline; no protected workflow
+or schema was altered to hide it. Capture this known unrelated failure in final
+handoff, and reuse current maintained CI rather than rerunning old previews.
+
 Authority: [owner task #261](https://github.com/vanderpol/scap-ng/issues/261).
 Recovered clean published main `f6990f426`; documentary CI green. Frozen #260
 candidate/DRAFT remain immutable. New in-scope implementation is

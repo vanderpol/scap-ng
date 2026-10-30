@@ -4,6 +4,17 @@ This guide documents intentional command-line tools that a human may run from a 
 
 Run commands from the repository root unless a section says otherwise.
 
+## Native 0.4 library maintenance (#261)
+
+`python tools/scap_ng_library_cli.py --help` exposes offline out-of-place
+`export-draft`, read-only `analyze`/`check`, explicit `apply`, generated `index`,
+lazy `search`/`uses`/`records`, and bounded advisory `census`. The historical
+normalizer invocation remains available; `scap_ng_repo_normalizer.py v04`
+delegates to this same engine. See the [commands, editor JSON contract and
+all-65 preservation evidence](../docs/developer/NATIVE-LIBRARY.md).
+`audit_v04_library_scale.py --output NEW_DIRECTORY` is an intentional synthetic
+performance audit, not a routine full-corpus CI run.
+
 ## Common setup
 
 Recommended environment:

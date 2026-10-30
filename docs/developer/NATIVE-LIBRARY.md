@@ -50,8 +50,11 @@ python tools/scap_ng_repo_normalizer.py v04 check /path/to/library/content
 python tools/scap_ng_library_cli.py analyze /path/to/library/content
 python tools/scap_ng_library_cli.py check /path/to/library/content --changed rules/example/changed.yaml
 python tools/scap_ng_library_cli.py search /path/to/library/content --scope example --query timeout
+python tools/scap_ng_library_cli.py search /path/to/library/content --kind assessment --status CONVERTED_UNVERIFIED
+python tools/scap_ng_library_cli.py records /path/to/library/content --scope example --status MANUAL_OCIL_ONLY_PRESERVED
 python tools/scap_ng_library_cli.py uses /path/to/library/content --scope example --kind assessment --id session-timeout-assessment
 python tools/scap_ng_library_cli.py index /path/to/library/content --full
+python tools/scap_ng_library_cli.py compile /path/to/library/content --scope example --output /tmp/new-example.scapng
 python tools/scap_ng_library_cli.py census /path/to/library/content --near --max-pairs 100
 ```
 
@@ -91,6 +94,21 @@ indexed; they need no catalog or Benchmark. API: `scap_ng_library.index.Library`
 `Library.compile_scope(scope)` adapts one selected eligible graph to the
 unchanged native compiler. No normalizer code interprets OVAL or scanner results.
 
+The index is genuinely disposable: a rebuild recovers frozen proof/warning
+associations from durable `records/streams/` sidecars by scoped kind/ID and
+rechecks current hashes. A modified Rule or Assessment cannot inherit the old
+proof, and Rule navigation exposes an unverified selected-method dependency.
+`records` lazily queries preserved originals by scope/ID/title/status, clearly
+labels them non-editable records, and links their exact original archive member.
+No metadata record becomes a native Assessment. A native standalone file named
+`catalog.yaml` still dispatches by its content; only the exact generated catalog
+format is treated as navigation metadata.
+Declared Benchmark ownership survives file renames (including after cache
+deletion) through exact imported document identities and durable source-owner
+metadata. Ambiguous ownership fails closed. Physical filenames never replace
+native IDs. Native authoring/compilation stays independent of the evidence
+repository being online; original XML inspection uses the linked archive.
+
 ## Explicit presentation apply and editor contract
 
 `analyze` returns `change_manifest`; applications may present its diff, then
@@ -126,3 +144,59 @@ Every candidate remains a proposal with field differences, source locations,
 reverse users and source/program hashes. No fingerprint is used as proof to
 merge, remove content or repoint consumers; platform, inputs, Variables/Set/
 Filters, quantifiers, provenance and error/unknown contracts remain untouched.
+
+`compile` emits a new derived package outside editable source through the
+unchanged native compiler, without adding Benchmark requirements to standalone
+Assessment authoring. Full bundles still require one selected Benchmark. Real
+normalized RHEL 9 and Windows Server 2025 subsets were compiled and independently
+package-verified: 415 and 257 unchanged program hashes, with 20 and 18 shared
+Objects respectively. Package integrity and operand comparison establish no new
+original-source proof, live scanner behavior or publisher authentication.
+
+## Completed all-65 layout acceptance
+
+One intentional acceptance consumed the exact published DRAFT archive and its
+file-digest inventory; no original conversion or OVAL proof replay occurred.
+All **65 streams /8,892 original Rules** remain accounted for: **4,258** retained
+static proofs, **2,559** unverified native, **422** blocked automated and
+**1,653** manual/OCIL. All **6,817** compiled Assessment program hashes/operands
+and all **4,258** accepted source/authoring/program hash pairs are unchanged.
+All **13,754 native YAML files are byte-identical** to the published source;
+only their locations change. The editable tree contains 60 native Benchmarks,
+60 applicability registries, 6,817 Rules and 6,817 Assessments. Five streams
+without native candidates remain original-only catalog/ledger records, not
+invented editable Benchmarks. Their publisher titles come from the exact
+preserved source Benchmark component; no source-graph inference is performed.
+
+Source-relative maximum/median paths were 215/187 characters; normalized
+content-relative paths are 138/122. Example (same native ID/payload/program):
+
+```text
+Before (within the published source stream):
+authoring/direct-slice/assessments/the-password-for-the-krbtgt-account-on-a-domain-must-be-reset-at-least-30452496-assessment.yaml
+
+After (within content/):
+assessments/local/microsoft-windows-server-2025-stig-scap-benchmar-3266ecf9/password-krbtgt-account-domain-reset-at-170dd99a.yaml
+```
+
+The full export took 705.84 seconds, peak RSS 279,924 KiB on the recorded Linux
+environment. Opening/searching one scope of the real 13,754-document index took
+0.059 seconds; a notified single-document check took 0.574 seconds and parsed
+one file. A separate synthetic 100-stream/10,100-document index audit took
+0.012 seconds for cached scope search and 0.433 seconds for a one-document
+edit/check (82,256 KiB peak). Timings are observations, not universal budgets.
+Reproduce the synthetic index audit explicitly with
+`python tools/audit_v04_library_scale.py --output NEW_DIRECTORY`.
+
+The separate reuse census found 404 ID-neutral structural candidate groups,
+examined 100 opt-in near pairs, and found no unreferenced Assessment documents.
+It performed zero promotions. Sharing still requires independent semantic,
+platform/applicability/input/provenance review and an explicitly requested step.
+
+Historical workflow caveat: changing the compatibility entry point triggered
+the older #214 0.3 layout preview workflow. Run `41039515609` fails during its
+existing source renderer/schema gate (1,567 rejected documents), before invoking
+the normalizer. No schema/renderer/protected workflow was changed for #261.
+The maintained regression and representative Board conversion workflows for
+the engine checkpoint passed. This unrelated historical preview is not a
+native 0.4 acceptance claim and was not weakened/reclassified to hide failure.

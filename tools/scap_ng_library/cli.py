@@ -1,5 +1,6 @@
 """Stable offline subprocess interface; JSON output for editor integrations."""
 import argparse
+from hashlib import sha256
 import json
 from pathlib import Path
 import signal
@@ -11,6 +12,7 @@ from .advisory import census
 from .export import export_draft
 from .index import Library
 from .transaction import apply_plan
+from .records import original_records
 
 
 def emit(value):
@@ -21,7 +23,7 @@ def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--version',action='version',version=REPORT_FORMAT)
     sub=parser.add_subparsers(dest='mode',required=True)
-    for name in ['analyze','check','apply','index','search','uses','census']:
+    for name in ['analyze','check','apply','index','search','uses','census','compile']:
         p=sub.add_parser(name);p.add_argument('root',type=Path)
         p.add_argument('--index',type=Path,help='optional disposable generated SQLite cache')
         p.add_argument('--changed',action='append',help='complete editor notification list, relative to root')
@@ -33,11 +35,16 @@ def main(argv=None):
             p.add_argument('--write',action='store_true',help='explicitly apply the printed safe presentation plan')
         if name=='search':
             p.add_argument('--query',default='');p.add_argument('--scope');p.add_argument('--limit',type=int,default=100)
+            p.add_argument('--kind');p.add_argument('--status')
         if name=='uses':
             p.add_argument('--kind',default='assessment');p.add_argument('--id',required=True);p.add_argument('--scope',required=True)
+        if name=='compile':
+            p.add_argument('--scope',required=True);p.add_argument('--output',type=Path,required=True)
     p=sub.add_parser('export-draft');p.add_argument('source',type=Path);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--full-corpus-deliverable',action='store_true')
     p.add_argument('--source-archive',type=Path,help='exact published archive required for full acceptance')
+    p=sub.add_parser('records');p.add_argument('root',type=Path);p.add_argument('--scope')
+    p.add_argument('--query',default='');p.add_argument('--status');p.add_argument('--limit',type=int,default=100)
     args=parser.parse_args(argv)
     old_handler=signal.getsignal(signal.SIGTERM)
     def cancelled(*_):raise KeyboardInterrupt()
@@ -46,6 +53,9 @@ def main(argv=None):
     try:
         if args.mode=='export-draft':
             emit(export_draft(args.source,args.output,full_corpus=args.full_corpus_deliverable,source_archive=args.source_archive));return 0
+        if args.mode=='records':
+            emit({'format':REPORT_FORMAT,'mode':'records','status':'PASS','validation_scope':'frozen_original_record_navigation',
+                  'matches':original_records(args.root,scope=args.scope,query=args.query,status=args.status,limit=args.limit)});return 0
         library=Library(args.root,cache=args.index)
         if args.mode in ('search','uses') and library.loaded_cache and args.changed is None and not args.full:
             report={'format':REPORT_FORMAT,'status':'PASS','validation_scope':'cached_navigation_only',
@@ -54,7 +64,8 @@ def main(argv=None):
             library.refresh(args.changed,full=args.full)
             report=library.check(changed=args.changed)
         report['mode']=args.mode
-        if args.mode=='search':report['matches']=library.search(query=args.query,scope=args.scope,limit=args.limit)
+        if args.mode=='search':report['matches']=library.search(query=args.query,scope=args.scope,
+            kind=args.kind,status=args.status,limit=args.limit)
         if args.mode=='uses':
             rows=library.rows('WHERE kind=? AND id=? AND scope=?',(args.kind,args.id,args.scope))
             if len(rows)!=1:raise ValueError('uses query must select exactly one scoped identity')
@@ -64,6 +75,16 @@ def main(argv=None):
             report['reuse_census']=census(library,near=args.near,max_pairs=args.max_pairs)
         if args.mode=='index':
             if report['status']=='PASS':library.persist();report['generated_index']=str(library.cache)
+        if args.mode=='compile' and report['status']=='PASS':
+            target=args.output.resolve()
+            if target.exists() or target.is_relative_to(library.root):
+                raise ValueError('compiled output must be new and outside editable authoring')
+            raw,manifest=library.compile_scope(args.scope)
+            target.parent.mkdir(parents=True,exist_ok=True)
+            with target.open('xb') as output:output.write(raw)
+            report.update(package=str(target),package_sha256=sha256(raw).hexdigest(),
+                          compiled_programs=len(manifest['build_provenance']['compiled_programs']),
+                          scanner_evaluated=False,publisher_trust_verified=False)
         if args.mode=='apply':
             plan=json.loads(args.plan.read_text()) if args.plan else library.plan(args.changed)
             emit({'event':'plan','validation':report,'change_manifest':plan})

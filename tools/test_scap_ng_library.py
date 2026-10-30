@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,7 @@ from scap_ng_library.export import export_draft
 from scap_ng_library.index import Library
 from scap_ng_library.advisory import census
 from scap_ng_library.transaction import apply_plan, atomic_write
+from scap_ng_library.records import original_records
 
 ROOT=Path(__file__).resolve().parents[1]
 FIXTURE=ROOT/'tests/fixtures/v04-native-library/focused-draft'
@@ -68,6 +70,32 @@ class NativeLibraryTests(unittest.TestCase):
         self.assertTrue(r['affected_consumers']);self.assertEqual(before,(self.root/'metadata/library.sqlite').read_bytes())
         self.assertTrue(updated.consumers(updated.rows('WHERE path=?',(a['path'],))[0],transitive=True))
 
+    def test_original_manual_records_and_status_search_are_not_native_placeholders(self):
+        matches=original_records(self.content,status='MANUAL_OCIL_ONLY_PRESERVED')
+        self.assertEqual(len(matches),3)
+        self.assertTrue(all(not m['editable_native_document'] and m['original_native_assessment_id'] is None for m in matches))
+        lib=self.library();rows=lib.search(kind='assessment',status='CONVERTED_UNVERIFIED')
+        self.assertEqual(len(rows),1);self.assertTrue(json.loads(rows[0]['warnings']))
+        with self.assertRaises(ValueError):original_records(self.content,scope='../escape')
+
+    def test_existing_typed_input_binding_rejects_dangling_parameter_and_input(self):
+        lib=self.library()
+        rule=next(r for r in lib.rows("WHERE kind='rule'") if self.body(r)['rule']['assessment_choices']['automated'].get('inputs'))
+        doc=self.body(rule);bindings=doc['rule']['assessment_choices']['automated']['inputs'];name=next(iter(bindings))
+        bindings[name]={'parameter':'unknown-parameter'};self.write(rule['path'],doc)
+        result=self.library([rule['path']]).check();self.assertIn('input-binding',[d['code'] for d in result['diagnostics']])
+        doc=self.body(rule);doc['rule']['assessment_choices']['automated']['inputs']['unknown-input']=doc['rule']['assessment_choices']['automated']['inputs'].pop(name)
+        self.write(rule['path'],doc);result=self.library([rule['path']]).check()
+        self.assertTrue(any('undeclared target Input' in d['message'] for d in result['diagnostics']))
+
+    def test_publisher_choice_labels_are_json_pointer_escaped_not_paths(self):
+        lib=self.library();rule=lib.rows("WHERE kind='rule'")[0];doc=self.body(rule)
+        choice=doc['rule']['assessment_choices'].pop('automated')
+        doc['rule']['assessment_choices']['automated/gui']=choice;doc['rule']['default_assessment_choice']='automated/gui'
+        self.write(rule['path'],doc);changed=self.library([rule['path']]);self.assertEqual(changed.check()['status'],'PASS')
+        fields=[r[0] for r in changed.db.execute('SELECT field FROM edges WHERE source=?',(rule['path'],))]
+        self.assertIn('/rule/assessment_choices/automated~1gui',fields)
+
     def test_changed_proof_payload_is_reported_unverified_not_inherited(self):
         lib=self.library();a=next(r for r in lib.rows("WHERE kind='assessment'") if r['status']=='CONVERTED_VERIFIED')
         doc=self.body(a);doc['assessment']['assessment_title']+=' updated';self.write(a['path'],doc)
@@ -75,6 +103,22 @@ class NativeLibraryTests(unittest.TestCase):
         self.assertEqual(r['status'],'PASS')
         self.assertIn('proof-no-longer-matches',[d['code'] for d in r['diagnostics']])
         self.assertEqual(changed.rows('WHERE path=?',(a['path'],))[0]['status'],'MODIFIED_UNVERIFIED')
+        dependent=changed.search(scope=a['scope'],kind='rule')
+        self.assertTrue(any(r['proof_status']=='UNVERIFIED_DEPENDENCY' for r in dependent))
+
+    def test_rule_edit_cannot_reuse_frozen_rule_closure_status(self):
+        lib=self.library();row=next(r for r in lib.rows("WHERE kind='rule'") if r['status']=='CONVERTED_VERIFIED')
+        doc=self.body(row);doc['rule']['title']+=' edited';self.write(row['path'],doc)
+        result=self.library([row['path']]);self.assertEqual(result.check()['status'],'PASS')
+        self.assertEqual(result.rows('WHERE path=?',(row['path'],))[0]['status'],'MODIFIED_UNVERIFIED')
+
+    def test_persistent_api_recovers_diagnostics_and_proof_after_syntax_fix(self):
+        lib=self.library();a=self.assessment(lib);path=self.content/a['path'];before=path.read_bytes()
+        path.write_text('assessment: [ invalid')
+        lib.refresh([a['path']]);self.assertEqual(lib.check()['status'],'FAIL')
+        path.write_bytes(before);lib.refresh([a['path']]);self.assertEqual(lib.parsed,1)
+        self.assertEqual(lib.check()['status'],'PASS')
+        self.assertEqual(lib.rows('WHERE path=?',(a['path'],))[0]['status'],a['status'])
 
     def test_move_is_identity_neutral_and_preserves_proof_provenance(self):
         lib=self.library();a=self.assessment(lib);old=self.content/a['path'];new=old.with_name('renamed-assessment.yaml');old.rename(new)
@@ -82,6 +126,27 @@ class NativeLibraryTests(unittest.TestCase):
         row=changed.rows('WHERE path=?',(moved,))[0]
         self.assertEqual((row['id'],row['authoring_sha'],row['status']),(a['id'],a['authoring_sha'],a['status']))
         self.assertTrue(changed.consumers(row))
+
+    def test_disposable_index_rebuild_restores_proof_and_warnings_from_sidecars(self):
+        (self.root/'metadata/library.sqlite').unlink()
+        lib=self.library(full=True);self.assertEqual(lib.check()['status'],'PASS')
+        rows=lib.rows("WHERE kind='assessment'")
+        self.assertEqual(sum(r['status']=='CONVERTED_VERIFIED' for r in rows),3)
+        self.assertEqual(sum(bool(json.loads(r['warnings'])) for r in rows),1)
+        self.assertEqual(sum(r['status']=='CONVERTED_VERIFIED' for r in lib.rows("WHERE kind='rule'")),3)
+
+    def test_benchmark_file_rename_preserves_declared_scope_with_or_without_cache(self):
+        lib=self.library();b=lib.rows("WHERE kind='benchmark'")[0];old=self.content/b['path'];new=old.with_name('renamed-policy.yaml');old.rename(new)
+        renamed=new.relative_to(self.content).as_posix();changed=self.library([b['path'],renamed]);self.assertEqual(changed.check()['status'],'PASS')
+        self.assertEqual(changed.rows('WHERE path=?',(renamed,))[0]['scope'],b['scope'])
+        (self.root/'metadata/library.sqlite').unlink();rebuilt=self.library(full=True)
+        self.assertEqual(rebuilt.check()['status'],'PASS');self.assertEqual(rebuilt.rows('WHERE path=?',(renamed,))[0]['scope'],b['scope'])
+
+    def test_benchmark_rename_and_title_edit_does_not_rebind_private_rule_scope(self):
+        lib=self.library();b=lib.rows("WHERE kind='benchmark'")[0];doc=self.body(b)
+        doc['benchmark']['title'][0]['text']+=' edited';old=self.content/b['path'];new=old.with_name('new-policy-name.yaml')
+        old.unlink();new.write_bytes(canonical_yaml(doc));changed=self.library([b['path'],new.relative_to(self.content).as_posix()])
+        self.assertEqual(changed.check()['status'],'PASS');self.assertEqual(changed.rows('WHERE path=?',(new.relative_to(self.content).as_posix(),))[0]['scope'],b['scope'])
 
     def test_duplicate_same_id_even_identical_payload_and_version_is_error(self):
         lib=self.library();a=self.assessment(lib);p=Path(a['path']).with_name('duplicate.yaml').as_posix();self.write(p,self.body(a))
@@ -92,13 +157,16 @@ class NativeLibraryTests(unittest.TestCase):
         lib=self.library();a=self.assessment(lib);(self.content/a['path']).unlink()
         r=self.library([a['path']]).check();self.assertEqual(r['status'],'FAIL')
         self.assertIn('missing-target',[d['code'] for d in r['diagnostics']])
+        source_error=next(d for d in r['diagnostics'] if d['code']=='missing-target')
+        self.assertIsNotNone(source_error['span'])
         rule=next(r for r in lib.rows("WHERE kind='rule'") if r['scope']==a['scope'])
         doc=self.body(rule);doc['rule']['assessment_choices']['automated']['assessment']=rule['id'];self.write(rule['path'],doc)
         r=self.library([a['path'],rule['path']]).check()
         self.assertIn('wrong-kind',[d['code'] for d in r['diagnostics']])
 
     def test_cross_private_scope_binding_rejected_and_global_shared_supported(self):
-        lib=self.library();a=self.assessment(lib);rule=next(r for r in lib.rows("WHERE kind='rule'") if r['scope']!=a['scope'])
+        lib=self.library();a=self.assessment(lib);rule=next(r for r in lib.rows("WHERE kind='rule'")
+            if r['scope']!=a['scope'] and not self.body(r)['rule']['assessment_choices']['automated'].get('inputs'))
         doc=self.body(rule);doc['rule']['assessment_choices']['automated']['assessment']=a['id'];self.write(rule['path'],doc)
         r=self.library([rule['path']]).check();self.assertIn('cross-scope',[d['code'] for d in r['diagnostics']])
         target=self.content/'assessments/shared/global'/Path(a['path']).name;target.parent.mkdir(parents=True)
@@ -143,6 +211,13 @@ class NativeLibraryTests(unittest.TestCase):
         r=self.library([catalog['path']]).check();self.assertIn('missing-target',[d['code'] for d in r['diagnostics']])
         self.assertTrue(any(self.body(b)['benchmark'].get('profiles') for b in lib.rows("WHERE kind='benchmark'")))
 
+    def test_named_applicability_and_policy_references_match_reader_contract(self):
+        lib=self.library();rule=lib.rows("WHERE kind='rule'")[0];original=self.body(rule)
+        for field,value in [('applicability',['missing-condition']),('requires',['missing-rule']),('conflicts',['missing-rule'])]:
+            doc=deepcopy(original);doc['rule'][field]=value;self.write(rule['path'],doc)
+            checked=self.library([rule['path']]).check()
+            self.assertIn('policy-reference',[d['code'] for d in checked['diagnostics']])
+
     def test_presentation_plan_stale_semantic_mutation_and_rollback(self):
         lib=self.library();a=self.assessment(lib);path=self.content/a['path'];path.write_bytes(path.read_bytes()+b'\n')
         lib=self.library([a['path']]);plan=lib.plan([a['path']]);self.assertEqual(len(plan['changes']),1)
@@ -172,12 +247,60 @@ class NativeLibraryTests(unittest.TestCase):
         c=census(lib,near=True,max_pairs=2);self.assertTrue(c['exact_candidates']);self.assertFalse(c['promotion_performed']);self.assertLessEqual(c['near_pairs_examined'],2)
         self.assertEqual(before,{p:p.read_bytes() for p in before})
 
+    def test_handled_cancellation_after_replace_restores_bytes(self):
+        lib=self.library();a=self.assessment(lib);path=self.content/a['path'];path.write_bytes(path.read_bytes()+b'\n')
+        lib=self.library([a['path']]);plan=lib.plan([a['path']]);before=path.read_bytes();calls=0
+        def interrupt_after_write(target,raw):
+            nonlocal calls
+            calls+=1;atomic_write(target,raw)
+            if calls==1:raise KeyboardInterrupt()
+        with patch('scap_ng_library.transaction.atomic_write',side_effect=interrupt_after_write),self.assertRaises(KeyboardInterrupt):
+            apply_plan(lib,plan)
+        self.assertEqual(path.read_bytes(),before)
+
+    @unittest.skipUnless(sys.platform!='win32','POSIX process signal contract')
+    def test_editor_subprocess_sigterm_returns_structured_cancellation(self):
+        code="""import sys,time
+sys.path.insert(0,sys.argv[1])
+from scap_ng_library.index import Library
+from scap_ng_library.cli import main
+def pending(*a,**k):
+ print('ready',file=sys.stderr,flush=True)
+ time.sleep(30)
+Library.refresh=pending
+raise SystemExit(main(['check',sys.argv[2]]))
+"""
+        process=subprocess.Popen([sys.executable,'-c',code,str(ROOT/'tools'),str(self.content)],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+        try:
+            import select
+            self.assertTrue(select.select([process.stderr],[],[],10)[0],'worker did not become ready')
+            self.assertEqual(process.stderr.readline().strip(),'ready')
+            process.send_signal(signal.SIGTERM);out,err=process.communicate(timeout=10)
+            self.assertEqual(process.returncode,130,err);self.assertEqual(json.loads(out)['status'],'CANCELLED')
+        finally:
+            if process.poll() is None:process.kill();process.wait()
+
+    def test_symlink_is_diagnosed_without_loading_outside_content(self):
+        lib=self.library();a=self.assessment(lib);link=self.content/'outside.yaml'
+        foreign=Path(self.temporary.name)/'foreign.yaml';foreign.write_bytes((self.content/a['path']).read_bytes())
+        try:link.symlink_to(foreign)
+        except OSError:self.skipTest('symlinks unavailable on host')
+        r=self.library(full=True).check();self.assertEqual(r['status'],'FAIL')
+        self.assertTrue(any('symlink' in d['message'] for d in r['diagnostics']))
+
     def test_parser_rejects_duplicate_keys_alias_cycle_nan_and_path_escape(self):
         for raw in [b'assessment: {id: x, id: y}',b'assessment: &x {id: x, cycle: *x}',b'assessment: {id: x, value: .nan}']:
             with self.subTest(raw=raw),self.assertRaises((ValueError,TypeError)):parse(raw)
         lib=self.library()
         with self.assertRaises(ValueError):lib.update('../escape.yaml',b'assessment: {id: bad}')
         with self.assertRaises(ValueError):lib.update('CON.yaml',b'assessment: {id: bad}')
+
+    def test_native_standalone_named_catalog_is_dispatched_by_content(self):
+        standalone=Path(self.temporary.name)/'native-only';standalone.mkdir()
+        lib=self.library();a=self.assessment(lib)
+        (standalone/'catalog.yaml').write_bytes(canonical_yaml(self.body(a)))
+        single=Library(standalone);self.addCleanup(single.close);single.refresh()
+        report=single.check();self.assertEqual(report['status'],'PASS');self.assertEqual(report['counts'],{'assessment':1})
 
     def test_unchanged_compiler_programs_and_cli_readonly_contract(self):
         lib=self.library()
@@ -191,6 +314,11 @@ class NativeLibraryTests(unittest.TestCase):
             result=subprocess.run([sys.executable,str(ROOT/'tools/scap_ng_repo_normalizer.py'),'v04',command,str(self.content)],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr);self.assertEqual(json.loads(result.stdout)['status'],'PASS')
         self.assertEqual(before,{p:p.read_bytes() for p in before})
+        scope=lib.rows("WHERE kind='benchmark'")[0]['scope'];target=Path(self.temporary.name)/'generated.scapng'
+        result=subprocess.run([sys.executable,str(ROOT/'tools/scap_ng_library_cli.py'),'compile',str(self.content),
+            '--scope',scope,'--output',str(target)],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+        self.assertTrue(target.is_file());self.assertFalse(json.loads(result.stdout)['scanner_evaluated'])
 
 
 if __name__=='__main__':unittest.main()

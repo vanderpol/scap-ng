@@ -2,6 +2,10 @@
 
 SCAP-NG is a pre-alpha successor to SCAP 1.4 designed to preserve supported assessment meaning while simplifying authoring, review, collection, results and scalable distribution.
 
+[Native 0.4 library maintenance and editor-callable CLI](docs/developer/NATIVE-LIBRARY.md)
+provides out-of-place layout export and logical-ID checks across the all-65
+DRAFT, with original proof/warning status preserved and no automatic deduplication.
+
 ## Start here — 0.4.0 pre-alpha candidate
 
 Use the [candidate operator guide](docs/releases/0.4.0-rc.md) for pinned

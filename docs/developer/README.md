@@ -11,6 +11,10 @@ For ongoing approved work and recovery, use the
 [autonomous development checkpoint](AUTONOMOUS-PROGRESS.md) and the standing
 workflow in [AGENTS.md](../../AGENTS.md).
 
+For native library maintenance and editor subprocess integration, use the
+[0.4 layout/index/analyze/check/apply contract](NATIVE-LIBRARY.md). It preserves
+the frozen #260 candidate and performs no automatic shared-Assessment promotion.
+
 | Area | Version-pinned source | Remaining work |
 | --- | --- | --- |
 | Core format and conformance | [Specification](../../specification/README.md), [conformance](../../specification/core/conformance.md) | Reconcile all approved 0.4 semantics at release promotion. |

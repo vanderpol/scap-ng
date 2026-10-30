@@ -24,10 +24,11 @@ def apply_plan(library, plan):
     if plan.get('format')!='scap-ng-library-plan/1' or plan.get('plan_sha256')!=digest(plan.get('changes')):
         raise ValueError('invalid/stale change manifest digest')
     before, after = {}, {}
-    # Validate a fresh full source view, not a caller's stale index/body cache.
+    # Discover source changes; validate staged references while reusing unchanged
+    # indexed YAML. Periodic full hash/schema census remains an explicit action.
     staged = Library(library.root,cache=library.cache)
     try:
-        staged.refresh(full=True)
+        staged.refresh()
         initial = staged.check()
         if initial['status']!='PASS':raise ValueError('source library must pass before presentation apply')
         for change in plan['changes']:
@@ -53,13 +54,20 @@ def apply_plan(library, plan):
                 atomic_write(library.root/relative,after[relative])
             final = Library(library.root,cache=library.cache)
             try:
-                final.refresh(full=True)
+                final.refresh()
                 if final.check()['status']!='PASS':raise ValueError('post-write validation failed')
                 # Publishing a regenerated cache is explicit in apply, not in check.
                 final.persist()
             finally:final.close()
         except BaseException:
-            for relative in reversed(written):atomic_write(library.root/relative,before[relative])
+            conflicts=[]
+            for relative in reversed(written):
+                current=read(library.root,relative)
+                if current==before[relative]:continue
+                if current!=after[relative]:
+                    conflicts.append(relative);continue
+                atomic_write(library.root/relative,before[relative])
+            if conflicts:raise ValueError('concurrent external edit preserved during rollback: '+', '.join(conflicts))
             raise
         return {'event':'applied','changed_files':sorted(written),'plan_sha256':plan['plan_sha256'],
                 'native_payloads_unchanged':True,'semantic_deduplication_performed':False}
