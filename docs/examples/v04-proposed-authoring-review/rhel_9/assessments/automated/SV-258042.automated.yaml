@@ -1,0 +1,81 @@
+assessment:
+  id: rhel-9-user-account-passwords-must-have-a-60-day-maximum-password-life-acf9336c-assessment
+  version: 1
+  assessment_title: RHEL 9 user account passwords must have a 60-day maximum password lifetime restriction.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  variables:
+    pattern-to-match-lines-starting-with-usernames-of-system-users-75626b8a-variable:
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - literal: {datatype: string, value: ^}
+        - values:
+            object:
+              capability: unix.password
+              username: {matches_regex: .*}
+              filters:
+              - include:
+                  user_id: {greater_than_or_equal: 1000, datatype: integer, values_found: one_or_more, values_matching: every}
+              - include:
+                  user_id:
+                    not_equal:
+                    - 65534
+                    - 65535
+                    - 4294967294
+                    - 4294967295
+                    datatype: integer
+                    value_match: every
+                    values_found: one_or_more
+                    values_matching: every
+            field: username
+        - literal: {datatype: string, value: $}
+  tests:
+    no-password-in-etc-shadow-has-a-maximum-password-age-of-0-or-greater-t-09aa45f4-test:
+      test_title: No password in /etc/shadow has a maximum password age of 0 or greater than 60
+      capability: unix.shadow
+      object:
+        username: {matches_regex: .+}
+        filters:
+        - include:
+            username:
+              matches_regex:
+                variable: pattern-to-match-lines-starting-with-usernames-of-system-users-75626b8a-variable
+              datatype: string
+              value_match: one_or_more
+              values_found: one_or_more
+              values_matching: every
+      require:
+        items_found: may_be_absent
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        and:
+        - fields:
+            chg_req: {greater_than: 0, datatype: integer}
+        - fields:
+            chg_req: {less_than_or_equal: 60, datatype: integer}
+      reported_elements: all
+    root-password-in-etc-shadow-does-not-have-a-maximum-password-age-of-0-58e92bf8-test:
+      test_title: Root password in /etc/shadow does not have a maximum password age of 0 or greater than 60
+      capability: unix.shadow
+      object:
+        username: {equals: root}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        and:
+        - fields:
+            chg_req: {greater_than: 0, datatype: integer}
+        - fields:
+            chg_req: {less_than_or_equal: 60, datatype: integer}
+      reported_elements: all
+  evaluate:
+    and:
+    - test: no-password-in-etc-shadow-has-a-maximum-password-age-of-0-or-greater-t-09aa45f4-test
+    - test: root-password-in-etc-shadow-does-not-have-a-maximum-password-age-of-0-58e92bf8-test

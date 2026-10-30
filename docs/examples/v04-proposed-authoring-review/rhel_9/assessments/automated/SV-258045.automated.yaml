@@ -1,0 +1,63 @@
+assessment:
+  id: rhel-9-duplicate-user-ids-uids-must-not-exist-for-interactive-users-ff28ba09-assessment
+  version: 1
+  assessment_title: RHEL 9 duplicate User IDs (UIDs) must not exist for interactive users.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  shared_objects:
+    interactive-users-9bd31dd5-object:
+      capability: unix.password
+      username: {matches_regex: .*}
+      filters:
+      - include:
+          user_id: {greater_than_or_equal: 1000, datatype: integer, values_found: one_or_more, values_matching: every}
+      object_title: Interactive Users
+  variables:
+    count-of-unique-uids-dcea8e96-variable:
+      kind: local
+      datatype: integer
+      expression:
+        function:
+          name: count
+          arguments:
+          - function:
+              name: unique
+              arguments:
+              - values:
+                  object: interactive-users-9bd31dd5-object
+                  field: user_id
+              options: {}
+          options: {}
+    count-of-passwd-entries-db0f92cf-variable:
+      kind: local
+      datatype: integer
+      expression:
+        function:
+          name: count
+          arguments:
+          - values:
+              object: interactive-users-9bd31dd5-object
+              field: user_id
+          options: {}
+  tests:
+    uids-are-unique-2d9205be-test:
+      test_title: UIDs are unique
+      capability: variable.value
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          value:
+            equals:
+              variable: count-of-unique-uids-dcea8e96-variable
+            datatype: integer
+            value_match: every
+      reported_elements: all
+      variable: count-of-passwd-entries-db0f92cf-variable
+  evaluate:
+    test: uids-are-unique-2d9205be-test

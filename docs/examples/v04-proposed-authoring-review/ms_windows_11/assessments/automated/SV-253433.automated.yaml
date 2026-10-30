@@ -1,0 +1,41 @@
+assessment:
+  id: the-built-in-guest-account-must-be-disabled-ade53083-assessment
+  version: 1
+  assessment_title: The built-in guest account must be disabled.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  variables:
+    built-in-guest-c8b136dc-variable:
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object:
+            capability: windows.sid_sid
+            trustee_sid: {matches_regex: '^S-1-5-[0-9-]+-501$'}
+            include_group: true
+            resolve_group: false
+          field: trustee_sid
+  tests:
+    the-built-in-guest-account-is-disabled-1eb2de30-test:
+      test_title: The built-in guest account is disabled.
+      capability: windows.user_sid55
+      object:
+        user_sid:
+          equals:
+            variable: built-in-guest-c8b136dc-variable
+          datatype: string
+          value_match: every
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          enabled: {equals: false, datatype: boolean}
+      reported_elements: all
+  evaluate:
+    test: the-built-in-guest-account-is-disabled-1eb2de30-test

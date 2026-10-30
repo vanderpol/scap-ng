@@ -1,5 +1,7 @@
 # SCAP-NG 0.4.0 — expanded Windows 11 and RHEL 9 authoring review
 
+> **Looking for the improved format?** Use the [40-Rule proposed authoring gallery](../v04-proposed-authoring-review/README.md), which is now the primary review collection. The files below remain the original generated baseline for before/after comparison.
+>
 > **WARNING — CURRENT GENERATED OUTPUT, NOT CANONICAL AUTHORING EXAMPLES.**
 > These files show the exact known-problem baseline so we can audit it; do not copy
 > their field-matching style into new Assessments. In particular,

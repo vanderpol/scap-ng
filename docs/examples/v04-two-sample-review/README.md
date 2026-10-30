@@ -1,5 +1,7 @@
 # SCAP-NG 0.4.0 — Windows 11 and RHEL 9 human-authoring review
 
+**[For a broader review, open the proposed 40-Rule gallery](../v04-proposed-authoring-review/README.md).**
+
 **October 30, 2026 — REVIEW CANDIDATE, NOT A FULL STIG OR FINAL RELEASE.**
 See [review findings](REVIEW-FINDINGS.md), [syntax issue #264](https://github.com/vanderpol/scap-ng/issues/264),
 and [broader Benchmark/content issue #265](https://github.com/vanderpol/scap-ng/issues/265).

@@ -1,0 +1,27 @@
+assessment:
+  id: rhel-9-must-be-configured-so-that-the-cryptographic-hashes-of-system-f-a8410393-assessment
+  version: 1
+  assessment_title: RHEL 9 must be configured so that the cryptographic hashes of system files match vendor values.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    verify-that-rhel-9-is-configured-so-that-the-cryptographic-hashes-of-s-65b6747d-test:
+      test_title: Verify that RHEL 9 is configured so that the cryptographic hashes of system files match vendor values.
+      capability: independent.shellcommand
+      object:
+        shell: bash
+        command: rpm -Va --noconfig | awk '$1 ~ /..5/ && $2 != "c"'
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          stdout_line: {values_found: none}
+      reported_elements: all
+  evaluate:
+    test: verify-that-rhel-9-is-configured-so-that-the-cryptographic-hashes-of-s-65b6747d-test

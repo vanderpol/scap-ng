@@ -1,0 +1,26 @@
+assessment:
+  id: the-system-must-be-configured-to-audit-account-management-security-gro-ed7263d0-assessment
+  version: 1
+  assessment_title: The system must be configured to audit Account Management - Security Group Management successes.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    audit-security-group-management-is-set-to-success-or-success-and-failu-80dc103a-test:
+      test_title: '''Audit Security Group Management'' is set to ''Success'' or ''Success and Failure'''
+      capability: windows.auditeventpolicysubcategories
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        or:
+        - fields:
+            security_group_management: {equals: AUDIT_SUCCESS}
+        - fields:
+            security_group_management: {equals: AUDIT_SUCCESS_FAILURE}
+      reported_elements: all
+  evaluate:
+    test: audit-security-group-management-is-set-to-success-or-success-and-failu-80dc103a-test

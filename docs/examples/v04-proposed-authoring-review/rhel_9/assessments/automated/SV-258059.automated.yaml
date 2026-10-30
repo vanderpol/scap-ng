@@ -1,0 +1,26 @@
+assessment:
+  id: the-root-account-must-be-the-only-account-having-unrestricted-access-t-2db1398a-assessment
+  version: 1
+  assessment_title: The root account must be the only account having unrestricted access to RHEL 9 system.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    only-the-root-account-has-a-uid-of-zero-5b269fc6-test:
+      test_title: Only the root account has a UID of zero.
+      capability: unix.password
+      object:
+        username:
+          not_equal: root
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          user_id: {not_equal: 0, datatype: integer}
+      reported_elements: all
+  evaluate:
+    test: only-the-root-account-has-a-uid-of-zero-5b269fc6-test

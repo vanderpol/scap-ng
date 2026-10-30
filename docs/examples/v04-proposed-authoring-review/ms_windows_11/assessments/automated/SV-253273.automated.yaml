@@ -1,0 +1,32 @@
+assessment:
+  id: accounts-must-be-configured-to-require-password-expiration-453e948f-assessment
+  version: 1
+  assessment_title: Accounts must be configured to require password expiration.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    accounts-must-be-configured-to-require-password-expiration-34441c7e-test:
+      test_title: Accounts must be configured to require password expiration.
+      capability: windows.cmdlet
+      object:
+        module_name: CimCmdlets
+        module_id: null
+        module_version: null
+        verb: Get
+        noun: CimInstance
+        parameters:
+          fields:
+            class: {equals: Win32_Useraccount, selection_match: every}
+            filter: {equals: PasswordExpires=False and LocalAccount=True and Disabled=false, selection_match: every}
+        select:
+          fields:
+            unique: {equals: 'Name,PasswordExpires,Disabled,LocalAccount', selection_match: every}
+      require:
+        items_found: none
+      reported_elements: all
+  evaluate:
+    test: accounts-must-be-configured-to-require-password-expiration-34441c7e-test

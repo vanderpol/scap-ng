@@ -1,0 +1,26 @@
+assessment:
+  id: the-maximum-password-age-must-be-configured-to-60-days-or-less-5b8802ca-assessment
+  version: 1
+  assessment_title: The maximum password age must be configured to 60 days or less.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    maximum-password-age-is-set-to-60-days-or-less-but-greater-than-0-5125e642-test:
+      test_title: Maximum Password Age is set to 60 days or less, but greater than 0.
+      capability: windows.passwordpolicy
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        and:
+        - fields:
+            max_passwd_age: {less_than_or_equal: 5184000, datatype: integer}
+        - fields:
+            max_passwd_age: {greater_than: 0, datatype: integer}
+      reported_elements: all
+  evaluate:
+    test: maximum-password-age-is-set-to-60-days-or-less-but-greater-than-0-5125e642-test

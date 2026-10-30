@@ -1,0 +1,28 @@
+assessment:
+  id: the-system-must-notify-the-user-when-a-bluetooth-device-attempts-to-co-0334d4b4-assessment
+  version: 1
+  assessment_title: The system must notify the user when a Bluetooth device attempts to connect.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    the-system-must-notify-the-user-when-a-bluetooth-device-attempts-to-co-47f88c30-test:
+      test_title: The system must notify the user when a Bluetooth device attempts to connect.
+      capability: windows.ntuser
+      object:
+        key: {equals: 'Software\Microsoft\BluetoothAuthenticationAgent'}
+        name: {equals: AcceptIncomingRequests}
+        include_default: false
+        item_creation: key_and_name_exist
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          value: {equals: '1'}
+      reported_elements: all
+  evaluate:
+    test: the-system-must-notify-the-user-when-a-bluetooth-device-attempts-to-co-47f88c30-test

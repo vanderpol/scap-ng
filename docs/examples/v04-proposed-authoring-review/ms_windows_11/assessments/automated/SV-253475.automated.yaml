@@ -1,0 +1,25 @@
+assessment:
+  id: user-account-control-must-virtualize-file-and-registry-write-failures-0bf963e3-assessment
+  version: 1
+  assessment_title: User Account Control must virtualize file and registry write failures to per-user locations.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    user-account-control-virtualize-file-and-registry-write-failures-to-pe-87d28e13-test:
+      test_title: '''User Account Control: Virtualize file and registry write failures to per-user locations'' is set to ''Enabled'''
+      capability: windows.registry
+      object: {hive: {equals: local_machine}, key: {equals: 'Software\Microsoft\Windows\CurrentVersion\Policies\System'}, name: {equals: EnableVirtualization}}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          type: {equals: dword}
+          value: {equals: 1, datatype: integer}
+      reported_elements: all
+  evaluate:
+    test: user-account-control-virtualize-file-and-registry-write-failures-to-pe-87d28e13-test

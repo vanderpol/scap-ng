@@ -1,0 +1,25 @@
+assessment:
+  id: rhel-9-must-prevent-files-with-the-setuid-and-setgid-bit-set-from-bein-fd9ad733-assessment
+  version: 1
+  assessment_title: RHEL 9 must prevent files with the setuid and setgid bit set from being executed on file systems that contain user home directories.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    home-is-mounted-with-the-nosuid-option-0a3f4d84-test:
+      test_title: /home is mounted with the nosuid option.
+      capability: linux.partition
+      object:
+        mount_point: {matches_regex: '.*\/home'}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement: {values_found: one_or_more, values_matching: one_or_more}
+        fields:
+          mount_options: {equals: nosuid}
+      reported_elements: all
+  evaluate:
+    test: home-is-mounted-with-the-nosuid-option-0a3f4d84-test
