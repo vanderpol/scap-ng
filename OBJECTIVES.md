@@ -8,6 +8,12 @@ This page maps active work to those objectives. It exists to detect two defects:
 - a major release issue that advances no stated SCAP-NG objective; or
 - a core objective with unfinished work but no issue tracking that work.
 
+## 0.4.0 maintenance follow-on
+
+| Issue | Objective(s) |
+| --- | --- |
+| [#261 Native library layout and editor-callable normalization CLI](https://github.com/vanderpol/scap-ng/issues/261) | O2, O4, O7, O8 |
+
 ## 0.3.0 issue traceability
 
 The GitHub issue is the detailed source for the problem, evidence, alternatives,
@@ -94,13 +100,13 @@ Every core objective has active tracked work:
 | Objective | Representative active issues |
 | --- | --- |
 | O1 | #7, #10, #164–#169, #172, #208 |
-| O2 | #24, #151–#159, #164–#169, #208 |
+| O2 | #24, #151–#159, #164–#169, #208, #261 |
 | O3 | #9, #10, #37, #118–#122, #165–#175, #208 |
-| O4 | #29, #41, #42, #44, #166, #168, #178, #208 |
+| O4 | #29, #41, #42, #44, #166, #168, #178, #208, #261 |
 | O5 | #48, #53, #54, #56, #118, #170, #176, #177 |
 | O6 | #20, #22, #30, #47, #48, #53, #54, #120, #121, #157–#159, #175, #176, #178 |
-| O7 | #6, #26–#28, #37, #38, #42, #49, #50, #55, #56, #116–#119, #122, #123, #128, #131, #133, #137, #151–#156, #171, #177, #208 |
-| O8 | #24, #26, #27, #29, #38, #41, #42, #44, #56, #151, #166, #208 |
+| O7 | #6, #26–#28, #37, #38, #42, #49, #50, #55, #56, #116–#119, #122, #123, #128, #131, #133, #137, #151–#156, #171, #177, #208, #261 |
+| O8 | #24, #26, #27, #29, #38, #41, #42, #44, #56, #151, #166, #208, #261 |
 
 If a future audit finds an open 0.3 issue with no objective, either map it
 honestly or question whether it belongs in the release. If an objective has no

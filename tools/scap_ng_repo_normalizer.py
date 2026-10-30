@@ -14,6 +14,7 @@ import json
 import os
 import re
 import shutil
+import sys
 from difflib import SequenceMatcher
 from collections import defaultdict
 from pathlib import Path
@@ -755,6 +756,9 @@ def near_rule_candidates(benchmarks: list[dict], *, limit: int | None = None) ->
     return out if not limit else out[:limit]
 
 def main() -> int:
+    if sys.argv[1:2] == ['v04']:
+        from scap_ng_library.cli import main as native_main
+        return native_main(sys.argv[2:])
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus_root", type=Path)
     ap.add_argument(

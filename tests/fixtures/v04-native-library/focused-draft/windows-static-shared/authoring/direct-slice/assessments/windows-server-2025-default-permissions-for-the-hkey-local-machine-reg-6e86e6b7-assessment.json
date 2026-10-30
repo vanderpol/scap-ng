@@ -1,0 +1,223 @@
+{
+  "assessment": {
+    "id": "windows-server-2025-default-permissions-for-the-hkey-local-machine-reg-6e86e6b7-assessment",
+    "version": 1,
+    "assessment_title": "Windows Server 2025 default permissions for the HKEY_LOCAL_MACHINE registry hive must be maintained.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "shared_objects": {
+      "gather-permissions-for-the-hkey-local-machine-software-registry-47dbbafb-object": {
+        "capability": "independent.shellcommand",
+        "shell": "powershell",
+        "command": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"System\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }",
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false,
+        "object_title": "Gather permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry"
+      }
+    },
+    "tests": {
+      "default-permissions-for-the-hkey-local-machine-security-registry-key-m-d92bb4ab-test": {
+        "test_title": "Default permissions for the HKEY_LOCAL_MACHINE\\SECURITY registry key must be maintained.",
+        "capability": "independent.shellcommand",
+        "object": {
+          "shell": "powershell",
+          "command": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Security\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access |  Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "matches_regex": [
+                "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:BUILTIN\\\\Administrators, Rights: ReadPermissions, ChangePermissions, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+              ],
+              "datatype": "string",
+              "value_match": "one_or_more",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      },
+      "default-non-domain-controller-permissions-for-the-hkey-local-machine-s-8f2ffae1-test": {
+        "test_title": "Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\\SOFTWARE registry key must be maintained.",
+        "capability": "independent.shellcommand",
+        "object": {
+          "shell": "powershell",
+          "command": "([Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(\"Software\", [System.Security.AccessControl.RegistryRights]::ReadPermissions)).GetAccessControl().Access | Where-Object { $_.RegistryRights -notmatch '\\d+' } | ForEach-Object { \"Identity:$($_.IdentityReference), Rights: $($_.RegistryRights), Access: $($_.AccessControlType), IsInherited: $($_.IsInherited), InheritanceFlags: $($_.InheritanceFlags), PropagationFlags: $($_.PropagationFlags)\" }",
+          "error_if_exit_status_not_0": false,
+          "error_if_stderr_exists": false
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "matches_regex": [
+                "^Identity:BUILTIN\\\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$",
+                "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+              ],
+              "datatype": "string",
+              "value_match": "one_or_more",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      },
+      "the-system-is-a-windows-domain-controller-62fc87e7-test": {
+        "test_title": "The system is a Windows Domain Controller",
+        "capability": "windows.wmi.query",
+        "object": {
+          "namespace": "root\\cimv2",
+          "query": "SELECT DomainRole FROM win32_computersystem"
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "or": [
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "records_found": "one_or_more",
+                    "records_matching": "every",
+                    "fields": {
+                      "domainrole": {
+                        "equals": "4",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "fields": {
+                "result": {
+                  "record": {
+                    "records_found": "one_or_more",
+                    "records_matching": "every",
+                    "fields": {
+                      "domainrole": {
+                        "equals": "5",
+                        "values_found": "one_or_more",
+                        "values_matching": "every"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "reported_elements": "all"
+      },
+      "default-domain-controller-permissions-for-the-hkey-local-machine-syste-4eec7261-test": {
+        "test_title": "Default Domain Controller permissions for the HKEY_LOCAL_MACHINE\\SYSTEM registry key must be maintained.",
+        "capability": "independent.shellcommand",
+        "object": "gather-permissions-for-the-hkey-local-machine-software-registry-47dbbafb-object",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "matches_regex": [
+                "^Identity:NT AUTHORITY\\\\Authenticated Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$",
+                "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:BUILTIN\\\\Server Operators, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                ""
+              ],
+              "datatype": "string",
+              "value_match": "one_or_more",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      },
+      "default-non-domain-controller-permissions-for-the-hkey-local-machine-s-a725d920-test": {
+        "test_title": "Default Non-Domain Controller permissions for the HKEY_LOCAL_MACHINE\\SYSTEM registry key must be maintained.",
+        "capability": "independent.shellcommand",
+        "object": "gather-permissions-for-the-hkey-local-machine-software-registry-47dbbafb-object",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "fields": {
+            "stdout_line": {
+              "matches_regex": [
+                "^Identity:BUILTIN\\\\Users, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:BUILTIN\\\\Administrators, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:NT AUTHORITY\\\\SYSTEM, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:CREATOR OWNER, Rights: FullControl, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: (None|InheritOnly)$",
+                "^Identity:APPLICATION PACKAGE AUTHORITY\\\\ALL APPLICATION PACKAGES, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$",
+                "^Identity:S-1-15-3-1024-1065365936-1281604716-3511738428-1654721687-432734479-3232135806-4053264122-3456934681, Rights: ReadKey, Access: Allow, IsInherited: False, InheritanceFlags: (ContainerInherit|None), PropagationFlags: None$"
+              ],
+              "datatype": "string",
+              "value_match": "one_or_more",
+              "values_found": "one_or_more",
+              "values_matching": "every"
+            }
+          }
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "and": [
+        {
+          "test": "default-permissions-for-the-hkey-local-machine-security-registry-key-m-d92bb4ab-test"
+        },
+        {
+          "test": "default-non-domain-controller-permissions-for-the-hkey-local-machine-s-8f2ffae1-test"
+        },
+        {
+          "or": [
+            {
+              "and": [
+                {
+                  "test": "the-system-is-a-windows-domain-controller-62fc87e7-test"
+                },
+                {
+                  "test": "default-domain-controller-permissions-for-the-hkey-local-machine-syste-4eec7261-test"
+                }
+              ]
+            },
+            {
+              "and": [
+                {
+                  "not": {
+                    "test": "the-system-is-a-windows-domain-controller-62fc87e7-test"
+                  }
+                },
+                {
+                  "test": "default-non-domain-controller-permissions-for-the-hkey-local-machine-s-a725d920-test"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

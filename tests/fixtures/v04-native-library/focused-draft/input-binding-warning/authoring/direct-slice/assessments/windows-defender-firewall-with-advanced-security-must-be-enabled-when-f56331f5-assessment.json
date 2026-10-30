@@ -1,0 +1,149 @@
+{
+  "assessment": {
+    "id": "windows-defender-firewall-with-advanced-security-must-be-enabled-when-f56331f5-assessment",
+    "version": 1,
+    "assessment_title": "Windows Defender Firewall with Advanced Security must be enabled when connected to a domain.",
+    "mode": "automated",
+    "class": "compliance",
+    "purpose": "assessment",
+    "specification": {
+      "id": "scap-ng.pre-alpha.assessment",
+      "version": "0.4.0"
+    },
+    "shared_objects": {
+      "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-8ec6075c-object": {
+        "capability": "windows.registry",
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile"
+        },
+        "name": {
+          "equals": "EnableFirewall"
+        },
+        "object_title": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile!EnableFirewall"
+      }
+    },
+    "inputs": {
+      "firewall-state-domain-profile-47b00982-input": {
+        "datatype": "integer",
+        "cardinality": "exactly_one",
+        "required": true,
+        "description": "The Domain Profile is used when the computer is connected to a network and is authenticated to a domain controller.",
+        "constraints": {
+          "allowed": [
+            0,
+            1
+          ]
+        }
+      }
+    },
+    "tests": {
+      "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-f74133c1-test": {
+        "test_title": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile!EnableFirewall value equals variable",
+        "capability": "windows.registry",
+        "object": "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-8ec6075c-object",
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "dword",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "equals": {
+                    "input": "firewall-state-domain-profile-47b00982-input"
+                  },
+                  "datatype": "integer",
+                  "value_match": "every",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ]
+        },
+        "reported_elements": "all"
+      },
+      "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-b12d036e-test": {
+        "test_title": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\DomainProfile!EnableFirewall non existent",
+        "capability": "windows.registry",
+        "object": "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-8ec6075c-object",
+        "require": {
+          "items_found": "none"
+        },
+        "reported_elements": "all"
+      },
+      "hkey-local-machine-system-currentcontrolset-services-sharedaccess-para-3880d1b1-test": {
+        "test_title": "HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile!EnableFirewall value equals variable",
+        "capability": "windows.registry",
+        "object": {
+          "hive": {
+            "equals": "local_machine"
+          },
+          "key": {
+            "equals": "SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\DomainProfile"
+          },
+          "name": {
+            "equals": "EnableFirewall"
+          }
+        },
+        "require": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "and": [
+            {
+              "fields": {
+                "type": {
+                  "equals": "dword",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            },
+            {
+              "fields": {
+                "value": {
+                  "equals": {
+                    "input": "firewall-state-domain-profile-47b00982-input"
+                  },
+                  "datatype": "integer",
+                  "value_match": "every",
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                }
+              }
+            }
+          ]
+        },
+        "reported_elements": "all"
+      }
+    },
+    "evaluate": {
+      "or": [
+        {
+          "test": "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-f74133c1-test"
+        },
+        {
+          "and": [
+            {
+              "test": "hkey-local-machine-software-policies-microsoft-windowsfirewall-domainp-b12d036e-test"
+            },
+            {
+              "test": "hkey-local-machine-system-currentcontrolset-services-sharedaccess-para-3880d1b1-test"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

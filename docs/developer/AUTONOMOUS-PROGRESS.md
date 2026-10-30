@@ -1,5 +1,35 @@
 # Autonomous development checkpoint
 
+## Active #261 — native library layout / editor-callable maintenance
+
+Authority: [owner task #261](https://github.com/vanderpol/scap-ng/issues/261).
+Recovered clean published main `f6990f426`; documentary CI green. Frozen #260
+candidate/DRAFT remain immutable. New in-scope implementation is
+`tools/scap_ng_library/` with entry points `scap_ng_library_cli.py` and
+`scap_ng_repo_normalizer.py v04`. The old normalizer invocation is unchanged.
+See [implementation/preflight and CLI contract](NATIVE-LIBRARY.md).
+
+Focused original-derived Linux/Windows/shared-Object/Input-warning export
+passes: 14 native documents, four unchanged Assessment program hashes, three
+retained proof pairs, three original manual ledger records, no fake Assessments.
+31 focused/new +historical-normalizer tests PASS after final diagnostic/rollback
+guards (8.463s). Repository layout check PASS. This is the first tested engine
+checkpoint; full all-65 layout acceptance/publication remain pending.
+Objective map includes #261 under O2/O4/O7/O8. No automatic dedup, normative
+schema/compiler/scanner changes, source split or editor implementation.
+
+Next: commit/push tested engine checkpoint; use automatic maintained CI once.
+Run the single intentional all-65 layout acceptance using the **already built**
+DRAFT, not source conversion/proof replay. Require pinned archive SHA, preserve
+8,892 source rows /6,817 native /4,258 proof pairs; measure time/memory and
+generate separate bounded reuse census. Publish a unique normalized-review
+candidate with short before/after examples and immutable provenance; update
+#261 and handoff. Existing corpus path `/workspace/rc-v040-20261029/all-65-draft/`,
+published ZIP `/workspace/rc-v040-20261029/remote-verified-all-65-revised-draft.zip`.
+Task work root `/workspace/library-v04-261/` contains focused export/test logs.
+Never regenerate or modify the frozen DRAFT. Profiles stay embedded; all native
+IDs/payloads unchanged, title-derived private navigation namespaces shorten paths.
+
 ## Release-candidate preparation complete — 2026-10-30
 
 Candidate: **`a5db02e1b29a2d7c312ddcf593be1ee055afb750`**. Later main

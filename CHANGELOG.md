@@ -6,6 +6,13 @@ proposals are not listed as delivered features.
 
 ## 0.4.0 — Unreleased
 
+- **2026-10-30:** Add opt-in native-library maintenance with non-destructive
+  DRAFT layout export, scoped logical-ID indexing, read-only analyze/check,
+  explicit presentation plans/rollback and advisory-only reuse census. Keep
+  Profiles embedded, native payload/program identities and proof warnings
+  intact; provide an offline editor-callable API without implementing the
+  editor ([#261](https://github.com/vanderpol/scap-ng/issues/261)).
+
 - **2026-10-29:** Add opt-in, warning-admitted exact NIWC catalog resolution,
   Test-level `all_exist` drafting, bounded typed check-export bindings and
   existing function/aggregation expression preservation. Separate native
