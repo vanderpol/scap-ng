@@ -12,6 +12,9 @@ decision packet. Native conversion, static proof and scanner-runtime evidence
 are separate gates. Warning-admitted drafts remain unverified. Final publication
 requires owner approval; see the [license inventory](docs/releases/0.4.0-LICENSE-INVENTORY.md).
 
+[Exact-SHA candidate downloads, CI and owner decision packet](https://github.com/vanderpol/scap-ng-evidence/tree/v04-toolchain-rc-20261030-a5db02e1b/runs/v04-toolchain/2026-10-30-v040-rc-a5db02e1b)
+· [Complete 65-STIG revised DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download).
+
 ### Earlier six-STIG sample checkpoint
 
 **[Earlier 0.4.0 six-STIG downloads and reproducible commands](docs/releases/0.4.0-six-stig-authoring.md)** — version-pinned YAML/JSON authoring (4,012 documents) and six compiled `.scapng` Benchmarks. The compiled content has integrity-verified Test/result programs, but remains **unsigned and unexecuted in an independent scanner**. Earlier checkpoints remain immutable. The [October 20 approved authoring preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) is retained for historical reproduction, not as the current download.

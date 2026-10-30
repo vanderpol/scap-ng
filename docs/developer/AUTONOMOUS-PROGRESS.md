@@ -1,5 +1,52 @@
 # Autonomous development checkpoint
 
+## Release-candidate preparation complete — 2026-10-30
+
+Candidate: **`a5db02e1b29a2d7c312ddcf593be1ee055afb750`**. Later main
+documentation receipts do not change this exact committed toolchain candidate.
+[Owner decision packet](https://github.com/vanderpol/scap-ng-evidence/tree/v04-toolchain-rc-20261030-a5db02e1b/runs/v04-toolchain/2026-10-30-v040-rc-a5db02e1b)
+contains downloads/checksums, dependency/license inventory, commands, CI and
+seven-case clean-extract evidence. Technical GO for pre-alpha evaluation;
+final source/specification licensing and publication/tag approval remain owner
+decisions. Owner replied "unsure" about licensing; no license was assigned.
+
+Exact candidate maintained CI: run `41029222399`, job `123974642484`, artifact
+`12966345704`: **3,331 tests / 3,330 passed / 0 failures/errors / 1 optional
+census skip / 629.728 test seconds**. All four triggered workflows green.
+The preceding implementation SHA `a08c9beb9` passed all 15 workflows, including
+six-source hash retention. Final changes are release-walkthrough fixes/prose;
+converter/compiler/schema bytes are unchanged. No unchanged expensive lane was
+manually duplicated. Fresh source extraction without .git, fresh offline
+11-dependency installation, pip check and all seven original/warning/negative
+CLI cases PASS. Exact-ref archive builds are byte-identical (6,783 files).
+
+[Published complete DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download):
+4,258 retained static proofs +2,559 UNVERIFIED native +422 automated blockers
++1,653 manual/OCIL =8,892 Rules across 65 original Benchmarks. All 6,817 native
+candidates compile; all accepted proof/hash pairs and older frozen archives
+unchanged. Fresh remote reconstruction and CRC/accounting/hash checks PASS.
+ZIP SHA256 `a09ee9a13cdfeeb1b8599eab61308e935a19b99eb62eadafd32002d13d90f8bd`.
+Recovered original primary cohorts: catalog 980/992; all_exist 1,181/1,184;
+imports/exports 338/381; aggregation 30/30. Warning counts overlap; see receipt.
+
+The preferred release-asset upload failed HTTP401 at uploads.github.com; it did
+not yield a downloadable release asset. Bounded documented Git fallback:
+evidence `9c37f56a5ab637d13b077d086ccd94fad635a0b6`, three <50MiB archive parts,
+immutable DRAFT evidence tag and standard-library reconstruction/hash checker.
+Candidate ZIPs are likewise retained with an explicit storage exception. No
+final source `v0.4.0` tag/release. No scanner/editor/normative schema changes.
+
+Samples: `vanderpol/scap-ng-editor-sample-data` commit
+`b595b490226934a26cd7265b86974904d5db1cce`, five native sample cases, all 54 file
+hashes and 22 JSON/YAML pairs checked. Historical views preserved.
+
+Recovery: `/workspace/rc-v040-20261029/` retains completed corpus, source pins,
+baseline/exclusions, candidate builds, offline wheels, fresh gate logs and
+publication scripts. Do not regenerate the completed corpus. Reuse exact-SHA
+CI/artifacts and immutable downloads. Independent proof of the 2,559 additions,
+remaining unsupported/source cases and scanner-runtime/publisher-trust gates
+remain separate follow-on work under #251/#255. #260 is ready for owner review.
+
 ## Active release-candidate task — #260 owner tasking
 
 Authority: [owner comment 6510844015](https://github.com/vanderpol/scap-ng/issues/260#issuecomment-6510844015),
