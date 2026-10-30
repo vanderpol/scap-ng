@@ -60,11 +60,15 @@ class AssessmentConverter:
     representation. `used` is external provenance; other containers are native
     declarations. Cached values are copied so a consumer cannot mutate a peer.
     """
-    def __init__(self, source, component_id, mappings, *, canonical_variable_functions=False):
+    def __init__(self, source, component_id, mappings, *, canonical_variable_functions=False,
+                 human_compact=False):
         self.source, self.component_id, self.mappings = source, component_id, mappings
         # Opt-in migration probe only. Production output and source-proof paths
         # retain their current syntax until coordinated compiler migration.
         self.canonical_variable_functions = canonical_variable_functions
+        # Opt-in authoring projection; a new program digest needs fresh review.
+        self.human_compact = human_compact
+        self.human_compaction = []
         self.active, self.cache, self.used = set(), {}, {}
         self.tests, self.variables, self.shared_objects = {}, {}, {}
         self.enum_projection_cache = {}
@@ -162,6 +166,12 @@ class AssessmentConverter:
             ensure(element.get('check') in MATCHING and found != 'none_exist', 'unsupported Test matching/absence combination')
             requirement.update(items_satisfying=MATCHING[element.get('check')])
             requirement.update(logical_condition(element.get('state_operator', 'AND'), conditions))
+            if self.human_compact:
+                from v04_human_authoring_compact import compact_test_requirement
+                compacted, edit = compact_test_requirement(requirement)
+                if edit:
+                    self.human_compaction.append({'source_test': element.get('id'), **edit})
+                    requirement = compacted
         object_id = objects[0].get('object_ref')
         self.same_family(object_id, 'object', mapping)
         acquisition = self.reference(object_id, 'object')
@@ -208,7 +218,14 @@ class AssessmentConverter:
                        'file-rights State field requires original datatype ' + str(datatype))
             conditions.append({'fields': {mapping['native']['state_field_map'][field]:
                                           self.predicate(policy_entity(child, mapping), mapping)}})
-        return logical_condition(element.get('operator', 'AND'), conditions)
+        condition = logical_condition(element.get('operator', 'AND'), conditions)
+        if self.human_compact:
+            from v04_human_authoring_compact import compact_source_state
+            compacted, edit = compact_source_state(condition)
+            if edit:
+                self.human_compaction.append({'source_state': element.get('id'), **edit})
+                return compacted
+        return condition
 
     def convert_object(self, element):
         from v04_direct_scalar_behaviors import behavior_routes, scalar_behaviors, split_behaviors
@@ -824,13 +841,13 @@ def dependency_blockers(source, node, mappings):
     return problems
 
 
-def convert_rule(source, source_id, mappings):
+def convert_rule(source, source_id, mappings, *, human_compact=False):
     """Convert one entire automated closure; failures leave no emitted artifacts."""
     documents = {}
     ensure(source_id in source.rules, f'source Rule not found: {source_id}')
     rule = source.rules[source_id]
     component, definition, omitted_checks = source.automated_check(rule)
-    converter = AssessmentConverter(source, component, mappings)
+    converter = AssessmentConverter(source, component, mappings, human_compact=human_compact)
     if getattr(source,'draft_compatibility',False):
         from v04_draft_inputs import check_exports
         converter.bound_exports=check_exports(source,rule)
@@ -866,6 +883,11 @@ def convert_rule(source, source_id, mappings):
         binding['selector_equivalences'] = converter.selector_equivalences
     if converter.enum_variable_equivalences:
         binding['enum_variable_equivalences'] = converter.enum_variable_equivalences
+    if converter.human_compaction:
+        # Explicitly separate presentation candidates from accepted source proofs.
+        binding['human_authoring_compaction_review'] = converter.human_compaction
+        binding['independent_static_proof_eligible'] = False
+        binding['conversion_status'] = 'CONVERTED_UNVERIFIED'
     warnings = list(converter.conversion_warnings)
     for check in rule.findall(f'{{{XCCDF}}}check'):
         if check.get('system') != OVAL:
@@ -885,13 +907,13 @@ def convert_rule(source, source_id, mappings):
     return documents, binding
 
 
-def convert(source: SourceModel, rule_ids: list[str]):
+def convert(source: SourceModel, rule_ids: list[str], *, human_compact=False):
     """Strict focused API; any unsupported selection fails the entire request."""
     ensure(rule_ids and len(set(rule_ids)) == len(rule_ids), 'distinct source Rules required')
     mappings = load_mappings()
     documents, bindings = {}, []
     for source_id in rule_ids:
-        native, binding = convert_rule(source, source_id, mappings)
+        native, binding = convert_rule(source, source_id, mappings, human_compact=human_compact)
         documents.update(native)
         bindings.append(binding)
     return assemble_subset(source, documents, bindings, mappings)
@@ -958,7 +980,8 @@ def blocker_category(message):
     return 'unsupported-construct'
 
 
-def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=None):
+def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=None,
+                      human_compact=False):
     """Inventory all Rules; isolate expected per-Rule failures and validate admission.
 
     Native output is atomic per Rule. Diagnostic probes of blocked closures are
@@ -984,7 +1007,8 @@ def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=No
             try:
                 rule = source.rules[row['source_rule']]
                 ensure(source.rule_selected(rule), 'disabled source defaults unsupported')
-                native, binding = convert_rule(source, row['source_rule'], mappings)
+                native, binding = convert_rule(source, row['source_rule'], mappings,
+                                               human_compact=human_compact)
                 for key, parameter in binding.get('policy_parameters', {}).items():
                     ensure(key not in accepted_parameters or accepted_parameters[key] == parameter,
                            'conflicting Benchmark Parameter binding: '+key)
@@ -1050,6 +1074,8 @@ def main():
                         help='validate original closures, prove source terms and compile only the proved primary subset')
     parser.add_argument('--draft', action='store_true',
                         help='allow warning-admitted catalog/all_exist drafts; never independent verification')
+    parser.add_argument('--human-compact', action='store_true',
+                        help='opt-in shorter Test require YAML; preserves inverse ledger; review only, not accepted proof')
     parser.add_argument('--compile', action='store_true',
                         help='compile generated authoring and independently check package structure/operands; no semantic-proof claim')
     parser.add_argument('--output', type=Path, required=True)
@@ -1057,6 +1083,7 @@ def main():
     ensure(not arguments.output.exists(), 'output exists; refusing overwrite')
     ensure(not (arguments.verify and arguments.inventory_only), '--verify requires --rule or --all-rules')
     ensure(not (arguments.verify and arguments.draft), '--draft and --verify are separate admission modes')
+    ensure(not (arguments.verify and arguments.human_compact), '--human-compact requires separate proof review')
     ensure(not (arguments.compile and arguments.inventory_only), '--compile requires conversion')
     started = time.perf_counter()
     if arguments.verify:
@@ -1072,9 +1099,10 @@ def main():
     manifest = None
     stages = {}
     if arguments.rule:
-        documents, trace = convert(source, arguments.rule)
+        documents, trace = convert(source, arguments.rule, human_compact=arguments.human_compact)
     else:
-        documents, trace, manifest = convert_benchmark(source, inventory_only=arguments.inventory_only, timings=stages)
+        documents, trace, manifest = convert_benchmark(source, inventory_only=arguments.inventory_only,
+                                                       timings=stages, human_compact=arguments.human_compact)
     converted = time.perf_counter()
     from v04_direct_yaml import authoring_yaml
     arguments.output.mkdir(parents=True)
