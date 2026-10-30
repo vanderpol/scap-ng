@@ -1,0 +1,36 @@
+assessment:
+  id: windows-11-must-be-configured-to-prioritize-ecc-curves-with-longer-key-18c3f41f-assessment
+  version: 1
+  assessment_title: Windows 11 must be configured to prioritize ECC Curves with longer key lengths first.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  variables:
+    merged-multi-string-ssl-ecccurves-setting-1829f9ea-variable:
+      kind: local
+      datatype: string
+      expression:
+        merge:
+          delimiter: ''
+          sort: document
+          order: ascending
+          values:
+            values:
+              object: {capability: windows.registry, hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Policies\Microsoft\Cryptography\Configuration\SSL\00010002\'}, name: {equals: EccCurves}}
+              field: value
+  tests:
+    prioritize-ecc-curves-with-longer-key-lengths-first-nistp384-requireme-1716eb55-test:
+      test_title: Prioritize ECC Curves with longer key lengths first. NistP384 Requirement
+      capability: variable.value
+      require:
+        items_found: one_or_more
+        items_satisfying: exactly_one
+        fields:
+          value: {matches_regex: '^NistP384\s*NistP256$', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+      variable: merged-multi-string-ssl-ecccurves-setting-1829f9ea-variable
+  evaluate:
+    test: prioritize-ecc-curves-with-longer-key-lengths-first-nistp384-requireme-1716eb55-test

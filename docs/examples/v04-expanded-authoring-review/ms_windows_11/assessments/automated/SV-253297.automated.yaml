@@ -1,0 +1,47 @@
+assessment:
+  id: windows-11-account-lockout-duration-must-be-configured-to-15-minutes-o-72cc5076-assessment
+  version: 1
+  assessment_title: Windows 11 account lockout duration must be configured to 15 minutes or greater.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    account-lockout-threshold-is-not-set-to-0-870535b1-test:
+      test_title: '''Account lockout threshold'' is not set to ''0'''
+      capability: windows.lockoutpolicy
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          lockout_threshold: {greater_than: 0, datatype: integer, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    account-lockout-duration-is-set-to-0-9700a88f-test:
+      test_title: '''Account lockout duration'' is set to ''0'''
+      capability: windows.lockoutpolicy
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        or:
+        - fields:
+            lockout_duration: {less_than_or_equal: 0, datatype: integer, values_found: one_or_more, values_matching: every}
+        - fields:
+            lockout_duration: {equals: 4294967295, datatype: integer, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    account-lockout-duration-is-set-to-15-minutes-or-greater-f4e82a24-test:
+      test_title: '''Account lockout duration'' is set to ''15 minutes'' or greater'
+      capability: windows.lockoutpolicy
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          lockout_duration: {greater_than_or_equal: 900, datatype: integer, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    and:
+    - test: account-lockout-threshold-is-not-set-to-0-870535b1-test
+    - or:
+      - test: account-lockout-duration-is-set-to-0-9700a88f-test
+      - test: account-lockout-duration-is-set-to-15-minutes-or-greater-f4e82a24-test

@@ -1,0 +1,27 @@
+assessment:
+  id: rhel-9-must-enable-a-user-session-lock-until-that-user-re-establishes-29fd1d64-assessment
+  version: 1
+  assessment_title: RHEL 9 must enable a user session lock until that user re-establishes access using established identification and authentication procedures for graphical user sessions.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    verify-the-operating-system-enables-a-user-s-session-lock-until-that-u-09968940-test:
+      test_title: Verify the operating system enables a user's session lock until that user re-establishes access using established identification and authentication procedures.
+      capability: independent.shellcommand
+      object:
+        shell: bash
+        command: gsettings get org.gnome.desktop.screensaver lock-enabled
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          stdout_line: {equals: 'true', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    test: verify-the-operating-system-enables-a-user-s-session-lock-until-that-u-09968940-test

@@ -1,0 +1,102 @@
+assessment:
+  id: the-deny-access-to-this-computer-from-the-network-user-right-on-workst-5c56242d-assessment
+  version: 1
+  assessment_title: The "Deny access to this computer from the network" user right on workstations must be configured to prevent access from highly privileged domain accounts and local accounts on domain systems and unauthenticated access on all systems.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  shared_objects:
+    wmi57-namespace-equals-root-cimv2-wql-equals-select-domainrole-from-wi-7df8a3d2-object:
+      capability: windows.wmi.query
+      namespace: 'root\cimv2'
+      query: SELECT DomainRole FROM win32_computersystem
+      object_title: 'Wmi57: namespace equals ''root\\cimv2''; wql equals ''SELECT DomainRole FROM win32_computersystem'''
+    userright-userright-equals-se-deny-network-logon-name-82c19759-object:
+      capability: windows.userright
+      userright: {equals: SE_DENY_NETWORK_LOGON_NAME}
+      object_title: 'Userright: userright equals ''SE_DENY_NETWORK_LOGON_NAME'''
+  tests:
+    the-system-is-a-windows-domain-member-workstation-c912945a-test:
+      test_title: The system is a Windows Domain Member Workstation
+      capability: windows.wmi.query
+      object: wmi57-namespace-equals-root-cimv2-wql-equals-select-domainrole-from-wi-7df8a3d2-object
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          result:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                domainrole: {equals: '1', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    deny-access-to-this-computer-from-the-network-local-account-41874596-test:
+      test_title: Deny access to this computer from the network - Local account
+      capability: windows.userright
+      object: userright-userright-equals-se-deny-network-logon-name-82c19759-object
+      require:
+        items_found: one_or_more
+        items_satisfying: one_or_more
+        fields:
+          trustee_name: {matches_regex: '^(?i)(NT Authority\\)?Local account$', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    deny-access-to-this-computer-from-the-network-guests-f466b770-test:
+      test_title: Deny access to this computer from the network - Guests
+      capability: windows.userright
+      object: userright-userright-equals-se-deny-network-logon-name-82c19759-object
+      require:
+        items_found: one_or_more
+        items_satisfying: one_or_more
+        fields:
+          trustee_name: {case_insensitive_equals: Guests, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    deny-access-to-this-computer-from-the-network-domain-admins-57461447-test:
+      test_title: Deny access to this computer from the network - Domain Admins
+      capability: windows.userright
+      object: userright-userright-equals-se-deny-network-logon-name-82c19759-object
+      require:
+        items_found: one_or_more
+        items_satisfying: one_or_more
+        fields:
+          trustee_name: {matches_regex: '^(?i)(.+\\)?Domain Admins$', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    deny-access-to-this-computer-from-the-network-enterprise-admins-6ff51001-test:
+      test_title: Deny access to this computer from the network - Enterprise Admins
+      capability: windows.userright
+      object: userright-userright-equals-se-deny-network-logon-name-82c19759-object
+      require:
+        items_found: one_or_more
+        items_satisfying: one_or_more
+        fields:
+          trustee_name: {matches_regex: '^(?i)(.+\\)?Enterprise Admins$', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    the-system-is-a-windows-standalone-workstation-ea626bf8-test:
+      test_title: The system is a Windows Standalone Workstation
+      capability: windows.wmi.query
+      object: wmi57-namespace-equals-root-cimv2-wql-equals-select-domainrole-from-wi-7df8a3d2-object
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          result:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                domainrole: {equals: '0', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    or:
+    - and:
+      - test: the-system-is-a-windows-domain-member-workstation-c912945a-test
+      - test: deny-access-to-this-computer-from-the-network-local-account-41874596-test
+      - test: deny-access-to-this-computer-from-the-network-guests-f466b770-test
+      - test: deny-access-to-this-computer-from-the-network-domain-admins-57461447-test
+      - test: deny-access-to-this-computer-from-the-network-enterprise-admins-6ff51001-test
+    - and:
+      - test: the-system-is-a-windows-standalone-workstation-ea626bf8-test
+      - test: deny-access-to-this-computer-from-the-network-guests-f466b770-test

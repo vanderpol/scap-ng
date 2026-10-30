@@ -1,0 +1,24 @@
+assessment:
+  id: rhel-9-network-interfaces-must-not-be-in-promiscuous-mode-f37203a5-assessment
+  version: 1
+  assessment_title: RHEL 9 network interfaces must not be in promiscuous mode.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    no-network-interfaces-are-in-promiscuous-mode-0549188c-test:
+      test_title: no network interfaces are in promiscuous mode
+      capability: unix.interface
+      object:
+        name: {matches_regex: .*}
+      require:
+        items_found: may_be_absent
+        items_satisfying: every
+        fields:
+          flag: {matches_regex: '(^|\s)PROMISC(\s|$)', values_found: one_or_more, values_matching: none}
+      reported_elements: all
+  evaluate:
+    test: no-network-interfaces-are-in-promiscuous-mode-0549188c-test

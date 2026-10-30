@@ -1,0 +1,57 @@
+assessment:
+  id: windows-11-systems-must-use-either-group-policy-or-an-approved-mobile-118bf54c-assessment
+  version: 1
+  assessment_title: Windows 11 systems must use either Group Policy or an approved Mobile Device Management (MDM) product to enforce STIG compliance.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    test-to-ensure-that-at-least-one-gpo-applied-is-enabled-80b03271-test:
+      test_title: Test to ensure that at least one GPO applied is enabled
+      capability: windows.cmdlet
+      object:
+        module_name: CimCmdlets
+        module_id: null
+        module_version: null
+        verb: Get
+        noun: CimInstance
+        parameters:
+          fields:
+            classname: {equals: RSOP_GPLink, selection_match: every}
+            namespace: {equals: 'ROOT\RSOP\Computer', selection_match: every}
+        select:
+          fields:
+            property: {equals: 'appliedOrder,enabled,GPO,SOM', selection_match: every}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: one_or_more
+              fields:
+                enabled: {equals: 'True', values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    run-a-powershell-command-to-determine-if-a-mobile-device-management-md-93ec2123-test:
+      test_title: Run a PowerShell command to determine if a Mobile Device Management (MDM) product is in use to enforce STIG compliance
+      capability: independent.shellcommand
+      object:
+        shell: powershell
+        command: Get-Service -name IntuneManagementExtension
+        pattern: IntuneManagementExtension
+        error_if_exit_status_not_0: false
+        error_if_stderr_exists: false
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          stdout_line: {matches_regex: Running, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    or:
+    - test: test-to-ensure-that-at-least-one-gpo-applied-is-enabled-80b03271-test
+    - test: run-a-powershell-command-to-determine-if-a-mobile-device-management-md-93ec2123-test

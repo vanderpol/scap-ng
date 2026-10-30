@@ -1,0 +1,24 @@
+assessment:
+  id: rhel-9-must-restrict-exposed-kernel-pointer-addresses-access-08161cd9-assessment
+  version: 1
+  assessment_title: RHEL 9 must restrict exposed kernel pointer addresses access.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    kernel-kptr-restrict-is-set-to-1-f2d327de-test:
+      test_title: kernel.kptr_restrict is set to 1
+      capability: unix.sysctl
+      object:
+        name: {equals: kernel.kptr_restrict}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          value: {equals: 1, datatype: integer, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    test: kernel-kptr-restrict-is-set-to-1-f2d327de-test

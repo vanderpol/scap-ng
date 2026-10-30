@@ -1,0 +1,24 @@
+assessment:
+  id: the-x86-ctrl-alt-delete-key-sequence-must-be-disabled-on-rhel-9-41e188d2-assessment
+  version: 1
+  assessment_title: The x86 Ctrl-Alt-Delete key sequence must be disabled on RHEL 9.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    the-ctrl-alt-del-target-unit-is-masked-b2e75d50-test:
+      test_title: The ctrl-alt-del.target unit is masked.
+      capability: unix.symlink
+      object:
+        full_path: {equals: /etc/systemd/system/ctrl-alt-del.target}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          canonical_path: {equals: /dev/null, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    test: the-ctrl-alt-del-target-unit-is-masked-b2e75d50-test

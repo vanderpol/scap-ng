@@ -1,0 +1,49 @@
+assessment:
+  id: the-built-in-administrator-account-must-be-renamed-4ce47a72-assessment
+  version: 1
+  assessment_title: The built-in administrator account must be renamed.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  shared_objects:
+    built-in-administrator-sid-abe31e1e-object:
+      capability: windows.sid_sid
+      trustee_sid: {matches_regex: '^S-1-5-[0-9-]+-500$'}
+      include_group: true
+      resolve_group: false
+      object_title: Built-in Administrator SID
+  variables:
+    localdomain-administrator-3f7d7934-variable:
+      kind: local
+      datatype: string
+      expression:
+        concat:
+        - values:
+            object: built-in-administrator-sid-abe31e1e-object
+            field: trustee_domain
+        - literal: {datatype: string, value: '\Administrator'}
+  tests:
+    accounts-rename-administrator-account-is-not-set-to-administrator-or-l-ee3d5905-test:
+      test_title: '''Accounts: Rename administrator account'' is not set to ''Administrator'' or ''localdomain\Administrator'''
+      capability: windows.sid_sid
+      object: built-in-administrator-sid-abe31e1e-object
+      require:
+        items_found: may_be_absent
+        items_satisfying: every
+        and:
+        - fields:
+            trustee_name: {case_insensitive_not_equal: Administrator, values_found: one_or_more, values_matching: every}
+        - fields:
+            trustee_name:
+              case_insensitive_not_equal:
+                variable: localdomain-administrator-3f7d7934-variable
+              datatype: string
+              value_match: every
+              values_found: one_or_more
+              values_matching: every
+      reported_elements: all
+  evaluate:
+    test: accounts-rename-administrator-account-is-not-set-to-administrator-or-l-ee3d5905-test

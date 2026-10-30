@@ -1,0 +1,25 @@
+assessment:
+  id: rhel-9-must-enable-the-hardware-random-number-generator-entropy-gather-49976f9d-assessment
+  version: 1
+  assessment_title: RHEL 9 must enable the hardware random number generator entropy gatherer service.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    rngd-service-is-active-a8b4d1ba-test:
+      test_title: rngd.service is active
+      capability: linux.systemdunitproperty
+      object:
+        unit: {equals: rngd.service}
+        property: {equals: ActiveState}
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          value: {equals: active, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+  evaluate:
+    test: rngd-service-is-active-a8b4d1ba-test

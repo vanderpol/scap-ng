@@ -1,0 +1,59 @@
+assessment:
+  id: rhel-9-must-configure-selinux-context-type-to-allow-the-use-of-a-nonde-cf81777f-assessment
+  version: 1
+  assessment_title: RHEL 9 must configure SELinux context type to allow the use of a nondefault faillock tally directory.
+  mode: automated
+  class: compliance
+  purpose: assessment
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  shared_objects:
+    etc-security-faillock-conf-dir-03492ecf-object:
+      capability: independent.textfilecontent54
+      full_path: {equals: /etc/security/faillock.conf}
+      pattern: {matches_regex: '^\s*dir\s*=\s*(.*)\s*$'}
+      instance: {greater_than_or_equal: 1, datatype: integer}
+      ignore_case: false
+      multiline: true
+      singleline: false
+      item_creation: all_object_elements_fullfilled
+      filesystem: all
+      object_title: /etc/security/faillock.conf dir
+  variables:
+    faillock-directory-1faf1801-variable:
+      kind: local
+      datatype: string
+      expression:
+        values:
+          object: etc-security-faillock-conf-dir-03492ecf-object
+          field: subexpression
+  tests:
+    configured-faillock-directory-has-correct-selinux-context-4d7d97ea-test:
+      test_title: configured faillock directory has correct selinux context
+      capability: linux.selinuxsecuritycontext
+      object:
+        directory:
+          equals:
+            variable: faillock-directory-1faf1801-variable
+          datatype: string
+          value_match: every
+        name: null
+        filesystem: all
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        fields:
+          type: {equals: faillog_t, values_found: one_or_more, values_matching: every}
+      reported_elements: all
+    etc-security-faillock-conf-dir-option-exists-1bca2322-test:
+      test_title: /etc/security/faillock.conf dir option exists
+      capability: independent.textfilecontent54
+      object: etc-security-faillock-conf-dir-03492ecf-object
+      require:
+        items_found: one_or_more
+      reported_elements: all
+  evaluate:
+    and:
+    - test: configured-faillock-directory-has-correct-selinux-context-4d7d97ea-test
+    - test: etc-security-faillock-conf-dir-option-exists-1bca2322-test
