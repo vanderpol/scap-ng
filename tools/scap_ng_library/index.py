@@ -395,6 +395,9 @@ class Library:
         if changed:
             affected = sorted({c['path'] for r in nodes if r['path'] in changed for c in self.consumers(r,transitive=True)})
         return {'format':REPORT_FORMAT,'mode':'check','status':'FAIL' if any(p['severity']=='error' for p in problems) else 'PASS',
+                'summary':f"Native source/reference check: {len(nodes)} documents, "
+                          f"{sum(p['severity']=='error' for p in problems)} errors, "
+                          f"{sum(p['severity']=='warning' for p in problems)} warnings; no new semantic proof.",
                 'validation_scope':'changed_notifications_and_indexed_reference_graph' if changed is not None else 'library',
                 'diagnostics':problems,'counts':dict(self.db.execute('SELECT kind,COUNT(*) FROM nodes GROUP BY kind')),
                 'affected_consumers':affected,'metrics':{'parsed_documents':self.parsed,'indexed_documents':len(nodes),

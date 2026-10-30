@@ -314,6 +314,7 @@ raise SystemExit(main(['check',sys.argv[2]]))
         for command in ['check','analyze']:
             result=subprocess.run([sys.executable,str(ROOT/'tools/scap_ng_repo_normalizer.py'),'v04',command,str(self.content)],capture_output=True,text=True)
             self.assertEqual(result.returncode,0,result.stdout+result.stderr);self.assertEqual(json.loads(result.stdout)['status'],'PASS')
+            self.assertIn('source/reference check',json.loads(result.stdout)['summary'])
         self.assertEqual(before,{p:p.read_bytes() for p in before})
         scope=lib.rows("WHERE kind='benchmark'")[0]['scope'];target=Path(self.temporary.name)/'generated.scapng'
         result=subprocess.run([sys.executable,str(ROOT/'tools/scap_ng_library_cli.py'),'compile',str(self.content),
