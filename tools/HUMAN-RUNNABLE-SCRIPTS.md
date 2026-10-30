@@ -2,7 +2,7 @@
 
 This guide documents intentional command-line tools that a human may run from a local checkout. It does **not** list import-only Python modules or `test_*.py` files.
 
-Run commands from the repository root unless a section says otherwise.
+Run commands from the repository root unless a section says otherwise. Find the [current 0.4 downloads and Assessment samples](../docs/releases/0.4.0-downloads-and-samples.md) before selecting an exact toolchain/input pair; the October 20–22 six-STIG releases remain earlier reproducible examples.
 
 ## Native 0.4 library maintenance (#261)
 

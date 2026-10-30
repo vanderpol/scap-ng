@@ -1,6 +1,8 @@
 # Windows 11 — SCAP-NG 0.4.0 authoring review
 
-Open the [approved six-STIG sample release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and inspect `authoring/ms_windows_11/` from the [YAML](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.yaml.zip) or [JSON](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.json.zip) ZIP. It contains source-backed Rules, Assessments, and shared Assessments in one verified cross-reference graph.
+This is a **historical six-STIG file-layout walkthrough**. For the current all-65 native YAML library and smaller current examples, start at the [0.4.0 downloads and samples index](../../../docs/releases/0.4.0-downloads-and-samples.md).
+
+Open the [earlier approved six-STIG sample release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and inspect `authoring/ms_windows_11/` from the [YAML](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.yaml.zip) or [JSON](https://github.com/vanderpol/scap-ng/releases/download/v0.4.0-six-stig-authoring-approved-20261020/scap-ng-0.4.0-six-stigs.json.zip) ZIP. It contains source-backed Rules, Assessments, and shared Assessments in one verified cross-reference graph.
 
 Start with [the current review guide](../REVIEW-GUIDE.md), then read [Assessment examples](../../../specification/examples/assessments.md). For complex Windows Tests, keep `windows.wmi.query` capability separate from older OVAL-derived Object IDs such as `wmi57`; the latter are source provenance, not alternate SCAP-NG collection capabilities. Do not rename compiled Object IDs unless every reference and source mapping is preserved.
 

@@ -5,6 +5,9 @@ source through the isolated direct converter. Each directory links actual YAML
 and structurally equivalent JSON, source provenance, and validation, compilation
 and independent source-comparison evidence. They represent automated subsets,
 not a complete Benchmark, six-STIG release or scanner-runtime equivalence.
+For the current **all-65 normalized native YAML download**, complete DRAFT,
+smaller pinned candidate examples, and historical six-STIG ZIPs, use the
+[0.4.0 downloads and Assessment samples index](../releases/0.4.0-downloads-and-samples.md).
 
 - [Nested Sets, Filters, Variables and genuinely shared Objects](direct-file-rights/README.md).
 - [NTUSER with ordered exclusion Filters and inline Registry acquisition](direct-ntuser/README.md).

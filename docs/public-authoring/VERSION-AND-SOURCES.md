@@ -6,7 +6,8 @@
 
 | Surface | Status for authors | How to use |
 | --- | --- | --- |
-| [Current 0.4.0 six-STIG samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) and [0.4.0 schema](../../schema/v0.4.0/README.md) | **Current pre-alpha authoring profile**, not Board-ratified or scanner-conformant | Use one pinned 0.4 release/schema; preserve source provenance and explicit exceptional requirements |
+| [Current 0.4.0 native downloads and Assessment samples](../releases/0.4.0-downloads-and-samples.md) and [0.4.0 schema](../../schema/v0.4.0/README.md) | **Current pre-alpha candidate**, not a final release, Board-ratified or scanner-conformant | Pin the exact 0.4 source/toolchain/schema set and heed each Rule's static-proof, UNVERIFIED or blocked status |
+| [October 20 six-STIG samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) | **Historical 0.4 authoring checkpoint** | Reproduce its earlier grammar/files only; do not use it as the current all-65 native library |
 | [0.3.0 archive](../../archive/0.3.0/README.md) and [0.3 schema](../../schema/v0.3.0/) | **Historical and reproducible** | Use only for reproducing legacy authoring, compiled demo bundles or synthetic results |
 | [October 15 r3 six-STIG preview](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-joval-meeting-preview-20261015-r3) | Historical source-backed **research input** | Do not use `collected_items_require` as if it were the current output grammar |
 | Proposed English-first/B/other research syntax | **Non-normative research** until separately approved | Do not generate it as if it were the selected supported grammar |

@@ -1,21 +1,17 @@
 # SCAP-NG roadmap
 
-Updated October 20, 2026. **Current authoring review: 0.4.0.** The 0.3.0 compiled demonstration release and source research remain [archived](archive/0.3.0/README.md), not erased or relabeled as 0.4.
+Updated October 30, 2026. **Active authoring review: 0.4.0 pre-alpha.** The current [downloads and Assessment samples index](docs/releases/0.4.0-downloads-and-samples.md) distinguishes the qualified toolchain candidate, full 65-stream DRAFT, normalized editable YAML, and earlier six-STIG demonstrations. The 0.3.0 compiler/source history remains [archived](archive/0.3.0/README.md), not relabeled as 0.4.
 
-## Now — finalize 0.4.0 authoring and native compilation
+## Now — review the 0.4.0 candidate and prepare owner publication decision
 
-The current 0.4.0 authoring grammar incorporates an exact-reachable **0.4-only Benchmark specification declaration** policy. The [six-STIG authoring samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) contain 4,001 YAML and JSON documents and resolve 2,958 Rule-choice links. [Versioned gate tracking](review/current/0.4.0-FINALIZATION-GATES.md) records schema, source graph and generic OVAL-result evidence.
+The #260 toolchain candidate compiles current native 0.4 authoring; #261 delivered a non-destructive normalized layout and editor-callable maintenance CLI. All 65 original streams /8,892 Rules are accounted for: 6,817 compiled native candidates (4,258 independently statically source-proved, 2,559 UNVERIFIED), 422 blocked automated Rules and 1,653 manual/OCIL originals. Sixty streams have editable native Benchmarks; five are retained as source-only records. No final `v0.4.0` release has been authorized.
 
-1. Finish native 0.4.0 authoring-to-bundle compilation, deterministic manifests, checksums and independent signature verification.
-2. Verify exceptional source matching and capability-specific OVAL semantics, including Variables, Sets, Filters, record fields and incomplete/error/unknown results.
-3. Align the browser editor with current 0.4.0 files and schemas; test import/edit/export roundtrips.
-4. Complete concise versioned reviewer material and release evidence before considering a final native package checkpoint.
+1. Review [the exact candidate and release gates](docs/releases/0.4.0-rc.md), source/permitted-license inventory, human-visible examples and known warning/proof limits before a final pre-alpha publication decision.
+2. Preserve original source semantics; treat unverified conversion, actual blocked constructs and scanner runtime equivalence as separate future gates. Do not let extra original-OVAL proofs block a clearly labeled authoring DRAFT.
+3. Integrate the [offline Python library CLI](docs/developer/NATIVE-LIBRARY.md) with the separate [VS Code Assessment Studio](https://github.com/vanderpol/scap-ng-vscode/issues/3). Avoid duplicate normalization engines and silent Assessment merging.
+4. Keep earlier six-STIG sample files and 0.3 releases immutable; use current 65-stream files for large-library maintenance/scale evaluation.
 
-**Parsed source, a signed bundle and scanner parity are different milestones.** An independent full scanner/evaluator remains to be demonstrated.
-
-## Archived 0.3.0
-
-The historical six-STIG source ZIP and independently compiled `.scapng` samples are preserved in the [0.3 archive](archive/0.3.0/README.md). Earlier full-corpus runs, decisions and issue records remain historical; the 0.3 pipeline is not the default for new 0.4 demonstrations.
+**Schema-valid authoring, compiled packages, independent static OVAL proof, publisher signing, and live scanner parity are different milestones.** An independently tested scanner/evaluator remains later work.
 
 ## Next — independent implementations and conformance
 

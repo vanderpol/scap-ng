@@ -5,7 +5,7 @@ links are part of the release toolchain, but they do not independently add
 normative requirements or establish scanner/runtime conformance.
 
 For current installation, conversion, compilation and verification, use the
-[0.4.0 candidate operator guide](../releases/0.4.0-rc.md).
+[0.4.0 candidate operator guide](../releases/0.4.0-rc.md) · [current all-65 native downloads and Assessment samples](../releases/0.4.0-downloads-and-samples.md).
 
 For ongoing approved work and recovery, use the
 [autonomous development checkpoint](AUTONOMOUS-PROGRESS.md) and the standing

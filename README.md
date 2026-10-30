@@ -2,6 +2,8 @@
 
 SCAP-NG is a pre-alpha successor to SCAP 1.4 designed to preserve supported assessment meaning while simplifying authoring, review, collection, results and scalable distribution.
 
+**[0.4.0 downloads and sample Assessments](docs/releases/0.4.0-downloads-and-samples.md)** — start here for the complete normalized editable YAML library, all-65 source DRAFT, pinned toolchains, and smaller review examples.
+
 [Native 0.4 library maintenance and editor-callable CLI](docs/developer/NATIVE-LIBRARY.md)
 provides out-of-place layout export and logical-ID checks across the all-65
 DRAFT, with original proof/warning status preserved and no automatic deduplication.
@@ -30,7 +32,7 @@ requires owner approval; see the [license inventory](docs/releases/0.4.0-LICENSE
 - **Understand what is still open:** [0.4.0 finalization gates](review/current/0.4.0-FINALIZATION-GATES.md) · [canonical grammar decision](research/assessment-simplification/compact-authoring-04/OWNER-0.4.0-CANONICAL-DECISION.md)
 - **Browse historical material:** [archived 0.3.0 release, examples and synthetic results](archive/0.3.0/README.md) · [OVAL Board records](board/README.md)
 
-All six current Benchmarks declare the exact reachable `0.4.0` automated Assessment specification. Their obsolete `0.3.0` declarations, source hashes and original authoring content remain in pinned historical releases and migration evidence. **0.3.0 is preserved, not deleted or silently converted.**
+The six Benchmarks in the **earlier six-STIG checkpoint** declare the exact reachable `0.4.0` automated Assessment specification. Their obsolete `0.3.0` declarations, source hashes and original authoring content remain in pinned historical releases and migration evidence. **0.3.0 is preserved, not deleted or silently converted.**
 
 ## What SCAP-NG changes
 

@@ -1,14 +1,16 @@
 # SCAP-NG 0.4.0 examples — Assessments
 
-**Current source-backed YAML/JSON authoring samples:** [immutable October 21 canonical source-only release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261021). The [October 20 pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) is immutable and uses the preceding authoring revision. Begin with [Benchmarks and Rules](README.md) for the policy context.
+**Current all-65 native YAML and focused source-backed Assessment downloads:** [0.4.0 downloads and sample Assessments](../../docs/releases/0.4.0-downloads-and-samples.md). Use the pinned native files for real rule logic; the code blocks below are explanatory excerpts, not an independently executed Assessment.
+
+**Earlier source-backed six-STIG YAML/JSON authoring samples (historical):** [immutable October 21 canonical source-only release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-canonical-flat-authoring-20261021). The [October 20 pre-release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) is immutable and uses the preceding authoring revision. Begin with [Benchmarks and Rules](README.md) for the policy context.
 
 A **Test** states what information to collect using `capability` and `object`, then what must be true using `require`. `evaluate` combines Test results. SCAP-NG retains these familiar OVAL concepts while reducing indirection in ordinary checks.
 
 ## 1. A simple automated Test
 
-**0.4.0 flat-Object grammar update (2026-10-21):** Native selectors and acquisition parameters live directly in `object`, without generic `select` or `collect` wrappers. Short complete comparisons may use one-line flow mappings; longer or complex Objects may be multiline. The current October 21 regenerated six-STIG candidate has passed strict native schema, exact source inverse, and independent package CI; the October 20 tagged pre-release remains the older baseline. No compiled or signed scanner bundle is claimed.
+**0.4.0 flat-Object grammar update (2026-10-21):** Native selectors and acquisition parameters live directly in `object`, without generic `select` or `collect` wrappers. Short complete comparisons may use one-line flow mappings; longer or complex Objects may be multiline. The earlier October 21 regenerated six-STIG candidate passed strict native schema, exact source inverse, and independent package CI; the October 20 tagged pre-release remains the older baseline. No compiled or signed scanner bundle is claimed.
 
-This small **syntax illustration** is deliberately shortened. It is *not a verbatim STIG Assessment*. For source-backed rule logic, use the complete, source-verified files in the current immutable authoring release.
+This small **syntax illustration** is deliberately shortened. It is *not a verbatim STIG Assessment*. For source-backed Rule logic, use the complete, proof-status-labeled native files in the [current normalized review library](../../docs/releases/0.4.0-downloads-and-samples.md). An UNVERIFIED draft must not be called source-proved.
 
 ```yaml
 tests:
@@ -59,23 +61,23 @@ tests:
       items: one_or_more
 
 evaluate:
-  all:
+  and:
     - test: domain-member-test
     - test: remote-logon-local-account-test
 ```
 
-This is **illustrative structure**, not the original Windows STIG logic. The source-backed Windows examples have additional record and trustee matching requirements that must not be dropped when editing or simplifying. The `and`/`or` and `any`/`all` meaning must be taken from the versioned `evaluate` contract, not guessed from indentation.
+This is **illustrative structure**, not the original Windows STIG logic. The source-backed Windows examples have additional record and trustee matching requirements that must not be dropped when editing or simplifying. The `and`/`or`/`one`/`xor` semantics must be read from the selected version's `evaluate` contract, not guessed from indentation.
 
 **Name Tests and Objects by their purpose or selected data**, not solely the collection technology. For example, `domain-membership-query` is more informative in demonstration material than `windows-wmi57-object`. The 0.4 capability name should come from the schema, such as `windows.wmi.query`; a legacy OVAL identifier like `wmi57` belongs in source provenance, not an invented new capability. **Existing converted logical IDs are not renamed merely for presentation**: renaming demands complete reference/provenance validation.
 
 ## 3. Manual alternatives and exceptional Assessments
 
-Rules may offer both automated and manual Assessment choices. A Rule's explicit `default_assessment_choice` does not remove the other choice or its provenance. All **2,958 Rule choice links** in the six-STIG authoring set are retained.
+Rules may offer both automated and manual Assessment choices. A Rule's explicit `default_assessment_choice` does not remove the other choice or its provenance. All **2,958 Rule choice links** in the earlier six-STIG authoring set were retained; the current all-65 DRAFT has its own complete Rule ledger.
 
 Of the **1,375 distinct automated Tests**, 816 use canonical `all_items_must`, 387 have structured presence-only requirements, and **172 retain source-exact uncommon requirement forms**. The latter are not silently rewritten into attractive shortcuts.
 
 ## 4. What validation proves
 
-The 4,001 authored documents validate against the current version-local schema in both YAML and JSON, and the typed-source graph roundtrips; **25,628 generic OVAL result comparisons** have also passed. These checks do *not* prove collection-capability behavior, signed-bundle compilation, scanner execution, or final OVAL equivalence. Four zero-Item/empty-aggregate reference scenarios remain explicitly unresolved.
+The earlier 4,001 authored documents validated against their pinned version-local schema in both YAML and JSON, and the typed-source graph roundtrips; **25,628 generic OVAL result comparisons** have also passed. These checks do *not* prove collection-capability behavior, signed-bundle compilation, scanner execution, or final OVAL equivalence. Four zero-Item/empty-aggregate reference scenarios remain explicitly unresolved.
 
 See [release gates](../../review/current/0.4.0-FINALIZATION-GATES.md) for the exact evidence. **Archived 0.3.0 examples and synthetic results** are available from [the 0.3.0 archive](../../archive/0.3.0/README.md); they must not be mistaken for actual 0.4 scan output.

@@ -1,6 +1,6 @@
 # Versioned SCAP-NG toolchain releases
 
-Current preparation instructions: [0.4.0 candidate guide](0.4.0-rc.md).
+Current preparation instructions: [0.4.0 candidate guide](0.4.0-rc.md). Find the [complete 0.4.0 downloads and sample-Assessment index](0.4.0-downloads-and-samples.md), including the separate normalized editable library and maintenance toolchain.
 The signed-SCAP entry point is `tools/v04_direct_converter.py`; independent
 source proof and package verification are separate entry points. The candidate
 includes a hash-pinned dependency lock and published matching offline wheels.

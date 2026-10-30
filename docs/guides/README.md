@@ -1,6 +1,6 @@
 # SCAP-NG Guides
 
-**Current scope: 0.4.0 pre-alpha.** These guides explain the current model. They do not declare an interoperable scanner standard or supersede the [specification](../../specification/README.md) and [versioned schemas](../../schema/v0.4.0/README.md).
+**Current scope: 0.4.0 pre-alpha.** For real YAML files and source-backed Assessment examples, start with the [current downloads and samples index](../releases/0.4.0-downloads-and-samples.md). These guides explain the current model. They do not declare an interoperable scanner standard or supersede the [specification](../../specification/README.md) and [versioned schemas](../../schema/v0.4.0/README.md).
 
 | Read this | If you want to… |
 | --- | --- |

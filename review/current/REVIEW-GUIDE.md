@@ -1,4 +1,6 @@
-# SCAP-NG 0.4.0 — a short six-STIG review
+# SCAP-NG 0.4.0 — historical six-STIG review walkthrough
+
+For the **current 65-stream native YAML**, source/verification status and simplified editable layout, use the [0.4.0 downloads and Assessment samples index](../../docs/releases/0.4.0-downloads-and-samples.md). The commands and paths below deliberately describe the **earlier October 20 six-STIG checkpoint**, not the latest normalized files.
 
 **Audience:** owner, implementers and OVAL Board reviewers. This is an authoring-sample review, not a request to certify or ratify a scanner.
 
@@ -17,6 +19,6 @@ Open either ZIP and follow `authoring/`. Both contain the same **4,001 logical s
 
 **Start with simple Tests before complicated Windows ones.** Inside `tests`, read `test_title`, `capability`, `object`, `require`, then the enclosing `evaluate` expression. Legacy-looking converted IDs are not new capability names. A more readable authoring presentation is covered in the [Assessment examples](../../specification/examples/assessments.md).
 
-**Known limits:** 172 exceptional matching requirements remain source-exact; 25,628 generic existence/matching result checks passed, but there is not yet a full capability-specific scanner equivalence proof or native signed 0.4 bundle compiler. See [finalization gates](0.4.0-FINALIZATION-GATES.md).
+**Known limits for this earlier checkpoint:** 172 exceptional matching requirements remained source-exact; 25,628 generic existence/matching result checks passed. The newer 0.4 candidate has compiled native packages, but no full capability-specific scanner equivalence proof or **publisher-signed final 0.4 release**. See [finalization gates](0.4.0-FINALIZATION-GATES.md).
 
 The historical [0.3.0 compiled/prerelease content](../../archive/0.3.0/README.md) remains independently accessible; do not compare its scanner bundles as if they were compiled 0.4.0 content.

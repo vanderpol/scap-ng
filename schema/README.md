@@ -2,7 +2,7 @@
 
 **Status:** versioned pre-alpha native schemas and capability mappings.
 
-- [v0.4.0](v0.4.0/README.md) is the **current pre-alpha authoring-sample schema**, not an OVAL Board standard, compiled bundle or scanner conformance result. [Six-STIG source samples](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020).
+- [v0.4.0](v0.4.0/README.md) is the **current pre-alpha authoring-sample schema**, not an OVAL Board standard, compiled bundle or scanner conformance result. [Current native 0.4 downloads and Assessment samples](../docs/releases/0.4.0-downloads-and-samples.md); the [October 20 six-STIG sample release](https://github.com/vanderpol/scap-ng/releases/tag/v0.4.0-six-stig-authoring-approved-20261020) is a historical checkpoint.
 - [v0.3.0](v0.3.0/README.md) is the **archived previous version**. Its original schema, authoring and historical compiled demonstrations are [preserved](../archive/0.3.0/README.md).
 - [v0.2.0](v0.2.0/README.md) and earlier versions are historical snapshots.
 
@@ -21,7 +21,7 @@ python tools/validate_native_semantics.py PATH_TO_CONTENT
 python tools/test_v04_schema_draft.py
 ```
 
-Current 0.4 source-schema checks, rejection fixtures and all 4,001 generated authoring documents were verified in both formats by the [0.4 six-STIG workflow](https://github.com/vanderpol/scap-ng/actions/runs/39472747469). This **does not** establish signed native .scapng compilation or scanner parity.
+The earlier October 20 0.4 source-schema checks, rejection fixtures and 4,001 generated authoring documents were verified in both formats by the [0.4 six-STIG workflow](https://github.com/vanderpol/scap-ng/actions/runs/39472747469). This **does not** establish signed native .scapng compilation or scanner parity.
 
 ## Change discipline
 

@@ -7,6 +7,7 @@ specification overview.
 For the current project/design review, use:
 
 - [Current review](../review/current/README.md)
+- [Current 0.4.0 native YAML downloads and source-backed Assessment samples](../docs/releases/0.4.0-downloads-and-samples.md)
 - [Draft specification](../specification/README.md)
 - [Real Benchmark and Rule policy examples](../specification/examples/README.md) and [technical Assessment examples](../specification/examples/assessments.md)
 
