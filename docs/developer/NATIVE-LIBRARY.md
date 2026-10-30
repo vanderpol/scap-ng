@@ -200,3 +200,19 @@ the normalizer. No schema/renderer/protected workflow was changed for #261.
 The maintained regression and representative Board conversion workflows for
 the engine checkpoint passed. This unrelated historical preview is not a
 native 0.4 acceptance claim and was not weakened/reclassified to hide failure.
+
+
+## Immutable delivery and final regression gate
+
+[Download the separate normalized-review candidate and exact source toolchain](https://github.com/vanderpol/scap-ng-evidence/tree/v04-normalized-library-review-20261030-ff69d46b3/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3).
+Exact implementation `ff69d46b36e05e45074a5e7f43bf2ef3cf464ddf` passed
+[maintained CI 41052208017](https://github.com/vanderpol/scap-ng/actions/runs/41052208017):
+3,359 selected /3,358 passed /one explicit optional corpus skip, zero failures
+or errors; 1,159.586 test seconds. All three triggered workflows passed.
+The packet preserves complete test identities/results, exact commands/input pins,
+separate census and performance reports, expanded file inventory and checksums.
+Both published archives passed fresh immutable-commit HTTPS download SHA256 and
+CRC checks. Source snapshot replay was byte-identical; clean-extracted offline
+installation, 28 library tests, CLI and independent package consumer passed.
+This evidence tag belongs only to the evidence repository; no final source
+0.4.0 release or tag was created.

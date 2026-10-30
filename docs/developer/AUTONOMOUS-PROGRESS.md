@@ -1,6 +1,41 @@
 # Autonomous development checkpoint
 
-## Active #261 — native library layout / editor-callable maintenance
+## Completed #261 — native library layout / editor-callable maintenance
+
+Published implementation HEAD: `ff69d46b36e05e45074a5e7f43bf2ef3cf464ddf`.
+Intermediate maintained integration `9e893266f42ea699a9a8798b37d8bbe9715e2e9c`
+PASS: run [41049843626](https://github.com/vanderpol/scap-ng/actions/runs/41049843626),
+3,359 selected /3,358 passed /one explicit optional full-corpus skip; no failures
+or errors. Final exact-implementation run [41052208017](https://github.com/vanderpol/scap-ng/actions/runs/41052208017)
+PASS: 3,359 selected /3,358 passed /one explicit optional full-corpus skip,
+zero failures/errors; 1,159.586 test seconds. All three triggered workflows
+(maintained, current design, issue reference) passed. The two subsequent fixes preserve
+native output: original record ZIP member resolution uses original ZIP identity
+rather than temporary input-folder labels; check JSON includes a readable summary.
+44 focused/compatibility tests PASS (8.878s); clean-extracted source snapshot:
+28 tests PASS (8.523s), fresh offline hash-pinned install, pip check, CLI export /
+zero-change analyze / original records / status search / cache deletion+rebuild /
+compile and independent package consumer PASS. Exact full-ref source snapshot
+replay is byte-identical: SHA256
+`adbb52973ce608ce918e840658ead7b3265c601b43dc71a466da4e8257fe421d`.
+
+Completed review archive: 44,544,308 bytes, 13,890 payload files, CRC and every
+expanded digest PASS; SHA256
+`a01ea589501bf8a53e5df68e50ca9478f19543d2bd3844546667fde743c28d8c`.
+Immutable [review download and evidence packet](https://github.com/vanderpol/scap-ng-evidence/tree/v04-normalized-library-review-20261030-ff69d46b3/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3),
+evidence commit `75e82a9`, tag `v04-normalized-library-review-20261030-ff69d46b3`.
+Both published ZIPs were freshly downloaded at immutable evidence commit
+`2fc4c4b`: SHA256 and ZIP CRC PASS. Do not regenerate the corpus. It includes the
+source snapshot, separate reuse census, resource/acceptance/hash receipts,
+source-only stream exceptions, CLI contract and bounded archive storage decision.
+Delivery is complete: code, exact test identities/results, normalized-review ZIP,
+exact source snapshot and CLI/editor contract. GitHub #261 carries the owner
+handoff; VS Code #3 receives the backend integration contract. No additional
+feature work, full-corpus export or proof replay is needed for #261. Future
+sharing/repointing, independent unverified-candidate proof, genuine conversion
+blockers, runtime scanner evidence, license selection and final release remain
+separate workstreams; this task makes no decision on them.
+
 
 Delivery acceptance completed after engine checkpoint
 `03ddc6beda8dcda5ff57439b0c3d7a2d12763d1b`: exact pinned source archive admitted,
@@ -26,8 +61,7 @@ record queries, persistent edit/error recovery, disposable index restoration
 from durable sidecars, Rule/Assessment proof demotion on edits, Benchmark file
 rename ownership, cancellation/rollback, Input/Parameter/policy reference checks,
 native kind dispatch independent of `catalog.yaml` filename. 44 focused +old
-normalizer tests PASS (8.915s), repository layout check PASS. Current final
-implementation is ready to commit; then capture its automatically triggered
+normalizer tests PASS (8.915s), repository layout check PASS. Final implementation is published; capture its automatically triggered
 maintained CI once while packaging the completed review candidate. Do not
 rerun all-65 conversion/export. The completed acceptance came from engine
 03ddc6bed; subsequent changes add editor/provenance/transaction hardening and
