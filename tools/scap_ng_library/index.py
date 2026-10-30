@@ -60,7 +60,7 @@ class Library:
     def __init__(self, root, *, cache=None):
         self.root = Path(root).resolve()
         self.cache = Path(cache) if cache else (
-            self.root.parent/'metadata/library.sqlite' if self.root.name=='content' else
+            self.root.parent/'metadata/library.sqlite' if self.root.name in ('content','authoring') else
             self.root.parent/'.scap-ng-index'/(self.root.name+'-'+sha256(str(self.root).encode()).hexdigest()[:8]+'.sqlite'))
         if self.cache.resolve().is_relative_to(self.root):
             raise ValueError('generated index must remain outside editable authoring tree')
@@ -124,7 +124,7 @@ class Library:
                         if path.name.endswith('.source-trace.json'):continue
                         declared.extend(json.loads(path.read_text()).get('native_path_mapping',[]))
                 self.benchmark_declarations=[r for r in declared if r['kind']=='benchmark']
-            exact.update(Path(r['path']).stem for r in self.benchmark_declarations
+            exact.update(scope_for(r['path']) for r in self.benchmark_declarations
                          if r['id']==ident and r['authoring_sha256']==body_hash)
         if len(exact)>1:raise ValueError('ambiguous declared Benchmark scope; no filename/first-match guess')
         return next(iter(exact)) if exact else scope_for(relative)

@@ -10,6 +10,7 @@ import sys
 from . import REPORT_FORMAT
 from .advisory import census
 from .export import export_draft
+from .reflow import reflow_layout
 from .index import Library
 from .transaction import apply_plan
 from .records import original_records
@@ -43,6 +44,8 @@ def main(argv=None):
     p=sub.add_parser('export-draft');p.add_argument('source',type=Path);p.add_argument('--output',type=Path,required=True)
     p.add_argument('--full-corpus-deliverable',action='store_true')
     p.add_argument('--source-archive',type=Path,help='exact published archive required for full acceptance')
+    p=sub.add_parser('reflow-layout');p.add_argument('source',type=Path);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--full-corpus-deliverable',action='store_true',help='require pinned 65-stream counts/proofs')
     p=sub.add_parser('records');p.add_argument('root',type=Path);p.add_argument('--scope')
     p.add_argument('--query',default='');p.add_argument('--status');p.add_argument('--limit',type=int,default=100)
     args=parser.parse_args(argv)
@@ -53,6 +56,8 @@ def main(argv=None):
     try:
         if args.mode=='export-draft':
             emit(export_draft(args.source,args.output,full_corpus=args.full_corpus_deliverable,source_archive=args.source_archive));return 0
+        if args.mode=='reflow-layout':
+            emit(reflow_layout(args.source,args.output,full_corpus=args.full_corpus_deliverable));return 0
         if args.mode=='records':
             emit({'format':REPORT_FORMAT,'mode':'records','status':'PASS','validation_scope':'frozen_original_record_navigation',
                   'matches':original_records(args.root,scope=args.scope,query=args.query,status=args.status,limit=args.limit)});return 0

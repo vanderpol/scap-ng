@@ -14,7 +14,7 @@ A Benchmark's `rules` list refers to logical Rule IDs; a Rule's `assessment_choi
 
 In that earlier six-STIG 0.4.0 sample set, **all six Benchmarks declare the exact reachable automated Assessment specification at version 0.4.0**, rather than carrying obsolete 0.3.0 declarations. Original source files, version-declaration changes, hashes and reversible source transformations are preserved in the workflow evidence.
 
-For the current normalized library, open the extracted `content/` tree as described in the [download index](../../docs/releases/0.4.0-downloads-and-samples.md). For historical six-STIG sample walkthroughs, start with `authoring/rhel_9/` or `authoring/ms_windows_server_2025/`, open a Rule under `rules/`, follow its `assessment_choices` logical ID to the matching Assessment, and then read its `tests` and `evaluate`.
+For internal testing of the unapproved normalized-layout prototype, open its extracted `content/` tree as described in the [download index](../../docs/releases/0.4.0-downloads-and-samples.md). For historical six-STIG sample walkthroughs, start with `authoring/rhel_9/` or `authoring/ms_windows_server_2025/`, open a Rule under `rules/`, follow its `assessment_choices` logical ID to the matching Assessment, and then read its `tests` and `evaluate`.
 
 An Assessment's **Test** owns the collection capability and expected outcomes. Inline `object` describes what to collect. `require` describes the expected Item population and matching values. More complex content retains Variables, Sets, Filters, nested record predicates and explicit logic.
 

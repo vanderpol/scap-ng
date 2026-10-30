@@ -88,6 +88,22 @@ def filename(kind, body):
 
 def scope_for(relative):
     parts = Path(relative).parts
+    # Human-readable v2 libraries use authoring/<short-stig>/... as their
+    # authoring root. Physical layout identifies the private namespace; YAML
+    # references still resolve by exact kind, logical ID and version.
+    if len(parts) >= 3 and parts[:2] == ('shared', 'assessments'):
+        if len(parts) < 4 or parts[2] not in ('automated', 'manual'):
+            raise ValueError('shared Assessments require an explicit method directory')
+        return 'shared'
+    if parts and parts[0] == 'standalone':
+        return 'standalone'
+    if len(parts) >= 2 and parts[0] not in ('benchmarks', 'applicability', 'rules', 'assessments'):
+        if parts[1] in ('benchmark.yaml', 'applicability.yaml'):
+            return parts[0]
+        if len(parts) >= 3 and parts[1] == 'rules':
+            return parts[0]
+        if len(parts) >= 4 and parts[1:3] in (('assessments', 'automated'), ('assessments', 'manual')):
+            return parts[0]
     if parts[0] in ('benchmarks', 'applicability') and len(parts) == 2:
         return Path(parts[1]).stem
     if parts[0] == 'rules' and len(parts) >= 3:

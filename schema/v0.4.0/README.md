@@ -1,6 +1,6 @@
 # SCAP-NG v0.4.0 — working schema draft
 
-**Download/navigation update (2026-10-30):** Find the [current all-65 native YAML review library, original DRAFT, exact toolchains and sample Assessments](../../docs/releases/0.4.0-downloads-and-samples.md). This page also preserves dated schema-design/checkpoint evidence; older six-STIG artifact links and their counts do **not** identify the latest native authoring corpus. Select the exact pinned toolchain/schema set for validation, not an earlier design excerpt.
+**Download/navigation update (2026-10-30):** Find the [full original 65-stream DRAFT, **internal layout prototype**, exact toolchains and focused sample Assessments](../../docs/releases/0.4.0-downloads-and-samples.md). This page also preserves dated schema-design/checkpoint evidence; older six-STIG artifact links and their counts do **not** identify the latest native authoring corpus. Select the exact pinned toolchain/schema set for validation, not an earlier design excerpt.
 
 **Pre-alpha schema review candidate**, not an accepted release, OVAL Board ratification, or scanner conformance. Historical 0.3.0 schemas remain [archived](../../archive/0.3.0/README.md).
 

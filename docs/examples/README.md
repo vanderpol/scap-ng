@@ -5,7 +5,7 @@ source through the isolated direct converter. Each directory links actual YAML
 and structurally equivalent JSON, source provenance, and validation, compilation
 and independent source-comparison evidence. They represent automated subsets,
 not a complete Benchmark, six-STIG release or scanner-runtime equivalence.
-For the current **all-65 normalized native YAML download**, complete DRAFT,
+For the complete 65-stream DRAFT and separately identified **internal layout prototype**,
 smaller pinned candidate examples, and historical six-STIG ZIPs, use the
 [0.4.0 downloads and Assessment samples index](../releases/0.4.0-downloads-and-samples.md).
 

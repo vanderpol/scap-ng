@@ -1,5 +1,43 @@
 # Native 0.4 library maintenance
 
+## Human-readable layout v2 (#263) — owner-approved path policy
+
+The earlier #261 `content/` ZIP is an **internal technical prototype**, not the
+human-facing authoring layout. The approved [#263 review](https://github.com/vanderpol/scap-ng/issues/263)
+uses 0.3-style short Benchmark directories, original SV-IDs as imported
+filenames, separate `assessments/automated/` and `assessments/manual/`, and no
+`local/` or unconditional filename hashes. For example:
+
+```text
+authoring/rhel_9/benchmark.yaml
+authoring/rhel_9/applicability.yaml
+authoring/rhel_9/rules/SV-257777.rule.yaml
+authoring/rhel_9/assessments/automated/SV-257777.automated.yaml
+```
+
+Source-only/manual originals remain under `records/`, not fake native
+Assessments. Actual shared Assessments are not automatically created; when
+independently approved, their filenames use short functional names separate
+from any one consuming SV-ID. All native logical IDs, source/proof associations,
+compiled programs and YAML payloads are independent of physical paths.
+
+The explicit out-of-place v2 adapter consumes the **fully completed, pinned
+v1 normalized review directory** and never rewrites that source:
+
+```bash
+python tools/scap_ng_library_cli.py reflow-layout /path/to/normalized-v1 \
+  --output /path/to/human-readable-v2 --full-corpus-deliverable
+python tools/scap_ng_library_cli.py check /path/to/human-readable-v2/authoring
+python tools/scap_ng_library_cli.py search /path/to/human-readable-v2/authoring \
+  --scope rhel_9 --kind assessment
+```
+
+For 0.4 the older `export-draft` command still reproduces #261's **v1**
+checkpoint. `reflow-layout` is the separately reviewed v2 path operation.
+Its generated catalog/SQLite cache live in `metadata/`, durable provenance
+sidecars in `records/`, and only native YAML in `authoring/`. Do not publish
+v2 as a release or claim scanner equivalence based on layout checks.
+
 Workstream [#261](https://github.com/vanderpol/scap-ng/issues/261), advancing
 O2/O4/O7/O8; downstream integration
 [VS Code #3](https://github.com/vanderpol/scap-ng-vscode/issues/3).

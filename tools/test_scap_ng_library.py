@@ -9,14 +9,17 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 from scap_ng_library.documents import canonical_yaml, digest, parse, validate
 from scap_ng_library.export import export_draft
+from scap_ng_library.reflow import reflow_layout
 from scap_ng_library.index import Library
 from scap_ng_library.advisory import census
 from scap_ng_library.transaction import apply_plan, atomic_write
 from scap_ng_library.records import original_records
+from package_v04_human_library import package as package_human_review
 
 ROOT=Path(__file__).resolve().parents[1]
 FIXTURE=ROOT/'tests/fixtures/v04-native-library/focused-draft'
@@ -39,6 +42,58 @@ class NativeLibraryTests(unittest.TestCase):
     def write(self,path,doc):
         target=self.content/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(canonical_yaml(doc))
     def body(self,row):return parse((self.content/row['path']).read_bytes())
+
+    def test_human_readable_reflow_preserves_payloads_proofs_and_compiler(self):
+        output=Path(self.temporary.name)/'human-v2'
+        receipt=reflow_layout(self.base,output)
+        self.assertEqual(receipt['status'],'PASS')
+        self.assertEqual(receipt['compiled_program_hashes_unchanged'],4)
+        self.assertEqual(receipt['accepted_static_proofs_unchanged'],3)
+        source={r['yaml_sha256'] for r in json.loads((self.base/'metadata/native-files.json').read_text())}
+        target={sha256(p.read_bytes()).hexdigest() for p in (output/'authoring').rglob('*.yaml')}
+        self.assertEqual(source,target)
+        self.assertTrue((output/'authoring/amazon_linux_2023/benchmark.yaml').is_file())
+        self.assertFalse((output/'authoring/assessments/local').exists())
+        for path in (output/'authoring').rglob('*.yaml'):
+            self.assertNotRegex(path.name,r'-[a-f0-9]{8}\\.yaml$')
+        lib=Library(output/'authoring');self.addCleanup(lib.close);lib.refresh(full=True)
+        self.assertEqual(lib.check()['status'],'PASS')
+        self.assertEqual(sum(r['status']=='CONVERTED_VERIFIED' for r in lib.rows("WHERE kind='assessment'")),3)
+        self.assertEqual({r['scope'] for r in lib.rows("WHERE kind='benchmark'")},
+                         {'amazon_linux_2023','ms_windows_server_2025','ms_windows_firewall'})
+
+    def test_reflow_refuses_changed_source_and_existing_destination(self):
+        root=Path(self.temporary.name)/'tampered';shutil.copytree(self.base,root)
+        item=next(r for r in json.loads((root/'metadata/native-files.json').read_text())
+                  if r['kind']=='assessment')
+        path=root/'content'/item['path'];path.write_bytes(path.read_bytes()+b'\n')
+        with self.assertRaisesRegex(ValueError,'source YAML bytes changed'):
+            reflow_layout(root,Path(self.temporary.name)/'out')
+        output=Path(self.temporary.name)/'existing';output.mkdir()
+        with self.assertRaisesRegex(ValueError,'destination must be new'):
+            reflow_layout(self.base,output)
+
+    def test_v2_shared_semantics_still_reject_unauthorized_cross_scope(self):
+        from scap_ng_library.documents import scope_for
+        self.assertEqual(scope_for('rhel_9/assessments/automated/SV-257851.automated.yaml'),'rhel_9')
+        self.assertEqual(scope_for('rhel_9/assessments/manual/SV-257851.manual.yaml'),'rhel_9')
+        self.assertEqual(scope_for('shared/assessments/automated/linux-home-nosuid.automated.yaml'),'shared')
+        self.assertEqual(scope_for('standalone/assessments/manual/process.yaml'),'standalone')
+        with self.assertRaisesRegex(ValueError,'explicit method directory'):
+            scope_for('shared/assessments/local/incorrect.yaml')
+
+    def test_human_review_zip_has_portable_paths_and_independent_checksum(self):
+        output=Path(self.temporary.name)/'review-v2'
+        reflow_layout(self.base,output)
+        artifact=Path(self.temporary.name)/'human-review.zip'
+        receipt=package_human_review(output,artifact)
+        self.assertEqual(receipt['accepted_proofs_unchanged'],3)
+        self.assertEqual(receipt['sha256'],sha256(artifact.read_bytes()).hexdigest())
+        with zipfile.ZipFile(artifact) as source:
+            self.assertIsNone(source.testzip())
+            paths=source.namelist()
+            self.assertTrue(any('/authoring/amazon_linux_2023/benchmark.yaml' in p for p in paths))
+            self.assertFalse(any('/assessments/local/' in p for p in paths))
 
     def test_original_derived_linux_windows_shared_object_warning_and_manual_records(self):
         self.assertEqual(self.receipt['conversion_statuses'],{'CONVERTED_VERIFIED':3,'CONVERTED_UNVERIFIED':1,'MANUAL_OCIL_ONLY_PRESERVED':3})

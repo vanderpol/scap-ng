@@ -1,6 +1,6 @@
 # SCAP-NG 0.4.0 — historical six-STIG review walkthrough
 
-For the **current 65-stream native YAML**, source/verification status and simplified editable layout, use the [0.4.0 downloads and Assessment samples index](../../docs/releases/0.4.0-downloads-and-samples.md). The commands and paths below deliberately describe the **earlier October 20 six-STIG checkpoint**, not the latest normalized files.
+For the **current 65-stream native YAML**, source/verification status and the **internal-only** normalized prototype (not approved for public authoring), use the [0.4.0 downloads and Assessment samples index](../../docs/releases/0.4.0-downloads-and-samples.md). The commands and paths below deliberately describe the **earlier October 20 six-STIG checkpoint**, not the latest normalized files.
 
 **Audience:** owner, implementers and OVAL Board reviewers. This is an authoring-sample review, not a request to certify or ratify a scanner.
 

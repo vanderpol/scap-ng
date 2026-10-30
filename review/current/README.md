@@ -1,10 +1,10 @@
 # Current SCAP-NG 0.4.0 owner review
 
-**Status (October 30, 2026):** current **pre-alpha native authoring review**, not a final scanner release, certification, signed publisher package or OVAL Board ratification. The current published source is the full 65-stream DRAFT plus its normalized editable YAML review library; older six-STIG sample runs remain pinned historical checkpoints.
+**Status (October 30, 2026):** current **pre-alpha native authoring review**, not a final scanner release, certification, signed publisher package or OVAL Board ratification. The current published source is the full 65-stream DRAFT plus a separate **internal-only** normalized YAML layout/CLI experiment; older six-STIG sample runs remain pinned historical checkpoints.
 
 ## Start with the current native source
 
-**[0.4 downloads and Assessment samples — start here](../../docs/releases/0.4.0-downloads-and-samples.md)** · [normalized editable all-65 YAML review ZIP and toolchain](https://github.com/vanderpol/scap-ng-evidence/tree/v04-normalized-library-review-20261030-ff69d46b3/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3) · [full 65-stream original-source DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download).
+**[0.4 downloads and Assessment samples — start here](../../docs/releases/0.4.0-downloads-and-samples.md)** · [internal normalized all-65 layout/CLI experiment](https://github.com/vanderpol/scap-ng-evidence/tree/v04-normalized-library-review-20261030-ff69d46b3/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3) · [full 65-stream original-source DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download).
 
 The source accounting covers **65 streams /8,892 original Rules**. The normalized review holds **60 editable native Benchmarks and 6,817 compiled candidate Assessments** (4,258 independently statically source-proved; 2,559 explicitly UNVERIFIED); **422 blocked automated and 1,653 manual/OCIL** records remain visible, without fabricated native Assessments. Five original-only streams have no editable native Benchmark. The 13,754 YAML files are byte-identical to the revised DRAFT and the original source/proof ledger is retained. The [normalization CLI contract](../../docs/developer/NATIVE-LIBRARY.md) serves authoring tools without declaring runtime scanner equivalence.
 

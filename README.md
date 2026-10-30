@@ -2,7 +2,7 @@
 
 SCAP-NG is a pre-alpha successor to SCAP 1.4 designed to preserve supported assessment meaning while simplifying authoring, review, collection, results and scalable distribution.
 
-**[0.4.0 downloads and sample Assessments](docs/releases/0.4.0-downloads-and-samples.md)** — start here for the complete normalized editable YAML library, all-65 source DRAFT, pinned toolchains, and smaller review examples.
+**[0.4.0 downloads and sample Assessments](docs/releases/0.4.0-downloads-and-samples.md)** — start here for focused authoring examples, the complete 65-stream source DRAFT, and pinned toolchains. The earlier normalized ZIP is an **internal layout prototype**, not the approved author-facing directory structure; [#263](https://github.com/vanderpol/scap-ng/issues/263) tracks the human-readable replacement.
 
 [Native 0.4 library maintenance and editor-callable CLI](docs/developer/NATIVE-LIBRARY.md)
 provides out-of-place layout export and logical-ID checks across the all-65
