@@ -1,5 +1,16 @@
 # SCAP-NG 0.4.0 — expanded Windows 11 and RHEL 9 authoring review
 
+> **WARNING — CURRENT GENERATED OUTPUT, NOT CANONICAL AUTHORING EXAMPLES.**
+> These files show the exact known-problem baseline so we can audit it; do not copy
+> their field-matching style into new Assessments. In particular,
+> [Windows 11 SV-253475](ms_windows_11/assessments/automated/SV-253475.automated.yaml)
+> needlessly repeats `values_found`/`values_matching` inside two `and` groups.
+> **[Use the proposed compact SV-253475 Assessment instead](../v04-two-sample-review/ms_windows_11/assessments/automated/SV-253475.automated.yaml)**
+> with one Test-wide `field_requirement` and a single `fields` mapping.
+> The latest owner decision also favors Test-wide field policy for single-field
+> checks, using per-field settings only as explicit overrides; this policy has
+> **not** yet been applied to this expanded gallery or the 65-stream archive.
+
 **October 30, 2026. Non-release, source-faithful review excerpts.**
 
 These examples preserve the original native Rule and Assessment YAML bytes from
