@@ -7,7 +7,7 @@
 **Status:** Owner-approved design decisions; **implementation/conformance tracking below is separate from approval**. This is a pre-alpha authoring contract, not OVAL Board ratification or scanner certification.
 **Primary work:** [#255](https://github.com/vanderpol/scap-ng/issues/255); case semantics [#267](https://github.com/vanderpol/scap-ng/issues/267); converter/evidence [#251](https://github.com/vanderpol/scap-ng/issues/251).
 
-This register consolidates the 27 sequential decisions made 2026-10-30–31. The terms below take precedence over superseded 0.3 and intermediate 0.4 examples. **A schema feature is not locked merely because its owner decision is approved.** Until source, schema, converter, compiler, editor contract, fixtures, and documentation agree, mark that row as an implementation gap, not as complete. Historic examples remain evidence only.
+This register consolidates the 28 sequential decisions made 2026-10-30–31. The terms below take precedence over superseded 0.3 and intermediate 0.4 examples. **A schema feature is not locked merely because its owner decision is approved.** Until source, schema, converter, compiler, editor contract, fixtures, and documentation agree, mark that row as an implementation gap, not as complete. Historic examples remain evidence only.
 
 ## Approved decisions
 
@@ -40,6 +40,7 @@ This register consolidates the 27 sequential decisions made 2026-10-30–31. The
 | 25 | `not_applicable` is an explicit, reason-bearing terminal outcome when applicability is genuinely disproved, not a euphemism for scanner inability. It can be selected from **any** `then`/`else_if.then`/`else` branch. False condition selects next branch; indeterminate condition propagates. The Rule applicability gate may independently produce N/A. Preserve OVAL-style Boolean aggregation. | Expression schema and evaluation, roll-up, examples. |
 | 26 | Add ordered `evaluate.else_if: [{if: ..., then: ...}, ...]`, with required initial `if/then` and final `else`. Evaluate branches in order, first true wins, only selected branch runs; preserve six-state propagation. Compiler may normalize to nested `if/then/else`. | Expression schema, normalizer, evaluator, fixtures. |
 | 27 | File and hierarchy traversal must express an unbounded depth as **`max_depth: unlimited`**, not `null` or a magic negative integer. Bounded depth is an integer of at least zero (`0` searches the starting directory only); OVAL `max_depth=-1` converts to `unlimited`. The editor may offer this explicitly documented choice but the scanner must not infer it from omission. Historical 0.1–0.3 grammars remain unchanged. | 0.4 capability schema, converter, independent source proof, schema-negative tests, authoring gallery. |
+| 28 | For **newly authored** file Objects, the editor suggests **`filesystem: local`** and writes it explicitly into YAML, even when the UI hides it. This is an **authoring preference**, not an implicit scanner default. **Source conversion is different:** OVAL 5.12.3 omitted `recurse_file_system` means effective `all`, which must serialize as **`filesystem: all`**; explicit OVAL `local` remains `local`, and `defined` becomes NG `same`. Do not normalize source-effective `all` to `local` or conflate filesystem scope with recursion depth/direction. | Version-local `filesystem_scope` annotation, serialized editor output, source-converter mappings, negative omission test, OVAL crosswalk. |
 
 ## Boundary examples (normative meaning; validate against the actual revised schema before publishing)
 
@@ -81,14 +82,28 @@ The `not_evaluated` branch must carry the observations and follow-up details thr
 
 **Unbounded traversal (Decision 27).** The authored Object uses `traversal: {recurse: directories, max_depth: unlimited}` for unrestricted downward directory depth, while `max_depth: 1` includes only one child level and `max_depth: 0` stays within the starting directory. OVAL `max_depth="-1"` becomes native `unlimited` without altering `recurse_direction` or `recurse_file_system`. `null`, `-1`, and the string `"-1"` are invalid authored 0.4 depth values.
 
+**File-system scope (Decision 28).** The following are both intentional and valid; the second does **not** inherit the editor's new-authoring suggestion:
+
+```yaml
+# New authored file Object; editor may visually hide the explicit default.
+object: {directory: {equals: /etc}, name: {equals: sshd_config}, filesystem: local}
+
+---
+# Converted OVAL Object whose recurse_file_system attribute was omitted:
+# the original OVAL 5.12.3 effective value is all, not local.
+object: {directory: {equals: /etc}, name: {equals: sshd_config}, filesystem: all}
+```
+
+For both, `filesystem` controls file-system search scope only. It does not itself enable recursion. Scanner and compiler consumers must read the serialized value, never synthesize a missing one.
+
 ## Implementation lock and review criteria
 
 This document records owner acceptance; the following must be checked **before** claiming 0.4.0 locked:
 
-The [editor-default ↔ pinned OVAL crosswalk](v04-editor-defaults-oval-crosswalk-20261031.md) is an **incomplete audit** of Decision 7, not an additional implicit default policy or a new approval. It distinguishes the five currently proposed hidden values, their actual OVAL counterparts, and capability-specific candidates that still need review.
+The [editor-default ↔ pinned OVAL crosswalk](v04-editor-defaults-oval-crosswalk-20261031.md) is an **incomplete audit** of Decisions 7 and 28, not an additional implicit default policy. It distinguishes the six currently annotated editor defaults, their actual OVAL counterparts, and capability-specific candidates that still need review.
 
 1. Update each version-local JSON Schema (`x-scap-ng-version`, `x-last-modified`), document standard editor defaults and case-selector metadata; inspect all native capabilities for vocabulary drift.
-2. Add positive and negative fixtures for all 26 decisions, including `may_be_absent`, missing Test `field_requirement`, long native IDs, redundant `purpose`, wrong selector case, `else_if` ordering and six-state N/A vs not-evaluated.
+2. Add positive and negative fixtures for all 28 decisions, including `may_be_absent`, missing Test `field_requirement`, long native IDs, redundant `purpose`, wrong selector case, `else_if` ordering, six-state N/A vs not-evaluated, explicit filesystem scope, and unbounded traversal.
 3. Update converter, compiler, editor-facing guidance and examples to emit **only** the approved 0.4 authoring syntax; preserve OVAL 5.12.3 provenance and source evidence.
 4. Run focused regression and source-equivalence tests, publish count of changed/blocked samples and **do not** claim semantic equivalence on schema acceptance alone. Rebuild broader 65-STIG gallery only as a separately authorized review build.
 5. Publish a before/after review packet tied to #255/#267 and record exact commit, acceptance date, tests and remaining gaps. Release/Board ratification require separate approval.

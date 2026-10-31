@@ -95,6 +95,22 @@ class V04ObjectSelectorTests(unittest.TestCase):
             with self.subTest(invalid_depth=value):
                 self.assertTrue(list(hierarchy.iter_errors({"max_depth": value})))
 
+    def test_filesystem_scope_editor_default_does_not_repair_omission(self):
+        scope = COMMON["$defs"]["filesystem_scope"]
+        self.assertEqual(scope["default"], "local")
+        self.assertTrue(scope["x-scap-ng-authoring"]["hide_when_default"])
+        doc = assessment_with_directory({"equals": "/etc"})
+        obj = doc["assessment"]["tests"]["demo-test"]["object"]
+        # An omitted source OVAL recurse_file_system is effectively 'all'.
+        self.assertEqual(obj["filesystem"], "all")
+        self.assertFalse(errors(doc))
+        obj["filesystem"] = "local"
+        self.assertFalse(errors(doc))
+        obj["filesystem"] = "same"  # OVAL 'defined'
+        self.assertFalse(errors(doc))
+        del obj["filesystem"]
+        self.assertTrue(errors(doc), "A schema default must not fill a missing authored field")
+
     def test_array_with_explicit_independent_value_match(self):
         pred = {
             "equals": ["/lib", "/lib64", "/usr/lib"],

@@ -1,5 +1,19 @@
 # Autonomous development checkpoint
 
+## Owner-confirmed new authoring `filesystem: local`, source OVAL `all` preserved (2026-10-31; #255)
+
+Decision 28 closes the `local` vs `all` discussion without another owner vote.
+New 0.4 file Objects receive the editor suggestion `filesystem: local`,
+which is serialized in YAML even if hidden in the graphical editor. The
+version-local `filesystem_scope` now carries explicit JSON Schema editor
+metadata; it does **not** authorize runtime inference when YAML omits scope.
+An OVAL 5.12.3 source Object with omitted `recurse_file_system` effectively
+requests `all`, so its source-faithful conversion must explicitly write
+`filesystem: all`. Source `local` maps to `local`, and `defined` maps to
+`same`. This metadata-only change must not rewrite existing source conversions
+or evidence baselines. The full 0.4 editor-default catalog still requires
+separate crosswalk review; PR #268 remains draft pending broader alignment.
+
 ## Owner-approved 0.4 traversal depth spelling (2026-10-31; #255)
 
 Jack approved `max_depth: unlimited` as the canonical authored form of
