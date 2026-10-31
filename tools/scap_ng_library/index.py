@@ -296,6 +296,10 @@ class Library:
         for scope,ident in duplicates:
             for row in self.rows('WHERE scope=? AND id=?',(scope,ident)):
                 problems.append(diagnostic(self.root,row,'duplicate-identity','duplicate identity in eligible scope: '+ident))
+        for value in self.db.execute("SELECT id FROM nodes WHERE kind='assessment' GROUP BY id HAVING COUNT(*)>1"):
+            for row in self.rows("WHERE kind='assessment' AND id=?", (value['id'],)):
+                problems.append(diagnostic(self.root,row,'duplicate-assessment-identity',
+                    'Assessment ID must be unique across the compiled library: '+row['id']))
         # A global shared Assessment must not shadow a private one, even unused.
         shared = self.rows("WHERE scope='shared'")
         for row in shared:
@@ -348,10 +352,8 @@ class Library:
             try:
                 target = self.resolve(source,edge['kind'],edge['id'],edge['version'])
                 adjacency[source['path']].append(target['path'])
-                if source['kind']=='assessment' and edge['purpose']:
-                    body=json.loads(self.rows('WHERE path=?',(target['path'],),payload=True)[0]['payload'])['assessment']
-                    if edge['purpose']!=body.get('purpose'):
-                        raise ValueError('purpose-mismatch: '+target['id'])
+                # Typed Rule/applicability/dependency edges determine use;
+                # an Assessment has no intrinsic purpose to compare or infer.
                 if source['kind']=='rule' and target['kind']=='assessment':
                     if source['scope'] in benchmark_specs:
                         if target['mode']=='automated' and target['specification'] not in benchmark_specs[source['scope']]:

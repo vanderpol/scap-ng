@@ -13,6 +13,15 @@ Coordination comments are posted on #268 and #260 before overlapping edits.
 No corpus restart, final release/tag, PR merge, source/proof-floor rebaseline,
 or separate all_exist oracle change is authorized.
 
+Native name migration committed locally as `806505233` (37 bounded tests and
+33 source integration tests PASS). Next identity/context checkpoint has 5 new
+and 36 existing focused tests PASS: strict native IDs, global library Assessment
+identity, context-free dependency resolution and quoted cmdlet version validation.
+[Identity/context packet](../audit/v04-owner-identity-context-20261031.md).
+No preserved historical proof/compiled hash has been replaced. Complete default
+catalog, bounded human samples, current fixture migration and maintained gates
+remain pending; continue safely on the registered draft branch.
+
 Published producer checkpoint `07ee42ff5` and conditional checkpoint `9c28c6afc`.
 Next native-identity checkpoint removes eleven suffixes without merging Solaris
 SVR4/IPS, preserves original mapping bytes/frozen pins, and rejects old native
