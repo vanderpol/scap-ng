@@ -76,11 +76,11 @@ class RemainingPrimitiveTests(unittest.TestCase):
         self.assertTrue(any(n.get('equals') == 'false' and 'datatype' not in n
                             for d in self.docs.values() for n in walk(d)))
         environments = [n for d in self.docs.values() for n in walk(d)
-                        if n.get('capability') == 'independent.environmentvariable58']
+                        if n.get('capability') == 'independent.environmentvariable']
         self.assertEqual(len(environments), 4)
         self.assertTrue(all(n['pid'] is None for n in environments))
         docs = deepcopy(self.docs)
-        env = next(n for d in docs.values() for n in walk(d) if n.get('capability') == 'independent.environmentvariable58')
+        env = next(n for d in docs.values() for n in walk(d) if n.get('capability') == 'independent.environmentvariable')
         env['pid'] = {'equals': 0, 'datatype': 'integer'}
         with self.assertRaises(AssertionError): verify_original(self.source.root, docs, self.trace)
         binding = next(b for b in self.trace['rules'] if any(v['kind'] == 'object' and

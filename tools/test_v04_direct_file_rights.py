@@ -20,7 +20,7 @@ from v04_direct_authoring_examples import capability_examples, walk
 ROOT = Path(__file__).resolve().parents[1]
 PINS = json.loads((ROOT / 'tests/fixtures/v04-direct-prototype/provenance.json').read_text())
 O, W = '{' + OVAL + '}', '{' + OVAL + '#windows}'
-CAP = 'windows.fileeffectiverights53'
+CAP = 'windows.fileeffectiverights'
 
 
 class DirectFileRightsTests(unittest.TestCase):

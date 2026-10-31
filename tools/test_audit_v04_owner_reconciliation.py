@@ -15,7 +15,7 @@ class OwnerReconciliationAudit(unittest.TestCase):
     def test_all_hundred_contracts_and_preserved_original_qnames(self):
         rows = self.report['capabilities']
         self.assertEqual(len(rows), 100)
-        row = next(r for r in rows if r['capability'] == 'independent.textfilecontent54')
+        row = next(r for r in rows if r['capability'] == 'independent.textfilecontent')
         self.assertEqual(row['native_expected_name'], 'independent.textfilecontent')
         self.assertEqual(row['source']['test'], 'textfilecontent54_test')
         self.assertTrue(row['source_default_declarations'])

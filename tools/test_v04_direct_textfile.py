@@ -22,7 +22,7 @@ from v04_direct_authoring_examples import walk
 ROOT = Path(__file__).resolve().parents[1]
 PINS = json.loads((ROOT / 'tests/fixtures/v04-direct-prototype/provenance.json').read_text())
 I = '{' + OVAL + '#independent}'
-CAP = 'independent.textfilecontent54'
+CAP = 'independent.textfilecontent'
 
 
 class DirectTextFileTests(unittest.TestCase):

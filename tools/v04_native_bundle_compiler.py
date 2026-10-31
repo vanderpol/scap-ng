@@ -21,6 +21,7 @@ import json
 from pathlib import Path
 import re
 import zipfile
+from functools import lru_cache
 
 from v04_a_authoring_graph_index import (
     canonical_json, graph_index, read_authoring_archive,
@@ -86,6 +87,8 @@ def compile_test_instruction(test_id, test):
     validate_test(test)
     if not isinstance(test.get("capability"), str) or not test["capability"]:
         raise ValueError(f"Test {test_id}: missing collector capability")
+    if test['capability'] not in _compiler_capabilities():
+        raise ValueError('unknown native 0.4 capability ' + repr(test['capability']))
     if "collected_items_require" in test:
         raise ValueError("legacy collected_items_require is not canonical 0.4")
     if isinstance(test.get("object"), dict) and "capability" in test["object"]:
@@ -100,6 +103,12 @@ def compile_test_instruction(test_id, test):
         "source_test_sha256": sha256(canonical_json(test)).hexdigest(),
         "operands": deepcopy(test),
     }
+
+
+@lru_cache(maxsize=1)
+def _compiler_capabilities():
+    from v04_canonical_source_ir import _supported_capabilities
+    return _supported_capabilities()
 
 
 def compile_assessment_program(assessment):

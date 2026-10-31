@@ -8,6 +8,7 @@ import argparse
 from copy import deepcopy
 import json
 from pathlib import Path
+import re
 import time
 import zipfile
 
@@ -222,7 +223,7 @@ class AssessmentConverter:
                    field in mapping['native']['state_field_map'], 'unsupported State field/namespace')
             ensure(field not in seen, 'repeated State field outside bounded proof')
             seen.add(field)
-            if mapping['capability'] == 'windows.fileeffectiverights53':
+            if mapping['capability'] == 'windows.fileeffectiverights':
                 types = tuple(mapping['native']['field_datatypes'][mapping['native']['state_field_map'][field]])
                 datatype = {('string',): 'string', ('boolean',): 'boolean'}.get(types)
                 # Original EntityStateBoolType requires explicit datatype;
@@ -269,7 +270,7 @@ class AssessmentConverter:
                     continue
                 field = local_name(child)
                 if field == 'behaviors' and (mapping['capability'] in (
-                        'independent.textfilecontent54', 'independent.shellcommand') or
+                        'independent.textfilecontent', 'independent.shellcommand') or
                         mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal', 'hierarchy_traversal') or
                         behavior_routes(mapping)):
                     ensure(child.tag == f'{{{mapping["source"]["namespace"]}}}behaviors' and behaviors is None,
@@ -320,7 +321,7 @@ class AssessmentConverter:
                     traversal_fields)
             if behavior_routes(mapping):
                 acquisition.update(scalar_behaviors(scalar_part, mapping))
-            if mapping['capability'] == 'independent.textfilecontent54':
+            if mapping['capability'] == 'independent.textfilecontent':
                 from v04_direct_file_behaviors import file_behaviors, textfile_path_controls
                 text_part, traversal_part = split_behaviors(behaviors,
                     {'ignore_case', 'multiline', 'singleline', 'item_creation'},
@@ -865,9 +866,13 @@ def convert_rule(source, source_id, mappings, *, human_compact=False):
         from v04_draft_inputs import check_exports
         converter.bound_exports=check_exports(source,rule)
     expression = converter.reference(definition, 'definition')
-    rule_id = native_identifier(rule, 'rule')
-    assessment_id = native_identifier(rule, 'assessment')
     title = rule.findtext(f'{{{XCCDF}}}title', '')
+    # Local Assessments retain a human-recognizable source control discriminator.
+    # These are not promoted/global shared-library names (Decision 11/12).
+    control = re.search(r'SV-\d+', source_id)
+    local_title = title + (' ' + control.group() if control else '')
+    rule_id = native_identifier(rule, 'rule', local_title)
+    assessment_id = native_identifier(rule, 'assessment', local_title)
     assessment = {'id': assessment_id, 'version': 1, 'assessment_title': title,
         'mode': 'automated', 'class': source.node(component, definition, 'definition').get('class'),
         'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'}}

@@ -13,6 +13,17 @@ Coordination comments are posted on #268 and #260 before overlapping edits.
 No corpus restart, final release/tag, PR merge, source/proof-floor rebaseline,
 or separate all_exist oracle change is authorized.
 
+Published producer checkpoint `07ee42ff5` and conditional checkpoint `9c28c6afc`.
+Next native-identity checkpoint removes eleven suffixes without merging Solaris
+SVR4/IPS, preserves original mapping bytes/frozen pins, and rejects old native
+aliases. [Identity ledger and proof boundaries](../audit/v04-native-identity-migration-20261031.md).
+37 bounded identity/converter/audit tests PASS (20.114s); 23 compiler/producer/
+conditional tests PASS (0.957s). No generator/proof-floor fingerprint rebaseline.
+CI at `07ee42ff5`: contract-sync and independent JSON authoring PASS; canonical,
+draft-schema and clean-extract still FAIL, Board was running at inspection.
+Keep next work local until its integration gate completes; continue defaults,
+consumer-purpose and native identity validation in parallel.
+
 Conditional implementation is committed as `9c28c6afc` (44 focused PASS).
 The next producer checkpoint has 35 targeted tests PASS (9.721s), including
 real pinned Linux/Windows schema/compile/static source comparisons, record

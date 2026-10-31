@@ -415,6 +415,9 @@ class Source:
 
 class Native:
     def __init__(self, assessment):
+        # Explicit historical proof-witness decoding, never schema/compiler repair.
+        from v04_native_capability_names import archival_witness_identities
+        assessment = archival_witness_identities(assessment)
         self.a, self.active = assessment, set()
         self.used = {'tests': set(), 'shared_objects': set(), 'variables': set()}
         keys(assessment, {'id', 'version', 'assessment_title', 'class', 'purpose', 'mode',

@@ -138,7 +138,7 @@ class AllExistNormalizationTests(unittest.TestCase):
         from jsonschema import Draft202012Validator
         schema = json.loads((ROOT / 'schema/v0.4.0/collected-item.schema.json').read_text())
         validator = Draft202012Validator(schema)
-        item = {'id': 'audit-rule-item', 'capability': 'independent.textfilecontent54',
+        item = {'id': 'audit-rule-item', 'capability': 'independent.textfilecontent',
                 'status': 'does_not_exist', 'fields': {}, 'provenance': {}}
         self.assertFalse(validator.is_valid(item))
         for status in ('exists', 'error', 'not_collected'):
@@ -147,7 +147,7 @@ class AllExistNormalizationTests(unittest.TestCase):
             (ROOT / 'schema/v0.4.0/collection-result.schema.json').read_text()))
         for status in ('complete', 'incomplete', 'error', 'not_collected'):
             self.assertTrue(collection.is_valid({'id': 'audit-rules-collection',
-                'capability': 'independent.textfilecontent54', 'status': status, 'item_refs': []}))
+                'capability': 'independent.textfilecontent', 'status': status, 'item_refs': []}))
         self.assertFalse(contract_evidence(CONTRACT)['unrestricted_oval_equivalence'])
 
     def test_source_drift_and_unknown_contract_fail_closed(self):

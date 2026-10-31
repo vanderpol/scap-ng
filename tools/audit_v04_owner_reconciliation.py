@@ -29,7 +29,8 @@ def walk(value, pointer=''):
 
 
 def slug_capability(name):
-    return re.sub(r'\d+$', '', name)
+    from v04_native_capability_names import canonical_capability
+    return canonical_capability(name)
 
 
 class SourceDefaults:

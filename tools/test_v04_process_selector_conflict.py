@@ -30,7 +30,7 @@ class ProcessSelectorConflictTests(unittest.TestCase):
         cls.raw = raw
         cls.root = ET.fromstring(raw)
         cls.mappings = probe_mappings()
-        cls.mapping = next(m for m in cls.mappings if m['capability'] == 'unix.process58')
+        cls.mapping = next(m for m in cls.mappings if m['capability'] == 'unix.process')
         cls.validator = build_validators(ROOT / 'schema/v0.4.0')['assessment.schema.json']
 
     def test_valid_original_combined_selectors_are_blocked_by_overlapping_one_of(self):
@@ -56,7 +56,7 @@ class ProcessSelectorConflictTests(unittest.TestCase):
             self.assertEqual(result['source_proof'], 'PROVED', result)
             seen += 1
         self.assertEqual(seen, 8)
-        self.assertIn('unix.process58', {m['capability'] for m in load_mappings()})
+        self.assertIn('unix.process', {m['capability'] for m in load_mappings()})
 
     def test_review_only_exact_alternative_proposal_has_bounded_effect(self):
         # Retain the isolated proposal and require it to agree with the now
