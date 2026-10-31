@@ -271,8 +271,9 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
     recurse_source=str(
         behaviors.get(
             "recurse",
-            "junctions and directories"
-            if traversal_definition=="windows_file_traversal"
+            ("directories" if mapping.get("specification_version") == "0.4.0"
+             else "junctions and directories")
+            if traversal_definition == "windows_file_traversal"
             else "symlinks and directories",
         )
     )
