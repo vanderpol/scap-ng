@@ -275,6 +275,7 @@ class CapabilityV04Tests(unittest.TestCase):
             "reported_elements":"all",
             "capability":"windows.passwordpolicy",
             "require":{"items_found":"one_or_more", "items_satisfying":"every",
+                       "field_requirement": {"values_found": "one_or_more", "values_matching": "every"},
                        "fields":{field_name:{"equals":14,
                            "values_found":"one_or_more", "values_matching":"every"}}},
         }
@@ -360,6 +361,7 @@ class CapabilityV04Tests(unittest.TestCase):
                 "mount_point":{"equals":"/home"}
             }),
             "require":{"items_found":"one_or_more", "items_satisfying":"every",
+                       "field_requirement": {"values_found": "one_or_more", "values_matching": "one_or_more"},
                        "fields":{"mount_options":{"equals":"nosuid",
                            "values_found":"one_or_more", "values_matching":"one_or_more"}}},
         }

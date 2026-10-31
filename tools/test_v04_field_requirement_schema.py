@@ -16,7 +16,7 @@ from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = {'values_found': 'one_or_more', 'values_matching': 'every'}
-OPTIONAL = {'values_found': 'may_be_absent', 'values_matching': 'every'}
+OPTIONAL = {'values_found': 'zero_or_more', 'values_matching': 'every'}
 
 
 def requirement():
@@ -34,7 +34,7 @@ def document(req):
     return {'assessment': {
         'id': 'edition-assessment', 'version': 1,
         'assessment_title': 'Windows Enterprise editions', 'mode': 'automated',
-        'class': 'inventory', 'purpose': 'applicability',
+        'class': 'inventory',
         'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
         'tests': {'edition-test': {
             'test_title': 'Enterprise or EnterpriseS',
@@ -66,7 +66,7 @@ class ProductionFieldRequirementTests(unittest.TestCase):
     def test_enterprise_alternative_complete_conditions(self):
         self.assert_valid(requirement())
         req = requirement()
-        req['items_found'] = 'may_be_absent'
+        req['items_found'] = 'zero_or_more'
         req['items_satisfying'] = 'one_or_more'
         self.assert_valid(req)
 
@@ -91,6 +91,8 @@ class ProductionFieldRequirementTests(unittest.TestCase):
         for scope in ('test', 'group', 'condition', 'field'):
             req = requirement()
             if scope != 'test':
+                # These narrower scopes remain valid as overrides, but cannot
+                # replace the mandatory Test-wide baseline (owner Decision 3).
                 del req['field_requirement']
                 if scope == 'group':
                     # Individual alternatives can inherit from their own group.
@@ -103,7 +105,10 @@ class ProductionFieldRequirementTests(unittest.TestCase):
                     for alt in req['or']:
                         for field in alt['fields'].values():
                             field.update(REQUIRED)
-            self.assert_valid(req)
+            self.assert_valid(req, valid=(scope == 'test'))
+            if scope != 'test':
+                req['field_requirement'] = dict(REQUIRED)
+                self.assert_valid(req)
 
     def test_missing_scope_and_sibling_leakage_rejected(self):
         req = requirement()
@@ -112,10 +117,12 @@ class ProductionFieldRequirementTests(unittest.TestCase):
         req['or'][0]['field_requirement'] = dict(REQUIRED)
         self.assert_valid(req, valid=False)
         req['or'][1]['field_requirement'] = dict(REQUIRED)
+        self.assert_valid(req, valid=False)  # local branches cannot replace Test-wide requirement
+        req['field_requirement'] = dict(REQUIRED)
         self.assert_valid(req)
         del req['or'][1]['field_requirement']
         req['or'][1]['fields']['value'].update(REQUIRED)
-        self.assert_valid(req, valid=False)  # type remains unscoped
+        self.assert_valid(req)  # type inherits the Test-wide requirement
 
     def test_old_names_rejected_in_every_scope(self):
         for name in ('require', 'state_fields_require', 'states_match',
@@ -135,7 +142,7 @@ class ProductionFieldRequirementTests(unittest.TestCase):
                               test_changes={name: dict(REQUIRED)}, valid=False)
 
     def test_item_existence_does_not_encode_satisfaction(self):
-        for found in ('none', 'exactly_one', 'one_or_more', 'may_be_absent'):
+        for found in ('none', 'exactly_one', 'one_or_more', 'zero_or_more'):
             self.assert_valid({'items_found': found})
             for satisfying in ('none', 'exactly_one', 'one_or_more', 'every'):
                 req = requirement()
@@ -206,7 +213,7 @@ class ProductionFieldRequirementTests(unittest.TestCase):
         req['or'] = [{'fields': {'unlabeled': {'values_found': 'none'}}}]
         self.assert_valid(req)
         del req['field_requirement']
-        self.assert_valid(req)  # explicit absence needs no inherited pair
+        self.assert_valid(req, valid=False)  # a field-level condition requires a Test baseline
 
         for predicate in (
             {'values_found': 'none', 'values_matching': 'every'},

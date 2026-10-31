@@ -67,7 +67,7 @@ class TestEvaluateLogicalOperators(unittest.TestCase):
 
     def test_versioned_schema_metadata_stays_self_contained(self):
         self.assertEqual(self.schema["x-scap-ng-version"],"0.4.0")
-        self.assertEqual(self.schema["x-last-modified"],"2026-10-23")
+        self.assertEqual(self.schema["x-last-modified"],"2026-10-31")
         self.assertIn("/v0.4.0/",self.schema["$id"])
 
 

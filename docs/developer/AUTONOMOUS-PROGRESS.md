@@ -1,5 +1,30 @@
 # Autonomous development checkpoint
 
+## Owner-approved 0.4.0 authoring contract consolidation (2026-10-31; #255 / #267)
+
+The owner approved Decisions 1–26 (including the final per-selector case and
+`windows.cmdlet.module_version` version datatype decisions). Canonical dated
+[decision record](../audit/v04-owner-final-decisions-20261031.md) now separates
+owner approval from schema, compiler, converter, editor and scanner readiness.
+The initial version-local schema pass removes Assessment `purpose`, replaces
+`may_be_absent` with `zero_or_more`, mandates Test-wide
+`field_requirement` for comparisons, restricts selected native IDs to 64
+characters, annotates editor-materialized defaults, adds ordered
+`evaluate.else_if` and reason-bearing `not_evaluated`, and annotates Windows
+Registry/file selectors and cmdlet version typing. It deliberately leaves all
+pinned source proof-floor hashes and the 65-STIG library untouched.
+
+Focused schema acceptance: new 13-case owner decision suite passed; revised
+cardinality, field inheritance, draft grammar and evaluate tests passed. These
+are **syntax and contract metadata tests only**. No scanner or conditional
+runtime execution was claimed. Maintained tests and generator/converter
+fixtures that still emit `purpose`, `may_be_absent`, old numeric capability
+names or missing Test-wide requirements require migration before 0.4 release.
+Remaining implementation gates, explicitly red old-baseline integration
+tests and the purpose-scoped review branch are listed in the decision record.
+Do not update generator parity hashes without source-reviewed migration or
+merge this branch into main yet. Keep #251 source validation independent.
+
 ## Active #251/#255 — bounded independent source validation (2026-10-30)
 
 Owner instruction: continue pinned-original 0.4 independent validation, leaving
