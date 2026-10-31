@@ -34,16 +34,13 @@ class CanonicalResultPlanTests(unittest.TestCase):
         for modern, legacy in (("and", "all"), ("or", "any"),
                                ("one", "one"), ("xor", "odd")):
             modern_plan = compile_canonical_result_plan(authored(paired(modern)))
-            legacy_plan = compile_canonical_result_plan(authored(paired(legacy)))
-            self.assertEqual(modern_plan["instructions"], legacy_plan["instructions"])
-            self.assertNotEqual(modern_plan["source_sha256"],
-                                legacy_plan["source_sha256"]) if modern != legacy else None
+            if modern != legacy:
+                with self.assertRaises(UnsupportedExpression):
+                    compile_canonical_result_plan(authored(paired(legacy)))
             for left, right in product(sorted(SIX), repeat=2):
                 supplied = {"left-test": left, "right-test": right}
                 result = evaluate_supplied_results(modern_plan, supplied)
                 self.assertEqual(result["outcome"], combine(legacy, (left, right)))
-                self.assertEqual(result["outcome"], evaluate_supplied_results(
-                    legacy_plan, supplied)["outcome"])
                 self.assertFalse(result["scanner_executed"])
                 self.assertFalse(result["tests_evaluated"])
                 self.assertEqual(result["stage"], STAGE)
@@ -77,20 +74,22 @@ class CanonicalResultPlanTests(unittest.TestCase):
             with self.subTest(bad=bad), self.assertRaisesRegex(ValueError, "result keys"):
                 evaluate_supplied_results(plan, {"left-test": "true"}, bad)
 
-    def test_conditional_is_explicitly_unsupported_not_assumed_false(self):
+    def test_approved_conditional_propagates_unknown_without_selecting_a_branch(self):
         conditional = {"if": {"test": "left-test"},
                        "then": {"test": "right-test"},
                        "else": {"test": "third-test"}}
-        with self.assertRaises(UnsupportedExpression):
-            compile_canonical_result_plan(authored(conditional))
+        plan = compile_canonical_result_plan(authored(conditional))
+        observed = evaluate_supplied_results(plan, {'left-test': 'unknown'})
+        self.assertEqual(observed['outcome'], 'unknown')
+        self.assertEqual(len(observed['trace']), 2)
         report = census_authoring({
             "authoring/a/first.json": {"assessment": authored(paired("and"))},
             "authoring/a/second.json": {"assessment": authored(conditional)},
         })
         self.assertEqual(report["counts"]["automated_assessments"], 2)
-        self.assertEqual(report["counts"]["compiled_supplied_result_plans"], 1)
-        self.assertEqual(report["counts"]["unsupported_result_expressions"], 1)
-        self.assertFalse(report["conditional_semantics_implemented"])
+        self.assertEqual(report["counts"]["compiled_supplied_result_plans"], 2)
+        self.assertEqual(report["counts"].get("unsupported_result_expressions", 0), 0)
+        self.assertTrue(report["conditional_semantics_implemented"])
 
     def test_serialized_source_pinned_result_plan_manifest_rejects_changes(self):
         docs = {

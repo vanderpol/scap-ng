@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json",
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-10-23",
+  "x-last-modified": "2026-10-31",
   "title": "SCAP-NG shared capability schema primitives v0.4.0",
   "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern. Owner-accepted 0.3 compact source can omit an inferred literal comparison datatype or use a self-describing typed operation; published compiled Assessments retain fully explicit canonical datatypes. compare_as is not supported.",
   "$defs": {
@@ -15,7 +15,8 @@
         "variable": {
           "type": "string",
           "minLength": 1,
-          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$"
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+          "maxLength": 64
         }
       },
       "additionalProperties": false
@@ -172,7 +173,7 @@
         "one_or_more",
         "none",
         "exactly_one",
-        "may_be_absent"
+        "zero_or_more"
       ]
     },
     "logical_operator": {
@@ -377,11 +378,16 @@
       ],
       "properties": {
         "max_depth": {
-          "type": [
-            "integer",
-            "null"
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unlimited"
+            }
           ],
-          "minimum": 0
+          "description": "Maximum downward hierarchy recursion depth; 0 means starting key only and unlimited maps OVAL -1."
         }
       },
       "additionalProperties": false
@@ -459,12 +465,16 @@
       ],
       "properties": {
         "max_depth": {
-          "type": [
-            "integer",
-            "null"
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unlimited"
+            }
           ],
-          "minimum": 0,
-          "description": "Maximum downward recursion depth; null means no limit. OVAL -1 imports as null."
+          "description": "Maximum downward recursion depth: 0 means starting directory only, positive integers bound descendant depth, and unlimited has no depth limit. OVAL -1 imports as unlimited."
         },
         "recurse": {
           "type": "string",
@@ -532,7 +542,12 @@
         "local",
         "same"
       ],
-      "description": "Filesystem search scope independent of recursion. OVAL recurse_file_system all/local/defined maps to all/local/same and applies to exact full_path as well as directory/name selection."
+      "default": "local",
+      "x-scap-ng-authoring": {
+        "group": "acquisition",
+        "hide_when_default": true
+      },
+      "description": "For newly authored NG file Objects, editors suggest local and serialize it explicitly (optionally hidden in the editor). This annotation is not a scanner/runtime default. Source conversion must retain the effective OVAL recurse_file_system value: omitted OVAL means all, explicitly local means local, and defined maps to same. Filesystem scope is independent of recursion and applies to full_path as well as directory/name selection."
     },
     "foreach_binding": {
       "type": "object",
@@ -571,6 +586,7 @@
     "object_reference": {
       "type": "string",
       "minLength": 1,
+      "maxLength": 64,
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"
     },
     "inline_object": {

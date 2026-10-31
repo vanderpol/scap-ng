@@ -47,7 +47,7 @@ def fixture(*, req=None, obj=None):
     return {"assessment": {
         "id": "draft-schema-assessment", "version": 1,
         "assessment_title": "0.4 canonical example", "mode": "automated",
-        "class": "compliance", "purpose": "assessment",
+        "class": "compliance",
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
         "tests": {"demo-test": test}, "evaluate": {"test": "demo-test"},
     }}

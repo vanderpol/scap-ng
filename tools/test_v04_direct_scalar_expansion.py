@@ -44,13 +44,15 @@ class ScalarExpansionTests(unittest.TestCase):
                     self.assertEqual(result['source_proof'], 'PROVED', result)
                     proved += 1
         self.assertEqual(proved, 46)
-        self.assertEqual(seen, set(self.pin['capabilities']))
+        from v04_native_capability_names import canonical_capability
+        self.assertEqual(seen, {canonical_capability(c) for c in self.pin['capabilities']})
 
     def test_frozen_identities_cover_original_xsd_fields(self):
         # Inspect original declarations independently of the converter's map.
         # Deprecated fields absent from a reviewed map are not silently admitted.
         for capability in self.pin['capabilities']:
-            record = CONTRACTS[capability]
+            from v04_native_capability_names import canonical_capability
+            record = CONTRACTS[canonical_capability(capability)]
             schema = ET.parse(ROOT / record['source']['definitions_schema']).getroot()
             for kind, names in (('object', record['selectors']), ('state', record['fields'])):
                 declaration = schema.find(XS + 'element[@name="' + record['source'][kind] + '"]')

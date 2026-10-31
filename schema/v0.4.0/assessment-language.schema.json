@@ -98,12 +98,12 @@
     },
     "existence_cardinality": {
       "type": "string",
-      "enum": ["none", "exactly_one", "one_or_more", "every", "may_be_absent"],
+      "enum": ["none", "exactly_one", "one_or_more", "every", "zero_or_more"],
       "description": "State field/record existence cardinality. Preserve the OVAL entity/record all_exist distinction pending separate evidence review."
     },
     "item_existence_cardinality": {
       "type": "string",
-      "enum": ["none", "exactly_one", "one_or_more", "may_be_absent"],
+      "enum": ["none", "exactly_one", "one_or_more", "zero_or_more"],
       "description": "Collected NG Items have no synthetic does-not-exist entries. OVAL Test all_exist and at_least_one_exists both map to one_or_more; preserve their original source attributes in provenance."
     },
     "paired_requirement": {
@@ -26420,6 +26420,67 @@
         }
       ]
     },
+    "canonical_inherited_record_predicate": {
+      "type": "object",
+      "required": [
+        "record"
+      ],
+      "properties": {
+        "record": {
+          "type": "object",
+          "required": [
+            "records_found"
+          ],
+          "properties": {
+            "records_found": {
+              "$ref": "#/$defs/existence_cardinality"
+            },
+            "records_matching": {
+              "$ref": "#/$defs/cardinality"
+            },
+            "fields": {
+              "type": "object",
+              "minProperties": 1,
+              "propertyNames": {
+                "type": "string",
+                "minLength": 1
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/canonical_field_predicate"
+              }
+            },
+            "redact_result": {
+              "const": true
+            },
+            "field_requirement": {
+              "$ref": "#/$defs/paired_requirement"
+            }
+          },
+          "additionalProperties": false,
+          "if": {
+            "properties": {
+              "records_found": {
+                "const": "none"
+              }
+            },
+            "required": [
+              "records_found"
+            ]
+          },
+          "then": {
+            "maxProperties": 1
+          },
+          "else": {
+            "required": [
+              "records_matching",
+              "fields"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Record correlation and aggregation retained; member comparisons inherit the nearest complete Test/group/record field policy. Local overrides must be complete pairs."
+    },
     "canonical_inherited_condition": {
       "oneOf": [
         {
@@ -26442,7 +26503,7 @@
               "additionalProperties": {
                 "oneOf": [
                   {"$ref": "#/$defs/canonical_field_predicate"},
-                  {"$ref": "#/$defs/record_wrapper_predicate"}
+                  {"$ref": "#/$defs/canonical_inherited_record_predicate"}
                 ]
               }
             }
@@ -26759,20 +26820,27 @@
       "type": "object",
       "required": [
         "items_found",
-        "items_satisfying"
+        "items_satisfying",
+        "field_requirement"
       ],
       "properties": {
         "items_found": {
           "$ref": "#/$defs/item_existence_cardinality",
+          "default": "one_or_more",
+          "x-scap-ng-authoring": {"group": "items", "hide_when_default": true},
           "description": "Selected-Item existence requirement (OVAL Test check_existence). Both source all_exist and at_least_one_exists map to one_or_more; preserve their distinct source spellings only in provenance."
         },
         "items_satisfying": {
           "$ref": "#/$defs/cardinality",
+          "default": "every",
+          "x-scap-ng-authoring": {"group": "items", "hide_when_default": true},
           "description": "How many collected Items must satisfy the complete condition (OVAL Test check). Never conflated with items_found."
         },
         "field_requirement": {
           "$ref": "#/$defs/paired_requirement",
-          "description": "Optional shared values_found/values_matching pair for fields in this Test, overridden only by a closer complete pair on a group, condition, or individual field. No implicit field requirement."
+          "default": {"values_found": "one_or_more", "values_matching": "every"},
+          "x-scap-ng-authoring": {"group": "field_requirements", "hide_when_default": true},
+          "description": "Required shared values_found/values_matching pair for comparison Tests. The editor may offer these defaults but must serialize the complete pair. A closer complete pair overrides it; no runtime default."
         },
         "fields": {
           "type": "object",
@@ -26781,7 +26849,7 @@
           "additionalProperties": {
             "oneOf": [
               {"$ref": "#/$defs/canonical_field_predicate"},
-              {"$ref": "#/$defs/record_wrapper_predicate"}
+              {"$ref": "#/$defs/canonical_inherited_record_predicate"}
             ]
           },
           "description": "One complete condition; distinct fields are combined with logical AND."
@@ -26830,7 +26898,7 @@
                 "additionalProperties": {
                   "oneOf": [
                     {"$ref": "#/$defs/explicit_field_predicate"},
-                    {"$ref": "#/$defs/record_wrapper_predicate"}
+                    {"$ref": "#/$defs/canonical_inherited_record_predicate"}
                   ]
                 }
               },
@@ -26846,5 +26914,5 @@
     }
   },
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-10-28"
+  "x-last-modified": "2026-10-31"
 }

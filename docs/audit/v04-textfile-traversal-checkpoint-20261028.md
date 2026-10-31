@@ -38,7 +38,7 @@ multiline: true
 singleline: false
 item_creation: all_object_elements_fullfilled
 filesystem: all
-traversal: {max_depth: null, recurse: symlinks_and_directories}
+traversal: {max_depth: unlimited, recurse: symlinks_and_directories}
 ```
 
 This is downward acquisition with original unbounded depth and original default

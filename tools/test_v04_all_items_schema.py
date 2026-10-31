@@ -18,13 +18,15 @@ test = Draft202012Validator({'$ref': '#/$defs/test', '$defs': defs})
 count = {'values_found': 'one_or_more', 'values_matching': 'every'}
 good = [
     {'items_found': 'one_or_more', 'items_satisfying': 'every',
+     'field_requirement': count,
      'fields': {'type': {'equals': 'dword', **count},
                 'value': {'equals': 0, **count}}},
-    {'items_found': 'may_be_absent', 'items_satisfying': 'one_or_more',
+    {'items_found': 'zero_or_more', 'items_satisfying': 'one_or_more',
      'field_requirement': count,
      'or': [{'fields': {'value': {'equals': 'Enterprise'}}},
             {'fields': {'value': {'equals': 'EnterpriseS'}}}]},
     {'items_found': 'exactly_one', 'items_satisfying': 'none',
+     'field_requirement': count,
      'and': [{'fields': {'value': {'equals': 'Enterprise', **count}}},
              {'fields': {'type': {'equals': 'string', **count}}}]},
 ]
@@ -44,7 +46,7 @@ for value in good:
 for value in bad:
     assert list(condition.iter_errors(value)), value
 
-for quantity in ('none', 'exactly_one', 'one_or_more', 'may_be_absent'):
+for quantity in ('none', 'exactly_one', 'one_or_more', 'zero_or_more'):
     assert not list(presence.iter_errors({'items_found': quantity})), quantity
 for value in ({}, {'items': 'one_or_more'}, {'items_found': 'every'},
               {'items_found': 'one_or_more', 'items_satisfying': 'every'}):
@@ -61,7 +63,9 @@ assert list(test.iter_errors(no_scope)), 'Missing field scope accepted'
 group_scope = {'require': {'items_found': 'one_or_more', 'items_satisfying': 'every',
                            'and': [{'field_requirement': count,
                                     'fields': {'value': {'equals': 0}}}]}}
-assert not list(test.iter_errors(group_scope)), 'Group scope rejected'
+assert list(test.iter_errors(group_scope)), 'Group scope incorrectly replaced Test baseline'
+group_scope['require']['field_requirement'] = count
+assert not list(test.iter_errors(group_scope)), 'Group override rejected with Test baseline'
 
 legacy = {'states': [{'value': {'equals': 0}}], 'states_match': 'all',
           'require': 'at_least_one_exists_and_all_match'}

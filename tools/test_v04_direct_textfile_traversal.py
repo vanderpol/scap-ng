@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / 'tests/fixtures/v04-direct-textfile-traversal'
 O = '{http://oval.mitre.org/XMLSchema/oval-definitions-5}'
 I = '{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}'
-CAP = 'independent.textfilecontent54'
+CAP = 'independent.textfilecontent'
 
 
 class DirectTextTraversalTests(unittest.TestCase):
@@ -47,7 +47,7 @@ class DirectTextTraversalTests(unittest.TestCase):
         # convert or prove any original all_exist Test from this document.
         a = {'id': 'constructed-object-compiler-wrapper', 'version': 1,
             'assessment_title': 'Original Object only; constructed Test is not original Test conversion',
-            'mode': 'automated', 'class': 'compliance', 'purpose': 'assessment',
+            'mode': 'automated', 'class': 'compliance',
             'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
             'tests': {'constructed-object-test': {'capability': CAP, 'object': deepcopy(acquisition),
                 'test_title': 'Constructed compiler wrapper for original Object only',
@@ -73,7 +73,7 @@ class DirectTextTraversalTests(unittest.TestCase):
     def test_two_byte_pinned_original_objects_validate_compile_and_match_independent_terms(self):
         self.assertEqual(sha256(self.raw).hexdigest(), self.pin['sha256'])
         root = self.root(); before = ET.tostring(root)
-        for identifier, depth in zip(self.pin['object_ids'], (1, None)):
+        for identifier, depth in zip(self.pin['object_ids'], (1, 'unlimited')):
             _, obj, _ = self.terms(root, identifier)
             self.assertEqual(obj['traversal'], {'max_depth': depth, 'recurse': 'symlinks_and_directories'})
             self.assertEqual((obj['ignore_case'], obj['multiline'], obj['singleline']), (False, True, False))

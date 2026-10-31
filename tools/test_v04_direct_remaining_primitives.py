@@ -49,7 +49,14 @@ class RemainingPrimitiveTests(unittest.TestCase):
     def test_case_insensitive_inequality_retains_names_and_field_scopes(self):
         nodes = [n for d in self.docs.values() for n in walk(d) if 'case_insensitive_not_equal' in n]
         self.assertEqual({n['case_insensitive_not_equal'] for n in nodes}, {'Administrator', 'Guest'})
-        self.assertTrue(all(n['values_found'] == 'one_or_more' and n['values_matching'] == 'every' for n in nodes))
+        # The current producer materializes the shared pair at Test scope.
+        from v04_field_requirement import field_scopes
+        policies = [p['field_requirement'] for d in self.docs.values() if 'assessment' in d
+                    for t in d['assessment']['tests'].values()
+                    for p in field_scopes(t['require']) if 'field_requirement' in p]
+        self.assertTrue(policies)
+        self.assertTrue(all(p == {'values_found': 'one_or_more', 'values_matching': 'every'}
+                            for p in policies))
         docs = deepcopy(self.docs)
         p = next(n for d in docs.values() for n in walk(d) if 'case_insensitive_not_equal' in n)
         p['not_equal'] = p.pop('case_insensitive_not_equal')
@@ -69,11 +76,11 @@ class RemainingPrimitiveTests(unittest.TestCase):
         self.assertTrue(any(n.get('equals') == 'false' and 'datatype' not in n
                             for d in self.docs.values() for n in walk(d)))
         environments = [n for d in self.docs.values() for n in walk(d)
-                        if n.get('capability') == 'independent.environmentvariable58']
+                        if n.get('capability') == 'independent.environmentvariable']
         self.assertEqual(len(environments), 4)
         self.assertTrue(all(n['pid'] is None for n in environments))
         docs = deepcopy(self.docs)
-        env = next(n for d in docs.values() for n in walk(d) if n.get('capability') == 'independent.environmentvariable58')
+        env = next(n for d in docs.values() for n in walk(d) if n.get('capability') == 'independent.environmentvariable')
         env['pid'] = {'equals': 0, 'datatype': 'integer'}
         with self.assertRaises(AssertionError): verify_original(self.source.root, docs, self.trace)
         binding = next(b for b in self.trace['rules'] if any(v['kind'] == 'object' and

@@ -11,8 +11,8 @@ NIL = '{http://www.w3.org/2001/XMLSchema-instance}nil'
 NULLABLE_FIELDS = {
     'windows.ntuser': {'name': 'string'},
     'windows.appcmdlistconfig': {'identifier': 'string'},
-    'windows.fileeffectiverights53': {'filename': 'string'},
-    'independent.environmentvariable58': {'pid': 'int'},
+    'windows.fileeffectiverights': {'filename': 'string'},
+    'independent.environmentvariable': {'pid': 'int'},
 }
 
 

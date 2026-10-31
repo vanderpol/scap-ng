@@ -46,7 +46,9 @@ def scan(documents):
             # Logical groups and leaves have exactly one key. The ONLY
             # multi-key expression is IF/THEN/ELSE, whose branches must be
             # complete. Avoid silently scanning two competing operators.
-            if len(node)!=1 and set(node)!={"if","then","else"}:
+            conditional = ({'if', 'then', 'else'} <= set(node)
+                           and not set(node) - {'if', 'then', 'else', 'else_if'})
+            if len(node)!=1 and not conditional:
                 problems.append((path,"ambiguous evaluate operator scope",where,sorted(node)));return
             for key,val in node.items():
                 if key=="test":
@@ -60,9 +62,19 @@ def scan(documents):
                         problems.append((path,"invalid evaluate group",where,key))
                     else:
                         for i,child in enumerate(val):eval_refs(child,where+"/"+key+"/"+str(i))
-                elif key=="not_applicable":
-                    if not isinstance(val,dict) or not isinstance(val.get("reason"),str) or not val["reason"].strip():
-                        problems.append((path,"invalid not_applicable reason",where))
+                elif key in ("not_applicable", "not_evaluated"):
+                    if not isinstance(val,dict) or set(val)!={'reason'} or not isinstance(val.get("reason"),str) or not val["reason"].strip():
+                        problems.append((path,"invalid " + key + " reason",where))
+                elif key == 'else_if':
+                    if not isinstance(val, list) or not val:
+                        problems.append((path, 'invalid ordered else_if', where))
+                    else:
+                        for i, branch in enumerate(val):
+                            if not isinstance(branch, dict) or set(branch) != {'if', 'then'}:
+                                problems.append((path, 'invalid else_if entry', where, i))
+                                continue
+                            for part in ('if', 'then'):
+                                eval_refs(branch[part], where + '/else_if/' + str(i) + '/' + part)
                 elif key in ("not","if","then","else"):
                     eval_refs(val,where+"/"+key)
                 else:problems.append((path,"unknown evaluate construct",where,key))

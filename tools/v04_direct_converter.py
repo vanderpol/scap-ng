@@ -8,6 +8,7 @@ import argparse
 from copy import deepcopy
 import json
 from pathlib import Path
+import re
 import time
 import zipfile
 
@@ -24,7 +25,7 @@ CAPABILITIES = tuple(SUPPORT['enabled'])
 ensure(SUPPORT['specification_version'] == '0.4.0' and len(CAPABILITIES) == len(set(CAPABILITIES)),
        'invalid direct capability activation registry')
 EXISTENCE = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
-             'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
+             'only_one_exists': 'exactly_one', 'any_exist': 'zero_or_more'}
 FIELD_EXISTENCE = {**EXISTENCE, 'all_exist': 'every'}
 MATCHING = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none', 'only one': 'exactly_one'}
 COMPARISONS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
@@ -70,6 +71,7 @@ class AssessmentConverter:
         self.human_compact = human_compact
         self.human_compaction = []
         self.active, self.cache, self.used = set(), {}, {}
+        self.native_names = {}
         self.tests, self.variables, self.shared_objects = {}, {}, {}
         self.enum_projection_cache = {}
         self.object_uses = None
@@ -84,6 +86,16 @@ class AssessmentConverter:
                    f'{{{mapping["source"]["namespace"]}}}{mapping["source"].get(kind)}']
         ensure(len(matches) == 1, f'unsupported {kind} capability: {element.tag}')
         return matches[0]
+
+    def native_name(self, element, suffix, title=None):
+        identifier = native_identifier(element, suffix, title)
+        key = suffix, identifier
+        original = element.get('id')
+        ensure(isinstance(original, str) and original, 'source node lacks identity for native naming')
+        ensure(key not in self.native_names or self.native_names[key] == original,
+               f'native {suffix} name collision {identifier}: {self.native_names.get(key)} vs {original}')
+        self.native_names[key] = original
+        return identifier
 
     def reference(self, identifier, kind):
         if self.object_uses is None:
@@ -143,7 +155,7 @@ class AssessmentConverter:
             # OVAL unknown_test always returns unknown; its required legacy
             # count attributes do not govern that result. The approved native
             # grammar still requires this uniform structured requirement.
-            identifier = native_identifier(element, 'test')
+            identifier = self.native_name(element, 'test')
             self.tests[identifier] = {'test_title': element.get('comment', ''), 'capability': mapping['capability'],
                 'require': {'items_found': 'one_or_more'}, 'reported_elements': 'all'}
             return {'test': identifier}
@@ -173,11 +185,13 @@ class AssessmentConverter:
                     self.human_compaction.append({'source_test': element.get('id'), **edit})
                     requirement = compacted
         object_id = objects[0].get('object_ref')
+        from v04_direct_authoring_contract import test_requirement
+        requirement = test_requirement(requirement)
         self.same_family(object_id, 'object', mapping)
         acquisition = self.reference(object_id, 'object')
         if isinstance(acquisition, dict):
             acquisition.pop('capability')  # Test inheritance; Variable/private Objects keep their own capability.
-        identifier = native_identifier(element, 'test')
+        identifier = self.native_name(element, 'test')
         self.tests[identifier] = {'test_title': element.get('comment', ''), 'capability': mapping['capability'],
                                   'object': acquisition, 'require': requirement, 'reported_elements': 'all'}
         if draft_all_exist:
@@ -209,7 +223,7 @@ class AssessmentConverter:
                    field in mapping['native']['state_field_map'], 'unsupported State field/namespace')
             ensure(field not in seen, 'repeated State field outside bounded proof')
             seen.add(field)
-            if mapping['capability'] == 'windows.fileeffectiverights53':
+            if mapping['capability'] == 'windows.fileeffectiverights':
                 types = tuple(mapping['native']['field_datatypes'][mapping['native']['state_field_map'][field]])
                 datatype = {('string',): 'string', ('boolean',): 'boolean'}.get(types)
                 # Original EntityStateBoolType requires explicit datatype;
@@ -256,7 +270,7 @@ class AssessmentConverter:
                     continue
                 field = local_name(child)
                 if field == 'behaviors' and (mapping['capability'] in (
-                        'independent.textfilecontent54', 'independent.shellcommand') or
+                        'independent.textfilecontent', 'independent.shellcommand') or
                         mapping['native'].get('traversal_definition') in ('file_traversal', 'windows_file_traversal', 'hierarchy_traversal') or
                         behavior_routes(mapping)):
                     ensure(child.tag == f'{{{mapping["source"]["namespace"]}}}behaviors' and behaviors is None,
@@ -307,7 +321,7 @@ class AssessmentConverter:
                     traversal_fields)
             if behavior_routes(mapping):
                 acquisition.update(scalar_behaviors(scalar_part, mapping))
-            if mapping['capability'] == 'independent.textfilecontent54':
+            if mapping['capability'] == 'independent.textfilecontent':
                 from v04_direct_file_behaviors import file_behaviors, textfile_path_controls
                 text_part, traversal_part = split_behaviors(behaviors,
                     {'ignore_case', 'multiline', 'singleline', 'item_creation'},
@@ -334,7 +348,7 @@ class AssessmentConverter:
         # Source identity, not payload equality, determines shared acquisitions.
         if self.object_uses[element.get('id')] > 1:
             title = self.object_title(element, mapping)
-            identifier = native_identifier(element, 'object', title=title)
+            identifier = self.native_name(element, 'object', title=title)
             acquisition['object_title'] = title
             self.shared_objects[identifier] = acquisition
             return identifier
@@ -418,7 +432,7 @@ class AssessmentConverter:
             # consumer's var_check separately; never infer it from array length.
             return [self.literal(datatype, child.text or '') for child in element]
         ensure(local_name(element) == 'local_variable' and len(element) == 1, 'external/malformed Variable unsupported')
-        identifier = native_identifier(element, 'variable')
+        identifier = self.native_name(element, 'variable')
         expression = self.function(element[0])
         if self.canonical_variable_functions:
             from v04_variable_function_migration import canonical_expression
@@ -439,7 +453,7 @@ class AssessmentConverter:
         value = self.reference(source_id, 'variable')
         if isinstance(value, list):
             element = self.source.node(self.component_id, source_id, 'variable')
-            identifier = native_identifier(element, 'variable')
+            identifier = self.native_name(element, 'variable')
             datatype = element.get('datatype')
             self.variables[identifier] = {'kind': 'constant',
                 'datatype': native_datatype(datatype),
@@ -632,7 +646,7 @@ class AssessmentConverter:
                    'runtime enum Variable requires an approved alias-domain projection')
         expression(variable[0])
         active.remove(identifier)
-        return {'variable': native_identifier(variable, 'variable')}
+        return {'variable': self.native_name(variable, 'variable')}
 
     def record_predicate(self, element, mapping):
         """Preserve a complete record before combining its named field results."""
@@ -852,12 +866,16 @@ def convert_rule(source, source_id, mappings, *, human_compact=False):
         from v04_draft_inputs import check_exports
         converter.bound_exports=check_exports(source,rule)
     expression = converter.reference(definition, 'definition')
-    rule_id = native_identifier(rule, 'rule')
-    assessment_id = rule_id.removesuffix('-rule') + '-assessment'
     title = rule.findtext(f'{{{XCCDF}}}title', '')
+    # Local Assessments retain a human-recognizable source control discriminator.
+    # These are not promoted/global shared-library names (Decision 11/12).
+    control = re.search(r'SV-\d+', source_id)
+    local_title = title + (' ' + control.group() if control else '')
+    rule_id = native_identifier(rule, 'rule', local_title)
+    assessment_id = native_identifier(rule, 'assessment', local_title)
     assessment = {'id': assessment_id, 'version': 1, 'assessment_title': title,
         'mode': 'automated', 'class': source.node(component, definition, 'definition').get('class'),
-        'purpose': 'assessment', 'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'}}
+        'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'}}
     for section in ('shared_objects', 'variables'):
         if getattr(converter, section):
             assessment[section] = getattr(converter, section)
@@ -872,6 +890,10 @@ def convert_rule(source, source_id, mappings, *, human_compact=False):
         'extensions': {}, 'warnings': [], 'identifiers': [], 'references': [], 'requires': [], 'conflicts': [],
         'applicability': [], 'parameters': {}, 'remediation': {}, 'organizational_input_requirements': {},
         'assessment_choices': {'automated': {'assessment': assessment_id}}, 'default_assessment_choice': 'automated'}
+    optional_metadata = ('discussion', 'rationale', 'extensions', 'warnings', 'identifiers', 'references', 'remediation')
+    omitted_metadata = [key for key in optional_metadata if native_rule[key] in (None, '', [], {})]
+    for key in omitted_metadata:
+        native_rule.pop(key)
     documents[f'authoring/direct-slice/rules/{rule_id}.json'] = {'rule': native_rule}
     if converter.input_bindings:
         native_rule['assessment_choices']['automated']['inputs']=converter.input_bindings
@@ -879,6 +901,11 @@ def convert_rule(source, source_id, mappings, *, human_compact=False):
         'component': component, 'definition': definition, 'native_rule': rule_id, 'assessment': assessment_id,
         'dependencies': converter.used, 'omitted_checks': omitted_checks,
         'source_platforms': [child.get('idref') for child in rule.findall(f'{{{XCCDF}}}platform')]}
+    binding['authoring_contract_migration'] = {'owner_decision_date': '2026-10-31',
+        'decisions': [1, 3, 6, 10, 13, 14], 'requires_fresh_proof': True,
+        'omitted_empty_optional_metadata': omitted_metadata,
+        'native_identity_sources': [{'kind': kind, 'native_id': ident, 'source_id': original}
+                                    for (kind, ident), original in sorted(converter.native_names.items())]}
     if converter.selector_equivalences:
         binding['selector_equivalences'] = converter.selector_equivalences
     if converter.enum_variable_equivalences:
@@ -914,6 +941,7 @@ def convert(source: SourceModel, rule_ids: list[str], *, human_compact=False):
     documents, bindings = {}, []
     for source_id in rule_ids:
         native, binding = convert_rule(source, source_id, mappings, human_compact=human_compact)
+        ensure(not set(native) & set(documents), 'native Rule/Assessment name collision in selected source Rules')
         documents.update(native)
         bindings.append(binding)
     return assemble_subset(source, documents, bindings, mappings)
@@ -1017,6 +1045,9 @@ def convert_benchmark(source, *, inventory_only=False, timings=None, mappings=No
             measured['conversion'] += time.perf_counter() - started
             started = time.perf_counter()
             if binding is not None:
+                if set(native) & set(documents):
+                    blockers.append(issue('native-identity',
+                        'native Rule/Assessment name collision in selected source Rules', row['source_rule']))
                 for path, document in native.items():
                     kind, = document
                     for error in document_errors(validators[kind + '.schema.json'], document):

@@ -95,7 +95,7 @@ def merge_coverage(previous, results):
 def write_feature_matrix(results, path):
     """Observed features in attempted complete graphs, never parser coverage %."""
     rows = []
-    names = ['unix.file', 'unix.password', 'independent.textfilecontent54', 'windows.registry',
+    names = ['unix.file', 'unix.password', 'independent.textfilecontent', 'windows.registry',
              'windows.wmi.query', 'independent.shellcommand', 'set', 'filter', 'object_component',
              'concat', 'regex_capture', 'merge', 'unique', 'extend_definition', 'multi_state_tests',
              'conditional_all_exist']

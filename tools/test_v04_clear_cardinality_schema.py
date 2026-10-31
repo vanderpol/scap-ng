@@ -13,8 +13,8 @@ from referencing import Registry, Resource
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EXISTENCE = ('none', 'exactly_one', 'one_or_more', 'every', 'may_be_absent')
-ITEM_EXISTENCE = ('none', 'exactly_one', 'one_or_more', 'may_be_absent')
+EXISTENCE = ('none', 'exactly_one', 'one_or_more', 'every', 'zero_or_more')
+ITEM_EXISTENCE = ('none', 'exactly_one', 'one_or_more', 'zero_or_more')
 SATISFACTION = ('none', 'exactly_one', 'one_or_more', 'every')
 FIELD_COUNT = {'values_found': 'one_or_more', 'values_matching': 'every'}
 
@@ -23,7 +23,7 @@ def assessment(requirement):
     return {'assessment': {
         'id': 'quantifier-review', 'version': 1,
         'assessment_title': 'Quantifier grammar fixture', 'mode': 'automated',
-        'class': 'inventory', 'purpose': 'applicability',
+        'class': 'inventory',
         'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
         'tests': {'quantifier-test': {
             'test_title': 'Quantifier fixture', 'capability': 'windows.registry',
@@ -34,6 +34,7 @@ def assessment(requirement):
 
 def with_field(*, existence='one_or_more', satisfying='every', field=None):
     return {'items_found': existence, 'items_satisfying': satisfying,
+            'field_requirement': dict(FIELD_COUNT),
             'fields': {'value': field or {'equals': 1, **FIELD_COUNT}}}
 
 
@@ -106,8 +107,9 @@ class ClearCardinalitySchemaTests(unittest.TestCase):
         self.assert_grammar(with_field(field={'record': {'records_found': 'none'}}))
 
     def test_inline_scalar_and_nested_record_require_explicit_cardinality(self):
+        # Field-local cardinality is optional when the Test declares its pair.
+        self.assert_grammar(with_field(field={'equals': 1}))
         for field in (
-            {'equals': 1},
             {'equals': 1, 'values_found': 'one_or_more'},
             {'equals': 1, 'values_matching': 'every'},
             {'equals': 1, 'require': 'at_least_one_exists_and_all_match'},
@@ -138,7 +140,8 @@ class ClearCardinalitySchemaTests(unittest.TestCase):
                   {'fields': {'value': {'equals': 2, **FIELD_COUNT}}}]
         for operator in ('and', 'or', 'one', 'xor'):
             self.assert_grammar({'items_found': 'one_or_more',
-                                 'items_satisfying': 'every', operator: fields})
+                                 'items_satisfying': 'every',
+                                 'field_requirement': dict(FIELD_COUNT), operator: fields})
         for operator in ('all', 'any', 'odd'):
             self.assert_grammar({'items_found': 'one_or_more',
                                  'items_satisfying': 'every', operator: fields},
@@ -155,6 +158,8 @@ class ClearCardinalitySchemaTests(unittest.TestCase):
         req['or'][0]['field_requirement'] = dict(FIELD_COUNT)
         self.assert_grammar(req, valid=False)  # sibling does not inherit
         req['or'][1]['field_requirement'] = dict(FIELD_COUNT)
+        self.assert_grammar(req, valid=False)  # not a substitute for Test baseline
+        req['field_requirement'] = dict(FIELD_COUNT)
         self.assert_grammar(req)
 
     def test_expected_operand_cardinality_has_same_tokens_but_distinct_name(self):
@@ -251,7 +256,7 @@ class ClearCardinalitySchemaTests(unittest.TestCase):
         self.assertEqual(crosswalk['existence'], {
             'all_exist': 'one_or_more', 'at_least_one_exists': 'one_or_more',
             'none_exist': 'none', 'only_one_exists': 'exactly_one',
-            'any_exist': 'may_be_absent'})
+            'any_exist': 'zero_or_more'})
         sidecar = json.loads((ROOT / 'schema/v0.4.0/'
                               'authoring-vocabulary.en.json').read_text())
         terms = sidecar['term_scopes']

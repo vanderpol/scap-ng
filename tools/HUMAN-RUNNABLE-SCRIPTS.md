@@ -1086,3 +1086,11 @@ fixed original-node fixtures and existing native programs. Optional
 XSD/Schematron validation. It never converts or edits a corpus. It reports
 DISA/NIWC findings separately and retains unresolved all_exist/reference-model
 boundaries. See [results, source citations and review hold](../docs/audit/v04-independent-validation-20261030.md).
+
+
+## Owner-contract reconciliation inventory (#255/#268)
+
+`audit_v04_owner_reconciliation.py --output NEW_REPORT.json` audits 100 native
+capability contracts, generated schemas, source XSD default declarations and
+producer/example/fixture drift. It is read-only and does not promote defaults,
+regenerate a corpus or rebaseline fingerprints. See [scope and limits](../docs/audit/v04-owner-reconciliation-20261031.md).

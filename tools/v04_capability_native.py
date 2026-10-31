@@ -20,6 +20,11 @@ def parameter_schema(spec):
                else {'type': spec.get('type', 'string')})
     if not spec.get('schema_ref') and spec.get('enum'):
         literal['enum'] = list(spec['enum'])
+    if spec.get('semantic_datatype') == 'version':
+        # Pinned OVAL common DatatypeEnumeration/version: nonnegative integer
+        # components separated by one non-digit character, not string order.
+        literal['pattern'] = r'^[0-9]+(?:[^0-9][0-9]+)*$'
+        literal['x-scap-ng-semantic-datatype'] = 'version'
     if spec.get('description'):
         literal['description'] = spec['description']
     variants = [literal]

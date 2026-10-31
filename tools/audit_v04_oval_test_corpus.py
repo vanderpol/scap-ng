@@ -108,7 +108,7 @@ def assessment_for(visitor, identifier):
     source_test = visitor.source.node(visitor.component_id, identifier, 'test')
     assessment = {'id': native_identifier(source_test, 'assessment'), 'version': 1,
                   'assessment_title': source_test.get('comment') or identifier,
-                  'mode': 'automated', 'class': 'compliance', 'purpose': 'assessment',
+                  'mode': 'automated', 'class': 'compliance',
                   'specification': {'id': 'scap-ng.pre-alpha.assessment', 'version': '0.4.0'},
                   'tests': visitor.tests, 'evaluate': expression}
     for section in ('variables', 'shared_objects'):

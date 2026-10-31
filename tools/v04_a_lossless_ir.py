@@ -93,8 +93,8 @@ def _check_assessment_dependency_targets(documents):
             if (type(dep.get("expected_version")) is not type(target_assessment.get("version"))
                     or dep.get("expected_version") != target_assessment.get("version")):
                 raise ValueError(f"{path}: Assessment dependency {alias} version mismatch")
-            if dep.get("purpose") != target_assessment.get("purpose"):
-                raise ValueError(f"{path}: Assessment dependency {alias} purpose mismatch")
+            # Usage belongs to the consumer's typed invocation, not the target
+            # Assessment. No intrinsic purpose is inferred from class or mode.
             from_folder = PurePosixPath(path).parts[1]
             to_folder = PurePosixPath(target_path).parts[1]
             if to_folder not in ("shared", from_folder):

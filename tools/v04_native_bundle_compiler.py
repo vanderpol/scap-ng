@@ -21,6 +21,7 @@ import json
 from pathlib import Path
 import re
 import zipfile
+from functools import lru_cache
 
 from v04_a_authoring_graph_index import (
     canonical_json, graph_index, read_authoring_archive,
@@ -37,6 +38,7 @@ from v04_canonical_unsigned_package import (
 )
 from v04_field_requirement import validate_test
 from v04_a_dataflow_index import index_assessment_dataflow
+from v04_native_identities import assessment_identities, require_identity
 
 
 FORMAT_VERSION = "0.4.0"
@@ -83,9 +85,12 @@ def compile_test_instruction(test_id, test):
     """
     if not isinstance(test_id, str) or not isinstance(test, dict):
         raise ValueError("invalid Test instruction")
+    require_identity(test_id, suffix='test', label='Test ID')
     validate_test(test)
     if not isinstance(test.get("capability"), str) or not test["capability"]:
         raise ValueError(f"Test {test_id}: missing collector capability")
+    if test['capability'] not in _compiler_capabilities():
+        raise ValueError('unknown native 0.4 capability ' + repr(test['capability']))
     if "collected_items_require" in test:
         raise ValueError("legacy collected_items_require is not canonical 0.4")
     if isinstance(test.get("object"), dict) and "capability" in test["object"]:
@@ -102,9 +107,18 @@ def compile_test_instruction(test_id, test):
     }
 
 
+@lru_cache(maxsize=1)
+def _compiler_capabilities():
+    from v04_canonical_source_ir import _supported_capabilities
+    return _supported_capabilities()
+
+
 def compile_assessment_program(assessment):
     if not isinstance(assessment, dict) or assessment.get("mode") != "automated":
         raise ValueError("native program requires automated Assessment")
+    assessment_identities(assessment)
+    if 'purpose' in assessment:
+        raise ValueError('Assessment purpose belongs at the typed invocation context')
     tests = assessment.get("tests") or {}
     if not isinstance(tests, dict):
         raise ValueError("invalid Assessment Tests")

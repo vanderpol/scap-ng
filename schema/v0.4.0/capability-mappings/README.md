@@ -26,4 +26,9 @@ Historical OVAL numeric suffixes (for example `54`, `55`, `57`, `58`, `511`, and
 
 A reviewed native capability MAY use a clearer semantic name when the mapping proves equivalence and preserves the exact source identity in its durable `source` and `migration_crosswalk` metadata. The established example is `windows:wmi57_test` -> `windows.wmi.query`.
 
-Importers SHALL NOT simply strip a numeric suffix when doing so would make a revised Test appear interchangeable with an older/deprecated predecessor. Version-suffixed capability names that have not yet received an explicit semantic rename remain unchanged for 0.4.0. Codex content work SHALL use the names defined by the versioned mappings and SHALL NOT invent or normalize capability names independently.
+Decision 5 (2026-10-31, #255/#268) removes version-revision suffixes from
+native identities while preserving exact source QNames and distinct collection
+families. The reviewed identity table is `tools/v04_native_capability_names.py`.
+In particular, source `package511` becomes `solaris.package.ips`, distinct from
+SVR4 `solaris.package`; removing digits must never merge these contracts.
+Old native names are historical evidence, not current validation aliases.

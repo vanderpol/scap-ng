@@ -18,18 +18,18 @@ import v04_scalar_source_proof as scalar_proof
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRA = {OD + '#unix}file': 'unix.file', OD + '#unix}password': 'unix.password',
-         OD + '#independent}textfilecontent54': 'independent.textfilecontent54',
+         OD + '#independent}textfilecontent54': 'independent.textfilecontent',
          OD + '#windows}userright': 'windows.userright', OD + '#windows}service': 'windows.service',
-         OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights53',
+         OD + '#windows}fileeffectiverights53': 'windows.fileeffectiverights',
          OD + '#windows}cmdlet': 'windows.cmdlet', OD + '#windows}ntuser': 'windows.ntuser',
          OD + '#windows}appcmd': 'windows.appcmd', OD + '#windows}appcmdlistconfig': 'windows.appcmdlistconfig',
-         OD + '#independent}environmentvariable58': 'independent.environmentvariable58',
+         OD + '#independent}environmentvariable58': 'independent.environmentvariable',
          OD + '#independent}yamlfilecontent': 'independent.yamlfilecontent'}
 SCALAR_ACQUISITIONS = {
     'windows.ntuser': ('key', 'name'),
     'windows.appcmd': ('identifier_type', 'identifier', 'parameter'),
     'windows.appcmdlistconfig': ('identifier_type', 'identifier', 'section', 'parameter'),
-    'independent.environmentvariable58': ('pid', 'name'),
+    'independent.environmentvariable': ('pid', 'name'),
 }
 NAMES = {'filepath': 'full_path', 'path': 'directory', 'filename': 'name'}
 FILE_FIELDS = {**NAMES, 'group_id': 'owner_gid', 'user_id': 'owner_uid',
@@ -193,12 +193,14 @@ def original_service_contract():
 
 
 @lru_cache(maxsize=2)
-def original_file_rights_contract(cap='windows.fileeffectiverights53'):
+def original_file_rights_contract(cap='windows.fileeffectiverights'):
     """Original typed rights and the non-expanding SID acquisition defaults."""
     xs = '{http://www.w3.org/2001/XMLSchema}'
     schema = ET.parse(ROOT / 'third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd').getroot()
-    need(cap in ('windows.fileeffectiverights53', 'windows.regkeyeffectiverights53'), 'unknown direct-SID rights contract')
-    name = cap.split('.')[-1]
+    need(cap in ('windows.fileeffectiverights', 'windows.regkeyeffectiverights'), 'unknown direct-SID rights contract')
+    # Native identity is independent from the pinned original OVAL QName.
+    name = {'windows.fileeffectiverights': 'fileeffectiverights53',
+            'windows.regkeyeffectiverights': 'regkeyeffectiverights53'}[cap]
     state = schema.find(xs + 'element[@name="' + name + '_state"]')
     fields = {}
     for field in state.findall('.//' + xs + 'sequence/' + xs + 'element'):
@@ -295,7 +297,7 @@ class ExpandedSource(Source):
                 fields = {**FILE_FIELDS, 'type': 'type', 'sticky': 'sticky'}
                 need(field in fields, 'unknown original file projection field')
                 value['values']['field'] = fields[field]
-            elif capability in ('independent.textfilecontent54', 'windows.fileeffectiverights53'):
+            elif capability in ('independent.textfilecontent', 'windows.fileeffectiverights'):
                 value['values']['field'] = NAMES.get(field, field)
             return value
         if name not in ('regex_capture', 'merge', 'unique'):
@@ -337,14 +339,14 @@ class ExpandedSource(Source):
         if cap == 'windows.cmdlet':
             need(all(c.tag == '{' + OD + '#windows}value' and c.get('datatype') == 'record'
                      for c in self.get(ident, 'states')), 'cmdlet State outside bounded value-record proof')
-        if cap == 'windows.fileeffectiverights53':
+        if cap == 'windows.fileeffectiverights':
             contract, _ = original_file_rights_contract()
             for entity in self.get(ident, 'states'):
                 name = local(entity)
                 need(entity.tag == '{' + OD + '#windows}' + name and name in contract,
                      'unknown original file-rights State field')
                 need(entity.get('datatype', 'string') == contract[name], 'original rights field datatype')
-        if cap == 'independent.textfilecontent54':
+        if cap == 'independent.textfilecontent':
             allowed = {'filepath', 'path', 'filename', 'pattern', 'instance', 'text', 'subexpression'}
             need(all(c.tag == '{' + OD + '#independent}' + local(c) and local(c) in allowed
                      for c in self.get(ident, 'states')), 'unsupported original text-file State field')
@@ -407,7 +409,7 @@ class ExpandedSource(Source):
                     n = deepcopy(n)
                     n['predicate']['operand'] = closed_string_enum(operand, aliases)
                 names = FILE_FIELDS if cap == 'unix.file' else NAMES if cap in (
-                    'independent.textfilecontent54', 'windows.fileeffectiverights53') else {}
+                    'independent.textfilecontent', 'windows.fileeffectiverights') else {}
                 return {**n, 'field': names.get(n['field'], n['field'])}
             op, children = next(iter(n.items()))
             return {op: [rename(c) for c in children]}
@@ -472,7 +474,7 @@ class ExpandedSource(Source):
                 return {'capability': cap, 'variable': self.variable((n[0].text or '').strip())}
             finally:
                 self.active.remove(ident)
-        if cap == 'windows.regkeyeffectiverights53':
+        if cap == 'windows.regkeyeffectiverights':
             original_file_rights_contract(cap)
         registered = scalar_proof.source_object(self, ident, cap)
         if registered is not None:
@@ -567,7 +569,7 @@ class ExpandedSource(Source):
                 return value
             finally:
                 self.active.remove(ident)
-        if cap == 'windows.fileeffectiverights53':
+        if cap == 'windows.fileeffectiverights':
             need(ident not in self.active, 'cyclic Object')
             keys(n, META, 'file-rights Object')
             original_file_rights_contract()
@@ -596,7 +598,7 @@ class ExpandedSource(Source):
                 return value
             finally:
                 self.active.remove(ident)
-        if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
+        if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent'):
             if cap == 'windows.registry':
                 # Leaf Registry Filters also constrain Object projections used
                 # by Variables. Read them in source order, at collection scope.
@@ -682,7 +684,7 @@ class ExpandedSource(Source):
                     behaviors = dict(c.attrib)
                     continue
                 allowed = {'unix.password': {'username'}, 'unix.file': {'filepath', 'path', 'filename'},
-                           'independent.textfilecontent54': {'filepath', 'path', 'filename', 'pattern', 'instance'}}[cap]
+                           'independent.textfilecontent': {'filepath', 'path', 'filename', 'pattern', 'instance'}}[cap]
                 need(name in allowed and NAMES.get(name, name) not in fields, 'unproved/duplicate selector ' + name)
                 nil = '{http://www.w3.org/2001/XMLSchema-instance}nil'
                 if cap == 'unix.file' and name == 'filename' and nil in c.attrib:
@@ -703,14 +705,14 @@ class ExpandedSource(Source):
                 need(recurse in ('symlinks', 'directories', 'symlinks and directories'), 'deprecated/unproved recursion')
                 if (direction == 'down' and 'full_path' not in fields and
                         fields.get('directory', {}).get('operation') == 'equals'):
-                    fields['traversal'] = {'max_depth': None if depth == -1 else depth,
+                    fields['traversal'] = {'max_depth': 'unlimited' if depth == -1 else depth,
                         'recurse': 'symlinks_and_directories' if recurse == 'symlinks and directories' else recurse,
                         'direction': 'down'}
                 need(behaviors.get('recurse_file_system', 'all') in ('all', 'local', 'defined'),
                      'invalid original filesystem scope')
                 fields['filesystem'] = {'all': 'all', 'local': 'local', 'defined': 'same'}[
                     behaviors.get('recurse_file_system', 'all')]
-            elif cap == 'independent.textfilecontent54':
+            elif cap == 'independent.textfilecontent':
                 keys(behaviors, {'ignore_case', 'multiline', 'singleline', 'item_creation'} | scalar_proof.FILE_BEHAVIORS,
                      'textfile behaviors')
                 need('full_path' not in fields or not set(behaviors) & {'max_depth', 'recurse_direction'},
@@ -1012,7 +1014,7 @@ class ExpandedNative(Native):
             if n.get('filters'):
                 result['filters'] = self.filters(n['filters'])
             return result
-        if cap == 'windows.fileeffectiverights53' and 'set' not in n:
+        if cap == 'windows.fileeffectiverights' and 'set' not in n:
             allowed = {'full_path', 'directory', 'name', 'trustee_sid'}
             keys(n, allowed | {'capability', 'object_title', 'filesystem', 'filters'}, 'native rights Object')
             selectors = set(n) & allowed
@@ -1040,10 +1042,10 @@ class ExpandedNative(Native):
         if 'set' in n:
             keys(n, {'set', 'capability', 'object_title'}, 'Set Object')
             return {'capability': cap, 'set': self.set_term(n['set'], cap)}
-        if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent54'):
+        if cap not in ('unix.file', 'unix.password', 'independent.textfilecontent'):
             return super().object(n, cap)
         allowed = {'unix.password': {'username'}, 'unix.file': {'directory', 'name', 'full_path', 'filesystem', 'traversal'},
-                   'independent.textfilecontent54': {'directory', 'name', 'full_path', 'pattern', 'instance',
+                   'independent.textfilecontent': {'directory', 'name', 'full_path', 'pattern', 'instance',
                       'filesystem', 'traversal', 'ignore_case', 'singleline', 'multiline', 'item_creation'}}[cap]
         keys(n, allowed | {'capability', 'object_title', 'filters', 'for_each'}, 'Object')
         fields = {}
@@ -1051,19 +1053,19 @@ class ExpandedNative(Native):
             if k in ('capability', 'object_title', 'filters', 'for_each'):
                 continue
             if k == 'traversal':
-                if cap == 'independent.textfilecontent54':
+                if cap == 'independent.textfilecontent':
                     need('directory' in n and self.predicate(n['directory'], selector=True)['operation'] == 'equals',
                          'native textfile traversal requires an equality directory')
                     need(isinstance(v, dict), 'native textfile traversal shape')
                     depth = v.get('max_depth')
                     need(set(v) == {'max_depth', 'recurse'} and
-                         (depth is None or type(depth) is int and depth >= 0) and
+                         (depth == 'unlimited' or type(depth) is int and depth >= 0) and
                          v['recurse'] in ('directories', 'symlinks', 'symlinks_and_directories'),
                          'native textfile traversal depth/recurse type')
                 keys(v, {'max_depth', 'recurse'}, 'traversal')
                 fields[k] = {**v, 'direction': 'down'}
             elif k in ('filesystem', 'ignore_case', 'singleline', 'multiline', 'item_creation'):
-                if cap == 'independent.textfilecontent54' and k in ('ignore_case', 'singleline', 'multiline'):
+                if cap == 'independent.textfilecontent' and k in ('ignore_case', 'singleline', 'multiline'):
                     need(type(v) is bool, 'native textfile Boolean behavior type')
                 fields[k] = v
             elif cap == 'unix.file' and k == 'name' and v is None:
@@ -1088,8 +1090,9 @@ class ExpandedNative(Native):
         return value
 
 
-def expanded_compare(source, definition, assessment):
-    result = compare(source, definition, assessment, native_type=ExpandedNative)
+def expanded_compare(source, definition, assessment, *, invocation_purpose=None):
+    result = compare(source, definition, assessment, native_type=ExpandedNative,
+                     invocation_purpose=invocation_purpose)
     if result['outcome'] == 'PROVED' and source.selector_equivalences:
         result['selector_equivalences'] = list(source.selector_equivalences.values())
     if result['outcome'] == 'PROVED' and source.normalizations:

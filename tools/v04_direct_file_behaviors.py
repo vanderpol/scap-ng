@@ -43,7 +43,7 @@ def hierarchy_behaviors(element, acquisition):
     key = acquisition.get('key')
     ensure('key' in acquisition and (key is None or isinstance(key, dict) and 'equals' in key),
            'hierarchy recursion requires an equality key or hive-root selector')
-    return {'traversal': {'max_depth': None if depth == -1 else depth}}
+    return {'traversal': {'max_depth': 'unlimited' if depth == -1 else depth}}
 
 
 def traversal_behaviors(element, acquisition, *, windows=False):
@@ -90,7 +90,7 @@ def traversal_behaviors(element, acquisition, *, windows=False):
     result = {'filesystem': FILESYSTEMS[scope]}
     directory = acquisition.get('directory')
     if direction == 'down' and 'full_path' not in acquisition and isinstance(directory, dict) and 'equals' in directory:
-        result['traversal'] = {'max_depth': None if depth == -1 else depth, 'recurse': options[recurse]}
+        result['traversal'] = {'max_depth': 'unlimited' if depth == -1 else depth, 'recurse': options[recurse]}
     return result
 
 

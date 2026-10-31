@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ET
 from audit_v04_oval_test_corpus import PIN, file_inventory, xml_documents
 
 ROOT = Path(__file__).resolve().parents[1]
-FAMILIES = ('independent.shellcommand', 'independent.sql512', 'windows.cmdlet', 'windows.wmi.query')
+FAMILIES = ('independent.shellcommand', 'independent.sql', 'windows.cmdlet', 'windows.wmi.query')
 X = '{http://www.w3.org/2001/XMLSchema}'
 O = '{http://oval.mitre.org/XMLSchema/oval-definitions-5}'
 

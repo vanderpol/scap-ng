@@ -31,7 +31,7 @@ def assessment(*, scoped=True):
     return {"assessment": {
         "id": "edition-assessment", "version": 1,
         "assessment_title": "Windows Enterprise editions", "mode": "automated",
-        "class": "inventory", "purpose": "applicability",
+        "class": "inventory",
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
         "tests": {"edition-test": {
             "test_title": "Enterprise or EnterpriseS",

@@ -11,9 +11,11 @@ import json
 from pathlib import Path
 
 from v04_source_package_semantics import Source, META, OD, local, keys, need, source_hierarchy, native_hierarchy
+from v04_native_capability_names import RENAMES, canonical_capability, rename_native_identities
 
 ROOT = Path(__file__).resolve().parents[1]
-CONTRACTS = json.loads((ROOT / 'tests/fixtures/v04-scalar-proof-contracts.json').read_text())['capabilities']
+CONTRACTS = {canonical_capability(k): v for k, v in json.loads(
+    (ROOT / 'tests/fixtures/v04-scalar-proof-contracts.json').read_text())['capabilities'].items()}
 FILE_BEHAVIORS = {'max_depth', 'recurse', 'recurse_direction', 'recurse_file_system'}
 
 
@@ -77,18 +79,27 @@ def source_traversal(behaviors, fields, kind):
     result = {'filesystem': {'all': 'all', 'local': 'local', 'defined': 'same'}[scope]}
     directory = fields.get('directory')
     if direction == 'down' and 'full_path' not in fields and isinstance(directory, dict) and directory.get('operation') == 'equals':
-        result['traversal'] = {'max_depth': None if depth == -1 else depth,
+        result['traversal'] = {'max_depth': 'unlimited' if depth == -1 else depth,
                                'recurse': options[recurse], 'direction': 'down'}
     return result
 
 
 @lru_cache(maxsize=None)
 def contract(capability):
+    capability = canonical_capability(capability)
     record = CONTRACTS.get(capability)
     if record is not None:
         path = ROOT / 'schema/v0.4.0/capability-mappings/supported' / (capability + '.json')
-        need(sha256(path.read_bytes()).hexdigest() == record['mapping_sha256'],
-             'unreviewed scalar proof mapping: ' + capability)
+        original = {v: k for k, v in RENAMES.items()}.get(capability)
+        if original:
+            pinned = ROOT / 'tests/fixtures/v04-owner-original-mappings-20261031' / (original + '.json')
+            need(sha256(pinned.read_bytes()).hexdigest() == record['mapping_sha256'],
+                 'changed preserved scalar proof mapping: ' + original)
+            need(json.loads(path.read_text()) == rename_native_identities(json.loads(pinned.read_text())),
+                 'unreviewed scalar proof mapping beyond approved identity migration: ' + capability)
+        else:
+            need(sha256(path.read_bytes()).hexdigest() == record['mapping_sha256'],
+                 'unreviewed scalar proof mapping: ' + capability)
     return record
 
 

@@ -43,7 +43,7 @@ def assessment_with_directory(predicate):
         "directory": predicate,
         "name": None,
         "filesystem": "all",
-        "traversal": {"max_depth": None, "recurse": "symlinks_and_directories"},
+        "traversal": {"max_depth": "unlimited", "recurse": "symlinks_and_directories"},
     }
     return doc
 
@@ -69,6 +69,47 @@ class V04ObjectSelectorTests(unittest.TestCase):
                 pred = {key: value}
                 self.assertTrue(self.valid(pred))
                 self.assertFalse(errors(assessment_with_directory(pred)))
+
+    def test_unbounded_file_depth_is_explicit_and_null_is_rejected(self):
+        doc = assessment_with_directory({"equals": "/etc"})
+        traversal = doc["assessment"]["tests"]["demo-test"]["object"]["traversal"]
+        self.assertEqual(traversal["max_depth"], "unlimited")
+        self.assertFalse(errors(doc))
+        for value in (0, 1, 2):
+            traversal["max_depth"] = value
+            with self.subTest(valid_depth=value):
+                self.assertFalse(errors(doc))
+        for value in (None, -1, "-1", "infinite", True):
+            traversal["max_depth"] = value
+            with self.subTest(invalid_depth=value):
+                self.assertTrue(errors(doc))
+
+    def test_hierarchy_depth_has_the_same_unbounded_spelling(self):
+        hierarchy = Draft202012Validator(
+            {"$ref": COMMON["$id"] + "#/$defs/hierarchy_traversal"}, registry=REGISTRY
+        )
+        for value in (0, 1, 4, "unlimited"):
+            with self.subTest(valid_depth=value):
+                self.assertFalse(list(hierarchy.iter_errors({"max_depth": value})))
+        for value in (None, -1, "-1", True):
+            with self.subTest(invalid_depth=value):
+                self.assertTrue(list(hierarchy.iter_errors({"max_depth": value})))
+
+    def test_filesystem_scope_editor_default_does_not_repair_omission(self):
+        scope = COMMON["$defs"]["filesystem_scope"]
+        self.assertEqual(scope["default"], "local")
+        self.assertTrue(scope["x-scap-ng-authoring"]["hide_when_default"])
+        doc = assessment_with_directory({"equals": "/etc"})
+        obj = doc["assessment"]["tests"]["demo-test"]["object"]
+        # An omitted source OVAL recurse_file_system is effectively 'all'.
+        self.assertEqual(obj["filesystem"], "all")
+        self.assertFalse(errors(doc))
+        obj["filesystem"] = "local"
+        self.assertFalse(errors(doc))
+        obj["filesystem"] = "same"  # OVAL 'defined'
+        self.assertFalse(errors(doc))
+        del obj["filesystem"]
+        self.assertTrue(errors(doc), "A schema default must not fill a missing authored field")
 
     def test_array_with_explicit_independent_value_match(self):
         pred = {

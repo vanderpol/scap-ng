@@ -315,7 +315,7 @@ def field_scopes(requirement):
                 found.append({'path': [*field_path, 'record'],
                               'record_requirement': {key: record[key] for key in
                                   ('records_found', 'records_matching') if key in record}})
-                visit(record, [*field_path, 'record'])
+                visit(record, [*field_path, 'record'], inherited, declared_at)
                 continue
             explicit = {key: predicate[key] for key in ('values_found', 'values_matching')
                         if key in predicate}

@@ -22,6 +22,7 @@ from import_v04_oval_leaf_pilot import slug
 from v04_flat_object_authoring import flatten_document, restore_document
 from v04_native_bundle_compiler import compile_test_instruction
 from v04_field_requirement import promote_test
+from v04_native_capability_names import canonical_capability
 
 
 OD = "http://oval.mitre.org/XMLSchema/oval-definitions-5"
@@ -459,7 +460,7 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
     if environment and not native_id.startswith("test-"):
         native_id = "test-" + native_id
     native_test = {
-        "test_title": old_test["test_title"], "capability": capability,
+        "test_title": old_test["test_title"], "capability": canonical_capability(capability),
         "reported_elements": "all",
         "require": ({"items": native_existence} if not with_state else
                     "at_least_one_exists_and_" +
@@ -476,7 +477,6 @@ def convert(v003, source_xml, definition_id, provenance, catalog_dir, catalog,
         "id": a["id"], "version": a["version"],
         "assessment_title": a["assessment_title"],
         "mode": "automated", "class": a["class"],
-        "purpose": a["purpose"],
         "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"},
         "tests": {native_id: native_test},
         "evaluate": {"and": [{"test": native_id}]} if apparmor or uname else {"test": native_id},

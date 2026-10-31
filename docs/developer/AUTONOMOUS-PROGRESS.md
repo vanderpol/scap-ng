@@ -1,5 +1,134 @@
 # Autonomous development checkpoint
 
+## Active #268 reconciliation handoff (2026-10-31; #255)
+
+Owner explicitly authorized implementation of Decisions 1–28 on the registered
+`codex/v04-owner-contract-20261031` draft branch. Main remains `956bf093f` at
+preflight; PR input `a5a7fc08c`. Isolated worktree:
+`/workspace/scap-ng-owner-contract-268`. Original main checkout at `7ddf8d696`
+and its unpublished source-proof notes are untouched; copies/patch and full
+working audit reports live at `/workspace/reconciliation-268-20261031/`.
+[Current reconciliation packet](../audit/v04-owner-reconciliation-20261031.md).
+Coordination comments are posted on #268 and #260 before overlapping edits.
+No corpus restart, final release/tag, PR merge, source/proof-floor rebaseline,
+or separate all_exist oracle change is authorized.
+
+Native name migration committed locally as `806505233` (37 bounded tests and
+33 source integration tests PASS). Next identity/context checkpoint has 5 new
+and 36 existing focused tests PASS: strict native IDs, global library Assessment
+identity, context-free dependency resolution and quoted cmdlet version validation.
+[Identity/context packet](../audit/v04-owner-identity-context-20261031.md).
+No preserved historical proof/compiled hash has been replaced. Complete default
+catalog, bounded human samples, current fixture migration and maintained gates
+remain pending; continue safely on the registered draft branch.
+
+Published producer checkpoint `07ee42ff5` and conditional checkpoint `9c28c6afc`.
+Next native-identity checkpoint removes eleven suffixes without merging Solaris
+SVR4/IPS, preserves original mapping bytes/frozen pins, and rejects old native
+aliases. [Identity ledger and proof boundaries](../audit/v04-native-identity-migration-20261031.md).
+37 bounded identity/converter/audit tests PASS (20.114s); 23 compiler/producer/
+conditional tests PASS (0.957s). No generator/proof-floor fingerprint rebaseline.
+CI at `07ee42ff5`: contract-sync and independent JSON authoring PASS; canonical,
+draft-schema and clean-extract still FAIL, Board was running at inspection.
+Keep next work local until its integration gate completes; continue defaults,
+consumer-purpose and native identity validation in parallel.
+
+Conditional implementation is committed as `9c28c6afc` (44 focused PASS).
+The next producer checkpoint has 35 targeted tests PASS (9.721s), including
+real pinned Linux/Windows schema/compile/static source comparisons, record
+inheritance and collision regression. [Producer contract and limitations](../audit/v04-owner-producer-compatibility-20261031.md).
+CI for published `31b7ee859` completed (four migration gates FAIL); it is safe
+to publish the batched local checkpoints without superseding an active gate.
+Still pending: capability suffix migration, strict compiler/library identities,
+consumer-purpose dependencies, complete editor-default audit and current example
+migration. Historical fixtures/anchors are not blindly rebaselined. No corpus,
+release, merge or scanner claim. Keep executing safe reconciliation work.
+
+Published audit checkpoint: `31b7ee859` on the existing draft PR branch.
+Next local coherent change implements approved conditional supplied-result blocks
+and independent package-reader compatibility. Forty-four focused tests PASS
+(0.448s), including a current-schema complete package with ordered else_if and
+reason-bearing terminals. [Conditional contract/results](../audit/v04-owner-conditional-compatibility-20261031.md).
+Pure Boolean operator algebra remains unchanged; native legacy aliases now
+reject. Static references close over all branches; only selected blocks consume
+supplied results. No collector or source-oracle change. This checkpoint does not
+qualify complete Rule Results/scanner integration. Keep working on the producer,
+capability naming, consumer-purpose and default-audit gaps after this commit.
+
+First checkpoint: all 100 mappings/generated schemas inventoried; eleven old
+numeric capability names, current producer/example drift and historical fixture
+classification recorded. Exactly five annotated controls (paired field policy
+counts once). Source count corrected to 189 attribute +15 element defaults;
+Windows recurse directories and OVAL all/editor local distinctions confirmed.
+81 baseline focused tests PASS and five new audit tests PASS. No acceptance
+fingerprint updated. Full catalog and producer/compiler migration still pending;
+continue through safe steps, not merely this audit checkpoint.
+
+## Owner-confirmed new authoring `filesystem: local`, source OVAL `all` preserved (2026-10-31; #255)
+
+Decision 28 closes the `local` vs `all` discussion without another owner vote.
+New 0.4 file Objects receive the editor suggestion `filesystem: local`,
+which is serialized in YAML even if hidden in the graphical editor. The
+version-local `filesystem_scope` now carries explicit JSON Schema editor
+metadata; it does **not** authorize runtime inference when YAML omits scope.
+An OVAL 5.12.3 source Object with omitted `recurse_file_system` effectively
+requests `all`, so its source-faithful conversion must explicitly write
+`filesystem: all`. Source `local` maps to `local`, and `defined` maps to
+`same`. This metadata-only change must not rewrite existing source conversions
+or evidence baselines. The full 0.4 editor-default catalog still requires
+separate crosswalk review; PR #268 remains draft pending broader alignment.
+
+## Owner-approved 0.4 traversal depth spelling (2026-10-31; #255)
+
+Jack approved `max_depth: unlimited` as the canonical authored form of
+unbounded file/hierarchy traversal (Decision 27), replacing 0.4's old
+`max_depth: null`. OVAL 5.12.3 source `-1` is still the effective original
+default; converter and independent proof readers now translate it to the
+literal `unlimited`. Nonnegative integers (including 0) retain their
+existing bounded-depth meanings. The 0.4 schema explicitly rejects `null`,
+negative sentinels and Boolean values; historical 0.1–0.3 source/schema files
+and generated archives remain unmodified. The version-local capability mapping
+annotations, five mapping-identity proof pins (only the mapping text
+`max_depth_-1` target changed), authoring sample and OVAL crosswalk were
+reviewed and updated under #255, **not** source-proof-floor rebaselined.
+
+Focused verification in the working branch: a combined run of **111 tests
+passed** (80 owner/schema/generator, 29 versioned native mapping including
+0.3/0.4 depth compatibility, direct OVAL file-default proof and
+original-vs-native traversal mutation proof). The 0.4 crosswalk also caught
+and corrected a previously wrong Windows omitted-`recurse` converter choice:
+OVAL defaults `windows: directories`, not `junctions_and_directories`.
+The new source-backed regression checks the 0.4 mapping without rewriting
+the historical 0.3 generator.
+Broader direct integration remains red on preexisting `purpose`, long IDs and
+missing comparison `field_requirement` drift, not evidence of a failed depth
+mapping. Continue tracking those under #255/#251 and keep PR #268 a draft.
+
+## Owner-approved 0.4.0 authoring contract consolidation (2026-10-31; #255 / #267)
+
+The owner approved Decisions 1–26 (including the final per-selector case and
+`windows.cmdlet.module_version` version datatype decisions). Canonical dated
+[decision record](../audit/v04-owner-final-decisions-20261031.md) now separates
+owner approval from schema, compiler, converter, editor and scanner readiness.
+The initial version-local schema pass removes Assessment `purpose`, replaces
+`may_be_absent` with `zero_or_more`, mandates Test-wide
+`field_requirement` for comparisons, restricts selected native IDs to 64
+characters, annotates editor-materialized defaults, adds ordered
+`evaluate.else_if` and reason-bearing `not_evaluated`, and annotates Windows
+Registry/file selectors and cmdlet version typing. It deliberately leaves all
+pinned source proof-floor hashes and the 65-STIG library untouched.
+
+Focused schema acceptance: new 13-case owner decision suite passed; revised
+cardinality, field inheritance, draft grammar and evaluate tests passed. These
+are **syntax and contract metadata tests only**. No scanner or conditional
+runtime execution was claimed. Maintained tests and generator/converter
+fixtures that still emit `purpose`, `may_be_absent`, old numeric capability
+names or missing Test-wide requirements require migration before 0.4 release.
+Remaining implementation gates, explicitly red old-baseline integration
+tests and the purpose-scoped review branch are listed in the decision record.
+Do not update generator parity hashes without source-reviewed migration or
+merge this branch into main yet. Keep #251 source validation independent.
+
 ## Active #251/#255 — bounded independent source validation (2026-10-30)
 
 Owner instruction: continue pinned-original 0.4 independent validation, leaving
