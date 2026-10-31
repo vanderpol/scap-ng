@@ -1,5 +1,26 @@
 # Autonomous development checkpoint
 
+## Owner-approved 0.4 traversal depth spelling (2026-10-31; #255)
+
+Jack approved `max_depth: unlimited` as the canonical authored form of
+unbounded file/hierarchy traversal (Decision 27), replacing 0.4's old
+`max_depth: null`. OVAL 5.12.3 source `-1` is still the effective original
+default; converter and independent proof readers now translate it to the
+literal `unlimited`. Nonnegative integers (including 0) retain their
+existing bounded-depth meanings. The 0.4 schema explicitly rejects `null`,
+negative sentinels and Boolean values; historical 0.1–0.3 source/schema files
+and generated archives remain unmodified. The version-local capability mapping
+annotations, five mapping-identity proof pins (only the mapping text
+`max_depth_-1` target changed), authoring sample and OVAL crosswalk were
+reviewed and updated under #255, **not** source-proof-floor rebaselined.
+
+Focused verification in the working branch: 80 owner/schema/generator tests
+passed; the direct OVAL file-default proof passed; 27 historical native mapping
+tests passed; a further original-vs-native traversal mutation test passed.
+Broader direct integration remains red on preexisting `purpose`, long IDs and
+missing comparison `field_requirement` drift, not evidence of a failed depth
+mapping. Continue tracking those under #255/#251 and keep PR #268 a draft.
+
 ## Owner-approved 0.4.0 authoring contract consolidation (2026-10-31; #255 / #267)
 
 The owner approved Decisions 1–26 (including the final per-selector case and

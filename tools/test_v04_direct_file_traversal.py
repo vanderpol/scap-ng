@@ -59,7 +59,7 @@ class DirectFileTraversalTests(unittest.TestCase):
         self.assertEqual(traversal_behaviors(None, {'full_path': {'equals': '/etc/passwd'}}), {'filesystem': 'all'})
         element = ET.Element(U + 'behaviors', recurse_direction='down', recurse_file_system='defined')
         self.assertEqual(traversal_behaviors(element, {'directory': {'equals': '/etc'}, 'name': None}),
-                         {'filesystem': 'same', 'traversal': {'max_depth': None, 'recurse': 'symlinks_and_directories'}})
+                         {'filesystem': 'same', 'traversal': {'max_depth': 'unlimited', 'recurse': 'symlinks_and_directories'}})
         # Original XSD says depth/direction do not apply to filepath or to a
         # non-equality path. Ignored source attributes remain in provenance.
         for selectors in ({'full_path': {'equals': '/etc/passwd'}}, {'directory': {'matches_regex': '^/etc/'}, 'name': None}):

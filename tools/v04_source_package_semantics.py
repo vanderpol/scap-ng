@@ -122,14 +122,14 @@ def source_hierarchy(behavior, key):
     if direction == 'none':
         return {}
     need(key is None or isinstance(key, dict) and key.get('operation') == 'equals', 'unproved hierarchy key context')
-    return {'traversal': {'max_depth': None if depth == -1 else depth, 'direction': 'down'}}
+    return {'traversal': {'max_depth': 'unlimited' if depth == -1 else depth, 'direction': 'down'}}
 
 
 def native_hierarchy(value):
     keys(value, {'max_depth'}, 'native hierarchy traversal')
     need(set(value) == {'max_depth'}, 'native hierarchy max_depth required')
     depth = value['max_depth']
-    need(depth is None or isinstance(depth, int) and not isinstance(depth, bool) and depth >= 0,
+    need(depth == 'unlimited' or isinstance(depth, int) and not isinstance(depth, bool) and depth >= 0,
          'invalid native hierarchy max_depth')
     return {**value, 'direction': 'down'}
 

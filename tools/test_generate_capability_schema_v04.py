@@ -295,7 +295,7 @@ class CapabilityV04Tests(unittest.TestCase):
             },
             "name":None,
             "filesystem":"all",
-            "traversal":{"max_depth":None,"recurse":"symlinks_and_directories"},
+            "traversal":{"max_depth":"unlimited","recurse":"symlinks_and_directories"},
         }
         top={
             "capability":"unix.file",

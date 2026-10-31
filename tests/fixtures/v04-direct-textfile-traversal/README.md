@@ -7,7 +7,7 @@ The XML is byte-exact original Self-Assertion content pinned at
 Original Objects `oval:org.mitre.oval.test:obj:12` and `:734` specify downward
 traversal with depths 1 and -1. Their acquisition dependency closures pass the
 original XSD/Schematron and independently match the native Object terms; -1 is
-represented by native `max_depth: null`. The original default traversal includes
+represented by native `max_depth: unlimited`. The original default traversal includes
 symlinks and directories; regex flags and Item creation are separate parameters.
 
 The **whole original document is not declared valid**: it retains an unrelated

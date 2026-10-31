@@ -77,7 +77,7 @@ def source_traversal(behaviors, fields, kind):
     result = {'filesystem': {'all': 'all', 'local': 'local', 'defined': 'same'}[scope]}
     directory = fields.get('directory')
     if direction == 'down' and 'full_path' not in fields and isinstance(directory, dict) and directory.get('operation') == 'equals':
-        result['traversal'] = {'max_depth': None if depth == -1 else depth,
+        result['traversal'] = {'max_depth': 'unlimited' if depth == -1 else depth,
                                'recurse': options[recurse], 'direction': 'down'}
     return result
 

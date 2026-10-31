@@ -7,7 +7,7 @@
 **Status:** Owner-approved design decisions; **implementation/conformance tracking below is separate from approval**. This is a pre-alpha authoring contract, not OVAL Board ratification or scanner certification.
 **Primary work:** [#255](https://github.com/vanderpol/scap-ng/issues/255); case semantics [#267](https://github.com/vanderpol/scap-ng/issues/267); converter/evidence [#251](https://github.com/vanderpol/scap-ng/issues/251).
 
-This register consolidates the 26 sequential decisions made 2026-10-30–31. The terms below take precedence over superseded 0.3 and intermediate 0.4 examples. **A schema feature is not locked merely because its owner decision is approved.** Until source, schema, converter, compiler, editor contract, fixtures, and documentation agree, mark that row as an implementation gap, not as complete. Historic examples remain evidence only.
+This register consolidates the 27 sequential decisions made 2026-10-30–31. The terms below take precedence over superseded 0.3 and intermediate 0.4 examples. **A schema feature is not locked merely because its owner decision is approved.** Until source, schema, converter, compiler, editor contract, fixtures, and documentation agree, mark that row as an implementation gap, not as complete. Historic examples remain evidence only.
 
 ## Approved decisions
 
@@ -39,6 +39,7 @@ This register consolidates the 26 sequential decisions made 2026-10-30–31. The
 | 24 | An Assessment may explicitly reach a technically **`not_evaluated`** branch when a necessary check is knowingly beyond available inspection (e.g. remote share ACL). The Rule reports meaningful **informational/manual follow-up**, with observed evidence and why completion was impossible. Known noncompliance stays `fail`; unexpected collection failure stays `error`. | Expression grammar, result roll-up, branch fixtures. |
 | 25 | `not_applicable` is an explicit, reason-bearing terminal outcome when applicability is genuinely disproved, not a euphemism for scanner inability. It can be selected from **any** `then`/`else_if.then`/`else` branch. False condition selects next branch; indeterminate condition propagates. The Rule applicability gate may independently produce N/A. Preserve OVAL-style Boolean aggregation. | Expression schema and evaluation, roll-up, examples. |
 | 26 | Add ordered `evaluate.else_if: [{if: ..., then: ...}, ...]`, with required initial `if/then` and final `else`. Evaluate branches in order, first true wins, only selected branch runs; preserve six-state propagation. Compiler may normalize to nested `if/then/else`. | Expression schema, normalizer, evaluator, fixtures. |
+| 27 | File and hierarchy traversal must express an unbounded depth as **`max_depth: unlimited`**, not `null` or a magic negative integer. Bounded depth is an integer of at least zero (`0` searches the starting directory only); OVAL `max_depth=-1` converts to `unlimited`. The editor may offer this explicitly documented choice but the scanner must not infer it from omission. Historical 0.1–0.3 grammars remain unchanged. | 0.4 capability schema, converter, independent source proof, schema-negative tests, authoring gallery. |
 
 ## Boundary examples (normative meaning; validate against the actual revised schema before publishing)
 
@@ -78,9 +79,13 @@ The `not_evaluated` branch must carry the observations and follow-up details thr
 
 **Version contract (Decision 23).** `object: {module_version: {equals: '1.0.0.0'}}` is a typed version selector because `windows.cmdlet` says so; it is not an untyped string cast. Incompatible explicit datatypes and invalid version tokens are rejected.
 
+**Unbounded traversal (Decision 27).** The authored Object uses `traversal: {recurse: directories, max_depth: unlimited}` for unrestricted downward directory depth, while `max_depth: 1` includes only one child level and `max_depth: 0` stays within the starting directory. OVAL `max_depth="-1"` becomes native `unlimited` without altering `recurse_direction` or `recurse_file_system`. `null`, `-1`, and the string `"-1"` are invalid authored 0.4 depth values.
+
 ## Implementation lock and review criteria
 
 This document records owner acceptance; the following must be checked **before** claiming 0.4.0 locked:
+
+The [editor-default ↔ pinned OVAL crosswalk](v04-editor-defaults-oval-crosswalk-20261031.md) is an **incomplete audit** of Decision 7, not an additional implicit default policy or a new approval. It distinguishes the five currently proposed hidden values, their actual OVAL counterparts, and capability-specific candidates that still need review.
 
 1. Update each version-local JSON Schema (`x-scap-ng-version`, `x-last-modified`), document standard editor defaults and case-selector metadata; inspect all native capabilities for vocabulary drift.
 2. Add positive and negative fixtures for all 26 decisions, including `may_be_absent`, missing Test `field_requirement`, long native IDs, redundant `purpose`, wrong selector case, `else_if` ordering and six-state N/A vs not-evaluated.

@@ -703,7 +703,7 @@ class ExpandedSource(Source):
                 need(recurse in ('symlinks', 'directories', 'symlinks and directories'), 'deprecated/unproved recursion')
                 if (direction == 'down' and 'full_path' not in fields and
                         fields.get('directory', {}).get('operation') == 'equals'):
-                    fields['traversal'] = {'max_depth': None if depth == -1 else depth,
+                    fields['traversal'] = {'max_depth': 'unlimited' if depth == -1 else depth,
                         'recurse': 'symlinks_and_directories' if recurse == 'symlinks and directories' else recurse,
                         'direction': 'down'}
                 need(behaviors.get('recurse_file_system', 'all') in ('all', 'local', 'defined'),
@@ -1057,7 +1057,7 @@ class ExpandedNative(Native):
                     need(isinstance(v, dict), 'native textfile traversal shape')
                     depth = v.get('max_depth')
                     need(set(v) == {'max_depth', 'recurse'} and
-                         (depth is None or type(depth) is int and depth >= 0) and
+                         (depth == 'unlimited' or type(depth) is int and depth >= 0) and
                          v['recurse'] in ('directories', 'symlinks', 'symlinks_and_directories'),
                          'native textfile traversal depth/recurse type')
                 keys(v, {'max_depth', 'recurse'}, 'traversal')

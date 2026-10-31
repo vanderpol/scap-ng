@@ -303,7 +303,7 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
         raise ValueError("OVAL file recursion is not valid with full_path selection")
     if not has_full_path and direction=="down" and path_uses_oval_equality:
         obj["traversal"]={
-            "max_depth":None if raw_depth==-1 else raw_depth,
+            "max_depth":("unlimited" if mapping.get("specification_version")=="0.4.0" else None) if raw_depth==-1 else raw_depth,
             "recurse":recurse,
         }
 
@@ -345,7 +345,7 @@ def _materialize_hierarchy_traversal(obj: dict, mapping: dict):
         raise ValueError(f"invalid OVAL max_depth value: {raw_depth}")
 
     if direction=="down":
-        obj["traversal"]={"max_depth":None if raw_depth==-1 else raw_depth}
+        obj["traversal"]={"max_depth":("unlimited" if mapping.get("specification_version")=="0.4.0" else None) if raw_depth==-1 else raw_depth}
 
     for key in ("max_depth","recurse_direction"):
         behaviors.pop(key,None)
