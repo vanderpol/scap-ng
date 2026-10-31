@@ -1088,8 +1088,9 @@ class ExpandedNative(Native):
         return value
 
 
-def expanded_compare(source, definition, assessment):
-    result = compare(source, definition, assessment, native_type=ExpandedNative)
+def expanded_compare(source, definition, assessment, *, invocation_purpose=None):
+    result = compare(source, definition, assessment, native_type=ExpandedNative,
+                     invocation_purpose=invocation_purpose)
     if result['outcome'] == 'PROVED' and source.selector_equivalences:
         result['selector_equivalences'] = list(source.selector_equivalences.values())
     if result['outcome'] == 'PROVED' and source.normalizations:

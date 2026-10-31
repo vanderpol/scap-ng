@@ -13,6 +13,17 @@ Coordination comments are posted on #268 and #260 before overlapping edits.
 No corpus restart, final release/tag, PR merge, source/proof-floor rebaseline,
 or separate all_exist oracle change is authorized.
 
+Conditional implementation is committed as `9c28c6afc` (44 focused PASS).
+The next producer checkpoint has 35 targeted tests PASS (9.721s), including
+real pinned Linux/Windows schema/compile/static source comparisons, record
+inheritance and collision regression. [Producer contract and limitations](../audit/v04-owner-producer-compatibility-20261031.md).
+CI for published `31b7ee859` completed (four migration gates FAIL); it is safe
+to publish the batched local checkpoints without superseding an active gate.
+Still pending: capability suffix migration, strict compiler/library identities,
+consumer-purpose dependencies, complete editor-default audit and current example
+migration. Historical fixtures/anchors are not blindly rebaselined. No corpus,
+release, merge or scanner claim. Keep executing safe reconciliation work.
+
 Published audit checkpoint: `31b7ee859` on the existing draft PR branch.
 Next local coherent change implements approved conditional supplied-result blocks
 and independent package-reader compatibility. Forty-four focused tests PASS

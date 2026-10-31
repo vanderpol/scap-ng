@@ -26420,6 +26420,67 @@
         }
       ]
     },
+    "canonical_inherited_record_predicate": {
+      "type": "object",
+      "required": [
+        "record"
+      ],
+      "properties": {
+        "record": {
+          "type": "object",
+          "required": [
+            "records_found"
+          ],
+          "properties": {
+            "records_found": {
+              "$ref": "#/$defs/existence_cardinality"
+            },
+            "records_matching": {
+              "$ref": "#/$defs/cardinality"
+            },
+            "fields": {
+              "type": "object",
+              "minProperties": 1,
+              "propertyNames": {
+                "type": "string",
+                "minLength": 1
+              },
+              "additionalProperties": {
+                "$ref": "#/$defs/canonical_field_predicate"
+              }
+            },
+            "redact_result": {
+              "const": true
+            },
+            "field_requirement": {
+              "$ref": "#/$defs/paired_requirement"
+            }
+          },
+          "additionalProperties": false,
+          "if": {
+            "properties": {
+              "records_found": {
+                "const": "none"
+              }
+            },
+            "required": [
+              "records_found"
+            ]
+          },
+          "then": {
+            "maxProperties": 1
+          },
+          "else": {
+            "required": [
+              "records_matching",
+              "fields"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Record correlation and aggregation retained; member comparisons inherit the nearest complete Test/group/record field policy. Local overrides must be complete pairs."
+    },
     "canonical_inherited_condition": {
       "oneOf": [
         {
@@ -26442,7 +26503,7 @@
               "additionalProperties": {
                 "oneOf": [
                   {"$ref": "#/$defs/canonical_field_predicate"},
-                  {"$ref": "#/$defs/record_wrapper_predicate"}
+                  {"$ref": "#/$defs/canonical_inherited_record_predicate"}
                 ]
               }
             }
@@ -26788,7 +26849,7 @@
           "additionalProperties": {
             "oneOf": [
               {"$ref": "#/$defs/canonical_field_predicate"},
-              {"$ref": "#/$defs/record_wrapper_predicate"}
+              {"$ref": "#/$defs/canonical_inherited_record_predicate"}
             ]
           },
           "description": "One complete condition; distinct fields are combined with logical AND."
@@ -26837,7 +26898,7 @@
                 "additionalProperties": {
                   "oneOf": [
                     {"$ref": "#/$defs/explicit_field_predicate"},
-                    {"$ref": "#/$defs/record_wrapper_predicate"}
+                    {"$ref": "#/$defs/canonical_inherited_record_predicate"}
                   ]
                 }
               },

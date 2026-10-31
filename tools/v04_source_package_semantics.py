@@ -14,8 +14,13 @@ CAPS = {OD + '#windows}registry': 'windows.registry',
         OD + '#windows}wmi57': 'windows.wmi.query',
         OD + '#independent}shellcommand': 'independent.shellcommand'}
 FOUND = {'at_least_one_exists': 'one_or_more', 'none_exist': 'none',
-         'only_one_exists': 'exactly_one', 'any_exist': 'may_be_absent'}
+         'only_one_exists': 'exactly_one', 'any_exist': 'zero_or_more'}
 FIELD_FOUND = {**FOUND, 'all_exist': 'every'}
+
+
+def existence_token(value):
+    """Read historical witness spelling; current authoring rejects that alias."""
+    return 'zero_or_more' if value == 'may_be_absent' else value
 CHECK = {'all': 'every', 'at least one': 'one_or_more', 'none satisfy': 'none',
          'only one': 'exactly_one'}
 OPS = {'equals': 'equals', 'not equal': 'not_equal', 'pattern match': 'matches_regex',
@@ -467,16 +472,17 @@ class Native:
     def predicate(self, n, inherited=None, selector=False):
         need(isinstance(n, dict), 'native predicate type')
         policy = {**(inherited or {}), **n}
-        if not selector and policy.get('values_found') == 'none':
+        if not selector and 'record' not in n and policy.get('values_found') == 'none':
             need(set(n) == {'values_found'}, 'native absence redundant fields')
             return {'found': 'none'}
         if 'record' in n:
             keys(n, {'record'}, 'record wrapper')
             r = n['record']
-            keys(r, {'records_found', 'records_matching', 'fields'}, 'record')
+            keys(r, {'records_found', 'records_matching', 'fields', 'field_requirement'}, 'record')
             return {'operation': 'equals', 'comparison_datatype': 'record',
-                    'found': r['records_found'], 'matching': r['records_matching'],
-                    'operand': {'record': {k: self.predicate(v) for k, v in sorted(r['fields'].items())}}}
+                    'found': existence_token(r['records_found']), 'matching': r['records_matching'],
+                    'operand': {'record': {k: self.predicate(v, r.get('field_requirement', inherited))
+                                           for k, v in sorted(r['fields'].items())}}}
         ops = set(n) & set(OPS.values())
         need(len(ops) == 1, 'native scalar operation')
         op, = ops
@@ -489,7 +495,7 @@ class Native:
             result['expected_matching'] = n['value_match']
         if not selector:
             need('values_found' in policy and 'values_matching' in policy, 'missing effective field policy')
-            result.update(found=policy['values_found'], matching=policy['values_matching'])
+            result.update(found=existence_token(policy['values_found']), matching=policy['values_matching'])
         return result
 
     def condition(self, n, inherited=None):
@@ -537,7 +543,7 @@ class Native:
         need(n.get('reported_elements') == 'all', 'reporting/evidence proof requires all')
         r = n['require']
         result = {'capability': n['capability'], 'object': self.object(n['object'], n['capability']),
-                  'found': r['items_found']}
+                  'found': existence_token(r['items_found'])}
         if set(r) != {'items_found'}:
             result.update(matching=r['items_satisfying'], condition=self.condition(r))
         return result
@@ -565,11 +571,16 @@ def first_difference(expected, actual, path='$'):
     return None
 
 
-def compare(source, definition, assessment, *, native_type=Native):
+def compare(source, definition, assessment, *, native_type=Native, invocation_purpose=None):
     """Bind Test IDs by the complete criteria/evaluate structure, never titles."""
     native = native_type(assessment)
-    need(assessment.get('class') == source.get(definition, 'definitions').get('class')
-         and assessment.get('purpose') == 'assessment', 'Assessment class/purpose boundary')
+    need(assessment.get('class') == source.get(definition, 'definitions').get('class'),
+         'Assessment class boundary')
+    need(invocation_purpose in (None, 'assessment', 'applicability'), 'unknown invocation purpose')
+    if 'purpose' in assessment:
+        # Archived proof witnesses predate Decision 6. Reading that metadata
+        # does not make it valid current authoring or establish an invocation.
+        need(assessment['purpose'] == 'assessment', 'historical Assessment purpose boundary')
     expected, actual = source.expression(definition), native.expression(assessment['evaluate'])
     bindings, inverse = {}, {}
     def bind(a, b):
@@ -609,4 +620,5 @@ def compare(source, definition, assessment, *, native_type=Native):
     return {'outcome': 'UNVERIFIABLE/UNSUPPORTED' if unsupported else 'PROVED',
             'test_bindings': bindings, 'comparisons': terms, 'unsupported_obligations': unsupported,
             'proof_scope': 'structural identity of typed collection/comparison/result terms; not scanner execution',
-            'normalizations_applied': []}
+            'normalizations_applied': [], 'invocation_purpose': invocation_purpose,
+            'historical_root_purpose_metadata': 'purpose' in assessment}
