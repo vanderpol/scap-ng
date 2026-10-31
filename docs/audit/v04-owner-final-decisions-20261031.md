@@ -100,7 +100,7 @@ For both, `filesystem` controls file-system search scope only. It does not itsel
 
 This document records owner acceptance; the following must be checked **before** claiming 0.4.0 locked:
 
-The [editor-default ↔ pinned OVAL crosswalk](v04-editor-defaults-oval-crosswalk-20261031.md) is an **incomplete audit** of Decisions 7 and 28, not an additional implicit default policy. It distinguishes the six currently annotated editor defaults, their actual OVAL counterparts, and capability-specific candidates that still need review.
+The [editor-default ↔ pinned OVAL crosswalk](v04-editor-defaults-oval-crosswalk-20261031.md) is an **incomplete audit** of Decisions 7 and 28, not an additional implicit default policy. It distinguishes the **five annotated controls** (including one paired `field_requirement` control), their actual OVAL counterparts, and capability-specific candidates that still need review.
 
 1. Update each version-local JSON Schema (`x-scap-ng-version`, `x-last-modified`), document standard editor defaults and case-selector metadata; inspect all native capabilities for vocabulary drift.
 2. Add positive and negative fixtures for all 28 decisions, including `may_be_absent`, missing Test `field_requirement`, long native IDs, redundant `purpose`, wrong selector case, `else_if` ordering, six-state N/A vs not-evaluated, explicit filesystem scope, and unbounded traversal.

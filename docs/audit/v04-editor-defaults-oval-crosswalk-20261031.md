@@ -8,15 +8,14 @@ The pinned source is `third_party/scap-1.4-schemas/oval_5.12.3/` in this reposit
 
 ## 1. Existing explicit editor defaults
 
-These are the complete `default` plus `x-scap-ng-authoring.hide_when_default: true` annotations in the current draft schema as of this audit, not a claim that the *desired* list is complete.
+These are the **five** `default` plus `x-scap-ng-authoring.hide_when_default: true` annotated controls in the current draft schema, not a claim that the *desired* list is complete. The `field_requirement` annotation contains **two** scalar members, but is **one paired control**, not two separate independently hidden defaults.
 
 | NG authored location | Current editor default | OVAL 5.12.3 counterpart | Equivalence/status |
 |---|---|---|---|
 | `Test.reported_elements` | `all` | No exact source `reported_elements` control. OVAL has different source/results representation. | **NG-specific** reporting choice; hidden in editor only after explicit saved YAML. |
 | `Test.require.items_found` | `one_or_more` | `oval-def:TestType/@check_existence`: default `at_least_one_exists`. | **Aligned** for the ordinary no-synthetic-Items case; OVAL `all_exist` requires distinct source-evidence review. |
 | `Test.require.items_satisfying` | `every` | `oval-def:TestType/@check`: **required attribute; no default**. | **NG editor preference, not an OVAL default.** Do not fill a missing/invalid OVAL source `check` from this suggestion. |
-| `Test.require.field_requirement.values_found` | `one_or_more` | `EntityStateSimpleBaseType/@check_existence`: default `at_least_one_exists` (same for complex state entities). | **Aligned** as the common field-presence choice, subject to correct item/record semantics. |
-| `Test.require.field_requirement.values_matching` | `every` | `EntityState*BaseType/@entity_check`: default `all`. | **Aligned** as the common field match choice. A field with an explicit override must write its complete pair. |
+| `Test.require.field_requirement` (complete pair) | `{values_found: one_or_more, values_matching: every}` | `EntityStateSimpleBaseType/@check_existence`: default `at_least_one_exists` (also complex entities); `EntityState*BaseType/@entity_check`: default `all`. | **Aligned** as common field presence/match choices, subject to item/record semantics. An explicit field exception must write both members together. The schema hides/shows the complete pair as one control. |
 | File Object `filesystem` scope | `local` | OVAL `FileBehaviors/@recurse_file_system` omission defaults to **`all`**, though the XSD recommends `local` for most searches. | **Owner-confirmed NG authoring choice (2026-10-31), intentionally distinct from OVAL omission semantics.** Editors prefill and serialize `local`; source converters preserve effective `all` from omitted OVAL. `defined` maps to `same`. |
 
 Schema references: `schema/v0.4.0/assessment.schema.json` (`reported_elements`), `schema/v0.4.0/assessment-language.schema.json` (`canonical_all_items_requirement`) and `schema/v0.4.0/capability-common.schema.json` (`filesystem_scope`). OVAL XSD: `oval-definitions-schema.xsd`, `TestType` and `EntityState*BaseType` plus independent/Windows `FileBehaviors`.
@@ -56,10 +55,10 @@ Schema references: `schema/v0.4.0/assessment.schema.json` (`reported_elements`),
 
 The source XSD itself recommends `recurse_file_system=local` for most content *despite* its omission default of `all`. The owner confirmed `local` as the **new-authoring editor value**, not a blanket source-conversion normalization. The editor must never conflate source-effective `all` with the `recurse` traversal choice, or treat `all` as an instruction to recursively search. The pinned Windows `FileBehaviors` XSD defaults `recurse=directories`, **not** `junctions and directories`; a converter that follows junctions on an omitted Windows `recurse` attribute silently changes the source search.
 
-## 4. Owner decisions still needed before finalizing
+## 4. Remaining review before finalizing
 
-- Should the editor **hide** `items_satisfying: every` once serialized, even though OVAL Test `check` has no default? (Already annotated as a suggested NG default; this question is about hiding, not OVAL equivalence.)
-- Which conditional or capability-specific defaults beyond the six existing annotations are worth hiding in the UI? The candidate table is for review, not automatic schema activation.
+- The owner has already approved the principle of hiding **explicitly serialized** defaults (Decision 7); current schema metadata specifically marks `items_satisfying: every` hideable. **No second vote is required** on that UI display behavior. OVAL source `check` is still required and must never be inferred from this editor suggestion.
+- Which conditional or capability-specific defaults beyond the **five annotated controls** are worth hiding in the UI? The candidate table is for review, not automatic schema activation; each candidate still needs a source-aware conformance check and, where semantics change, an owner decision.
 
 ## Primary pinned source anchors
 

@@ -23,7 +23,7 @@ This file is the durable registry for every non-`main` branch in `vanderpol/scap
 
 | Branch | Status | Purpose / relationship to main | Disposition |
 | --- | --- | --- | --- |
-| `codex/v04-owner-contract-20261031` | active | Owner-approved 0.4.0 authoring/schema decisions #255/#267, plus 2026-10-31 `max_depth: unlimited` correction, staged separately from current `main` because existing converter/galleries are not yet aligned. Draft PR #268 from main `956bf093f`; initial published tree commit `91b8f9b1e`. | Align converter, scanner/editor contracts, examples and focused source equivalence before review and merge; do not treat green schema checks alone as release acceptance. |
+| `codex/v04-owner-contract-20261031` | active | Owner-approved 0.4.0 authoring/schema Decisions 1–28 (#255/#267), including 2026-10-31 `max_depth: unlimited` and explicit new-authoring `filesystem: local` / source OVAL `all` preservation, staged separately from current `main` because existing converter/galleries are not yet aligned. Draft PR #268 from main `956bf093f`; initial published tree commit `91b8f9b1e`. | Align converter, scanner/editor contracts, examples and focused source equivalence before review and merge; do not treat green schema checks alone as release acceptance. |
 
 Release-candidate audit 2026-10-29 (#260): fetched all 36 remote branch heads;
 compared their ahead/behind counts to source `4d78f700a`. Fifteen non-main
