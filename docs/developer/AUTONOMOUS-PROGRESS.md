@@ -1,5 +1,27 @@
 # Autonomous development checkpoint
 
+## Active #268 reconciliation handoff (2026-10-31; #255)
+
+Owner explicitly authorized implementation of Decisions 1–28 on the registered
+`codex/v04-owner-contract-20261031` draft branch. Main remains `956bf093f` at
+preflight; PR input `a5a7fc08c`. Isolated worktree:
+`/workspace/scap-ng-owner-contract-268`. Original main checkout at `7ddf8d696`
+and its unpublished source-proof notes are untouched; copies/patch and full
+working audit reports live at `/workspace/reconciliation-268-20261031/`.
+[Current reconciliation packet](../audit/v04-owner-reconciliation-20261031.md).
+Coordination comments are posted on #268 and #260 before overlapping edits.
+No corpus restart, final release/tag, PR merge, source/proof-floor rebaseline,
+or separate all_exist oracle change is authorized.
+
+First checkpoint: all 100 mappings/generated schemas inventoried; eleven old
+numeric capability names, current producer/example drift and historical fixture
+classification recorded. Exactly five annotated controls (paired field policy
+counts once). Source count corrected to 189 attribute +15 element defaults;
+Windows recurse directories and OVAL all/editor local distinctions confirmed.
+81 baseline focused tests PASS and five new audit tests PASS. No acceptance
+fingerprint updated. Full catalog and producer/compiler migration still pending;
+continue through safe steps, not merely this audit checkpoint.
+
 ## Owner-confirmed new authoring `filesystem: local`, source OVAL `all` preserved (2026-10-31; #255)
 
 Decision 28 closes the `local` vs `all` discussion without another owner vote.
