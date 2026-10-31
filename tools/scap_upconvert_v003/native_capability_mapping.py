@@ -212,6 +212,13 @@ def _coerce_collection_parameter(value, spec: dict):
     return copy.deepcopy(value)
 
 
+def _native_depth(raw_depth: int, mapping: dict):
+    """Keep historical 0.1–0.3 serialization while emitting readable 0.4 depth."""
+    if raw_depth != -1:
+        return raw_depth
+    return "unlimited" if mapping.get("specification_version") == "0.4.0" else None
+
+
 def _materialize_file_traversal(obj: dict, mapping: dict):
     """Translate OVAL file scope and downward recursion into separate native fields.
 
@@ -303,7 +310,7 @@ def _materialize_file_traversal(obj: dict, mapping: dict):
         raise ValueError("OVAL file recursion is not valid with full_path selection")
     if not has_full_path and direction=="down" and path_uses_oval_equality:
         obj["traversal"]={
-            "max_depth":("unlimited" if mapping.get("specification_version")=="0.4.0" else None) if raw_depth==-1 else raw_depth,
+            "max_depth":_native_depth(raw_depth, mapping),
             "recurse":recurse,
         }
 
@@ -345,7 +352,7 @@ def _materialize_hierarchy_traversal(obj: dict, mapping: dict):
         raise ValueError(f"invalid OVAL max_depth value: {raw_depth}")
 
     if direction=="down":
-        obj["traversal"]={"max_depth":("unlimited" if mapping.get("specification_version")=="0.4.0" else None) if raw_depth==-1 else raw_depth}
+        obj["traversal"]={"max_depth":_native_depth(raw_depth, mapping)}
 
     for key in ("max_depth","recurse_direction"):
         behaviors.pop(key,None)

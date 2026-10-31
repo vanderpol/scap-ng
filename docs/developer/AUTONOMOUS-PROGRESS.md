@@ -14,9 +14,10 @@ annotations, five mapping-identity proof pins (only the mapping text
 `max_depth_-1` target changed), authoring sample and OVAL crosswalk were
 reviewed and updated under #255, **not** source-proof-floor rebaselined.
 
-Focused verification in the working branch: 80 owner/schema/generator tests
-passed; the direct OVAL file-default proof passed; 27 historical native mapping
-tests passed; a further original-vs-native traversal mutation test passed.
+Focused verification in the working branch: a combined run of **110 tests
+passed** (80 owner/schema/generator, 28 versioned native mapping including
+0.3/0.4 depth compatibility, direct OVAL file-default proof and
+original-vs-native traversal mutation proof).
 Broader direct integration remains red on preexisting `purpose`, long IDs and
 missing comparison `field_requirement` drift, not evidence of a failed depth
 mapping. Continue tracking those under #255/#251 and keep PR #268 a draft.

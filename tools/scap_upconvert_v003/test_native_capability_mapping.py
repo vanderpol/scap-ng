@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import unittest
 
-from native_capability_mapping import apply_capability_mapping, source_capability
+from native_capability_mapping import _native_depth, apply_capability_mapping, source_capability
 
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -440,6 +440,11 @@ class ReviewedNativeCapabilityMappingRegressionTests(unittest.TestCase):
 
 
 class V03ProductionMappingTests(unittest.TestCase):
+    def test_unbounded_depth_respects_versioned_authoring_contract(self):
+        self.assertIsNone(_native_depth(-1, {"specification_version": "0.3.0"}))
+        self.assertEqual(_native_depth(-1, {"specification_version": "0.4.0"}), "unlimited")
+        self.assertEqual(_native_depth(2, {"specification_version": "0.4.0"}), 2)
+
     def mapping(self,name):
         return json.loads(
             (ROOT/"schema/v0.3.0/capability-mappings/supported"/name).read_text(
