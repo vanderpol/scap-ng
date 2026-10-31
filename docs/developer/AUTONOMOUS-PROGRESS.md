@@ -13,6 +13,17 @@ Coordination comments are posted on #268 and #260 before overlapping edits.
 No corpus restart, final release/tag, PR merge, source/proof-floor rebaseline,
 or separate all_exist oracle change is authorized.
 
+Published audit checkpoint: `31b7ee859` on the existing draft PR branch.
+Next local coherent change implements approved conditional supplied-result blocks
+and independent package-reader compatibility. Forty-four focused tests PASS
+(0.448s), including a current-schema complete package with ordered else_if and
+reason-bearing terminals. [Conditional contract/results](../audit/v04-owner-conditional-compatibility-20261031.md).
+Pure Boolean operator algebra remains unchanged; native legacy aliases now
+reject. Static references close over all branches; only selected blocks consume
+supplied results. No collector or source-oracle change. This checkpoint does not
+qualify complete Rule Results/scanner integration. Keep working on the producer,
+capability naming, consumer-purpose and default-audit gaps after this commit.
+
 First checkpoint: all 100 mappings/generated schemas inventoried; eleven old
 numeric capability names, current producer/example drift and historical fixture
 classification recorded. Exactly five annotated controls (paired field policy

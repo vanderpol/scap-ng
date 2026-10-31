@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Canonical 0.4.0 six-state expression plan, with supplied Test outcomes only.
 
-Compiles the native 0.4.0 Boolean syntax (and/or/one/xor/not and legacy
-aliases) to the independently audited six-state OVAL result combiner.
-No Test/State/Item/Variable collection, IF/ELSE branching, host execution,
-runtime applicability decisions, or scanner parity is claimed.
+Compiles canonical Boolean syntax and owner-approved ordered conditional
+branches over supplied outcomes. No Test/State/Item/Variable collection,
+host execution or scanner parity is claimed.
 
 This is the first bounded logical-result backend, NOT an executable scanner.
 Refs #232 #229.
@@ -23,7 +22,7 @@ from v04_a_truth_plan import (
 STAGE = "CANONICAL_040_SUPPLIED_TEST_RESULTS_ONLY_NOT_SCANNER"
 SPEC = {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"}
 OP_ALIASES = {"and": "all", "or": "any", "xor": "odd"}
-OPERATORS = frozenset(("and", "or", "one", "xor", "all", "any", "odd"))
+OPERATORS = frozenset(("and", "or", "one", "xor"))
 MAX_NODES = 16384
 
 
@@ -38,9 +37,19 @@ def _legacy_result_tree(source, *, max_nodes=MAX_NODES):
             raise ValueError("canonical expression resource budget exceeded")
         if not isinstance(node, dict):
             raise ValueError("canonical expression node must be an object")
-        if set(node) == {"if", "then", "else"}:
-            raise UnsupportedExpression(
-                "conditional result semantics require separate six-state acceptance")
+        if 'if' in node:
+            if not {'if', 'then', 'else'} <= set(node) or set(node) - {'if', 'then', 'else', 'else_if'}:
+                raise ValueError('conditional requires if/then/final else')
+            branches = node.get('else_if', [])
+            if not isinstance(branches, list) or ('else_if' in node and not branches):
+                raise ValueError('else_if requires a nonempty ordered list')
+            fallback = visit(node['else'], depth + 1)
+            for branch in reversed(branches):
+                if not isinstance(branch, dict) or set(branch) != {'if', 'then'}:
+                    raise ValueError('else_if entry requires exactly if/then')
+                fallback = {'if': visit(branch['if'], depth + 1),
+                            'then': visit(branch['then'], depth + 1), 'else': fallback}
+            return {'if': visit(node['if'], depth + 1), 'then': visit(node['then'], depth + 1), 'else': fallback}
         if len(node) != 1:
             raise ValueError("expression must have exactly one operator")
         kind, payload = next(iter(node.items()))
@@ -51,11 +60,62 @@ def _legacy_result_tree(source, *, max_nodes=MAX_NODES):
                     [visit(child, depth + 1) for child in payload]}
         if kind == "not":
             return {"not": visit(payload, depth + 1)}
-        if kind in ("test", "assessment", "not_applicable"):
+        if kind in ('not_applicable', 'not_evaluated'):
+            if (not isinstance(payload, dict) or set(payload) != {'reason'}
+                    or not isinstance(payload['reason'], str) or not payload['reason'].strip()):
+                raise ValueError(f'{kind} requires an explicit nonempty reason')
+            return {kind: deepcopy(payload)}
+        if kind in ("test", "assessment"):
             return {kind: deepcopy(payload)}
         raise UnsupportedExpression(f"unsupported 0.4.0 result operator: {kind}")
 
     return visit(source, 0)
+
+
+def _control_plan(assessment, tree, field):
+    """Static references for all branches; nested blocks execute lazily (#255)."""
+    refs = {'tests': set(), 'dependencies': set()}
+    total = 0
+
+    def block(node, path):
+        nonlocal total
+        total += 1
+        if total > MAX_NODES or len(path) > 256:
+            raise ValueError('conditional expression resource budget exceeded')
+        if 'if' in node:
+            branches = [{'condition': block(node['if'], path + ['if']),
+                         'then': block(node['then'], path + ['then']), 'path': path}]
+            for i, branch in enumerate(node.get('else_if', [])):
+                at = path + ['else_if', i]
+                branches.append({'condition': block(branch['if'], at + ['if']),
+                                 'then': block(branch['then'], at + ['then']), 'path': at})
+            return [{'op': 'select_first_true', 'branches': branches,
+                     'else': block(node['else'], path + ['else']), 'path': path}]
+        kind, payload = next(iter(node.items()))
+        if kind in ('test', 'assessment'):
+            group = 'tests' if kind == 'test' else 'dependencies'
+            if not isinstance(payload, str) or payload not in assessment.get(group, {}):
+                raise ValueError(f'{path}: unresolved {kind} reference {payload!r}')
+            refs[group].add(payload)
+            return [{'op': 'read_' + kind, 'id': payload, 'path': path}]
+        if kind in ('not_applicable', 'not_evaluated'):
+            return [{'op': kind, 'reason': payload['reason'], 'path': path}]
+        if kind == 'not':
+            return block(payload, path + [kind]) + [{'op': 'not', 'path': path}]
+        instructions = []
+        for i, child in enumerate(payload):
+            instructions.extend(block(child, path + [OP_ALIASES.get(kind, kind), i]))
+        return instructions + [{'op': OP_ALIASES.get(kind, kind), 'count': len(payload), 'path': path}]
+
+    instructions = block(tree, [field])
+    return {'instructions': instructions, 'instruction_count': total,
+            'requires': {key: sorted(values) for key, values in refs.items()}}
+
+
+def _has_control(tree):
+    if isinstance(tree, dict):
+        return bool({'if', 'not_evaluated', 'not_applicable'} & set(tree)) or any(_has_control(v) for v in tree.values())
+    return isinstance(tree, list) and any(_has_control(v) for v in tree)
 
 
 def compile_canonical_result_plan(assessment, field="evaluate"):
@@ -67,7 +127,9 @@ def compile_canonical_result_plan(assessment, field="evaluate"):
         raise ValueError("explicit 0.4.0 evaluate/applicability required")
     normalized = deepcopy(assessment)
     normalized[field] = _legacy_result_tree(assessment[field])
-    original_plan = compile_expression(normalized, field)
+    control = _has_control(assessment[field])
+    original_plan = (_control_plan(assessment, assessment[field], field) if control
+                     else compile_expression(normalized, field))
     return {
         "stage": STAGE,
         "assessment_id": assessment["id"],
@@ -79,7 +141,7 @@ def compile_canonical_result_plan(assessment, field="evaluate"):
         "requires": original_plan["requires"],
         "scanner_executed": False,
         "tests_evaluated": False,
-        "conditional_semantics_implemented": False,
+        "conditional_semantics_implemented": control,
     }
 
 
@@ -87,6 +149,8 @@ def evaluate_supplied_results(plan, test_results, dependency_results=None):
     """Full OVAL six-state Boolean composition; no hidden Test defaults."""
     if not isinstance(plan, dict) or plan.get("stage") != STAGE:
         raise ValueError("unsupported native 0.4 result plan")
+    if plan.get('conditional_semantics_implemented'):
+        return _evaluate_control(plan, test_results, dependency_results)
     # Delegate six-state truth algebra to audited OVAL-aligned operator core.
     legacy = {
         "stage": "RESEARCH_SUPPLIED_RESULTS_ONLY_NOT_SCANNER",
@@ -104,6 +168,69 @@ def evaluate_supplied_results(plan, test_results, dependency_results=None):
         "tests_evaluated": False,
         "outcomes_provided_by_caller": True,
     }
+
+
+def _evaluate_control(plan, tests, dependencies):
+    from v04_a_truth_plan import SIX, combine
+    deps = dependencies or {}
+    if not isinstance(tests, dict) or not isinstance(deps, dict):
+        raise ValueError('supplied outcomes must be mappings')
+    for supplied, key in ((tests, 'tests'), (deps, 'dependencies')):
+        if set(supplied) - set(plan['requires'][key]):
+            raise ValueError('undeclared supplied outcome')
+    trace, terminals = [], []
+
+    def execute(instructions):
+        stack = []
+        for instruction in instructions:
+            op = instruction['op']
+            if op in ('read_test', 'read_assessment'):
+                values = tests if op == 'read_test' else deps
+                if instruction['id'] not in values:
+                    raise ValueError('missing supplied outcome for selected ' + instruction['id'])
+                value = values[instruction['id']]
+                if type(value) is not str or value not in SIX:
+                    raise ValueError('invalid six-state supplied outcome')
+            elif op in ('not_applicable', 'not_evaluated'):
+                value = op
+                terminals.append({'outcome': op, 'reason': instruction['reason'], 'path': instruction['path']})
+            elif op == 'select_first_true':
+                for branch in instruction['branches']:
+                    condition = execute(branch['condition'])
+                    if condition == 'true':
+                        value = execute(branch['then'])
+                        break
+                    if condition != 'false':
+                        value = condition
+                        break
+                else:
+                    value = execute(instruction['else'])
+            elif op == 'not':
+                if not stack:
+                    raise ValueError('malformed conditional unary stack')
+                previous = stack.pop()
+                value = {'true': 'false', 'false': 'true'}.get(previous, previous)
+            elif op in ('all', 'any', 'one', 'odd'):
+                count = instruction['count']
+                if type(count) is not int or count < 1 or count > len(stack):
+                    raise ValueError('malformed conditional operator count')
+                values = stack[-count:]
+                del stack[-count:]
+                value = combine(op, values)
+            else:
+                raise ValueError('unsupported conditional instruction')
+            stack.append(value)
+            trace.append({'path': instruction['path'], 'operation': op, 'outcome': value})
+        if len(stack) != 1:
+            raise ValueError('malformed conditional expression stack')
+        return stack[0]
+
+    outcome = execute(plan['instructions'])
+    return {'stage': STAGE, 'assessment_id': plan['assessment_id'], 'expression_field': plan['field'],
+            'outcome': outcome, 'trace': trace, 'explicit_terminal_outcomes': terminals,
+            'manual_follow_up_required': outcome == 'not_evaluated' and any(t['outcome'] == outcome for t in terminals),
+            'tests_supplied': len(tests), 'dependencies_supplied': len(deps),
+            'scanner_executed': False, 'tests_evaluated': False, 'outcomes_provided_by_caller': True}
 
 
 def census_authoring(documents):
@@ -140,5 +267,5 @@ def census_authoring(documents):
         "plan_manifest_sha256": sha256(canonical_json(plans)).hexdigest(),
         "scanner_executed": False,
         "tests_evaluated": False,
-        "conditional_semantics_implemented": False,
+        "conditional_semantics_implemented": True,
     }

@@ -107,26 +107,45 @@ def validators(schema_root):
 def expression_plan(a):
     """Independent postorder translation, including exact source AST locations."""
     plan, tests, dependencies = [], set(), set()
-    def visit(node, path):
+    def visit(node, path, output=None):
+        output = plan if output is None else output
+        if isinstance(node, dict) and 'if' in node:
+            require({'if', 'then', 'else'} <= set(node) and not set(node) - {'if', 'then', 'else', 'else_if'},
+                    'conditional requires if/then/final else')
+            alternatives = node.get('else_if', [])
+            require(isinstance(alternatives, list) and ('else_if' not in node or alternatives), 'invalid ordered else_if')
+            choices = [(node, path)] + [(choice, path + ['else_if', i]) for i, choice in enumerate(alternatives)]
+            branches = []
+            for i, (choice, at) in enumerate(choices):
+                require(isinstance(choice, dict) and (i == 0 or set(choice) == {'if', 'then'}), 'invalid else_if entry')
+                condition, selected = [], []
+                visit(choice['if'], at + ['if'], condition)
+                visit(choice['then'], at + ['then'], selected)
+                branches.append({'condition': condition, 'then': selected, 'path': at})
+            fallback = []
+            visit(node['else'], path + ['else'], fallback)
+            output.append({'op': 'select_first_true', 'branches': branches, 'else': fallback, 'path': path})
+            return
         require(isinstance(node, dict) and len(node) == 1, 'unsupported result expression')
         op, value = next(iter(node.items()))
         if op in ('test', 'assessment'):
             table = a.get('tests', {}) if op == 'test' else a.get('dependencies', {})
             require(value in table, 'unresolved expression reference')
             (tests if op == 'test' else dependencies).add(value)
-            plan.append({'op': 'read_' + op, 'id': value, 'path': path})
+            output.append({'op': 'read_' + op, 'id': value, 'path': path})
         elif op in ('and', 'or', 'one', 'xor'):
             require(isinstance(value, list) and value, 'empty expression')
             encoded = {'and': 'all', 'or': 'any', 'xor': 'odd'}.get(op, op)
             for i, child in enumerate(value):
-                visit(child, path + [encoded, i])
-            plan.append({'op': encoded, 'count': len(value), 'path': path})
+                visit(child, path + [encoded, i], output)
+            output.append({'op': encoded, 'count': len(value), 'path': path})
         elif op == 'not':
-            visit(value, path + ['not'])
-            plan.append({'op': 'not', 'path': path})
-        elif op == 'not_applicable':
-            require(isinstance(value, dict) and set(value) == {'reason'}, 'invalid not-applicable')
-            plan.append({'op': op, 'reason': value['reason'], 'path': path})
+            visit(value, path + ['not'], output)
+            output.append({'op': 'not', 'path': path})
+        elif op in ('not_applicable', 'not_evaluated'):
+            require(isinstance(value, dict) and set(value) == {'reason'} and isinstance(value['reason'], str)
+                    and value['reason'].strip(), 'invalid reason-bearing terminal')
+            output.append({'op': op, 'reason': value['reason'], 'path': path})
         else:
             raise ValueError('unsupported result operator: ' + op)
     visit(a['evaluate'], ['evaluate'])

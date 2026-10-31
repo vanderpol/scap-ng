@@ -23,8 +23,8 @@ def audit(path):
     report["total_canonical_documents"] = len(docs)
     report["json_authoring_archive"] = path.name
     report["coverage_interpretation"] = (
-        "Only Boolean result composition with externally supplied six-state leaves. "
-        "Unsupported IF/ELSE and missing primitive collector semantics remain open."
+        "Boolean and owner-approved ordered branches with externally supplied six-state leaves. "
+        "No primitive collector execution or scanner conformance is established."
     )
     return report
 
