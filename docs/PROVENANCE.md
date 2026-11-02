@@ -73,7 +73,7 @@ They are not included in the immutable JSON digest.
 
 The staging import did **not** move the compiler, converter, authoring normalizer, scanner, runtime or independent collection proofs. It did not change source-research evidence or proof baselines, publish a 0.4.0 release, or obtain OVAL Board ratification. Repository naming and visibility changed **after** this import; those later administrative changes must not be confused with schema validation or release qualification.
 
-Large generated corpora and published evidence remain separately tracked in [scap-ng-evidence](https://github.com/vanderpol/scap-ng-evidence). The [October 30 complete DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download) and [normalized review library](https://github.com/vanderpol/scap-ng-evidence/blob/main/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3/README.md) are historical pre-release checkpoints, not independent scanner-runtime proof.
+Historical conversion artifacts and proofs are research records, not current 0.4 authoring samples. The obsolete public corpus has been retired from project navigation; its verified retention belongs in the private research repository. No complete 65-stream library has yet been qualified against the current pre-alpha grammar. See the [evidence publication tracker](https://github.com/vanderpol/scap-ng-evidence/issues/1) for qualification and retirement status.
 
 ## Generated documentation and source audit
 
