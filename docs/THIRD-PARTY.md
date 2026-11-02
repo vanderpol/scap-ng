@@ -1,28 +1,13 @@
-# Third-party attribution and licensing boundary
+# Third-party sources and licensing
 
-This staging import includes project-owned schemas, native capability mapping
-metadata, and a small set of curated source-derived authoring examples.
+SCAP-NG project-owned material is offered under [Apache-2.0](../LICENSE). This does **not** relicense OVAL, DISA, NIST, NIWC or other referenced third-party materials. Preserve their original source identifiers, notices and provenance.
 
-- The top-level Apache-2.0 license is **not** a claim to relicense OVAL, DISA,
-  NIST, NIWC or other third-party source material cited in mapping provenance
-  or examples. Preserve source identifiers, notices and provenance.
-- No original SCAP 1.4 benchmark, OVAL XML corpus, external source archive,
-  historical package binary, research fixture bundle or published proof asset
-  has been copied into this staging repository.
-- Each curated example traces to an exact file in the original Git repository;
-  its semantics must not be represented as independently runtime-proved.
-- Before any public 0.4.0 distribution, complete the project-wide provenance,
-  copyright, notices and release-packaging review.
+This repository contains schemas, capability mapping metadata and four small source-derived Assessment examples. It does **not** contain the original SCAP 1.4 benchmarks, OVAL XML corpus, research archives or bulk proof assets. The [provenance record](PROVENANCE.md) identifies the original example locations; schema-valid examples are **not** independently proved scanner results.
 
-## OVAL documentation research boundary
+Before any public 0.4.0 distribution, review the full collection of source rights, attribution, notices and packaging.
 
-The 5.12.3 OVAL Windows `ntuser` XSD contains extensive field and scanner
-implementation annotations. Its source file includes a Government
-License/Disclaimer that requires reproduction alongside a copy or modification
-of the original XSD. To keep ownership boundaries clear, our generated
-documentation uses original summaries, pinned upstream links, and an offline
-audit of annotation counts and hashes; **it does not copy the original XSD
-prose**. All translated scanner notes remain unreviewed implementation
-candidates, not frozen SCAP-NG rules. Verbatim incorporation, if ever desired,
-requires a separate reviewed notices/attribution decision.
+## OVAL XSD research
 
+The OVAL 5.12.3 Windows `ntuser` XSD includes implementation annotations and a Government License/Disclaimer. Copying or modifying the original XSD can require reproducing its notice. The generated SCAP-NG scanner notes instead use original summaries, source links and an offline audit of annotation counts and hashes, **without copying the XSD prose**.
+
+Translated scanner notes are research candidates, not approved SCAP-NG semantics. Any later verbatim incorporation requires a separate attribution and notices review.
