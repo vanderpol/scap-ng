@@ -9,7 +9,7 @@ Four curated Assessments illustrate current authoring syntax. They are validated
 | [Optional organizational Input](windows-optional-organizational-input.assessment.yaml) | Input presence guard and `not_evaluated` fallback |
 | [Windows SYSVOL permissions](windows-server-2025-sysvol-permissions.assessment.yaml) | More complex expression and shellcommand acquisition |
 
-Start with Windows Registry or Linux. The permissions example is a source conversion, **not** proof of native permissions-scanner support.
+Start with Windows Registry or Linux. The permissions example is a source conversion, **not** proof of native permissions-scanner support. The optional Input example demonstrates Assessment-level `input_provided` branching, **not** a complete Rule-level organizational Input dependency mapping; the latter has an [open 0.4 contract gap](https://github.com/vanderpol/scap-ng/issues/8).
 
 These examples illustrate syntax; they do not establish runtime behavior, independently prove conversion equivalence, or demonstrate that any host complies. For original source paths and pinned provenance, see [provenance](../docs/PROVENANCE.md).
 
