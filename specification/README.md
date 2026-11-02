@@ -59,6 +59,23 @@ An optional Input may be **omitted**; that is not the same as an explicitly supp
 
 `not_evaluated` documents inability to evaluate a branch; `not_applicable` indicates a different, reasoned outcome. Neither is a substitute for a failed check or collection error. Result rollups and scanner-runtime conformance must be established by their applicable semantic and Result contracts, not inferred from these examples.
 
+## Reading results without confusing them with policy
+
+SCAP-NG separates **technical evaluation** from the **policy interpretation** of that evaluation:
+
+| Layer | What it describes | Source schema |
+| --- | --- | --- |
+| Test Result | Observed data and evaluation for an individual Test | [Test Result](../schema/test-result.schema.json) |
+| Assessment Result | The Assessment invocation, technical outcome, reason, completeness and supporting Test/collection data | [Assessment Result](../schema/assessment-result.schema.json) |
+| Rule Result | Policy-facing evaluation of a Rule that consumes an Assessment | [Rule Result](../schema/rule-result.schema.json) |
+| Benchmark Result | Effective policy selection, Rule Results and summary counters for a target | [Benchmark Result](../schema/benchmark-result.schema.json) |
+
+The [shared Result types](../schema/result-types.schema.json) declare **six technical outcomes**: `true`, `false`, `error`, `unknown`, `not_evaluated`, and `not_applicable`. A technical `true` is **not by itself** a policy `pass`: the consuming Rule determines policy meaning. `Informational` is not a seventh technical truth value.
+
+The Assessment Result requires a concise human-readable `summary` alongside `outcome` and three separate completeness flags: `logical_complete`, `population_complete`, and `evidence_complete`. Do not replace those distinctions with a generic "passed" label. The Benchmark Result structurally requires counters for `total`, `pass`, `fail`, `not_applicable`, `not_evaluated`, `error`, and `unknown`. Reporting those fields does **not** establish the policies for counting, denominators or rollups.
+
+The Result schemas define *permitted data structures*. They do **not** settle runtime truth propagation, early-stop behavior, error precedence, completeness qualifications, policy rollup, or percentage denominators. Those require explicit normative rules and conformance tests before a scanner or editor claims definitive execution behavior. An authoring preview is not a live Result.
+
 ## Authority and remaining work
 
 Use the [generated schema reference](../docs/generated/schema-reference.md) for structural details and the [capability catalog](../docs/generated/capability-catalog.md) for supported selectors. The editor may hide **explicitly serialized** defaults using pinned schema metadata; it must not invent scanner-side defaults or rewrite source on open/save.
