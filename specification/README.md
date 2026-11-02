@@ -24,6 +24,35 @@ The [0.4 schemas](../schema/README.md) define the current **machine-readable str
 
 Compare the [Windows Registry](../examples/windows-server-2025-lock-screen.assessment.yaml) and [Linux nosuid](../examples/linux-home-nosuid.assessment.yaml) examples.
 
+## Worked example: Windows Registry policy
+
+The [Windows Server 2025 Registry Assessment](../examples/windows-server-2025-lock-screen.assessment.yaml) checks a specific value without separate named OVAL States:
+
+```yaml
+capability: windows.registry
+object: {hive: {equals: local_machine}, key: {equals: 'SOFTWARE\Policies\Microsoft\Windows\Personalization'}, name: {equals: NoLockScreenSlideshow}}
+require:
+  item_requirement: {items_found: one_or_more, items_satisfying: every}
+  field_requirement: {values_found: one_or_more, values_matching: every}
+  fields: {type: {equals: dword}, value: {equals: 1}}
+```
+
+In ordinary language: **look up the specified Windows Registry value; require at least one collected Item; require every selected Item to satisfy the Test; and require the relevant collected fields to exist and match the expected DWORD type and value 1**. These are authored conditions, not observations from a scan.
+
+The four parts answer different questions:
+
+| Authored element | Question it answers |
+| --- | --- |
+| `object` | Which data should be acquired? |
+| `items_found` | How many Items must be found? |
+| `items_satisfying` | How many selected Items must satisfy the complete Test condition? |
+| `values_found` / `values_matching` | What is required of the collected field values? |
+| `fields` | What values or comparisons are expected? |
+
+**Shared requirements are not repetitive per-field settings.** The Test-level `field_requirement` applies across fields according to the language contract. Keep an explicit field-level override when a particular field intentionally differs; do not mechanically delete it. For instance, the [SYSVOL example](../examples/windows-server-2025-sysvol-permissions.assessment.yaml) explicitly requires `stderr_line: {values_found: none}`, rather than applying the shared requirement of at least one value. The [Linux `nosuid` example](../examples/linux-home-nosuid.assessment.yaml) uses `values_matching: one_or_more` for mount options, not `every`; these choices are not interchangeable.
+
+The `evaluate` expression is a separate level: it combines complete Test outcomes, not individual Registry or mount field values. `one` means exactly one branch is true, while `xor` represents odd parity across branches. For source-specific value acquisition, advanced Variables, logical groupings and complex regular expressions, inspect the [SYSVOL example](../examples/windows-server-2025-sysvol-permissions.assessment.yaml); do not infer runtime scanner behavior from a valid authoring document.
+
 ## Inputs and outcomes
 
 An optional Input may be **omitted**; that is not the same as an explicitly supplied empty value. Consumers of optional Inputs require an explicit `input_provided` guard. The [Input example](../examples/windows-optional-organizational-input.assessment.yaml) shows a `not_evaluated` fallback when the organization has not supplied the expected value.
