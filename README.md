@@ -2,7 +2,9 @@
 
 **Pre-alpha 0.4 — specification, schemas and examples.**
 
-SCAP-NG separates **Rules** (what a policy requires) from **Assessments** (how to check it). This repository contains the current schema candidate, a small set of readable examples and supporting specification material.
+SCAP-NG is a pre-alpha successor to SCAP 1.4 designed to preserve supported assessment meaning while simplifying authoring, review, collection, results and scalable distribution.
+
+This repository provides the current schema candidate, a small set of readable examples and supporting specification material.
 
 **Status:** SCAP-NG 0.4.0 has not been released or approved by the OVAL Board. Schema-valid content does not establish scanner support or compliance.
 
