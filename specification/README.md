@@ -1,21 +1,9 @@
-# SCAP-NG specification — pre-alpha 0.4
+# Specification — SCAP-NG 0.4 (pre-alpha)
 
-The 0.4 **schema family is frozen**. The full human-readable normative
-specification is being curated from the original development repository; its
-older pages contain 0.3 design history, research proposals and examples that
-may not agree with the final 29 owner-approved 0.4 language decisions.
+The [0.4 schema and metadata](../schema/README.md) are the current **machine-readable structural contract**. The human-readable normative specification is still being reconciled against the owner-approved 0.4 decisions.
 
-Until that editorial reconciliation is independently reviewed, the
-[versioned schema family](../schema/README.md) and its capability,
-selector/API, datatype, editor-metadata and result contracts are the
-machine-readable source for structural conformance. Schema validity alone
-does not prove semantic, collection or scanner conformance.
+Start with the [examples](../examples/README.md) and [generated reference](../docs/generated/schema-reference.md). These illustrate syntax; they do not introduce additional language requirements.
 
-The [curated examples](../examples/README.md) illustrate current syntax but
-do not define additional language rules.
+**Important distinction:** schema validity alone does not prove semantic correctness, scanner implementation, data collection or target compliance.
 
-**Future work (separate reviewed PR):** publish a coherent Content Author
-Guide, Application Developer Guide, complete semantic conformance criteria,
-SCAP 1.4 crosswalk and packaging/integrity guidance without copying stale
-draft text or weakening the frozen schema contracts.
-
+The next specification pass will document evaluation and missing-data semantics, applicability and result rollups, case sensitivity, Inputs, manual and shared Assessments, and packaging. Older 0.3 research and future 0.5 proposals must not silently become 0.4 requirements. Unresolved semantics require explicit review, not guesses.
