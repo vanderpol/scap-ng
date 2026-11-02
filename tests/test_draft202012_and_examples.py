@@ -13,13 +13,13 @@ from test_schema_integrity import ROOT, PREFIX, load, refs, frozen_paths
 PROJECT = ROOT.parent
 EXAMPLES = {
     'windows-server-2025-lock-screen.assessment.yaml':
-        '957cdba19b9b6be80497734121659c31e3269db1ce24218119f65aa9afe771e1',
+        '8501a018cd98fe1d041e2fd0a4438da3bc4cb031a9087506fcbf1d538bb33b2b',
     'windows-server-2025-sysvol-permissions.assessment.yaml':
-        'd8b3fd97fb9c5b5d83be712a081a97a62a013d3db2439b3d1528a73a1d4df5e8',
+        '3fdb03b50b2506cbaf99bd300e0667f5056bd93be7e3e5f0cd3aee68515acba4',
     'linux-home-nosuid.assessment.yaml':
-        'b88d34d2ed41a7b5abcbdedb4a4c44a5b3ad2291a8ae0cbb66b316f783e48cf8',
+        '52b5e412f5b3c473e9a974d9d7ce9494e6d6afe10a9ae32e8c59db429ee8ebe6',
     'windows-optional-organizational-input.assessment.yaml':
-        '8f19d25fe07d881b1dc816a0b48ee431df05f9b58e85a1e59f5fd601393bda34',
+        'c2056c9cc3d594cf78ac8fbc3bb1e2e03e880f74da1477d5e435cb0a00bc2b76',
 }
 
 
@@ -69,12 +69,23 @@ class Draft202012AndExamples(unittest.TestCase):
 
     def test_curated_examples_are_current_and_structurally_valid(self):
         schema = load(ROOT / 'assessment.schema.json')
+        language = load(ROOT / 'assessment-language.schema.json')
+        self.assertEqual(
+            list(language['$defs']['canonical_all_items_requirement']['properties'])[:3],
+            ['item_requirement', 'field_requirement', 'fields'],
+            'schema declaration order should reflect the editor presentation order')
         validator = Draft202012Validator(schema, registry=self.registry)
         self.assertEqual(len(list((PROJECT / 'examples').glob('*.yaml'))), len(EXAMPLES))
         for name, expected_hash in EXAMPLES.items():
             with self.subTest(example=name):
                 raw = (PROJECT / 'examples' / name).read_bytes()
                 self.assertEqual(sha256(raw).hexdigest(), expected_hash)
+                self.assertIn(b'item_requirement: {', raw)
+                self.assertIn(b'field_requirement: {', raw)
+                if name == 'windows-server-2025-lock-screen.assessment.yaml':
+                    self.assertIn(b'fields: {type: {equals: dword}, value: {equals: 1}}', raw)
+                if name == 'linux-home-nosuid.assessment.yaml':
+                    self.assertIn(b'fields: {mount_options: {equals: nosuid}}', raw)
                 document = yaml.load(raw, Loader=UniqueYaml)
                 validator.validate(document)
                 body = document['assessment']
@@ -86,6 +97,9 @@ class Draft202012AndExamples(unittest.TestCase):
                     self.assertNotIn('items_satisfying', requirement)
                     self.assertEqual(set(requirement['item_requirement']),
                                      {'items_found', 'items_satisfying'})
+                    self.assertEqual(list(requirement)[:3],
+                                     ['item_requirement', 'field_requirement', 'fields'],
+                                     'current examples must display Item, Field requirements before predicates')
 
 
 if __name__ == '__main__':
