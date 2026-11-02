@@ -1,0 +1,385 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-01",
+  "title": "Closed native Variable declarations and legacy expressions (Decision 29)",
+  "description": "Finite current native vocabulary. No canonical function envelope, implicit options or value execution. Declaration/reference/derived type compatibility is additionally enforced by semantic validation and the direct compiler.",
+  "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/pull/268#issuecomment-6550047257",
+  "$ref": "#/$defs/declaration",
+  "$defs": {
+    "declaration": {
+      "type": "object",
+      "required": [
+        "kind",
+        "datatype",
+        "expression"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "local",
+            "constant"
+          ]
+        },
+        "datatype": {
+          "$ref": "capability-common.schema.json#/$defs/native_datatype"
+        },
+        "expression": {
+          "$ref": "#/$defs/expression"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "constant"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "expression": {
+                "type": "object",
+                "required": [
+                  "literal"
+                ],
+                "properties": {
+                  "literal": {
+                    "oneOf": [
+                      {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "datatype",
+                          "value"
+                        ],
+                        "properties": {
+                          "datatype": {
+                            "$ref": "capability-common.schema.json#/$defs/native_datatype"
+                          },
+                          "value": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "array",
+                              "object"
+                            ]
+                          }
+                        },
+                        "additionalProperties": false,
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "datatype": {
+                                  "const": "record"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "value": {
+                                  "type": "object"
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "value": {
+                                  "anyOf": [
+                                    {
+                                      "type": [
+                                        "string",
+                                        "number",
+                                        "boolean"
+                                      ]
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "type": [
+                                          "string",
+                                          "number",
+                                          "boolean"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "literal"
+          ],
+          "properties": {
+            "literal": {
+              "oneOf": [
+                {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean"
+                    ]
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "datatype",
+                    "value"
+                  ],
+                  "properties": {
+                    "datatype": {
+                      "$ref": "capability-common.schema.json#/$defs/native_datatype"
+                    },
+                    "value": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "array",
+                        "object"
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "datatype": {
+                            "const": "record"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "value": {
+                            "type": "object"
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": [
+                                    "string",
+                                    "number",
+                                    "boolean"
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "variable"
+          ],
+          "properties": {
+            "variable": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+              "maxLength": 64
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "values"
+          ],
+          "properties": {
+            "values": {
+              "type": "object",
+              "required": [
+                "object",
+                "field"
+              ],
+              "properties": {
+                "object": {
+                  "$ref": "capability-common.schema.json#/$defs/object_use"
+                },
+                "field": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "concat"
+          ],
+          "properties": {
+            "concat": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "#/$defs/expression"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "regex_capture"
+          ],
+          "properties": {
+            "regex_capture": {
+              "type": "object",
+              "required": [
+                "pattern",
+                "value"
+              ],
+              "properties": {
+                "pattern": {
+                  "type": "string"
+                },
+                "value": {
+                  "$ref": "#/$defs/expression"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "unique"
+          ],
+          "properties": {
+            "unique": {
+              "$ref": "#/$defs/expression"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Existing scalar-value unique only. Record literals are opaque data, not supported transformation operands; semantic validation enforces this domain."
+        },
+        {
+          "type": "object",
+          "required": [
+            "merge"
+          ],
+          "properties": {
+            "merge": {
+              "type": "object",
+              "required": [
+                "delimiter",
+                "sort",
+                "order",
+                "values"
+              ],
+              "properties": {
+                "delimiter": {
+                  "type": "string"
+                },
+                "sort": {
+                  "enum": [
+                    "document",
+                    "lexical",
+                    "numeric",
+                    "natural"
+                  ]
+                },
+                "order": {
+                  "enum": [
+                    "ascending",
+                    "descending"
+                  ]
+                },
+                "values": {
+                  "$ref": "#/$defs/expression"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

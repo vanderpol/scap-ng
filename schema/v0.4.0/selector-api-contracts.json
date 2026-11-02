@@ -1,0 +1,1505 @@
+{
+  "format": "scap-ng/selector-api-contracts/1",
+  "schema_version": "0.4.0",
+  "owner_decision": 22,
+  "scope": "15 final selector/API contracts; no scanner execution or universal case control",
+  "sources": {
+    "env": {
+      "id": "env",
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/system.environment.getenvironmentvariable?view=net-10.0",
+      "retrieved_at": "2026-11-02T10:16:52.485656+00:00",
+      "sha256": "fc9f52abfbf0296e362f43cfa197872f439df4a84a469910d3b2de32c8939e38",
+      "bytes": 118429,
+      "status": "retrieved",
+      "claim": "Environment name lookup is case-sensitive on Unix-like systems and case-insensitive on Windows; values remain independent."
+    },
+    "posix-env": {
+      "id": "posix-env",
+      "url": "https://pubs.opengroup.org/onlinepubs/9799919799/functions/getenv.html",
+      "retrieved_at": "2026-11-02T10:16:52.930899+00:00",
+      "sha256": "deadaa32e051bee7c6521bb16dfd355e08036c0aba6ecc46565484033b39e7b8",
+      "bytes": 15226,
+      "status": "retrieved",
+      "claim": "getenv searches the calling process environment; an unfound name returns null, distinct from a present empty value."
+    },
+    "win-env": {
+      "id": "win-env",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/procthread/environment-variables",
+      "retrieved_at": "2026-11-02T10:16:52.520095+00:00",
+      "sha256": "b6c211006aab1c54c9dea02167e836d0b8c6eba48dac236b037265b2c92ee31b",
+      "bytes": 51684,
+      "status": "retrieved",
+      "claim": "The environment is process-scoped. GetEnvironmentStrings reads the caller environment, not every other process."
+    },
+    "iis-appcmd": {
+      "id": "iis-appcmd",
+      "url": "https://learn.microsoft.com/en-us/iis/get-started/getting-started-with-iis/getting-started-with-appcmdexe",
+      "retrieved_at": "2026-11-02T10:16:52.484658+00:00",
+      "sha256": "8515155594a41cb4cd9c00e06750d5b2531b7890a928fb7f4a9b3a2379310e6d",
+      "bytes": 97555,
+      "status": "retrieved",
+      "claim": "AppCmd has separate object identifiers, configuration section paths and property/collection expressions."
+    },
+    "iis-case": {
+      "id": "iis-case",
+      "url": "https://learn.microsoft.com/en-us/iis/web-development-reference/native-code-api-reference/iapphostpropertyschema-iscasesensitive-property",
+      "retrieved_at": "2026-11-02T10:16:52.390275+00:00",
+      "sha256": "11d89983ff30c034b3f1125960c2e09725eb1af58ee373e0b43f21e7a94ac3ad",
+      "bytes": 48787,
+      "status": "retrieved",
+      "claim": "IIS exposes IsCaseSensitive for individual property values; it is not a universal rule for identifiers or configuration syntax."
+    },
+    "iis-attribute": {
+      "id": "iis-attribute",
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.administration.configurationattributeschemacollection.item?view=iis-dotnet",
+      "retrieved_at": "2026-11-02T10:16:52.485115+00:00",
+      "sha256": "4dc4d87e09d5c9a640a15a130f0e80ac77c26774bcec778744376102e071a430",
+      "bytes": 54287,
+      "status": "retrieved",
+      "claim": "The documented MWA attribute-schema name indexer ignores case. This does not establish identical casing behavior for every AppCmd path component."
+    },
+    "iis-config": {
+      "id": "iis-config",
+      "url": "https://learn.microsoft.com/en-us/iis/get-started/planning-your-iis-architecture/introduction-to-applicationhostconfig",
+      "retrieved_at": "2026-11-02T10:16:52.514083+00:00",
+      "sha256": "80c4d7b4018c75ddd40eb536264c16d3c023e59c1b6b0315fdd50b95b5cbdb98",
+      "bytes": 65907,
+      "status": "retrieved",
+      "claim": "ApplicationHost configuration is schema-defined and extensible; section registrations and attributes identify configuration locations."
+    },
+    "iis-section": {
+      "id": "iis-section",
+      "url": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/mc-iisa/b8ca90fd-7c8c-4e8f-9ecc-3ecf640db266",
+      "retrieved_at": "2026-11-02T10:16:52.388903+00:00",
+      "sha256": "1e285ec4e3b237a5c4d9748fe4baf29051c28c590f491795f242a651673d3f3f",
+      "bytes": 38901,
+      "status": "retrieved",
+      "claim": "GetAdminSection resolves a named section at a path; an unsupported section returns ERROR_PATH_NOT_FOUND."
+    },
+    "ps-case": {
+      "id": "ps-case",
+      "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_case-sensitivity?view=powershell-7.6",
+      "retrieved_at": "2026-11-02T10:16:52.700003+00:00",
+      "sha256": "e380d51e165c5987feeb3ed4b960a6d3624e01b6d9ebef778edd4dd2c4426a7d",
+      "bytes": 62872,
+      "status": "retrieved",
+      "claim": "PowerShell command/parameter names and non-dictionary member access ignore case; modules can encounter filesystem exceptions, dictionaries can use other comparers."
+    },
+    "ps-modules": {
+      "id": "ps-modules",
+      "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/import-module?view=powershell-7.6",
+      "retrieved_at": "2026-11-02T10:16:52.859604+00:00",
+      "sha256": "183c8341efc12481bb904806e7a212c84b131eca5494e14c5b43f98d939a3737",
+      "bytes": 171507,
+      "status": "retrieved",
+      "claim": "Module import can constrain a module by its name, GUID and version; a nullable constraint is not an invented module choice."
+    },
+    "ps-select": {
+      "id": "ps-select",
+      "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/select-object?view=powershell-7.6",
+      "retrieved_at": "2026-11-02T10:16:52.779989+00:00",
+      "sha256": "02ae2b96540b37e54348b8f3a3c722bc178d98936d742c6e3ffb7f90bcc7496b",
+      "bytes": 111965,
+      "status": "retrieved",
+      "claim": "Select-Object selects named properties and can execute distinct selection options; property names must not be confused with arbitrary dictionary keys or values."
+    },
+    "win-files": {
+      "id": "win-files",
+      "url": "https://learn.microsoft.com/en-us/windows/wsl/case-sensitivity",
+      "retrieved_at": "2026-11-02T10:16:52.772241+00:00",
+      "sha256": "730268eb6aba326785ecfcabf431473884b40bc0c0428a72cb87e46a4fee685e",
+      "bytes": 62920,
+      "status": "retrieved",
+      "claim": "Windows directories can have distinct case-sensitivity flags; effective path lookup is contextual, not globally insensitive."
+    },
+    "win-paths": {
+      "id": "win-paths",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file",
+      "retrieved_at": "2026-11-02T10:16:52.745275+00:00",
+      "sha256": "8e7f3450a6c465fe75882e3bedf357a455fd456d96973e9dd1babc650c031f1d",
+      "bytes": 67904,
+      "status": "retrieved",
+      "claim": "Windows filename/path behavior also depends on filesystem and the API namespace in use."
+    },
+    "sid": {
+      "id": "sid",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/securitybaseapi/nf-securitybaseapi-equalsid",
+      "retrieved_at": "2026-11-02T10:16:52.799156+00:00",
+      "sha256": "3e804b338700ca2909fc81b44632975a83eacd9ca6dbd7a37417558f9bfa1346",
+      "bytes": 52365,
+      "status": "retrieved",
+      "claim": "EqualSid compares valid SID structures exactly; identity is not a generic case-folded account-name string."
+    },
+    "sid-strings": {
+      "id": "sid-strings",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/secauthz/sid-strings",
+      "retrieved_at": "2026-11-02T10:16:52.784586+00:00",
+      "sha256": "5aacfc28e25f690fe24205620c7e095d3e0775ebdcd838cf595304551445c68e",
+      "bytes": 60952,
+      "status": "retrieved",
+      "claim": "SID strings represent security identifiers; account display names and SDDL aliases are distinct representations."
+    },
+    "sid-parse": {
+      "id": "sid-parse",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/sddl/nf-sddl-convertstringsidtosidw",
+      "retrieved_at": "2026-11-02T10:16:52.911738+00:00",
+      "sha256": "703c7ab56dcb3bb6360be55f20336158407966b7fe2fa351c61075ad21e2a6bf",
+      "bytes": 53770,
+      "status": "retrieved",
+      "claim": "ConvertStringSidToSid parses a textual SID for the native API; parse failure is not proof that an account is absent."
+    },
+    "account": {
+      "id": "account",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountnamew",
+      "retrieved_at": "2026-11-02T10:16:52.913286+00:00",
+      "sha256": "334d4533902c549fc9879b0ec759bc3afdca2090eabce72483a6dc933349446f",
+      "bytes": 56488,
+      "status": "retrieved",
+      "claim": "LookupAccountName resolves qualified names to SIDs in a target system/domain context; isolated names can be ambiguous."
+    },
+    "registry": {
+      "id": "registry",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/sysinfo/structure-of-the-registry",
+      "retrieved_at": "2026-11-02T10:16:52.937829+00:00",
+      "sha256": "bb830e03a6ba9a77594df609bd4460610b5bfe07856d4addb0ee519177d6aa4f",
+      "bytes": 49136,
+      "status": "retrieved",
+      "claim": "Windows registry key names are case-insensitive; registry hierarchy is not a filesystem path namespace."
+    },
+    "registry-value": {
+      "id": "registry-value",
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/microsoft.win32.registry.getvalue?view=net-10.0",
+      "retrieved_at": "2026-11-02T10:16:53.146753+00:00",
+      "sha256": "53e1679c5eb6878e3d5061f5363998a2400b4203b1cb6610b831622b5d16a821",
+      "bytes": 75138,
+      "status": "retrieved",
+      "claim": "Registry value-name lookup is insensitive; a default value and key-level selection are distinct requests."
+    },
+    "ntuser": {
+      "id": "ntuser",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/sysinfo/registry-hives",
+      "retrieved_at": "2026-11-02T10:16:52.978376+00:00",
+      "sha256": "02ff59d34960c7891f890615007039011d997a4288f4a2819b93ea0f9695157d",
+      "bytes": 50037,
+      "status": "retrieved",
+      "claim": "NTUSER.DAT is a user registry hive; accessing/loading profile hives is distinct from case comparison."
+    },
+    "service": {
+      "id": "service",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-openservicew",
+      "retrieved_at": "2026-11-02T10:16:52.994153+00:00",
+      "sha256": "dc76c62c544f773dfb192b3b5ea3891d0f87625ba4f8f3a5d7a978cd99dd9ba3",
+      "bytes": 55746,
+      "status": "retrieved",
+      "claim": "SCM service names preserve spelling but compare case-insensitively; display names are not service keys."
+    },
+    "rights": {
+      "id": "rights",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/secauthz/privilege-constants",
+      "retrieved_at": "2026-11-02T10:16:53.025308+00:00",
+      "sha256": "496782d92984830a403c428cf31086e71b3581b389d19245e840005e6772c7bc",
+      "bytes": 64398,
+      "status": "retrieved",
+      "claim": "Privilege constants identify specific Windows privileges; their documented macro spelling and API string are distinct."
+    },
+    "account-rights": {
+      "id": "account-rights",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/secauthz/account-rights-constants",
+      "retrieved_at": "2026-11-02T10:16:53.127438+00:00",
+      "sha256": "b3c76c615a62211456d6ee920e3fd4b5708ee95967751ba1fdf9bc1a761669b3",
+      "bytes": 54026,
+      "status": "retrieved",
+      "claim": "Logon account rights use documented constants; account rights and privileges are related but not interchangeable sets."
+    },
+    "wmi-path": {
+      "id": "wmi-path",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/wmisdk/describing-the-location-of-a-wmi-object",
+      "retrieved_at": "2026-11-02T10:16:53.186001+00:00",
+      "sha256": "d6b922a82f8e58a04ae6fc60e540ae4eaec8d07510285768253b0c4805c0db8b",
+      "bytes": 52681,
+      "status": "retrieved",
+      "claim": "WMI object paths identify server/namespace/class/instance locations; a namespace is not a filesystem directory."
+    },
+    "wmi-query": {
+      "id": "wmi-query",
+      "url": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wmi/6c8a38f4-4ee1-47cb-99f1-b42718a575ce",
+      "retrieved_at": "2026-11-02T10:16:53.073137+00:00",
+      "sha256": "cc5a43e42e0ee3612f8b58702edaf4fb2d8aa6a4bab04624c3e876ca57b71075",
+      "bytes": 37748,
+      "status": "retrieved",
+      "claim": "Windows WMI WQL literal string data is case-insensitive, unlike the cited generic CIM rule."
+    },
+    "wmi-grammar": {
+      "id": "wmi-grammar",
+      "url": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wmi/cf0410f3-541f-477a-848f-9133a1272725",
+      "retrieved_at": "2026-11-02T10:16:53.186476+00:00",
+      "sha256": "640af81f13f72bc06d3bddf8b5c120d62aa00291671ef2d47075bbd6109d1328",
+      "bytes": 53858,
+      "status": "retrieved",
+      "claim": "WQL has a grammar and typed comparisons; string relation tests are case-insensitive and invalid type/operator uses are errors."
+    },
+    "wua": {
+      "id": "wua",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/wuapi/nf-wuapi-iupdatesearcher-search",
+      "retrieved_at": "2026-11-02T10:16:53.202186+00:00",
+      "sha256": "ca5d57d234075f62677c03c16747156dec7c2ba0d52c22c006a7b631d44941fb",
+      "bytes": 61418,
+      "status": "retrieved",
+      "claim": "Windows Update Search uses a criteria grammar with string comparisons insensitive unless specified; arbitrary SQL is not accepted."
+    },
+    "wua-superseded": {
+      "id": "wua-superseded",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/wuapi/nf-wuapi-iupdatesearcher-get_includepotentiallysupersededupdates",
+      "retrieved_at": "2026-11-02T10:16:53.194920+00:00",
+      "sha256": "51393de9d7a372184759963fd875ae5760b009e353e17fe75729f2be932debd4",
+      "bytes": 52027,
+      "status": "retrieved",
+      "claim": "The superseded-update option controls the candidate update population, not letter casing or collected-value comparison."
+    },
+    "oval-windows": {
+      "id": "oval-windows",
+      "url": "https://github.com/vanderpol/scap-ng/blob/606ffe1cf/third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+      "repository_path": "third_party/scap-1.4-schemas/oval_5.12.3/windows-definitions-schema.xsd",
+      "sha256": "b66f1547bfd0bb8ea6cf58a0eec9f8de417aad6642f741d0ed0ad7b6462314ff",
+      "claim": "Pinned source sid_object documents case-insensitive trustee names; Object fields and source behavior controls are preserved separately from native comparisons.",
+      "status": "pinned-repository-source"
+    },
+    "wmi-interface": {
+      "id": "wmi-interface",
+      "url": "https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-wmi/7a50647a-5311-41c2-8f4f-83bcfb497877",
+      "retrieved_at": "2026-11-02T10:20:27.624358+00:00",
+      "sha256": "5fd7f82b1c810f0f419e76e3adf0b69f71fa3357824a2fc7fda9aa309667714c",
+      "bytes": 43620,
+      "status": "retrieved",
+      "claim": "Windows WMI requires case-insensitive class names."
+    },
+    "wmi-path-rules": {
+      "id": "wmi-path-rules",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/wmisdk/wmi-object-path-requirements",
+      "retrieved_at": "2026-11-02T10:20:27.680602+00:00",
+      "sha256": "8286b43b2ce3ca61f07be397507b999b49975769b1463664c8ed95e3f976b450",
+      "bytes": 47996,
+      "status": "retrieved",
+      "claim": "Windows WMI object-path comparisons are always case-insensitive."
+    },
+    "native-acquisition": {
+      "id": "native-acquisition",
+      "url": "https://github.com/vanderpol/scap-ng/blob/606ffe1cf/schema/v0.4.0/capability-common.schema.json",
+      "repository_path": "schema/v0.4.0/capability-common.schema.json",
+      "sha256": "e6e14208941a8a130005771afcec56bbc6b4a9d59a74d7c575a3820e525933c8",
+      "claim": "Existing explicit filesystem/traversal and shared acquisition grammar; no new case setting or runtime default.",
+      "status": "pinned-repository-source"
+    }
+  },
+  "capabilities": {
+    "independent.environmentvariable": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows",
+        "Unix-like platforms with process-environment access"
+      ],
+      "fields": {
+        "pid": {
+          "role": "selector",
+          "case_policy": "numeric_identity",
+          "rule": "Numeric identity; letter case does not apply. Preserve declared integer/null meaning; do not stringify or invent a process.",
+          "sources": [
+            "env",
+            "win-env"
+          ],
+          "positive": {
+            "operand": 42,
+            "expectation": "Select process identity 42 in the selected target context."
+          },
+          "negative": {
+            "operand": "42",
+            "expectation": "A text operand is not an integer selector; no implicit conversion."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "name": {
+          "role": "selector",
+          "case_policy": "platform_environment",
+          "rule": "Windows environment names compare insensitively; Unix-like environment names compare sensitively. A selected-process namespace and supplied platform must be known. Preserve bytes/spelling and values.",
+          "sources": [
+            "env",
+            "posix-env",
+            "win-env"
+          ],
+          "positive": {
+            "operand": "PATH",
+            "context": "Unix target with PATH set",
+            "expectation": "Select PATH; Windows Path may also identify it."
+          },
+          "negative": {
+            "operand": "path",
+            "context": "Unix target has PATH but not path",
+            "expectation": "No matching name; do not transplant Windows casing. Access failure is an error, not this absence."
+          },
+          "required_context": [
+            "target platform",
+            "selected process"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Name lookup follows the target platform, not the scanner host or PowerShell wildcard behavior.",
+        "A remote process requires an actual provider; the caller environment is not a substitute."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.appcmd": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows with IIS/AppCmd and selected configuration schema"
+      ],
+      "fields": {
+        "identifier_type": {
+          "role": "selector",
+          "case_policy": "canonical_enum",
+          "rule": "Use the exact native enum token in the mapping. Case variations are not native aliases. The backend maps documented constants to API arguments without rewriting authored values.",
+          "sources": [
+            "iis-appcmd"
+          ],
+          "positive": {
+            "operand": "Site",
+            "expectation": "Exact declared enum member is accepted."
+          },
+          "negative": {
+            "operand": "site",
+            "expectation": "Undeclared casing is rejected by the native enum contract."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "identifier": {
+          "role": "selector",
+          "case_policy": "iis_schema_identity",
+          "rule": "Resolve the selected Site, VDir or Apppool namespace using IIS configuration key schema/API identity. Property-value casing follows that key property IsCaseSensitive; do not impose a Windows-wide insensitive rule. For listconfig Webserver, null means the already permitted server context.",
+          "sources": [
+            "iis-appcmd",
+            "iis-case",
+            "iis-config"
+          ],
+          "positive": {
+            "operand": "Default Web Site",
+            "context": "exact configured Site identity",
+            "expectation": "Select that configured site."
+          },
+          "negative": {
+            "operand": "default web site",
+            "context": "selected identity property schema IsCaseSensitive=true",
+            "expectation": "Does not match the mixed-case property. With false, the API may match; obtain the actual schema, never guess."
+          },
+          "required_context": [
+            "identifier_type",
+            "IIS identity namespace",
+            "key-property schema/IsCaseSensitive"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "parameter": {
+          "role": "selector",
+          "case_policy": "iis_property_expression",
+          "rule": "Interpret the setting-location expression using the selected IIS/AppCmd schema. Property names, collection expressions and quoted key values are different components. MWA attribute-schema name lookup is documented insensitive; embedded key values use their own IsCaseSensitive. Preserve the full expression; no whole-string fold or filesystem rule.",
+          "sources": [
+            "iis-appcmd",
+            "iis-case",
+            "iis-attribute"
+          ],
+          "positive": {
+            "operand": "processModel.identityType",
+            "context": "Apppool setting supported by installed schema",
+            "expectation": "Resolve the named property; returned value casing is not inferred from its name."
+          },
+          "negative": {
+            "operand": "processModel.notAProperty",
+            "expectation": "Unsupported property is an acquisition diagnostic, not a fabricated empty setting."
+          },
+          "required_context": [
+            "selected IIS API grammar",
+            "installed property/collection schema"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "IIS extension/property schemas can set IsCaseSensitive independently.",
+        "A virtual directory/configuration path is not a physical filesystem path.",
+        "Documentation for the MWA attribute-name indexer does not prove that every AppCmd alias or section-path casing is accepted. Use the actual selected API grammar."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.appcmdlistconfig": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows with IIS/AppCmd and selected configuration schema"
+      ],
+      "fields": {
+        "identifier_type": {
+          "role": "selector",
+          "case_policy": "canonical_enum",
+          "rule": "Use the exact native enum token in the mapping. Case variations are not native aliases. The backend maps documented constants to API arguments without rewriting authored values.",
+          "sources": [
+            "iis-appcmd"
+          ],
+          "positive": {
+            "operand": "Site",
+            "expectation": "Exact declared enum member is accepted."
+          },
+          "negative": {
+            "operand": "site",
+            "expectation": "Undeclared casing is rejected by the native enum contract."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "identifier": {
+          "role": "selector",
+          "case_policy": "iis_schema_identity",
+          "rule": "Resolve the selected Site, VDir or Apppool namespace using IIS configuration key schema/API identity. Property-value casing follows that key property IsCaseSensitive; do not impose a Windows-wide insensitive rule. For listconfig Webserver, null means the already permitted server context.",
+          "sources": [
+            "iis-appcmd",
+            "iis-case",
+            "iis-config"
+          ],
+          "positive": {
+            "operand": "Default Web Site",
+            "context": "exact configured Site identity",
+            "expectation": "Select that configured site."
+          },
+          "negative": {
+            "operand": "default web site",
+            "context": "selected identity property schema IsCaseSensitive=true",
+            "expectation": "Does not match the mixed-case property. With false, the API may match; obtain the actual schema, never guess."
+          },
+          "required_context": [
+            "identifier_type",
+            "IIS identity namespace",
+            "key-property schema/IsCaseSensitive"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "parameter": {
+          "role": "selector",
+          "case_policy": "iis_property_expression",
+          "rule": "Interpret the setting-location expression using the selected IIS/AppCmd schema. Property names, collection expressions and quoted key values are different components. MWA attribute-schema name lookup is documented insensitive; embedded key values use their own IsCaseSensitive. Preserve the full expression; no whole-string fold or filesystem rule.",
+          "sources": [
+            "iis-appcmd",
+            "iis-case",
+            "iis-attribute"
+          ],
+          "positive": {
+            "operand": "processModel.identityType",
+            "context": "Apppool setting supported by installed schema",
+            "expectation": "Resolve the named property; returned value casing is not inferred from its name."
+          },
+          "negative": {
+            "operand": "processModel.notAProperty",
+            "expectation": "Unsupported property is an acquisition diagnostic, not a fabricated empty setting."
+          },
+          "required_context": [
+            "selected IIS API grammar",
+            "installed property/collection schema"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "section": {
+          "role": "selector",
+          "case_policy": "iis_section_path",
+          "rule": "Resolve a registered section path through IIS configuration API at the selected scope, preserving exact authored spelling. No universal case-insensitive alias for section paths is documented here: use registered canonical names. Unsupported section/path is an API error; do not reinterpret section syntax as a field comparison.",
+          "sources": [
+            "iis-section",
+            "iis-config",
+            "iis-appcmd"
+          ],
+          "positive": {
+            "operand": "system.webServer/security/authentication/anonymousAuthentication",
+            "expectation": "Resolve the registered section at the selected IIS scope."
+          },
+          "negative": {
+            "operand": "system.webServer/notASection",
+            "expectation": "Unsupported section produces an API diagnostic, not an absent collected value."
+          },
+          "required_context": [
+            "registered section names",
+            "IIS configuration scope/API"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "IIS extension/property schemas can set IsCaseSensitive independently.",
+        "A virtual directory/configuration path is not a physical filesystem path.",
+        "Documentation for the MWA attribute-name indexer does not prove that every AppCmd alias or section-path casing is accepted. Use the actual selected API grammar."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.cmdlet": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows PowerShell/PowerShell on Windows with the selected module"
+      ],
+      "fields": {
+        "module_name": {
+          "role": "acquisition_parameter",
+          "case_policy": "powershell_module_identity",
+          "rule": "PowerShell module/command names are insensitive where PowerShell defines them. Preserve canonical native verb enum spelling, which remains exact in YAML. Module filesystem discovery must honor target path rules. Null module_name leaves that existing source constraint unconstrained, never selects a fallback.",
+          "sources": [
+            "ps-case",
+            "ps-modules"
+          ],
+          "positive": {
+            "operand": "Microsoft.PowerShell.Management",
+            "expectation": "Resolve the supplied declared module/cmdlet name in its target session."
+          },
+          "negative": {
+            "operand": "Missing.Module",
+            "expectation": "Wrong native verb enum case rejects; otherwise a missing command/module is an acquisition error."
+          },
+          "required_context": [
+            "PowerShell session/module discovery",
+            "filesystem for module files"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "verb": {
+          "role": "acquisition_parameter",
+          "case_policy": "powershell_command_identity",
+          "rule": "PowerShell module/command names are insensitive where PowerShell defines them. Preserve canonical native verb enum spelling, which remains exact in YAML. Module filesystem discovery must honor target path rules. Null module_name leaves that existing source constraint unconstrained, never selects a fallback.",
+          "sources": [
+            "ps-case",
+            "ps-modules"
+          ],
+          "positive": {
+            "operand": "Get",
+            "expectation": "Resolve the supplied declared module/cmdlet name in its target session."
+          },
+          "negative": {
+            "operand": "get",
+            "expectation": "Wrong native verb enum case rejects; otherwise a missing command/module is an acquisition error."
+          },
+          "required_context": [
+            "PowerShell session/module discovery",
+            "filesystem for module files"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "noun": {
+          "role": "acquisition_parameter",
+          "case_policy": "powershell_command_identity",
+          "rule": "PowerShell module/command names are insensitive where PowerShell defines them. Preserve canonical native verb enum spelling, which remains exact in YAML. Module filesystem discovery must honor target path rules. Null module_name leaves that existing source constraint unconstrained, never selects a fallback.",
+          "sources": [
+            "ps-case",
+            "ps-modules"
+          ],
+          "positive": {
+            "operand": "Item",
+            "expectation": "Resolve the supplied declared module/cmdlet name in its target session."
+          },
+          "negative": {
+            "operand": "NoSuchNativeCmdlet",
+            "expectation": "Wrong native verb enum case rejects; otherwise a missing command/module is an acquisition error."
+          },
+          "required_context": [
+            "PowerShell session/module discovery",
+            "filesystem for module files"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "module_id": {
+          "role": "acquisition_parameter",
+          "case_policy": "guid_identity",
+          "rule": "A supplied module GUID constrains module identity, not culture-sensitive text. Preserve its lexical form and let the documented module specification parse/resolve it; null retains the existing unconstrained meaning. Do not invent a module from an invalid GUID.",
+          "sources": [
+            "ps-modules"
+          ],
+          "positive": {
+            "operand": "00000000-0000-0000-0000-000000000001",
+            "expectation": "Select only a module with that GUID if one is installed."
+          },
+          "negative": {
+            "operand": "00000000-0000-0000-0000-000000000002",
+            "expectation": "A distinct GUID is not the same module, irrespective of letter casing."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "module_version": {
+          "role": "acquisition_parameter",
+          "case_policy": "version_identity",
+          "rule": "The existing version domain applies, not string casing or lexicographic order; preserve explicit lexical version and null unconstrained meaning. Do not infer case rules for filenames or rewrite version operands.",
+          "sources": [
+            "ps-modules"
+          ],
+          "positive": {
+            "operand": "1.2.3",
+            "expectation": "Constrain the selected module using the existing version specification."
+          },
+          "negative": {
+            "operand": "latest",
+            "expectation": "Not a native lexical version; compiler rejects without conversion."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "parameters": {
+          "role": "acquisition_parameter",
+          "case_policy": "powershell_record_context",
+          "rule": "Treat record member names as named cmdlet parameters for parameters, and selected output property names for select. PowerShell parameter names/non-dictionary members are insensitive; arbitrary nested dictionary keys, calculated expressions and parameter values are opaque cmdlet/provider data and retain their own comparer. Null means no supplied record, not implicit arguments.",
+          "sources": [
+            "ps-case",
+            "ps-select"
+          ],
+          "positive": {
+            "operand": {
+              "fields": {
+                "Name": {
+                  "equals": "Example",
+                  "selection_match": "every"
+                }
+              }
+            },
+            "context": "a named parameter or non-dictionary output property",
+            "expectation": "Bind the name under the documented PowerShell name semantics; preserve its value exactly."
+          },
+          "negative": {
+            "operand": {
+              "Key": "value",
+              "key": "other"
+            },
+            "context": "nested case-sensitive dictionary value",
+            "expectation": "Do not collapse distinct data keys or lowercase values. Schema shape still follows the existing object-record definition."
+          },
+          "required_context": [
+            "cmdlet metadata",
+            "record role",
+            "dictionary/member context",
+            "provider value semantics"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "select": {
+          "role": "acquisition_parameter",
+          "case_policy": "powershell_record_context",
+          "rule": "Treat record member names as named cmdlet parameters for parameters, and selected output property names for select. PowerShell parameter names/non-dictionary members are insensitive; arbitrary nested dictionary keys, calculated expressions and parameter values are opaque cmdlet/provider data and retain their own comparer. Null means no supplied record, not implicit arguments.",
+          "sources": [
+            "ps-case",
+            "ps-select"
+          ],
+          "positive": {
+            "operand": {
+              "fields": {
+                "Name": {
+                  "equals": "Example",
+                  "selection_match": "every"
+                }
+              }
+            },
+            "context": "a named parameter or non-dictionary output property",
+            "expectation": "Bind the name under the documented PowerShell name semantics; preserve its value exactly."
+          },
+          "negative": {
+            "operand": {
+              "Key": "value",
+              "key": "other"
+            },
+            "context": "nested case-sensitive dictionary value",
+            "expectation": "Do not collapse distinct data keys or lowercase values. Schema shape still follows the existing object-record definition."
+          },
+          "required_context": [
+            "cmdlet metadata",
+            "record role",
+            "dictionary/member context",
+            "provider value semantics"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Command discovery does not include arbitrary ExternalScript/Application names.",
+        "Module file lookup follows filesystem rules; non-dictionary member access differs from dictionary key access.",
+        "Cmdlet parameter values and dynamic/calculated selection data have their own cmdlet/provider semantics, not PowerShell name semantics."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.fileeffectiverights": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows filesystem and security APIs"
+      ],
+      "fields": {
+        "full_path": {
+          "role": "selector",
+          "case_policy": "filesystem_context",
+          "rule": "Resolve each path component under its containing directory, filesystem and selected Windows API case rules. Inspect effective per-directory case sensitivity; never lowercase paths. Null name selects a directory only where the existing schema permits.",
+          "sources": [
+            "win-files",
+            "win-paths"
+          ],
+          "positive": {
+            "operand": "C:\\Data\\Policy.txt",
+            "context": "case-sensitive containing directory, exact stored spelling",
+            "expectation": "Exact spelling selects the existing target."
+          },
+          "negative": {
+            "operand": "C:\\Data\\policy.txt",
+            "context": "case-sensitive parent and only the mixed-case target exists",
+            "expectation": "The differently cased component does not identify that target. An insensitive parent can instead resolve it."
+          },
+          "required_context": [
+            "filesystem",
+            "containing-directory case flag",
+            "Windows API/namespace"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "directory": {
+          "role": "selector",
+          "case_policy": "filesystem_context",
+          "rule": "Resolve each path component under its containing directory, filesystem and selected Windows API case rules. Inspect effective per-directory case sensitivity; never lowercase paths. Null name selects a directory only where the existing schema permits.",
+          "sources": [
+            "win-files",
+            "win-paths"
+          ],
+          "positive": {
+            "operand": "C:\\Data",
+            "context": "case-sensitive containing directory, exact stored spelling",
+            "expectation": "Exact spelling selects the existing target."
+          },
+          "negative": {
+            "operand": "C:\\data",
+            "context": "case-sensitive parent and only the mixed-case target exists",
+            "expectation": "The differently cased component does not identify that target. An insensitive parent can instead resolve it."
+          },
+          "required_context": [
+            "filesystem",
+            "containing-directory case flag",
+            "Windows API/namespace"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "name": {
+          "role": "selector",
+          "case_policy": "filesystem_context",
+          "rule": "Resolve each path component under its containing directory, filesystem and selected Windows API case rules. Inspect effective per-directory case sensitivity; never lowercase paths. Null name selects a directory only where the existing schema permits.",
+          "sources": [
+            "win-files",
+            "win-paths"
+          ],
+          "positive": {
+            "operand": "Policy.txt",
+            "context": "case-sensitive containing directory, exact stored spelling",
+            "expectation": "Exact spelling selects the existing target."
+          },
+          "negative": {
+            "operand": "policy.txt",
+            "context": "case-sensitive parent and only the mixed-case target exists",
+            "expectation": "The differently cased component does not identify that target. An insensitive parent can instead resolve it."
+          },
+          "required_context": [
+            "filesystem",
+            "containing-directory case flag",
+            "Windows API/namespace"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "trustee_sid": {
+          "role": "selector",
+          "case_policy": "sid_identity",
+          "rule": "Use valid SID identity in the Windows SID namespace, with API parsing and exact SID structure equality. Preserve authored text. Do not infer account-name case semantics, accept arbitrary aliases, or promise that lowercase s is valid.",
+          "sources": [
+            "sid",
+            "sid-strings",
+            "sid-parse"
+          ],
+          "positive": {
+            "operand": "S-1-5-32-544",
+            "expectation": "Select the SID for built-in Administrators, independent of localized display name."
+          },
+          "negative": {
+            "operand": "S-1-5-32-545",
+            "expectation": "A different RID denotes a different SID; casing cannot equate the two."
+          },
+          "required_context": [
+            "target Windows security authority",
+            "valid SID parser result"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "filesystem": {
+          "role": "acquisition_parameter",
+          "case_policy": "canonical_enum",
+          "rule": "Explicit existing filesystem scope all/local/same is an exact native enum. It limits the search boundary independently of recursion and per-component case rules. No omitted runtime default is supplied.",
+          "sources": [
+            "native-acquisition",
+            "win-files"
+          ],
+          "positive": {
+            "operand": "all",
+            "expectation": "Use the explicit all-filesystem search boundary."
+          },
+          "negative": {
+            "operand": "ALL",
+            "expectation": "Reject the undeclared native enum casing."
+          },
+          "required_context": [],
+          "uncertainty": "No new filesystem support or traversal API behavior is inferred."
+        }
+      },
+      "exceptions": [
+        "SMB/remote filesystems and filesystem namespaces can differ; a directory flag alone is not a substitute for API semantics.",
+        "Effective rights depend on the actual security descriptor/token; a localized trustee name is not a SID."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": "windows_file_traversal",
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.group_sid": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows security/account APIs"
+      ],
+      "fields": {
+        "group_sid": {
+          "role": "selector",
+          "case_policy": "sid_identity",
+          "rule": "Use valid SID identity in the Windows SID namespace, with API parsing and exact SID structure equality. Preserve authored text. Do not infer account-name case semantics, accept arbitrary aliases, or promise that lowercase s is valid.",
+          "sources": [
+            "sid",
+            "sid-strings",
+            "sid-parse"
+          ],
+          "positive": {
+            "operand": "S-1-5-32-544",
+            "expectation": "Select the SID for built-in Administrators, independent of localized display name."
+          },
+          "negative": {
+            "operand": "S-1-5-32-545",
+            "expectation": "A different RID denotes a different SID; casing cannot equate the two."
+          },
+          "required_context": [
+            "target Windows security authority",
+            "valid SID parser result"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "SID structure identity is independent from account display-name spelling or localization.",
+        "Unresolved SID/account lookup and denied access must be diagnosed, not fabricated as absent accounts."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.sid_sid": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows security/account APIs"
+      ],
+      "fields": {
+        "trustee_sid": {
+          "role": "selector",
+          "case_policy": "sid_identity",
+          "rule": "Use valid SID identity in the Windows SID namespace, with API parsing and exact SID structure equality. Preserve authored text. Do not infer account-name case semantics, accept arbitrary aliases, or promise that lowercase s is valid.",
+          "sources": [
+            "sid",
+            "sid-strings",
+            "sid-parse"
+          ],
+          "positive": {
+            "operand": "S-1-5-32-544",
+            "expectation": "Select the SID for built-in Administrators, independent of localized display name."
+          },
+          "negative": {
+            "operand": "S-1-5-32-545",
+            "expectation": "A different RID denotes a different SID; casing cannot equate the two."
+          },
+          "required_context": [
+            "target Windows security authority",
+            "valid SID parser result"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "include_group": {
+          "role": "acquisition_parameter",
+          "case_policy": "boolean_control",
+          "rule": "Include matching groups in the acquired account population. It is an explicit Boolean, not a case policy or hidden runtime default.",
+          "sources": [
+            "account",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": true,
+            "expectation": "Explicitly enable the documented acquisition behavior."
+          },
+          "negative": {
+            "operand": "true",
+            "expectation": "A string is not the Boolean; no truthy conversion or omitted default."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "resolve_group": {
+          "role": "acquisition_parameter",
+          "case_policy": "boolean_control",
+          "rule": "Recursively resolve group membership only when explicitly requested. It is an explicit Boolean, not a case policy or hidden runtime default.",
+          "sources": [
+            "account",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": true,
+            "expectation": "Explicitly enable the documented acquisition behavior."
+          },
+          "negative": {
+            "operand": "true",
+            "expectation": "A string is not the Boolean; no truthy conversion or omitted default."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "SID structure identity is independent from account display-name spelling or localization.",
+        "Unresolved SID/account lookup and denied access must be diagnosed, not fabricated as absent accounts."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.user_sid": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows security/account APIs"
+      ],
+      "fields": {
+        "user_sid": {
+          "role": "selector",
+          "case_policy": "sid_identity",
+          "rule": "Use valid SID identity in the Windows SID namespace, with API parsing and exact SID structure equality. Preserve authored text. Do not infer account-name case semantics, accept arbitrary aliases, or promise that lowercase s is valid.",
+          "sources": [
+            "sid",
+            "sid-strings",
+            "sid-parse"
+          ],
+          "positive": {
+            "operand": "S-1-5-32-544",
+            "expectation": "Select the SID for built-in Administrators, independent of localized display name."
+          },
+          "negative": {
+            "operand": "S-1-5-32-545",
+            "expectation": "A different RID denotes a different SID; casing cannot equate the two."
+          },
+          "required_context": [
+            "target Windows security authority",
+            "valid SID parser result"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "SID structure identity is independent from account display-name spelling or localization.",
+        "Unresolved SID/account lookup and denied access must be diagnosed, not fabricated as absent accounts."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.ntuser": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows loaded/offline NTUSER.DAT profile hives"
+      ],
+      "fields": {
+        "key": {
+          "role": "selector",
+          "case_policy": "registry_identity",
+          "rule": "Registry key/value-name identity is case-insensitive in the Registry API. Preserve spelling and registry view. Empty value name requests the default value; null name/key is structural only where already allowed, not a wildcard.",
+          "sources": [
+            "registry",
+            "registry-value"
+          ],
+          "positive": {
+            "operand": "Software\\Vendor",
+            "expectation": "Resolves the same key/value identity as its lower-case spelling in the same hive/view."
+          },
+          "negative": {
+            "operand": "Software\\Other",
+            "expectation": "Different name selects a different identity; failed access cannot establish absence."
+          },
+          "required_context": [
+            "registry hive and 32/64-bit view",
+            "loaded user hive when applicable"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "name": {
+          "role": "selector",
+          "case_policy": "registry_identity",
+          "rule": "Registry key/value-name identity is case-insensitive in the Registry API. Preserve spelling and registry view. Empty value name requests the default value; null name/key is structural only where already allowed, not a wildcard.",
+          "sources": [
+            "registry",
+            "registry-value"
+          ],
+          "positive": {
+            "operand": "Setting",
+            "expectation": "Resolves the same key/value identity as its lower-case spelling in the same hive/view."
+          },
+          "negative": {
+            "operand": "OtherSetting",
+            "expectation": "Different name selects a different identity; failed access cannot establish absence."
+          },
+          "required_context": [
+            "registry hive and 32/64-bit view",
+            "loaded user hive when applicable"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "include_default": {
+          "role": "acquisition_parameter",
+          "case_policy": "boolean_control",
+          "rule": "Include the local Default user profile hive only when explicitly enabled. It is an explicit Boolean, not a case policy or hidden runtime default.",
+          "sources": [
+            "ntuser",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": true,
+            "expectation": "Explicitly enable the documented acquisition behavior."
+          },
+          "negative": {
+            "operand": "true",
+            "expectation": "A string is not the Boolean; no truthy conversion or omitted default."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "item_creation": {
+          "role": "acquisition_parameter",
+          "case_policy": "canonical_enum",
+          "rule": "Use exact existing key_and_name_exist/every_ntuser tokens. These choose the source acquisition population; they do not authorize fabricated Items or make failed hive reads into absence.",
+          "sources": [
+            "ntuser",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": "key_and_name_exist",
+            "expectation": "Use the already specified source population policy."
+          },
+          "negative": {
+            "operand": "KEY_AND_NAME_EXIST",
+            "expectation": "No case alias; reject the undeclared enum token."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Registry key/value identity remains insensitive even if the backing profile path is case-sensitive.",
+        "Default-user profile inclusion and key/name versus every-ntuser population policy are independent explicit controls.",
+        "Unavailable/locked hive or denied profile access is collection failure, not proven missing key/value."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": "hierarchy_traversal",
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.regkeyeffectiverights": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows Registry and security APIs"
+      ],
+      "fields": {
+        "hive": {
+          "role": "selector",
+          "case_policy": "canonical_enum",
+          "rule": "Use the exact native enum token in the mapping. Case variations are not native aliases. The backend maps documented constants to API arguments without rewriting authored values.",
+          "sources": [
+            "registry"
+          ],
+          "positive": {
+            "operand": "local_machine",
+            "expectation": "Exact declared enum member is accepted."
+          },
+          "negative": {
+            "operand": "local_machine",
+            "expectation": "Undeclared casing is rejected by the native enum contract."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "key": {
+          "role": "selector",
+          "case_policy": "registry_identity",
+          "rule": "Registry key/value-name identity is case-insensitive in the Registry API. Preserve spelling and registry view. Empty value name requests the default value; null name/key is structural only where already allowed, not a wildcard.",
+          "sources": [
+            "registry",
+            "registry-value"
+          ],
+          "positive": {
+            "operand": "Software\\Vendor",
+            "expectation": "Resolves the same key/value identity as its lower-case spelling in the same hive/view."
+          },
+          "negative": {
+            "operand": "Software\\Other",
+            "expectation": "Different name selects a different identity; failed access cannot establish absence."
+          },
+          "required_context": [
+            "registry hive and 32/64-bit view",
+            "loaded user hive when applicable"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "trustee_sid": {
+          "role": "selector",
+          "case_policy": "sid_identity",
+          "rule": "Use valid SID identity in the Windows SID namespace, with API parsing and exact SID structure equality. Preserve authored text. Do not infer account-name case semantics, accept arbitrary aliases, or promise that lowercase s is valid.",
+          "sources": [
+            "sid",
+            "sid-strings",
+            "sid-parse"
+          ],
+          "positive": {
+            "operand": "S-1-5-32-544",
+            "expectation": "Select the SID for built-in Administrators, independent of localized display name."
+          },
+          "negative": {
+            "operand": "S-1-5-32-545",
+            "expectation": "A different RID denotes a different SID; casing cannot equate the two."
+          },
+          "required_context": [
+            "target Windows security authority",
+            "valid SID parser result"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Hive identity uses exact native enum tokens; registry view is independent of path casing.",
+        "Unresolvable trustee or inaccessible security descriptor is an error."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": "hierarchy_traversal",
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.service": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows Service Control Manager"
+      ],
+      "fields": {
+        "service_name": {
+          "role": "selector",
+          "case_policy": "scm_identity",
+          "rule": "SCM service-name comparison is insensitive while preserving original spelling. Resolve the service key through SCM, not the service display name.",
+          "sources": [
+            "service"
+          ],
+          "positive": {
+            "operand": "Spooler",
+            "expectation": "Identifies the same SCM key as spooler."
+          },
+          "negative": {
+            "operand": "Print Spooler",
+            "expectation": "A display name is not a substitute for service_name; no hidden conversion."
+          },
+          "required_context": [
+            "selected SCM database"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "service_name is the SCM key, not display_name or an executable filesystem path."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.sid": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows account/security authority"
+      ],
+      "fields": {
+        "trustee_name": {
+          "role": "selector",
+          "case_policy": "windows_account_identity",
+          "rule": "Windows trustee-name identity is insensitive as documented in the pinned OVAL source for LookupAccountName-style resolution. Resolve in the target authority/domain and preserve spelling; do not use an unrelated host account or a generic Unicode casefold surrogate.",
+          "sources": [
+            "account",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": "CONTOSO\\Alice",
+            "expectation": "Select the same target account identity as contoso\\alice."
+          },
+          "negative": {
+            "operand": "OTHER\\Alice",
+            "expectation": "A different authority can identify a different principal; case folding does not erase domain context."
+          },
+          "required_context": [
+            "target authority/domain",
+            "qualified name resolution"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "include_group": {
+          "role": "acquisition_parameter",
+          "case_policy": "boolean_control",
+          "rule": "Include matching groups only when explicitly enabled. It is an explicit Boolean, not a case policy or hidden runtime default.",
+          "sources": [
+            "account",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": true,
+            "expectation": "Explicitly enable the documented acquisition behavior."
+          },
+          "negative": {
+            "operand": "true",
+            "expectation": "A string is not the Boolean; no truthy conversion or omitted default."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "resolve_group": {
+          "role": "acquisition_parameter",
+          "case_policy": "boolean_control",
+          "rule": "Recursively resolve groups only when explicitly enabled. It is an explicit Boolean, not a case policy or hidden runtime default.",
+          "sources": [
+            "account",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": true,
+            "expectation": "Explicitly enable the documented acquisition behavior."
+          },
+          "negative": {
+            "operand": "true",
+            "expectation": "A string is not the Boolean; no truthy conversion or omitted default."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Use qualified domain/computer trustee names to avoid ambiguous isolated lookups.",
+        "Account names, SID identity and returned display-name comparisons are separate."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.userright": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows LSA policy/security APIs"
+      ],
+      "fields": {
+        "userright": {
+          "role": "selector",
+          "case_policy": "canonical_enum",
+          "rule": "Use the exact native enum token in the mapping. Case variations are not native aliases. The backend maps documented constants to API arguments without rewriting authored values.",
+          "sources": [
+            "rights",
+            "account-rights",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": "SE_BACKUP_NAME",
+            "expectation": "Exact declared enum member is accepted."
+          },
+          "negative": {
+            "operand": "se_backup_name",
+            "expectation": "Undeclared casing is rejected by the native enum contract."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Native SE_*_NAME catalog tokens identify documented privilege/logon-right constants; localized display labels and API Se... strings are not interchangeable authored aliases.",
+        "Do not infer a common arbitrary-string case rule from the underlying privilege lookup function."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.wmi.query": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows WMI WQL in the explicitly supplied namespace"
+      ],
+      "fields": {
+        "namespace": {
+          "role": "acquisition_parameter",
+          "case_policy": "wmi_namespace_identity",
+          "rule": "Use the Windows WMI namespace/object-path namespace through the WMI API, preserving authored text and server scope; namespace names are insensitive in Windows WMI, not filesystem paths. Do not assume generic CIM or non-Windows query engines share this contract.",
+          "sources": [
+            "wmi-path",
+            "wmi-query",
+            "wmi-path-rules",
+            "wmi-interface"
+          ],
+          "positive": {
+            "operand": "ROOT\\CIMV2",
+            "expectation": "The Windows WMI namespace identity is the same as root\\cimv2."
+          },
+          "negative": {
+            "operand": "root\\OtherNamespace",
+            "expectation": "Different namespace is not an alias; unavailable namespace is diagnosed."
+          },
+          "required_context": [
+            "target Windows WMI namespace/server"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "query": {
+          "role": "acquisition_parameter",
+          "case_policy": "wql_grammar",
+          "rule": "Pass WQL as a query language expression without whole-query case rewriting. Windows WQL names/keywords and documented string relation comparisons are insensitive; preserve quoted text, escaping, typed operands and operator grammar. Result require record fields retain their own explicit collected-value comparisons.",
+          "sources": [
+            "wmi-query",
+            "wmi-grammar",
+            "wmi-path-rules",
+            "wmi-interface"
+          ],
+          "positive": {
+            "operand": "SELECT Name FROM Win32_Process WHERE Name = 'notepad.exe'",
+            "expectation": "Use WQL string comparison behavior, not native require.equals behavior."
+          },
+          "negative": {
+            "operand": "SELECT Name FROM Win32_Process WHERE ProcessId = 'not-a-number'",
+            "expectation": "Invalid type/operator/query is an API diagnostic, not absence."
+          },
+          "required_context": [
+            "Windows WQL parser",
+            "selected namespace/provider",
+            "operand types"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "WQL is not a general SQL engine and does not support arbitrary cross-namespace expressions.",
+        "A provider requiring undocumented casing is a provider conformance defect, not a new native case switch.",
+        "An unavailable namespace/provider/query failure is an error, not an empty result or a fabricated record."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    },
+    "windows.wuaupdatesearcher": {
+      "status": "DOCUMENTED_CONTRACT_NOT_RUNTIME_VERIFIED",
+      "platform": [
+        "Windows Update Agent Search API"
+      ],
+      "fields": {
+        "search_criteria": {
+          "role": "selector",
+          "case_policy": "wua_criteria_grammar",
+          "rule": "Interpret as the Windows Update Search criteria language. Its string comparisons are insensitive unless the supported criterion specifies otherwise; respect the documented Boolean grammar and escaping. Preserve the whole expression and do not lowercase it or apply native field.equals to query source text.",
+          "sources": [
+            "wua"
+          ],
+          "positive": {
+            "operand": "Type='Software' and IsInstalled=0",
+            "expectation": "Apply WUA criterion semantics; Software/software compare under its documented string rule."
+          },
+          "negative": {
+            "operand": "IsInstalled=0 and (IsHidden=0 or Type='Software')",
+            "expectation": "Nested OR violates documented criteria grammar; return a query diagnostic, not no updates."
+          },
+          "required_context": [
+            "WUA criteria grammar/criterion",
+            "target search service/catalog"
+          ],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        },
+        "include_superseded_updates": {
+          "role": "acquisition_parameter",
+          "case_policy": "boolean_control",
+          "rule": "Control whether potentially superseded matching updates are included. It is an explicit Boolean, not a case policy or hidden runtime default.",
+          "sources": [
+            "wua-superseded",
+            "oval-windows"
+          ],
+          "positive": {
+            "operand": true,
+            "expectation": "Explicitly enable the documented acquisition behavior."
+          },
+          "negative": {
+            "operand": "true",
+            "expectation": "A string is not the Boolean; no truthy conversion or omitted default."
+          },
+          "required_context": [],
+          "uncertainty": "No undocumented alias, Unicode folding, parser extension or provider behavior is assumed."
+        }
+      },
+      "exceptions": [
+        "Criteria expression strings are not arbitrary SQL and property-specific restrictions remain in force.",
+        "Search service selection/permissions and available update catalog affect population, not case semantics."
+      ],
+      "value_comparison": "Collected require fields use case-sensitive equals or explicit case_insensitive_equals independently from Object lookup. Native enum tokens remain exact.",
+      "limitations": [
+        "No native collector or target host was executed. API permissions, version availability, completeness and returned spelling require provider qualification."
+      ],
+      "traversal_contract": null,
+      "common_acquisition_controls": "Object Set/filters and optional traversal keep existing explicit schema semantics. Traversal depth/kind do not change per-component identity. object_title and capability are identity/presentation, not case controls. Generic for_each preserves its existing explicit binding/expansion contract; it is not an identifier case flag. Optional traversal max_depth and platform recurse enums remain literal controls, never a path-name comparison."
+    }
+  }
+}

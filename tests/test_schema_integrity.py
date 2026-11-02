@@ -1,0 +1,80 @@
+"""Frozen 0.4 schema-family byte and reference integrity, without network."""
+from hashlib import sha256
+import json
+from pathlib import Path
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[1] / 'schema' / 'v0.4.0'
+PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
+EXPECTED_JSON = 143
+EXPECTED_SCHEMAS = 34
+EXPECTED_REFS = 242
+EXPECTED_DIGEST = '476f5767276f5c2114f91b211cf4e159a75bee0806ea736fc631d9c40f4c4b80'
+
+
+def strict_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError('duplicate JSON key: ' + key)
+        result[key] = value
+    return result
+
+
+def load(path):
+    return json.loads(path.read_bytes(), object_pairs_hook=strict_object,
+                      parse_constant=lambda value: (_ for _ in ()).throw(
+                          ValueError('nonfinite JSON number: ' + value)))
+
+
+def refs(value):
+    if isinstance(value, list):
+        for item in value:
+            yield from refs(item)
+    elif isinstance(value, dict):
+        if '$ref' in value:
+            yield value['$ref']
+        for item in value.values():
+            yield from refs(item)
+
+
+def frozen_digest(paths):
+    checksum = sha256()
+    for path in sorted(paths):
+        checksum.update(path.relative_to(ROOT).as_posix().encode('utf-8') + b'\0')
+        checksum.update(path.read_bytes())
+    return checksum.hexdigest()
+
+
+class FrozenSchemaIntegrity(unittest.TestCase):
+    def test_family_has_exact_frozen_json_bytes(self):
+        paths = list(ROOT.rglob('*.json'))
+        self.assertEqual(len(paths), EXPECTED_JSON)
+        self.assertEqual(frozen_digest(paths), EXPECTED_DIGEST)
+
+    def test_root_schemas_parse_and_have_unique_draft_ids(self):
+        roots = sorted(ROOT.glob('*.schema.json'))
+        self.assertEqual(len(roots), EXPECTED_SCHEMAS)
+        identifiers = set()
+        for path in roots:
+            with self.subTest(schema=path.name):
+                document = load(path)
+                self.assertEqual(document['$schema'],
+                                 'https://json-schema.org/draft/2020-12/schema')
+                self.assertEqual(document['$id'], PREFIX + path.name)
+                self.assertEqual(document['x-scap-ng-version'], '0.4.0')
+                self.assertNotIn(document['$id'], identifiers)
+                identifiers.add(document['$id'])
+
+    def test_all_json_documents_parse_and_refs_count_is_frozen(self):
+        for path in ROOT.rglob('*.json'):
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertIsInstance(load(path), dict)
+        total = sum(len(list(refs(load(path)))) for path in ROOT.glob('*.schema.json'))
+        self.assertEqual(total, EXPECTED_REFS)
+
+
+if __name__ == '__main__':
+    unittest.main()
+

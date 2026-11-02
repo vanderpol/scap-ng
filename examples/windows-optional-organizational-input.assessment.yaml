@@ -1,0 +1,51 @@
+assessment:
+  id: windows-lock-screen-organizational-demo-assessment
+  version: 1
+  assessment_title: Organization-defined lock screen registry comparison (authoring
+    demonstration)
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  inputs:
+    slideshow-value-input:
+      datatype: integer
+      cardinality: exactly_one
+      required: false
+      description: Explicitly supplied expected registry value for this distinct demonstration
+        policy.
+  tests:
+    verifies-prevent-enabling-screen-slide-show-is-set-enabled-test:
+      test_title: Verifies 'Prevent enabling lock screen slide show' is set to 'Enabled'
+      capability: windows.registry
+      object:
+        hive:
+          equals: local_machine
+        key:
+          equals: SOFTWARE\Policies\Microsoft\Windows\Personalization
+        name:
+          equals: NoLockScreenSlideshow
+      require:
+        items_found: one_or_more
+        items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          type:
+            equals: dword
+          value:
+            equals:
+              input: slideshow-value-input
+            value_match: every
+      reported_elements: all
+  evaluate:
+    if:
+      input_provided: slideshow-value-input
+    then:
+      test: verifies-prevent-enabling-screen-slide-show-is-set-enabled-test
+    else:
+      not_evaluated:
+        reason: Organization has not supplied the expected slideshow policy value
+        follow_up: Obtain an authorized organizational value or perform manual review
