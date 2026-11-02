@@ -19,8 +19,8 @@ This repository provides the current schema candidate, a small set of readable e
 
 The examples are deliberately few. Larger generated content is published separately:
 
-- [Complete 65-benchmark DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download) — original content, conversions and rule ledger.
-- [Normalized YAML review library](https://github.com/vanderpol/scap-ng-evidence/blob/main/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3/README.md) — editable candidate content and preserved static proof records.
+- [Normalized YAML review library](https://github.com/vanderpol/scap-ng-evidence/blob/main/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3/README.md) — the better starting point for editable native Assessments; still a downloadable review ZIP, not a browsable GitHub source library.
+- [Complete 65-benchmark DRAFT archive](https://github.com/vanderpol/scap-ng-evidence/blob/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download/README.md) — preserves original content and full ledgers, but requires assembling three ZIP parts; **not** an author-friendly content browser.
 
 These are **pre-release review checkpoints**, not proof of scanner-runtime equivalence. See [evidence](https://github.com/vanderpol/scap-ng-evidence) for publication details and subsequent checkpoints.
 
