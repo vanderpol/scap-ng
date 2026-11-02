@@ -95,3 +95,18 @@ unreviewed or missing acquisition instructions and vendor references are
 identified as coverage gaps. `independent.shellcommand`, `windows.appcmd`,
 and `windows.appcmdlistconfig` are explicitly prioritized for future research.
 
+
+## Native Organizational Input discovery amendment — 2026-11-02
+
+The owner approved the [pre-release 0.4.0 native discovery amendment](https://github.com/vanderpol/scap-ng/issues/8#issuecomment-6587857027).
+The current candidate adds compiler-derived value/presence Input pointers. Source
+may omit the map; packaged metadata must be present and exact. Current grouped
+`item_requirement` grammar and all four curated Assessment bytes are unchanged.
+
+The preceding complete schema family remains at
+`c6414084677c061d205c2f4010ac915dc466adcc`, aggregate JSON SHA256
+`ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a`.
+The new candidate family and counts are recorded in
+[the amendment receipt](metadata/native-input-discovery-amendment.json).
+No historical schema/proof/archive is rewritten. This is an implementation
+candidate under review, not a released or OVAL Board-approved 0.4.0.
