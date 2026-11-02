@@ -7,10 +7,10 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 import yaml
 
-from test_schema_integrity import ROOT, PREFIX, load, refs
+from test_schema_integrity import ROOT, PREFIX, load, refs, frozen_paths
 
 
-PROJECT = ROOT.parents[1]
+PROJECT = ROOT.parent
 EXAMPLES = {
     'windows-server-2025-lock-screen.assessment.yaml':
         '1a0033280fdfc8defe57104b37268af90860b4b81ce28685f8db5445e7aedca6',
@@ -42,7 +42,7 @@ UniqueYaml.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, uniqu
 
 def schema_registry():
     resources = {}
-    for path in ROOT.rglob('*.json'):
+    for path in frozen_paths():
         doc = load(path)
         if '$schema' not in doc:
             continue
