@@ -76,6 +76,12 @@ The Assessment Result requires a concise human-readable `summary` alongside `out
 
 The Result schemas define *permitted data structures*. They do **not** settle runtime truth propagation, early-stop behavior, error precedence, completeness qualifications, policy rollup, or percentage denominators. Those require explicit normative rules and conformance tests before a scanner or editor claims definitive execution behavior. An authoring preview is not a live Result.
 
+## Known compatibility gap: Organizational Input use locations
+
+The [native Assessment grammar](../schema/assessment.schema.json) rejects named Test `state` and `states` structures. The [Rule schema](../schema/rule.schema.json) nevertheless currently requires `test`, `state`, and `state_slot` in each `organizational_input_requirements.*[].uses[]` entry. The [Assessment Result schema](../schema/assessment-result.schema.json) also retains optional `state_slot` fields for consumed organizational Inputs and related reasons.
+
+This **is a real pre-alpha structural mismatch**, not permission to reintroduce OVAL States in native Assessments or to manufacture placeholders. Its purpose and consumer compatibility are not yet reconciled. The exact follow-up and required migration/conformance review are tracked in [Issue #8](https://github.com/vanderpol/scap-ng/issues/8). Until that contract is resolved, the [optional Input example](../examples/windows-optional-organizational-input.assessment.yaml) demonstrates Assessment-level presence handling only; it does **not** claim to demonstrate a complete Rule dependency-map integration.
+
 ## Authority and remaining work
 
 Use the [generated schema reference](../docs/generated/schema-reference.md) for structural details and the [capability catalog](../docs/generated/capability-catalog.md) for supported selectors. The editor may hide **explicitly serialized** defaults using pinned schema metadata; it must not invent scanner-side defaults or rewrite source on open/save.
