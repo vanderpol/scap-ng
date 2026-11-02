@@ -76,11 +76,17 @@ The Assessment Result requires a concise human-readable `summary` alongside `out
 
 The Result schemas define *permitted data structures*. They do **not** settle runtime truth propagation, early-stop behavior, error precedence, completeness qualifications, policy rollup, or percentage denominators. Those require explicit normative rules and conformance tests before a scanner or editor claims definitive execution behavior. An authoring preview is not a live Result.
 
-## Known compatibility gap: Organizational Input use locations
+## Organizational Input discovery — approved pre-release amendment
 
-The [native Assessment grammar](../schema/assessment.schema.json) rejects named Test `state` and `states` structures. The [Rule schema](../schema/rule.schema.json) nevertheless currently requires `test`, `state`, and `state_slot` in each `organizational_input_requirements.*[].uses[]` entry. The [Assessment Result schema](../schema/assessment-result.schema.json) also retains optional `state_slot` fields for consumed organizational Inputs and related reasons.
+Under the [owner-approved 0.4.0 amendment](https://github.com/vanderpol/scap-ng/issues/8#issuecomment-6587857027), current Rule discovery uses `kind: value|presence` and a canonical RFC6901 `source_path` relative to the selected Assessment body. The enclosing `input` identifies the Benchmark Parameter. The pointer must identify an actual declared Input reference with the matching Rule binding; it is not a source coordinate or an invented State label.
 
-This **is a real pre-alpha structural mismatch**, not permission to reintroduce OVAL States in native Assessments or to manufacture placeholders. Its purpose and consumer compatibility are not yet reconciled. A compiler audit also identified a **legacy direct-Input validation path** that searches old State consumers and skips some binding checks when none are found. Native 0.4 `require.fields` and `input_provided` consumers therefore require independent negative-test coverage before Rule-level Input validation can be claimed. The exact follow-up and required migration/conformance review are tracked in [Issue #8](https://github.com/vanderpol/scap-ng/issues/8). Until that contract is resolved, the [optional Input example](../examples/windows-optional-organizational-input.assessment.yaml) demonstrates Assessment-level presence handling only; it does **not** claim to demonstrate a complete Rule dependency-map integration.
+Authors edit Input declarations, grouped Test requirements, presence guards and Rule Input-to-Parameter bindings. They may omit `organizational_input_requirements` in authoring source; the compiler derives it. Any explicit map must agree exactly with that derivation. Packaged Rules always contain the complete map, including `{}` when no organization-resolved dependency exists. Compilers and package verifiers must reject missing, duplicate, unexpected, wrong-kind and incorrectly bound locations. Schema validation alone cannot establish that graph agreement.
+
+The [constructed authoring and compiled examples](../examples/organizational-input/README.md) extend the existing [optional Assessment](../examples/windows-optional-organizational-input.assessment.yaml). Optional omission, supplied empty populations and indeterminate provision remain distinct; no implicit value or default is introduced. All branches close statically, and optional value use requires positive guard dominance.
+
+Historical 0.3 `test/state/state_slot` discovery stays behind version-directed compatibility checks. Current native Assessments do not regain States. Historical Result `state_slot` and current Result A wire fields are preserved rather than reinterpreted or removed.
+
+Implementation and coordinated compiler/converter/editor qualification remain tracked in [Issue #8](https://github.com/vanderpol/scap-ng/issues/8). This is an approved pre-release contract candidate, not a released or OVAL Board-approved specification or a scanner execution claim.
 
 ## Authority and remaining work
 
