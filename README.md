@@ -10,7 +10,7 @@ This repository provides the current schema candidate, a small set of readable e
 
 ## Start here
 
-1. [Examples](examples/README.md) — four short Assessments, from Windows Registry to Linux mounts and optional inputs.
+1. [Examples](examples/README.md) — four curated Assessments, from simple Registry checks to complex examples.
 2. [Schema](schema/README.md) — the authoritative machine-readable 0.4 structure and metadata.
 3. [Specification](specification/README.md) — current status and outstanding semantic documentation.
 4. [Reference](docs/generated/schema-reference.md) and [capabilities](docs/generated/capability-catalog.md) — generated from the schema.
