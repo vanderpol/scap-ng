@@ -1,20 +1,16 @@
-# Curated pre-alpha 0.4 Assessment examples
+# SCAP-NG 0.4 examples
 
-These four examples derive from the current selected source Assessments. They
-have been deliberately regenerated for the owner-approved pre-release 0.4
-`item_requirement` amendment (the former ungrouped Item counts are not valid).
-They are validated against the local `assessment.schema.json` in CI.
+Four curated Assessments illustrate current authoring syntax. They are validated against the local 0.4 Assessment schema in CI.
 
-| File | What it illustrates | Source scope |
-| --- | --- | --- |
-| [Windows lock screen](windows-server-2025-lock-screen.assessment.yaml) | Inline Registry Object and shared Test-wide field cardinality | Pinned converted Rule |
-| [Linux /home nosuid](linux-home-nosuid.assessment.yaml) | Linux selector and native requirement | Owner-approved 0.4 sample |
-| [Optional organizational Input](windows-optional-organizational-input.assessment.yaml) | Explicit Input guard and not-evaluated reason | Focused authoring demonstration |
-| [Windows SYSVOL permissions](windows-server-2025-sysvol-permissions.assessment.yaml) | Variable expression and shellcommand acquisition | Pinned source conversion, not a permissions-scanner claim |
+| Example | Demonstrates |
+| --- | --- |
+| [Windows Registry](windows-server-2025-lock-screen.assessment.yaml) | Compact inline Object, Item and Field requirements |
+| [Linux /home nosuid](linux-home-nosuid.assessment.yaml) | Mount selection and matching |
+| [Optional organizational Input](windows-optional-organizational-input.assessment.yaml) | Input presence guard and `not_evaluated` fallback |
+| [Windows SYSVOL permissions](windows-server-2025-sysvol-permissions.assessment.yaml) | More complex expression and shellcommand acquisition |
 
-Examples are not independent scanner runs, live observations, global sharing
-qualifications or proof promotions. **Do not use any supplied example as
-evidence that a target host complies.**
+Start with Windows Registry or Linux. The permissions example is a source conversion, **not** proof of native permissions-scanner support.
 
-Exact original paths and pinned source commit: [provenance](../docs/PROVENANCE.md).
+These examples illustrate syntax; they do not establish runtime behavior, independently prove conversion equivalence, or demonstrate that any host complies. For original source paths and pinned provenance, see [provenance](../docs/PROVENANCE.md).
 
+The full generated corpus and evidence are maintained separately in [SCAP-NG evidence](https://github.com/vanderpol/scap-ng-evidence); do not confuse DRAFT content with independently proved Assessments.
