@@ -1,9 +1,10 @@
 # SCAP-NG pre-alpha 0.4 schema family
 
-This directory contains the **owner-frozen 0.4 schema JSON set**, copied without
-modification from the approved source commit and physically flattened for the
-future whole-repository release-tag versioning policy. This is a language-contract
-freeze, not release authorization or scanner conformance.
+This directory contains the **owner-accepted 0.4 schema candidate**, physically
+flattened for whole-repository release-tag versioning. The original owner-frozen
+bytes remain recoverable at the prior Git commit. The owner approved a pre-release
+0.4 amendment grouping Item counts into `require.item_requirement`. This is not
+release authorization or scanner conformance.
 
 - 143 JSON files, including 34 root `.schema.json` definitions and their
   version-local supporting metadata.
@@ -27,10 +28,10 @@ flat `schema/`. Loading tools must register those identifiers against these
 local files; no implicit web lookup or schema rewrite is required. Do not mix
 0.3 or newer experimental language elements with 0.4 content.
 
-For binary compatibility with the freeze, some JSON metadata continues to
+For historical source lineage, some JSON metadata continues to
 record the historical source path `schema/v0.4.0/`; this is source lineage,
 **not a directory to load in this staging checkout**. The current files live
 under `schema/` and no frozen JSON was rewritten during flattening.
 
-The original source is retained in `vanderpol/scap-ng`; see
-[provenance](../docs/PROVENANCE.md) for the exact commit and JSON digest.
+The original research source is retained privately in `vanderpol/scap-ng-research`;
+see [provenance](../docs/PROVENANCE.md) for the original and amended digests.

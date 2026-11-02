@@ -20788,13 +20788,24 @@
     "item_presence_requirement": {
       "type": "object",
       "required": [
-        "items_found"
+        "item_requirement"
       ],
       "properties": {
-        "items_found": {
-          "$ref": "#/$defs/item_existence_cardinality",
-          "title": "Required Item existence",
-          "description": "Explicit selected-Item existence only, no matching. OVAL all_exist and at_least_one_exists are equivalent at Test level; preserve the original source attribute separately in provenance."
+        "item_requirement": {
+          "type": "object",
+          "required": [
+            "items_found"
+          ],
+          "properties": {
+            "items_found": {
+              "$ref": "#/$defs/item_existence_cardinality",
+              "title": "Required Item existence",
+              "description": "Explicit selected-Item existence only, no matching. OVAL all_exist and at_least_one_exists are equivalent at Test level; preserve the original source attribute separately in provenance."
+            }
+          },
+          "additionalProperties": false,
+          "title": "Item existence requirement",
+          "description": "Existence only; there is no satisfaction operation without a comparison."
         }
       },
       "additionalProperties": false,
@@ -27406,83 +27417,94 @@
     "canonical_all_items_requirement": {
       "type": "object",
       "required": [
-        "items_found",
-        "items_satisfying",
+        "item_requirement",
         "field_requirement"
       ],
       "properties": {
-        "items_found": {
-          "$ref": "#/$defs/item_existence_cardinality",
-          "default": "one_or_more",
-          "x-scap-ng-authoring": {
-            "group": "matching",
-            "hide_when_default": true,
-            "version": 1,
-            "control_id": "items_found",
-            "representation": "value",
-            "aggressive_preview": false,
-            "context": "comparison_test",
-            "new_authoring_only": true,
-            "serialize_explicitly": true,
-            "preserve_overrides": true,
-            "authority": "https://github.com/vanderpol/scap-ng/issues/269",
-            "oval_source": [
-              {
-                "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
-                "source_line": 374,
-                "source_xpath": "/xsd:schema/xsd:complexType[10]/xsd:attribute[3]",
-                "attribute": "check_existence",
-                "declaration_kind": "attribute",
-                "source_type": "oval:ExistenceEnumeration",
-                "source_default": "at_least_one_exists",
-                "declaration_context": [
-                  "TestType"
-                ],
-                "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
-                "reachability_limit": "QName dependency census; occurrence-specific overrides require review",
-                "origin": "XSD_DECLARED_DEFAULT",
-                "omission": "Use effective default after occurrence/restriction resolution; not native editor authority",
-                "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}TestType/@check_existence",
-                "documentation": ""
-              }
-            ]
+        "item_requirement": {
+          "type": "object",
+          "required": [
+            "items_found",
+            "items_satisfying"
+          ],
+          "properties": {
+            "items_found": {
+              "$ref": "#/$defs/item_existence_cardinality",
+              "default": "one_or_more",
+              "x-scap-ng-authoring": {
+                "group": "matching",
+                "hide_when_default": true,
+                "version": 1,
+                "control_id": "items_found",
+                "representation": "value",
+                "aggressive_preview": false,
+                "context": "comparison_test",
+                "new_authoring_only": true,
+                "serialize_explicitly": true,
+                "preserve_overrides": true,
+                "authority": "https://github.com/vanderpol/scap-ng/issues/269",
+                "oval_source": [
+                  {
+                    "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+                    "source_line": 374,
+                    "source_xpath": "/xsd:schema/xsd:complexType[10]/xsd:attribute[3]",
+                    "attribute": "check_existence",
+                    "declaration_kind": "attribute",
+                    "source_type": "oval:ExistenceEnumeration",
+                    "source_default": "at_least_one_exists",
+                    "declaration_context": [
+                      "TestType"
+                    ],
+                    "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+                    "reachability_limit": "QName dependency census; occurrence-specific overrides require review",
+                    "origin": "XSD_DECLARED_DEFAULT",
+                    "omission": "Use effective default after occurrence/restriction resolution; not native editor authority",
+                    "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}TestType/@check_existence",
+                    "documentation": ""
+                  }
+                ]
+              },
+              "description": "Selected-Item existence requirement (OVAL Test check_existence). Both source all_exist and at_least_one_exists map to one_or_more; preserve their distinct source spellings only in provenance.",
+              "title": "Items found"
+            },
+            "items_satisfying": {
+              "$ref": "#/$defs/cardinality",
+              "default": "every",
+              "x-scap-ng-authoring": {
+                "group": "matching",
+                "hide_when_default": true,
+                "version": 1,
+                "control_id": "items_satisfying",
+                "representation": "value",
+                "aggressive_preview": false,
+                "context": "comparison_test",
+                "new_authoring_only": true,
+                "serialize_explicitly": true,
+                "preserve_overrides": true,
+                "authority": "https://github.com/vanderpol/scap-ng/issues/269",
+                "oval_source": [
+                  {
+                    "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+                    "source_line": 375,
+                    "source_xpath": "/xsd:schema/xsd:complexType[10]/xsd:attribute[4]",
+                    "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+                    "attribute": "check",
+                    "declared_default": null,
+                    "use": "required",
+                    "origin": "REQUIRED_NO_DEFAULT",
+                    "effective_omission": "INVALID_SOURCE",
+                    "documentation": "",
+                    "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}declaration/@check"
+                  }
+                ]
+              },
+              "description": "How many collected Items must satisfy the complete condition (OVAL Test check). Never conflated with items_found.",
+              "title": "Items satisfying"
+            }
           },
-          "description": "Selected-Item existence requirement (OVAL Test check_existence). Both source all_exist and at_least_one_exists map to one_or_more; preserve their distinct source spellings only in provenance.",
-          "title": "Items found"
-        },
-        "items_satisfying": {
-          "$ref": "#/$defs/cardinality",
-          "default": "every",
-          "x-scap-ng-authoring": {
-            "group": "matching",
-            "hide_when_default": true,
-            "version": 1,
-            "control_id": "items_satisfying",
-            "representation": "value",
-            "aggressive_preview": false,
-            "context": "comparison_test",
-            "new_authoring_only": true,
-            "serialize_explicitly": true,
-            "preserve_overrides": true,
-            "authority": "https://github.com/vanderpol/scap-ng/issues/269",
-            "oval_source": [
-              {
-                "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
-                "source_line": 375,
-                "source_xpath": "/xsd:schema/xsd:complexType[10]/xsd:attribute[4]",
-                "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
-                "attribute": "check",
-                "declared_default": null,
-                "use": "required",
-                "origin": "REQUIRED_NO_DEFAULT",
-                "effective_omission": "INVALID_SOURCE",
-                "documentation": "",
-                "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}declaration/@check"
-              }
-            ]
-          },
-          "description": "How many collected Items must satisfy the complete condition (OVAL Test check). Never conflated with items_found.",
-          "title": "Items satisfying"
+          "additionalProperties": false,
+          "title": "Item requirement",
+          "description": "Explicit Item existence and satisfaction quantifiers; the two decisions remain independent."
         },
         "field_requirement": {
           "$ref": "#/$defs/paired_requirement",
@@ -27757,7 +27779,7 @@
           }
         }
       ],
-      "description": "One complete Test requirement: items_found is existence, items_satisfying is comparison aggregation. Conditions follow directly as fields/and/or/one/xor. Omitted field cardinality is never silently defaulted.",
+      "description": "One complete Test requirement: item_requirement gives explicit existence and satisfaction counts; conditions follow as fields/and/or/one/xor. Field cardinality must be explicit.",
       "x-scap-ng-authoring": {
         "version": 1,
         "control_id": "condition_logic",

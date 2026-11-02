@@ -1,10 +1,38 @@
-# Frozen 0.4 staging import provenance
+# 0.4 provenance and owner-approved pre-release amendment
+
+## Current candidate — 2026-11-02 Item grouping amendment
+
+The owner explicitly approved a narrow **pre-release change to the frozen 0.4
+authoring grammar** before VS Code editor handoff. In complete Tests, the
+two independent Item quantifiers now serialize as
+`require.item_requirement: {items_found: one_or_more, items_satisfying: every}`;
+existence-only Tests use `item_requirement: {items_found: one_or_more}`.
+`field_requirement` retains its separate sibling scope and original meaning.
+Legacy ungrouped Item keys fail schema validation. Result reporting fields
+remain unchanged: no scanner-result wire redesign was authorized.
+
+| Audit boundary | SHA-256 |
+| --- | --- |
+| Historical frozen flat 0.4 JSON family | `476f5767276f5c2114f91b211cf4e159a75bee0806ea736fc631d9c40f4c4b80` |
+| Amended flat 0.4 JSON family | `ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a` |
+
+The same sorted-relative-path-plus-NUL byte algorithm is enforced by
+`tests/test_schema_integrity.py`. It covers all **143 JSON files**, **34 root
+schemas**, **242 `$ref` occurrences** and **100 supported capabilities**.
+Four current Assessment samples were mechanically regenerated and their exact
+bytes re-pinned. The previous bytes, original source/proof records and historical
+publications remain available through Git history and archival evidence; their
+digests are not silently relabeled as new-semantic proofs. 0.4.0 is **not
+released**, and scanner/provider/runtime equivalence is not inferred from
+schema acceptance.
+
+## Historical staging import (retained unchanged for traceability)
 
 **Staging import: 2026-11-02. Not a release or name cutover.**
 
 | Boundary | Exact reference |
 | --- | --- |
-| Original source repository | `vanderpol/scap-ng` |
+| Original source repository (now renamed/private) | `vanderpol/scap-ng-research` |
 | Owner-accepted schema candidate | `6efe0d053e79d513339f7999c52d214886b6d201` |
 | Schema freeze merge commit | `1401c2851516e1af230231abe47a40419bca3dc1` |
 | Source commit used for staging | `d12a644f4607cdc9c9ada50e3a96d4fd0060c6d9` (Apache-2.0 LICENSE added; frozen schema tree unchanged) |

@@ -1,8 +1,9 @@
 # Curated pre-alpha 0.4 Assessment examples
 
-These four examples are **byte-for-byte copies** of current selected source
-Assessments, renamed only for navigation. They illustrate different language
-constructs and are validated against the local `assessment.schema.json` in CI.
+These four examples derive from the current selected source Assessments. They
+have been deliberately regenerated for the owner-approved pre-release 0.4
+`item_requirement` amendment (the former ungrouped Item counts are not valid).
+They are validated against the local `assessment.schema.json` in CI.
 
 | File | What it illustrates | Source scope |
 | --- | --- | --- |
