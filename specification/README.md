@@ -6,7 +6,7 @@ older pages contain 0.3 design history, research proposals and examples that
 may not agree with the final 29 owner-approved 0.4 language decisions.
 
 Until that editorial reconciliation is independently reviewed, the
-[versioned schema family](../schema/v0.4.0/README.md) and its capability,
+[versioned schema family](../schema/README.md) and its capability,
 selector/API, datatype, editor-metadata and result contracts are the
 machine-readable source for structural conformance. Schema validity alone
 does not prove semantic, collection or scanner conformance.

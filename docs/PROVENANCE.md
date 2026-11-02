@@ -9,6 +9,7 @@
 | Schema freeze merge commit | `1401c2851516e1af230231abe47a40419bca3dc1` |
 | Source commit used for staging | `d12a644f4607cdc9c9ada50e3a96d4fd0060c6d9` (Apache-2.0 LICENSE added; frozen schema tree unchanged) |
 | Schema source subtree | `schema/v0.4.0/` |
+| New staging location | `schema/` (files flattened; JSON bytes unchanged) |
 | Versioned JSON files | **143** |
 | Root JSON Schema definitions | **34** |
 | Root schema `$ref` occurrences | **242** |
@@ -18,6 +19,11 @@ The aggregate digest is SHA-256 over each JSON file, sorted by relative
 POSIX path, by feeding `relative-path UTF-8 + NUL + exact file bytes`. It
 protects the complete version-local JSON family, not only root schema files.
 Every JSON file copied into staging is byte-for-byte identical to source.
+
+The source-relative JSON paths beneath the old `schema/v0.4.0/` directory
+are exactly the same as the target-relative paths beneath flat `schema/`.
+The future 0.4 release tag will version **the entire specification, schema,
+metadata, examples and conformance suite together**, not just one directory.
 
 The four Markdown navigation pages within the schema subtree were
 **intentionally rewritten** for staging so outdated research, 0.3 drafts
@@ -37,8 +43,28 @@ They are not included in the immutable JSON digest.
   CI, historical issues, source research or proof baselines.
 - No compiler, converter, authoring normalizer, application runtime, scanner
   or independent collection proof imported.
-- No 0.4.0 release, OVAL Board ratification, schema flattening, repository
+- No 0.4.0 release, OVAL Board ratification, repository
   rename, privacy change or public URL cutover.
 - Historical evidence remains tracked independently in the original and
   `scap-ng-evidence` repositories until a reviewed public-link migration.
+
+## Generated documentation and source audit
+
+`tools/generate_docs.py` derives five offline reference/audit artifacts from
+the frozen schema tree and independent source-note metadata in
+`docs/metadata/`. The CI `--check` mode detects missing, stale or hand-edited
+outputs by exact-byte comparison, including the generator input-hash audit.
+
+An inventory of 5.12.3 OVAL `ntuser` XSD annotations was generated from the
+original research checkout using `tools/harvest_oval_ntuser.py`; this retains
+source file identities, annotation counts and hashes, but not copyrighted
+source documentation text. Every one of the 15 native NTUSER fields is matched
+against both legacy `ntuser_item` and `ntuser_state` annotations. Semantic
+equivalence remains **pending review**.
+
+Every supported and experimental capability receives a generated scanner
+implementation section. Documentation completeness is **not** asserted:
+unreviewed or missing acquisition instructions and vendor references are
+identified as coverage gaps. `independent.shellcommand`, `windows.appcmd`,
+and `windows.appcmdlistconfig` are explicitly prioritized for future research.
 

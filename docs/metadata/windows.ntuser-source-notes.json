@@ -1,0 +1,56 @@
+{
+  "format": "scap-ng/legacy-documentation-candidates/1",
+  "capability": "windows.ntuser",
+  "scope": "Non-normative, paraphrased source observations for editor and scanner review; these notes do not amend frozen 0.4 semantics.",
+  "review_status": "pending_native_equivalence_review",
+  "source_nodes": ["ntuser_test", "ntuser_object", "ntuser_state", "ntuser_item"],
+  "fields": {
+    "key": "Registry subkey within the user's HKCU-equivalent hive; omit the hive prefix when selecting a key.",
+    "name": "Registry value name. The legacy object distinguishes an empty name (default value) from a nil name (test the key itself); verify native nullable-selector behavior independently.",
+    "sid": "Windows security identifier associated with the user profile.",
+    "username": "User name, commonly qualified by computer or domain. Legacy OVAL recommends case-insensitive comparisons for Windows account names.",
+    "account_type": "Distinguishes local and domain user profiles.",
+    "logged_on": "Legacy guidance offers loaded HKEY_USERS profile SID comparison as an indicator, while allowing other Windows APIs to corroborate logon sessions.",
+    "days_since_last_logon": "Legacy guidance derives a day count from ProfileList load-time values, rounding downward; it specifies zero for an account considered currently logged on.",
+    "user_has_signed_into_explorer": "Legacy source points to a per-profile Explorer UserSigned indicator to distinguish interactive Explorer usage from some noninteractive sessions.",
+    "enabled": "Account enabled status may be unavailable for domain users without a domain controller. Legacy guidance distinguishes unavailable evidence from a disabled account.",
+    "date_modified": "Legacy field describes a 64-bit Windows FILETIME for the profile file, measured in 100-nanosecond intervals since 1601-01-01 UTC.",
+    "days_since_modified": "Legacy guidance counts days since the profile hive file changed and rounds upward.",
+    "filepath": "Path to the corresponding user's ntuser.dat profile hive.",
+    "last_write_time": "Registry hive/key/value write timestamp in Windows FILETIME units; precise scope depends on the collected registry location.",
+    "type": "Registry data type of the selected value. Source OVAL enums and native value mapping must be cross-checked; a special legacy empty state is not a collected type.",
+    "value": "Actual registry data. Legacy guidance distinguishes hex-encoded binary, numeric DWORD/QWORD, unexpanded expandable strings, and multiple entries for multi-string values. Native datatype and cardinality need independent validation."
+  },
+  "scanner_observations": [
+    {
+      "id": "profile_discovery",
+      "source_node": "ntuser_item",
+      "summary": "The legacy scanner profile-discovery recipe starts from the Windows ProfileList registry key and ProfileImagePath, with SID-pattern screening for human profiles. Verify profile and service-account exclusions before adopting."
+    },
+    {
+      "id": "loaded_hives",
+      "source_node": "ntuser_item",
+      "summary": "Loaded profiles can be observed under HKEY_USERS by SID; unloaded profiles may require reading their NTUSER.DAT files. These access paths need equivalent item identity and error handling."
+    },
+    {
+      "id": "safe_hive_access",
+      "source_node": "ntuser_item",
+      "summary": "Avoid operations that lock an original unloaded NTUSER.DAT and interfere with later interactive logon. Choose a safe read strategy and test concurrent profile activity."
+    },
+    {
+      "id": "native_selection",
+      "source_node": "ntuser_object",
+      "summary": "The legacy object distinguishes a default registry value from a key-only request and forbids recursion with non-equality key selection; native nullable selectors and traversal constraints must be verified."
+    },
+    {
+      "id": "missing_domain_data",
+      "source_node": "ntuser_state",
+      "summary": "Missing domain-controller access can make account-enabled state unavailable; scanner results should distinguish missing acquisition from a real false value."
+    },
+    {
+      "id": "types_and_time",
+      "source_node": "ntuser_item",
+      "summary": "Legacy Windows FILETIME, profile age rounding, registry type conversions and multi-string value cardinality require explicit native tests before implementation qualification."
+    }
+  ]
+}

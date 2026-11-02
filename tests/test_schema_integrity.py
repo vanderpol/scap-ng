@@ -5,7 +5,7 @@ from pathlib import Path
 import unittest
 
 
-ROOT = Path(__file__).resolve().parents[1] / 'schema' / 'v0.4.0'
+ROOT = Path(__file__).resolve().parents[1] / 'schema'
 PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
 EXPECTED_JSON = 143
 EXPECTED_SCHEMAS = 34
@@ -47,9 +47,15 @@ def frozen_digest(paths):
     return checksum.hexdigest()
 
 
+def frozen_paths():
+    """Only the flat release-owned schema tree, not stray local work files."""
+    return sorted((*ROOT.glob('*.json'),
+                   *(ROOT / 'capability-mappings').rglob('*.json')))
+
+
 class FrozenSchemaIntegrity(unittest.TestCase):
     def test_family_has_exact_frozen_json_bytes(self):
-        paths = list(ROOT.rglob('*.json'))
+        paths = frozen_paths()
         self.assertEqual(len(paths), EXPECTED_JSON)
         self.assertEqual(frozen_digest(paths), EXPECTED_DIGEST)
 
@@ -68,7 +74,7 @@ class FrozenSchemaIntegrity(unittest.TestCase):
                 identifiers.add(document['$id'])
 
     def test_all_json_documents_parse_and_refs_count_is_frozen(self):
-        for path in ROOT.rglob('*.json'):
+        for path in frozen_paths():
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
                 self.assertIsInstance(load(path), dict)
         total = sum(len(list(refs(load(path)))) for path in ROOT.glob('*.schema.json'))

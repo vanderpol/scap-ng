@@ -9,10 +9,16 @@ distribution, or evidence of a working scanner**.
 
 ## Start here
 
-- [Frozen 0.4 schema family](schema/v0.4.0/README.md) — the complete, versioned
+- [Frozen 0.4 schema family](schema/README.md) — the complete, versioned
   JSON Schema and capability metadata set.
 - [Specification status](specification/README.md) — scope and limits of the
   current pre-alpha language contract.
+- [Generated schema reference](docs/generated/schema-reference.md) and
+  [capability catalog](docs/generated/capability-catalog.md) — derived directly
+  from frozen schema/mapping metadata, with CI drift checks.
+- [Scanner implementation coverage](docs/generated/scanner-implementation-catalog.md)
+  — dedicated guidance section per capability, with explicit gaps and
+  [Windows NTUSER legacy-source audit](docs/generated/scanner-windows-ntuser.md).
 - [Current authoring examples](examples/README.md) — representative real
   converted Assessments, with explicit qualification limits.
 - [Source and freeze provenance](docs/PROVENANCE.md) — exact source commit,
@@ -38,8 +44,9 @@ scanner implementations.
 | [Original development repository](https://github.com/vanderpol/scap-ng) | Historical research, tooling and source history until controlled cutover |
 
 No historical release tags or artifacts have been moved. The editor and existing
-toolchain still pin the original `schema/v0.4.0` location; this staging copy
-retains that path and all frozen JSON bytes unchanged.
+toolchain still pin the original `schema/v0.4.0` location. This staging copy
+uses flat `schema/` files, with all frozen JSON bytes and versioned `$id` URIs
+unchanged. Consumers must pin an exact commit now, and a release tag later.
 
 ## Check the schema distribution
 
@@ -48,7 +55,12 @@ Run the Python standard-library integrity gate:
     python3 -m unittest discover -s tests -p 'test_schema_integrity.py' -v
 
 The complete CI gate also validates Draft 2020-12 schemas and the curated
-examples using the dependencies in `requirements-dev.txt`.
+examples using the dependencies in `requirements-dev.txt`. The generated
+reference pages are checked **byte-for-byte**; any change to schema-based
+documentation requires running `python3 tools/generate_docs.py` and committing
+its outputs. The same gate verifies a machine-readable provenance audit and
+scanner-coverage sections. Historical scanner research is labeled as such,
+never silently adopted as a normative 0.4 contract.
 
 ## License
 

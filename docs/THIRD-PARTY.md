@@ -14,3 +14,15 @@ metadata, and a small set of curated source-derived authoring examples.
 - Before any public 0.4.0 distribution, complete the project-wide provenance,
   copyright, notices and release-packaging review.
 
+## OVAL documentation research boundary
+
+The 5.12.3 OVAL Windows `ntuser` XSD contains extensive field and scanner
+implementation annotations. Its source file includes a Government
+License/Disclaimer that requires reproduction alongside a copy or modification
+of the original XSD. To keep ownership boundaries clear, our generated
+documentation uses original summaries, pinned upstream links, and an offline
+audit of annotation counts and hashes; **it does not copy the original XSD
+prose**. All translated scanner notes remain unreviewed implementation
+candidates, not frozen SCAP-NG rules. Verbatim incorporation, if ever desired,
+requires a separate reviewed notices/attribution decision.
+
