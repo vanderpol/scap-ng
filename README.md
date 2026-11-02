@@ -17,10 +17,6 @@ This repository provides the current schema candidate, a small set of readable e
 
 ## More content and tools
 
-For **current 0.4 authoring syntax**, use the [four canonical examples](examples/README.md). Large historical conversions and proof records are stored separately in [SCAP-NG evidence](https://github.com/vanderpol/scap-ng-evidence).
-
-**Do not use the October 30 DRAFT or normalized library as a current authoring template.** These predate the November 2 owner-approved Item grouping amendment and preserve older YAML, directory conventions and generated names. They remain archived for traceability, not for author-facing examples or current-schema validation. Publication remediation is tracked in [evidence issue #1](https://github.com/vanderpol/scap-ng-evidence/issues/1).
-
 - [VS Code authoring editor](https://github.com/vanderpol/scap-ng-vscode)
 - [Conversion and authoring tools](https://github.com/vanderpol/scap-ng-tools)
 - [Scanner implementation reference](docs/generated/scanner-implementation-catalog.md)
