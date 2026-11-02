@@ -1,71 +1,38 @@
 # SCAP-NG
 
-**Pre-alpha 0.4 specification and schema staging repository.**
+**Pre-alpha 0.4 — specification, schemas and examples.**
 
-This is the clean staging home for the next-generation Security Content
-Automation Protocol (SCAP-NG) specification. It is **not yet the public
-authoritative repository, an OVAL Board-approved standard, a released 0.4.0
-distribution, or evidence of a working scanner**.
+SCAP-NG separates **Rules** (what a policy requires) from **Assessments** (how to check it). This repository contains the current schema candidate, a small set of readable examples and supporting specification material.
+
+**Status:** SCAP-NG 0.4.0 has not been released or approved by the OVAL Board. Schema-valid content does not establish scanner support or compliance.
 
 ## Start here
 
-- [Frozen 0.4 schema family](schema/README.md) — the complete, versioned
-  JSON Schema and capability metadata set.
-- [Specification status](specification/README.md) — scope and limits of the
-  current pre-alpha language contract.
-- [Generated schema reference](docs/generated/schema-reference.md) and
-  [capability catalog](docs/generated/capability-catalog.md) — derived directly
-  from frozen schema/mapping metadata, with CI drift checks.
-- [Scanner implementation coverage](docs/generated/scanner-implementation-catalog.md)
-  — dedicated guidance section per capability, with explicit gaps and
-  [Windows NTUSER legacy-source audit](docs/generated/scanner-windows-ntuser.md).
-- [Current authoring examples](examples/README.md) — representative real
-  converted Assessments, with explicit qualification limits.
-- [Source and freeze provenance](docs/PROVENANCE.md) — exact source commit,
-  immutable JSON byte digest and permitted migration boundary.
-- [Third-party source policy](docs/THIRD-PARTY.md) — provenance and license
-  boundaries for mapping metadata and examples.
+1. [Examples](examples/README.md) — four short Assessments, from Windows Registry to Linux mounts and optional inputs.
+2. [Schema](schema/README.md) — the authoritative machine-readable 0.4 structure and metadata.
+3. [Specification](specification/README.md) — current status and outstanding semantic documentation.
+4. [Reference](docs/generated/schema-reference.md) and [capabilities](docs/generated/capability-catalog.md) — generated from the schema.
 
-SCAP-NG separates **policy Rules** (what must be true) from **Assessments**
-(how the requirement is tested). The 0.4 language uses direct capability
-selectors, explicit collection/matching requirements, typed Input and Variable
-contracts, and native Result structures. Versioned schemas and machine-readable
-metadata are intended to be reusable by editors, producers, validators and
-scanner implementations.
+## More content and tools
 
-## Repositories
+The curated examples are deliberately few. The [evidence repository](https://github.com/vanderpol/scap-ng-evidence) holds larger generated content and proof artifacts; distinguish DRAFT conversions from independently proved Assessments and use pinned versions rather than a moving branch.
 
-| Project | Responsibility |
-| --- | --- |
-| This staging repository | Specification and frozen versioned schemas |
-| [SCAP-NG tools](https://github.com/vanderpol/scap-ng-tools) | Converter and shared authoring/normalization utilities (in migration) |
-| [VS Code editor](https://github.com/vanderpol/scap-ng-vscode) | Interactive authoring UI |
-| [Evidence](https://github.com/vanderpol/scap-ng-evidence) | Proof and release evidence |
-| [Original development repository](https://github.com/vanderpol/scap-ng) | Historical research, tooling and source history until controlled cutover |
+- [VS Code authoring editor](https://github.com/vanderpol/scap-ng-vscode)
+- [Conversion and authoring tools](https://github.com/vanderpol/scap-ng-tools)
+- [Scanner implementation reference](docs/generated/scanner-implementation-catalog.md)
 
-No historical release tags or artifacts have been moved. The editor and existing
-toolchain still pin the original `schema/v0.4.0` location. This staging copy
-uses flat `schema/` files, with all frozen JSON bytes and versioned `$id` URIs
-unchanged. Consumers must pin an exact commit now, and a release tag later.
+## Validation and provenance
 
-## Check the schema distribution
+The versioned 0.4 schema files are in flat `schema/`. Pin the **whole repository** to an exact commit until a release tag exists.
 
-Run the Python standard-library integrity gate:
+Run the baseline integrity tests:
 
-    python3 -m unittest discover -s tests -p 'test_schema_integrity.py' -v
+```sh
+python3 -m unittest discover -s tests -p 'test_schema_integrity.py' -v
+```
 
-The complete CI gate also validates Draft 2020-12 schemas and the curated
-examples using the dependencies in `requirements-dev.txt`. The generated
-reference pages are checked **byte-for-byte**; any change to schema-based
-documentation requires running `python3 tools/generate_docs.py` and committing
-its outputs. The same gate verifies a machine-readable provenance audit and
-scanner-coverage sections. Historical scanner research is labeled as such,
-never silently adopted as a normative 0.4 contract.
+For exact schema hashes, source history and example origins, see [provenance](docs/PROVENANCE.md). Generated references are checked for drift in CI; changes to their metadata require regenerating them with `python3 tools/generate_docs.py`.
 
 ## License
 
-Project-owned source in this repository is offered under
-[Apache License 2.0](LICENSE). This does not relicense referenced SCAP 1.4/OVAL
-sources, third-party standards, or converted source content. See the
-[third-party policy](docs/THIRD-PARTY.md).
-
+Project-owned source is licensed under [Apache-2.0](LICENSE). Referenced SCAP/OVAL materials and converted third-party content retain their respective rights; see [third-party notices](docs/THIRD-PARTY.md).
