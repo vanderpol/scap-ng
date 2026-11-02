@@ -10,7 +10,9 @@ PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
 EXPECTED_JSON = 143
 EXPECTED_SCHEMAS = 34
 EXPECTED_REFS = 242
-EXPECTED_DIGEST = '476f5767276f5c2114f91b211cf4e159a75bee0806ea736fc631d9c40f4c4b80'
+# Owner-approved pre-release 0.4 amendment; prior freeze digest remains in
+# docs/PROVENANCE.md and the previous immutable Git commit.
+EXPECTED_DIGEST = 'ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a'
 
 
 def strict_object(pairs):

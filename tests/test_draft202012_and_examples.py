@@ -13,13 +13,13 @@ from test_schema_integrity import ROOT, PREFIX, load, refs, frozen_paths
 PROJECT = ROOT.parent
 EXAMPLES = {
     'windows-server-2025-lock-screen.assessment.yaml':
-        '1a0033280fdfc8defe57104b37268af90860b4b81ce28685f8db5445e7aedca6',
+        '957cdba19b9b6be80497734121659c31e3269db1ce24218119f65aa9afe771e1',
     'windows-server-2025-sysvol-permissions.assessment.yaml':
-        '174c93d5e86c0a9478c66507efd1db8deec588cd65c35582738c075d5a563d3c',
+        'd8b3fd97fb9c5b5d83be712a081a97a62a013d3db2439b3d1528a73a1d4df5e8',
     'linux-home-nosuid.assessment.yaml':
-        '6a6519e7c7b30ebede613ac3703eb0e3bf1e0cbe3c8add1e816a68c6d7bc102b',
+        'b88d34d2ed41a7b5abcbdedb4a4c44a5b3ad2291a8ae0cbb66b316f783e48cf8',
     'windows-optional-organizational-input.assessment.yaml':
-        'f3e645b95a7897093364e847abdd6728d68ae8105ce44db19f16ebb0fd0dcb54',
+        '8f19d25fe07d881b1dc816a0b48ee431df05f9b58e85a1e59f5fd601393bda34',
 }
 
 
@@ -80,6 +80,12 @@ class Draft202012AndExamples(unittest.TestCase):
                 body = document['assessment']
                 self.assertNotIn('purpose', body)
                 self.assertEqual(body['specification']['version'], '0.4.0')
+                for test in body['tests'].values():
+                    requirement = test['require']
+                    self.assertNotIn('items_found', requirement)
+                    self.assertNotIn('items_satisfying', requirement)
+                    self.assertEqual(set(requirement['item_requirement']),
+                                     {'items_found', 'items_satisfying'})
 
 
 if __name__ == '__main__':
