@@ -1,4 +1,8 @@
-# 0.4 provenance and owner-approved pre-release amendment
+# SCAP-NG 0.4 provenance
+
+This page records **which schema and examples were imported, what changed before release, and what has not been proved**. For authoring guidance, start with the [specification](../specification/README.md); for the four small examples, see [examples](../examples/README.md).
+
+**Current status:** pre-alpha 0.4 candidate; no released 0.4.0 distribution, OVAL Board approval, or scanner-runtime equivalence claim.
 
 ## Current candidate — 2026-11-02 Item grouping amendment
 
@@ -26,9 +30,9 @@ digests are not silently relabeled as new-semantic proofs. 0.4.0 is **not
 released**, and scanner/provider/runtime equivalence is not inferred from
 schema acceptance.
 
-## Historical staging import (retained unchanged for traceability)
+## Historical staging import (2026-11-02)
 
-**Staging import: 2026-11-02. Not a release or name cutover.**
+The import occurred before the public repository name cutover. The historical development source is now `vanderpol/scap-ng-research`; the current public specification repository uses `vanderpol/scap-ng`. The original import did not constitute a release.
 
 | Boundary | Exact reference |
 | --- | --- |
@@ -58,23 +62,18 @@ The four Markdown navigation pages within the schema subtree were
 and broken relative links do not appear as current normative guidance.
 They are not included in the immutable JSON digest.
 
-## Example source paths (bytes preserved)
+## Original locations of the four curated examples
 
 - `docs/examples/conformance-remediation-20261101/windows-server-2025-shows-on-lock-screen-sv-278080-assessment.yaml`
 - `docs/examples/conformance-remediation-20261101/windows-server-2025-control-permissions-sv-278139-assessment.yaml`
 - `docs/examples/owner-contract-20261031/linux-home-mount-nosuid-assessment.yaml`
 - `docs/examples/input-presence-20261101/optional-lock-screen.assessment.yaml`
 
-## Explicitly not done
+## Scope of the historical staging import
 
-- No changes to the original `scap-ng` repository, schemas, releases, tags,
-  CI, historical issues, source research or proof baselines.
-- No compiler, converter, authoring normalizer, application runtime, scanner
-  or independent collection proof imported.
-- No 0.4.0 release, OVAL Board ratification, repository
-  rename, privacy change or public URL cutover.
-- Historical evidence remains tracked independently in the original and
-  `scap-ng-evidence` repositories until a reviewed public-link migration.
+The staging import did **not** move the compiler, converter, authoring normalizer, scanner, runtime or independent collection proofs. It did not change source-research evidence or proof baselines, publish a 0.4.0 release, or obtain OVAL Board ratification. Repository naming and visibility changed **after** this import; those later administrative changes must not be confused with schema validation or release qualification.
+
+Large generated corpora and published evidence remain separately tracked in [scap-ng-evidence](https://github.com/vanderpol/scap-ng-evidence). The [October 30 complete DRAFT](https://github.com/vanderpol/scap-ng-evidence/tree/v04-revised-all65-draft-files-20261030-a08c9beb9/runs/v04-converter/2026-10-30-all-65-revised-draft-download) and [normalized review library](https://github.com/vanderpol/scap-ng-evidence/blob/main/runs/v04-library/2026-10-30-all65-normalized-review-ff69d46b3/README.md) are historical pre-release checkpoints, not independent scanner-runtime proof.
 
 ## Generated documentation and source audit
 
