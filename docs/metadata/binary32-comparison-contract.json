@@ -1,0 +1,40 @@
+{
+  "format": "scap-ng-0.4.0-binary32-comparisons/1",
+  "owner_direction": {
+    "date": "2026-11-03",
+    "approval": "Yes I approve",
+    "scope": "Coordinated binary32 contract work recommended in tools PR18; implementation remains in draft review."
+  },
+  "scope": "Existing six self-describing float_* comparisons; finite canonical binary32 expected operands only. No arithmetic or Result-wire extension.",
+  "source": "OVAL 5.12.3 / oval-common-schema.xsd / float; 2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+  "operations": [
+    "equals",
+    "not_equal",
+    "greater_than",
+    "greater_than_or_equal",
+    "less_than",
+    "less_than_or_equal"
+  ],
+  "observed": {
+    "domain": "W3C/OVAL decimal float lexical with optional exponent, INF, -INF, NaN",
+    "whitespace": "leading/trailing XML whitespace only",
+    "rounding": "direct decimal-to-IEEE754-binary32 roundTiesToEven; no binary64 intermediate",
+    "underflow": "gradual subnormal rounding and signed zero",
+    "overflow": "signed infinity",
+    "invalid": "cast error; never zero, null, missing, unknown or false"
+  },
+  "expected": {
+    "domain": "finite JSON numbers already exactly representable as binary32, or typed references whose runtime values satisfy the same invariant",
+    "source_conversion": "round source decimal lexical directly to binary32, then serialize a numeric value that round-trips that exact binary32 value",
+    "nonfinite": "blocked, including finite source decimals that overflow binary32",
+    "noncanonical": "reject rather than reinterpret a binary64 approximation"
+  },
+  "comparison": {
+    "signed_zero": "positive and negative zero compare equal",
+    "nan_against_finite": "not_equal true; all five other operations false",
+    "infinity_against_finite": "negative infinity below every finite value; positive infinity above every finite value"
+  },
+  "status": "Cast/comparison behavior does not replace collection, error/unknown/incomplete propagation, quantifiers, or Input provision. Existing runtime status rules remain required; this is not a scanner implementation.",
+  "serialization": "Nonfinite observed bits are internal comparison states only; original observed text/provenance stays lexical. No nonfinite JSON number or new Result representation is authorized.",
+  "compatibility": "Authoring schema JSON unchanged. Affected native programs require binary32 contract binding/version; old non-float program bytes remain unchanged. Historical float programs require their pinned pre-contract toolchain, never silent reinterpretation."
+}
