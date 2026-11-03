@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json",
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-11-01",
-  "title": "Closed native Variable declarations and legacy expressions (Decision 29)",
-  "description": "Finite current native vocabulary. No canonical function envelope, implicit options or value execution. Declaration/reference/derived type compatibility is additionally enforced by semantic validation and the direct compiler.",
-  "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/pull/268#issuecomment-6550047257",
+  "x-last-modified": "2026-11-03",
+  "title": "Native Variable declarations, legacy forms and bounded function calls",
+  "description": "Finite native vocabulary. Existing forms remain unchanged. The owner-directed pre-release amendment adds only arithmetic, substring and split with explicit options; it does not activate the broad canonical-call candidate or evaluate values.",
+  "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng-tools/issues/14#issuecomment-6592397246",
   "$ref": "#/$defs/declaration",
   "$defs": {
     "declaration": {
@@ -141,6 +141,103 @@
                   }
                 },
                 "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "arithmetic"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "integer",
+                  "float"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "substring"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "split"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
               }
             }
           }
@@ -378,8 +475,151 @@
             }
           },
           "additionalProperties": false
+        },
+        {
+          "$ref": "#/$defs/function_expression"
         }
       ]
+    },
+    "function_expression": {
+      "type": "object",
+      "required": [
+        "function"
+      ],
+      "properties": {
+        "function": {
+          "type": "object",
+          "required": [
+            "name",
+            "arguments",
+            "options"
+          ],
+          "properties": {
+            "name": {
+              "enum": [
+                "arithmetic",
+                "substring",
+                "split"
+              ]
+            },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              }
+            },
+            "options": {
+              "type": "object"
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "arithmetic"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 2
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "arithmetic_operation"
+                    ],
+                    "properties": {
+                      "arithmetic_operation": {
+                        "enum": [
+                          "add",
+                          "multiply"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Numeric add/multiply over the Cartesian product of argument populations; preserve multiplicity and collection flags. Boolean/string coercion is not supported."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "substring"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "substring_start",
+                      "substring_length"
+                    ],
+                    "properties": {
+                      "substring_start": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "substring_length": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "One-based OVAL substring; start below1 means1 at evaluation, start past length is an error, negative/oversized length means remainder. Options stay explicit and are not normalized during compilation."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "split"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "delimiter"
+                    ],
+                    "properties": {
+                      "delimiter": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Literal delimiter, not regular expression. Preserve leading, trailing and adjacent empty strings, duplicates and source collection flags; empty string values are not absent populations."
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Owner-directed three-function subset. Arguments retain collection/status semantics; no implicit options, truthiness defaults, or value execution."
     }
   }
 }
