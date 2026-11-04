@@ -1275,6 +1275,17 @@
   },
   "gaps_and_owner_decisions": [
     {
+      "id": "GAP-COMPAT-01",
+      "severity": "owner_review",
+      "finding": "The final Candidate-A snapshot passes focused nine-selector conversion tests, but the full pinned benchmark fixture CI run reports 11 historical native-document/inventory golden-parity failures.",
+      "decision": "Preserve existing converted artifacts; owner must approve either a reviewed golden migration or an explicit compatibility exception before merge.",
+      "references": [
+        "scap-ng-tools CI run 41873718088",
+        "scap-ng-tools@a208b7d78944b578906066815e2b43f563330806:tests/test_benchmark_conversion.py",
+        "scap-ng-tools@a208b7d78944b578906066815e2b43f563330806:tests/test_benchmark_inventory.py"
+      ]
+    },
+    {
       "id": "GAP-SEL-01",
       "severity": "resolved",
       "finding": "Owner-approved Candidate A names are now canonical in the three affected SCAP-NG mappings; converter output and selector contracts use filepath/path/filename for all nine selectors.",
@@ -1306,7 +1317,7 @@
       "python -m unittest tests.test_compatibility_audit tests.test_schema_integrity tests.test_generated_documentation tests.test_variable_function_documentation -v (16 tests passed)",
       "python -m unittest discover -s tests -v (27 tests passed with declared dependencies installed)"
     ],
-    "tools_result": "SCAP_NG_SCHEMA_ROOT=<accepted mapping candidate> PYTHONPATH=src python -m unittest discover -s tests -v: 18 passed, 4 fixture-dependent suites skipped; filesystem compatibility tests passed.",
+    "tools_result": "Local final-snapshot suite: 20 passed, 3 fixture-dependent skips; focused filesystem compatibility tests passed. CI full fixture run 41873718088 failed 11 historical benchmark golden-parity assertions; no golden artifacts were rebaselined.",
     "schema_selector_tests": "Existing tests/test_native_selector_contracts.py cover positive, negative, boundary, nullability, lists/variables, regex spelling, and inventory reconciliation when Draft 2020-12 dependencies are installed.",
     "runtime_result": "No evaluator/scanner implementation found; runtime parity not claimed."
   },

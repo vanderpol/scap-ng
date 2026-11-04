@@ -170,4 +170,6 @@ pre-selector/amendment boundaries and are not relabeled. The nine filesystem
 mapping mismatches are resolved in the canonical mapping candidate. The separate
 scap-ng-tools draft PR is pinned above, and PR #16 generated-file conflicts have
 been rebased/regenerated. The VS Code editor must pin the exact candidate source
-commit and regenerated manifest only after owner acceptance.
+commit and regenerated manifest only after owner acceptance. Full-fixture tools CI
+run `41873718088` found 11 historical golden-parity failures; no converted content
+or golden artifacts were modified.

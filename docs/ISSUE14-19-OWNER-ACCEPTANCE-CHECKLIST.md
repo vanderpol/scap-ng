@@ -32,7 +32,7 @@ generated outputs, not by a semantic disagreement in the authoring prose.
 | #18 | Acceptable after #17 | Confirm its nine-selector batch and generated count reconciliation. |
 | #20 | Documentation-safe, grammar unchanged | Decide whether the documented `unique` arity gap is acceptable for now. |
 | #21 | Review report/tests safe after #20 | Filesystem naming is resolved to A; tools repin and runtime qualification remain tracked. |
-| #22 | Draft coordination follow-up | Mapping-side schema candidate and tools-side snapshot repin are separate reviewable changes; consume the exact pins below without merging automatically. |
+| #22 | Draft coordination follow-up | Mapping-side schema candidate and tools-side snapshot repin are separate reviewable changes; focused selector tests pass, but full benchmark golden parity requires owner review before merge. |
 
 No PR in this stack should be merged while it is marked draft or while its
 base branch omits the prior schema/integrity changes.
@@ -127,3 +127,7 @@ The verified coordinated candidate now has source commit
 `305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` over 236
 resources. The editor owner must consume these exact values; no VS Code files
 are changed here.
+
+## Full-fixture compatibility decision
+
+The final Candidate-A focused converter tests pass for all nine filesystem selectors. The tools CI fixture run `41873718088` nevertheless reports 11 historical benchmark golden-parity failures after using the final snapshot. Existing converted content and golden artifacts were not changed. Owner approval is required before rebaselining those outputs or adding a compatibility exception.

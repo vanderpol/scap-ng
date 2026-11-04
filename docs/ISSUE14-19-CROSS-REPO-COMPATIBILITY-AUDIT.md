@@ -95,6 +95,7 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 
 ## Owner review queue
 
+1. **GAP-COMPAT-01 (owner_review)** — The final Candidate-A snapshot passes the focused nine-selector tests, but the full pinned benchmark fixture CI run changes historical native-document/inventory golden outputs (11 assertions). Preserve existing converted artifacts and require owner approval before any golden migration or compatibility exception.
 1. **GAP-SEL-01 (resolved)** — Owner-approved Candidate A names are now canonical in the three affected SCAP-NG mappings; converter output and selector contracts use filepath/path/filename for all nine selectors. **Decision:** No alias or rename; retain the approved OVAL names.
 1. **GAP-VAR-01 (owner_review)** — unique is narrowed to one expression in active schema and converter while pinned OVAL UniqueFunctionType permits one or more components. **Decision:** Approve the narrowing or authorize a semantics-preserving multi-component representation.
 1. **GAP-VAR-02 (qualification)** — No runtime proof for Cartesian products, cast execution, regex dialect/first-match behavior, unique ordering, merge sorting, missing values, statuses, or errors. **Decision:** Add evaluator/conformance vectors before claiming runtime parity.
