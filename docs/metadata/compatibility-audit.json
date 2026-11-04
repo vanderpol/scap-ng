@@ -1266,10 +1266,11 @@
     }
   ],
   "snapshot_gate": {
-    "status": "blocked_for_direct_execution",
-    "finding": "The accepted SCAP-NG mapping candidate now emits the public filepath/path/filename keys. Direct tools execution remains blocked until the tools snapshot and semantic pack are repinned from this candidate.",
+    "status": "verified_against_accepted_candidate",
+    "finding": "scap-ng-tools FrozenSchemaSnapshot and regenerated semantic pack validate the accepted SCAP-NG candidate: 145 JSON files, 35 root schemas, 658 root references, digest e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5.",
     "references": [
-      "scap-ng-tools@1f4f74d:src/scap_ng_tools/contracts/schema_snapshot.py:15-19,83-106"
+      "scap-ng-tools@filesystem-selector-a:src/scap_ng_tools/contracts/schema_snapshot.py",
+      "scap-ng-tools@filesystem-selector-a:src/scap_ng_tools/converter/_v04_semantic/contracts-0.4.0.json"
     ]
   },
   "gaps_and_owner_decisions": [
@@ -1293,9 +1294,9 @@
     },
     {
       "id": "GAP-SNAP-01",
-      "severity": "coordination",
-      "finding": "Tools snapshot pin is older than the current SCAP-NG stack.",
-      "decision": "Repin tools only as a separately reviewed compatibility change; this audit does not alter the pin."
+      "severity": "resolved",
+      "finding": "The tools snapshot and semantic pack now verify against the accepted Candidate-A SCAP-NG schema; editor-pack regeneration also passed with 236 resources.",
+      "decision": "Keep the exact source/digest/pack pins and update the separate tools PR."
     }
   ],
   "tests_and_evidence": {
@@ -1305,7 +1306,7 @@
       "python -m unittest tests.test_compatibility_audit tests.test_schema_integrity tests.test_generated_documentation tests.test_variable_function_documentation -v (16 tests passed)",
       "python -m unittest discover -s tests -v (27 tests passed with declared dependencies installed)"
     ],
-    "tools_result": "PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m unittest discover -s tests -v (14 tests run; 1 import error: missing referencing; 5 fixture-dependent suites skipped)",
+    "tools_result": "SCAP_NG_SCHEMA_ROOT=<accepted mapping candidate> PYTHONPATH=src python -m unittest discover -s tests -v: 18 passed, 4 fixture-dependent suites skipped; filesystem compatibility tests passed.",
     "schema_selector_tests": "Existing tests/test_native_selector_contracts.py cover positive, negative, boundary, nullability, lists/variables, regex spelling, and inventory reconciliation when Draft 2020-12 dependencies are installed.",
     "runtime_result": "No evaluator/scanner implementation found; runtime parity not claimed."
   },
@@ -1315,8 +1316,8 @@
       "A": "filepath/path/filename",
       "B": "full_path/directory/filename"
     },
-    "current_public_validation": "alternative-a.assessment.yaml validates; Candidate B and the old tools emission remain rejected, while the accepted mapping now emits Candidate A names.",
-    "tools_observed_emission": "tools-emission.assessment.yaml uses full_path/directory/name and is rejected by current public overlay",
+    "current_public_validation": "alternative-a.assessment.yaml validates; Candidate B and the pre-change tools emission remain rejected, while the accepted mapping and tools candidate emit Candidate A names.",
+    "tools_observed_emission": "tools-emission.assessment.yaml records the pre-change full_path/directory/name output and is rejected by the current public overlay; the repinned tools candidate emits filepath/path/filename.",
     "automated_test": "tests/test_compatibility_audit.py:test_filesystem_alternatives_have_recorded_compatibility_outcomes"
   },
   "unique_representation_proposal": {
@@ -1333,7 +1334,7 @@
     "compatibility": "Retain existing one-expression form through a oneOf during migration; do not alter schema or converter without approval."
   },
   "tools_compatibility_plan": {
-    "status": "owner_review_only",
+    "status": "verified_candidate",
     "required_files": [
       "src/scap_ng_tools/contracts/schema_snapshot.py",
       "src/scap_ng_tools/converter/_v04_semantic/__init__.py",
@@ -1349,16 +1350,18 @@
     "candidate_pin": {
       "json_count": 145,
       "root_count": 35,
-      "root_ref_count": 652,
-      "sha256": "0590d688edfe9f6bfcb0b3a849706dc7b2ce3e5eefbc9421c7fbb0caf0087a71"
+      "root_ref_count": 658,
+      "sha256": "e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5",
+      "pack_sha256": "212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d"
     }
   },
   "editor_pin": {
-    "status": "schema_candidate_changed_tools_repins_pending",
-    "schema_commit": "pending-mapping-branch-commit",
-    "schema_digest": "0590d688edfe9f6bfcb0b3a849706dc7b2ce3e5eefbc9421c7fbb0caf0087a71",
-    "manifest_sha256": "pending-tools-editor-pack-regeneration",
+    "status": "accepted_mapping_candidate_tools_pack_verified",
+    "schema_commit": "7e38222494ee92a9a5584e2879d1688632bb21a5",
+    "schema_digest": "e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5",
+    "manifest_sha256": "e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd",
     "stable_rollback_commit": "463675f3b931e596c922352a131cb3c515ab2265",
-    "warning": "Final commit and editor-pack manifest require the tools repin and regeneration; VS Code integration remains out of scope."
+    "warning": "VS Code integration remains out of scope; editor owner must consume these exact values.",
+    "resource_count": 236
   }
 }

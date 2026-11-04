@@ -1,7 +1,7 @@
 # Issues #14/#19 owner acceptance checklist
 
 This checklist prepares draft PRs #15–#21 for coordinated acceptance. It does
-not merge any PR and does not select a filesystem naming candidate.
+not merge any PR. The owner-approved Candidate A naming decision is recorded below.
 
 ## Dependency chain and merge order
 
@@ -80,7 +80,7 @@ schema or converter change.
 
 ## Required scap-ng-tools compatibility changes
 
-After the filesystem choice, update the tools in a separate reviewed change:
+With the filesystem choice resolved, update the tools in a separate reviewed change:
 
 1. Repin `FrozenSchemaSnapshot` constants to the accepted flat schema's exact
    JSON count, root count, reference count, and aggregate SHA-256.
@@ -93,19 +93,19 @@ After the filesystem choice, update the tools in a separate reviewed change:
 4. Run tools' full unit suite with the accepted snapshot plus SCAP-NG's full
    suite. Keep source crosswalk metadata separate from native field names.
 
-The current tools baseline is intentionally blocked against this checkout:
-it expects 143 JSON files, 34 roots, 242 root references, and digest
-`ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a`; the
-current SCAP-NG candidate is 145 JSON files, 35 roots, 652 root references,
-and digest `2adf88f5c1fd950e997579c00064388b5f12e9e29cde38075bf75b76d1f25843`.
+The historical tools baseline was intentionally blocked against the pre-mapping
+checkout: it expected 143 JSON files, 34 roots, 242 root references, and digest
+`ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a`. The
+separate tools candidate is now repinned and verified against 145 JSON files,
+35 roots, 658 root references, and digest
+`e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`; its
+semantic pack digest is `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d`.
 
 Provenance records the same current candidate and historical boundary in `docs/PROVENANCE.md` under “Current coordinated selector/function draft”.
 
 ## VS Code editor pin
 
-The current schema candidate commit after the approved mapping update is
-recorded by the mapping PR; the editor's offline pack must be regenerated from
-that exact commit after the tools repin. The pre-mapping PR #21 candidate was:
+The pre-mapping PR #21 candidate was:
 
 ```
 7b9b61108aa30a601828268576308e510477094e
@@ -118,8 +118,10 @@ The pre-mapping candidate values were:
 * editor candidate pack manifest SHA-256: `2aa28f9926d4d7774edcf48b991f1f48b121e34a7dce9006b1db129a6301727e`
 * stable rollback commit: `463675f3b931e596c922352a131cb3c515ab2265`
 
-The accepted mapping candidate now has schema digest
-`0590d688edfe9f6bfcb0b3a849706dc7b2ce3e5eefbc9421c7fbb0caf0087a71` and
-`145 / 35 / 658` JSON/root/reference counts. Its exact final source commit
-and editor-pack manifest remain pending the separate tools regeneration. The
-editor must never pin a moving branch or an unmerged draft.
+The verified coordinated candidate now has source commit
+`7e38222494ee92a9a5584e2879d1688632bb21a5`, schema digest
+`e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`, and
+`145 / 35 / 658` JSON/root/reference counts. The editor-pack manifest is
+`e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd` over 236
+resources. The editor owner must consume these exact values; no VS Code files
+are changed here.

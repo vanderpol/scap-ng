@@ -1,7 +1,7 @@
 """Cross-repository Issue #14/#19 audit integrity checks.
 
-These checks intentionally use only the repository's JSON artifacts. They do not
-claim that the separately pinned converter can execute against this snapshot.
+These checks use the repository's JSON artifacts and the accepted cross-repository
+compatibility evidence. They do not claim scanner/runtime evaluation parity.
 """
 import json
 from pathlib import Path
@@ -106,7 +106,14 @@ class CompatibilityAuditTests(unittest.TestCase):
         )
         for axis in self.audit["semantic_axes"]:
             self.assertNotIn("runtime_verified", axis["status"])
-        self.assertEqual(self.audit["snapshot_gate"]["status"], "blocked_for_direct_execution")
+        self.assertEqual(self.audit["snapshot_gate"]["status"], "verified_against_accepted_candidate")
+        self.assertIn("145 JSON files", self.audit["snapshot_gate"]["finding"])
+        self.assertIn("658 root references", self.audit["snapshot_gate"]["finding"])
+        self.assertEqual(
+            self.audit["editor_pin"]["schema_digest"],
+            "e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5",
+        )
+        self.assertEqual(self.audit["editor_pin"]["resource_count"], 236)
 
     def test_filesystem_alternatives_have_recorded_compatibility_outcomes(self):
         evidence = ROOT / "docs/evidence/issue21/filesystem-selector-alternatives"

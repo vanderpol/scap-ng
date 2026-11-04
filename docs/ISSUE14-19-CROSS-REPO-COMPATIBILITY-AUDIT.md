@@ -2,8 +2,8 @@
 This report audits the coordinated draft stack without merging PRs or changing converter behavior. It distinguishes verified conversion/schema behavior from intended semantics and runtime gaps. The machine-readable matrix is `docs/metadata/compatibility-audit.json`.
 ## Executive result
 * Selector inventory reconciles to **141 total / 28 resolved / 113 unresolved**.
-* The resolved selector contract shape is structurally tested, but direct tools execution is **blocked by the tools frozen snapshot pin** (145 current JSON files and 35 root schemas versus the tools expectation of 143 and 34).
-* The accepted mapping update now emits `filepath`, `path`, and `filename` for all nine affected filesystem selectors; no aliases are introduced.
+* The resolved selector contract shape and direct tools compatibility are now **verified** against the accepted Candidate-A snapshot (145 JSON files, 35 roots, 658 references).
+* The converter mapping and native emission now use the owner-approved OVAL names `filepath`, `path`, and `filename` for all nine filesystem selector contracts. The source crosswalk may still mention OVAL XML acquisition names such as `full_path`, `directory`, and `name`; those source names are not native aliases.
 * All seven retained Variable forms are compared. `concat`, `regex_capture`, `merge`, and `unique` are structurally bounded in converter output; no evaluator was found, so Cartesian products, casts, ordering, regex execution, statuses, and runtime errors remain unverified.
 ## Pins and coordinated stack
 * OVAL 5.12.3: `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`; XSD SHA-256 `06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc`.
@@ -12,7 +12,7 @@ This report audits the coordinated draft stack without merging PRs or changing c
 * Draft stack: [#15](https://github.com/vanderpol/scap-ng/pull/15), [#16](https://github.com/vanderpol/scap-ng/pull/16), [#17](https://github.com/vanderpol/scap-ng/pull/17), [#18](https://github.com/vanderpol/scap-ng/pull/18), and [#20](https://github.com/vanderpol/scap-ng/pull/20); Issue [#19](https://github.com/vanderpol/scap-ng/issues/19). None is merged by this work. The tools function-adapter comparison is [tools PR #16](https://github.com/vanderpol/scap-ng-tools/pull/16).
 ## Selector compatibility matrix
 
-`Schema key` is the current resolved native selector name. `Converter key` is the key selected by `mapping.native.selector_map` in `v04_direct_converter.py` before schema validation. “Mapping/emission key match” is not runtime proof.
+`Schema key` is the current resolved native selector name. `Converter key` is the key selected by `mapping.native.selector_map` in `v04_direct_converter.py` before schema validation. “Verified native key match” proves emitted YAML vocabulary and schema acceptance; it is not scanner/runtime proof.
 
 | Capability | Schema key | Operators / type | Null / enum | Converter key | Result |
 |---|---|---|---|---|---|
@@ -22,18 +22,18 @@ This report audits the coordinated draft stack without merging PRs or changing c
 | `linux.systemdunitdependency` | `unit` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `unit` | structural key match |
 | `linux.systemdunitproperty` | `property` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `property` | structural key match |
 | `linux.systemdunitproperty` | `unit` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `unit` | structural key match |
-| `unix.file` | `filename` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `filename` | mapping/emission key match |
-| `unix.file` | `filepath` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `filepath` | mapping/emission key match |
-| `unix.file` | `path` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `path` | mapping/emission key match |
+| `unix.file` | `filename` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `filename` | verified native key match |
+| `unix.file` | `filepath` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `filepath` | verified native key match |
+| `unix.file` | `path` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `path` | verified native key match |
 | `unix.interface` | `name` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `name` | structural key match |
 | `unix.password` | `username` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `username` | structural key match |
 | `unix.shadow` | `username` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `username` | structural key match |
-| `windows.file` | `filename` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `filename` | mapping/emission key match |
-| `windows.file` | `filepath` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `filepath` | mapping/emission key match |
-| `windows.file` | `path` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `path` | mapping/emission key match |
-| `windows.fileeffectiverights` | `filename` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `filename` | mapping/emission key match |
-| `windows.fileeffectiverights` | `filepath` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `filepath` | mapping/emission key match |
-| `windows.fileeffectiverights` | `path` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `path` | mapping/emission key match |
+| `windows.file` | `filename` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `filename` | verified native key match |
+| `windows.file` | `filepath` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `filepath` | verified native key match |
+| `windows.file` | `path` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `path` | verified native key match |
+| `windows.fileeffectiverights` | `filename` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `filename` | verified native key match |
+| `windows.fileeffectiverights` | `filepath` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `filepath` | verified native key match |
+| `windows.fileeffectiverights` | `path` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `path` | verified native key match |
 | `windows.fileeffectiverights` | `trustee_sid` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `trustee_sid` | structural key match |
 | `windows.ntuser` | `key` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | no | `key` | structural key match |
 | `windows.ntuser` | `name` | `equals, not_equal, case_insensitive_equals, case_insensitive_not_equal, matches_regex` / `string` | yes | `name` | structural key match |
@@ -74,7 +74,7 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 ## Restrictions and compatibility risks
 
 * Resolved selector restrictions are field-specific string operators, explicit enum values for registry hives, and nullable higher-level selectors. Existing schema tests cover positive, negative, boundary, list/Variable, nullability, unknown key, and legacy `pattern_match` cases.
-* The nine filesystem key differences are resolved in the canonical mapping candidate. Direct tools execution remains pending the separate tools snapshot/semantic-pack repin.
+* The nine filesystem selector mismatches are resolved in the coordinated candidate: the converter emits the canonical native keys and the direct YAML/schema regression tests validate them. Pre-change `full_path`/`directory`/`name` output remains recorded only as migration evidence and is not accepted as a native alias.
 * Tools also fail closed on unproved cross-datatype Variable operands and have no runtime evaluator. These are converter qualification boundaries, not new schema semantics.
 ## Evidence and test results
 
@@ -82,7 +82,7 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 - `python tools/generate_docs.py --check`
 - `python -m unittest tests.test_compatibility_audit tests.test_schema_integrity tests.test_generated_documentation tests.test_variable_function_documentation -v (16 tests passed)`
 - `python -m unittest discover -s tests -v (27 tests passed with declared dependencies installed)`
-- Tools: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m unittest discover -s tests -v (14 tests run; 1 import error: missing referencing; 5 fixture-dependent suites skipped).
+- Tools: SCAP_NG_SCHEMA_ROOT=<accepted mapping candidate> PYTHONPATH=src python -m unittest discover -s tests -v: 18 passed, 4 fixture-dependent suites skipped; filesystem compatibility tests passed.
 - Existing `tests/test_native_selector_contracts.py` is the positive/negative/boundary contract suite when optional Draft 2020-12 dependencies (`jsonschema` and `referencing`) are installed.
 - No destructive commands, merges, converter edits, schema repins, or editor behavior changes were made.
 ## Acceptance artifacts
@@ -90,13 +90,13 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 * Filesystem alternatives: `docs/evidence/issue21/filesystem-selector-alternatives/`. Candidate A validates; Candidate B and the pre-change tools emission remain rejected.
 * Owner checklist and merge order: `docs/ISSUE14-19-OWNER-ACCEPTANCE-CHECKLIST.md`.
 * Proposed multi-component `unique` shape remains owner-review only: additive `unique: [expression, ...]`; no grammar change was made.
-* Current schema candidate digest after the approved mapping update: `0590d688edfe9f6bfcb0b3a849706dc7b2ce3e5eefbc9421c7fbb0caf0087a71`; final source commit and editor manifest remain pending tools repin/regeneration.
+* Verified candidate pins: schema source commit `7e38222494ee92a9a5584e2879d1688632bb21a5`, schema digest `e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`, tools semantic pack `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d`, and editor-pack manifest `e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd` over 236 resources.
 
 ## Owner review queue
 
 1. **GAP-SEL-01 (resolved)** — Owner-approved Candidate A names are now canonical in the three affected SCAP-NG mappings; converter output and selector contracts use filepath/path/filename for all nine selectors. **Decision:** No alias or rename; retain the approved OVAL names.
 1. **GAP-VAR-01 (owner_review)** — unique is narrowed to one expression in active schema and converter while pinned OVAL UniqueFunctionType permits one or more components. **Decision:** Approve the narrowing or authorize a semantics-preserving multi-component representation.
 1. **GAP-VAR-02 (qualification)** — No runtime proof for Cartesian products, cast execution, regex dialect/first-match behavior, unique ordering, merge sorting, missing values, statuses, or errors. **Decision:** Add evaluator/conformance vectors before claiming runtime parity.
-1. **GAP-SNAP-01 (coordination)** — Tools snapshot pin is older than the current SCAP-NG stack. **Decision:** Repin tools only as a separately reviewed compatibility change; this audit does not alter the pin.
+1. **GAP-SNAP-01 (resolved)** — The tools snapshot and semantic pack now verify against the accepted Candidate-A SCAP-NG schema; editor-pack regeneration also passed with 236 resources. **Decision:** Keep the exact source/digest/pack pins and update the separate tools PR.
 
-The key vocabulary decision is resolved to Candidate A. The `unique` arity, tools snapshot repin, and runtime conformance remain explicit review/qualification items; no grammar or runtime claims are added.
+The key vocabulary and snapshot gate are resolved for this candidate. Preserve the approved 0.4.0 schema; the `unique` arity and runtime conformance gaps remain explicit owner-review/qualification items.

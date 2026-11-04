@@ -157,12 +157,12 @@ aliases are introduced.
 
 | Audit boundary | Value |
 | --- | --- |
-| Candidate source commit | pending final mapping-branch commit |
+| Candidate source commit | `7e38222494ee92a9a5584e2879d1688632bb21a5` |
 | Flat JSON family | 145 files |
 | Root schemas | 35 |
 | Root schema `$ref` occurrences | 658 |
-| Aggregate SHA-256 | `0590d688edfe9f6bfcb0b3a849706dc7b2ce3e5eefbc9421c7fbb0caf0087a71` |
-| Editor candidate pack manifest | pending tools/VS Code regeneration |
+| Aggregate SHA-256 | `e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5` |
+| Editor candidate pack manifest | `e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd` (236 resources) |
 
 The earlier 143-file, 34-root, 242-reference values above remain historical
 pre-selector/amendment boundaries and are not relabeled. The nine filesystem
