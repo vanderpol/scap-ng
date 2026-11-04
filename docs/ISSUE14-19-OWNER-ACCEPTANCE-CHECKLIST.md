@@ -101,7 +101,7 @@ checkout: it expected 143 JSON files, 34 roots, 242 root references, and digest
 separate tools candidate is now repinned and verified against 145 JSON files,
 35 roots, 658 root references, and digest
 `e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`; its
-semantic pack digest is `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d`.
+semantic pack digest is `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d` from tools commit `3ba3cda8506a3973a63ca5b509e771fb9cd511b0`.
 
 Provenance records the same current candidate and historical boundary in `docs/PROVENANCE.md` under “Current coordinated selector/function draft”.
 
