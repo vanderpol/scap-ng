@@ -17,10 +17,10 @@ capability catalog, then by capability importance:
 | `windows.regkeyeffectiverights` | 22 | 3 |
 | `windows.file` | 19 | 3 |
 | `windows.ntuser` | 15 | 2 |
-| **Batch total** | **103** | **13** |
+| **Batch total** | **103** | **15** |
 
 The count above is the sum of capability uses, not selector contracts. This
-batch resolves **13 selectors**. The repository inventory is now **19 resolved
+batch resolves **15 selectors**. The repository inventory is now **19 resolved
 and 122 unresolved of 141 total**; the original baseline was 4 resolved and
 137 unresolved.
 
