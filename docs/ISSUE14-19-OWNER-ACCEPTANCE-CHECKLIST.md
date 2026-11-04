@@ -8,16 +8,18 @@ not merge any PR and does not select a filesystem naming candidate.
 Recommended order after owner review:
 
 1. **PR #15** — native selector baseline from `main`.
-2. **PR #17** — filesystem/Windows selector batch, based on #15.
-3. **PR #18** — next selector batch, based on #17.
-4. **PR #20** — Issue #19 retained-function documentation, based on #18.
-5. **PR #21** — cross-repository compatibility audit and this acceptance evidence, based on #20.
-6. **PR #16** is semantically independent documentation, but is **not mergeable as-is** beside #15: it conflicts in frozen generated documentation, `tests/test_schema_integrity.py`, and `tools/generate_docs.py`. Rebase it onto the accepted #15→#18 chain, regenerate all artifacts, and then place it before #20 or merge its resolved content during that chain.
+2. **PR #16 (rebased)** — author-facing documentation, regenerated on top of #15.
+3. **PR #17 (rebased)** — filesystem/Windows selector batch, on top of #16.
+4. **PR #18** — next selector batch, based on #17.
+5. **PR #20** — Issue #19 retained-function documentation, based on #18.
+6. **PR #21** — cross-repository compatibility audit and this acceptance evidence, based on #20.
 
-The chained pairs #15→#17→#18→#20→#21 are ancestry-clean. The only
-identified textual conflict is #16 against the selector chain; it is caused by
-both branches updating frozen counts/digests and generated outputs, not by a
-semantic disagreement in the authoring prose.
+PR #16 is semantically independent documentation, but is **not mergeable as-is**:
+it conflicts with #15 in frozen generated documentation,
+`tests/test_schema_integrity.py`, and `tools/generate_docs.py`. Rebase #16
+onto #15, regenerate all artifacts, then rebase #17 onto that combined result.
+The conflict is caused by both branches updating frozen counts/digests and
+generated outputs, not by a semantic disagreement in the authoring prose.
 
 ## Acceptance status
 
