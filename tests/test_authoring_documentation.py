@@ -62,6 +62,19 @@ class AuthoringDocumentationTests(unittest.TestCase):
         visit(document)
         self.assertEqual(missing, [])
 
+    def test_variable_expression_descriptions_match_expression_semantics(self):
+        document = json.loads((ROOT / 'variable-expression.schema.json').read_text())
+        expressions = document['$defs']['expression']['oneOf']
+        regex = expressions[4]['properties']['regex_capture']['properties']
+        merge = expressions[6]['properties']['merge']['properties']
+        values = expressions[2]['properties']['values']['properties']
+        self.assertEqual(regex['value']['title'], 'Input expression')
+        self.assertIn('capture pattern', regex['value']['description'])
+        self.assertEqual(merge['values']['title'], 'Values expression')
+        self.assertIn('combine into one string', merge['values']['description'])
+        self.assertEqual(values['field']['title'], 'Collected field')
+        self.assertIn('collected field', values['field']['description'])
+
     def test_documentation_audit_covers_every_schema_root(self):
         roots = sorted(ROOT.glob('*.schema.json'))
         self.assertEqual(len(roots), 34)
