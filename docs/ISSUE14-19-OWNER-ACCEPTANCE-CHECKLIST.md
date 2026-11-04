@@ -27,22 +27,21 @@ generated outputs, not by a semantic disagreement in the authoring prose.
 |---|---|---|
 | #15 | Acceptable pending selector-baseline approval | Confirm the reviewed operator/value/nullability restrictions and retain the 0.4.0 baseline. |
 | #16 | Rebase/regenerate before merge | Resolve frozen-artifact conflicts; accept documentation-only changes separately from grammar decisions. |
-| #17 | Acceptable after #15 and naming decision | Choose whether its public filesystem names remain provisional A; do not merge a silent alias. |
+| #17 | Acceptable after #15 and approved mapping update | Candidate A is now canonical; retain the names without aliases. |
 | #18 | Acceptable after #17 | Confirm its nine-selector batch and generated count reconciliation. |
 | #20 | Documentation-safe, grammar unchanged | Decide whether the documented `unique` arity gap is acceptable for now. |
-| #21 | Review report/tests safe after #20 | Record owner decisions for filesystem naming, tools repin, and runtime qualification. |
+| #21 | Review report/tests safe after #20 | Filesystem naming is resolved to A; tools repin and runtime qualification remain tracked. |
 
 No PR in this stack should be merged while it is marked draft or while its
 base branch omits the prior schema/integrity changes.
 
 ## Filesystem naming decision
 
-The current public overlay uses Candidate A (`filepath` / `path` / `filename`).
-The converter mapping at `scap-ng-tools@1f4f74d` emits
-`full_path` / `directory` / `name`. Candidate B is
-`full_path` / `directory` / `filename`; it therefore still requires a
-coordinated converter/mapping change for the final component. Neither option
-is implemented here.
+The owner-approved Candidate A (`filepath` / `path` / `filename`) is now
+canonical in the three affected SCAP-NG mappings. The pre-change converter
+snapshot emitted `full_path` / `directory` / `name`; the separate tools PR
+updates its snapshot/mappings so the converter emits Candidate A. Candidate B
+is not implemented and no aliases are introduced.
 
 Representative assessments and expected outcomes are in
 `docs/evidence/issue21/filesystem-selector-alternatives/`:
@@ -53,9 +52,9 @@ Representative assessments and expected outcomes are in
 * `tools-emission.assessment.yaml` records the exact current converter shape
   and is intentionally rejected by the current public overlay.
 
-Recommendation: **do not add permissive aliases**. Select one vocabulary,
-update the canonical mappings and converter snapshot in one reviewed change,
-then migrate/regenerate converted content and provenance together.
+Recommendation: **retain Candidate A and do not add permissive aliases**. The
+canonical mapping update and converter snapshot repin remain separate reviewed
+changes; migrate/regenerate converted content and provenance together.
 
 ## `unique` arity proposal
 
@@ -104,20 +103,23 @@ Provenance records the same current candidate and historical boundary in `docs/P
 
 ## VS Code editor pin
 
-The exact current PR #21 candidate commit required by the editor's offline
-schema pack is:
+The current schema candidate commit after the approved mapping update is
+recorded by the mapping PR; the editor's offline pack must be regenerated from
+that exact commit after the tools repin. The pre-mapping PR #21 candidate was:
 
 ```
 7b9b61108aa30a601828268576308e510477094e
 ```
 
-The authoritative values for the current candidate are:
+The pre-mapping candidate values were:
 
 * schema digest: `2adf88f5c1fd950e997579c00064388b5f12e9e29cde38075bf75b76d1f25843`
 * JSON/root/reference counts: `145 / 35 / 652`
 * editor candidate pack manifest SHA-256: `2aa28f9926d4d7774edcf48b991f1f48b121e34a7dce9006b1db129a6301727e`
 * stable rollback commit: `463675f3b931e596c922352a131cb3c515ab2265`
 
-Final editor metadata must use the full values above. If #16 is accepted or A/B changes are made, this commit and
-manifest must be replaced with the new combined schema commit; the editor must
-never pin a moving branch or an unmerged draft.
+The accepted mapping candidate now has schema digest
+`0590d688edfe9f6bfcb0b3a849706dc7b2ce3e5eefbc9421c7fbb0caf0087a71` and
+`145 / 35 / 658` JSON/root/reference counts. Its exact final source commit
+and editor-pack manifest remain pending the separate tools regeneration. The
+editor must never pin a moving branch or an unmerged draft.

@@ -85,21 +85,13 @@ class CompatibilityAuditTests(unittest.TestCase):
             if emitted != row["selector"]:
                 mismatches.append((row["capability"], row["selector"], emitted))
         self.assertEqual(len(self.audit["selector_matrix"]), 28)
-        self.assertEqual(len(mismatches), 9)
-        self.assertEqual(
-            set(mismatches),
-            {
-                ("unix.file", "filepath", "full_path"),
-                ("unix.file", "path", "directory"),
-                ("unix.file", "filename", "name"),
-                ("windows.file", "filepath", "full_path"),
-                ("windows.file", "path", "directory"),
-                ("windows.file", "filename", "name"),
-                ("windows.fileeffectiverights", "filepath", "full_path"),
-                ("windows.fileeffectiverights", "path", "directory"),
-                ("windows.fileeffectiverights", "filename", "name"),
-            },
-        )
+        self.assertEqual(mismatches, [])
+        for capability in ("unix.file", "windows.file", "windows.fileeffectiverights"):
+            rows = [row for row in self.audit["selector_matrix"] if row["capability"] == capability]
+            self.assertEqual(
+                {row["selector"] for row in rows if row["selector"] in {"filepath", "path", "filename"}},
+                {"filepath", "path", "filename"},
+            )
 
     def test_all_retained_forms_and_runtime_boundaries_are_explicit(self):
         self.assertEqual(

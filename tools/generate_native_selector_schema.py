@@ -66,6 +66,17 @@ def object_schema(capability, selectors, mapping):
         'filters': {'type': 'array', 'minItems': 1, 'items': {'$ref': 'capability-common.schema.json#/$defs/state_filter'}},
         **selector_props,
     }
+    # File selectors are acquisition keys, not the whole Object grammar. The
+    # converter materializes OVAL FileBehaviors' effective filesystem scope
+    # and, when requested, explicit traversal. Keep those source-equivalent
+    # controls in the selector overlay so converted Objects validate without
+    # inventing defaults or editor behavior.
+    traversal = mapping.get('native', {}).get('traversal_definition')
+    if traversal in ('file_traversal', 'windows_file_traversal'):
+        props['filesystem'] = {'$ref': 'capability-common.schema.json#/$defs/filesystem_scope'}
+        props['traversal'] = {
+            '$ref': f'capability-common.schema.json#/$defs/{traversal}'
+        }
     return defs, {
         'oneOf': [
             {'$ref': 'capability-common.schema.json#/$defs/object_reference'},
