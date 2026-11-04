@@ -50,9 +50,13 @@ def object_schema(capability, selectors, mapping):
     defs = {}
     prefix = capability.replace('.', '_')
     for field, contract in selectors.items():
-        enum = mapping.get('native', {}).get('selector_value_enums', {}).get(field)
+        mapped_field = mapping.get('native', {}).get('selector_map', {}).get(field, field)
+        enum = (mapping.get('native', {}).get('selector_value_enums', {}).get(field)
+                or mapping.get('native', {}).get('selector_value_enums', {}).get(mapped_field))
         defs[f'{prefix}_{field}_selector'] = selector_predicate(contract, enum)
-    nullable = set(mapping.get('native', {}).get('nullable_selectors', []))
+    nullable = set(mapping.get('native', {}).get('nullable_selectors', [])) | {
+        field for field, contract in selectors.items() if contract.get('nullable', False)
+    }
     selector_props = {}
     for field in selectors:
         ref = {'$ref': f'#/$defs/{prefix}_{field}_selector'}
@@ -99,8 +103,10 @@ def build():
         if unknown:
             raise SystemExit(f'{capability}: resolved unknown selectors: {sorted(unknown)}')
         for field in sorted(selector_map):
-            mapping_types = native.get('field_datatypes', {}).get(field, [])
-            enums = native.get('selector_value_enums', {}).get(field, [])
+            mapped_field = selector_map.get(field, field)
+            mapping_types = native.get('field_datatypes', {}).get(mapped_field, [])
+            enums = (native.get('selector_value_enums', {}).get(field)
+                     or native.get('selector_value_enums', {}).get(mapped_field, []))
             if field in selected:
                 contract = selected[field]
                 if not contract['operators'] or not set(contract['operators']) <= native_tokens:
@@ -121,13 +127,33 @@ def build():
                 'allowed_operators': operators,
                 'value_types': mapping_types,
                 'enum': enums or None,
-                'nullable': field in native.get('nullable_selectors', []),
+                'nullable': selected.get(field, {}).get('nullable', field in native.get('nullable_selectors', [])) if field in selected else field in native.get('nullable_selectors', []),
                 'reason': notes,
             })
         if selected:
             local_defs, obj = object_schema(capability, selected, mapping)
             defs.update(local_defs)
             objects[f'{capability.replace(".", "_")}_object'] = obj
+    generated_total = len(inventory)
+    generated_resolved = sum(item['status'] == 'resolved' for item in inventory)
+    generated_unresolved = sum(item['status'] == 'unresolved' for item in inventory)
+    source_resolved = sum(len(contract.get('selectors', {}))
+                          for contract in resolved.values())
+    if (generated_total != generated_resolved + generated_unresolved
+            or generated_resolved != source_resolved):
+        raise SystemExit(
+            'selector inventory reconciliation failed: '
+            f'generated={generated_total}/{generated_resolved}/{generated_unresolved}, '
+            f'source_resolved={source_resolved}')
+    batch = source.get('batch')
+    batch_actual = None
+    if batch:
+        batch_actual = sum(len(source['resolved'].get(cap, {}).get('selectors', {}))
+                           for cap in batch.get('resolved_capabilities', []))
+        if batch_actual != batch.get('selector_count'):
+            raise SystemExit(
+                'selector batch accounting mismatch: '
+                f'declared={batch.get("selector_count")}, actual={batch_actual}')
     output = {
         '$schema': 'https://json-schema.org/draft/2020-12/schema',
         '$id': 'https://scap-ng.dev/schema/v0.4.0/native-selector.schema.json',
@@ -153,7 +179,18 @@ def build():
         'resolved_capabilities': sorted(resolved),
         'selector_count': len(inventory),
         'resolved_count': sum(i['status'] == 'resolved' for i in inventory),
-        'unresolved_count': sum(i['status'] == 'unresolved' for i in inventory),
+        'unresolved_count': generated_unresolved,
+        'inventory_reconciliation': {
+            'reconciled': True,
+            'generated_contract_inventory': {
+                'selector_count': generated_total,
+                'resolved_count': generated_resolved,
+                'unresolved_count': generated_unresolved,
+            },
+            'source_resolved_count': source_resolved,
+            'batch_declared_selector_count': batch.get('selector_count') if batch else None,
+            'batch_actual_selector_count': batch_actual,
+        },
         'pattern_match_boundary': source['operator_vocabulary']['pattern_match_boundary'],
         'selectors': inventory,
     }
