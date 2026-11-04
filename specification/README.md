@@ -84,7 +84,7 @@ Authors edit Input declarations, grouped Test requirements, presence guards and 
 
 The [constructed authoring and compiled examples](../examples/organizational-input/README.md) extend the existing [optional Assessment](../examples/windows-optional-organizational-input.assessment.yaml). Optional omission, supplied empty populations and indeterminate provision remain distinct; no implicit value or default is introduced. All branches close statically, and optional value use requires positive guard dominance.
 
-Historical 0.3 `test/state/state_slot` discovery stays behind version-directed compatibility checks. Current native Assessments do not regain States. Historical Result `state_slot` and current Result A wire fields are preserved rather than reinterpreted or removed.
+Native 0.4 discovery uses compiler-derived `kind: value|presence` records with RFC 6901 `source_path` pointers relative to the selected Assessment body. Current native Assessments do not regain named States. OVAL source States remain source-fidelity/provenance concepts; they are not native 0.4 authoring fields.
 
 Implementation and coordinated compiler/converter/editor qualification remain tracked in [Issue #8](https://github.com/vanderpol/scap-ng/issues/8). This is an approved pre-release contract candidate, not a released or OVAL Board-approved specification or a scanner execution claim.
 

@@ -26,7 +26,7 @@ class NativeDiscoverySchema(unittest.TestCase):
         self.validator.validate(doc)
 
     def test_legacy_tuple_bad_kind_extra_fields_and_bad_pointer_escape_reject(self):
-        for use in ({'test':'registry-test','state':'synthetic-state','state_slot':'value'},
+        for use in ({'test':'registry-test','state':'synthetic-state'},
                     {'kind':'other','source_path':'/evaluate/if/input_provided'},
                     {'kind':'value','source_path':'/a~2b/input'},
                     {'kind':'value','source_path':'#/evaluate/if/input_provided'},
@@ -58,6 +58,14 @@ class NativeDiscoverySchema(unittest.TestCase):
         field=schema['properties']['organizational_input_requirements']
         self.assertTrue(field['readOnly']);self.assertNotIn('default',field)
         self.assertNotIn('organizational_input_requirements',schema['required'])
+
+    def test_current_result_has_no_retired_state_slot_field(self):
+        result = load(ROOT / 'assessment-result.schema.json')
+        properties = result['properties']['assessment_result']['properties']
+        consumed = properties['consumed_organizational_inputs']['items']['properties']
+        reason = properties['reason']['oneOf'][2]['properties']
+        self.assertNotIn('state_slot', consumed)
+        self.assertNotIn('state_slot', reason)
 
 
 if __name__=='__main__':unittest.main()
