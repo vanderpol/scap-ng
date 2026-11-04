@@ -167,6 +167,9 @@ class NativeSelectorContractTests(unittest.TestCase):
             ('windows.fileeffectiverights', 'trustee_sid'),
             ('windows.ntuser', 'key'),
             ('windows.regkeyeffectiverights', 'key'),
+            ('windows.service', 'service_name'),
+            ('unix.shadow', 'username'),
+            ('linux.systemdunitproperty', 'property'),
         ):
             with self.subTest(capability=capability, field=field):
                 self.assert_valid(self.batch_document(capability, {
@@ -175,6 +178,37 @@ class NativeSelectorContractTests(unittest.TestCase):
                 self.assert_valid(self.batch_document(capability, {
                     field: {'value_match': 'every', 'equals': ['one', 'two']}
                 }))
+
+    def test_next_high_usage_string_batch_positive_negative_boundaries(self):
+        batch = {
+            'windows.service': ('service_name',),
+            'unix.shadow': ('username',),
+            'unix.password': ('username',),
+            'unix.interface': ('name',),
+            'linux.dpkginfo': ('name',),
+            'linux.selinuxboolean': ('name',),
+            'linux.systemdunitdependency': ('unit',),
+            'linux.systemdunitproperty': ('unit', 'property'),
+        }
+        native_ops = ('equals', 'not_equal', 'case_insensitive_equals',
+                      'case_insensitive_not_equal', 'matches_regex')
+        for capability, fields in batch.items():
+            with self.subTest(capability=capability):
+                for field in fields:
+                    for operator in native_ops:
+                        self.assert_valid(self.batch_document(capability, {
+                            field: {operator: 'example-value'}
+                        }))
+                    for predicate in (
+                        {'equals': 7},
+                        {'equals': []},
+                        {'greater_than': 'example-value'},
+                        {'pattern_match': 'example-value'},
+                    ):
+                        with self.subTest(field=field, predicate=predicate):
+                            self.assert_invalid(self.batch_document(capability, {field: predicate}))
+                self.assert_invalid(self.batch_document(
+                    capability, {'unsupported_selector': {'equals': 'x'}}))
 
     def test_native_spelling_round_trips_without_rewriting(self):
         raw = (PROJECT / 'examples/linux-home-nosuid.assessment.yaml').read_text()
@@ -198,8 +232,22 @@ class NativeSelectorContractTests(unittest.TestCase):
             self.assertIn(f'{prefix}_object', generated['$defs'])
             for selector in contract['selectors']:
                 self.assertIn(f'{prefix}_{selector}_selector', generated['$defs'])
-        self.assertEqual(audit['resolved_count'], 19)
-        self.assertEqual(audit['unresolved_count'], 122)
+        self.assertEqual(audit['resolved_count'], 28)
+        self.assertEqual(audit['unresolved_count'], 113)
+        reconciliation = audit['inventory_reconciliation']
+        self.assertTrue(reconciliation['reconciled'])
+        self.assertEqual(reconciliation['generated_contract_inventory'], {
+            'selector_count': audit['selector_count'],
+            'resolved_count': audit['resolved_count'],
+            'unresolved_count': audit['unresolved_count'],
+        })
+        self.assertEqual(reconciliation['source_resolved_count'], audit['resolved_count'])
+        self.assertEqual(reconciliation['batches'], [
+            {'id': 'filesystem-and-windows-01', 'declared_selector_count': 15,
+             'actual_selector_count': 15, 'reconciled': True},
+            {'id': 'unix-and-windows-02', 'declared_selector_count': 9,
+             'actual_selector_count': 9, 'reconciled': True},
+        ])
         self.assertGreater(audit['unresolved_count'], 0,
                            'ambiguous mappings must remain visibly unresolved')
         for item in audit['selectors']:

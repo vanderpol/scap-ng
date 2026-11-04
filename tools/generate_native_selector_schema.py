@@ -145,15 +145,22 @@ def build():
             'selector inventory reconciliation failed: '
             f'generated={generated_total}/{generated_resolved}/{generated_unresolved}, '
             f'source_resolved={source_resolved}')
-    batch = source.get('batch')
-    batch_actual = None
-    if batch:
+    batches = source.get('batches') or ([source['batch']] if source.get('batch') else [])
+    batch_reconciliations = []
+    for batch in batches:
         batch_actual = sum(len(source['resolved'].get(cap, {}).get('selectors', {}))
                            for cap in batch.get('resolved_capabilities', []))
         if batch_actual != batch.get('selector_count'):
             raise SystemExit(
                 'selector batch accounting mismatch: '
+                f'{batch.get("id", "unknown")}: '
                 f'declared={batch.get("selector_count")}, actual={batch_actual}')
+        batch_reconciliations.append({
+            'id': batch.get('id'),
+            'declared_selector_count': batch.get('selector_count'),
+            'actual_selector_count': batch_actual,
+            'reconciled': True,
+        })
     output = {
         '$schema': 'https://json-schema.org/draft/2020-12/schema',
         '$id': 'https://scap-ng.dev/schema/v0.4.0/native-selector.schema.json',
@@ -188,8 +195,7 @@ def build():
                 'unresolved_count': generated_unresolved,
             },
             'source_resolved_count': source_resolved,
-            'batch_declared_selector_count': batch.get('selector_count') if batch else None,
-            'batch_actual_selector_count': batch_actual,
+            'batches': batch_reconciliations,
         },
         'pattern_match_boundary': source['operator_vocabulary']['pattern_match_boundary'],
         'selectors': inventory,
