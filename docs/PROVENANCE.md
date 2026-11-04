@@ -95,3 +95,40 @@ unreviewed or missing acquisition instructions and vendor references are
 identified as coverage gaps. `independent.shellcommand`, `windows.appcmd`,
 and `windows.appcmdlistconfig` are explicitly prioritized for future research.
 
+
+## Issue #14 native Object selector contract candidate — 2026-11-04
+
+This draft candidate preserves the approved 0.4.0 baseline while adding a
+capability-conditioned native selector overlay. The reviewed contract closes
+`windows.registry.hive`, `windows.registry.key`, `windows.registry.name`, and
+`linux.partition.mount_point`; the other **137 of 141** supported selector
+fields remain explicitly unresolved and retain the generic baseline. No
+operator subset is inferred from `selector_source_operations` alone.
+
+`matches_regex` is the native 0.4 Object selector spelling. `pattern_match` is
+kept only in the source/migration vocabulary and is not accepted as a native
+Object property. Hive source case-insensitive equality is crosswalked to the
+canonical `equals` enum operation; the generic case switch is intentionally not
+exposed for hive.
+
+The input contract is `schema/native-selector-contracts.json`; the deterministic
+output is `schema/native-selector.schema.json`, checked by
+`tools/generate_native_selector_schema.py --check`. The canonical
+`assessment-language.schema.json` applies the generated definitions only when
+the Test capability is one of the reviewed capabilities. This candidate changes
+schema acceptance and editor completion for those selectors, but does not claim
+scanner implementation coverage or prove lossless conversion of the unresolved
+65-benchmark corpus. Existing examples, manual Assessments, proofs and published
+artifacts were not rewritten or deleted.
+
+| Audit boundary | Value |
+| --- | --- |
+| Prior approved 0.4.0 JSON family | `c6414084677c061d205c2f4010ac915dc466adcc`, `ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a` |
+| Candidate JSON family | 145 files, 35 root schemas, 296 `$ref` occurrences, `2de36b96ccf3771ee2d849ee73cf905a11db936064fb7b6b9458fd985e902156` |
+| Selector audit | 141 supported selector fields: 4 resolved, 137 unresolved |
+
+This is a draft PR candidate for owner review. It must not be merged as a
+compatibility-breaking schema amendment without owner approval. The editor
+handoff is the exact commit containing this candidate schema family and
+`native-selector-audit.json`; no `.external/editor-pack` or VS Code repository
+changes are included here.

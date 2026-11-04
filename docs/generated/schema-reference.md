@@ -6,7 +6,7 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 The JSON Schema `$id` URIs retain their versioned `v0.4.0` identity. The physical repository layout is flat under `schema/`; resolvers should use the pinned release snapshot rather than fetching unversioned files over the network.
 
-## Root schemas (34)
+## Root schemas (35)
 
 | Schema | Title | Schema description |
 | --- | --- | --- |
@@ -29,6 +29,7 @@ The JSON Schema `$id` URIs retain their versioned `v0.4.0` identity. The physica
 | [`item-report.schema.json`](../../schema/item-report.schema.json) | Draft derived Item report 0.4.0 | An explicitly marked projection of evaluated/redacted canonical Items. Not a replacement Assessment Result. |
 | [`manual-assessment-result.schema.json`](../../schema/manual-assessment-result.schema.json) | SCAP-NG Manual Assessment Result v0.4.0 high-level draft | Disposable high-level schema for a self-contained manual determination and its provenance. |
 | [`manual-assessment.schema.json`](../../schema/manual-assessment.schema.json) | SCAP-NG Manual Assessment v0.4.0 high-level draft | Disposable high-level schema for simple, traceable human determinations. Intentionally avoids OCIL-style questionnaire/workflow graphs. |
+| [`native-selector.schema.json`](../../schema/native-selector.schema.json) | SCAP-NG 0.4 capability-specific native Object selectors | Generated capability-specific selector overlay. Resolved entries close the operator vocabulary and value constraints; unresolved mappings are intentionally not guessed. |
 | [`organizational-input.schema.json`](../../schema/organizational-input.schema.json) | SCAP-NG Organizational Input Set v0.4.0 draft | External organization-supplied policy data for Parameters intentionally left unresolved by a Benchmark publisher. |
 | [`package-manifest.schema.json`](../../schema/package-manifest.schema.json) | SCAP-NG package manifest v0.4.0 | Pre-alpha manifest for the SCAP-NG logical object graph. Container member paths are storage bindings only; logical IDs are authoritative. |
 | [`reported-elements.schema.json`](../../schema/reported-elements.schema.json) | Draft Test reported elements 0.4.0 | Reporting selection only. Authors SHALL select all, compared, or an explicit field list. This is not redaction or an Object selector. |

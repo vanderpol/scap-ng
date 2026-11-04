@@ -1,0 +1,158 @@
+# Issue #14 native Object selector audit
+
+This audit is generated from the supported capability mappings and the reviewed
+native contract input in `schema/native-selector-contracts.json`. It is a
+schema-contract inventory, not a scanner-implementation claim.
+
+Resolved selectors are enforced by `schema/native-selector.schema.json` and by
+capability-conditioned references in the canonical Assessment schema. An
+unresolved selector deliberately retains the generic 0.4 baseline; no operator
+restriction is inferred from OVAL prose or `selector_source_operations`.
+
+Native 0.4 Object selectors serialize `matches_regex`. The legacy/source
+migration spelling `pattern_match` remains a crosswalk value and is not a
+native selector property. This boundary is intentional and tested.
+
+| Capability | Selector | Status | Allowed native operators | Value types | Enum | Nullable | Notes |
+|---|---|---|---|---|---|---|---|
+| `aix.fileset` | `flstinst` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `aix.fix` | `apar_number` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `asa.line` | `show_subcommand` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `file.hash` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `file.hash` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `file.hash` | `hash_type` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `file.hash` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.environmentvariable` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.environmentvariable` | `pid` | unresolved | — (unresolved) | `integer` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.textfilecontent` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.textfilecontent` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.textfilecontent` | `instance` | unresolved | — (unresolved) | `integer` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.textfilecontent` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.textfilecontent` | `pattern` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.xmlfilecontent` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.xmlfilecontent` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.xmlfilecontent` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.xmlfilecontent` | `xpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.yamlfilecontent` | `content` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.yamlfilecontent` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.yamlfilecontent` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.yamlfilecontent` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `independent.yamlfilecontent` | `yamlpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.bgpneighbor` | `neighbor` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.global` | `global_command` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.interface` | `name` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.line` | `show_subcommand` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.routingprotocolauthintf` | `interface` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.routingprotocolauthintf` | `protocol` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.section` | `section_command` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.snmpcommunity` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.snmpgroup` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.snmphost` | `host` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `ios.snmpuser` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.bgpneighbor` | `neighbor` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.global` | `global_command` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.interface` | `name` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.line` | `show_subcommand` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.routingprotocolauthintf` | `interface` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.routingprotocolauthintf` | `protocol` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.section` | `section_command` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.snmpcommunity` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.snmpgroup` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.snmphost` | `host` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `iosxe.snmpuser` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `junos.show` | `subcommand` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.dpkginfo` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.inetlisteningservers` | `local_address` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.inetlisteningservers` | `local_port` | unresolved | — (unresolved) | `integer` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.inetlisteningservers` | `protocol` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.kernelmodule` | `module_name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.partition` | `mount_point` | resolved | `equals`, `not_equal`, `case_insensitive_equals`, `case_insensitive_not_equal`, `matches_regex` | `string` | — | no | The native contract uses the string selector vocabulary. Source-specific conversion must retain the selected operation and does not infer a broader typed comparison. |
+| `linux.rpminfo` | `name` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifyfile` | `arch` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifyfile` | `epoch` | unresolved | — (unresolved) | `string`, `integer` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifyfile` | `filepath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifyfile` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifyfile` | `release` | unresolved | — (unresolved) | `string`, `version` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifyfile` | `version` | unresolved | — (unresolved) | `string`, `version` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifypackage` | `arch` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifypackage` | `epoch` | unresolved | — (unresolved) | `string`, `integer` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifypackage` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifypackage` | `release` | unresolved | — (unresolved) | `string`, `version` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.rpmverifypackage` | `version` | unresolved | — (unresolved) | `string`, `version` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.selinuxboolean` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.selinuxsecuritycontext` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.selinuxsecuritycontext` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.selinuxsecuritycontext` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.selinuxsecuritycontext` | `pid` | unresolved | — (unresolved) | `integer` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.systemdunitdependency` | `unit` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.systemdunitproperty` | `property` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `linux.systemdunitproperty` | `unit` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.accountinfo` | `username` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.authorizationdb` | `right_name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.authorizationdb` | `xpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.diskinfo` | `device_identifier` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.installhistory` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.keychain` | `filepath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.launchd` | `label` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.nvram` | `variable` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.plist` | `app_id` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.plist` | `filepath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.plist` | `xpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.pwpolicy` | `authenticator` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.pwpolicy` | `authenticator_password` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.pwpolicy` | `directory_node` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.pwpolicy` | `username` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.pwpolicy` | `xpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.systemprofiler` | `data_type` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `macos.systemprofiler` | `xpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `panos.config` | `xpath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.package` | `pkginst` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.package.ips` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.package.ips` | `publisher` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.package.ips` | `timestamp` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.package.ips` | `version` | unresolved | — (unresolved) | `version` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.smf` | `fmri` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.smfproperty` | `instance` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.smfproperty` | `property` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `solaris.smfproperty` | `service` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.file` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.file` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.file` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.interface` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.password` | `username` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.process` | `command_line` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.process` | `pid` | unresolved | — (unresolved) | `integer` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.shadow` | `username` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.sshd` | `filepath` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.sshd` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.symlink` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `unix.sysctl` | `name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmd` | `identifier` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmd` | `identifier_type` | unresolved | — (unresolved) | `string` | `Site`, `VDir`, `Apppool` | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmd` | `parameter` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmdlistconfig` | `identifier` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmdlistconfig` | `identifier_type` | unresolved | — (unresolved) | `string` | `Site`, `VDir`, `Webserver` | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmdlistconfig` | `parameter` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.appcmdlistconfig` | `section` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.file` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.file` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.file` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.fileeffectiverights` | `filename` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.fileeffectiverights` | `filepath` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.fileeffectiverights` | `path` | unresolved | — (unresolved) | not declared | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.fileeffectiverights` | `trustee_sid` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.group_sid` | `group_sid` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.ntuser` | `key` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.ntuser` | `name` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.registry` | `hive` | resolved | `equals` | `string` | `classes_root`, `current_config`, `current_user`, `current_user_local_settings`, `local_machine`, `users` | no | Hive names are canonical enum values. Case-insensitive source equality is normalized to the canonical enum equality operation; a generic case switch is not exposed. |
+| `windows.registry` | `key` | resolved | `equals`, `not_equal`, `case_insensitive_equals`, `case_insensitive_not_equal`, `matches_regex` | `string` | — | yes | Registry key identity is case-insensitive. The explicit operation remains part of the authored contract so source conversion and native evaluation can preserve intent. |
+| `windows.registry` | `name` | resolved | `equals`, `not_equal`, `case_insensitive_equals`, `case_insensitive_not_equal`, `matches_regex` | `string` | — | yes | Registry value-name identity is case-insensitive. The explicit operation remains part of the authored contract so source conversion and native evaluation can preserve intent. |
+| `windows.regkeyeffectiverights` | `hive` | unresolved | — (unresolved) | `string` | `classes_root`, `current_config`, `current_user`, `current_user_local_settings`, `local_machine`, `users` | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.regkeyeffectiverights` | `key` | unresolved | — (unresolved) | `string` | — | yes | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.regkeyeffectiverights` | `trustee_sid` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.service` | `service_name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.sid` | `trustee_name` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.sid_sid` | `trustee_sid` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.user_sid` | `user_sid` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.userright` | `userright` | unresolved | — (unresolved) | `string` | `SE_ASSIGNPRIMARYTOKEN_NAME`, `SE_AUDIT_NAME`, `SE_BACKUP_NAME`, `SE_CHANGE_NOTIFY_NAME`, `SE_CREATE_GLOBAL_NAME`, `SE_CREATE_PAGEFILE_NAME`, `SE_CREATE_PERMANENT_NAME`, `SE_CREATE_SYMBOLIC_LINK_NAME`, `SE_CREATE_TOKEN_NAME`, `SE_DEBUG_NAME`, `SE_ENABLE_DELEGATION_NAME`, `SE_IMPERSONATE_NAME`, `SE_INC_BASE_PRIORITY_NAME`, `SE_INCREASE_QUOTA_NAME`, `SE_INC_WORKING_SET_NAME`, `SE_LOAD_DRIVER_NAME`, `SE_LOCK_MEMORY_NAME`, `SE_MACHINE_ACCOUNT_NAME`, `SE_MANAGE_VOLUME_NAME`, `SE_PROF_SINGLE_PROCESS_NAME`, `SE_RELABEL_NAME`, `SE_REMOTE_SHUTDOWN_NAME`, `SE_RESTORE_NAME`, `SE_SECURITY_NAME`, `SE_SHUTDOWN_NAME`, `SE_SYNC_AGENT_NAME`, `SE_SYSTEM_ENVIRONMENT_NAME`, `SE_SYSTEM_PROFILE_NAME`, `SE_SYSTEMTIME_NAME`, `SE_TAKE_OWNERSHIP_NAME`, `SE_TCB_NAME`, `SE_TIME_ZONE_NAME`, `SE_TRUSTED_CREDMAN_ACCESS_NAME`, `SE_UNDOCK_NAME`, `SE_UNSOLICITED_INPUT_NAME`, `SE_BATCH_LOGON_NAME`, `SE_DENY_BATCH_LOGON_NAME`, `SE_DENY_INTERACTIVE_LOGON_NAME`, `SE_DENY_NETWORK_LOGON_NAME`, `SE_DENY_REMOTE_INTERACTIVE_LOGON_NAME`, `SE_DENY_SERVICE_LOGON_NAME`, `SE_INTERACTIVE_LOGON_NAME`, `SE_NETWORK_LOGON_NAME`, `SE_REMOTE_INTERACTIVE_LOGON_NAME`, `SE_SERVICE_LOGON_NAME` | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
+| `windows.wuaupdatesearcher` | `search_criteria` | unresolved | — (unresolved) | `string` | — | no | Native operator subset has not been reviewed; generic baseline is retained and no restriction is generated. |
