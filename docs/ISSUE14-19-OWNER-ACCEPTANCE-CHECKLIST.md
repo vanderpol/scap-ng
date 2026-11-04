@@ -98,6 +98,8 @@ it expects 143 JSON files, 34 roots, 242 root references, and digest
 current SCAP-NG candidate is 145 JSON files, 35 roots, 652 root references,
 and digest `2adf88f5c1fd950e997579c00064388b5f12e9e29cde38075bf75b76d1f25843`.
 
+Provenance records the same current candidate and historical boundary in `docs/PROVENANCE.md` under “Current coordinated selector/function draft”.
+
 ## VS Code editor pin
 
 The exact current PR #21 candidate commit required by the editor's offline
