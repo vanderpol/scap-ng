@@ -80,7 +80,8 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 
 - `python tools/generate_native_selector_schema.py --check`
 - `python tools/generate_docs.py --check`
-- `python -m unittest discover -s tests -v (13 tests run; 2 modules blocked by missing referencing dependency)`
+- `python -m unittest tests.test_compatibility_audit tests.test_schema_integrity tests.test_generated_documentation tests.test_variable_function_documentation -v (15 tests passed)`
+- `python -m unittest discover -s tests -v (17 tests discovered; 2 modules blocked by missing referencing dependency)`
 - Tools: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m unittest discover -s tests -v (14 tests run; 1 import error: missing referencing; 5 fixture-dependent suites skipped).
 - Existing `tests/test_native_selector_contracts.py` is the positive/negative/boundary contract suite when optional Draft 2020-12 dependencies (`jsonschema` and `referencing`) are installed.
 - No destructive commands, merges, converter edits, schema repins, or editor behavior changes were made.
