@@ -1,0 +1,24 @@
+# Observed scap-ng-tools emission at 1f4f74d; intentionally retained as evidence.
+# This is not asserted to validate against the current SCAP-NG public overlay.
+assessment:
+  id: issue21-filesystem-selector-tools-emission
+  version: 1
+  assessment_title: Current tools filesystem selector emission
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    file-selector-test:
+      test_title: Select one known Unix configuration file.
+      capability: unix.file
+      object:
+        full_path: {equals: /etc/ssh/sshd_config}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {type: {equals: regular}}
+      reported_elements: all
+  evaluate:
+    test: file-selector-test

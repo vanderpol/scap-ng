@@ -80,11 +80,18 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 
 - `python tools/generate_native_selector_schema.py --check`
 - `python tools/generate_docs.py --check`
-- `python -m unittest tests.test_compatibility_audit tests.test_schema_integrity tests.test_generated_documentation tests.test_variable_function_documentation -v (15 tests passed)`
-- `python -m unittest discover -s tests -v (17 tests discovered; 2 modules blocked by missing referencing dependency)`
+- `python -m unittest tests.test_compatibility_audit tests.test_schema_integrity tests.test_generated_documentation tests.test_variable_function_documentation -v (16 tests passed)`
+- `python -m unittest discover -s tests -v (27 tests passed with declared dependencies installed)`
 - Tools: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python -m unittest discover -s tests -v (14 tests run; 1 import error: missing referencing; 5 fixture-dependent suites skipped).
 - Existing `tests/test_native_selector_contracts.py` is the positive/negative/boundary contract suite when optional Draft 2020-12 dependencies (`jsonschema` and `referencing`) are installed.
 - No destructive commands, merges, converter edits, schema repins, or editor behavior changes were made.
+## Acceptance artifacts
+
+* Filesystem alternatives: `docs/evidence/issue21/filesystem-selector-alternatives/`. Candidate A validates; Candidate B and the observed tools emission are intentionally rejected until the naming decision.
+* Owner checklist and merge order: `docs/ISSUE14-19-OWNER-ACCEPTANCE-CHECKLIST.md`.
+* Proposed multi-component `unique` shape: additive `unique: [expression, ...]`, preserving existing one-expression content; proposal only.
+* Current editor candidate pin: `7b9b61108aa30a601828268576308e510477094e` with schema digest `2adf88f5c1fd950e997579c00064388b5f12e9e29cde38075bf75b76d1f25843`; it must be replaced after PR #16/naming decisions.
+
 ## Owner review queue
 
 1. **GAP-SEL-01 (owner_review)** — Nine filesystem selector keys emitted by the current tools mapping (full_path/directory/name) differ from the 0.4 public resolved contract keys (filepath/path/filename) for unix.file, windows.file, and the path/name portion of windows.fileeffectiverights. Direct execution against the current checkout is snapshot-blocked, so this is not silently repaired. **Decision:** Choose one canonical native key vocabulary and coordinate schema/mapping/converter migration; do not merge as a compatibility-neutral change.

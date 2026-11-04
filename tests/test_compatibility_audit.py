@@ -7,6 +7,10 @@ import json
 from pathlib import Path
 import unittest
 
+from jsonschema import Draft202012Validator
+import yaml
+from referencing import Registry, Resource
+
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -22,6 +26,20 @@ class CompatibilityAuditTests(unittest.TestCase):
         cls.selector_audit = load("docs/metadata/native-selector-audit.json")
         cls.contracts = load("schema/native-selector-contracts.json")
         cls.generated = load("schema/native-selector.schema.json")
+        resources = {}
+        schema_root = ROOT / "schema"
+        for path in sorted((*schema_root.glob("*.json"), *(schema_root / "capability-mappings").rglob("*.json"))):
+            document = json.loads(path.read_text(encoding="utf-8"))
+            if "$schema" not in document:
+                continue
+            resource = Resource.from_contents(document)
+            resources["https://scap-ng.dev/schema/v0.4.0/" + path.relative_to(schema_root).as_posix()] = resource
+            if "$id" in document:
+                resources[document["$id"]] = resource
+        cls.assessment_validator = Draft202012Validator(
+            load("schema/assessment.schema.json"),
+            registry=Registry().with_resources(resources.items()),
+        )
         cls.mappings = {
             path.stem: json.loads(path.read_text(encoding="utf-8"))
             for path in (ROOT / "schema/capability-mappings/supported").glob("*.json")
@@ -97,6 +115,17 @@ class CompatibilityAuditTests(unittest.TestCase):
         for axis in self.audit["semantic_axes"]:
             self.assertNotIn("runtime_verified", axis["status"])
         self.assertEqual(self.audit["snapshot_gate"]["status"], "blocked_for_direct_execution")
+
+    def test_filesystem_alternatives_have_recorded_compatibility_outcomes(self):
+        evidence = ROOT / "docs/evidence/issue21/filesystem-selector-alternatives"
+        valid = yaml.safe_load((evidence / "alternative-a.assessment.yaml").read_text())
+        self.assertEqual(list(self.assessment_validator.iter_errors(valid)), [])
+        for name in ("alternative-b.assessment.yaml", "tools-emission.assessment.yaml"):
+            with self.subTest(name=name):
+                candidate = yaml.safe_load((evidence / name).read_text())
+                errors = list(self.assessment_validator.iter_errors(candidate))
+                self.assertTrue(errors)
+                self.assertIn("full_path", errors[0].message)
 
     def test_source_resolved_count_remains_distinct_from_matrix_count(self):
         # The contract input and generated audit both cover the accumulated
