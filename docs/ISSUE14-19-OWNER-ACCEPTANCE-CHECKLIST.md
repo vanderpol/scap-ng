@@ -99,9 +99,9 @@ The historical tools baseline was intentionally blocked against the pre-mapping
 checkout: it expected 143 JSON files, 34 roots, 242 root references, and digest
 `ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a`. The
 separate tools candidate is now repinned and verified against 145 JSON files,
-35 roots, 658 root references, and digest
-`0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593`; its
-semantic pack digest is `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92` from tools commit `a208b7d78944b578906066815e2b43f563330806`.
+35 roots, 673 root references, and digest
+`d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d`; its
+semantic pack digest is `0f2de8d318ed5a8a102e51ffbcc09dedaac074a21b04dc86799b5e9f0b773114` from tools commit `a208b7d78944b578906066815e2b43f563330806`.
 
 Provenance records the same current candidate and historical boundary in `docs/PROVENANCE.md` under “Current coordinated selector/function draft”.
 
@@ -121,10 +121,10 @@ The pre-mapping candidate values were:
 * stable rollback commit: `463675f3b931e596c922352a131cb3c515ab2265`
 
 The verified coordinated candidate now has source commit
-`5a13698933c88ca1e271d635b9bee39af75bc027`, schema digest
-`0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593`, and
-`145 / 35 / 658` JSON/root/reference counts. The editor-pack manifest is
-`305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` over 236
+`b08d13ef857698068251ef64e8a3bf70db6e5a65`, schema digest
+`d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d`, and
+`145 / 35 / 673` JSON/root/reference counts. The editor-pack manifest is
+`3a844ac0cc2e2ed51bd3d2acf0cc684e731551287c8b5ce095b7ef54695b1181` over 236
 resources. The editor owner must consume these exact values; no VS Code files
 are changed here.
 

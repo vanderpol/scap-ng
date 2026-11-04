@@ -157,13 +157,13 @@ aliases are introduced.
 
 | Audit boundary | Value |
 | --- | --- |
-| Candidate source commit | `5a13698933c88ca1e271d635b9bee39af75bc027` |
+| Candidate source commit | `b08d13ef857698068251ef64e8a3bf70db6e5a65` |
 | Flat JSON family | 145 files |
 | Root schemas | 35 |
 | Root schema `$ref` occurrences | 658 |
-| Aggregate SHA-256 | `0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593` |
-| Tools compatibility candidate | `scap-ng-tools@a208b7d78944b578906066815e2b43f563330806` (semantic pack `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92`) |
-| Editor candidate pack manifest | `305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` (236 resources) |
+| Aggregate SHA-256 | `d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d` |
+| Tools compatibility candidate | `scap-ng-tools@a208b7d78944b578906066815e2b43f563330806` (semantic pack `0f2de8d318ed5a8a102e51ffbcc09dedaac074a21b04dc86799b5e9f0b773114`) |
+| Editor candidate pack manifest | `3a844ac0cc2e2ed51bd3d2acf0cc684e731551287c8b5ce095b7ef54695b1181` (236 resources) |
 
 The earlier 143-file, 34-root, 242-reference values above remain historical
 pre-selector/amendment boundaries and are not relabeled. The nine filesystem

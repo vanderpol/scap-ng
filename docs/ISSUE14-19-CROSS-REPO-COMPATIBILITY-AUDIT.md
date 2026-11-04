@@ -91,7 +91,7 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 * Filesystem alternatives: `docs/evidence/issue21/filesystem-selector-alternatives/`. Candidate A validates; Candidate B and the pre-change tools emission remain rejected.
 * Owner checklist and merge order: `docs/ISSUE14-19-OWNER-ACCEPTANCE-CHECKLIST.md`.
 * Proposed multi-component `unique` shape remains owner-review only: additive `unique: [expression, ...]`; no grammar change was made.
-* Verified candidate pins: schema source commit `5a13698933c88ca1e271d635b9bee39af75bc027`, schema digest `0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593`, tools semantic pack `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92`, and editor-pack manifest `305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` over 236 resources.
+* Verified candidate pins: schema source commit `b08d13ef857698068251ef64e8a3bf70db6e5a65`, schema digest `d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d`, tools semantic pack `0f2de8d318ed5a8a102e51ffbcc09dedaac074a21b04dc86799b5e9f0b773114`, and editor-pack manifest `3a844ac0cc2e2ed51bd3d2acf0cc684e731551287c8b5ce095b7ef54695b1181` over 236 resources.
 
 ## Owner review queue
 

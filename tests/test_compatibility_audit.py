@@ -108,10 +108,10 @@ class CompatibilityAuditTests(unittest.TestCase):
             self.assertNotIn("runtime_verified", axis["status"])
         self.assertEqual(self.audit["snapshot_gate"]["status"], "verified_against_accepted_candidate")
         self.assertIn("145 JSON files", self.audit["snapshot_gate"]["finding"])
-        self.assertIn("658 root references", self.audit["snapshot_gate"]["finding"])
+        self.assertIn("673 root references", self.audit["snapshot_gate"]["finding"])
         self.assertEqual(
             self.audit["editor_pin"]["schema_digest"],
-            "0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593",
+            "d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d",
         )
         self.assertEqual(self.audit["editor_pin"]["resource_count"], 236)
 
