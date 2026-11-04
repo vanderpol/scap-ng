@@ -14,13 +14,15 @@ cardinality, and native datatype remain where they explain the current grammar.
 Changes include:
 
 - `variables` now explains named typed variables and supported expressions in
-  plain language rather than citing a numbered design decision.
+  plain language rather than citing a numbered design decision. Nested literal
+  and expression `value` fields now have schema-sourced hover descriptions.
 - Dependency `purpose` and specification descriptions explain author meaning
   without issue references or provisional implementation history.
 - Reserved function-expression and result-schema descriptions identify their
   authoring status without presenting internal candidate terminology as guidance.
-- `tests/test_authoring_documentation.py` scans every canonical schema title and
-  description and fails on obvious internal decision/PR markers.
+- `tests/test_authoring_documentation.py` inventories titles, descriptions and
+  examples, fails on obvious internal decision/PR markers, and requires hover
+  descriptions for variable expression values.
 
 This draft is intentionally separate from the operator/validation PR. It does
 not censor legitimate technical terminology or remove historical evidence.

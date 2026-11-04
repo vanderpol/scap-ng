@@ -41,6 +41,27 @@ class AuthoringDocumentationTests(unittest.TestCase):
                         failures.append(f'{path.name}{location}: {text}')
         self.assertEqual(failures, [])
 
+    def test_variable_expression_values_have_hover_descriptions(self):
+        document = json.loads((ROOT / 'variable-expression.schema.json').read_text())
+        missing = []
+        def visit(node, path=''):
+            if isinstance(node, dict):
+                properties = node.get('properties', {})
+                if isinstance(properties, dict):
+                    for key, child in properties.items():
+                        if key in {'value', 'literal', 'regex_capture', 'concat', 'values'} and isinstance(child, dict):
+                            if not child.get('description'):
+                                missing.append(f'{path}/{key}')
+                        visit(child, f'{path}/{key}')
+                for key, child in node.items():
+                    if key != 'properties':
+                        visit(child, f'{path}/{key}')
+            elif isinstance(node, list):
+                for index, child in enumerate(node):
+                    visit(child, f'{path}/{index}')
+        visit(document)
+        self.assertEqual(missing, [])
+
     def test_documentation_audit_covers_every_schema_root(self):
         roots = sorted(ROOT.glob('*.schema.json'))
         self.assertEqual(len(roots), 34)

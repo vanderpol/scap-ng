@@ -20,19 +20,23 @@
           "enum": [
             "local",
             "constant"
-          ]
+          ],
+          "description": "Whether this is a local derived Variable or a constant declaration."
         },
         "datatype": {
-          "$ref": "capability-common.schema.json#/$defs/native_datatype"
+          "$ref": "capability-common.schema.json#/$defs/native_datatype",
+          "description": "Type of values produced by this Variable."
         },
         "expression": {
-          "$ref": "#/$defs/expression"
+          "$ref": "#/$defs/expression",
+          "description": "Expression that produces the Variable values."
         },
         "title": {
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "description": "Optional author-facing name for this Variable."
         }
       },
       "additionalProperties": false,
@@ -41,7 +45,8 @@
           "if": {
             "properties": {
               "kind": {
-                "const": "constant"
+                "const": "constant",
+                "description": "Whether this is a local derived Variable or a constant declaration."
               }
             }
           },
@@ -80,7 +85,8 @@
                         ],
                         "properties": {
                           "datatype": {
-                            "$ref": "capability-common.schema.json#/$defs/native_datatype"
+                            "$ref": "capability-common.schema.json#/$defs/native_datatype",
+                            "description": "Type of values produced by this Variable."
                           },
                           "value": {
                             "type": [
@@ -89,7 +95,9 @@
                               "boolean",
                               "array",
                               "object"
-                            ]
+                            ],
+                            "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                            "title": "Value"
                           }
                         },
                         "additionalProperties": false,
@@ -98,14 +106,17 @@
                             "if": {
                               "properties": {
                                 "datatype": {
-                                  "const": "record"
+                                  "const": "record",
+                                  "description": "Type of values produced by this Variable."
                                 }
                               }
                             },
                             "then": {
                               "properties": {
                                 "value": {
-                                  "type": "object"
+                                  "type": "object",
+                                  "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                                  "title": "Value"
                                 }
                               }
                             },
@@ -130,17 +141,22 @@
                                         ]
                                       }
                                     }
-                                  ]
+                                  ],
+                                  "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                                  "title": "Value"
                                 }
                               }
                             }
                           }
                         ]
                       }
-                    ]
+                    ],
+                    "description": "A literal value or value list used by the Variable.",
+                    "title": "Literal value"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "description": "Expression that produces the Variable values."
               }
             }
           }
@@ -182,7 +198,8 @@
                   ],
                   "properties": {
                     "datatype": {
-                      "$ref": "capability-common.schema.json#/$defs/native_datatype"
+                      "$ref": "capability-common.schema.json#/$defs/native_datatype",
+                      "description": "Type of values produced by this Variable."
                     },
                     "value": {
                       "type": [
@@ -191,7 +208,9 @@
                         "boolean",
                         "array",
                         "object"
-                      ]
+                      ],
+                      "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                      "title": "Value"
                     }
                   },
                   "additionalProperties": false,
@@ -200,14 +219,17 @@
                       "if": {
                         "properties": {
                           "datatype": {
-                            "const": "record"
+                            "const": "record",
+                            "description": "Type of values produced by this Variable."
                           }
                         }
                       },
                       "then": {
                         "properties": {
                           "value": {
-                            "type": "object"
+                            "type": "object",
+                            "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                            "title": "Value"
                           }
                         }
                       },
@@ -232,14 +254,18 @@
                                   ]
                                 }
                               }
-                            ]
+                            ],
+                            "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                            "title": "Value"
                           }
                         }
                       }
                     }
                   ]
                 }
-              ]
+              ],
+              "description": "A literal value or value list used by the Variable.",
+              "title": "Literal value"
             }
           },
           "additionalProperties": false
@@ -253,7 +279,9 @@
             "variable": {
               "type": "string",
               "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
-              "maxLength": 64
+              "maxLength": 64,
+              "description": "Reference to another named Variable.",
+              "title": "Variable reference"
             }
           },
           "additionalProperties": false
@@ -276,10 +304,14 @@
                 },
                 "field": {
                   "type": "string",
-                  "minLength": 1
+                  "minLength": 1,
+                  "description": "Name of the collected field whose values become this Variable.",
+                  "title": "Collected field"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "Collect values from a field of an Object.",
+              "title": "Collected values"
             }
           },
           "additionalProperties": false
@@ -295,7 +327,9 @@
               "minItems": 2,
               "items": {
                 "$ref": "#/$defs/expression"
-              }
+              },
+              "description": "Concatenate two or more expression results in order.",
+              "title": "Concatenate"
             }
           },
           "additionalProperties": false
@@ -314,13 +348,19 @@
               ],
               "properties": {
                 "pattern": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Regular expression used to capture text.",
+                  "title": "Capture pattern"
                 },
                 "value": {
-                  "$ref": "#/$defs/expression"
+                  "$ref": "#/$defs/expression",
+                  "description": "Value supplied by this expression. Its allowed shape follows the declared datatype.",
+                  "title": "Value"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "Capture text from an expression with a regular expression.",
+              "title": "Regular-expression capture"
             }
           },
           "additionalProperties": false
@@ -332,7 +372,9 @@
           ],
           "properties": {
             "unique": {
-              "$ref": "#/$defs/expression"
+              "$ref": "#/$defs/expression",
+              "description": "Remove duplicate scalar values from an expression result.",
+              "title": "Unique values"
             }
           },
           "additionalProperties": false,
@@ -354,7 +396,9 @@
               ],
               "properties": {
                 "delimiter": {
-                  "type": "string"
+                  "type": "string",
+                  "description": "Text placed between merged values.",
+                  "title": "Delimiter"
                 },
                 "sort": {
                   "enum": [
@@ -362,19 +406,27 @@
                     "lexical",
                     "numeric",
                     "natural"
-                  ]
+                  ],
+                  "description": "Ordering used before values are merged.",
+                  "title": "Sort values"
                 },
                 "order": {
                   "enum": [
                     "ascending",
                     "descending"
-                  ]
+                  ],
+                  "description": "Ascending or descending direction for the selected sort.",
+                  "title": "Sort order"
                 },
                 "values": {
-                  "$ref": "#/$defs/expression"
+                  "$ref": "#/$defs/expression",
+                  "description": "Collect values from a field of an Object.",
+                  "title": "Collected values"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "Combine values into one string with explicit delimiter, sorting and order.",
+              "title": "Merge values"
             }
           },
           "additionalProperties": false
