@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json",
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-11-01",
-  "title": "Native variable declarations and expressions",
-  "description": "Finite current native vocabulary. No canonical function envelope, implicit options or value execution. Declaration/reference/derived type compatibility is additionally enforced by semantic validation and the direct compiler.",
+  "x-last-modified": "2026-11-04",
+  "title": "Native Variable declarations and retained expressions",
+  "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or retained transformations. The schema describes the authoring shape; type compatibility, collection status, and evaluation results are checked separately by semantic validation or the runtime when those implementations exist.",
   "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/pull/268#issuecomment-6550047257",
   "$ref": "#/$defs/declaration",
   "$defs": {
@@ -21,22 +21,26 @@
             "local",
             "constant"
           ],
-          "description": "Whether this is a local derived Variable or a constant declaration."
+          "title": "Variable kind",
+          "description": "Use `local` for a derived value or `constant` for a literal declaration."
         },
         "datatype": {
           "$ref": "capability-common.schema.json#/$defs/native_datatype",
-          "description": "Type of values produced by this Variable."
+          "title": "Variable datatype",
+          "description": "Datatype promised by this Variable. The expression must produce compatible values."
         },
         "expression": {
           "$ref": "#/$defs/expression",
-          "description": "Expression that produces the Variable values."
+          "title": "Variable expression",
+          "description": "Expression that supplies this Variable’s values."
         },
         "title": {
           "type": [
             "string",
             "null"
           ],
-          "description": "Optional author-facing name for this Variable."
+          "title": "Authoring title",
+          "description": "Optional author-facing title for this Variable."
         }
       },
       "additionalProperties": false,
@@ -85,7 +89,8 @@
                         "properties": {
                           "datatype": {
                             "$ref": "capability-common.schema.json#/$defs/native_datatype",
-                            "description": "Datatype of this literal value."
+                            "title": "Literal datatype",
+                            "description": "Datatype of the supplied literal or record."
                           },
                           "value": {
                             "type": [
@@ -95,8 +100,8 @@
                               "array",
                               "object"
                             ],
-                            "description": "Literal value or record data. Its shape follows the selected datatype.",
-                            "title": "Literal value"
+                            "title": "Literal payload",
+                            "description": "Payload for the selected datatype; record data uses an object and scalar datatypes use scalar/list data."
                           }
                         },
                         "additionalProperties": false,
@@ -113,8 +118,8 @@
                               "properties": {
                                 "value": {
                                   "type": "object",
-                                  "description": "Literal value or record data. Its shape follows the selected datatype.",
-                                  "title": "Literal value"
+                                  "title": "Literal payload",
+                                  "description": "Record data for `record`; scalar or ordered list data for other datatypes."
                                 }
                               }
                             },
@@ -140,8 +145,8 @@
                                       }
                                     }
                                   ],
-                                  "description": "Literal value or record data. Its shape follows the selected datatype.",
-                                  "title": "Literal value"
+                                  "title": "Literal payload",
+                                  "description": "Scalar or ordered list data for the selected datatype."
                                 }
                               }
                             }
@@ -149,12 +154,17 @@
                         ]
                       }
                     ],
-                    "description": "A literal value or value list used by the Variable.",
-                    "title": "Literal value"
+                    "title": "Literal value",
+                    "description": "A scalar, ordered list, or explicitly typed value. Use the typed form when the datatype matters; lists preserve their supplied order and duplicates.",
+                    "examples": [
+                      {
+                        "datatype": "string",
+                        "value": "example"
+                      }
+                    ]
                   }
                 },
-                "additionalProperties": false,
-                "description": "Expression that produces the Variable values."
+                "additionalProperties": false
               }
             }
           }
@@ -197,7 +207,8 @@
                   "properties": {
                     "datatype": {
                       "$ref": "capability-common.schema.json#/$defs/native_datatype",
-                      "description": "Datatype of this literal value."
+                      "title": "Literal datatype",
+                      "description": "Datatype of the supplied literal or record."
                     },
                     "value": {
                       "type": [
@@ -207,8 +218,8 @@
                         "array",
                         "object"
                       ],
-                      "description": "Literal value or record data. Its shape follows the selected datatype.",
-                      "title": "Literal value"
+                      "title": "Literal payload",
+                      "description": "Payload for the selected datatype; record data uses an object and scalar datatypes use scalar/list data."
                     }
                   },
                   "additionalProperties": false,
@@ -225,8 +236,8 @@
                         "properties": {
                           "value": {
                             "type": "object",
-                            "description": "Literal value or record data. Its shape follows the selected datatype.",
-                            "title": "Literal value"
+                            "title": "Literal payload",
+                            "description": "Record data for `record`; scalar or ordered list data for other datatypes."
                           }
                         }
                       },
@@ -252,8 +263,8 @@
                                 }
                               }
                             ],
-                            "description": "Literal value or record data. Its shape follows the selected datatype.",
-                            "title": "Literal value"
+                            "title": "Literal payload",
+                            "description": "Scalar or ordered list data for the selected datatype."
                           }
                         }
                       }
@@ -261,11 +272,19 @@
                   ]
                 }
               ],
-              "description": "A literal value or value list used by the Variable.",
-              "title": "Literal value"
+              "title": "Literal value",
+              "description": "A scalar, ordered list, or explicitly typed value. Use the typed form when the datatype matters; lists preserve their supplied order and duplicates.",
+              "examples": [
+                {
+                  "datatype": "string",
+                  "value": "example"
+                }
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "title": "Literal expression",
+          "description": "Produce literal scalar, list, or typed data."
         },
         {
           "type": "object",
@@ -277,11 +296,16 @@
               "type": "string",
               "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
               "maxLength": 64,
-              "description": "Reference to another named Variable.",
-              "title": "Variable reference"
+              "title": "Variable reference",
+              "description": "Reference another named Variable. The referenced Variable supplies values and evaluation status.",
+              "examples": [
+                "host-name-variable"
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "title": "Variable reference expression",
+          "description": "Use values from another Variable."
         },
         {
           "type": "object",
@@ -297,21 +321,33 @@
               ],
               "properties": {
                 "object": {
-                  "$ref": "capability-common.schema.json#/$defs/object_use"
+                  "$ref": "capability-common.schema.json#/$defs/object_use",
+                  "title": "Collection Object",
+                  "description": "Object source whose collected Items supply the field values."
                 },
                 "field": {
                   "type": "string",
                   "minLength": 1,
-                  "description": "Name of the collected field whose values become this Variable.",
-                  "title": "Collected field"
+                  "title": "Collected field",
+                  "description": "Name of the collected field to read from each collected Item."
                 }
               },
               "additionalProperties": false,
-              "description": "Collect values from a field of an Object.",
-              "title": "Collected values"
+              "title": "Collected field values",
+              "description": "Read the selected field from the collected Object. Field availability, multiplicity, and collection status are semantic/runtime concerns.",
+              "examples": [
+                {
+                  "object": {
+                    "object_ref": "server-object"
+                  },
+                  "field": "hostname"
+                }
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "title": "Collected values expression",
+          "description": "Produce values from a collected Object field."
         },
         {
           "type": "object",
@@ -325,11 +361,37 @@
               "items": {
                 "$ref": "#/$defs/expression"
               },
-              "description": "Concatenate two or more expression results in order.",
-              "title": "Concatenate"
+              "title": "Concatenated components",
+              "description": "Concatenate two or more components in order. Multiple values produce the Cartesian product of component values. A missing or nonexistent component yields the inherited source status; Error, Incomplete, Not Collected, and Not Applicable statuses are not silently converted to strings.",
+              "examples": [
+                [
+                  {
+                    "literal": "https://"
+                  },
+                  {
+                    "variable": "host-name-variable"
+                  },
+                  {
+                    "literal": "/policy"
+                  }
+                ],
+                [
+                  {
+                    "literal": [
+                      "a",
+                      "b"
+                    ]
+                  },
+                  {
+                    "literal": ".conf"
+                  }
+                ]
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "title": "Concatenation expression",
+          "description": "Join two or more ordered expressions while retaining collection/status semantics."
         },
         {
           "type": "object",
@@ -346,21 +408,31 @@
               "properties": {
                 "pattern": {
                   "type": "string",
-                  "description": "Regular expression used to capture text.",
-                  "title": "Capture pattern"
+                  "title": "Capture pattern",
+                  "description": "Regular expression containing the capture group to return."
                 },
                 "value": {
                   "$ref": "#/$defs/expression",
-                  "description": "Expression whose string values are processed by the capture pattern.",
-                  "title": "Input expression"
+                  "title": "Input expression",
+                  "description": "Expression producing the string value(s) to search. Each value is processed independently."
                 }
               },
               "additionalProperties": false,
-              "description": "Capture text from an expression with a regular expression.",
-              "title": "Regular-expression capture"
+              "title": "Regular-expression capture",
+              "description": "Capture text from each input string using the first capturing group. The source regex dialect and first-match behavior are retained; inputs with no capture group or no match produce an empty string under the inherited function contract.",
+              "examples": [
+                {
+                  "pattern": "^https://([^/]+)/",
+                  "value": {
+                    "variable": "url-variable"
+                  }
+                }
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "title": "Regex capture expression",
+          "description": "Extract the first capture from each input string."
         },
         {
           "type": "object",
@@ -370,12 +442,23 @@
           "properties": {
             "unique": {
               "$ref": "#/$defs/expression",
-              "description": "Remove duplicate scalar values from an expression result.",
-              "title": "Unique values"
+              "title": "Unique values",
+              "description": "Remove duplicate scalar values from the input. Record data is not a supported transformation operand; value ordering and status propagation remain governed by the inherited semantic contract.",
+              "examples": [
+                {
+                  "values": {
+                    "object": {
+                      "object_ref": "server-object"
+                    },
+                    "field": "tag"
+                  }
+                }
+              ]
             }
           },
           "additionalProperties": false,
-          "description": "Existing scalar-value unique only. Record literals are opaque data, not supported transformation operands; semantic validation enforces this domain."
+          "description": "Remove duplicate scalar values.",
+          "title": "Unique expression"
         },
         {
           "type": "object",
@@ -394,8 +477,8 @@
               "properties": {
                 "delimiter": {
                   "type": "string",
-                  "description": "Text placed between merged values.",
-                  "title": "Delimiter"
+                  "title": "Join delimiter",
+                  "description": "String inserted between adjacent values."
                 },
                 "sort": {
                   "enum": [
@@ -404,29 +487,41 @@
                     "numeric",
                     "natural"
                   ],
-                  "description": "Ordering used before values are merged.",
-                  "title": "Sort values"
+                  "title": "Sort mode",
+                  "description": "`document` preserves input order; `lexical`, `numeric`, and `natural` select the corresponding explicit ordering."
                 },
                 "order": {
                   "enum": [
                     "ascending",
                     "descending"
                   ],
-                  "description": "Ascending or descending direction for the selected sort.",
-                  "title": "Sort order"
+                  "title": "Sort order",
+                  "description": "Ascending or descending order for the selected sort mode."
                 },
                 "values": {
                   "$ref": "#/$defs/expression",
-                  "description": "Expression producing the values to combine into one string.",
-                  "title": "Values expression"
+                  "title": "Values expression",
+                  "description": "Expression producing values to join. Collection and status propagation are semantic/runtime behavior, not schema execution."
                 }
               },
               "additionalProperties": false,
-              "description": "Combine values into one string with explicit delimiter, sorting and order.",
-              "title": "Merge values"
+              "title": "Merged values",
+              "description": "Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.",
+              "examples": [
+                {
+                  "delimiter": ",",
+                  "sort": "document",
+                  "order": "ascending",
+                  "values": {
+                    "variable": "tag-values-variable"
+                  }
+                }
+              ]
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "title": "Merge expression",
+          "description": "Sort and join values into one string."
         }
       ]
     }
