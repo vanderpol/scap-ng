@@ -162,11 +162,12 @@ aliases are introduced.
 | Root schemas | 35 |
 | Root schema `$ref` occurrences | 658 |
 | Aggregate SHA-256 | `e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5` |
+| Tools compatibility candidate | `scap-ng-tools@3ba3cda8506a3973a63ca5b509e771fb9cd511b0` (semantic pack `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d`) |
 | Editor candidate pack manifest | `e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd` (236 resources) |
 
 The earlier 143-file, 34-root, 242-reference values above remain historical
 pre-selector/amendment boundaries and are not relabeled. The nine filesystem
-mapping mismatches are resolved in the canonical mapping candidate. A separate
-scap-ng-tools PR updates its snapshot and generated semantic pack; the VS Code
-editor must pin the final combined commit and regenerated manifest only after
-that PR and the generated-file conflicts from PR #16 are accepted.
+mapping mismatches are resolved in the canonical mapping candidate. The separate
+scap-ng-tools draft PR is pinned above, and PR #16 generated-file conflicts have
+been rebased/regenerated. The VS Code editor must pin the exact candidate source
+commit and regenerated manifest only after owner acceptance.
