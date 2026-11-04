@@ -150,23 +150,26 @@ or VS Code files are changed.
 
 ## Current coordinated selector/function draft — 2026-11-04
 
-The latest unmerged owner-review candidate is draft PR #21, based on the
-selector and Variable-function draft chain (#15–#20). Its exact schema source
-commit is:
+The latest unmerged owner-review candidate is the filesystem-mapping A branch,
+based on the selector and Variable-function draft chain (#15–#21). The owner
+approved the established OVAL names `filepath`, `path`, and `filename`; no
+aliases are introduced.
 
 | Audit boundary | Value |
 | --- | --- |
-| Candidate source commit | `7b9b61108aa30a601828268576308e510477094e` |
+| Candidate source commit | `b08d13ef857698068251ef64e8a3bf70db6e5a65` |
 | Flat JSON family | 145 files |
 | Root schemas | 35 |
-| Root schema `$ref` occurrences | 652 |
-| Aggregate SHA-256 | `2adf88f5c1fd950e997579c00064388b5f12e9e29cde38075bf75b76d1f25843` |
-| Editor candidate pack manifest | `2aa28f9926d4d7774edcf48b991f1f48b121e34a7dce9006b1db129a6301727e` |
+| Root schema `$ref` occurrences | 658 |
+| Aggregate SHA-256 | `d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d` |
+| Tools compatibility candidate | `scap-ng-tools@a208b7d78944b578906066815e2b43f563330806` (semantic pack `0f2de8d318ed5a8a102e51ffbcc09dedaac074a21b04dc86799b5e9f0b773114`) |
+| Editor candidate pack manifest | `3a844ac0cc2e2ed51bd3d2acf0cc684e731551287c8b5ce095b7ef54695b1181` (236 resources) |
 
 The earlier 143-file, 34-root, 242-reference values above remain historical
-pre-selector/amendment boundaries and are not relabeled. The current value is
-still a draft candidate: PR #16 requires a rebase/regeneration, and the
-filesystem naming decision (Candidate A or B) remains open. The VS Code editor
-must pin the final combined commit and regenerated manifest only after those
-owner decisions; it must not treat the current draft hash as a released
-0.4.0 baseline.
+pre-selector/amendment boundaries and are not relabeled. The nine filesystem
+mapping mismatches are resolved in the canonical mapping candidate. The separate
+scap-ng-tools draft PR is pinned above, and PR #16 generated-file conflicts have
+been rebased/regenerated. The VS Code editor must pin the exact candidate source
+commit and regenerated manifest only after owner acceptance. Full-fixture tools CI
+run `41873718088` found 11 historical golden-parity failures; no converted content
+or golden artifacts were modified.

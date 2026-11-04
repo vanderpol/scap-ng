@@ -210,6 +210,38 @@ class NativeSelectorContractTests(unittest.TestCase):
                 self.assert_invalid(self.batch_document(
                     capability, {'unsupported_selector': {'equals': 'x'}}))
 
+    def test_set_operands_and_collection_parameters_are_supported(self):
+        set_document = self.batch_document('windows.fileeffectiverights', {
+            'set': {
+                'operator': 'union',
+                'operands': [{
+                    'object': {
+                        'filepath': {'equals': 'C:/Windows/System32/eventvwr.exe'},
+                        'trustee_sid': {'matches_regex': '.*'},
+                        'filesystem': 'all',
+                    },
+                    'filters': [],
+                }],
+            },
+        })
+        self.assert_valid(set_document)
+
+        ntuser = self.batch_document('windows.ntuser', {
+            'key': {'equals': 'Software\\Example'},
+            'include_default': False,
+            'item_creation': 'key_and_name_exist',
+        })
+        self.assert_valid(ntuser)
+        invalid = deepcopy(ntuser)
+        invalid['assessment']['tests'][next(iter(invalid['assessment']['tests']))]['object']['unknown_parameter'] = True
+        self.assert_invalid(invalid)
+
+        generated = load(SCHEMA / 'native-selector.schema.json')
+        ntuser_object = generated['$defs']['windows_ntuser_object']['oneOf'][1]
+        self.assertIn('include_default', ntuser_object['properties'])
+        self.assertIn('item_creation', ntuser_object['properties'])
+        self.assertIn('set', ntuser_object['properties'])
+
     def test_native_spelling_round_trips_without_rewriting(self):
         raw = (PROJECT / 'examples/linux-home-nosuid.assessment.yaml').read_text()
         parsed = yaml.load(raw, Loader=UniqueYaml)

@@ -13,27 +13,36 @@
   },
   "native": {
     "selector_case_semantics": {
-      "full_path": {"mode": "filesystem_per_directory", "description": "Resolve path components under each containing directory's effective case-sensitivity configuration; do not normalize filenames unconditionally."},
-      "directory": {"mode": "filesystem_per_directory", "description": "Directory component lookup follows the effective case-sensitivity configuration of the parent directory."},
-      "name": {"mode": "filesystem_per_directory", "description": "Filename lookup follows the containing directory's effective case-sensitivity configuration."},
       "scanner_discovery": "On Windows, query the containing directory's case-sensitive flag before enforcing exact path-name matching; Microsoft documents fsutil.exe file queryCaseSensitiveInfo <path>. API implementations must also account for filesystem and Win32 API-specific lookup behavior. Do not assume NTFS case-insensitive lookup universally.",
       "references": [
         "https://learn.microsoft.com/en-us/windows/wsl/case-sensitivity",
         "https://learn.microsoft.com/en-us/windows/desktop/fileio/naming-a-file"
-      ]
+      ],
+      "filepath": {
+        "mode": "filesystem_per_directory",
+        "description": "Resolve path components under each containing directory's effective case-sensitivity configuration; do not normalize filenames unconditionally."
+      },
+      "path": {
+        "mode": "filesystem_per_directory",
+        "description": "Directory component lookup follows the effective case-sensitivity configuration of the parent directory."
+      },
+      "filename": {
+        "mode": "filesystem_per_directory",
+        "description": "Filename lookup follows the containing directory's effective case-sensitivity configuration."
+      }
     },
     "selector_map": {
-      "filepath": "full_path",
-      "path": "directory",
-      "filename": "name"
+      "filepath": "filepath",
+      "path": "path",
+      "filename": "filename"
     },
     "object_selector_alternatives": [
       [
-        "full_path"
+        "filepath"
       ],
       [
-        "directory",
-        "name"
+        "path",
+        "filename"
       ]
     ],
     "uses_file_traversal": true,
@@ -116,6 +125,15 @@
       "product_version": [
         "string",
         "version"
+      ],
+      "filepath": [
+        "string"
+      ],
+      "path": [
+        "string"
+      ],
+      "filename": [
+        "string"
       ]
     },
     "state_value_enums": {
@@ -148,7 +166,10 @@
       ]
     },
     "traversal_definition": "windows_file_traversal",
-    "post_alignment_ready": true
+    "post_alignment_ready": true,
+    "nullable_selectors": [
+      "filename"
+    ]
   },
   "migration_crosswalk": {
     "file_type": {

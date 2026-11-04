@@ -1,7 +1,7 @@
 """Cross-repository Issue #14/#19 audit integrity checks.
 
-These checks intentionally use only the repository's JSON artifacts. They do not
-claim that the separately pinned converter can execute against this snapshot.
+These checks use the repository's JSON artifacts and the accepted cross-repository
+compatibility evidence. They do not claim scanner/runtime evaluation parity.
 """
 import json
 from pathlib import Path
@@ -85,21 +85,13 @@ class CompatibilityAuditTests(unittest.TestCase):
             if emitted != row["selector"]:
                 mismatches.append((row["capability"], row["selector"], emitted))
         self.assertEqual(len(self.audit["selector_matrix"]), 28)
-        self.assertEqual(len(mismatches), 9)
-        self.assertEqual(
-            set(mismatches),
-            {
-                ("unix.file", "filepath", "full_path"),
-                ("unix.file", "path", "directory"),
-                ("unix.file", "filename", "name"),
-                ("windows.file", "filepath", "full_path"),
-                ("windows.file", "path", "directory"),
-                ("windows.file", "filename", "name"),
-                ("windows.fileeffectiverights", "filepath", "full_path"),
-                ("windows.fileeffectiverights", "path", "directory"),
-                ("windows.fileeffectiverights", "filename", "name"),
-            },
-        )
+        self.assertEqual(mismatches, [])
+        for capability in ("unix.file", "windows.file", "windows.fileeffectiverights"):
+            rows = [row for row in self.audit["selector_matrix"] if row["capability"] == capability]
+            self.assertEqual(
+                {row["selector"] for row in rows if row["selector"] in {"filepath", "path", "filename"}},
+                {"filepath", "path", "filename"},
+            )
 
     def test_all_retained_forms_and_runtime_boundaries_are_explicit(self):
         self.assertEqual(
@@ -114,7 +106,14 @@ class CompatibilityAuditTests(unittest.TestCase):
         )
         for axis in self.audit["semantic_axes"]:
             self.assertNotIn("runtime_verified", axis["status"])
-        self.assertEqual(self.audit["snapshot_gate"]["status"], "blocked_for_direct_execution")
+        self.assertEqual(self.audit["snapshot_gate"]["status"], "verified_against_accepted_candidate")
+        self.assertIn("145 JSON files", self.audit["snapshot_gate"]["finding"])
+        self.assertIn("673 root references", self.audit["snapshot_gate"]["finding"])
+        self.assertEqual(
+            self.audit["editor_pin"]["schema_digest"],
+            "d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d",
+        )
+        self.assertEqual(self.audit["editor_pin"]["resource_count"], 236)
 
     def test_filesystem_alternatives_have_recorded_compatibility_outcomes(self):
         evidence = ROOT / "docs/evidence/issue21/filesystem-selector-alternatives"
