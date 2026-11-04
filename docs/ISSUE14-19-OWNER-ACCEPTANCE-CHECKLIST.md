@@ -12,7 +12,8 @@ Recommended order after owner review:
 3. **PR #17 (rebased)** — filesystem/Windows selector batch, on top of #16.
 4. **PR #18** — next selector batch, based on #17.
 5. **PR #20** — Issue #19 retained-function documentation, based on #18.
-6. **PR #21** — cross-repository compatibility audit and this acceptance evidence, based on #20.
+6. **PR #21** — cross-repository compatibility audit and acceptance evidence, based on #20.
+7. **PR #22** — owner-approved Candidate-A mapping/snapshot coordination, based on #21; tools-side PR is `vanderpol/scap-ng-tools#22`.
 
 PR #16 is semantically independent documentation, but is **not mergeable as-is**:
 it conflicts with #15 in frozen generated documentation,
@@ -27,10 +28,11 @@ generated outputs, not by a semantic disagreement in the authoring prose.
 |---|---|---|
 | #15 | Acceptable pending selector-baseline approval | Confirm the reviewed operator/value/nullability restrictions and retain the 0.4.0 baseline. |
 | #16 | Rebase/regenerate before merge | Resolve frozen-artifact conflicts; accept documentation-only changes separately from grammar decisions. |
-| #17 | Acceptable after #15 and approved mapping update | Candidate A is now canonical; retain the names without aliases. |
+| #17 | Acceptable after #16 and approved mapping update | Candidate A is now canonical; retain the names without aliases. |
 | #18 | Acceptable after #17 | Confirm its nine-selector batch and generated count reconciliation. |
 | #20 | Documentation-safe, grammar unchanged | Decide whether the documented `unique` arity gap is acceptable for now. |
 | #21 | Review report/tests safe after #20 | Filesystem naming is resolved to A; tools repin and runtime qualification remain tracked. |
+| #22 | Draft coordination follow-up | Mapping-side schema candidate and tools-side snapshot repin are separate reviewable changes; consume the exact pins below without merging automatically. |
 
 No PR in this stack should be merged while it is marked draft or while its
 base branch omits the prior schema/integrity changes.
