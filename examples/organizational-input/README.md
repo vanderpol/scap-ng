@@ -17,4 +17,4 @@ to the selected Assessment body. Pointers identify actual Input references,
 including the presence guard. Wrong kind, target, Input/Parameter identity,
 duplicates, missing or unexpected locations reject during semantic compilation
 and package verification; JSON Schema alone does not prove those graph checks.
-Historical 0.3 State tuples and Results retain their own pinned contracts.
+OVAL source State terms remain source-fidelity/provenance concepts and are not native 0.4 authoring fields.

@@ -194,7 +194,7 @@ rewritten.
 | Audit boundary | Value |
 | --- | --- |
 | Prior current-main JSON family | 145 files, 35 root schemas, 673 `$ref` occurrences, `d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d` |
-| Native discovery candidate JSON family | 145 files, 35 root schemas, 673 `$ref` occurrences, `6560b1af3c7bdefb9379d377b7ee9fb6fc5987981c56c93b663e382ac84e6d03` |
+| Native discovery candidate JSON family | 145 files, 35 root schemas, 673 `$ref` occurrences, `dfbcb781008f62f41a547265da43fa5c32cce32bdd54438d0d6bd6093b62463e` |
 | Scope | Rule discovery, native 0.4 validation, current Result cleanup; no editor changes |
 
 This is an unreleased pre-alpha candidate. It is not an OVAL Board approval,
