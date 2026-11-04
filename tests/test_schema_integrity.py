@@ -9,10 +9,10 @@ ROOT = Path(__file__).resolve().parents[1] / 'schema'
 PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
 EXPECTED_JSON = 145
 EXPECTED_SCHEMAS = 35
-EXPECTED_REFS = 296
+EXPECTED_REFS = 503
 # Owner-approved pre-release 0.4 amendment; prior freeze digest remains in
 # docs/PROVENANCE.md and the previous immutable Git commit.
-EXPECTED_DIGEST = '35fbd0d9483209af0dbee23e4bc04f998d9e77a4b2b43fac158102ba4544091c'
+EXPECTED_DIGEST = '430f1d8df846be4669fdafa94bb1096d5f56ba7b50f881de8cf7347ab1519bbc'
 
 
 def strict_object(pairs):
