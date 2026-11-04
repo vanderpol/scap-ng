@@ -35,7 +35,7 @@ class VariableFunctionDocumentationTests(unittest.TestCase):
         text = node['description'].lower()
         for term in ('two or more', 'order', 'cartesian product',
                      'nonexistent', 'error', 'incomplete', 'not collected',
-                     'not applicable'):
+                     'not applicable', 'cast', 'incompatible'):
             with self.subTest(term=term):
                 self.assertIn(term, text)
         self.assertGreaterEqual(len(node['examples']), 2)
