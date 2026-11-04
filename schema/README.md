@@ -16,7 +16,7 @@ For readable descriptions, use the generated [schema reference](../docs/generate
 
 Pin the **entire repository** to an exact commit until a 0.4 release tag exists. The files live in flat `schema/`, but retain versioned JSON `$id` identifiers. Schema loaders must resolve those identifiers to local files, not fetch them from the web.
 
-The owner-approved pre-release amendment groups Item requirements under `require.item_requirement`. Do not mix earlier 0.3 syntax with this candidate.
+The owner-approved pre-release amendment groups Item requirements under `require.item_requirement`. Only this native 0.4 syntax is accepted.
 
 See [provenance](../docs/PROVENANCE.md) for exact source commits, original and amended schema hashes, and migration details. **0.4.0 is not released or OVAL Board-approved.**
 

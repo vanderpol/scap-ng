@@ -173,3 +173,29 @@ been rebased/regenerated. The VS Code editor must pin the exact candidate source
 commit and regenerated manifest only after owner acceptance. Full-fixture tools CI
 run `41873718088` found 11 historical golden-parity failures; no converted content
 or golden artifacts were modified.
+
+
+## Issue #8 native Organizational Input discovery — 2026-11-04
+
+The owner has retired SCAP-NG 0.3. This candidate is **native 0.4-only** and
+implements the approved compiler-derived Organizational Input discovery shape:
+`kind: value|presence` plus an RFC 6901 `source_path` relative to the selected
+Assessment body. Rule authoring may omit the derived map; explicit maps are
+checked for exact agreement, and packaged Rules must carry the complete derived
+map. OVAL 5.12.3 State terms remain source-fidelity/provenance concepts only.
+
+The current 0.4 Result schema was audited for actual producers/consumers. No
+current 0.4 Result example, producer, or consumer uses `state_slot`; it was a
+legacy compatibility field rather than a current Result A contract. It is
+therefore removed from the current Result schema in this candidate. No current
+0.4 evidence, source proof, historical golden, or archived artifact was
+rewritten.
+
+| Audit boundary | Value |
+| --- | --- |
+| Prior current-main JSON family | 145 files, 35 root schemas, 673 `$ref` occurrences, `d2d8d59bcc722eacdba80342232f6d92d5bba812aab077753486268c3f74aa2d` |
+| Native discovery candidate JSON family | 145 files, 35 root schemas, 673 `$ref` occurrences, `63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5` |
+| Scope | Rule discovery, native 0.4 validation, current Result cleanup; no editor changes |
+
+This is an unreleased pre-alpha candidate. It is not an OVAL Board approval,
+scanner qualification, or release claim.
