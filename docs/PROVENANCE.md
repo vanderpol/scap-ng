@@ -136,3 +136,14 @@ changes are included here.
 ## Issue #14 selector batch 01 — 2026-11-04
 
 The first follow-on batch is documented in `docs/ISSUE14-SELECTOR-BATCH-FILESYSTEM.md`. It resolves 15 high-usage Linux filesystem and Windows selector contracts. The prior candidate digest above remains recorded for provenance; this batch candidate has 503 `$ref` occurrences and family digest `770bd3d2aa9ef0cea57be66c3f02e9fd7aba83bbbebf4fae830c4499b4d4abbe`. The generated inventory now reconciles to 141 total, 19 resolved, and 122 explicitly unresolved; the generator and tests reject batch-count drift. This remains a draft and requires owner approval before any merge.
+
+## Issue #19 retained variable-function documentation — 2026-11-04
+
+This draft documents the retained native Variable forms against the pinned OVAL
+5.12.3 XSD and records the broader function disposition in
+`docs/metadata/variable-function-audit.json`. It enriches schema hover/help,
+including nested `concat`, `regex_capture.value`, `merge.values`, and literal
+value sites. It makes no compiler, interpreter, scanner, or runtime claim and
+introduces no semantic implementation change. The exact schema commit for an
+editor-pack repin is the documentation PR commit; no `.external/editor-pack`
+or VS Code files are changed.

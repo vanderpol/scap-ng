@@ -1,0 +1,171 @@
+{
+  "format": "scap-ng-variable-function-audit/0.1",
+  "schema_version": "0.4.0",
+  "status": "schema_documentation_complete_runtime_unverified",
+  "source": {
+    "language": "OVAL 5.12.3",
+    "repository": "OVAL-Community/OVAL",
+    "tag": "v5.12.3",
+    "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+    "url": "https://github.com/OVAL-Community/OVAL/blob/v5.12.3/oval-schemas/oval-definitions-schema.xsd",
+    "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+    "sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+    "source_components": [
+      "FunctionGroup",
+      "ComponentGroup",
+      "VariableComponentType",
+      "LiteralComponentType"
+    ]
+  },
+  "baseline_policy": "Inherit OVAL function semantics unless an explicit traceable SCAP-NG owner decision establishes a difference. No approved deviation was identified for the retained forms in this audit.",
+  "retained_forms": [
+    {
+      "name": "literal",
+      "native_shape": "{literal: scalar|list|{datatype,value}}",
+      "source_construct": "Literal component / typed literal value",
+      "source_lines": "FunctionGroup component model; typed literal component",
+      "input_cardinality": "one scalar, ordered list, or typed value; record payload is an object",
+      "result_semantics": "Preserve authored value, order, duplicates, datatype, and explicit record shape",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified"
+    },
+    {
+      "name": "variable",
+      "native_shape": "{variable: name-variable}",
+      "source_construct": "VariableComponentType",
+      "source_lines": "oval-definitions-schema.xsd VariableComponentType",
+      "input_cardinality": "one referenced Variable population",
+      "result_semantics": "Reference preserves the referenced values and evaluation status; reference cycles and type compatibility require semantic validation",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified"
+    },
+    {
+      "name": "values",
+      "native_shape": "{values: {object, field}}",
+      "source_construct": "Native collected-field composition; no one-to-one OVAL function",
+      "input_cardinality": "values from the selected collected Object field",
+      "result_semantics": "Preserve collected multiplicity and provider status; field absence is not silently converted to a literal",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "native composition; no approved semantic deviation identified"
+    },
+    {
+      "name": "concat",
+      "native_shape": "{concat: [expression, expression, ...]}",
+      "source_construct": "ConcatFunctionType",
+      "source_lines": "770-823",
+      "input_cardinality": "two or more ordered components",
+      "input_types": "string-compatible components; inherited OVAL casting expectations apply",
+      "result_semantics": "Concatenate in component order; multiple-valued components produce Cartesian-product combinations; missing/nonexistent components produce the inherited status; status flags propagate rather than becoming strings",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified"
+    },
+    {
+      "name": "regex_capture",
+      "native_shape": "{regex_capture: {pattern, value}}",
+      "source_construct": "RegexCaptureFunctionType",
+      "source_lines": "931-953",
+      "input_cardinality": "one input expression; each value is processed independently",
+      "input_types": "string",
+      "result_semantics": "Use the first capturing group and inherited regex/first-match behavior; no capture or no match yields the source-defined empty-string result",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified"
+    },
+    {
+      "name": "unique",
+      "native_shape": "{unique: expression}",
+      "source_construct": "UniqueFunctionType",
+      "source_lines": "954-962",
+      "input_cardinality": "one native expression in the current grammar",
+      "input_types": "scalar values; record literals are explicitly outside the retained transformation domain",
+      "result_semantics": "Remove duplicate values while preserving inherited collection/status semantics; this native schema does not redefine ordering",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "The current native grammar accepts one expression, while OVAL UniqueFunctionType permits one or more components; no owner decision authorizing that narrowing was identified. Widening or preserving this boundary requires semantic review."
+    },
+    {
+      "name": "merge",
+      "native_shape": "{merge: {delimiter, sort, order, values}}",
+      "source_construct": "Native composition; no one-to-one OVAL function",
+      "input_cardinality": "one values expression",
+      "input_types": "string-compatible values; explicit sort mode and order",
+      "result_semantics": "Join with the explicit delimiter; document order preserves input order and other modes request lexical, numeric, or natural sorting. Duplicates are not removed implicitly",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "native composition; no approved semantic deviation identified"
+    }
+  ],
+  "oval_function_disposition": [
+    {
+      "name": "arithmetic",
+      "disposition": "deferred",
+      "reason": "Not in active variable-expression grammar; inactive canonical-call candidate is not authorization."
+    },
+    {
+      "name": "begin",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "concat",
+      "disposition": "retained",
+      "reason": "Direct retained expression form."
+    },
+    {
+      "name": "end",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "escape_regex",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "split",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "substring",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "time_difference",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "regex_capture",
+      "disposition": "retained",
+      "reason": "Direct retained expression form."
+    },
+    {
+      "name": "unique",
+      "disposition": "retained",
+      "reason": "Direct retained expression form with explicit scalar-domain boundary."
+    },
+    {
+      "name": "count",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    },
+    {
+      "name": "glob_to_regex",
+      "disposition": "deferred",
+      "reason": "Not retained in active native grammar."
+    }
+  ],
+  "inactive_candidate": {
+    "schema": "schema/variable-function-expression.schema.json",
+    "disposition": "deferred_migration_candidate",
+    "note": "Its broader canonical-call vocabulary is not referenced by Assessment and must not be presented as active native support."
+  },
+  "verification": {
+    "json_schema_shape": "verified by tests/test_variable_function_documentation.py and the repository Draft 2020-12 suite",
+    "compiler": "not present in this repository; no compiler parity claim",
+    "interpreter_or_runtime": "not present in this repository; no execution parity claim",
+    "independent_proofs": "not present for these functions",
+    "compatibility_gap": "Runtime collection/status propagation, casting, regex dialect, ordering, and error behavior require a runnable evaluator and conformance vectors before qualification."
+  },
+  "unsupported_functions": [],
+  "unsupported_policy": "No OVAL function is labeled unsupported without an explicit owner decision; functions outside the active grammar are deferred rather than silently treated as equivalent."
+}

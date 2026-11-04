@@ -69,9 +69,9 @@ class AuthoringDocumentationTests(unittest.TestCase):
         merge = expressions[6]['properties']['merge']['properties']
         values = expressions[2]['properties']['values']['properties']
         self.assertEqual(regex['value']['title'], 'Input expression')
-        self.assertIn('capture pattern', regex['value']['description'])
+        self.assertIn('string value', regex['value']['description'])
         self.assertEqual(merge['values']['title'], 'Values expression')
-        self.assertIn('combine into one string', merge['values']['description'])
+        self.assertIn('values to join', merge['values']['description'])
         self.assertEqual(values['field']['title'], 'Collected field')
         self.assertIn('collected field', values['field']['description'])
 
