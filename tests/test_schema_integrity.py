@@ -7,12 +7,12 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1] / 'schema'
 PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
-EXPECTED_JSON = 143
-EXPECTED_SCHEMAS = 34
-EXPECTED_REFS = 242
+EXPECTED_JSON = 145
+EXPECTED_SCHEMAS = 35
+EXPECTED_REFS = 296
 # Owner-approved pre-release 0.4 amendment; prior freeze digest remains in
 # docs/PROVENANCE.md and the previous immutable Git commit.
-EXPECTED_DIGEST = 'ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a'
+EXPECTED_DIGEST = '2de36b96ccf3771ee2d849ee73cf905a11db936064fb7b6b9458fd985e902156'
 
 
 def strict_object(pairs):

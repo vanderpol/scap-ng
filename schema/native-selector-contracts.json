@@ -1,0 +1,51 @@
+{
+  "format": "scap-ng-native-selector-contracts/0.1",
+  "schema_version": "0.4.0",
+  "status": "owner-review-draft",
+  "description": "Reviewed native Object selector contracts used to generate the capability-specific schema overlay. A resolved entry is authoritative for native operator tokens and literal value constraints; selectors not listed here remain explicitly unresolved and retain the generic baseline until their contract is reviewed.",
+  "operator_vocabulary": {
+    "metadata_properties": ["datatype", "value_match", "redact_result"],
+    "native_tokens": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
+    "source_crosswalk": {
+      "pattern match": "matches_regex",
+      "equals": "equals",
+      "not equal": "not_equal",
+      "case insensitive equals": "case_insensitive_equals",
+      "case insensitive not equal": "case_insensitive_not_equal"
+    },
+    "pattern_match_boundary": "pattern_match is the 0.3 migration/source vocabulary. It is not a native 0.4 Object selector property; native selectors serialize matches_regex."
+  },
+  "resolved": {
+    "windows.registry": {
+      "selectors": {
+        "hive": {
+          "operators": ["equals"],
+          "value_types": ["string"],
+          "enum_source": "native.selector_value_enums.hive",
+          "source_crosswalk": {"equals": "equals", "case insensitive equals": "equals"},
+          "notes": "Hive names are canonical enum values. Case-insensitive source equality is normalized to the canonical enum equality operation; a generic case switch is not exposed."
+        },
+        "key": {
+          "operators": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
+          "value_types": ["string"],
+          "notes": "Registry key identity is case-insensitive. The explicit operation remains part of the authored contract so source conversion and native evaluation can preserve intent."
+        },
+        "name": {
+          "operators": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
+          "value_types": ["string"],
+          "notes": "Registry value-name identity is case-insensitive. The explicit operation remains part of the authored contract so source conversion and native evaluation can preserve intent."
+        }
+      }
+    },
+    "linux.partition": {
+      "selectors": {
+        "mount_point": {
+          "operators": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
+          "value_types": ["string"],
+          "notes": "The native contract uses the string selector vocabulary. Source-specific conversion must retain the selected operation and does not infer a broader typed comparison."
+        }
+      }
+    }
+  },
+  "unresolved_policy": "Every selector in the supported mapping catalog is inventoried by the generator. Selectors without a resolved entry are marked unresolved with their mapping-declared value types and enums; no operator restriction is invented until an owner-reviewed native contract is added."
+}
