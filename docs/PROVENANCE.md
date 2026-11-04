@@ -162,7 +162,7 @@ aliases are introduced.
 | Root schemas | 35 |
 | Root schema `$ref` occurrences | 658 |
 | Aggregate SHA-256 | `0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593` |
-| Tools compatibility candidate | `scap-ng-tools@3e69cd822fcd961f4d9492c9f9ea48f18693742f` (semantic pack `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92`) |
+| Tools compatibility candidate | `scap-ng-tools@a208b7d78944b578906066815e2b43f563330806` (semantic pack `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92`) |
 | Editor candidate pack manifest | `305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` (236 resources) |
 
 The earlier 143-file, 34-root, 242-reference values above remain historical

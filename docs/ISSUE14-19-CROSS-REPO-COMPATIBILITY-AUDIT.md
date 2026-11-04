@@ -9,7 +9,7 @@ This report audits the coordinated draft stack without merging PRs or changing c
 * OVAL 5.12.3: `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`; XSD SHA-256 `06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc`.
 * scap-ng audit base: `8f39cd1`.
 * scap-ng-tools converter baseline: `1f4f74d`.
-* Tools compatibility candidate: `scap-ng-tools@3e69cd822fcd961f4d9492c9f9ea48f18693742f` ([draft #22](https://github.com/vanderpol/scap-ng-tools/pull/22)).
+* Tools compatibility candidate: `scap-ng-tools@a208b7d78944b578906066815e2b43f563330806` ([draft #22](https://github.com/vanderpol/scap-ng-tools/pull/22)).
 * Draft stack: [#15](https://github.com/vanderpol/scap-ng/pull/15), [#16](https://github.com/vanderpol/scap-ng/pull/16), [#17](https://github.com/vanderpol/scap-ng/pull/17), [#18](https://github.com/vanderpol/scap-ng/pull/18), and [#20](https://github.com/vanderpol/scap-ng/pull/20); Issue [#19](https://github.com/vanderpol/scap-ng/issues/19). None is merged by this work. The tools function-adapter comparison is [tools PR #16](https://github.com/vanderpol/scap-ng-tools/pull/16).
 ## Selector compatibility matrix
 
