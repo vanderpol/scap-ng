@@ -45,7 +45,7 @@ The pinned OVAL `FunctionGroup` includes `arithmetic`, `begin`, `concat`,
 `regex_capture`, `unique`, `count`, and `glob_to_regex`. Only `concat`,
 `regex_capture`, and `unique` are retained as direct native forms. The active
 schema's `values` and `merge` are native compositions, not claims that OVAL
-has identically named functions. The remaining functions are deferred; the
+has identically named functions. The remaining functions are deferred, not declared unsupported without an owner decision; no unsupported function disposition is asserted. The
 inactive `variable-function-expression.schema.json` is a migration candidate,
 not active editor or runtime support.
 
