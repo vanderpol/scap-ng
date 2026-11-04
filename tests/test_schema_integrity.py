@@ -12,7 +12,7 @@ EXPECTED_SCHEMAS = 35
 EXPECTED_REFS = 673
 # Owner-approved pre-release 0.4 amendment; prior freeze digest remains in
 # docs/PROVENANCE.md and the previous immutable Git commit.
-EXPECTED_DIGEST = 'dfbcb781008f62f41a547265da43fa5c32cce32bdd54438d0d6bd6093b62463e'
+EXPECTED_DIGEST = '63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5'
 
 
 def strict_object(pairs):
