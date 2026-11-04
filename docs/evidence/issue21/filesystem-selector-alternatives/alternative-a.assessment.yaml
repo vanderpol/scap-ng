@@ -1,0 +1,24 @@
+# Candidate A: current public SCAP-NG selector vocabulary.
+# This is a source-equivalent representative Assessment, not a scanner proof.
+assessment:
+  id: issue21-filesystem-selector-alternative-a
+  version: 1
+  assessment_title: Candidate A filesystem selector vocabulary
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.0
+  tests:
+    file-selector-test:
+      test_title: Select one known Unix configuration file.
+      capability: unix.file
+      object:
+        filepath: {equals: /etc/ssh/sshd_config}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {type: {equals: regular}}
+      reported_elements: all
+  evaluate:
+    test: file-selector-test
