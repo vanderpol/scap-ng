@@ -100,8 +100,8 @@ checkout: it expected 143 JSON files, 34 roots, 242 root references, and digest
 `ab1933f2d9171ee0af70c0fab855b00f5faf78bf59ad4924fbf24b402ac4072a`. The
 separate tools candidate is now repinned and verified against 145 JSON files,
 35 roots, 658 root references, and digest
-`e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`; its
-semantic pack digest is `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d` from tools commit `3ba3cda8506a3973a63ca5b509e771fb9cd511b0`.
+`0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593`; its
+semantic pack digest is `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92` from tools commit `3e69cd822fcd961f4d9492c9f9ea48f18693742f`.
 
 Provenance records the same current candidate and historical boundary in `docs/PROVENANCE.md` under “Current coordinated selector/function draft”.
 
@@ -121,9 +121,9 @@ The pre-mapping candidate values were:
 * stable rollback commit: `463675f3b931e596c922352a131cb3c515ab2265`
 
 The verified coordinated candidate now has source commit
-`7e38222494ee92a9a5584e2879d1688632bb21a5`, schema digest
-`e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`, and
+`5a13698933c88ca1e271d635b9bee39af75bc027`, schema digest
+`0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593`, and
 `145 / 35 / 658` JSON/root/reference counts. The editor-pack manifest is
-`e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd` over 236
+`305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` over 236
 resources. The editor owner must consume these exact values; no VS Code files
 are changed here.

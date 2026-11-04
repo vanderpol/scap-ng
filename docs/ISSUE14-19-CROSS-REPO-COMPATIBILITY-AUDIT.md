@@ -9,7 +9,7 @@ This report audits the coordinated draft stack without merging PRs or changing c
 * OVAL 5.12.3: `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`; XSD SHA-256 `06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc`.
 * scap-ng audit base: `8f39cd1`.
 * scap-ng-tools converter baseline: `1f4f74d`.
-* Tools compatibility candidate: `scap-ng-tools@3ba3cda8506a3973a63ca5b509e771fb9cd511b0` ([draft #22](https://github.com/vanderpol/scap-ng-tools/pull/22)).
+* Tools compatibility candidate: `scap-ng-tools@3e69cd822fcd961f4d9492c9f9ea48f18693742f` ([draft #22](https://github.com/vanderpol/scap-ng-tools/pull/22)).
 * Draft stack: [#15](https://github.com/vanderpol/scap-ng/pull/15), [#16](https://github.com/vanderpol/scap-ng/pull/16), [#17](https://github.com/vanderpol/scap-ng/pull/17), [#18](https://github.com/vanderpol/scap-ng/pull/18), and [#20](https://github.com/vanderpol/scap-ng/pull/20); Issue [#19](https://github.com/vanderpol/scap-ng/issues/19). None is merged by this work. The tools function-adapter comparison is [tools PR #16](https://github.com/vanderpol/scap-ng-tools/pull/16).
 ## Selector compatibility matrix
 
@@ -91,7 +91,7 @@ The pinned XSD supplies the source type/function declarations, not an evaluator.
 * Filesystem alternatives: `docs/evidence/issue21/filesystem-selector-alternatives/`. Candidate A validates; Candidate B and the pre-change tools emission remain rejected.
 * Owner checklist and merge order: `docs/ISSUE14-19-OWNER-ACCEPTANCE-CHECKLIST.md`.
 * Proposed multi-component `unique` shape remains owner-review only: additive `unique: [expression, ...]`; no grammar change was made.
-* Verified candidate pins: schema source commit `7e38222494ee92a9a5584e2879d1688632bb21a5`, schema digest `e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5`, tools semantic pack `212e9572c18e5fb25c53508531d1cb0d8c7b030d306d72b8a25d57db2645394d`, and editor-pack manifest `e78ea28a779bf62c317582e3dd70f5e8c663fcde53c75098c2fb6bda9bf479dd` over 236 resources.
+* Verified candidate pins: schema source commit `5a13698933c88ca1e271d635b9bee39af75bc027`, schema digest `0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593`, tools semantic pack `5e3aa7a017cbce86cb724679fd1a3ce15e1ff63def48f09b61a3f83f3484fb92`, and editor-pack manifest `305dbd0b77729c69f3bc5d40232b0b3fbc5a32646310678f61ff2ae304831a5f` over 236 resources.
 
 ## Owner review queue
 

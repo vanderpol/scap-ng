@@ -111,7 +111,7 @@ class CompatibilityAuditTests(unittest.TestCase):
         self.assertIn("658 root references", self.audit["snapshot_gate"]["finding"])
         self.assertEqual(
             self.audit["editor_pin"]["schema_digest"],
-            "e9405d79f9eac95e84a3f0293dcb37bd7f3e547b790131f296692baa656838a5",
+            "0a8c5a5840b5a17839db87decf034544286baf56383f52de71795862cca20593",
         )
         self.assertEqual(self.audit["editor_pin"]["resource_count"], 236)
 
