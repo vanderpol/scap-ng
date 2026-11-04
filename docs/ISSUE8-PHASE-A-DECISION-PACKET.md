@@ -1,5 +1,15 @@
 # Issue #8 Phase A — native Organizational Input contract audit
 
+> **Owner scope correction — 2026-11-04:** SCAP-NG 0.3 is retired. This
+> Phase A packet predates that correction. Its Phase B recommendations to
+> preserve 0.3 `test/state/state_slot` compatibility and current Result
+> `state_slot` are **superseded**. Phase B is native 0.4-only: no 0.3
+> acceptance, parsing, golden, or compatibility gate. OVAL 5.12.3 States remain
+> source-fidelity/provenance concepts. The current 0.4 Result field audit and
+> removal are documented in schema PR #24; archived 0.3 records are not
+> rewritten and impose no engineering obligation.
+
+
 **Status:** evidence-only decision packet; no contract or implementation change
 **Date:** 2026-11-04
 **Scope:** `vanderpol/scap-ng#8`, owner-requested Phase A after the 2026-11-04
