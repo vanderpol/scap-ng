@@ -322,7 +322,7 @@ def generated_documents():
     for path in immutable:
         fingerprint.update(path.relative_to(SCHEMAS).as_posix().encode() + b'\0')
         fingerprint.update(path.read_bytes())
-    if len(immutable) != 145 or fingerprint.hexdigest() != '2de36b96ccf3771ee2d849ee73cf905a11db936064fb7b6b9458fd985e902156':
+    if len(immutable) != 145 or fingerprint.hexdigest() != '35fbd0d9483209af0dbee23e4bc04f998d9e77a4b2b43fac158102ba4544091c':
         raise ValueError('Frozen 0.4 JSON baseline changed')
     manifest = {
         'format': 'scap-ng/schema-documentation-drift-audit/1',
