@@ -64,8 +64,25 @@ def object_schema(capability, selectors, mapping):
     props = {
         'capability': {'type': 'string', 'minLength': 1},
         'filters': {'type': 'array', 'minItems': 1, 'items': {'$ref': 'capability-common.schema.json#/$defs/state_filter'}},
+        # Set expressions are Object-level acquisition composition. Keep them
+        # in every generated capability overlay so capability-specific
+        # additionalProperties checks do not reject the OVAL 5.12.3 Set form.
+        'set': {'$ref': 'capability-common.schema.json#/$defs/set_expression'},
         **selector_props,
     }
+    for field, parameter in mapping.get('native', {}).get('collection_parameters', {}).items():
+        parameter_schema = {'type': parameter['type']}
+        if parameter.get('type') == 'float':
+            parameter_schema['type'] = 'number'
+        if parameter.get('enum'):
+            parameter_schema['enum'] = parameter['enum']
+        if parameter.get('allow_variable'):
+            parameter_schema = {'oneOf': [
+                parameter_schema,
+                {'$ref': 'capability-common.schema.json#/$defs/variable_reference'},
+                {'$ref': 'capability-common.schema.json#/$defs/input_reference'},
+            ]}
+        props[field] = parameter_schema
     # File selectors are acquisition keys, not the whole Object grammar. The
     # converter materializes OVAL FileBehaviors' effective filesystem scope
     # and, when requested, explicit traversal. Keep those source-equivalent
