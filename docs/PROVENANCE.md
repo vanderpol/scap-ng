@@ -132,3 +132,7 @@ compatibility-breaking schema amendment without owner approval. The editor
 handoff is the exact commit containing this candidate schema family and
 `native-selector-audit.json`; no `.external/editor-pack` or VS Code repository
 changes are included here.
+
+## Issue #14 selector batch 01 — 2026-11-04
+
+The first follow-on batch is documented in `docs/ISSUE14-SELECTOR-BATCH-FILESYSTEM.md`. It resolves 13 high-usage Linux filesystem and Windows selector contracts. The prior candidate digest above remains recorded for provenance; this batch candidate has 503 `$ref` occurrences and family digest `4e45e7afe299705cc0ee16aa83444e913fef0600c37f1120395414d9c1d08d9a`. The inventory is now 19 resolved and 122 explicitly unresolved. This remains a draft and requires owner approval before any merge.

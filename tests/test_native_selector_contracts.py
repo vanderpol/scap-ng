@@ -96,6 +96,86 @@ class NativeSelectorContractTests(unittest.TestCase):
                 self.object_for(document, 'home-is-mounted-with-the-nosuid-option-test')['mount_point'] = predicate
                 self.assert_invalid(document)
 
+    def batch_document(self, capability, obj):
+        document = deepcopy(self.windows)
+        test = next(iter(document['assessment']['tests'].values()))
+        test['capability'] = capability
+        test['object'] = obj
+        return document
+
+    def test_filesystem_and_windows_batch_positive_negative_boundary_contracts(self):
+        batch = {
+            'unix.file': {
+                'selectors': ('filepath', 'path', 'filename'),
+                'nullable': {'filename'},
+                'enum': {},
+            },
+            'windows.file': {
+                'selectors': ('filepath', 'path', 'filename'),
+                'nullable': {'filename'},
+                'enum': {},
+            },
+            'windows.fileeffectiverights': {
+                'selectors': ('filepath', 'path', 'filename', 'trustee_sid'),
+                'nullable': {'filename'},
+                'enum': {},
+            },
+            'windows.ntuser': {
+                'selectors': ('key', 'name'),
+                'nullable': {'name'},
+                'enum': {},
+            },
+            'windows.regkeyeffectiverights': {
+                'selectors': ('hive', 'key', 'trustee_sid'),
+                'nullable': {'key'},
+                'enum': {'hive': 'local_machine'},
+            },
+        }
+        native_ops = ('equals', 'not_equal', 'case_insensitive_equals',
+                      'case_insensitive_not_equal', 'matches_regex')
+        for capability, spec in batch.items():
+            with self.subTest(capability=capability):
+                for field in spec['selectors']:
+                    operators = ('equals',) if field in spec['enum'] else native_ops
+                    for operator in operators:
+                        value = spec['enum'].get(field, 'C:/Policy\\item')
+                        self.assert_valid(self.batch_document(capability, {
+                            field: {operator: value}
+                        }))
+
+                    if field in spec['nullable']:
+                        self.assert_valid(self.batch_document(capability, {field: None}))
+                    else:
+                        self.assert_invalid(self.batch_document(capability, {field: None}))
+
+                    for predicate in (
+                        {'equals': 7},
+                        {'equals': []},
+                        {'greater_than': 'C:/Policy'},
+                        {'pattern_match': 'C:/Policy'},
+                    ):
+                        with self.subTest(field=field, predicate=predicate):
+                            self.assert_invalid(self.batch_document(capability, {field: predicate}))
+
+                self.assert_invalid(self.batch_document(
+                    capability, {'unsupported_selector': {'equals': 'x'}}))
+
+    def test_batch_preserves_variables_lists_and_native_regex_spelling(self):
+        for capability, field in (
+            ('unix.file', 'filepath'),
+            ('windows.file', 'path'),
+            ('windows.fileeffectiverights', 'trustee_sid'),
+            ('windows.ntuser', 'key'),
+            ('windows.regkeyeffectiverights', 'key'),
+        ):
+            with self.subTest(capability=capability, field=field):
+                self.assert_valid(self.batch_document(capability, {
+                    field: {'value_match': 'every', 'matches_regex': {'variable': 'selector-values-variable'}}
+                }))
+                self.assert_valid(self.batch_document(capability, {
+                    field: {'value_match': 'every', 'equals': ['one', 'two']}
+                }))
+
     def test_native_spelling_round_trips_without_rewriting(self):
         raw = (PROJECT / 'examples/linux-home-nosuid.assessment.yaml').read_text()
         parsed = yaml.load(raw, Loader=UniqueYaml)
@@ -118,8 +198,14 @@ class NativeSelectorContractTests(unittest.TestCase):
             self.assertIn(f'{prefix}_object', generated['$defs'])
             for selector in contract['selectors']:
                 self.assertIn(f'{prefix}_{selector}_selector', generated['$defs'])
+        self.assertEqual(audit['resolved_count'], 19)
+        self.assertEqual(audit['unresolved_count'], 122)
         self.assertGreater(audit['unresolved_count'], 0,
                            'ambiguous mappings must remain visibly unresolved')
+        for item in audit['selectors']:
+            if item['status'] == 'resolved':
+                self.assertTrue(item['allowed_operators'])
+                self.assertTrue(item['value_types'])
 
 
 if __name__ == '__main__':

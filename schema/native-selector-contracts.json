@@ -4,8 +4,18 @@
   "status": "owner-review-draft",
   "description": "Reviewed native Object selector contracts used to generate the capability-specific schema overlay. A resolved entry is authoritative for native operator tokens and literal value constraints; selectors not listed here remain explicitly unresolved and retain the generic baseline until their contract is reviewed.",
   "operator_vocabulary": {
-    "metadata_properties": ["datatype", "value_match", "redact_result"],
-    "native_tokens": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
+    "metadata_properties": [
+      "datatype",
+      "value_match",
+      "redact_result"
+    ],
+    "native_tokens": [
+      "equals",
+      "not_equal",
+      "case_insensitive_equals",
+      "case_insensitive_not_equal",
+      "matches_regex"
+    ],
     "source_crosswalk": {
       "pattern match": "matches_regex",
       "equals": "equals",
@@ -19,20 +29,43 @@
     "windows.registry": {
       "selectors": {
         "hive": {
-          "operators": ["equals"],
-          "value_types": ["string"],
+          "operators": [
+            "equals"
+          ],
+          "value_types": [
+            "string"
+          ],
           "enum_source": "native.selector_value_enums.hive",
-          "source_crosswalk": {"equals": "equals", "case insensitive equals": "equals"},
+          "source_crosswalk": {
+            "equals": "equals",
+            "case insensitive equals": "equals"
+          },
           "notes": "Hive names are canonical enum values. Case-insensitive source equality is normalized to the canonical enum equality operation; a generic case switch is not exposed."
         },
         "key": {
-          "operators": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
-          "value_types": ["string"],
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
           "notes": "Registry key identity is case-insensitive. The explicit operation remains part of the authored contract so source conversion and native evaluation can preserve intent."
         },
         "name": {
-          "operators": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
-          "value_types": ["string"],
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
           "notes": "Registry value-name identity is case-insensitive. The explicit operation remains part of the authored contract so source conversion and native evaluation can preserve intent."
         }
       }
@@ -40,12 +73,359 @@
     "linux.partition": {
       "selectors": {
         "mount_point": {
-          "operators": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"],
-          "value_types": ["string"],
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
           "notes": "The native contract uses the string selector vocabulary. Source-specific conversion must retain the selected operation and does not infer a broader typed comparison."
+        }
+      }
+    },
+    "unix.file": {
+      "selectors": {
+        "filepath": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 unix file_object selectors use EntityObjectStringType and retain all five string operations through the native crosswalk. filename null is the explicit directory-object form; empty string remains a string operand. Existing traversal constraints stay in the capability mapping."
+        },
+        "path": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 unix file_object selectors use EntityObjectStringType and retain all five string operations through the native crosswalk. filename null is the explicit directory-object form; empty string remains a string operand. Existing traversal constraints stay in the capability mapping."
+        },
+        "filename": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 unix file_object selectors use EntityObjectStringType and retain all five string operations through the native crosswalk. filename null is the explicit directory-object form; empty string remains a string operand. Existing traversal constraints stay in the capability mapping.",
+          "nullable": true
+        }
+      }
+    },
+    "windows.file": {
+      "selectors": {
+        "filepath": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 Windows file_object selectors use EntityObjectStringType and retain all five string operations through the native crosswalk. filename null is the explicit directory-object form; empty string remains a string operand. Filesystem lookup remains per-directory/provider case context from the existing mapping; no global case switch is added."
+        },
+        "path": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 Windows file_object selectors use EntityObjectStringType and retain all five string operations through the native crosswalk. filename null is the explicit directory-object form; empty string remains a string operand. Filesystem lookup remains per-directory/provider case context from the existing mapping; no global case switch is added."
+        },
+        "filename": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 Windows file_object selectors use EntityObjectStringType and retain all five string operations through the native crosswalk. filename null is the explicit directory-object form; empty string remains a string operand. Filesystem lookup remains per-directory/provider case context from the existing mapping; no global case switch is added.",
+          "nullable": true
+        }
+      }
+    },
+    "windows.fileeffectiverights": {
+      "selectors": {
+        "filepath": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 fileeffectiverights53_object selectors use EntityObjectStringType and retain all five string operations, including the source-limited non-equals trustee SID search. filename null selects the higher-level directory. SID identity and effective-rights acquisition remain separate from native string comparison."
+        },
+        "path": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 fileeffectiverights53_object selectors use EntityObjectStringType and retain all five string operations, including the source-limited non-equals trustee SID search. filename null selects the higher-level directory. SID identity and effective-rights acquisition remain separate from native string comparison."
+        },
+        "filename": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 fileeffectiverights53_object selectors use EntityObjectStringType and retain all five string operations, including the source-limited non-equals trustee SID search. filename null selects the higher-level directory. SID identity and effective-rights acquisition remain separate from native string comparison.",
+          "nullable": true
+        },
+        "trustee_sid": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 fileeffectiverights53_object selectors use EntityObjectStringType and retain all five string operations, including the source-limited non-equals trustee SID search. filename null selects the higher-level directory. SID identity and effective-rights acquisition remain separate from native string comparison."
+        }
+      }
+    },
+    "windows.ntuser": {
+      "selectors": {
+        "key": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 ntuser_object key and name use EntityObjectStringType with all five string operations. name null selects the higher-level key and empty string remains the default-value name. Existing hive/profile discovery and traversal controls remain separate."
+        },
+        "name": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 ntuser_object key and name use EntityObjectStringType with all five string operations. name null selects the higher-level key and empty string remains the default-value name. Existing hive/profile discovery and traversal controls remain separate.",
+          "nullable": true
+        }
+      }
+    },
+    "windows.regkeyeffectiverights": {
+      "selectors": {
+        "hive": {
+          "operators": [
+            "equals"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 regkeyeffectiverights53_object uses the canonical registry-hive enum with equals only; key and trustee_sid retain all five EntityObjectStringType operations. key null selects the higher-level hive. Source-limited non-equals trustee searches and security-descriptor errors remain conversion/runtime concerns.",
+          "enum_source": "native.selector_value_enums.hive"
+        },
+        "key": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 regkeyeffectiverights53_object uses the canonical registry-hive enum with equals only; key and trustee_sid retain all five EntityObjectStringType operations. key null selects the higher-level hive. Source-limited non-equals trustee searches and security-descriptor errors remain conversion/runtime concerns.",
+          "nullable": true
+        },
+        "trustee_sid": {
+          "operators": [
+            "equals",
+            "not_equal",
+            "case_insensitive_equals",
+            "case_insensitive_not_equal",
+            "matches_regex"
+          ],
+          "value_types": [
+            "string"
+          ],
+          "source_crosswalk": {
+            "equals": "equals",
+            "not equal": "not_equal",
+            "case insensitive equals": "case_insensitive_equals",
+            "case insensitive not equal": "case_insensitive_not_equal",
+            "pattern match": "matches_regex"
+          },
+          "notes": "OVAL 5.12.3 regkeyeffectiverights53_object uses the canonical registry-hive enum with equals only; key and trustee_sid retain all five EntityObjectStringType operations. key null selects the higher-level hive. Source-limited non-equals trustee searches and security-descriptor errors remain conversion/runtime concerns."
         }
       }
     }
   },
-  "unresolved_policy": "Every selector in the supported mapping catalog is inventoried by the generator. Selectors without a resolved entry are marked unresolved with their mapping-declared value types and enums; no operator restriction is invented until an owner-reviewed native contract is added."
+  "unresolved_policy": "Every selector in the supported mapping catalog is inventoried by the generator. Selectors without a resolved entry are marked unresolved with their mapping-declared value types and enums; no operator restriction is invented until an owner-reviewed native contract is added.",
+  "batch": {
+    "id": "filesystem-and-windows-01",
+    "priority_basis": "converted_content_usage_counts in docs/generated/capability-catalog.md; then capability importance",
+    "resolved_capabilities": [
+      "windows.fileeffectiverights",
+      "unix.file",
+      "windows.file",
+      "windows.regkeyeffectiverights",
+      "windows.ntuser"
+    ],
+    "selector_count": 13,
+    "source_definition_pin": "OVAL 5.12.3 definitions_schema paths in each existing mapping; source annotations are summarized without copying licensed prose",
+    "ambiguities": [
+      "Filesystem lookup case behavior remains provider/filesystem context; native case-sensitive and case-insensitive comparison operators preserve the source operation and do not add a global case switch.",
+      "The pinned OVAL file_object filename entity is nillable; native null is explicit for filename/name where the reviewed contract permits directory selection. Empty string remains a string operand, not null."
+    ]
+  }
 }

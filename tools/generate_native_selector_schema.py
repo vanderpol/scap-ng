@@ -50,9 +50,13 @@ def object_schema(capability, selectors, mapping):
     defs = {}
     prefix = capability.replace('.', '_')
     for field, contract in selectors.items():
-        enum = mapping.get('native', {}).get('selector_value_enums', {}).get(field)
+        mapped_field = mapping.get('native', {}).get('selector_map', {}).get(field, field)
+        enum = (mapping.get('native', {}).get('selector_value_enums', {}).get(field)
+                or mapping.get('native', {}).get('selector_value_enums', {}).get(mapped_field))
         defs[f'{prefix}_{field}_selector'] = selector_predicate(contract, enum)
-    nullable = set(mapping.get('native', {}).get('nullable_selectors', []))
+    nullable = set(mapping.get('native', {}).get('nullable_selectors', [])) | {
+        field for field, contract in selectors.items() if contract.get('nullable', False)
+    }
     selector_props = {}
     for field in selectors:
         ref = {'$ref': f'#/$defs/{prefix}_{field}_selector'}
@@ -99,8 +103,10 @@ def build():
         if unknown:
             raise SystemExit(f'{capability}: resolved unknown selectors: {sorted(unknown)}')
         for field in sorted(selector_map):
-            mapping_types = native.get('field_datatypes', {}).get(field, [])
-            enums = native.get('selector_value_enums', {}).get(field, [])
+            mapped_field = selector_map.get(field, field)
+            mapping_types = native.get('field_datatypes', {}).get(mapped_field, [])
+            enums = (native.get('selector_value_enums', {}).get(field)
+                     or native.get('selector_value_enums', {}).get(mapped_field, []))
             if field in selected:
                 contract = selected[field]
                 if not contract['operators'] or not set(contract['operators']) <= native_tokens:
@@ -121,7 +127,7 @@ def build():
                 'allowed_operators': operators,
                 'value_types': mapping_types,
                 'enum': enums or None,
-                'nullable': field in native.get('nullable_selectors', []),
+                'nullable': selected.get(field, {}).get('nullable', field in native.get('nullable_selectors', [])) if field in selected else field in native.get('nullable_selectors', []),
                 'reason': notes,
             })
         if selected:
