@@ -2,10 +2,10 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json",
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-11-04",
-  "title": "Native Variable declarations and retained expressions",
-  "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or retained transformations. The schema describes the authoring shape; type compatibility, collection status, and evaluation results are checked separately by semantic validation or the runtime when those implementations exist.",
-  "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/pull/268#issuecomment-6550047257",
+  "x-last-modified": "2026-11-06",
+  "title": "Native Variable declarations and OVAL-compatible function expressions",
+  "description": "Declare typed Variables from literal data, other Variables, collected Object fields, or ordered function expressions. Canonical function calls preserve operand order, collection multiplicity, empty values, and evaluation status; datatype compatibility and status propagation are enforced by semantic validation and runtime evaluation.",
+  "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/issues/19",
   "$ref": "#/$defs/declaration",
   "$defs": {
     "declaration": {
@@ -165,6 +165,263 @@
                   }
                 },
                 "additionalProperties": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "arithmetic"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "integer",
+                  "float"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "substring"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "split"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "count"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "integer"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "concat"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "regex_capture"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "unique"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "expression": {
+                "required": [
+                  "function"
+                ],
+                "properties": {
+                  "function": {
+                    "required": [
+                      "name"
+                    ],
+                    "properties": {
+                      "name": {
+                        "const": "merge"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "datatype": {
+                "enum": [
+                  "string"
+                ]
               }
             }
           }
@@ -522,8 +779,389 @@
           "additionalProperties": false,
           "title": "Merge expression",
           "description": "Sort and join values into one string."
+        },
+        {
+          "$ref": "#/$defs/function_expression"
         }
       ]
+    },
+    "function_expression": {
+      "type": "object",
+      "required": [
+        "function"
+      ],
+      "properties": {
+        "function": {
+          "type": "object",
+          "required": [
+            "name",
+            "arguments",
+            "options"
+          ],
+          "properties": {
+            "name": {
+              "enum": [
+                "arithmetic",
+                "substring",
+                "split",
+                "count",
+                "concat",
+                "regex_capture",
+                "unique",
+                "merge"
+              ]
+            },
+            "arguments": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "description": "Ordered expression operands. Each operand may be a collection; function-specific Cartesian, flattening, and status rules apply."
+            },
+            "options": {
+              "type": "object",
+              "description": "Function-specific options. Unknown options and implicit defaults are invalid."
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "arithmetic"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 2
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "arithmetic_operation"
+                    ],
+                    "properties": {
+                      "arithmetic_operation": {
+                        "enum": [
+                          "add",
+                          "multiply"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Numeric add/multiply over Cartesian-product operands; preserve multiplicity and diagnostic statuses. No boolean/string coercion."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "substring"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "substring_start",
+                      "substring_length"
+                    ],
+                    "properties": {
+                      "substring_start": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      },
+                      "substring_length": {
+                        "type": "integer",
+                        "minimum": -2147483648,
+                        "maximum": 2147483647
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "OVAL one-based substring with signed 32-bit start/length. Start below one clamps; start past the value is an error; negative length means remainder."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "split"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "delimiter"
+                    ],
+                    "properties": {
+                      "delimiter": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Literal delimiter split; retain leading, trailing, adjacent empty parts and duplicates. Empty delimiter is literal, not regex."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "count"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "options": {
+                    "type": "object",
+                    "maxProperties": 0,
+                    "additionalProperties": false,
+                    "description": "Count has no options."
+                  },
+                  "arguments": {
+                    "minItems": 1
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "concat"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 2
+                  },
+                  "options": {
+                    "type": "object",
+                    "maxProperties": 0,
+                    "additionalProperties": false,
+                    "description": "Concat has no options."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "regex_capture"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "pattern"
+                    ],
+                    "properties": {
+                      "pattern": {
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Literal regular-expression pattern; matching outputs retain OVAL capture collection semantics."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "unique"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "maxProperties": 0,
+                    "additionalProperties": false,
+                    "description": "Unique has no options."
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "name": {
+                    "const": "merge"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "arguments": {
+                    "minItems": 1
+                  },
+                  "options": {
+                    "type": "object",
+                    "required": [
+                      "delimiter",
+                      "sort",
+                      "order"
+                    ],
+                    "properties": {
+                      "delimiter": {
+                        "type": "string",
+                        "description": "Literal text inserted between values."
+                      },
+                      "sort": {
+                        "enum": [
+                          "document",
+                          "lexical",
+                          "numeric",
+                          "natural"
+                        ]
+                      },
+                      "order": {
+                        "enum": [
+                          "ascending",
+                          "descending"
+                        ]
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Merge options are explicit so ordering and delimiter semantics are never inferred."
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "description": "Canonical ordered function-call envelope. Arguments are expressions evaluated as collections; options are explicit and function-specific. These calls preserve source collection/status semantics and are not evaluated by JSON Schema alone.",
+      "examples": [
+        {
+          "function": {
+            "name": "count",
+            "arguments": [
+              {
+                "values": {
+                  "object": {
+                    "id": "files-object"
+                  },
+                  "field": "path"
+                }
+              }
+            ],
+            "options": {}
+          }
+        },
+        {
+          "function": {
+            "name": "unique",
+            "arguments": [
+              {
+                "literal": [
+                  "a",
+                  "b"
+                ]
+              },
+              {
+                "literal": [
+                  "b",
+                  "c"
+                ]
+              }
+            ],
+            "options": {}
+          }
+        },
+        {
+          "function": {
+            "name": "merge",
+            "arguments": [
+              {
+                "literal": [
+                  "10",
+                  "2"
+                ]
+              },
+              {
+                "literal": [
+                  ""
+                ]
+              }
+            ],
+            "options": {
+              "delimiter": ",",
+              "sort": "numeric",
+              "order": "ascending"
+            }
+          }
+        },
+        {
+          "function": {
+            "name": "split",
+            "arguments": [
+              {
+                "literal": "a,,b"
+              }
+            ],
+            "options": {
+              "delimiter": ","
+            }
+          }
+        }
+      ]
+    }
+  },
+  "x-scap-ng-variable-function-contract": {
+    "version": "0.4.0-variable-functions/1",
+    "source": "OVAL 5.12.3 variable function and component semantics",
+    "status_propagation": "Function evaluation preserves error, unknown, incomplete, not-collected, not-applicable, and empty populations; no status is converted to a literal value.",
+    "collection_model": "Arguments are ordered collections. Multi-valued arguments use the OVAL Cartesian-product rule where the operation is value-combining; flattening preserves order and duplicates unless the named function removes them.",
+    "functions": {
+      "count": "Returns the number of values in the flattened operand population. Empty values count as values; an empty population returns zero; diagnostic statuses propagate.",
+      "concat": "Concatenates ordered components over the Cartesian product of operand populations. Empty strings are values, not missing values.",
+      "unique": "Flattens ordered components and removes duplicate values while retaining first-occurrence order.",
+      "merge": "Flattens ordered components, applies the explicit sort/order policy, and joins values with the explicit delimiter. Empty values and duplicates are retained.",
+      "split": "Splits each string value on a literal delimiter. Leading, trailing, and adjacent empty parts are retained; an empty delimiter is literal and not a regular expression.",
+      "substring": "Uses OVAL one-based indexing and signed 32-bit options. Start below one clamps to one; start past the value is an error; negative length means through the end.",
+      "arithmetic": "Applies add or multiply to numeric Cartesian-product operands without implicit string/boolean coercion."
     }
   }
 }

@@ -242,7 +242,7 @@
               },
               "constraints": {
                 "type": "object",
-                "description": "Explicit constraints on supplied values. They do not supply a missing Input or change its cardinality.",
+                "description": "Explicit constraints on supplied values. They do not supply a missing Input or change its cardinality. `allowed` preserves finite values; `relation` preserves one typed numeric bound.",
                 "properties": {
                   "allowed": {
                     "type": "array",
@@ -255,6 +255,35 @@
                       ]
                     },
                     "description": "Explicit allowed values in the declared domain; no casts or defaults."
+                  },
+                  "relation": {
+                    "type": "object",
+                    "required": [
+                      "operator",
+                      "value"
+                    ],
+                    "properties": {
+                      "operator": {
+                        "type": "string",
+                        "enum": [
+                          "less_than",
+                          "less_than_or_equal",
+                          "greater_than",
+                          "greater_than_or_equal"
+                        ]
+                      },
+                      "value": {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean",
+                          "object"
+                        ],
+                        "description": "Typed relational bound; compiler/runtime reject nonnumeric relations and never coerce values."
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "One typed numeric relation preserved from the source XCCDF Value operator."
                   }
                 },
                 "additionalProperties": false
