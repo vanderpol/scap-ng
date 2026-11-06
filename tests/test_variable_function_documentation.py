@@ -15,6 +15,7 @@ class VariableFunctionDocumentationTests(unittest.TestCase):
         cls.branches = {
             next(iter(branch['required'])): branch
             for branch in cls.expression['oneOf']
+            if 'required' in branch
         }
 
     def test_retained_expression_inventory_is_complete_and_documented(self):
