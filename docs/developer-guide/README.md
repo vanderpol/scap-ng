@@ -1,42 +1,40 @@
 # SCAP-NG application developer guide
 
-**Status:** documentation architecture pilot. SCAP-NG 0.4 remains pre-alpha;
-schema-valid Assessments do not imply scanner support.
+SCAP-NG 0.4.0 is pre-alpha. This guide describes contracts and implementation
+gaps; structural validation does not establish scanner support or equivalence.
+Pin the entire repository commit, including schemas, specification and examples.
 
-## Read only what you implement
+## Reading order
 
-1. [Common schema and authoring reference](../generated/schema-reference.md)
-2. [Capability catalog](../generated/capability-catalog.md)
-3. Choose your platform:
-   - [Windows pilot](../generated/developer-guide-windows-pilot.md)
-   - [UNIX/Linux pilot](../generated/developer-guide-unix-pilot.md)
-   - [Platform-independent command pilot](../generated/developer-guide-independent-pilot.md)
-4. [Full scanner guidance coverage and documented gaps](../generated/scanner-implementation-catalog.md)
+1. [Shared schema reference](../generated/schema-reference.md): Assessment and Test structure.
+2. [Platform index](../generated/developer-guide-index.md): read only the capability families you implement. Windows implementers do not need the UNIX guide. Read independent capabilities only when implementing them.
+3. [Specification](../../specification/README.md): shared evaluation and result contracts. Capability pages supplement those contracts; they do not define alternative evaluation rules.
+4. [Gap inventory](../generated/developer-guide-gaps.json) and [implementation plan](plan.md): work still needed before qualification.
 
-The platform pages are generated from the pinned capability contracts and a
-small **proposal-only** field-annotation overlay. The 0.4 schema bytes are
-unchanged. If the annotation vocabulary is approved for a future schema
-version, the field-level source moves into the canonical schema generation
-pipeline and this temporary overlay is removed.
+The same frozen mappings and resolved selector contracts supply both author
+fields and implementer tables. Reviewed pilot prose has one temporary home in
+[the annotation sidecar](../metadata/schema-documentation-pilot.json).
+[Ownership and the future annotation proposal](annotation-proposal.md) explain
+how to prevent a second documentation authority. No 0.4.0 schema bytes change.
 
-## Common requirements not captured by field annotations
+## Shared implementation boundaries
 
-- **Trust:** authenticate content before privileged execution. The reference
-  implementation's application-specific signer trust store and opt-in unsigned
-  developer mode are design decisions pending normative documentation.
-- **Target and applicability:** determine the assessed target, record its
-  identity, and apply Benchmark/Rule applicability; preserve instance evidence
-  when presenting host-level results. Aggregation behavior needs a separate
-  contract review.
-- **Collection:** bound traversal and enumeration; distinguish absent,
-  inaccessible, and incomplete evidence. Never invent nonexistent Items.
-- **Results:** retain decisive reasons, error/unknown semantics, and evidence
-  provenance. Human-readable explanations and text/HTML reports are application
-  views of structured results.
-- **Performance:** benchmark large filesystems and identities; balance reuse,
-  parallelism, caching, and resource limits without prescribing a database,
-  programming language, or operating-system API.
+- Resolve schemas locally from the pinned snapshot. Apply documented semantic
+  checks as well as structural validation; schema acceptance alone does not
+  prove that an Assessment has an executable collection contract.
+- Keep target identity, applicability, selected Items and result evidence linked.
+  Use the shared specification for evaluation; unresolved acquisition details
+  must not silently become vendor defaults.
+- Preserve absence, inaccessible data, incomplete collection and comparison
+  failure as distinct inputs wherever the native contract distinguishes them.
+  An unavailable collector is not proof that the selected object does not exist.
+- For shell commands, enforce package/signature verification policy outside the
+  command string, as recorded by the capability's trust rule. Execution policy,
+  resource limits and failure mappings still require contract review.
+- Preserve evidence provenance and decisive reasons in structured results.
+  Reports are views of that evidence. This guide does not prescribe a storage
+  engine, programming language, framework or operating-system API.
 
-Missing collection algorithms, failure mappings, and conformance vectors are
-explicit gaps. Legacy OVAL 5.12.3 XSD descriptions are **research inputs**,
-not automatically authoritative SCAP-NG behavior.
+[Three-pilot review](pilot-review.md) separates frozen facts, OVAL research and
+open decisions. Legacy OVAL descriptions are implementation research inputs;
+they do not add requirements to SCAP-NG.

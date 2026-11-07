@@ -44,8 +44,8 @@ def frontmatter(heading, version):
     return (f'{NOTICE}\n\n# {heading} — {version}\n\n'
             'This is a **generated reference** from the frozen schema and capability '
             'metadata, not a statement of scanner implementation conformance. '
-            'The repository release tag pins this documentation, the schema, '
-            'the specification and examples together.\n\n')
+            'Pin the entire repository commit (or release tag when available), including '
+            'documentation, schemas, specification and examples.\n\n')
 
 
 def assessment_properties(schema):
@@ -172,7 +172,7 @@ def render_scanner_catalog(version, mappings, coverage):
                      f'**Contract:** [mapping](../../schema/capability-mappings/{group}/{path.name}).\n\n')
         selectors = ', '.join(f'`{field}`' for field in native.get('selector_map', {}))
         parameters = ', '.join(f'`{field}`' for field in native.get('collection_parameters', {}))
-        fields = ', '.join(f'`{field}`' for field in native.get('state_field_map', {}))
+        fields = ', '.join(f'`{field}`' for field in sorted(set(native.get('state_field_map', {}).values())))
         lines.append(f'- Authoring selectors: {selectors or "none declared"}.\n')
         lines.append(f'- Collection parameters: {parameters or "none declared"}.\n')
         lines.append(f'- Returned/state fields: {fields or "none declared"}.\n')
@@ -203,85 +203,9 @@ def render_scanner_catalog(version, mappings, coverage):
 
 
 def render_developer_pilot(version, mappings, proposal):
-    """Demonstrate platform guides composed from frozen contracts and draft annotations.
-
-    The proposal lives outside the frozen schema tree until the owner approves
-    an annotation vocabulary. Nothing here qualifies a scanner or changes 0.4.
-    """
-    if proposal['status'] != 'proposal_only_not_part_of_frozen_0.4_schema':
-        raise ValueError('Documentation pilot must not claim normative 0.4 status')
-    by_name = {item['capability']: (group, path, item)
-               for group, path, item in mappings}
-    result = {}
-    for name, record in sorted(proposal['capabilities'].items()):
-        if name not in by_name:
-            raise ValueError(f'{name}: no capability mapping')
-        group, path, item = by_name[name]
-        native = item['native']
-        fields = set(native.get('selector_map', {})) | set(native.get('collection_parameters', {}))
-        extras = set(record['properties']) - fields
-        if extras:
-            raise ValueError(f'{name}: undocumented authoring fields {sorted(extras)}')
-        if group != 'supported':
-            raise ValueError(f'{name}: pilot requires a supported capability mapping')
-        for field, annotation in record['properties'].items():
-            scanner = annotation['x-scap-ng-scanner']
-            if not annotation.get('description') or scanner['documentation_status'] != 'partial':
-                raise ValueError(f'{name}.{field}: missing draft documentation boundary')
-            if not scanner.get('known_contract') or not scanner.get('open_question'):
-                raise ValueError(f'{name}.{field}: missing known/pending separation')
-        platform = record['platform']
-        if platform not in ('windows', 'unix', 'independent'):
-            raise ValueError(f'{name}: unknown documentation platform {platform}')
-        result.setdefault(platform, []).append((name, path, item, record))
-
-    pages = {}
-    for platform, entries in sorted(result.items()):
-        lines = [frontmatter(f'{platform.capitalize()} scanner developer guide — pilot', version),
-                 '**Proposal only:** Field annotations below are not included in the '
-                 'frozen 0.4 JSON Schemas. This generated view demonstrates the '
-                 'future schema-first author and scanner documentation model. '
-                 'No scanner acquisition or equivalence qualification is claimed.\n\n',
-                 'Shared execution, validation, applicability, results, and trust '
-                 'requirements belong in the common specification; this page '
-                 'contains only platform/capability details.\n\n']
-        for name, path, item, record in entries:
-            native = item['native']
-            source = item.get('source', {})
-            lines.extend([f'## {name}\n\n',
-                          f'**Frozen contract:** [capability mapping](../../schema/capability-mappings/supported/{path.name}). '
-                          f'**Legacy source:** {source.get("language", "not recorded")}; '
-                          f'{source.get("test", "test not recorded")}.\n\n'])
-            rows = []
-            for field, annotation in sorted(record['properties'].items()):
-                scanner = annotation['x-scap-ng-scanner']
-                rows.append((f'`{field}`', annotation['description'],
-                             scanner['known_contract'], scanner['open_question']))
-            lines.append(entries_table(['Object field', 'Content-author help',
-                                        'Known scanner contract', 'Pending research'], rows))
-            selectors = native.get('selector_map', {})
-            if selectors:
-                lines.append('\n**Selector crosswalk (source → native):** '
-                             + ', '.join(f'`{key}` → `{value}`'
-                                         for key, value in selectors.items()) + '.\n')
-            parameters = native.get('collection_parameters', {})
-            unannotated = sorted(set(parameters) - set(record['properties']))
-            if unannotated:
-                lines.append('\n**Additional declared collection parameters:** '
-                             + ', '.join(f'`{x}`' for x in unannotated) + '.\n')
-            state_fields = native.get('state_field_map', {})
-            if state_fields:
-                lines.append('\n**Collected fields:** '
-                             + ', '.join(f'`{x}`' for x in state_fields.values()) + '.\n')
-            lines.append('\n**Semantic validator rules:**\n\n')
-            for rule in item.get('semantic_validator_rules', []):
-                lines.append(f'- `{rule["id"]}`: {rule["rule"]}\n')
-            if not item.get('semantic_validator_rules'):
-                lines.append('- No additional rules recorded in this capability mapping.\n')
-            lines.append('\n**Physical collection, missing/error behavior, and conformance:** '
-                         'not yet qualified; do not infer them from legacy OVAL names.\n\n')
-        pages[f'developer-guide-{platform}-pilot.md'] = ''.join(lines)
-    return pages
+    """Render author/scanner views from a shared frozen-contract model."""
+    from developer_guide import render
+    return render(version, mappings, proposal, frontmatter, entries_table)
 
 
 def render_ntuser(version, mapping, notes, audit):
@@ -435,8 +359,9 @@ def verify_documents(expected, output_dir):
     failures = {}
     for filename, content in expected.items():
         path = output_dir / filename
-        actual = path.read_text(encoding='utf-8') if path.exists() else ''
-        if actual != content:
+        raw = path.read_bytes() if path.exists() else None
+        actual = raw.decode('utf-8', errors='replace') if raw is not None else ''
+        if raw != content.encode('utf-8'):
             failures[filename] = '\n'.join(list(difflib.unified_diff(
                 actual.splitlines(), content.splitlines(), fromfile='committed',
                 tofile='expected', lineterm=''))[:24])
@@ -460,7 +385,7 @@ def main():
     else:
         GENERATED.mkdir(parents=True, exist_ok=True)
         for filename, content in expected.items():
-            (GENERATED / filename).write_text(content, encoding='utf-8')
+            (GENERATED / filename).write_text(content, encoding='utf-8', newline='\n')
         print(f'Generated {len(expected)} documentation files from immutable 0.4 metadata')
 
 

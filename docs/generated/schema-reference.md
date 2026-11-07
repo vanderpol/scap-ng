@@ -2,7 +2,7 @@
 
 # Structural schema reference — 0.4.0
 
-This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. The repository release tag pins this documentation, the schema, the specification and examples together.
+This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. Pin the entire repository commit (or release tag when available), including documentation, schemas, specification and examples.
 
 The JSON Schema `$id` URIs retain their versioned `v0.4.0` identity. The physical repository layout is flat under `schema/`; resolvers should use the pinned release snapshot rather than fetching unversioned files over the network.
 

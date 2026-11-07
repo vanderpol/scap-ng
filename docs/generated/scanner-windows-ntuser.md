@@ -2,7 +2,7 @@
 
 # Windows NTUSER: authoring and scanner evidence — 0.4.0
 
-This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. The repository release tag pins this documentation, the schema, the specification and examples together.
+This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. Pin the entire repository commit (or release tag when available), including documentation, schemas, specification and examples.
 
 **Normative boundary:** The current contract is the frozen [windows.ntuser capability mapping](../../schema/capability-mappings/supported/windows.ntuser.json) plus the 0.4 schemas. Legacy OVAL observations below are **review candidates only**, not new 0.4 rules or a qualified scanner implementation.
 

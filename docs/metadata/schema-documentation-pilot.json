@@ -1,5 +1,5 @@
 {
-  "format": "scap-ng/schema-documentation-pilot/1",
+  "format": "scap-ng/schema-documentation-pilot/2",
   "status": "proposal_only_not_part_of_frozen_0.4_schema",
   "purpose": "Trial field-level schema annotations and platform documentation without changing the immutable 0.4 grammar.",
   "capabilities": {
@@ -11,7 +11,18 @@
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
             "known_contract": "Hive is a canonical enum; do not apply a generic case-insensitive string lookup.",
-            "open_question": "Which access-denied and unavailable-hive outcomes map to each collection status?"
+            "open_question": "Which access-denied and unavailable-hive outcomes map to each collection status?",
+            "contract_refs": [
+              "/native/selector_map/hive",
+              "/native/selector_value_enums/hive"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "windows.registry/registry_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         },
         "key": {
@@ -19,7 +30,18 @@
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
             "known_contract": "Registry key identity is case-insensitive.",
-            "open_question": "How should inaccessible parent keys and missing keys differ in evidence?"
+            "open_question": "How should inaccessible parent keys and missing keys differ in evidence?",
+            "contract_refs": [
+              "/native/selector_map/key",
+              "/native/selector_case_semantics/key"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "windows.registry/registry_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         },
         "name": {
@@ -27,39 +49,101 @@
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
             "known_contract": "Value-name identity is case-insensitive; null means the key itself, not its default value.",
-            "open_question": "Which native API errors should be distinguished from absence?"
+            "open_question": "Which native API errors should be distinguished from absence?",
+            "contract_refs": [
+              "/native/selector_map/name",
+              "/migration_crosswalk/null_semantics/name_empty_string"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "windows.registry/registry_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         }
-      }
+      },
+      "gaps": [
+        "acquisition",
+        "absence_errors",
+        "runtime_vectors",
+        "registry_traversal_overlay",
+        "value_encoding_and_cardinality",
+        "timestamp_units",
+        "registry_view_selection"
+      ]
     },
     "unix.file": {
       "platform": "unix",
       "properties": {
         "filepath": {
-          "description": "Select a file using its full path. This selector cannot be combined with traversal.",
+          "description": "Select by complete filepath; the mapping records a no-traversal restriction (see naming gap).",
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
-            "known_contract": "Uses the native full_path selector; no traversal when full_path selection is used.",
-            "open_question": "How should a disappearing or inaccessible file be recorded?"
+            "known_contract": "Authored selector is filepath; its collected field is full_path. The recorded no-traversal semantic rule uses the full_path name; this naming discrepancy needs reconciliation.",
+            "open_question": "How should a disappearing or inaccessible file be recorded?",
+            "contract_refs": [
+              "/native/selector_map/filepath",
+              "/native/state_field_map/filepath"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "unix.file/file_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         },
         "path": {
           "description": "Directory selector used with filename for file discovery.",
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
-            "known_contract": "Maps to native directory selection; traversal is subject to the file traversal contract.",
-            "open_question": "How should local, remote, and changed mount boundaries be detected during traversal?"
+            "known_contract": "Authored selector is path; its collected field is directory. File traversal and filesystem scope have separate frozen definitions.",
+            "open_question": "How should local, remote, and changed mount boundaries be detected during traversal?",
+            "contract_refs": [
+              "/native/selector_map/path",
+              "/native/state_field_map/path"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "unix.file/file_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         },
         "filename": {
           "description": "Filename selector evaluated within the selected directory.",
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
-            "known_contract": "Maps to native name selection; the selector operation determines matching.",
-            "open_question": "How should directory changes during scanning affect completeness?"
+            "known_contract": "Authored selector is filename; its collected field is name. Null selects the directory object according to the resolved selector contract; it is not an empty filename.",
+            "open_question": "How should directory changes during scanning affect completeness?",
+            "contract_refs": [
+              "/native/selector_map/filename",
+              "/native/state_field_map/filename"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "unix.file/file_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         }
-      }
+      },
+      "gaps": [
+        "acquisition",
+        "absence_errors",
+        "runtime_vectors",
+        "selector_vs_result_naming",
+        "time_units",
+        "symlink_and_acl_status",
+        "mount_boundaries"
+      ]
     },
     "independent.shellcommand": {
       "platform": "independent",
@@ -69,7 +153,17 @@
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
             "known_contract": "Select the interpreter specified by the Assessment.",
-            "open_question": "How should a missing interpreter or launch failure be represented?"
+            "open_question": "How should a missing interpreter or launch failure be represented?",
+            "contract_refs": [
+              "/native/collection_parameters/shell"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "independent.shellcommand/shellcommand_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         },
         "command": {
@@ -77,7 +171,17 @@
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
             "known_contract": "Command execution is trust-sensitive; validation of trusted content belongs outside the command string.",
-            "open_question": "How should execution timeouts, cancellation, and output limits be reported?"
+            "open_question": "How should execution timeouts, cancellation, and output limits be reported?",
+            "contract_refs": [
+              "/native/collection_parameters/command"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "independent.shellcommand/shellcommand_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         },
         "pattern": {
@@ -85,10 +189,78 @@
           "x-scap-ng-scanner": {
             "documentation_status": "partial",
             "known_contract": "Matches stdout lines; matching lines and captured subexpressions remain separately observable.",
-            "open_question": "What exact line splitting and regex conformance vectors are required?"
+            "open_question": "What exact line splitting and regex conformance vectors are required?",
+            "contract_refs": [
+              "/native/collection_parameters/pattern"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "independent.shellcommand/shellcommand_object",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
+          }
+        },
+        "error_if_exit_status_not_0": {
+          "description": "Set explicitly: whether a nonzero process exit is a collection error.",
+          "x-scap-ng-scanner": {
+            "documentation_status": "partial",
+            "known_contract": "Set explicitly: whether a nonzero process exit is a collection error. The mapping requires this boolean; do not rely on a runtime default.",
+            "open_question": "How are process evidence, partial output and collection status combined on failure?",
+            "contract_refs": [
+              "/native/collection_parameters/error_if_exit_status_not_0"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "independent.shellcommand/ShellCommandBehaviors",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
+          }
+        },
+        "error_if_stderr_exists": {
+          "description": "Set explicitly: whether stderr output is a collection error.",
+          "x-scap-ng-scanner": {
+            "documentation_status": "partial",
+            "known_contract": "Set explicitly: whether stderr output is a collection error. The mapping requires this boolean; do not rely on a runtime default.",
+            "open_question": "How are process evidence, partial output and collection status combined on failure?",
+            "contract_refs": [
+              "/native/collection_parameters/error_if_stderr_exists"
+            ],
+            "source_lineage": [
+              {
+                "audit_node": "independent.shellcommand/ShellCommandBehaviors",
+                "disposition": "legacy_candidate"
+              }
+            ],
+            "qualification_status": "not_established"
           }
         }
-      }
+      },
+      "gaps": [
+        "acquisition",
+        "absence_errors",
+        "runtime_vectors",
+        "empty_stdout_item_status",
+        "line_framing_and_capture_order",
+        "launch_timeout_limits",
+        "execution_environment",
+        "generic_object_acceptance_vs_mapping_requirements"
+      ]
     }
+  },
+  "annotation_policy": {
+    "authority": "Frozen schema descriptions and mapping facts first; reviewed prose here is a temporary single-source proposal.",
+    "future_keyword": "x-scap-ng-scanner",
+    "future_migration": "Owner approval required for a future schema version; never rewrite 0.4.0.",
+    "roles": [
+      "object selector",
+      "collection parameter",
+      "collected field",
+      "comparison field"
+    ],
+    "qualification": "partial documentation is not runtime qualification"
   }
 }
