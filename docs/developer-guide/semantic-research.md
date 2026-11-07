@@ -41,6 +41,13 @@ non-automated Assessment files; source/manual alternatives are not reclassified.
 
 ## Immediate decision packets
 
+Linked to #29: [shellcommand #31](https://github.com/vanderpol/scap-ng/issues/31),
+[Registry #32](https://github.com/vanderpol/scap-ng/issues/32),
+[UNIX file #33](https://github.com/vanderpol/scap-ng/issues/33), and
+[text-file #34](https://github.com/vanderpol/scap-ng/issues/34).
+The remaining continuation acquisition work stays linked to the existing
+[platform-playbook backlog #3](https://github.com/vanderpol/scap-ng/issues/3).
+
 ### Shellcommand: binding and execution-status contract
 
 The discrepancy is structural versus semantic: generic Object validation

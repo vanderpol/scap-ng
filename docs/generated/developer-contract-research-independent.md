@@ -10,6 +10,8 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Recorded native contract:** The mapping requires shell, command and both boolean error flags; pattern is optional. stdout_line is collected as string, with separate comparison datatype overrides. Trust policy stays outside command text.
 
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/31); native adoption and runtime qualification remain pending.
+
 **Legacy observations, not normative:** OVAL describes one Item per command, echoed identity, per-line stdout/stderr, captures and false error-flag defaults. Object and Item prose disagree about no-output status. Source prose defaulting the shell is not a native default.
 
 Native sources: [independent.shellcommand.json](../../schema/capability-mappings/supported/independent.shellcommand.json#/native), [independent.shellcommand.json](../../schema/capability-mappings/supported/independent.shellcommand.json#/semantic_validator_rules).
@@ -87,6 +89,8 @@ Each row references the research example; explicit input flags or selectors iden
 ## independent.textfilecontent
 
 **Recorded native contract:** Native capability name drops source 54 suffix. Flags ignore_case/multiline/singleline and item_creation are explicit mapping parameters. The literal all_object_elements_fullfilled spelling is frozen. Pattern selector operation remains unresolved as a serialized capability-specific contract.
+
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/34); native adoption and runtime qualification remain pending.
 
 **Legacy observations, not normative:** OVAL textfilecontent54 includes whole-block matching, instance selection including negative-from-end source indices, captures and item_creation choices. No-match behavior depends on item_creation, and source Windows view behavior was removed natively.
 

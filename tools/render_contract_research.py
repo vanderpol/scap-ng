@@ -34,6 +34,8 @@ def validate(research, vectors, content, lineage):
     for cap, record in research['capabilities'].items():
         if record['runtime_qualification'] != 'not_established' or record['status'] != 'research_recommendations_not_adopted':
             raise ValueError('Research cannot silently qualify or adopt a contract')
+        if not record.get('tracking_issue', '').startswith('https://github.com/vanderpol/scap-ng/issues/'):
+            raise ValueError('Research needs a linked native-contract tracking issue')
         for reference in record['native_refs']:
             filename, fragment = reference.split('#')
             path = ROOT / filename
@@ -68,6 +70,7 @@ def render(version, frontmatter, table):
             if cap.split('.')[0] != family:
                 continue
             lines += [f'## {cap}\n\n', '**Recorded native contract:** ' + record['native_facts'] + '\n\n',
+                      f'[Tracking issue]({record["tracking_issue"]}); native adoption and runtime qualification remain pending.\n\n',
                       '**Legacy observations, not normative:** ' + record['legacy_observations'] + '\n\n',
                       'Native sources: ' + ', '.join(f'[{ref.split("#")[0].split("/")[-1]}](../../{ref})'
                                                      for ref in record['native_refs']) + '.\n\n',

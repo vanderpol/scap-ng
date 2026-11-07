@@ -10,6 +10,8 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Recorded native contract:** mount_point selects partitions. The native mount_options_complete rule already requires effective options; configuration-file evidence alone is insufficient. Space fields and block_size are integers.
 
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/3); native adoption and runtime qualification remain pending.
+
 **Legacy observations, not normative:** OVAL calls space quantities physical block counts and block_size bytes per block; options require complete runtime evidence, not only configuration or one mount-table source.
 
 Native sources: [linux.partition.json](../../schema/capability-mappings/supported/linux.partition.json#/native), [linux.partition.json](../../schema/capability-mappings/supported/linux.partition.json#/semantic_validator_rules).
@@ -50,6 +52,8 @@ Each row references the research example; explicit input flags or selectors iden
 ## linux.rpminfo
 
 **Recorded native contract:** Mapping alternatives and migration metadata author package_name; selector_map records the source name to native package_name crosswalk. No dedicated resolved Object overlay exists. include_file_paths is an explicit required mapping parameter. full_path comparisons require requested paths or equivalent complete reused evidence.
+
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/3); native adoption and runtime qualification remain pending.
 
 **Legacy observations, not normative:** OVAL provides package identity, architecture, raw epoch, EVR, signature-key identifier and optional package-owned paths. Missing raw epoch may be (none), while composed EVR uses zero.
 

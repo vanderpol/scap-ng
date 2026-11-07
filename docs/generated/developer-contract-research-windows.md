@@ -10,6 +10,8 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Recorded native contract:** Authored filepath/path/filename differ from returned full_path/directory/name. Existing metadata requires per-directory filesystem case context, not unconditional case folding. Traversal uses Windows junction-specific vocabulary; windows_view is removed.
 
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/3); native adoption and runtime qualification remain pending.
+
 **Legacy observations, not normative:** OVAL distinguishes creation time from UNIX inode-change time, describes FILETIME, file attributes, version resources and directory Item behavior. Its directory type/status notes do not fully align with the native enum containing directory.
 
 Native sources: [windows.file.json](../../schema/capability-mappings/supported/windows.file.json#/native), [windows.file.json](../../schema/capability-mappings/supported/windows.file.json#/semantic_validator_rules), [capability-common.schema.json](../../schema/capability-common.schema.json#/$defs/windows_file_traversal).
@@ -55,6 +57,8 @@ Each row references the research example; explicit input flags or selectors iden
 ## windows.registry
 
 **Recorded native contract:** Canonical hive enum and case-insensitive key/name identity are recorded independently of comparison operators. Null key requires null name; null name selects the key, empty name its default value. Traversal metadata names hierarchy_traversal but the closed Object overlay rejects traversal. windows_view was removed.
+
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/32); native adoption and runtime qualification remain pending.
 
 **Legacy observations, not normative:** OVAL RegistryBehaviors includes depth/direction and view selection. State/Item notes define FILETIME, unsigned DWORD/QWORD, hex binary, raw versus expanded strings and multi-string handling. These encodings/status details are not automatically native.
 
@@ -144,6 +148,8 @@ Each row references the research example; explicit input flags or selectors iden
 ## windows.service
 
 **Recorded native contract:** service_name selects the service; start_type and current_state are separate returned fields with explicit enums. Dependencies and accepted controls are string-valued fields; PID is integer.
+
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/3); native adoption and runtime qualification remain pending.
 
 **Legacy observations, not normative:** OVAL identifies the service by SCM database name rather than display name and describes PID zero for a stopped service, running/system flags and dependencies.
 

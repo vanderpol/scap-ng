@@ -17,9 +17,9 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`file.hash`](#filehash) | supported | `documentation_gap` |
 | [`independent.environmentvariable`](#independentenvironmentvariable) | supported | `documentation_gap` |
 | [`independent.family`](#independentfamily) | supported | `documentation_gap` |
-| [`independent.shellcommand`](#independentshellcommand) | supported | `research_priority` |
+| [`independent.shellcommand`](#independentshellcommand) | supported | `legacy_researched_unqualified` |
 | [`independent.sql`](#independentsql) | supported | `documentation_gap` |
-| [`independent.textfilecontent`](#independenttextfilecontent) | supported | `documentation_gap` |
+| [`independent.textfilecontent`](#independenttextfilecontent) | supported | `legacy_researched_unqualified` |
 | [`independent.unknown`](#independentunknown) | supported | `documentation_gap` |
 | [`independent.xmlfilecontent`](#independentxmlfilecontent) | supported | `documentation_gap` |
 | [`independent.yamlfilecontent`](#independentyamlfilecontent) | supported | `documentation_gap` |
@@ -49,8 +49,8 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`linux.dpkginfo`](#linuxdpkginfo) | supported | `documentation_gap` |
 | [`linux.inetlisteningservers`](#linuxinetlisteningservers) | supported | `documentation_gap` |
 | [`linux.kernelmodule`](#linuxkernelmodule) | supported | `documentation_gap` |
-| [`linux.partition`](#linuxpartition) | supported | `documentation_gap` |
-| [`linux.rpminfo`](#linuxrpminfo) | supported | `documentation_gap` |
+| [`linux.partition`](#linuxpartition) | supported | `legacy_researched_unqualified` |
+| [`linux.rpminfo`](#linuxrpminfo) | supported | `legacy_researched_unqualified` |
 | [`linux.rpmverifyfile`](#linuxrpmverifyfile) | supported | `documentation_gap` |
 | [`linux.rpmverifypackage`](#linuxrpmverifypackage) | supported | `documentation_gap` |
 | [`linux.selinuxboolean`](#linuxselinuxboolean) | supported | `documentation_gap` |
@@ -81,7 +81,7 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`solaris.package`](#solarispackage) | supported | `documentation_gap` |
 | [`solaris.smf`](#solarissmf) | supported | `documentation_gap` |
 | [`solaris.smfproperty`](#solarissmfproperty) | supported | `documentation_gap` |
-| [`unix.file`](#unixfile) | supported | `documentation_gap` |
+| [`unix.file`](#unixfile) | supported | `legacy_researched_unqualified` |
 | [`unix.interface`](#unixinterface) | supported | `documentation_gap` |
 | [`unix.password`](#unixpassword) | supported | `documentation_gap` |
 | [`unix.process`](#unixprocess) | supported | `documentation_gap` |
@@ -95,15 +95,15 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`windows.appcmdlistconfig`](#windowsappcmdlistconfig) | supported | `research_priority` |
 | [`windows.auditeventpolicysubcategories`](#windowsauditeventpolicysubcategories) | supported | `documentation_gap` |
 | [`windows.cmdlet`](#windowscmdlet) | supported | `documentation_gap` |
-| [`windows.file`](#windowsfile) | supported | `documentation_gap` |
+| [`windows.file`](#windowsfile) | supported | `legacy_researched_unqualified` |
 | [`windows.fileeffectiverights`](#windowsfileeffectiverights) | supported | `documentation_gap` |
 | [`windows.group_sid`](#windowsgroup_sid) | supported | `documentation_gap` |
 | [`windows.lockoutpolicy`](#windowslockoutpolicy) | supported | `documentation_gap` |
 | [`windows.ntuser`](#windowsntuser) | supported | `legacy_candidate_unreviewed` |
 | [`windows.passwordpolicy`](#windowspasswordpolicy) | supported | `documentation_gap` |
-| [`windows.registry`](#windowsregistry) | supported | `documentation_gap` |
+| [`windows.registry`](#windowsregistry) | supported | `legacy_researched_unqualified` |
 | [`windows.regkeyeffectiverights`](#windowsregkeyeffectiverights) | supported | `documentation_gap` |
-| [`windows.service`](#windowsservice) | supported | `documentation_gap` |
+| [`windows.service`](#windowsservice) | supported | `legacy_researched_unqualified` |
 | [`windows.sid`](#windowssid) | supported | `documentation_gap` |
 | [`windows.sid_sid`](#windowssid_sid) | supported | `documentation_gap` |
 | [`windows.user_sid`](#windowsuser_sid) | supported | `documentation_gap` |
@@ -189,17 +189,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### independent.shellcommand
 
-**Guidance status:** `research_priority`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.shellcommand.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.shellcommand.json).
 
 - Authoring selectors: none declared.
 - Collection parameters: `shell`, `command`, `pattern`, `error_if_exit_status_not_0`, `error_if_stderr_exists`.
 - Returned/state fields: `command`, `exit_status`, `pattern`, `shell`, `stderr_line`, `stdout_line`, `subexpression`.
-- Research status: Pinned OVAL 5.12.3 XSD review is available in the developer-guide pilot. Empty-output/status conflicts, execution limits and native acquisition/error contracts remain unresolved; no runtime qualification.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-independent.md#independentshellcommand).
 - **Implementation steps:** Not yet reviewed/documented.
 
 **Source documentation:**
 
 - [OVAL 5.12.3 independent definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 independent system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### independent.sql
 
@@ -213,13 +215,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### independent.textfilecontent
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.textfilecontent.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.textfilecontent.json).
 
 - Authoring selectors: `filepath`, `path`, `filename`, `pattern`, `instance`.
 - Collection parameters: `ignore_case`, `multiline`, `singleline`, `item_creation`.
 - Returned/state fields: `directory`, `full_path`, `instance`, `name`, `pattern`, `subexpression`, `text`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-independent.md#independenttextfilecontent).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 independent definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 independent system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### independent.unknown
 
@@ -513,23 +521,35 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### linux.partition
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.partition.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.partition.json).
 
 - Authoring selectors: `mount_point`.
 - Collection parameters: none declared.
 - Returned/state fields: `block_size`, `device`, `fs_type`, `mount_options`, `mount_point`, `space_left`, `space_left_for_unprivileged_users`, `space_used`, `total_space`, `uuid`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-linux.md#linuxpartition).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 linux definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 linux system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### linux.rpminfo
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.rpminfo.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.rpminfo.json).
 
 - Authoring selectors: `name`.
 - Collection parameters: `include_file_paths`.
 - Returned/state fields: `architecture`, `epoch`, `evr`, `extended_name`, `full_path`, `package_name`, `release`, `signature_key_id`, `version`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-linux.md#linuxrpminfo).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 linux definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 linux system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### linux.rpmverifyfile
 
@@ -833,13 +853,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### unix.file
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/unix.file.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/unix.file.json).
 
 - Authoring selectors: `filepath`, `path`, `filename`.
 - Collection parameters: none declared.
 - Returned/state fields: `access_time`, `change_time`, `directory`, `full_path`, `group_execute`, `group_read`, `group_write`, `has_extended_acl`, `modify_time`, `name`, `other_execute`, `other_read`, `other_write`, `owner_execute`, `owner_gid`, `owner_read`, `owner_uid`, `owner_write`, `setgid`, `setuid`, `size`, `sticky`, `type`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-unix.md#unixfile).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 unix definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 unix system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### unix.interface
 
@@ -975,13 +1001,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### windows.file
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.file.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.file.json).
 
 - Authoring selectors: `filepath`, `path`, `filename`.
 - Collection parameters: none declared.
 - Returned/state fields: `access_time`, `attribute`, `company`, `creation_time`, `development_class`, `directory`, `full_path`, `internal_name`, `language`, `microsoft_checksum`, `modify_time`, `name`, `original_name`, `owner`, `product_name`, `product_version`, `size`, `type`, `version`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-windows.md#windowsfile).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 windows definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 windows system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### windows.fileeffectiverights
 
@@ -1040,13 +1072,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### windows.registry
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.registry.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.registry.json).
 
 - Authoring selectors: `hive`, `key`, `name`.
 - Collection parameters: none declared.
 - Returned/state fields: `expanded_value`, `hive`, `key`, `last_write_time`, `name`, `type`, `value`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-windows.md#windowsregistry).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 windows definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 windows system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### windows.regkeyeffectiverights
 
@@ -1060,13 +1098,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### windows.service
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.service.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.service.json).
 
 - Authoring selectors: `service_name`.
 - Collection parameters: none declared.
 - Returned/state fields: `controls_accepted`, `current_state`, `dependencies`, `description`, `display_name`, `path`, `pid`, `service_flag`, `service_name`, `service_type`, `start_name`, `start_type`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-windows.md#windowsservice).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 windows definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 windows system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### windows.sid
 

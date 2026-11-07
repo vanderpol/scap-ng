@@ -10,6 +10,8 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Recorded native contract:** Authored selectors are filepath/path/filename; collected fields are full_path/directory/name. Null filename is the directory form. File traversal is explicit and downward; depth 0 includes the starting directory; unlimited is a string token, not null or -1. Native semantic rules retain older collected-field naming.
 
+[Tracking issue](https://github.com/vanderpol/scap-ng/issues/33); native adoption and runtime qualification remain pending.
+
 **Legacy observations, not normative:** OVAL file Items include link types, integer epoch-second timestamps, size, UID/GID and mode bits. FileBehaviors distinguishes recursion and filesystem restriction. ACL unsupported is described as an absent entity, not false.
 
 Native sources: [unix.file.json](../../schema/capability-mappings/supported/unix.file.json#/native), [unix.file.json](../../schema/capability-mappings/supported/unix.file.json#/semantic_validator_rules), [capability-common.schema.json](../../schema/capability-common.schema.json#/$defs/file_traversal_base), [capability-common.schema.json](../../schema/capability-common.schema.json#/$defs/file_traversal), [capability-common.schema.json](../../schema/capability-common.schema.json#/$defs/filesystem_scope).

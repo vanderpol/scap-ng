@@ -178,6 +178,9 @@ def render_scanner_catalog(version, mappings, coverage):
         lines.append(f'- Returned/state fields: {fields or "none declared"}.\n')
         if record.get('reason'):
             lines.append(f'- Research status: {record["reason"]}\n')
+        if record.get('semantic_research_ref'):
+            family = name.split('.')[0]
+            lines.append(f'- [Semantic research: native facts versus proposals](developer-contract-research-{family}.md#{name.replace(".", "")}).\n')
         steps = record.get('scanner_steps', [])
         if steps:
             lines.append('\n**Curated implementation steps:**\n\n')
