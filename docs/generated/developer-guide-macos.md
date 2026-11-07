@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.accountinfo.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -45,6 +54,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.authorizationdb.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -74,6 +92,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.disabledservice.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -91,6 +118,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.diskinfo
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.diskinfo.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -129,6 +165,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.filevault.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -146,6 +191,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.firmwarepassword.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -162,6 +216,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.gatekeeper
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.gatekeeper.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
@@ -181,6 +244,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.installhistory
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.installhistory.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -211,6 +283,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.keychain.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -238,6 +319,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.launchd
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.launchd.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -267,6 +357,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.nvram.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -293,6 +392,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.plist
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.plist.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -327,6 +435,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.profiles.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -344,6 +461,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.pwpolicy
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.pwpolicy.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -384,6 +510,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.softwareupdate.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -401,6 +536,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.systemprofiler
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.systemprofiler.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -431,6 +575,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## macos.systemsetup
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/macos.systemsetup.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.

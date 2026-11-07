@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.appcmd.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -42,6 +51,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## windows.appcmdlistconfig
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.appcmdlistconfig.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -75,6 +93,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## windows.auditeventpolicysubcategories
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.auditeventpolicysubcategories.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
@@ -153,6 +180,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.cmdlet.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -164,8 +200,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 | module_name | string | true | true | — | PowerShell module name; null preserves source xsi:nil meaning that module name is unconstrained. |
 | module_version | string | true | true | — | Quoted lexical version value; type is inferred as version from this native capability contract. No author datatype needed. Reject non-version inputs rather than converting arbitrary strings. Null preserves source xsi:nil meaning that module version is unconstrained. State comparison version semantics remain distinct. |
 | noun | string | true | true | — | PowerShell cmdlet noun. |
-| parameters | not recorded | true | false | — | Named cmdlet invocation parameters; null means no parameters are supplied. |
-| select | not recorded | true | false | — | Named output properties selected from the cmdlet result; null means Select-Object is not used. |
+| parameters | not recorded | true | unresolved | — | Named cmdlet invocation parameters; null means no parameters are supplied. |
+| select | not recorded | true | unresolved | — | Named output properties selected from the cmdlet result; null means Select-Object is not used. |
 | verb | string | true | true | Approve, Assert, Compare, Confirm, Find, Get, Import, Measure, Read, Request, Resolve, Search, Select, Show, Test, Trace, Watch | PowerShell cmdlet verb. |
 
 ### Evidence and comparison fields
@@ -191,6 +227,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## windows.file
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.file.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -240,6 +285,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 ## windows.fileeffectiverights
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.fileeffectiverights.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -297,6 +351,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.group_sid.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -328,6 +391,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.lockoutpolicy.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -349,6 +421,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.ntuser.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -366,8 +447,8 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| include_default | boolean | true | false | — | Whether the local Default user's ntuser.dat is included. OVAL default false is materialized explicitly. |
-| item_creation | string | true | false | key_and_name_exist, every_ntuser | Controls whether Items are created only for matching key/name pairs or for every relevant ntuser.dat. OVAL default key_and_name_exist is materialized explicitly. |
+| include_default | boolean | true | unresolved | — | Whether the local Default user's ntuser.dat is included. OVAL default false is materialized explicitly. |
+| item_creation | string | true | unresolved | key_and_name_exist, every_ntuser | Controls whether Items are created only for matching key/name pairs or for every relevant ntuser.dat. OVAL default key_and_name_exist is materialized explicitly. |
 
 ### Evidence and comparison fields
 
@@ -400,6 +481,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.passwordpolicy.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -423,6 +513,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## windows.registry
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.registry.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -518,6 +617,15 @@ Illustrative schema fixture only; no host collection or scanner conformance is a
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.regkeyeffectiverights.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -569,6 +677,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.service.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -606,6 +723,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.sid.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -622,8 +748,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| include_group | boolean | true | false | — | Whether matching groups are included; importers materialize OVAL default true. |
-| resolve_group | boolean | true | false | — | Whether group membership is recursively resolved; importers materialize OVAL default false. |
+| include_group | boolean | true | unresolved | — | Whether matching groups are included; importers materialize OVAL default true. |
+| resolve_group | boolean | true | unresolved | — | Whether group membership is recursively resolved; importers materialize OVAL default false. |
 
 ### Evidence and comparison fields
 
@@ -642,6 +768,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.sid_sid.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -658,8 +793,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| include_group | boolean | true | false | — | Whether matching groups are included; importers materialize OVAL default true. |
-| resolve_group | boolean | true | false | — | Whether group membership is recursively resolved; importers materialize OVAL default false. |
+| include_group | boolean | true | unresolved | — | Whether matching groups are included; importers materialize OVAL default true. |
+| resolve_group | boolean | true | unresolved | — | Whether group membership is recursively resolved; importers materialize OVAL default false. |
 
 ### Evidence and comparison fields
 
@@ -677,6 +812,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## windows.user_sid
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.user_sid.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -712,6 +856,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.userright.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -741,6 +894,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.wmi.query.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -769,6 +931,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/windows.wuaupdatesearcher.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -785,7 +956,7 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| include_superseded_updates | boolean | true | false | — | Whether updates superseded by other matching updates are included. OVAL default true is materialized explicitly by importers. |
+| include_superseded_updates | boolean | true | unresolved | — | Whether updates superseded by other matching updates are included. OVAL default true is materialized explicitly by importers. |
 
 ### Evidence and comparison fields
 

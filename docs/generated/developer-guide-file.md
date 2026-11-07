@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/file.hash.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors

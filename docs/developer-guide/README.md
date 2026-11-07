@@ -7,6 +7,7 @@ Pin the entire repository commit, including schemas, specification and examples.
 ## Reading order
 
 1. [Shared schema reference](../generated/schema-reference.md): Assessment and Test structure.
+   [Shared contract model](../generated/developer-guide-contract-model.md): variables, evaluation, cardinality and documentation status.
 2. [Platform index](../generated/developer-guide-index.md): read only the capability families you implement. Windows implementers do not need the UNIX guide. Read independent capabilities only when implementing them.
 3. [Specification](../../specification/README.md): shared evaluation and result contracts. Capability pages supplement those contracts; they do not define alternative evaluation rules.
 4. [Gap inventory](../generated/developer-guide-gaps.json) and [implementation plan](plan.md): work still needed before qualification.

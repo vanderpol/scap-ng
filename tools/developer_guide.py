@@ -5,6 +5,71 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 PILOTS = {'windows', 'unix', 'independent'}
+DOCUMENTATION_STATUSES = ('verified', 'partially_documented', 'unresolved')
+
+
+def contract_sections(record, lineage):
+    """Explicit contract roles; status measures documentation, never execution."""
+    native, overlay = record['native'], record['overlay']
+    inline = next((part for part in overlay['oneOf'] if 'properties' in part), {}) if overlay else {}
+    controls = {key: value for key, value in inline.get('properties', {}).items()
+                if key not in record['selectors'] and key != 'capability'}
+    unresolved = sorted(set(record['selectors']) - set(record['resolved']))
+    return {
+        'authoring_contract': {
+            'documentation_status': 'partially_documented',
+            'selectors': record['selectors'],
+            'operators_and_literal_datatypes': record['resolved'],
+            'unresolved_selectors': unresolved,
+            'variables': {
+                'documentation_status': 'verified',
+                'selector_value_reference': 'schema/native-selector.schema.json#/$defs/selector_value_reference',
+                'variable_reference': 'schema/capability-common.schema.json#/$defs/variable_reference',
+                'input_reference': 'schema/capability-common.schema.json#/$defs/input_reference',
+                'scope': 'Shared reference forms; allowed positions depend on each selector/parameter schema.',
+                'parameter_allow_variable': {key: value.get('allow_variable')
+                                             for key, value in sorted(record['parameters'].items())}},
+            'collection_parameters': record['parameters'],
+            'collection_controls': controls,
+            'control_coverage': 'closed_overlay' if overlay else 'unresolved',
+            'pending': ['Acquisition semantics and mapping/schema discrepancies require review.']},
+        'collection_contract': {
+            'documentation_status': 'partially_documented' if record['fields'] else 'unresolved',
+            'selection': 'authoring_contract',
+            'returned_fields': record['fields'],
+            'source_to_native_fields': native.get('state_field_map', {}),
+            'field_datatypes': native.get('field_datatypes', {}),
+            'field_enums': native.get('state_value_enums', {}),
+            'acquisition': {'documentation_status': 'unresolved',
+                            'pending': 'Physical acquisition steps, completeness and per-field status mappings are not qualified.'}},
+        'evaluation_contract': {
+            'documentation_status': 'partially_documented',
+            'requirements': 'schema/assessment-language.schema.json#/$defs/canonical_all_items_requirement',
+            'presence_only': 'schema/assessment-language.schema.json#/$defs/item_presence_requirement',
+            'comparisons': 'schema/assessment-language.schema.json#/$defs/canonical_field_predicate',
+            'cardinality': {key: 'schema/assessment-language.schema.json#/$defs/' + key
+                            for key in ('cardinality', 'existence_cardinality', 'item_existence_cardinality', 'paired_requirement')},
+            'comparison_datatype_overrides': native.get('state_field_datatypes', {}),
+            'capability_semantic_rules': record['rules'],
+            'missing_error_behavior': {
+                'documentation_status': 'unresolved',
+                'known_rules_ref': 'evaluation_contract.capability_semantic_rules',
+                'collection_parameter_policies_ref': 'authoring_contract.collection_parameters',
+                'pending': 'Listed native rules remain applicable; a complete acquisition-to-evaluation status table is not documented.'}},
+        'provenance': {
+            'documentation_status': 'verified',
+            'native': {'disposition': 'native_contract_reference', 'mapping': record['path'],
+                       'scope': record['group'],
+                       'selectors': 'schema/native-selector-contracts.json',
+                       'shared_evaluation': 'schema/assessment-language.schema.json'},
+            'legacy': {'disposition': 'legacy_candidate',
+                       'audit_nodes': {key: value for key, value in sorted(lineage['nodes'].items())
+                                       if key.startswith(record['name'] + '/')},
+                       'status': 'reviewed_source_inventory' if record['annotation'] else 'not_reviewed_in_this_model'},
+            'boundary': 'Legacy documentation does not add native requirements.'},
+        'documentation_status': 'partially_documented',
+        'runtime_qualification': 'not_established',
+    }
 
 
 def pointer(document, fragment):
@@ -49,7 +114,7 @@ def model(mappings, proposal):
             raise ValueError(f'{name}: undocumented authoring fields {sorted(extras)}')
         for field, value in sorted(properties.items()):
             scanner = value['x-scap-ng-scanner']
-            if (not value.get('description') or scanner['documentation_status'] != 'partial'
+            if (not value.get('description') or scanner['documentation_status'] != 'partially_documented'
                     or not scanner.get('known_contract') or not scanner.get('open_question')):
                 raise ValueError(f'{name}.{field}: missing known/pending separation')
             if scanner.get('qualification_status') != 'not_established':
@@ -79,6 +144,8 @@ def model(mappings, proposal):
                            resolved=resolved, annotation=annotation,
                            rules=item.get('semantic_validator_rules', []),
                            overlay=overlays.get(name.replace('.', '_') + '_object')))
+    for record in result:
+        record['contracts'] = contract_sections(record, lineage)
     return result
 
 
@@ -104,6 +171,12 @@ def render(version, mappings, proposal, frontmatter, table):
             lines += [f'## {name}\n\n',
                       f'**Scope:** {record["group"]}. **Authority:** '
                       f'[frozen mapping](../../{record["path"]}).\n\n']
+            sections = record['contracts']
+            lines += [table(['Contract', 'Documentation status'],
+                            [(key.replace('_contract', '').replace('_', ' '), sections[key]['documentation_status'])
+                             for key in ('authoring_contract', 'collection_contract', 'evaluation_contract', 'provenance')]),
+                      '\n[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). '
+                      'Acquisition and complete missing/error mappings remain unresolved.\n\n']
             rows = []
             for field in sorted(record['selectors']):
                 contract = record['resolved'].get(field, {})
@@ -135,8 +208,8 @@ def render(version, mappings, proposal, frontmatter, table):
             if record['parameters']:
                 lines += ['\n### Collection parameters\n\n', table(
                     ['Name', 'Type', 'Required by mapping', 'Variable allowed', 'Enum', 'Description'],
-                    [(field, info.get('type', 'not recorded'), str(info.get('required', False)).lower(),
-                      str(info.get('allow_variable', False)).lower(), ', '.join(map(str, info.get('enum', []))) or '—',
+                    [(field, info.get('type', 'not recorded'), str(info.get('required', 'unresolved')).lower(),
+                      str(info.get('allow_variable', 'unresolved')).lower(), ', '.join(map(str, info.get('enum', []))) or '—',
                       properties.get(field, {}).get('description', info.get('description', 'not recorded')))
                      for field, info in sorted(record['parameters'].items())])]
             if record['fields']:
@@ -175,6 +248,10 @@ def render(version, mappings, proposal, frontmatter, table):
                                   missing_result_datatypes=[f for f in record['fields'] if f not in native.get('field_datatypes', {})],
                                   annotated_author_fields=len(annotation.get('properties', {})),
                                   qualification='not_established',
+                                  documentation_status=sections['documentation_status'],
+                                  contract_status={key: sections[key]['documentation_status'] for key in
+                                                   ('authoring_contract', 'collection_contract', 'evaluation_contract', 'provenance')},
+                                  unresolved_contracts=['collection_contract.acquisition', 'evaluation_contract.missing_error_behavior'],
                                   object_validation='closed_overlay' if record['overlay'] else 'no_dedicated_selector_overlay',
                                   gaps=annotation.get('gaps', ['acquisition', 'absence_errors', 'runtime_vectors'])))
         suffix = '-pilot' if platform in PILOTS else ''
@@ -191,6 +268,39 @@ def render(version, mappings, proposal, frontmatter, table):
              '\n[Expansion priorities and schedule](../developer-guide/plan.md) · '
              '[Proposed annotation ownership](../developer-guide/annotation-proposal.md).\n']
     pages['developer-guide-index.md'] = ''.join(index)
+    shared = records[0]['contracts']
+    lines = [frontmatter('Shared contract model', version),
+             'Every capability model separates authoring, collection, evaluation and provenance. '
+             'Documentation status is independent of runtime qualification.\n\n',
+             table(['Status', 'Meaning'], [
+                 ('verified', 'A source projection/reference is mechanically checked against the pinned native contracts or legacy audit; this does not verify scanner behavior.'),
+                 ('partially_documented', 'Known source-backed facts exist, with unresolved implementation contracts.'),
+                 ('unresolved', 'The model has no complete reviewed contract for this aspect; do not infer defaults.')]),
+             '\n## Authoring and variables\n\n',
+             'Selectors, native operators, literal datatypes, collection parameters and closed-overlay controls '
+             'are capability-specific. Shared reference syntax does not authorize a reference at every position.\n\n']
+    variable_refs = shared['authoring_contract']['variables']
+    evaluation = shared['evaluation_contract']
+    refs = [(key, variable_refs[key]) for key in ('selector_value_reference', 'variable_reference', 'input_reference')]
+    refs += [(key, evaluation[key]) for key in ('requirements', 'presence_only', 'comparisons')]
+    refs += list(evaluation['cardinality'].items())
+    rows = []
+    for label, ref in refs:
+        filename, fragment = ref.split('#')
+        schema = json.loads((ROOT / filename).read_text(encoding='utf-8'))
+        node = pointer(schema, fragment)
+        rows.append((label, f'[{ref}](../../{ref})', ', '.join(node.get('enum', [])) or '—',
+                     node.get('description', node.get('title', 'See referenced schema.'))))
+    lines += [table(['Contract aspect', 'Native authority', 'Enum (if declared)', 'Schema description'], rows),
+              '\n## Collection and evaluation\n\n',
+              'The collection contract identifies selected objects, returned fields, field datatypes/enums and unresolved '
+              'physical acquisition. The evaluation contract references shared requirements, comparisons and cardinalities, '
+              'and carries capability rules and comparison datatype overrides. It does not equate acquisition failure with absence. '
+              'Complete missing/error decision tables remain unresolved, even when individual native rules are known.\n\n',
+              'Native references and legacy audit nodes occupy separate provenance branches. Legacy facts cannot populate '
+              'native requirements without explicit adoption. Verified provenance means references match their recorded sources; '
+              'unreviewed capabilities retain an explicit legacy-review gap.\n']
+    pages['developer-guide-contract-model.md'] = ''.join(lines)
     pages['developer-guide-gaps.json'] = json.dumps(dict(
         format='scap-ng/developer-guide-gaps/1',
         summary=dict(capabilities=len(records), supported=sum(r['group'] == 'supported' for r in records),

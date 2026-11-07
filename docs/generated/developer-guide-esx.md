@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** experimental. **Authority:** [frozen mapping](../../schema/capability-mappings/experimental/esx.host_account.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -38,6 +47,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** experimental. **Authority:** [frozen mapping](../../schema/capability-mappings/experimental/esx.host_advancedsetting.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -60,6 +78,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## esx.host_service
 
 **Scope:** experimental. **Authority:** [frozen mapping](../../schema/capability-mappings/experimental/esx.host_service.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -86,6 +113,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## esx.host_vib
 
 **Scope:** experimental. **Authority:** [frozen mapping](../../schema/capability-mappings/experimental/esx.host_vib.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 

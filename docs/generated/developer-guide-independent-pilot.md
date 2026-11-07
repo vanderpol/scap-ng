@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.environmentvariable.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -42,6 +51,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.family.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -60,6 +78,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.shellcommand.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -68,8 +95,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
 | command | string | true | true | — | Command text executed by the selected interpreter. |
-| error_if_exit_status_not_0 | boolean | true | false | — | Set explicitly: whether a nonzero process exit is a collection error. |
-| error_if_stderr_exists | boolean | true | false | — | Set explicitly: whether stderr output is a collection error. |
+| error_if_exit_status_not_0 | boolean | true | unresolved | — | Set explicitly: whether a nonzero process exit is a collection error. |
+| error_if_stderr_exists | boolean | true | unresolved | — | Set explicitly: whether stderr output is a collection error. |
 | pattern | string | false | true | — | Optional regular expression used to retain matching stdout lines. |
 | shell | string | true | true | sh, bash, csh, ksh, zsh, cmd, powershell, pwsh | Interpreter used to run the authored command; use one of the allowed shell names. |
 
@@ -150,6 +177,15 @@ Illustrative schema fixture only; no host collection or scanner conformance is a
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.sql.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -184,6 +220,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.textfilecontent.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -204,10 +249,10 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| ignore_case | boolean | true | false | — | OVAL textfilecontent54 ignore_case behavior; importers materialize the default false. |
-| item_creation | string | true | false | all_object_elements_fullfilled, filepath_exists | OVAL textfilecontent54 item_creation behavior, preserving the source vocabulary. |
-| multiline | boolean | true | false | — | OVAL textfilecontent54 multiline behavior; importers materialize the default true. |
-| singleline | boolean | true | false | — | OVAL textfilecontent54 singleline behavior; importers materialize the default false. |
+| ignore_case | boolean | true | unresolved | — | OVAL textfilecontent54 ignore_case behavior; importers materialize the default false. |
+| item_creation | string | true | unresolved | all_object_elements_fullfilled, filepath_exists | OVAL textfilecontent54 item_creation behavior, preserving the source vocabulary. |
+| multiline | boolean | true | unresolved | — | OVAL textfilecontent54 multiline behavior; importers materialize the default true. |
+| singleline | boolean | true | unresolved | — | OVAL textfilecontent54 singleline behavior; importers materialize the default false. |
 
 ### Evidence and comparison fields
 
@@ -232,6 +277,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.unknown.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | unresolved |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -242,6 +296,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## independent.xmlfilecontent
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.xmlfilecontent.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -262,7 +325,7 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| item_creation | string | true | false | all_object_elements_fullfilled, filepath_exists | Controls XML item creation. Importers materialize the OVAL default all_object_elements_fullfilled. |
+| item_creation | string | true | unresolved | all_object_elements_fullfilled, filepath_exists | Controls XML item creation. Importers materialize the OVAL default all_object_elements_fullfilled. |
 
 ### Evidence and comparison fields
 
@@ -286,6 +349,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## independent.yamlfilecontent
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/independent.yamlfilecontent.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 

@@ -11,7 +11,7 @@ from test_draft202012_and_examples import schema_registry
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / 'tools'))
-from developer_guide import model  # noqa: E402
+from developer_guide import DOCUMENTATION_STATUSES, model, pointer  # noqa: E402
 from generate_docs import (generated_documents, load, mappings_inventory,  # noqa: E402
                            render_developer_pilot, verify_documents)
 
@@ -38,7 +38,7 @@ class DeveloperGuideTests(unittest.TestCase):
                          missing_result_datatypes=38))
         pages = [value for key, value in self.docs.items()
                  if key.startswith('developer-guide-') and key.endswith('.md')
-                 and key != 'developer-guide-index.md']
+                 and key not in {'developer-guide-index.md', 'developer-guide-contract-model.md'}]
         self.assertEqual(len(pages), 15)
         for record in inventory['capabilities']:
             name = record['capability']
@@ -158,6 +158,48 @@ class DeveloperGuideTests(unittest.TestCase):
             self.assertIn(node['file'], audit['files'])
             self.assertGreater(node['annotation_count'], 0)
             self.assertTrue(node['xpath'].startswith('/xsd:schema/'))
+
+    def test_all_capabilities_expose_five_contract_sections_and_honest_status(self):
+        ledger = json.loads(self.docs['developer-guide-gaps.json'])
+        statuses = {r['capability']: r['contract_status'] for r in ledger['capabilities']}
+        for record in model(self.mappings, self.proposal):
+            contract = record['contracts']
+            with self.subTest(capability=record['name']):
+                self.assertEqual(set(contract), {'authoring_contract', 'collection_contract',
+                                 'evaluation_contract', 'provenance', 'documentation_status',
+                                 'runtime_qualification'})
+                for section in statuses[record['name']]:
+                    self.assertIn(contract[section]['documentation_status'], DOCUMENTATION_STATUSES)
+                    self.assertEqual(statuses[record['name']][section], contract[section]['documentation_status'])
+                self.assertEqual(contract['collection_contract']['returned_fields'], record['fields'])
+                self.assertEqual(contract['collection_contract']['acquisition']['documentation_status'], 'unresolved')
+                self.assertEqual(contract['evaluation_contract']['missing_error_behavior']['documentation_status'], 'unresolved')
+                self.assertEqual(contract['documentation_status'], 'partially_documented')
+                self.assertEqual(contract['runtime_qualification'], 'not_established')
+                self.assertEqual(contract['provenance']['native']['disposition'], 'native_contract_reference')
+                self.assertEqual(contract['provenance']['legacy']['disposition'], 'legacy_candidate')
+
+    def test_shared_evaluation_and_variable_references_resolve_without_legacy_defaults(self):
+        for record in model(self.mappings, self.proposal):
+            contract = record['contracts']
+            author, evaluation = contract['authoring_contract'], contract['evaluation_contract']
+            refs = [author['variables'][key] for key in
+                    ('selector_value_reference', 'variable_reference', 'input_reference')]
+            refs += [evaluation[key] for key in ('requirements', 'presence_only', 'comparisons')]
+            refs += list(evaluation['cardinality'].values())
+            for ref in refs:
+                filename, fragment = ref.split('#')
+                self.assertIsInstance(pointer(load(PROJECT / filename), fragment), dict)
+            self.assertEqual(evaluation['capability_semantic_rules'], record['rules'])
+            self.assertEqual(evaluation['comparison_datatype_overrides'],
+                             record['native'].get('state_field_datatypes', {}))
+        records = {r['name']: r for r in model(self.mappings, self.proposal)}
+        shell = records['independent.shellcommand']['contracts']['authoring_contract']
+        self.assertTrue(shell['collection_parameters']['command']['allow_variable'])
+        self.assertIsNone(shell['variables']['parameter_allow_variable']['error_if_stderr_exists'])
+        unix = records['unix.file']['contracts']['authoring_contract']
+        self.assertIn('traversal', unix['collection_controls'])
+        self.assertNotIn('traversal', records['windows.registry']['contracts']['authoring_contract']['collection_controls'])
 
 
 if __name__ == '__main__':

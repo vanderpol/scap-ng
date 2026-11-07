@@ -31,7 +31,7 @@ orphan fields, missing facts/questions and qualification upgrades fail generatio
 {
   "description": "Select a canonical registry hive.",
   "x-scap-ng-scanner": {
-    "documentation_status": "partial",
+    "documentation_status": "partially_documented",
     "known_contract": "The hive uses the canonical enum.",
     "contract_refs": ["/native/selector_value_enums/hive"],
     "open_question": "How are unavailable hives represented?",
@@ -70,3 +70,26 @@ both schema annotations and guides from one source, then remove the temporary
 sidecar. Alternatives are keeping the sidecar permanently (simpler migration,
 but weaker co-location) or manually authoring two guides (creates duplicate
 authority; not recommended). No option requires rewriting frozen 0.4.0.
+
+## Required shared-model sections
+
+Every capability exposes all five sections, including explicitly unresolved ones:
+
+| Section | Contents |
+| --- | --- |
+| Authoring contract | Selectors, native operators, literal datatypes, scoped variable/Input references, collection parameters and closed-overlay controls |
+| Collection contract | Selection reference, returned fields, datatypes/enums, acquisition contract or explicit gap |
+| Evaluation contract | Shared requirements, comparisons and cardinalities; datatype overrides and native rules; missing/error decision-table coverage |
+| Provenance | Native contract references and separately classified legacy audit nodes, with scope and legacy-review status |
+| Documentation status | `verified`, `partially_documented`, or `unresolved`, independent of runtime qualification |
+
+`verified` identifies mechanically checked source projections/references, not
+scanner equivalence. A capability can have verified variable syntax and source
+references while acquisition and error mappings remain unresolved; its overall
+status stays partially documented. Existing source-backed rules remain in force
+when the complete decision table is missing. The model never promotes legacy
+OVAL prose to native behavior to fill a gap.
+
+The generated [shared contract reference](../generated/developer-guide-contract-model.md)
+resolves the actual schema definitions; platform pages and the machine ledger
+show section status. This is documentation structure only, outside frozen grammar.

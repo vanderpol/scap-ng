@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.file.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -115,6 +124,15 @@ Illustrative schema fixture only; no host collection or scanner conformance is a
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.interface.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -148,6 +166,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.password.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -180,6 +207,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 ## unix.process
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.process.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -222,6 +258,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.shadow.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -258,6 +303,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.sshd.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -287,6 +341,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.symlink.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -315,6 +378,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.sysctl.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -341,6 +413,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## unix.uname
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/unix.uname.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.

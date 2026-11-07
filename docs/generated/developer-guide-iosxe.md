@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.bgpneighbor.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -39,6 +48,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.global.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -64,6 +82,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## iosxe.interface
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.interface.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -109,6 +136,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.line.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -135,6 +171,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## iosxe.routingprotocolauthintf
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.routingprotocolauthintf.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -168,6 +213,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.section.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -195,6 +249,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## iosxe.snmpcommunity
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.snmpcommunity.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -225,6 +288,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## iosxe.snmpgroup
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.snmpgroup.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -259,6 +331,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.snmphost.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -288,6 +369,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## iosxe.snmpuser
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.snmpuser.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -320,6 +410,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## iosxe.version
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/iosxe.version.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.

@@ -12,6 +12,15 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.apparmorstatus.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -34,6 +43,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## linux.dpkginfo
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.dpkginfo.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -66,6 +84,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 ## linux.inetlisteningservers
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.inetlisteningservers.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -105,6 +132,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.kernelmodule.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -132,6 +168,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## linux.partition
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.partition.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -169,6 +214,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.rpminfo.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -185,7 +239,7 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| include_file_paths | boolean | true | false | — | Whether collection includes file paths owned by the installed package. Importers materialize the OVAL filepaths default as false. |
+| include_file_paths | boolean | true | unresolved | — | Whether collection includes file paths owned by the installed package. Importers materialize the OVAL filepaths default as false. |
 
 ### Evidence and comparison fields
 
@@ -210,6 +264,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.rpmverifyfile.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -231,17 +294,17 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| skip_capabilities | boolean | true | false | — | Whether file-capability verification is skipped; importers materialize OVAL nocaps, default false. |
-| skip_config_files | boolean | true | false | — | Whether RPM %config files are excluded; importers materialize OVAL noconfigfiles, default false. |
-| skip_file_digest | boolean | true | false | — | Whether file-digest verification is skipped; importers materialize OVAL nofiledigest, default false. |
-| skip_ghost_files | boolean | true | false | — | Whether RPM %ghost files are excluded; importers materialize OVAL noghostfiles, default false. |
-| skip_group | boolean | true | false | — | Whether file-group verification is skipped; importers materialize OVAL nogroup, default false. |
-| skip_link_target | boolean | true | false | — | Whether symbolic-link target verification is skipped; importers materialize OVAL nolinkto, default false. |
-| skip_mode | boolean | true | false | — | Whether mode verification is skipped; importers materialize OVAL nomode, default false. |
-| skip_mtime | boolean | true | false | — | Whether mtime verification is skipped; importers materialize OVAL nomtime, default false. |
-| skip_owner | boolean | true | false | — | Whether file-owner verification is skipped; importers materialize OVAL nouser, default false. |
-| skip_rdev | boolean | true | false | — | Whether device verification is skipped; importers materialize OVAL nordev, default false. |
-| skip_size | boolean | true | false | — | Whether file-size verification is skipped; importers materialize OVAL nosize, default false. |
+| skip_capabilities | boolean | true | unresolved | — | Whether file-capability verification is skipped; importers materialize OVAL nocaps, default false. |
+| skip_config_files | boolean | true | unresolved | — | Whether RPM %config files are excluded; importers materialize OVAL noconfigfiles, default false. |
+| skip_file_digest | boolean | true | unresolved | — | Whether file-digest verification is skipped; importers materialize OVAL nofiledigest, default false. |
+| skip_ghost_files | boolean | true | unresolved | — | Whether RPM %ghost files are excluded; importers materialize OVAL noghostfiles, default false. |
+| skip_group | boolean | true | unresolved | — | Whether file-group verification is skipped; importers materialize OVAL nogroup, default false. |
+| skip_link_target | boolean | true | unresolved | — | Whether symbolic-link target verification is skipped; importers materialize OVAL nolinkto, default false. |
+| skip_mode | boolean | true | unresolved | — | Whether mode verification is skipped; importers materialize OVAL nomode, default false. |
+| skip_mtime | boolean | true | unresolved | — | Whether mtime verification is skipped; importers materialize OVAL nomtime, default false. |
+| skip_owner | boolean | true | unresolved | — | Whether file-owner verification is skipped; importers materialize OVAL nouser, default false. |
+| skip_rdev | boolean | true | unresolved | — | Whether device verification is skipped; importers materialize OVAL nordev, default false. |
+| skip_size | boolean | true | unresolved | — | Whether file-size verification is skipped; importers materialize OVAL nosize, default false. |
 
 ### Evidence and comparison fields
 
@@ -278,6 +341,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.rpmverifypackage.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
 ### Object selectors
@@ -298,8 +370,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 | Name | Type | Required by mapping | Variable allowed | Enum | Description |
 | --- | --- | --- | --- | --- | --- |
-| skip_dependencies | boolean | true | false | — | Whether RPM dependency verification is skipped; importers materialize OVAL nodeps, default false. |
-| skip_scripts | boolean | true | false | — | Whether RPM verification scripts are skipped; importers materialize OVAL noscripts, default false. |
+| skip_dependencies | boolean | true | unresolved | — | Whether RPM dependency verification is skipped; importers materialize OVAL nodeps, default false. |
+| skip_scripts | boolean | true | unresolved | — | Whether RPM verification scripts are skipped; importers materialize OVAL noscripts, default false. |
 
 ### Evidence and comparison fields
 
@@ -323,6 +395,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## linux.selinuxboolean
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.selinuxboolean.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -351,6 +432,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 ## linux.selinuxsecuritycontext
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.selinuxsecuritycontext.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -399,6 +489,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.sestatus.json).
 
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
 
 No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
 
@@ -419,6 +518,15 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ## linux.systemdunitdependency
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.systemdunitdependency.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
@@ -446,6 +554,15 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 ## linux.systemdunitproperty
 
 **Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/linux.systemdunitproperty.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
 
 Operators/types: [resolved selector contracts](../../schema/native-selector-contracts.json); unresolved entries need review.
 
