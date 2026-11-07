@@ -20,6 +20,7 @@ This repository provides the current schema candidate, a small set of readable e
 - [VS Code authoring editor](https://github.com/vanderpol/scap-ng-vscode)
 - [Conversion and authoring tools](https://github.com/vanderpol/scap-ng-tools)
 - [Scanner implementation reference](docs/generated/scanner-implementation-catalog.md)
+- [Application developer guide (platform-organized pilot)](docs/developer-guide/README.md)
 
 ## Validation and provenance
 

@@ -202,6 +202,88 @@ def render_scanner_catalog(version, mappings, coverage):
     return ''.join(lines).rstrip() + '\n'
 
 
+def render_developer_pilot(version, mappings, proposal):
+    """Demonstrate platform guides composed from frozen contracts and draft annotations.
+
+    The proposal lives outside the frozen schema tree until the owner approves
+    an annotation vocabulary. Nothing here qualifies a scanner or changes 0.4.
+    """
+    if proposal['status'] != 'proposal_only_not_part_of_frozen_0.4_schema':
+        raise ValueError('Documentation pilot must not claim normative 0.4 status')
+    by_name = {item['capability']: (group, path, item)
+               for group, path, item in mappings}
+    result = {}
+    for name, record in sorted(proposal['capabilities'].items()):
+        if name not in by_name:
+            raise ValueError(f'{name}: no capability mapping')
+        group, path, item = by_name[name]
+        native = item['native']
+        fields = set(native.get('selector_map', {})) | set(native.get('collection_parameters', {}))
+        extras = set(record['properties']) - fields
+        if extras:
+            raise ValueError(f'{name}: undocumented authoring fields {sorted(extras)}')
+        if group != 'supported':
+            raise ValueError(f'{name}: pilot requires a supported capability mapping')
+        for field, annotation in record['properties'].items():
+            scanner = annotation['x-scap-ng-scanner']
+            if not annotation.get('description') or scanner['documentation_status'] != 'partial':
+                raise ValueError(f'{name}.{field}: missing draft documentation boundary')
+            if not scanner.get('known_contract') or not scanner.get('open_question'):
+                raise ValueError(f'{name}.{field}: missing known/pending separation')
+        platform = record['platform']
+        if platform not in ('windows', 'unix', 'independent'):
+            raise ValueError(f'{name}: unknown documentation platform {platform}')
+        result.setdefault(platform, []).append((name, path, item, record))
+
+    pages = {}
+    for platform, entries in sorted(result.items()):
+        lines = [frontmatter(f'{platform.capitalize()} scanner developer guide — pilot', version),
+                 '**Proposal only:** Field annotations below are not included in the '
+                 'frozen 0.4 JSON Schemas. This generated view demonstrates the '
+                 'future schema-first author and scanner documentation model. '
+                 'No scanner acquisition or equivalence qualification is claimed.\n\n',
+                 'Shared execution, validation, applicability, results, and trust '
+                 'requirements belong in the common specification; this page '
+                 'contains only platform/capability details.\n\n']
+        for name, path, item, record in entries:
+            native = item['native']
+            source = item.get('source', {})
+            lines.extend([f'## {name}\n\n',
+                          f'**Frozen contract:** [capability mapping](../../schema/capability-mappings/supported/{path.name}). '
+                          f'**Legacy source:** {source.get("language", "not recorded")}; '
+                          f'{source.get("test", "test not recorded")}.\n\n'])
+            rows = []
+            for field, annotation in sorted(record['properties'].items()):
+                scanner = annotation['x-scap-ng-scanner']
+                rows.append((f'`{field}`', annotation['description'],
+                             scanner['known_contract'], scanner['open_question']))
+            lines.append(entries_table(['Object field', 'Content-author help',
+                                        'Known scanner contract', 'Pending research'], rows))
+            selectors = native.get('selector_map', {})
+            if selectors:
+                lines.append('\n**Selector crosswalk (source → native):** '
+                             + ', '.join(f'`{key}` → `{value}`'
+                                         for key, value in selectors.items()) + '.\n')
+            parameters = native.get('collection_parameters', {})
+            unannotated = sorted(set(parameters) - set(record['properties']))
+            if unannotated:
+                lines.append('\n**Additional declared collection parameters:** '
+                             + ', '.join(f'`{x}`' for x in unannotated) + '.\n')
+            state_fields = native.get('state_field_map', {})
+            if state_fields:
+                lines.append('\n**Collected fields:** '
+                             + ', '.join(f'`{x}`' for x in state_fields.values()) + '.\n')
+            lines.append('\n**Semantic validator rules:**\n\n')
+            for rule in item.get('semantic_validator_rules', []):
+                lines.append(f'- `{rule["id"]}`: {rule["rule"]}\n')
+            if not item.get('semantic_validator_rules'):
+                lines.append('- No additional rules recorded in this capability mapping.\n')
+            lines.append('\n**Physical collection, missing/error behavior, and conformance:** '
+                         'not yet qualified; do not infer them from legacy OVAL names.\n\n')
+        pages[f'developer-guide-{platform}-pilot.md'] = ''.join(lines)
+    return pages
+
+
 def render_ntuser(version, mapping, notes, audit):
     if mapping['capability'] != notes['capability']:
         raise ValueError('NTUSER source notes do not match capability')
@@ -306,6 +388,7 @@ def generated_documents():
     notes = load(METADATA / 'windows.ntuser-source-notes.json')
     audit = load(METADATA / 'windows.ntuser-oval-audit.json')
     coverage = load(METADATA / 'scanner-guidance-status.json')
+    proposal = load(METADATA / 'schema-documentation-pilot.json')
     ntuser = next(item for group, _, item in mappings
                   if group == 'supported' and item['capability'] == 'windows.ntuser')
     md_files = {
@@ -316,6 +399,7 @@ def generated_documents():
             version, mappings, coverage),
         'scanner-windows-ntuser.md': render_ntuser(version, ntuser, notes, audit),
     }
+    md_files.update(render_developer_pilot(version, mappings, proposal))
     immutable = sorted((*SCHEMAS.glob('*.json'),
                         *(SCHEMAS / 'capability-mappings').rglob('*.json')))
     fingerprint = sha256()
