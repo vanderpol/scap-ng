@@ -2,7 +2,7 @@
 
 # Capability contract catalog — 0.4.0
 
-This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. The repository release tag pins this documentation, the schema, the specification and examples together.
+This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. Pin the entire repository commit (or release tag when available), including documentation, schemas, specification and examples.
 
 ## 100 supported and 4 experimental mappings
 

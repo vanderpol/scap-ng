@@ -1,0 +1,1710 @@
+{
+  "format": "scap-ng/developer-semantic-vectors/1",
+  "status": "research_not_adopted",
+  "runtime_execution": "not_run",
+  "vectors": [
+    {
+      "id": "shell-positive",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout": [
+          "example"
+        ],
+        "stderr": []
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "One execution Item; all example fields match.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-negative",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout": [
+          "other"
+        ],
+        "stderr": []
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "One Item retained; stdout comparison fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-no-bytes",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout_bytes_hex": "",
+        "stderr": []
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Execution Item retained, stdout population empty; one-or-more stdout requirement fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-empty-line",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout_bytes_hex": "0a",
+        "stderr": []
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "One empty stdout line, distinct from no bytes; literal example does not match.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-duplicate",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout": [
+          "example",
+          "example"
+        ],
+        "stderr": []
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Duplicate lines preserved; every value matches.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-conflicting",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout": [
+          "example",
+          "other"
+        ],
+        "stderr": []
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Both lines preserved; every does not reduce to any.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-nonzero-strict",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 7,
+        "stdout": [
+          "example"
+        ],
+        "stderr": []
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Explicit nonzero error flag true; preserve exit status and output.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-nonzero-permissive",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 7,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [],
+        "error_if_exit_status_not_0": false
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "No collection error from nonzero flag alone; example exit_status equals zero fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-stderr-strict",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [
+          "warning"
+        ]
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Explicit stderr flag true; retain stderr separately.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-stderr-permissive",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "exit_status": 0,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [
+          "warning"
+        ],
+        "error_if_stderr_exists": false
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "No collection error from stderr alone; matched stdout retained.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-interpreter-missing",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": false,
+        "failure": "interpreter_not_found"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "No fabricated process exit code or absence success.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-permission-denied",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": false,
+        "failure": "permission_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Record launch failure; do not convert to empty successful collection.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-timeout",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "partial_stdout": [
+          "example"
+        ],
+        "failure": "timeout"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Partial output is diagnostic evidence, not complete success.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-output-limit",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "partial_stdout": [
+          "example"
+        ],
+        "failure": "output_limit"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Record truncation and incomplete collection.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-malformed-cast",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "launched": true,
+        "stdout": [
+          "not-an-integer"
+        ],
+        "comparison_datatype": "integer"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed comparison failure result; never cast to zero or drop the value.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-no-match",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "stdout": [
+          "other"
+        ],
+        "pattern": "^example$"
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Execution Item retained; selected stdout lines empty.",
+      "topic": "shell-output",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-captures",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "stdout": [
+          "left=1 right=2"
+        ],
+        "pattern": "left=(.*) right=(.*)"
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Retain matching line plus both captures with association; exact native capture cardinality/order requires decision.",
+      "topic": "shell-output",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-malformed-pattern",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "pattern": "["
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed reject-before-launch diagnostic; schema acceptance alone is insufficient.",
+      "topic": "shell-output",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-malformed-encoding",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "stdout_bytes_hex": "ff"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed decoding-error diagnostic with original byte evidence; no replacement-character normalization.",
+      "topic": "shell-output",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-positive",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "complete": true,
+        "type": "dword",
+        "value": 1
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Default named value exists; example comparisons match.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-negative",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "complete": true,
+        "type": "dword",
+        "value": 0
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Existing value fails expected integer.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-key-missing",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "complete": true,
+        "key_exists": false
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "No selected Item; example needs one or more.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-value-missing",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "complete": true,
+        "key_exists": true,
+        "default_value_exists": false
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Key existence does not create the selected default value.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-denied",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "complete": false,
+        "failure": "access_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Do not make an absence requirement true from denied enumeration.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-race",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "complete": false,
+        "failure": "deleted_during_query"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Distinguish transient incomplete query from complete absence.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-expansion-error",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "expand_string",
+        "value": "%UNAVAILABLE%",
+        "expanded_value_status": "error"
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Keep raw value and expansion diagnostic; exact field-specific propagation needs contract.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-empty-string",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "string",
+        "value": ""
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Existing empty string is not a missing value; example expects DWORD.",
+      "topic": "registry-values",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-multi-duplicates",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "multi_string",
+        "value": [
+          "a",
+          "a",
+          "b"
+        ]
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Preserve all three strings; no deduplication or implicit join. Use a reviewed multi-string requirement, not the DWORD example.",
+      "topic": "registry-values",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-empty-multi",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "multi_string",
+        "value": []
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Keep value identity and empty element population distinctly from absent named value.",
+      "topic": "registry-values",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-qword-range",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "qword",
+        "value": 18446744073709551615
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Lossless unsigned payload; no binary64 rounding or signed wrap.",
+      "topic": "registry-values",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-binary-malformed",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "binary",
+        "value": "not-hex"
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Reject only under an approved native binary codec; source hex form alone is not a native contract.",
+      "topic": "registry-values",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-view-conflict",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "32_bit": {
+          "value": 0
+        },
+        "64_bit": {
+          "value": 1
+        }
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Target view must be explicit; no implicit process view or merging.",
+      "topic": "registry-view",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-key-versus-default",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "object_name": null,
+        "key_exists": true,
+        "default_value_exists": false
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Null selects the key itself; the default-value example must be changed explicitly to a key-presence requirement.",
+      "topic": "registry-view",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-depth-zero",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "root_value": 1,
+        "child_value": 0,
+        "max_depth": 0
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Future proposal selects starting key only; current registry traversal syntax is rejected.",
+      "topic": "registry-traversal",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-depth-unlimited",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "root_value": 1,
+        "child_value": 0,
+        "max_depth": "unlimited"
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Future traversal includes descendants; compare every selected value, not just the root.",
+      "topic": "registry-traversal",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-positive",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "complete": true,
+        "owner_uid": 0
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Existing fixture file is owned by root in the controlled evidence.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-negative",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "complete": true,
+        "owner_uid": 1000
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Do not resolve UID through a name or effective-access test.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-missing",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "complete": true,
+        "exists": false
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "No synthetic missing Item; one-or-more population fails.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-permission-denied",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "complete": false,
+        "failure": "parent_search_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Denied lookup is not complete absence.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-race",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "complete": false,
+        "failure": "removed_during_metadata_read"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Preserve readable independent fields and incomplete diagnostic.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-dangling-link",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "link_exists": true,
+        "target_exists": false,
+        "link_owner_uid": 0
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Recommended direct link-object metadata preserves link existence, not target absence.",
+      "topic": "unix-links",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-link-owner-conflict",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "link_owner_uid": 1000,
+        "target_owner_uid": 0
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Recommended direct selection compares link ownership; target substitution would change the result.",
+      "topic": "unix-links",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-link-cycle",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "recurse": "symlinks_and_directories",
+        "ancestor_cycle": true
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Terminate cyclic descent and report completeness according to a reviewed traversal contract; never hang.",
+      "topic": "unix-links",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-depth-zero",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "path": "/fixture",
+        "filename": null,
+        "max_depth": 0
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Starting directory only; uses a traversal variant, not the full-path example.",
+      "topic": "unix-boundaries",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-depth-one",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "path": "/fixture",
+        "max_depth": 1,
+        "children": [
+          "a",
+          "a/b"
+        ]
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Include first descendant depth, exclude deeper a/b; variant requires explicit path/filename selectors.",
+      "topic": "unix-boundaries",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-bind-same-filesystem",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "filesystem": "same",
+        "bind_mount_same_filesystem": true
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Recommended filesystem identity boundary differs from a mount-instance boundary.",
+      "topic": "unix-boundaries",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-local-unknown",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "filesystem": "local",
+        "classification": "unknown"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed incomplete classification diagnostic; do not guess local.",
+      "topic": "unix-boundaries",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-duplicate-path-aliases",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "paths": [
+          "/a/file",
+          "/b/file"
+        ],
+        "same_inode": true
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Keep distinct selected path identities; use ancestor identity for cycle prevention, not global path deduplication.",
+      "topic": "unix-boundaries",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-acl-none",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "acl_supported": true,
+        "extra_acl": false
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Recommended has_extended_acl=false; this vector requires an ACL-specific variant of the Assessment.",
+      "topic": "unix-metadata",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-acl-unsupported",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "acl_supported": false
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Recommend not_collected with diagnostic; source OVAL absent-entity behavior is an explicit alternative.",
+      "topic": "unix-metadata",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-mode-versus-effective",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "owner_read_bit": false,
+        "effective_read_via_acl": true
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Mode-bit fields describe permission bits, not effective access.",
+      "topic": "unix-metadata",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-time-resolution",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "raw_seconds": 1700000000,
+        "raw_nanoseconds": 123456789
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Proposed native integer seconds plus separate raw provenance; no unapproved timestamp conversion.",
+      "topic": "unix-metadata",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "windows-file-positive",
+      "capability": "windows.file",
+      "example": "docs/developer-guide/research-examples/windows.file.json",
+      "input": {
+        "size": 42
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Existing fixture file has a positive size.",
+      "topic": "windows-file-context",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "windows-file-empty",
+      "capability": "windows.file",
+      "example": "docs/developer-guide/research-examples/windows.file.json",
+      "input": {
+        "size": 0
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Existing empty file is not missing.",
+      "topic": "windows-file-context",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "windows-file-resource-missing",
+      "capability": "windows.file",
+      "example": "docs/developer-guide/research-examples/windows.file.json",
+      "input": {
+        "size": 42,
+        "version_resource_status": "does_not_exist"
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Independent absent version resource does not erase size evidence.",
+      "topic": "windows-file-context",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "windows-file-denied",
+      "capability": "windows.file",
+      "example": "docs/developer-guide/research-examples/windows.file.json",
+      "input": {
+        "failure": "access_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed collection error; no absence substitution.",
+      "topic": "windows-file-context",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "windows-file-case-conflict",
+      "capability": "windows.file",
+      "example": "docs/developer-guide/research-examples/windows.file.json",
+      "input": {
+        "directory_case_sensitive": true,
+        "names": [
+          "A",
+          "a"
+        ]
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Honor per-directory identity rather than global case folding.",
+      "topic": "windows-file-context",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "service-running",
+      "capability": "windows.service",
+      "example": "docs/developer-guide/research-examples/windows.service.json",
+      "input": {
+        "current_state": "SERVICE_RUNNING"
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Selected service satisfies example.",
+      "topic": "service-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "service-stopped",
+      "capability": "windows.service",
+      "example": "docs/developer-guide/research-examples/windows.service.json",
+      "input": {
+        "current_state": "SERVICE_STOPPED",
+        "pid": 0
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Zero PID is a stopped service, not a missing service.",
+      "topic": "service-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "service-disabled-running",
+      "capability": "windows.service",
+      "example": "docs/developer-guide/research-examples/windows.service.json",
+      "input": {
+        "start_type": "SERVICE_DISABLED",
+        "current_state": "SERVICE_RUNNING"
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Configuration and runtime state are independent.",
+      "topic": "service-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "service-denied",
+      "capability": "windows.service",
+      "example": "docs/developer-guide/research-examples/windows.service.json",
+      "input": {
+        "failure": "query_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed query error; not proof of service absence.",
+      "topic": "service-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "rpm-positive",
+      "capability": "linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "input": {
+        "package_name": "scap-ng-fixture"
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Selected installed package matches the example.",
+      "topic": "rpm-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "rpm-absent",
+      "capability": "linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "input": {
+        "complete": true,
+        "packages": []
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Complete empty population fails existence requirement.",
+      "topic": "rpm-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "rpm-multi-arch",
+      "capability": "linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "input": {
+        "packages": [
+          {
+            "name": "scap-ng-fixture",
+            "arch": "x86_64"
+          },
+          {
+            "name": "scap-ng-fixture",
+            "arch": "i686"
+          }
+        ]
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Preserve both installed identities; both satisfy package-name comparison.",
+      "topic": "rpm-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "rpm-paths-disabled",
+      "capability": "linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "input": {
+        "include_file_paths": false,
+        "requires_full_path": true
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Existing semantic rule requires requested paths or complete reused evidence.",
+      "topic": "rpm-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "rpm-epoch-none",
+      "capability": "linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "input": {
+        "epoch": "(none)",
+        "evr": "0:1-1"
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Preserve raw epoch; EVR normalization is not a cast of raw evidence.",
+      "topic": "rpm-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "rpm-db-denied",
+      "capability": "linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "input": {
+        "failure": "package_database_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed error diagnostic; not package absence.",
+      "topic": "rpm-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "partition-positive",
+      "capability": "linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "input": {
+        "mount_options": [
+          "rw",
+          "nodev"
+        ]
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Effective nodev value exists.",
+      "topic": "partition-units",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "partition-negative",
+      "capability": "linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "input": {
+        "mount_options": [
+          "rw"
+        ]
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Missing effective nodev value fails field condition.",
+      "topic": "partition-units",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "partition-conflicting-config",
+      "capability": "linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "input": {
+        "effective_options": [
+          "rw"
+        ],
+        "fstab": [
+          "nodev"
+        ]
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Native completeness rule forbids configuration-only success.",
+      "topic": "partition-units",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "partition-block-units",
+      "capability": "linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "input": {
+        "total_space": 100,
+        "block_size": 4096
+      },
+      "proposed_outcome": "unresolved",
+      "expected_evidence": "Proposed 100 blocks, not 100 bytes; units require adoption.",
+      "topic": "partition-units",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "partition-denied",
+      "capability": "linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "input": {
+        "failure": "mount_evidence_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed error; no fabricated empty complete collection.",
+      "topic": "partition-units",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-positive",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "text": "setting=enabled",
+        "captures": [
+          "enabled"
+        ]
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Selected first match capture satisfies the example.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-negative",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "text": "setting=disabled",
+        "captures": [
+          "disabled"
+        ]
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Capture does not match enabled.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-no-match-default",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "file_exists": true,
+        "matches": [],
+        "item_creation": "all_object_elements_fullfilled"
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Proposed no matching Items; one-or-more fails.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-no-match-filepath-exists",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "file_exists": true,
+        "matches": [],
+        "item_creation": "filepath_exists"
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Proposed file evidence Item has no capture values; field requirement fails.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-denied",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "failure": "read_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed read error; not no-match.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-malformed-pattern",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "pattern": "["
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed pattern validation failure, not an empty match population.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "text-duplicate-conflicting",
+      "capability": "independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "input": {
+        "selected_instance": 1,
+        "matches": [
+          "enabled",
+          "disabled"
+        ]
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "With instance=1 only first match is selected; retaining all instances would change meaning.",
+      "topic": "text-match-identity",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-both-failures-00",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "exit_status": 7,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [
+          "warning"
+        ],
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": false
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Both process conditions occur; flags act independently. With both false the example exit-status comparison still fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-both-failures-01",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "exit_status": 7,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [
+          "warning"
+        ],
+        "error_if_exit_status_not_0": false,
+        "error_if_stderr_exists": true
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Both process conditions occur; flags act independently. With both false the example exit-status comparison still fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-both-failures-10",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "exit_status": 7,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [
+          "warning"
+        ],
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": false
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Both process conditions occur; flags act independently. With both false the example exit-status comparison still fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "shell-both-failures-11",
+      "capability": "independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "input": {
+        "exit_status": 7,
+        "stdout": [
+          "example"
+        ],
+        "stderr": [
+          "warning"
+        ],
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": true
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Both process conditions occur; flags act independently. With both false the example exit-status comparison still fails.",
+      "topic": "shell-status",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-absence-confirmed",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "require_variant": "presence only: items_found none",
+        "complete": true,
+        "items": []
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Explicit absence variant: complete confirmed empty population satisfies none-found.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-absence-denied",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "require_variant": "presence only: items_found none",
+        "complete": false,
+        "failure": "access_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Absence variant must not become true when selection was denied.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-absence-confirmed",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "require_variant": "presence only: items_found none",
+        "complete": true,
+        "items": []
+      },
+      "proposed_outcome": "true",
+      "expected_evidence": "Explicit absence variant: complete confirmed empty population satisfies none-found.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-absence-denied",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "require_variant": "presence only: items_found none",
+        "complete": false,
+        "failure": "access_denied"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Absence variant must not become true when selection was denied.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-multiple-conflicting",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "object_variant": "name-pattern selection in one key",
+        "items": [
+          {
+            "value": 1
+          },
+          {
+            "value": 0
+          }
+        ]
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Preserve both selected Items; every-item satisfaction cannot become one-or-more.",
+      "topic": "registry-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "unix-multiple-conflicting",
+      "capability": "unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "input": {
+        "object_variant": "path/filename selection of two files",
+        "items": [
+          {
+            "owner_uid": 0
+          },
+          {
+            "owner_uid": 1000
+          }
+        ]
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "Preserve both selected Items; every-item satisfaction cannot become one-or-more.",
+      "topic": "unix-errors",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "registry-malformed-integer",
+      "capability": "windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "input": {
+        "type": "dword",
+        "value": "not-an-integer"
+      },
+      "proposed_outcome": "error",
+      "expected_evidence": "Proposed malformed collection/comparison diagnostic; never coerce to zero.",
+      "topic": "registry-values",
+      "status": "proposed_not_scanner_verified"
+    },
+    {
+      "id": "partition-missing",
+      "capability": "linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "input": {
+        "complete": true,
+        "mount_exists": false
+      },
+      "proposed_outcome": "false",
+      "expected_evidence": "A complete missing mount does not satisfy the example existence requirement.",
+      "topic": "partition-units",
+      "status": "proposed_not_scanner_verified"
+    }
+  ],
+  "schema_probes": [
+    {
+      "id": "schema-shell-missing-shell",
+      "capability": "independent.shellcommand",
+      "object": {
+        "command": "printf example",
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": true
+      },
+      "accepted": true,
+      "boundary": "Generic schema acceptance does not enforce mapping required parameters."
+    },
+    {
+      "id": "schema-shell-missing-command",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "sh",
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": true
+      },
+      "accepted": true,
+      "boundary": "Generic schema acceptance does not enforce mapping required parameters."
+    },
+    {
+      "id": "schema-shell-missing-error_if_exit_status_not_0",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "sh",
+        "command": "printf example",
+        "error_if_stderr_exists": true
+      },
+      "accepted": true,
+      "boundary": "Generic schema acceptance does not enforce mapping required parameters."
+    },
+    {
+      "id": "schema-shell-missing-error_if_stderr_exists",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "sh",
+        "command": "printf example",
+        "error_if_exit_status_not_0": true
+      },
+      "accepted": true,
+      "boundary": "Generic schema acceptance does not enforce mapping required parameters."
+    },
+    {
+      "id": "schema-shell-malformed-shell",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "not-a-shell",
+        "command": "printf example",
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": true
+      },
+      "accepted": true,
+      "boundary": "Generic Object baseline; not a semantic approval."
+    },
+    {
+      "id": "schema-shell-malformed-command",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "sh",
+        "command": [],
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": true
+      },
+      "accepted": true,
+      "boundary": "Generic Object baseline; not a semantic approval."
+    },
+    {
+      "id": "schema-shell-malformed-error_if_stderr_exists",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "sh",
+        "command": "printf example",
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": "false"
+      },
+      "accepted": true,
+      "boundary": "Generic Object baseline; not a semantic approval."
+    },
+    {
+      "id": "schema-shell-malformed-pattern",
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": "sh",
+        "command": "printf example",
+        "error_if_exit_status_not_0": true,
+        "error_if_stderr_exists": true,
+        "pattern": "["
+      },
+      "accepted": true,
+      "boundary": "Generic Object baseline; not a semantic approval."
+    },
+    {
+      "id": "schema-registry-literal",
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE\\Fixture"
+        },
+        "name": {
+          "equals": ""
+        }
+      },
+      "accepted": true,
+      "boundary": "Reviewed selector vocabulary."
+    },
+    {
+      "id": "schema-registry-traversal",
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE\\Fixture"
+        },
+        "name": {
+          "equals": ""
+        },
+        "traversal": {
+          "max_depth": 0
+        }
+      },
+      "accepted": false,
+      "boundary": "Closed overlay rejects property or noncanonical enum."
+    },
+    {
+      "id": "schema-registry-windows_view",
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE\\Fixture"
+        },
+        "name": {
+          "equals": ""
+        },
+        "windows_view": "32_bit"
+      },
+      "accepted": false,
+      "boundary": "Closed overlay rejects property or noncanonical enum."
+    },
+    {
+      "id": "schema-registry-hive",
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "HKEY_LOCAL_MACHINE"
+        },
+        "key": {
+          "equals": "SOFTWARE\\Fixture"
+        },
+        "name": {
+          "equals": ""
+        }
+      },
+      "accepted": false,
+      "boundary": "Closed overlay rejects property or noncanonical enum."
+    },
+    {
+      "id": "schema-registry-null-key-named-value",
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": null,
+        "name": {
+          "equals": "value"
+        }
+      },
+      "accepted": true,
+      "boundary": "The key-null/name-null rule requires semantic validation beyond structural schema."
+    },
+    {
+      "id": "schema-unix-filepath",
+      "capability": "unix.file",
+      "object": {
+        "filepath": {
+          "equals": "/fixture"
+        }
+      },
+      "accepted": true,
+      "boundary": "Reviewed authored selector spelling."
+    },
+    {
+      "id": "schema-unix-full-path-alias",
+      "capability": "unix.file",
+      "object": {
+        "full_path": {
+          "equals": "/fixture"
+        }
+      },
+      "accepted": false,
+      "boundary": "Collected name is not the closed authored selector."
+    },
+    {
+      "id": "schema-unix-depth-None",
+      "capability": "unix.file",
+      "object": {
+        "path": {
+          "equals": "/fixture"
+        },
+        "filename": null,
+        "traversal": {
+          "max_depth": null,
+          "recurse": "directories"
+        }
+      },
+      "accepted": false,
+      "boundary": "Current depth grammar, independently of future mount/link semantics."
+    },
+    {
+      "id": "schema-unix-depth--1",
+      "capability": "unix.file",
+      "object": {
+        "path": {
+          "equals": "/fixture"
+        },
+        "filename": null,
+        "traversal": {
+          "max_depth": -1,
+          "recurse": "directories"
+        }
+      },
+      "accepted": false,
+      "boundary": "Current depth grammar, independently of future mount/link semantics."
+    },
+    {
+      "id": "schema-unix-depth-0",
+      "capability": "unix.file",
+      "object": {
+        "path": {
+          "equals": "/fixture"
+        },
+        "filename": null,
+        "traversal": {
+          "max_depth": 0,
+          "recurse": "directories"
+        }
+      },
+      "accepted": true,
+      "boundary": "Current depth grammar, independently of future mount/link semantics."
+    },
+    {
+      "id": "schema-unix-depth-unlimited",
+      "capability": "unix.file",
+      "object": {
+        "path": {
+          "equals": "/fixture"
+        },
+        "filename": null,
+        "traversal": {
+          "max_depth": "unlimited",
+          "recurse": "directories"
+        }
+      },
+      "accepted": true,
+      "boundary": "Current depth grammar, independently of future mount/link semantics."
+    },
+    {
+      "id": "schema-unix-filepath-plus-traversal",
+      "capability": "unix.file",
+      "object": {
+        "filepath": {
+          "equals": "/fixture"
+        },
+        "traversal": {
+          "max_depth": 0,
+          "recurse": "directories"
+        }
+      },
+      "accepted": true,
+      "boundary": "Structural acceptance does not apply the mapping no-traversal semantic rule."
+    },
+    {
+      "id": "schema-windows-filepath",
+      "capability": "windows.file",
+      "object": {
+        "filepath": {
+          "equals": "C:\\Fixture"
+        }
+      },
+      "accepted": true,
+      "boundary": "Current selector spelling."
+    },
+    {
+      "id": "schema-windows-full-path-alias",
+      "capability": "windows.file",
+      "object": {
+        "full_path": {
+          "equals": "C:\\Fixture"
+        }
+      },
+      "accepted": false,
+      "boundary": "Historical normalized alias is not current authored spelling."
+    },
+    {
+      "id": "schema-service-display-name",
+      "capability": "windows.service",
+      "object": {
+        "display_name": {
+          "equals": "Example"
+        }
+      },
+      "accepted": false,
+      "boundary": "Service identity uses service_name."
+    },
+    {
+      "id": "schema-rpm-source-name",
+      "capability": "linux.rpminfo",
+      "object": {
+        "name": {
+          "equals": "fixture"
+        },
+        "include_file_paths": false
+      },
+      "accepted": true,
+      "boundary": "Generic acceptance of a source spelling is not approval of an authored alias."
+    },
+    {
+      "id": "schema-rpm-mapping-package-name",
+      "capability": "linux.rpminfo",
+      "object": {
+        "package_name": {
+          "equals": "fixture"
+        },
+        "include_file_paths": false
+      },
+      "accepted": true,
+      "boundary": "The native mapping spelling passes a generic Object baseline; there is no closed RPM overlay."
+    },
+    {
+      "id": "schema-rpm-omitted-path-flag",
+      "capability": "linux.rpminfo",
+      "object": {
+        "name": {
+          "equals": "fixture"
+        }
+      },
+      "accepted": true,
+      "boundary": "Mapping required flags are not necessarily schema-required."
+    },
+    {
+      "id": "schema-text-malformed-flags",
+      "capability": "independent.textfilecontent",
+      "object": {
+        "full_path": {
+          "equals": "/fixture"
+        },
+        "ignore_case": "false",
+        "pattern": {
+          "matches_regex": "["
+        }
+      },
+      "accepted": true,
+      "boundary": "No dedicated closed overlay for this capability."
+    },
+    {
+      "id": "schema-text-legacy-capability",
+      "capability": "independent.textfilecontent54",
+      "object": {
+        "full_path": {
+          "equals": "/fixture"
+        }
+      },
+      "accepted": true,
+      "boundary": "Generic capability string acceptance is not support or alias approval."
+    }
+  ],
+  "fixture_format": "Abstract research inputs, not native Result documents.",
+  "comparison_preconditions": "For proposed true/false comparisons, assume an applicable target, resolved selectors, complete selected population and complete required fields unless the case explicitly supplies absence/failure. Error/unresolved scenarios do not assume successful acquisition. Explicit input flags or requirement/selectors identify a variant of the example; none are native runtime defaults."
+}
