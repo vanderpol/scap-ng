@@ -275,6 +275,8 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 | type | type | string | none separately recorded | directory, char, disk, pipe, remote, unknown |
 | version | version | version | none separately recorded | — |
 
+[Semantic contract research — recommendations only](developer-contract-research-windows.md#windowsfile). Native requirements, legacy observations and proposed regression expectations remain separate.
+
 ### Recorded semantic rules
 
 - `windows.file.filter_state_capability`: Every Set filter State reference must resolve to capability windows.file.
@@ -606,6 +608,8 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 Illustrative schema fixture only; no host collection or scanner conformance is asserted.
 
 
+[Semantic contract research — recommendations only](developer-contract-research-windows.md#windowsregistry). Native requirements, legacy observations and proposed regression expectations remain separate.
+
 ### Recorded semantic rules
 
 - `windows.registry.key_null_requires_name_null`: When key is null, name must also be null because a value cannot exist without a containing key.
@@ -714,6 +718,8 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 | service_type | service_type | string | none separately recorded | SERVICE_FILE_SYSTEM_DRIVER, SERVICE_KERNEL_DRIVER, SERVICE_WIN32_OWN_PROCESS, SERVICE_WIN32_SHARE_PROCESS, SERVICE_INTERACTIVE_PROCESS |
 | start_name | start_name | string | none separately recorded | — |
 | start_type | start_type | string | none separately recorded | SERVICE_AUTO_START, SERVICE_BOOT_START, SERVICE_DEMAND_START, SERVICE_DISABLED, SERVICE_SYSTEM_START |
+
+[Semantic contract research — recommendations only](developer-contract-research-windows.md#windowsservice). Native requirements, legacy observations and proposed regression expectations remain separate.
 
 ### Recorded semantic rules
 

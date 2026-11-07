@@ -166,6 +166,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 Illustrative schema fixture only; no host collection or scanner conformance is asserted.
 
 
+[Semantic contract research — recommendations only](developer-contract-research-independent.md#independentshellcommand). Native requirements, legacy observations and proposed regression expectations remain separate.
+
 ### Recorded semantic rules
 
 - `independent.shellcommand.filter_state_capability`: Every Set filter State reference must resolve to capability independent.shellcommand.
@@ -265,6 +267,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 | pattern | pattern | string | none separately recorded | — |
 | subexpression | subexpression | string, boolean, integer, float, binary, version, ipv4, ipv6, rpm_evr, debian_evr, fileset_revision, ios_version | none separately recorded | — |
 | text | text | string, boolean, integer, float, binary, version, ipv4, ipv6, rpm_evr, debian_evr, fileset_revision, ios_version | none separately recorded | — |
+
+[Semantic contract research — recommendations only](developer-contract-research-independent.md#independenttextfilecontent). Native requirements, legacy observations and proposed regression expectations remain separate.
 
 ### Recorded semantic rules
 

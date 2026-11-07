@@ -65,7 +65,7 @@ def contract_sections(record, lineage):
             'legacy': {'disposition': 'legacy_candidate',
                        'audit_nodes': {key: value for key, value in sorted(lineage['nodes'].items())
                                        if key.startswith(record['name'] + '/')},
-                       'status': 'reviewed_source_inventory' if record['annotation'] else 'not_reviewed_in_this_model'},
+                       'status': 'reviewed_source_inventory' if record['annotation'] or record.get('research') else 'not_reviewed_in_this_model'},
             'boundary': 'Legacy documentation does not add native requirements.'},
         'documentation_status': 'partially_documented',
         'runtime_qualification': 'not_established',
@@ -99,6 +99,7 @@ def model(mappings, proposal):
     if lineage['status'] != 'legacy_research_not_native_contract':
         raise ValueError('OVAL lineage must remain non-normative')
     overlays = json.loads((ROOT / 'schema/native-selector.schema.json').read_text(encoding='utf-8'))['$defs']
+    research = json.loads((ROOT / 'docs/metadata/developer-guide-semantic-research.json').read_text(encoding='utf-8'))
     result = []
     for group, path, item in sorted(mappings, key=lambda row: row[2]['capability']):
         name, native = item['capability'], item.get('native', {})
@@ -142,6 +143,7 @@ def model(mappings, proposal):
                            path=path.relative_to(ROOT).as_posix(), native=native,
                            selectors=selectors, parameters=parameters, fields=fields,
                            resolved=resolved, annotation=annotation,
+                           research=research['capabilities'].get(name),
                            rules=item.get('semantic_validator_rules', []),
                            overlay=overlays.get(name.replace('.', '_') + '_object')))
     for record in result:
@@ -233,6 +235,10 @@ def render(version, mappings, proposal, frontmatter, table):
                 example = ROOT / 'docs/developer-guide/examples' / (name + '.json')
                 lines += ['### Structural example\n\n', '```json\n' + example.read_text(encoding='utf-8') + '```\n\n',
                           'Illustrative schema fixture only; no host collection or scanner conformance is asserted.\n\n']
+            if record['research']:
+                lines += ['\n[Semantic contract research — recommendations only]'
+                          f'(developer-contract-research-{record["platform"]}.md#{name.replace(".", "")}). '
+                          'Native requirements, legacy observations and proposed regression expectations remain separate.\n']
             if record['rules']:
                 lines += ['\n### Recorded semantic rules\n\n']
                 lines += [f'- `{rule["id"]}`: {rule["rule"]}\n' for rule in record['rules']]

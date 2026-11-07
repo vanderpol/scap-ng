@@ -205,6 +205,8 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 | total_space | total_space | integer | none separately recorded | — |
 | uuid | uuid | string | none separately recorded | — |
 
+[Semantic contract research — recommendations only](developer-contract-research-linux.md#linuxpartition). Native requirements, legacy observations and proposed regression expectations remain separate.
+
 ### Recorded semantic rules
 
 - `linux.partition.filter_state_capability`: Every Set filter State reference must resolve to capability linux.partition.
@@ -254,6 +256,8 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 | release | release | string, version | none separately recorded | — |
 | signature_key_id | signature_keyid | string | none separately recorded | — |
 | version | version | string, version | none separately recorded | — |
+
+[Semantic contract research — recommendations only](developer-contract-research-linux.md#linuxrpminfo). Native requirements, legacy observations and proposed regression expectations remain separate.
 
 ### Recorded semantic rules
 

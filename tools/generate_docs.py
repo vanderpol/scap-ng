@@ -324,6 +324,8 @@ def generated_documents():
         'scanner-windows-ntuser.md': render_ntuser(version, ntuser, notes, audit),
     }
     md_files.update(render_developer_pilot(version, mappings, proposal))
+    from render_contract_research import render as render_research
+    md_files.update(render_research(version, frontmatter, entries_table))
     immutable = sorted((*SCHEMAS.glob('*.json'),
                         *(SCHEMAS / 'capability-mappings').rglob('*.json')))
     fingerprint = sha256()

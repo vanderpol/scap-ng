@@ -1,0 +1,333 @@
+{
+  "format": "scap-ng/developer-semantic-research/1",
+  "status": "research_not_adopted",
+  "capabilities": {
+    "independent.shellcommand": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "The mapping requires shell, command and both boolean error flags; pattern is optional. stdout_line is collected as string, with separate comparison datatype overrides. Trust policy stays outside command text.",
+      "native_refs": [
+        "schema/capability-mappings/supported/independent.shellcommand.json#/native",
+        "schema/capability-mappings/supported/independent.shellcommand.json#/semantic_validator_rules"
+      ],
+      "legacy_observations": "OVAL describes one Item per command, echoed identity, per-line stdout/stderr, captures and false error-flag defaults. Object and Item prose disagree about no-output status. Source prose defaulting the shell is not a native default.",
+      "legacy_nodes": [
+        "independent.shellcommand/shellcommand_test",
+        "independent.shellcommand/shellcommand_object",
+        "independent.shellcommand/shellcommand_state",
+        "independent.shellcommand/ShellCommandBehaviors",
+        "independent.shellcommand/shellcommand_item"
+      ],
+      "topics": [
+        {
+          "id": "shell-binding",
+          "gap": "Generic Object validation accepts missing required parameters, string flags, unknown shells and missing command. Mapping requirements are not a closed schema binding.",
+          "recommendation": "Keep frozen acceptance unchanged. In a future approved contract, validate required parameter presence and types before launch, after resolving allowed Variable/Input references. No default shell, default booleans or string-to-boolean coercion.",
+          "compatibility": "Tightening schema rejection changes the accepted document set. Treat as a separately versioned validation decision; preserve historical import defaults as explicit source provenance.",
+          "alternatives": [
+            "Retain schema plus explicit semantic diagnostics.",
+            "Add a closed binding only in an approved future version (recommended)."
+          ],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "shell-status",
+          "gap": "Native metadata lacks a complete launch/empty-output/exit/stderr/timeout decision table.",
+          "recommendation": "For successful launch, retain one execution Item with raw stdout/stderr and exit status even when stdout is empty. Empty stdout is an empty entity population, not a nonexistent process. Apply each explicit error flag independently; retain evidence on nonzero exit or stderr. Missing interpreter, launch denial, timeout and truncated collection produce collection diagnostics and cannot prove absence.",
+          "compatibility": "Do not import the contradictory OVAL Item-status wording. The exact native collection/Test outcome mapping and empty-line framing need owner approval before qualification.",
+          "alternatives": [
+            "Execution Item with empty stdout entity population (recommended).",
+            "Treat no matching stdout as no Item; this loses execution identity and changes existence tests."
+          ],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "shell-output",
+          "gap": "Line splitting, encoding, regex/capture ordering, malformed casts and execution limits are not fully specified.",
+          "recommendation": "Preserve bytes or a lossless raw-output reference alongside decoded lines. Distinguish no bytes from one empty line and preserve duplicate lines. Publish explicit decoder/newline policy and capture-to-line association; keep stderr outside stdout filtering. Failed typed comparison must not fabricate a default numeric value. Limits, working directory, environment, stdin, interpreter identity and privileges must be explicit execution context, not hidden shell wrappers.",
+          "compatibility": "Line framing and decode/cast failures can change results. No universal timeout or environment default is proposed for adoption here.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": true,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/independent.shellcommand",
+      "example": "docs/developer-guide/research-examples/independent.shellcommand.json",
+      "runtime_qualification": "not_established"
+    },
+    "windows.registry": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "Canonical hive enum and case-insensitive key/name identity are recorded independently of comparison operators. Null key requires null name; null name selects the key, empty name its default value. Traversal metadata names hierarchy_traversal but the closed Object overlay rejects traversal. windows_view was removed.",
+      "native_refs": [
+        "schema/capability-mappings/supported/windows.registry.json#/native",
+        "schema/capability-mappings/supported/windows.registry.json#/semantic_validator_rules",
+        "schema/capability-common.schema.json#/$defs/hierarchy_traversal"
+      ],
+      "legacy_observations": "OVAL RegistryBehaviors includes depth/direction and view selection. State/Item notes define FILETIME, unsigned DWORD/QWORD, hex binary, raw versus expanded strings and multi-string handling. These encodings/status details are not automatically native.",
+      "legacy_nodes": [
+        "windows.registry/registry_test",
+        "windows.registry/registry_object",
+        "windows.registry/registry_state",
+        "windows.registry/RegistryBehaviors",
+        "windows.registry/registry_item"
+      ],
+      "topics": [
+        {
+          "id": "registry-traversal",
+          "gap": "Mapping and overlay disagree; a preserved converted Object carries downward unlimited traversal as max_depth:null.",
+          "recommendation": "Keep frozen rejection. Review a future explicit downward traversal binding with nonnegative depth or unlimited, preserving starting-key inclusion, equality-only key traversal and null/default identity. Do not infer traversal from a broad name regex.",
+          "compatibility": "Adding traversal broadens grammar; changing historical null to unlimited is a reviewed migration, not a documentation edit.",
+          "alternatives": [
+            "Keep traversal unrepresentable in 0.4 (recommended freeze treatment).",
+            "Add explicit hierarchy traversal in an approved future contract."
+          ],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "registry-view",
+          "gap": "No native view selector/evidence contract replaces removed windows_view; scanner process architecture would introduce a hidden default.",
+          "recommendation": "Use an explicitly selected, recorded target registry view in a future target/collection context. Retain view in evidence identity. Do not silently union views or choose the scanner-process view. Current unqualified view-dependent cases remain unresolved.",
+          "compatibility": "Old 32/64-bit source behavior cannot be discarded without reviewing each affected comparison and target applicability.",
+          "alternatives": [
+            "Explicit target view plus provenance (recommended).",
+            "Collect all views with distinct identity; may change cardinality.",
+            "Implicit process view; reject as a hidden assumption."
+          ],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "registry-values",
+          "gap": "Integer datatype alone does not fix timestamp units, unsigned ranges, binary codec, string expansion or empty/multiple string cardinality.",
+          "recommendation": "Recommend FILETIME integer ticks for last_write_time and unsigned 32/64-bit values with lossless integer handling. Preserve REG_SZ text, REG_EXPAND_SZ raw and expanded evidence separately, and every REG_MULTI_SZ element including empty strings. Recommend hex octets only if approved as the shared native binary codec. Retain an existing multi-string value with zero elements distinctly from a missing value; do not synthesize missing Items.",
+          "compatibility": "FILETIME can exceed binary64 exact-integer range. Empty multi-string representation, binary codec and version comparisons need explicit native decisions; no payloads or units are rewritten here.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "registry-errors",
+          "gap": "Absent, denied, partially enumerated, deleted-during-query and unsupported-type results lack a complete native mapping.",
+          "recommendation": "Only complete confirmed absence supplies an empty selected population. Preserve inaccessible/partial collection diagnostics; an absence requirement must not become true from access denial. Retain accessible key identity and independent fields when a value read fails.",
+          "compatibility": "Recommended error propagation is not an assertion of existing scanner behavior. Distinguish key, named value, default value and expansion failure in fixtures.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": true,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/windows.registry",
+      "example": "docs/developer-guide/research-examples/windows.registry.json",
+      "runtime_qualification": "not_established"
+    },
+    "unix.file": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "Authored selectors are filepath/path/filename; collected fields are full_path/directory/name. Null filename is the directory form. File traversal is explicit and downward; depth 0 includes the starting directory; unlimited is a string token, not null or -1. Native semantic rules retain older collected-field naming.",
+      "native_refs": [
+        "schema/capability-mappings/supported/unix.file.json#/native",
+        "schema/capability-mappings/supported/unix.file.json#/semantic_validator_rules",
+        "schema/capability-common.schema.json#/$defs/file_traversal_base",
+        "schema/capability-common.schema.json#/$defs/file_traversal",
+        "schema/capability-common.schema.json#/$defs/filesystem_scope"
+      ],
+      "legacy_observations": "OVAL file Items include link types, integer epoch-second timestamps, size, UID/GID and mode bits. FileBehaviors distinguishes recursion and filesystem restriction. ACL unsupported is described as an absent entity, not false.",
+      "legacy_nodes": [
+        "unix.file/file_test",
+        "unix.file/file_object",
+        "unix.file/file_state",
+        "unix.file/FileBehaviors",
+        "unix.file/file_item"
+      ],
+      "topics": [
+        {
+          "id": "unix-boundaries",
+          "gap": "all/local/same exist, but mount identity, unknown filesystem classification, symlink cycles and races need a complete collection contract.",
+          "recommendation": "Recommend same remain within the starting filesystem identity; distinguish that from a mount-instance boundary. Classify local using target filesystem evidence; uncertain classification yields incomplete evidence rather than guessing. Traverse links only under the explicit recurse policy, prevent ancestor cycles and retain distinct selected path aliases.",
+          "compatibility": "Bind mounts can share filesystem identity. Switching to a mount-ID boundary is a different contract. Source defined-to-same conversion alone does not prove equivalence.",
+          "alternatives": [
+            "Filesystem identity boundary (recommended for same).",
+            "Mount-instance boundary; stricter and may omit source-selected paths."
+          ],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "unix-links",
+          "gap": "Link-object metadata versus target metadata is not fully specified, including dangling links and directory links selected by filepath.",
+          "recommendation": "Recommend link-object metadata for direct selection, preserving dangling-link existence; following a target is a separate explicit traversal action. Keep directory selection through path plus null filename. Record cycles, target failures and disappearing paths without silently replacing one identity by another.",
+          "compatibility": "Existing stat-versus-link-stat collector choices may disagree; require independent platform vectors before adopting this recommendation.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "unix-metadata",
+          "gap": "Integer timestamps lack explicit native epoch/resolution; permissions and ACL unavailable states are incompletely documented.",
+          "recommendation": "Recommend UTC epoch seconds for access/change/modify times, with change meaning inode metadata change, not creation. Preserve mode bits and numeric ownership independently of effective access or ACL grants. Extra ACL false means supported with no extra ACL; recommend not_collected plus diagnostic when unsupported, never false. Preserve more precise raw timestamps in provenance if collected, without inventing native units.",
+          "compatibility": "Time resolution and ACL unsupported-status choices can change comparisons. OVAL uses does-not-exist for unsupported ACL; the proposed not-collected status is deliberately an owner decision.",
+          "alternatives": [
+            "Unsupported ACL as not_collected with diagnostic (recommended).",
+            "Legacy-style does_not_exist entity; changes absence predicates differently."
+          ],
+          "disposition": "proposal_not_native_requirement"
+        },
+        {
+          "id": "unix-errors",
+          "gap": "Missing, inaccessible, partially traversed and changed files lack a complete native outcome table.",
+          "recommendation": "Use zero selected Items only for complete confirmed absence. Parent-directory denial, lost permissions or incomplete traversal retain diagnostics and completeness; they cannot satisfy none-found by omission. Preserve independent readable metadata if later fields fail.",
+          "compatibility": "Permission bits are not effective access tests. Synthetic does-not-exist Items remain forbidden by the existing native Item schema.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": true,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/unix.file",
+      "example": "docs/developer-guide/research-examples/unix.file.json",
+      "runtime_qualification": "not_established"
+    },
+    "windows.file": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "Authored filepath/path/filename differ from returned full_path/directory/name. Existing metadata requires per-directory filesystem case context, not unconditional case folding. Traversal uses Windows junction-specific vocabulary; windows_view is removed.",
+      "native_refs": [
+        "schema/capability-mappings/supported/windows.file.json#/native",
+        "schema/capability-mappings/supported/windows.file.json#/semantic_validator_rules",
+        "schema/capability-common.schema.json#/$defs/windows_file_traversal"
+      ],
+      "legacy_observations": "OVAL distinguishes creation time from UNIX inode-change time, describes FILETIME, file attributes, version resources and directory Item behavior. Its directory type/status notes do not fully align with the native enum containing directory.",
+      "legacy_nodes": [
+        "windows.file/file_test",
+        "windows.file/file_object",
+        "windows.file/file_state",
+        "windows.file/FileBehaviors",
+        "windows.file/file_item"
+      ],
+      "topics": [
+        {
+          "id": "windows-file-context",
+          "gap": "Case context, junction loops, removed views, timestamp units and directory type/status need reconciled acquisition guidance.",
+          "recommendation": "Honor documented per-directory case identity. Recommend retaining reparse/junction identity and explicit traversal policy; preserve creation/access/modify separately. Adopt FILETIME only through the native unit decision. Missing version resource is a field condition, not a missing file.",
+          "compatibility": "Historical converted full_path/directory/name and null depth are not current authored selector/depth syntax. Do not reuse UNIX timestamp or symlink rules blindly.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": false,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/windows.file",
+      "example": "docs/developer-guide/research-examples/windows.file.json",
+      "runtime_qualification": "not_established"
+    },
+    "windows.service": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "service_name selects the service; start_type and current_state are separate returned fields with explicit enums. Dependencies and accepted controls are string-valued fields; PID is integer.",
+      "native_refs": [
+        "schema/capability-mappings/supported/windows.service.json#/native",
+        "schema/capability-mappings/supported/windows.service.json#/semantic_validator_rules"
+      ],
+      "legacy_observations": "OVAL identifies the service by SCM database name rather than display name and describes PID zero for a stopped service, running/system flags and dependencies.",
+      "legacy_nodes": [
+        "windows.service/service_test",
+        "windows.service/service_object",
+        "windows.service/service_state",
+        "windows.service/service_item"
+      ],
+      "topics": [
+        {
+          "id": "service-identity",
+          "gap": "Name/display-name identity, multi-valued flags/dependencies, missing services and service-query denial need a native acquisition/status table.",
+          "recommendation": "Recommend stable service-name identity and separate configuration/runtime observations. Disabled start mode does not imply stopped runtime state. Preserve every dependency and accepted-control value, including group identities. A missing service differs from denied enumeration; stopped PID zero is not missing data.",
+          "compatibility": "Do not turn flag collections into one arbitrary string or synthesize one record per flag. No live Windows service evidence is claimed.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": false,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/windows.service",
+      "example": "docs/developer-guide/research-examples/windows.service.json",
+      "runtime_qualification": "not_established"
+    },
+    "linux.rpminfo": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "Mapping alternatives and migration metadata author package_name; selector_map records the source name to native package_name crosswalk. No dedicated resolved Object overlay exists. include_file_paths is an explicit required mapping parameter. full_path comparisons require requested paths or equivalent complete reused evidence.",
+      "native_refs": [
+        "schema/capability-mappings/supported/linux.rpminfo.json#/native",
+        "schema/capability-mappings/supported/linux.rpminfo.json#/semantic_validator_rules"
+      ],
+      "legacy_observations": "OVAL provides package identity, architecture, raw epoch, EVR, signature-key identifier and optional package-owned paths. Missing raw epoch may be (none), while composed EVR uses zero.",
+      "legacy_nodes": [
+        "linux.rpminfo/rpminfo_test",
+        "linux.rpminfo/rpminfo_object",
+        "linux.rpminfo/rpminfo_state",
+        "linux.rpminfo/RpmInfoBehaviors",
+        "linux.rpminfo/rpminfo_item"
+      ],
+      "topics": [
+        {
+          "id": "rpm-identity",
+          "gap": "The guide labels selector_map source keys as authored fields; the generic schema accepts both source name and native package_name. Installed version/architecture populations, epoch normalization and path completeness need acquisition guidance.",
+          "recommendation": "Follow the mapping native alternative package_name for the research example, and record generic schema acceptance separately. Recommend retaining every installed version/architecture identity, raw epoch and explicit EVR comparison semantics. Report key ID as identification evidence, not signature verification. Do not return a complete path population when include_file_paths was false unless independently complete reused evidence exists.",
+          "compatibility": "Both source name and package_name pass the current generic Object baseline; this is not alias approval. Do not silently rename authored fields or change raw (none) epoch to integer zero. Package database denial is not proof of absence.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": false,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/linux.rpminfo",
+      "example": "docs/developer-guide/research-examples/linux.rpminfo.json",
+      "runtime_qualification": "not_established"
+    },
+    "linux.partition": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "mount_point selects partitions. The native mount_options_complete rule already requires effective options; configuration-file evidence alone is insufficient. Space fields and block_size are integers.",
+      "native_refs": [
+        "schema/capability-mappings/supported/linux.partition.json#/native",
+        "schema/capability-mappings/supported/linux.partition.json#/semantic_validator_rules"
+      ],
+      "legacy_observations": "OVAL calls space quantities physical block counts and block_size bytes per block; options require complete runtime evidence, not only configuration or one mount-table source.",
+      "legacy_nodes": [
+        "linux.partition/partition_test",
+        "linux.partition/partition_object",
+        "linux.partition/partition_state",
+        "linux.partition/partition_item"
+      ],
+      "topics": [
+        {
+          "id": "partition-units",
+          "gap": "Native integer space fields do not declare units; mount namespaces, duplicate mount identities and option cardinality need acquisition guidance.",
+          "recommendation": "Preserve the existing effective-option requirement. Recommend one field value per effective option and target mount identity/namespace evidence. Recommend legacy-compatible block counts with explicit byte block_size, without assuming one block-size source. Missing mount differs from unreadable/incomplete mount evidence.",
+          "compatibility": "Interpreting historical block counts as bytes changes comparisons. Bind/overlay mounts and reserved free blocks need independent fixtures; do not collapse duplicate mount-point observations.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": false,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/linux.partition",
+      "example": "docs/developer-guide/research-examples/linux.partition.json",
+      "runtime_qualification": "not_established"
+    },
+    "independent.textfilecontent": {
+      "status": "research_recommendations_not_adopted",
+      "native_facts": "Native capability name drops source 54 suffix. Flags ignore_case/multiline/singleline and item_creation are explicit mapping parameters. The literal all_object_elements_fullfilled spelling is frozen. Pattern selector operation remains unresolved as a serialized capability-specific contract.",
+      "native_refs": [
+        "schema/capability-mappings/supported/independent.textfilecontent.json#/native",
+        "schema/capability-mappings/supported/independent.textfilecontent.json#/semantic_validator_rules"
+      ],
+      "legacy_observations": "OVAL textfilecontent54 includes whole-block matching, instance selection including negative-from-end source indices, captures and item_creation choices. No-match behavior depends on item_creation, and source Windows view behavior was removed natively.",
+      "legacy_nodes": [
+        "independent.textfilecontent/textfilecontent54_test",
+        "independent.textfilecontent/textfilecontent54_object",
+        "independent.textfilecontent/textfilecontent54_state",
+        "independent.textfilecontent/Textfilecontent54Behaviors",
+        "independent.textfilecontent/FileBehaviors",
+        "independent.textfilecontent/textfilecontent_item"
+      ],
+      "topics": [
+        {
+          "id": "text-match-identity",
+          "gap": "Source versus authored selector names, instance operators, regex flags, no-match Item creation and capture grouping need reviewed native bindings. The guide similarly exposes selector_map source keys although mapping alternatives use full_path/directory/name; generic acceptance cannot resolve field identity.",
+          "recommendation": "Keep explicit flags and the exact frozen item_creation enum. Recommend no Items on no-match for all_object_elements_fullfilled, but an existing-file evidence Item with absent match fields for filepath_exists. Preserve duplicate matches, occurrence identity and capture association; distinguish malformed pattern, unreadable file and no match. Do not infer that schema acceptance establishes this behavior.",
+          "compatibility": "The pinned corpus uses independent.textfilecontent54 and historical full_path/directory/name. No capability rewrite, regex translation or negative-index normalization is performed. Filepath-exists Item semantics require an owner decision before qualification.",
+          "alternatives": [],
+          "disposition": "proposal_not_native_requirement"
+        }
+      ],
+      "owner_decision": true,
+      "content_ref": "docs/metadata/developer-guide-content-audit.json#/capabilities/independent.textfilecontent",
+      "example": "docs/developer-guide/research-examples/independent.textfilecontent.json",
+      "runtime_qualification": "not_established"
+    }
+  }
+}

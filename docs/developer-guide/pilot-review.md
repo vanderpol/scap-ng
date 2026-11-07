@@ -9,9 +9,9 @@ have not been executed on target systems. Schema probes test acceptance only.
 
 Reviewed OVAL Community **5.12.3**, tag `v5.12.3`, commit
 [`2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`](https://github.com/OVAL-Community/OVAL/tree/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas).
-The [machine inventory](../metadata/developer-guide-oval-audit.json) pins six
-XSD files, Git blob identities, SHA-256 hashes and 15 element/type annotation
-inventories: each capability's test, object, state, item and behaviors type.
+The [machine inventory](../metadata/developer-guide-oval-audit.json) now pins eight
+XSD files and 39 annotation inventories. The original three-pilot subset below
+retains its six-file / 15-node identities; Phase 2 adds five capability reviews.
 It includes exact namespace-qualified XPath locators; `xsd` denotes
 `http://www.w3.org/2001/XMLSchema`. Descriptions here are paraphrases; original
 XSD licensing remains with upstream. No complete XSD or verbatim documentation

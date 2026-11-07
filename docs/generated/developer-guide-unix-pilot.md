@@ -114,6 +114,8 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
 Illustrative schema fixture only; no host collection or scanner conformance is asserted.
 
 
+[Semantic contract research — recommendations only](developer-contract-research-unix.md#unixfile). Native requirements, legacy observations and proposed regression expectations remain separate.
+
 ### Recorded semantic rules
 
 - `unix.file.filter_state_capability`: Every file-selection filter State reference must resolve to capability unix.file.

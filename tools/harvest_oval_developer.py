@@ -13,12 +13,22 @@ import xml.etree.ElementTree as ET
 XSD = '{http://www.w3.org/2001/XMLSchema}'
 PIN = '2f140ee5c5dd1ed9606fcd5afc301f6baeb48706'
 OUTPUT = Path(__file__).resolve().parents[1] / 'docs/metadata/developer-guide-oval-audit.json'
-CAPABILITIES = {'windows': 'registry', 'unix': 'file', 'independent': 'shellcommand'}
+CAPABILITIES = {
+    'windows.registry': ('registry', 'RegistryBehaviors'),
+    'unix.file': ('file', 'FileBehaviors'),
+    'independent.shellcommand': ('shellcommand', 'ShellCommandBehaviors'),
+    'windows.file': ('file', 'FileBehaviors'),
+    'windows.service': ('service', None),
+    'linux.rpminfo': ('rpminfo', 'RpmInfoBehaviors'),
+    'linux.partition': ('partition', None),
+    'independent.textfilecontent': ('textfilecontent54', 'Textfilecontent54Behaviors'),
+}
 
 
 def harvest(source):
     files, nodes = {}, {}
-    for family, capability in sorted(CAPABILITIES.items()):
+    for capability_name, (capability, behaviors) in sorted(CAPABILITIES.items()):
+        family = capability_name.split('.')[0]
         for category in ('definitions', 'system-characteristics'):
             filename = f'{family}-{category}-schema.xsd'
             content = (source / filename).read_bytes()
@@ -28,9 +38,13 @@ def harvest(source):
             root = ET.fromstring(content)
             expected = ([capability + suffix for suffix in ('_test', '_object', '_state')]
                         if category == 'definitions' else [capability + '_item'])
-            if category == 'definitions':
-                expected.append({'windows': 'RegistryBehaviors', 'unix': 'FileBehaviors',
-                                 'independent': 'ShellCommandBehaviors'}[family])
+            if category == 'definitions' and behaviors:
+                expected.append(behaviors)
+            if capability_name == 'independent.textfilecontent':
+                if category == 'system-characteristics':
+                    expected = ['textfilecontent_item']
+                else:
+                    expected.append('FileBehaviors')
             for name in expected:
                 matches = [node for node in root if node.get('name') == name]
                 if len(matches) != 1:
@@ -38,7 +52,7 @@ def harvest(source):
                 node = matches[0]
                 annotations = [' '.join(''.join(part.itertext()).split())
                                for part in node.iter(XSD + 'documentation')]
-                nodes[f'{family}.{capability}/{name}'] = dict(
+                nodes[f'{capability_name}/{name}'] = dict(
                     file=filename,
                     xpath=f'/xsd:schema/xsd:{node.tag.split("}")[-1]}[@name="{name}"]',
                     annotation_count=len(annotations),
@@ -59,7 +73,7 @@ def main():
     if args.check:
         if OUTPUT.read_bytes() != value.encode():
             raise SystemExit('OVAL developer provenance inventory drifted')
-        print('OVAL developer provenance inventory matches (6 files, 15 nodes)')
+        print('OVAL developer provenance inventory matches (8 files, 39 nodes)')
     else:
         OUTPUT.write_text(value, encoding='utf-8', newline='\n')
 

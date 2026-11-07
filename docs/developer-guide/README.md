@@ -39,3 +39,7 @@ how to prevent a second documentation authority. No 0.4.0 schema bytes change.
 [Three-pilot review](pilot-review.md) separates frozen facts, OVAL research and
 open decisions. Legacy OVAL descriptions are implementation research inputs;
 they do not add requirements to SCAP-NG.
+
+[Phase 2 semantic research and decision packets](semantic-research.md) cover the
+three priorities and five continuation capabilities; recommendations are not
+adopted semantics.

@@ -149,8 +149,8 @@ class DeveloperGuideTests(unittest.TestCase):
         audit = load(PROJECT / 'docs/metadata/developer-guide-oval-audit.json')
         self.assertEqual(audit['upstream_commit'], '2f140ee5c5dd1ed9606fcd5afc301f6baeb48706')
         self.assertEqual(audit['status'], 'legacy_research_not_native_contract')
-        self.assertEqual(len(audit['files']), 6)
-        self.assertEqual(len(audit['nodes']), 15)
+        self.assertEqual(len(audit['files']), 8)
+        self.assertEqual(len(audit['nodes']), 39)
         for file in audit['files'].values():
             self.assertIn(audit['upstream_commit'], file['url'])
             self.assertRegex(file['sha256'], r'^[0-9a-f]{64}$')
