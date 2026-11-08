@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/review/issue43-phase-a/require-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-02",
+  "title": "Native 0.4 requirement Result",
+  "description": "Technical observation at one native Test/group/record/field location; record_ref preserves per-record correlation. Source OVAL identities belong only in migration provenance.",
+  "type": "object",
+  "required": [
+    "require_ref",
+    "outcome",
+    "field_results"
+  ],
+  "properties": {
+    "require_ref": {
+      "type": "string",
+      "pattern": "^/tests/(?:[^~/]|~[01])+/require(?:/(?:[^~]|~[01])*)?$",
+      "description": "Canonical RFC6901 location in the owning Assessment; semantic validation must resolve it to a requirement node of this Test."
+    },
+    "record_ref": {
+      "type": "string",
+      "pattern": "^/fields/(?:[^~]|~[01])+$",
+      "description": "Canonical RFC6901 pointer into the retained Item to this exact typed record instance, including array index when multivalued."
+    },
+    "outcome": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/result-types.schema.json#/$defs/technical_outcome"
+    },
+    "operator": {
+      "enum": [
+        "and",
+        "or",
+        "one",
+        "xor"
+      ]
+    },
+    "records_found": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/assessment-language.schema.json#/$defs/existence_cardinality"
+    },
+    "records_matching": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/assessment-language.schema.json#/$defs/cardinality"
+    },
+    "field_results": {
+      "type": "array",
+      "items": {
+        "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/field-result.schema.json"
+      }
+    },
+    "require_results": {
+      "type": "array",
+      "items": {
+        "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/require-result.schema.json"
+      }
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "uniqueItems": true
+    },
+    "observation_complete": {
+      "type": "boolean",
+      "description": "Explicit supplied completeness for record absence; never inferred from missing retained values."
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "error"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason",
+          "evidence_refs"
+        ],
+        "properties": {
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

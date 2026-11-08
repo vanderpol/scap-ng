@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-01",
+  "title": "Draft SCAP-NG 0.4.0 automated expression",
+  "description": "SCAP-NG 0.4.0 Test-result expression grammar. Logical and/or/one/xor are canonical; legacy all/any/odd are invalid. Item cardinalities are separate.",
+  "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression",
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "test"
+          ],
+          "properties": {
+            "test": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-test$"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assessment"
+          ],
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "if",
+            "then",
+            "else"
+          ],
+          "properties": {
+            "if": {
+              "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/condition"
+            },
+            "then": {
+              "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+            },
+            "else_if": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Selects the first true alternative branch when preceding conditions are false.",
+              "items": {
+                "type": "object",
+                "required": [
+                  "if",
+                  "then"
+                ],
+                "properties": {
+                  "if": {
+                    "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/condition"
+                  },
+                  "then": {
+                    "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "else": {
+              "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+              },
+              "description": "Logical AND of complete Test outcomes; separate from Test Item matching."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+              },
+              "description": "Logical OR of complete Test outcomes; separate from Test Item matching."
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not_evaluated"
+          ],
+          "properties": {
+            "not_evaluated": {
+              "type": "object",
+              "description": "Declares that this branch cannot be evaluated and provides a reason.",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                "follow_up": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "What a reviewer or manual follow-up must inspect."
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not_applicable"
+          ],
+          "properties": {
+            "not_applicable": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "one"
+          ],
+          "properties": {
+            "one": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "xor"
+          ],
+          "properties": {
+            "xor": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+              },
+              "description": "Logical XOR of complete Test outcomes; separate from Test Item matching."
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "x-scap-ng-authoring": {
+        "version": 1,
+        "control_id": "assessment_logic",
+        "group": "logic",
+        "representation": "key",
+        "hide_when_default": false,
+        "aggressive_preview": true,
+        "context": "explicit_logical_group",
+        "new_authoring_only": true,
+        "serialize_explicitly": true,
+        "preserve_overrides": true,
+        "authority": "https://github.com/vanderpol/scap-ng/issues/269",
+        "default_key": "and",
+        "hide_scope": "choice_only_arguments_remain_visible",
+        "oval_source": [
+          {
+            "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+            "source_line": 310,
+            "source_xpath": "/xsd:schema/xsd:complexType[6]/xsd:attribute[2]",
+            "attribute": "operator",
+            "declaration_kind": "attribute",
+            "source_type": "oval:OperatorEnumeration",
+            "source_default": "AND",
+            "declaration_context": [
+              "CriteriaType"
+            ],
+            "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+            "reachability_limit": "QName dependency census; occurrence-specific overrides require review",
+            "origin": "XSD_DECLARED_DEFAULT",
+            "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}CriteriaType/@operator",
+            "documentation": ""
+          }
+        ]
+      },
+      "title": "Assessment logic",
+      "description": "Explicit new-authoring selection for assessment logic; applies only in explicit logical group. Preserve source-effective values and visible overrides; no runtime fallback."
+    },
+    "input_presence": {
+      "type": "object",
+      "required": [
+        "input_provided"
+      ],
+      "properties": {
+        "input_provided": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-input$",
+          "description": "Declared local Input provision, not truthiness or nonemptiness. Only direct evaluate if/else_if guards; absent and provided empty remain distinct."
+        }
+      },
+      "additionalProperties": false
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/expression"
+        },
+        {
+          "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/expression.schema.json#/$defs/input_presence"
+        }
+      ]
+    }
+  }
+}
