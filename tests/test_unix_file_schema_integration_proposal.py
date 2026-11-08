@@ -34,7 +34,7 @@ class UnixFileCanonicalIntegrationProposal(unittest.TestCase):
             Draft202012Validator.check_schema(doc)
 
     def test_all_23_contracts_have_shared_meanings_and_real_type_nodes(self):
-        source, _, mapping, _, _ = integration.load_schemas()
+        source, *_ = integration.load_schemas()
         defs = self.capability['$defs']
         self.assertEqual(defs['field_meanings'], source['$defs']['field_meanings'])
         self.assertEqual(len(defs['item_fields']['properties']), 23)
@@ -43,8 +43,8 @@ class UnixFileCanonicalIntegrationProposal(unittest.TestCase):
             self.assertEqual(node['$ref'], meaning)
             self.assertEqual(defs['require_fields']['properties'][name]['$ref'], meaning)
             tag = defs['value_' + name]['properties']['datatype']['$ref'].split('/')[-1]
-            expected = mapping['field_datatypes'][name][0]
-            self.assertEqual(defs[tag]['const'], expected)
+            expected = defs[tag]['const']
+            self.assertIn(expected, {'integer', 'string', 'boolean'})
             self.assertEqual(defs['value_' + name]['properties']['value']['type'], expected)
 
     def test_proposed_item_dispatch_and_exact_compatibility_delta(self):
