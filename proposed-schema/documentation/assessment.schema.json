@@ -1,0 +1,554 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-01",
+  "title": "SCAP-NG Assessment v0.4.0 draft",
+  "description": "Defines an Assessment's metadata and its manual procedure or automated checks.",
+  "type": "object",
+  "required": [
+    "assessment"
+  ],
+  "properties": {
+    "assessment": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "assessment_title",
+        "mode",
+        "class"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+          "maxLength": 64,
+          "description": "Assessment identifier.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "description": "Version of this Assessment content.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "assessment_title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Human-readable title for the Assessment.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "automated"
+          ],
+          "description": "Selects whether the Assessment uses a manual procedure or automated Tests.",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch-2.json",
+            "case": "01",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+          }
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "compliance",
+            "vulnerability",
+            "patch",
+            "inventory",
+            "miscellaneous"
+          ],
+          "description": "Classification of the Assessment.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "variables": {
+          "type": "object",
+          "description": "Named typed variables. Each variable declares its value type and supported expression form; unsupported function names, options, arities and incompatible derived types are invalid. Values are never supplied implicitly.",
+          "additionalProperties": {
+            "$ref": "variable-expression.schema.json"
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+            "maxLength": 64
+          }
+        },
+        "tests": {
+          "type": "object",
+          "description": "Defines the named Tests available to this Assessment.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "test_title",
+              "capability",
+              "require"
+            ],
+            "properties": {
+              "test_title": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_test_title"
+              },
+              "reported_elements": {
+                "$ref": "reported-elements.schema.json",
+                "default": "all",
+                "x-scap-ng-authoring": {
+                  "group": "reporting",
+                  "hide_when_default": true,
+                  "version": 1,
+                  "control_id": "reported_elements",
+                  "representation": "value",
+                  "aggressive_preview": false,
+                  "context": "automated_test",
+                  "new_authoring_only": true,
+                  "serialize_explicitly": true,
+                  "preserve_overrides": true,
+                  "authority": "https://github.com/vanderpol/scap-ng/issues/269"
+                },
+                "description": "Required in saved automated Tests. The editor may prefill and hide 'all', but must serialize it explicitly; this is not a scanner default.",
+                "title": "Reported elements"
+              },
+              "capability": {
+                "type": "string",
+                "minLength": 1,
+                "title": "Evidence collection capability",
+                "description": "Identifies the native collector and its supported selector and result fields."
+              },
+              "object": {
+                "$ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/object_use",
+                "title": "Collection Object",
+                "description": "Defines the evidence source and selectors; an inline Object inherits its Test capability."
+              },
+              "variable": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+                "description": "Named Variable used as the native Test source where the capability supports variable.value."
+              },
+              "require": {
+                "$ref": "assessment-language.schema.json#/$defs/test/properties/require",
+                "title": "Required evidence conditions",
+                "description": "Structured collected-Item population and field requirements; no legacy State wrapper or implicit field default."
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "capability": {
+                      "not": {
+                        "const": "independent.unknown"
+                      },
+                      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/tests/additionalProperties/properties/capability"
+                    }
+                  },
+                  "required": [
+                    "capability"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "reported_elements"
+                  ]
+                }
+              },
+              {
+                "$ref": "assessment-language.schema.json#/$defs/test"
+              }
+            ],
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "result"
+                  ]
+                },
+                {
+                  "required": [
+                    "existence"
+                  ]
+                },
+                {
+                  "required": [
+                    "match"
+                  ]
+                },
+                {
+                  "required": [
+                    "state"
+                  ]
+                },
+                {
+                  "required": [
+                    "states"
+                  ]
+                },
+                {
+                  "required": [
+                    "states_match"
+                  ]
+                },
+                {
+                  "required": [
+                    "state_fields_require"
+                  ]
+                }
+              ]
+            }
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-test$",
+            "maxLength": 64
+          },
+          "title": "Named automated Tests",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch-2.json",
+            "case": "02",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+          }
+        },
+        "evaluate": {
+          "$ref": "expression.schema.json",
+          "title": "Test result evaluation",
+          "description": "Combines Test and Assessment outcomes using Boolean operators and conditional expressions.",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch.json",
+            "case": "04",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+          }
+        },
+        "procedure": {
+          "type": "string",
+          "description": "Manual procedure used to assess the condition.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "inputs": {
+          "type": "object",
+          "description": "Named typed input contracts declared by the Assessment. Policy-layer bindings are supplied by the referring Rule/Assessment selection, not hard-coded here.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "datatype",
+              "cardinality",
+              "required"
+            ],
+            "properties": {
+              "datatype": {
+                "$ref": "capability-common.schema.json#/$defs/native_datatype",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/datatype_tag"
+              },
+              "cardinality": {
+                "type": "string",
+                "enum": [
+                  "exactly_one",
+                  "zero_or_one",
+                  "one_or_more",
+                  "zero_or_more"
+                ],
+                "description": "Sets how many values a supplied Input may contain.",
+                "x-doc-review": {
+                  "status": "editorially-approved",
+                  "source": "editorial-batch-2.json",
+                  "case": "03",
+                  "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+                }
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Specifies whether this Input must be supplied.",
+                "x-doc-review": {
+                  "status": "editorially-approved",
+                  "source": "editorial-batch-2.json",
+                  "case": "04",
+                  "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+                }
+              },
+              "description": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Human explanation of the expected input and its policy meaning; not an executable requirement."
+              },
+              "constraints": {
+                "type": "object",
+                "description": "Explicit constraints on supplied values. They do not supply a missing Input or change its cardinality.",
+                "properties": {
+                  "allowed": {
+                    "type": "array",
+                    "items": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "object"
+                      ]
+                    },
+                    "description": "Lists the permitted values for this Input.",
+                    "x-doc-review": {
+                      "status": "editorially-approved",
+                      "source": "editorial-batch-2.json",
+                      "case": "05",
+                      "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-input$",
+            "maxLength": 64
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "description": "Defines the publisher’s evidence requirements and guidance for this Assessment.",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch-2.json",
+            "case": "28",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+          }
+        },
+        "specification": {
+          "type": "object",
+          "description": "Specification identifier and version used by this Assessment. This pre-release identifier is provisional.",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "SCAP-NG specification identifier.",
+              "x-doc-status": "native-grammar-derived"
+            },
+            "version": {
+              "type": "string",
+              "minLength": 1,
+              "description": "SCAP-NG language version used by the Assessment.",
+              "x-doc-status": "native-grammar-derived"
+            }
+          },
+          "additionalProperties": false
+        },
+        "dependencies": {
+          "type": "object",
+          "description": "Statically declared dependencies on other Assessments whose final Assessment truth/result may be consumed by this Assessment's evaluate expression. Keys are local aliases.",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "assessment",
+              "expected_version"
+            ],
+            "properties": {
+              "assessment": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Logical Assessment ID in native 0.4 authoring; compiler resolves kind, identity, exact version and scope to a packaged reference.",
+                "title": "Assessment"
+              },
+              "expected_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Transitional duplicate target identity for converted source; when present it SHALL match the resolved Assessment ID. Not required for native logical-ID authoring."
+              },
+              "expected_version": {
+                "type": [
+                  "string",
+                  "integer"
+                ],
+                "description": "Expected logical version of the referenced Assessment dependency.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "purpose": {
+                "enum": [
+                  "assessment",
+                  "applicability"
+                ],
+                "description": "Optional context for invoking this dependency. It is not an intrinsic target property and does not provide an assessment default."
+              }
+            },
+            "additionalProperties": false
+          },
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "maxLength": 64
+          }
+        },
+        "applicability": {
+          "oneOf": [
+            {
+              "$ref": "expression.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Conditions limiting where this Assessment applies.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "response": {
+          "description": "Response information associated with the Assessment.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "references": {
+          "description": "External references supporting this Assessment.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "evidence_guidance": {
+          "description": "Instructions for recording assessment evidence.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "shared_objects": {
+          "type": "object",
+          "description": "Assessment-scoped named Objects with meaningful reusable/referenceable acquisition identity. Private Objects are authored inline with their consumer.",
+          "additionalProperties": {
+            "allOf": [
+              {
+                "$ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "object_title",
+                  "capability"
+                ],
+                "properties": {
+                  "object_title": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_object_title"
+                  }
+                }
+              }
+            ]
+          },
+          "propertyNames": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$",
+            "maxLength": 64
+          },
+          "title": "Shared collection Objects"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "manual",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/mode"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "$ref": "manual-assessment.schema.json#/properties/assessment"
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "automated",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/mode"
+              }
+            },
+            "required": [
+              "mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "specification",
+              "tests",
+              "evaluate"
+            ],
+            "properties": {
+              "version": {
+                "type": "integer",
+                "minimum": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/version"
+              },
+              "specification": {
+                "properties": {
+                  "id": {
+                    "const": "scap-ng.pre-alpha.assessment",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/specification/properties/id"
+                  },
+                  "version": {
+                    "const": "0.4.0",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/specification/properties/version"
+                  }
+                },
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/specification"
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "procedure"
+                  ]
+                },
+                {
+                  "required": [
+                    "response"
+                  ]
+                },
+                {
+                  "required": [
+                    "references"
+                  ]
+                },
+                {
+                  "required": [
+                    "evidence_guidance"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "description": "Automated Assessments contain Test-local typed predicates and Object/Set-operand Filters with no named State registry. Shared Objects retain explicit acquisition identity.",
+      "title": "Assessment"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-review": {
+    "status": "editorially-approved",
+    "source": "editorial-batch.json",
+    "case": "25",
+    "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+  },
+  "x-doc-origin": "schema/assessment.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

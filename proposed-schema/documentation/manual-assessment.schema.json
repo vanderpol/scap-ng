@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/manual-assessment.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-31",
+  "title": "SCAP-NG Manual Assessment v0.4.0 high-level draft",
+  "description": "Disposable high-level schema for simple, traceable human determinations. Intentionally avoids OCIL-style questionnaire/workflow graphs.",
+  "type": "object",
+  "required": [
+    "assessment"
+  ],
+  "properties": {
+    "assessment": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "assessment_title",
+        "mode",
+        "class",
+        "procedure",
+        "response"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/id"
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/version"
+        },
+        "assessment_title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/assessment_title"
+        },
+        "mode": {
+          "const": "manual",
+          "description": "Identifies this Assessment as manual.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "class": {
+          "type": "string",
+          "enum": [
+            "compliance",
+            "vulnerability",
+            "patch",
+            "inventory",
+            "miscellaneous"
+          ],
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/class"
+        },
+        "procedure": {
+          "type": "string",
+          "minLength": 1,
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/procedure"
+        },
+        "response": {
+          "type": "object",
+          "description": "Small human-response contract. UI labels are separate from normalized SCAP-NG outcomes.",
+          "required": [
+            "type",
+            "choices",
+            "allow_comment",
+            "allow_evidence"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "Publisher-defined or standardized response vocabulary identifier.",
+              "minLength": 1
+            },
+            "choices": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "value",
+                  "outcome"
+                ],
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Serialized response value for this choice.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "label": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "Human-readable label for this response choice.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "outcome": {
+                    "type": "string",
+                    "enum": [
+                      "true",
+                      "false",
+                      "error",
+                      "unknown",
+                      "not_evaluated",
+                      "not_applicable"
+                    ],
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "description": "Response choices offered for the manual procedure.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "allow_comment": {
+              "type": "boolean",
+              "description": "Whether the response configuration permits a comment.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "allow_evidence": {
+              "type": "boolean",
+              "description": "Whether the response configuration permits supporting evidence.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": false
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/references"
+        },
+        "evidence_guidance": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "x-doc-status": "native-structure-derived",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment.schema.json#/properties/assessment/properties/evidence_guidance"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Manual Assessment containing a procedure and response configuration.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/manual-assessment.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

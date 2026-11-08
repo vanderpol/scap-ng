@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-28",
+  "title": "SCAP-NG Variable Result draft v0.4.0 strawman",
+  "description": "Resolved runtime Variable value set with explicit datatype, cardinality, status, and provenance.",
+  "type": "object",
+  "required": [
+    "id",
+    "datatype",
+    "status",
+    "cardinality",
+    "values",
+    "item_refs"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of the Variable being reported.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "variable_title": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Human-readable title of the reported Variable.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "datatype": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "const": "record"
+      },
+      "description": "OVAL-compatible Variable results are not record-typed; records are collected Item/entity structures."
+    },
+    "status": {
+      "type": "string",
+      "description": "Completeness/evaluation status of the resolved Variable value set. 'incomplete' explicitly preserves a partial known value stream; values and cardinality describe only observed values, not a proved total population. It does not establish evaluator propagation precedence.",
+      "enum": [
+        "complete",
+        "incomplete",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable",
+        "zero_values"
+      ]
+    },
+    "cardinality": {
+      "type": "string",
+      "enum": [
+        "zero",
+        "one",
+        "many"
+      ],
+      "description": "Reported size class of the Variable value set.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "$ref": "result-types.schema.json#/$defs/typed_value"
+      },
+      "description": "Values reported for the Variable.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "source": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Source label associated with the reported Variable values.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "provenance": {
+      "type": "object",
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_provenance"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_diagnostics"
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "Local Items consumed while producing this Variable, including intermediate extraction/filter/selection use."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "zero_values",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "cardinality": {
+            "const": "zero",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/cardinality"
+          },
+          "values": {
+            "maxItems": 0,
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/values"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "complete",
+              "incomplete"
+            ],
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "oneOf": [
+          {
+            "properties": {
+              "cardinality": {
+                "const": "zero",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/cardinality"
+              },
+              "values": {
+                "maxItems": 0,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/values"
+              }
+            }
+          },
+          {
+            "properties": {
+              "cardinality": {
+                "const": "one",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/cardinality"
+              },
+              "values": {
+                "minItems": 1,
+                "maxItems": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/values"
+              }
+            }
+          },
+          {
+            "properties": {
+              "cardinality": {
+                "const": "many",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/cardinality"
+              },
+              "values": {
+                "minItems": 2,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/values"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "x-doc-origin": "schema/variable-result.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

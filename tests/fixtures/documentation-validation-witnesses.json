@@ -1,0 +1,229 @@
+[
+  {
+    "name": "shell-missing-parameters-retains-generic-acceptance",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "independent.shellcommand",
+      "object": {},
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "shell-untyped-parameters-retains-generic-acceptance",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "independent.shellcommand",
+      "object": {
+        "shell": 42,
+        "command": false
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "registry-null-value-name",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE"
+        },
+        "name": null
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "registry-traversal-remains-rejected",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "windows.registry",
+      "object": {
+        "hive": {
+          "equals": "local_machine"
+        },
+        "key": {
+          "equals": "SOFTWARE"
+        },
+        "name": null,
+        "traversal": {
+          "max_depth": 0
+        }
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": false
+  },
+  {
+    "name": "file-selector-string",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "unix.file",
+      "object": {
+        "filepath": {
+          "equals": "/etc/example"
+        }
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "file-selector-number",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "unix.file",
+      "object": {
+        "filepath": {
+          "equals": 42
+        }
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": false
+  },
+  {
+    "name": "service-name-string",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "windows.service",
+      "object": {
+        "service_name": {
+          "equals": "EventLog"
+        }
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "service-name-number",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "windows.service",
+      "object": {
+        "service_name": {
+          "equals": 42
+        }
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": false
+  },
+  {
+    "name": "partition-mount-point",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "linux.partition",
+      "object": {
+        "mount_point": {
+          "equals": "/"
+        }
+      },
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "unknown-capability-generic-acceptance-retained",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/test",
+    "instance": {
+      "capability": "unknown.capability",
+      "object": {},
+      "require": {
+        "item_requirement": {
+          "items_found": "one_or_more"
+        }
+      }
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "field-absence-only",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/canonical_field_predicate",
+    "instance": {
+      "values_found": "none"
+    },
+    "expected_valid": true
+  },
+  {
+    "name": "field-absence-with-comparator-rejected",
+    "schema_file": "assessment-language.schema.json",
+    "pointer": "/$defs/canonical_field_predicate",
+    "instance": {
+      "values_found": "none",
+      "equals": 1
+    },
+    "expected_valid": false
+  },
+  {
+    "name": "concat-syntax-no-runtime-claim",
+    "schema_file": "variable-expression.schema.json",
+    "pointer": "/$defs/expression",
+    "instance": {
+      "concat": [
+        {
+          "literal": "a"
+        },
+        {
+          "literal": "b"
+        }
+      ]
+    },
+    "expected_valid": true
+  }
+]

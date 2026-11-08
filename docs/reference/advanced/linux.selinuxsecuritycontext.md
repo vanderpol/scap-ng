@@ -1,0 +1,28 @@
+# linux.selinuxsecuritycontext — advanced constraints
+
+Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/meanings/properties/full_path](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/full_path) | {} | source-derived |
+| [/$defs/meanings/properties/directory](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/directory) | {} | source-derived |
+| [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/name) | {} | source-derived |
+| [/$defs/meanings/properties/pid](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/pid) | {} | source-derived |
+| [/$defs/meanings/properties/user](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/user) | {} | source-meaning-reviewed |
+| [/$defs/meanings/properties/role](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/role) | {} | source-meaning-reviewed |
+| [/$defs/meanings/properties/type](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/type) | {} | source-meaning-reviewed |
+| [/$defs/meanings/properties/low_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/low_sensitivity) | {} | source-derived |
+| [/$defs/meanings/properties/low_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/low_category) | {} | source-derived |
+| [/$defs/meanings/properties/high_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/high_sensitivity) | {} | source-derived |
+| [/$defs/meanings/properties/high_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/high_category) | {} | source-derived |
+| [/$defs/meanings/properties/rawlow_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawlow_sensitivity) | {} | source-derived |
+| [/$defs/meanings/properties/rawlow_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawlow_category) | {} | source-derived |
+| [/$defs/meanings/properties/rawhigh_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawhigh_sensitivity) | {} | source-derived |
+| [/$defs/meanings/properties/rawhigh_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawhigh_category) | {} | source-derived |
+| [/$defs/object](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/object/properties/full_path](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/full_path) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/object/properties/directory](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/directory) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/name) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/object/properties/pid](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/pid) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/item](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/require](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/require) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/test/properties/require", "type_alternatives": ["object"]} | existing-native |

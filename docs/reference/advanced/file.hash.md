@@ -1,0 +1,18 @@
+# file.hash — advanced constraints
+
+Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/meanings/properties/full_path](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/meanings/properties/full_path) | {} | source-derived |
+| [/$defs/meanings/properties/directory](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/meanings/properties/directory) | {} | source-derived |
+| [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/meanings/properties/name) | {} | source-derived |
+| [/$defs/meanings/properties/algorithm](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/meanings/properties/algorithm) | {"declared_values_not_new_validation_restrictions": ["md5", "sha1", "sha224", "sha256", "sha384", "sha512"]} | source-derived |
+| [/$defs/meanings/properties/digest](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/meanings/properties/digest) | {} | source-derived |
+| [/$defs/object](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/object/properties/full_path](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/object/properties/full_path) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/object/properties/directory](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/object/properties/directory) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/object/properties/name) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-derived |
+| [/$defs/object/properties/algorithm](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/object/properties/algorithm) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"], "declared_values_not_new_validation_restrictions": ["md5", "sha1", "sha224", "sha256", "sha384", "sha512"]} | source-derived |
+| [/$defs/item](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/require](../../../proposed-schema/documentation/capabilities/file.hash.schema.json#/$defs/require) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/test/properties/require", "type_alternatives": ["object"]} | existing-native |

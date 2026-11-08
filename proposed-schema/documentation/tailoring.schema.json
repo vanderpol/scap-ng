@@ -1,0 +1,250 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/tailoring.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-06",
+  "title": "SCAP-NG Tailoring v0.4.0 strawman",
+  "description": "External local-policy modification bound to an exact Benchmark publication. This pre-release schema describes the policy-resolution structure; evaluation semantics are defined in the specification.",
+  "type": "object",
+  "required": [
+    "tailoring"
+  ],
+  "properties": {
+    "tailoring": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "purpose",
+        "benchmark",
+        "profile",
+        "extends",
+        "enabled_rules",
+        "disabled_rules",
+        "group_operations",
+        "check_selectors",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable logical identity of this Tailoring artifact."
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "description": "Tailoring version/revision."
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Human-readable reason the Tailoring exists."
+        },
+        "benchmark": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Identifier of the target Benchmark.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Version of the target Benchmark.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Identity of the Benchmark to which this Tailoring applies.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "profile": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional publisher Profile resolved before this Tailoring."
+        },
+        "extends": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional parent Tailoring identity/path; cycles are semantically invalid."
+        },
+        "enabled_rules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Rule identifiers declared enabled by this Tailoring.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "disabled_rules": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Rule identifiers declared disabled by this Tailoring.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "group_operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "group",
+              "selected"
+            ],
+            "properties": {
+              "group": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Identifier of the group named by this selection declaration.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "selected": {
+                "type": "boolean",
+                "description": "Whether the group is declared selected.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "justification": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Explanation accompanying the group-selection declaration.",
+                "x-doc-status": "native-structure-derived"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Group-selection declarations carried by this Tailoring.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "check_selectors": {
+          "type": "object",
+          "description": "Rule ID to published Assessment/check selector.",
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "organization",
+            "created_by",
+            "created_at",
+            "modified_by",
+            "modified_at",
+            "authorized_by",
+            "authorized_at",
+            "authorization_reference",
+            "authorization_status"
+          ],
+          "properties": {
+            "organization": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_organization"
+            },
+            "created_by": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "description": "Person or system recorded as creating the Tailoring.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "created_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time",
+              "description": "Timestamp recorded for creation of the Tailoring.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "modified_by": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "description": "Person or system recorded as modifying the Tailoring.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "modified_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time",
+              "description": "Timestamp recorded for modification of the Tailoring.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "authorized_by": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorized_by"
+            },
+            "authorized_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time",
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorized_at"
+            },
+            "authorization_reference": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorization_reference"
+            },
+            "authorization_status": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Authorization status declared for the Tailoring.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": true,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_provenance"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Benchmark selection and Parameter changes recorded as a Tailoring document.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/tailoring.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}
