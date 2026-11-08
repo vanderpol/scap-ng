@@ -33,6 +33,13 @@ Editorial receipt: editorial-batch.json case 20
 | [/$defs/logical_operator](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/logical_operator) | {"type": "string", "enum": ["and", "or", "one", "xor"]} | native-grammar-derived |
 | [/$defs/native_datatype](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/native_datatype) | {"type": "string", "enum": ["string", "boolean", "integer", "float", "binary", "version", "ipv4", "ipv6", "rpm_evr", "debian_evr", "fileset_revision", "ios_version", "record"]} | native-grammar-derived |
 | [/$defs/file_traversal](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal) | {"unevaluatedProperties": false} | existing-native |
+
+[/$defs/file_traversal](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal): Controls recursive searching through directories and symbolic links.
+
+Traversal is downward. Its binding to equality-selected path versus filepath is not yet specified consistently by the native contracts.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/file_traversal/allOf/1](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal/allOf/1) | {"type": "object"} | existing-native |
 | [/$defs/file_traversal/allOf/1/properties/recurse](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal/allOf/1/properties/recurse) | {"type": "string", "enum": ["directories", "symlinks", "symlinks_and_directories"], "default": "symlinks_and_directories"} | existing-native |
 | [/$defs/file_selection](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_selection) | {"type": "object", "additionalProperties": false} | native-grammar-derived |
@@ -84,6 +91,13 @@ Editorial receipt: editorial-batch.json case 19
 | [/$defs/object_record/properties/fields/propertyNames](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/object_record/properties/fields/propertyNames) | {"type": "string", "minLength": 1} | existing-native |
 | [/$defs/object_record/properties/redact_result](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/object_record/properties/redact_result) | {"type": "boolean", "const": true} | existing-native |
 | [/$defs/filesystem_scope](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/filesystem_scope) | {"type": "string", "enum": ["all", "local", "same"], "default": "local"} | existing-native |
+
+[/$defs/filesystem_scope](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/filesystem_scope): Filesystem scope: all, local, or the starting filesystem (same).
+
+Filesystem scope is independent of recursion. Link/target metadata, cycle handling and precise local/same mount classification remain unspecified.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/foreach_binding](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_binding) | {"type": "object", "required": ["item", "in"], "additionalProperties": false} | withheld |
 
 [/$defs/foreach_binding](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_binding): Native 0.4 collection-expansion foreach binding. The source is one named shared/referenceable Object. Chaining is permitted: a source Object may itself use for_each, creating correlated lexical lineage. Independent multi-source Cartesian expansion is not implicit.

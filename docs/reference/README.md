@@ -17,8 +17,8 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 | capability pages | 104 |
 | shared pages | 35 |
 | advanced pages | 139 |
-| description owners | 1745 |
-| duplicate text groups | 141 |
+| description owners | 2097 |
+| duplicate text groups | 165 |
 | capability unique description owners | 794 |
 | preserved semantic holds | 9 |
 | preserved withheld definitions | 1 |

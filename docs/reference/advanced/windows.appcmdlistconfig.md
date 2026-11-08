@@ -4,6 +4,18 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/windows.appcmdlistconfig.schema.json#) | {} | source-derived-proposal |
+
+[schema](../../../proposed-schema/documentation/capabilities/windows.appcmdlistconfig.schema.json#): The `windows.appcmdlistconfig` is one of two tests used to gather Microsoft Internet Information Server (IIS) configuration settings.
+
+It can gather Webserver, Site, and VDir settings.
+
+Whereas certain website (Site) and virtual directory (VDir) data gathering are found in both or either test.
+
+Meaning to be able capture larger sets of Site or VDir data both tests may be needed to gather all data.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/identifier_type](../../../proposed-schema/documentation/capabilities/windows.appcmdlistconfig.schema.json#/$defs/meanings/properties/identifier_type) | {"declared_values_not_new_validation_restrictions": ["Site", "VDir", "Webserver"]} | source-derived |
 | [/$defs/meanings/properties/identifier](../../../proposed-schema/documentation/capabilities/windows.appcmdlistconfig.schema.json#/$defs/meanings/properties/identifier) | {} | source-derived |
 | [/$defs/meanings/properties/section](../../../proposed-schema/documentation/capabilities/windows.appcmdlistconfig.schema.json#/$defs/meanings/properties/section) | {} | source-derived |

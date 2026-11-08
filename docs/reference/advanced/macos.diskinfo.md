@@ -4,7 +4,17 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/macos.diskinfo.schema.json#) | {} | source-derived-proposal |
 | [/$defs/meanings/properties/device_identifier](../../../proposed-schema/documentation/capabilities/macos.diskinfo.schema.json#/$defs/meanings/properties/device_identifier) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/device_identifier](../../../proposed-schema/documentation/capabilities/macos.diskinfo.schema.json#/$defs/meanings/properties/device_identifier): Disk device identifier.
+
+The device identifier.
+
+Use a wildcard pattern to collect information for all disk devices.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/volume_name](../../../proposed-schema/documentation/capabilities/macos.diskinfo.schema.json#/$defs/meanings/properties/volume_name) | {} | source-derived |
 | [/$defs/meanings/properties/file_system_personality](../../../proposed-schema/documentation/capabilities/macos.diskinfo.schema.json#/$defs/meanings/properties/file_system_personality) | {} | source-derived |
 | [/$defs/meanings/properties/removable_media](../../../proposed-schema/documentation/capabilities/macos.diskinfo.schema.json#/$defs/meanings/properties/removable_media) | {} | source-derived |

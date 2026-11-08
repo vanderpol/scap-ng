@@ -32,7 +32,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Full path of the collected entry.",
+          "description": "Full path of the collected entry.\n\n`full_path` specifies the absolute path for a file on the machine.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -49,7 +49,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Directory component of the collected path.",
+          "description": "Directory component of the collected path.\n\n`directory` specifies the directory component of the absolute path to a file on the machine.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -66,7 +66,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Entry name without the directory.",
+          "description": "Entry name without the directory.\n\nThe name of the file.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -83,7 +83,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Kind of filesystem entry.",
+          "description": "Kind of filesystem entry.\n\nThis is the file's type: regular file (regular), directory, named pipe (fifo), symbolic link, socket or block special.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -100,7 +100,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Numeric group ID of the owning group.",
+          "description": "Numeric group ID of the owning group.\n\nThis is the group owner of the file, by group number.\n\n`owner_gid` represents the group owner of a file, by group number.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -117,7 +117,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Numeric user ID of the owner.",
+          "description": "Numeric user ID of the owner.\n\nThe numeric user id, or uid, is the third column of each user's entry in /etc/passwd.\n\nThis element represents the owner of the file.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -151,7 +151,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Last inode-status change, not creation time.",
+          "description": "Last inode-status change, not creation time.\n\nAn inode is a Unix data structure that stores all of the information about a particular file.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -202,7 +202,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Set-user-ID permission flag.",
+          "description": "Set-user-ID permission flag.\n\nDoes the program run with the uid (thus privileges) of the file's owner, rather than the calling user?",
           "x-doc-datatypes": [
             "boolean"
           ]
@@ -219,7 +219,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Set-group-ID permission flag.",
+          "description": "Set-group-ID permission flag.\n\nDoes the program run with the gid (thus privileges) of the file's group owner, rather than the calling user's group?",
           "x-doc-datatypes": [
             "boolean"
           ]
@@ -406,7 +406,7 @@
             }
           },
           "x-doc-status": "editorially-approved",
-          "description": "Whether ACL permissions differ from standard UNIX permissions.",
+          "description": "Whether ACL permissions differ from standard UNIX permissions.\n\nDoes the file or directory have ACL permissions applied to it?",
           "x-doc-datatypes": [
             "boolean"
           ]
@@ -463,7 +463,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "Name of a file to evaluate.",
+          "description": "Name of a file to evaluate.\n\n`filename` specifies the name of a file to evaluate.",
           "x-doc-datatypes": [
             "string"
           ],
@@ -487,7 +487,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/native-selector.schema.json#/$defs/unix_file_object/oneOf/1",
-      "x-doc-role": "Object"
+      "x-doc-role": "Object",
+      "description": "A file object defines the path and filename of the file(s).\n\nIn addition, a number of behaviors may be provided that help guide the collection of objects.\n\nThe Object is used by a file test to define the specific file(s) to be evaluated.\n\nThe set of files to be evaluated may be identified with either a complete filepath or a path and filename."
     },
     "item": {
       "properties": {
@@ -496,7 +497,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json",
-      "x-doc-role": "Item"
+      "x-doc-role": "Item",
+      "description": "The file item holds information about the individual files found on a system.\n\nEach file item contains path and filename information as well as its type, associated user and group ids, relevant dates, and the privileges granted."
     },
     "require": {
       "properties": {
@@ -505,12 +507,21 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/test/properties/require",
-      "x-doc-role": "Require"
+      "x-doc-role": "Require",
+      "description": "The comparison fields define the different metadata associated with a UNIX file.\n\nThis includes the path, filename, type, group id, user id, size, etc.\n\nIn addition, the permission associated with the file are also included."
     }
   },
   "x-doc-roles": {
     "Object": "#/$defs/object",
     "Item": "#/$defs/item",
     "Require": "#/$defs/require"
+  },
+  "description": "The file test is used to check metadata associated with UNIX files, of the sort returned by either an ls command, stat command or stat() system call.",
+  "x-doc-status": "source-derived-proposal",
+  "x-doc-fidelity": {
+    "source_version": "5.12.3",
+    "source_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+    "annotation_scope": "capability overview and mapped field explanations",
+    "native_runtime_approval": false
   }
 }

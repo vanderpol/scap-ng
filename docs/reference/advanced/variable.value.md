@@ -4,6 +4,14 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/variable.value.schema.json#) | {} | source-derived-proposal |
+
+[schema](../../../proposed-schema/documentation/capabilities/variable.value.schema.json#): The variable test allows the value of a variable to be compared to a defined value.
+
+As an example one might use this test to validate that a variable being passed in from an external source falls within a specified range.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/value](../../../proposed-schema/documentation/capabilities/variable.value.schema.json#/$defs/meanings/properties/value) | {} | source-derived |
 | [/$defs/object](../../../proposed-schema/documentation/capabilities/variable.value.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
 | [/$defs/item](../../../proposed-schema/documentation/capabilities/variable.value.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |

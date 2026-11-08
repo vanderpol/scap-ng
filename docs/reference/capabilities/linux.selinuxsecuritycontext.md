@@ -2,27 +2,29 @@
 
 Proposed documentation; frozen 0.4.0 validation is unchanged.
 
+The `linux.selinuxsecuritycontext` is used to check the security context of a file or process on the local system.
+
 **Contract status: unresolved.** Native collection boundaries, field multiplicity, missing values and error propagation are not established by field descriptions. Legacy source documentation is not a native execution contract.
 
-Field meanings below are documentation proposals derived from the pinned sources. Reviewed wording and unresolved entries are identified in the [coverage ledger](../coverage.json) and schema annotations.
-
-Occurrences indicate how many times a field may appear within its parent object; a field may separately contain multiple values. Object tables describe inline forms; named Object references and Set composition use the [shared collection grammar](../shared/capability-common.md). Item fields use the shared [typed-value wrapper](../shared/result-types.md); a field may contain one wrapper or an array. Capability-specific units, multiplicity and error behavior require evidence.
+Occurrences indicate how many times a field may appear within its parent object; a field may separately contain multiple values. Value datatypes are declarations; [advanced constraints](../advanced/linux.selinuxsecuritycontext.md) retain the validated encodings and any broader schema acceptance.
 
 ## Object
 
-| Field | Schema type | Occurrences | Description | Details |
+The Object is used by `linux.selinuxsecuritycontext` to define the security contexts of files and processes to collect from the local system.
+
+| Field | Value datatype | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `capability` | string | 0..1 | Optional for inline Objects only, whose capability is inherited from the enclosing Test; when supplied it must agree with the Test capability. | [/$defs/object/properties/capability](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/capability) |
 | `filters` | array | 0..1 | Leaf Object post-collection Filters; observed Items, not selectors or compliance States. | [/$defs/object/properties/filters](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/filters) |
-| `full_path` | object | 0..1 | Absolute path for a file on the machine. | [/$defs/object/properties/full_path](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/full_path) |
-| `directory` | object | 0..1 | Directory component of the absolute path to a file on the machine. | [/$defs/object/properties/directory](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/directory) |
-| `name` | object | 0..1 | Name of a file to evaluate. | [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/name) |
-| `pid` | object | 0..1 | Process ID of the process. | [/$defs/object/properties/pid](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/pid) |
+| `full_path` | string | 0..1 | Absolute path for a file on the machine. | [/$defs/object/properties/full_path](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/full_path) |
+| `directory` | string | 0..1 | Directory component of the absolute path to a file on the machine. | [/$defs/object/properties/directory](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/directory) |
+| `name` | string | 0..1 | Name of a file to evaluate. | [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/name) |
+| `pid` | integer | 0..1 | Process ID of the process. | [/$defs/object/properties/pid](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/pid) |
 | `traversal` | object | 0..1 | Controls recursive searching through directories and symbolic links. | [/$defs/object/properties/traversal](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/object/properties/traversal) |
 
 ### traversal
 
-| Field | Schema type | Occurrences | Description | Details |
+| Field | Value datatype | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `max_depth` | integer, string | 1..1 (required) | Maximum downward recursion depth; 0 includes only the starting directory. | [/$defs/file_traversal_base/properties/max_depth](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal_base/properties/max_depth) |
 | `recurse` | string | 1..1 (required) | Entry types to follow during recursion. | [/$defs/file_traversal/allOf/1/properties/recurse](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal/allOf/1/properties/recurse) |
@@ -31,47 +33,37 @@ Validation shape: [/$defs/inline_object](../../../proposed-schema/documentation/
 
 ## Item
 
-| Field | Schema type | Occurrences | Description | Details |
+This item describes the SELinux security context of a file or process on the local system.
+
+This item follows the SELinux security context structure: user:role:type:low_sensitivity[:low_category]- high_sensitivity [:high_category].
+
+| Field | Value datatype | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `full_path` | array, object | 0..1 | Absolute path for a file on the machine. | [/$defs/meanings/properties/full_path](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/full_path) |
-| `directory` | array, object | 0..1 | Directory component of the absolute path to a file on the machine. | [/$defs/meanings/properties/directory](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/directory) |
-| `name` | array, object | 0..1 | The name of the file. | [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/name) |
-| `pid` | array, object | 0..1 | The process ID of the process. | [/$defs/meanings/properties/pid](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/pid) |
-| `user` | array, object | 0..1 | SELinux user component of the security context. | [/$defs/meanings/properties/user](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/user) |
-| `role` | array, object | 0..1 | SELinux role component of the security context. | [/$defs/meanings/properties/role](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/role) |
-| `type` | array, object | 0..1 | SELinux type or process domain component of the security context. | [/$defs/meanings/properties/type](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/type) |
-| `low_sensitivity` | array, object | 0..1 | Current sensitivity of a file or process. | [/$defs/meanings/properties/low_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/low_sensitivity) |
-| `low_category` | array, object | 0..1 | Set of categories associated with the low sensitivity. | [/$defs/meanings/properties/low_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/low_category) |
-| `high_sensitivity` | array, object | 0..1 | Maximum range for a file or the clearance for a process. | [/$defs/meanings/properties/high_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/high_sensitivity) |
-| `high_category` | array, object | 0..1 | Set of categories associated with the high sensitivity. | [/$defs/meanings/properties/high_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/high_category) |
-| `rawlow_sensitivity` | array, object | 0..1 | Current sensitivity of a file or process but in its raw context. | [/$defs/meanings/properties/rawlow_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawlow_sensitivity) |
-| `rawlow_category` | array, object | 0..1 | Set of categories associated with the low sensitivity but in its raw context. | [/$defs/meanings/properties/rawlow_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawlow_category) |
-| `rawhigh_sensitivity` | array, object | 0..1 | Maximum range for a file or the clearance for a process but in its raw context. | [/$defs/meanings/properties/rawhigh_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawhigh_sensitivity) |
-| `rawhigh_category` | array, object | 0..1 | Set of categories associated with the high sensitivity but in its raw context. | [/$defs/meanings/properties/rawhigh_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawhigh_category) |
+| `full_path` | string | 0..1 | Absolute path for a file on the machine. | [/$defs/meanings/properties/full_path](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/full_path) |
+| `directory` | string | 0..1 | Directory component of the absolute path to a file on the machine. | [/$defs/meanings/properties/directory](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/directory) |
+| `name` | string | 0..1 | The name of the file. | [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/name) |
+| `pid` | integer | 0..1 | The process ID of the process. | [/$defs/meanings/properties/pid](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/pid) |
+| `user` | string | 0..1 | SELinux user component of the security context. | [/$defs/meanings/properties/user](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/user) |
+| `role` | string | 0..1 | SELinux role component of the security context. | [/$defs/meanings/properties/role](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/role) |
+| `type` | string | 0..1 | SELinux type or process domain component of the security context. | [/$defs/meanings/properties/type](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/type) |
+| `low_sensitivity` | string | 0..1 | Current sensitivity of a file or process. | [/$defs/meanings/properties/low_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/low_sensitivity) |
+| `low_category` | string | 0..1 | Set of categories associated with the low sensitivity. | [/$defs/meanings/properties/low_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/low_category) |
+| `high_sensitivity` | string | 0..1 | Maximum range for a file or the clearance for a process. | [/$defs/meanings/properties/high_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/high_sensitivity) |
+| `high_category` | string | 0..1 | Set of categories associated with the high sensitivity. | [/$defs/meanings/properties/high_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/high_category) |
+| `rawlow_sensitivity` | string | 0..1 | Current sensitivity of a file or process but in its raw context. | [/$defs/meanings/properties/rawlow_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawlow_sensitivity) |
+| `rawlow_category` | string | 0..1 | Set of categories associated with the low sensitivity but in its raw context. | [/$defs/meanings/properties/rawlow_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawlow_category) |
+| `rawhigh_sensitivity` | string | 0..1 | Maximum range for a file or the clearance for a process but in its raw context. | [/$defs/meanings/properties/rawhigh_sensitivity](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawhigh_sensitivity) |
+| `rawhigh_category` | string | 0..1 | Set of categories associated with the high sensitivity but in its raw context. | [/$defs/meanings/properties/rawhigh_category](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json#/$defs/meanings/properties/rawhigh_category) |
 
 Validation shape: [schema](../../../proposed-schema/documentation/collected-item.schema.json#).
 
 ## Require
 
-Field meanings are shared with Item; comparisons use the [native Require grammar](../shared/assessment-language.md). This is a field vocabulary, not a whitelist or a promise that every field is collected.
+This includes SELinux security context's user, type role, low sensitivity, low category, high sensitivity, high category, raw low sensitivity, raw low category, raw high sensitivity, and raw high category.
 
-### Condition logic
+This state follows the SELinux security context structure: user:role:type:low_sensitivity[:low_category]- high_sensitivity [:high_category].
 
-| Field | Schema type | Occurrences | Description | Details |
-| --- | --- | --- | --- | --- |
-| `item_requirement` | object | 1..1 (required) | Sets how many Items must be found and how many must satisfy the comparison. | [/$defs/canonical_all_items_requirement/properties/item_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement) |
-| `field_requirement` | object | 1..1 (required) | Sets the shared value-count requirements for fields in this comparison. | [/$defs/canonical_all_items_requirement/properties/field_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/field_requirement) |
-| `fields` | object | Conditional (at most 1) | Requires all listed field conditions to hold for an Item. | [/$defs/canonical_all_items_requirement/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/fields) |
-| `and` | array | Conditional (at most 1) | Groups child conditions using logical AND. | [/$defs/canonical_all_items_requirement/properties/and](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/and) |
-| `or` | array | Conditional (at most 1) | Groups child conditions using logical OR. | [/$defs/canonical_all_items_requirement/properties/or](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/or) |
-| `one` | array | Conditional (at most 1) | **Unresolved description** | [/$defs/canonical_all_items_requirement/properties/one](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/one) |
-| `xor` | array | Conditional (at most 1) | **Unresolved description** | [/$defs/canonical_all_items_requirement/properties/xor](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/xor) |
-
-### Item existence requirement
-
-| Field | Schema type | Occurrences | Description | Details |
-| --- | --- | --- | --- | --- |
-| `item_requirement` | object | 1..1 (required) | Existence only; there is no satisfaction operation without a comparison. | [/$defs/item_presence_requirement/properties/item_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/item_presence_requirement/properties/item_requirement) |
+Use the Item fields above with the [shared Require forms and count policies](../shared/assessment-language.md). Capability-specific comparison-domain declarations, where different, are listed below.
 
 
 Validation shape: [/$defs/test/properties/require](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/test/properties/require).
@@ -82,25 +74,6 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 | Role / field | Declared datatype or collection shape | Annotation status |
 | --- | --- | --- |
-| Object.`full_path` | string | source-derived |
-| Object.`directory` | string | source-derived |
-| Object.`name` | string | source-derived |
-| Object.`pid` | integer | source-derived |
-| Item.`full_path` | string | source-derived |
-| Item.`directory` | string | source-derived |
-| Item.`name` | string | source-derived |
-| Item.`pid` | integer | source-derived |
-| Item.`user` | string | source-meaning-reviewed |
-| Item.`role` | string | source-meaning-reviewed |
-| Item.`type` | string | source-meaning-reviewed |
-| Item.`low_sensitivity` | string | source-derived |
-| Item.`low_category` | string | source-derived |
-| Item.`high_sensitivity` | string | source-derived |
-| Item.`high_category` | string | source-derived |
-| Item.`rawlow_sensitivity` | string | source-derived |
-| Item.`rawlow_category` | string | source-derived |
-| Item.`rawhigh_sensitivity` | string | source-derived |
-| Item.`rawhigh_category` | string | source-derived |
 
 See the [schema](../../../proposed-schema/documentation/capabilities/linux.selinuxsecuritycontext.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 
