@@ -584,7 +584,7 @@ def report(result, catalog):
             f'Discovered **{len(result["schemas"])} schema documents** among {len(result["manifest"])} JSON inputs. Audited {len(result["inventory"])} schema nodes, including {len(public)} public current-core/shared nodes. {len(result["excluded"])} generated capability definitions are explicit scope exclusions; no capability expansion is authorized.', '',
             'Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.', '',
             f'Found **{len(result["findings"])} deduplicated findings** at {len(result["crosswalk"])} canonical proposal locations. Presence is not useful-quality approval. Structural-only/provisional proposals remain open for review; generic filler cannot close a gap.', '',
-            '[Bounded editorial batch](EDITORIAL-REVIEW.md) · [Phase 1 wording inventory](CROSSWALK.md) · [two bounded previews](PILOTS.md) · [machine inventory](inventory.jsonl) · [gap register](gaps.jsonl) · [full crosswalk](crosswalk.jsonl) · [annotation patch](proposed-annotations.patch.json).', '']
+            '[Batch 1 editorial receipt](EDITORIAL-REVIEW.md) · [Batch 2 pending review](EDITORIAL-REVIEW-2.md) · [Phase 1 wording inventory](CROSSWALK.md) · [two bounded previews](PILOTS.md) · [machine inventory](inventory.jsonl) · [gap register](gaps.jsonl) · [full crosswalk](crosswalk.jsonl) · [annotation patch](proposed-annotations.patch.json).', '']
     rows += table_count(Counter('own' if r['own_description'] else 'inherited' if r['effective_description'] else 'missing' for r in public), 'Description presence')
     rows += table_count(Counter(r['quality'] for r in public), 'Useful-quality review state')
     rows += table_count(Counter(p['decision_kind'] for p in result['crosswalk']), 'Review decision kind')
@@ -672,24 +672,27 @@ def pilot_report(result, catalog):
     return '\n'.join(rows)
 
 
-def editorial_batch(result, root=ROOT):
+def editorial_batch(result, root=ROOT, filename="editorial-batch.json"):
     """Validate the bounded editorial worksheet; never emit/apply schema edits."""
-    file = root / DEST / 'editorial-batch.json'
+    file = root / DEST / filename
     if not file.exists():
         return None
     batch = json.loads(file.read_text())
     rows = batch['proposals']
     descriptions = [r for r in rows if r['author_description'] is not None]
-    if not 20 <= len(descriptions) <= 30 or len(rows) > 30:
-        raise ValueError('Editorial batch must contain 20–30 descriptions and at most 30 cases')
+    minimum = 20 if filename == 'editorial-batch.json' else 25
+    if not minimum <= len(descriptions) <= 30 or len(rows) > 30:
+        raise ValueError(f'Editorial batch must contain {minimum}–30 descriptions and at most 30 cases')
     if batch['native_commit'] != NATIVE_COMMIT or batch['phase1_commit'] != '823ac12fbd0b5eaa7096ef4c6855ee25ff4f49a2' or batch['workflow']['canonical_installation_authorized'] is not False:
         raise ValueError('Editorial worksheet may not authorize canonical installation')
     if len({r['id'] for r in rows}) != len(rows) or len({(r['schema_uri'], r['pointer']) for r in rows}) != len(rows):
         raise ValueError('Duplicate editorial case')
-    required = {'references', 'evaluation', 'variables', 'Require', 'functions', 'results', 'document roots'}
+    required = ({'references', 'evaluation', 'variables', 'Require', 'functions', 'results', 'document roots'}
+                if filename == 'editorial-batch.json' else
+                {'references', 'evaluation', 'variables', 'Require', 'Inputs', 'results', 'document roots'})
     if not required <= {r['category'] for r in rows}:
         raise ValueError('Editorial sample lacks the required diversity')
-    if not batch['workflow']['editorial_review'].startswith('pending') or not batch['workflow']['normative_approval'].startswith('pending'):
+    if not batch['workflow']['normative_approval'].startswith('pending'):
         raise ValueError('Independent editorial/normative approval is not asserted by this batch')
     blocked = {r['schema_pointer'] for r in language_catalog(result)['unreachable_shared_foreach_helpers'] if not r['assessment_reachable']}
     prior = {p['id']: p for p in result['crosswalk']}
@@ -714,8 +717,10 @@ def editorial_batch(result, root=ROOT):
             raise ValueError('Unsupported Codex-draft origin')
         if not row['engineering_note'].strip() or not row['codex_proposal'].strip():
             raise ValueError('Missing independent engineering note or original draft')
-        if row['classification'] not in {'editorial', 'semantic_decision_needed'} or row['editorial_status'] != 'pending_editorial_review':
-            raise ValueError('Editorial/semantic review is not an approval')
+        if row['classification'] not in {'editorial', 'semantic_decision_needed'}:
+            raise ValueError('Unsupported editorial classification')
+        if filename != 'editorial-batch.json' and (row['editorial_status'] != 'pending_editorial_review' or row.get('editorial_review_url') or not batch['workflow']['editorial_review'].startswith('pending')):
+            raise ValueError('Batch 2 must remain pending editorial review')
         if row['classification'] == 'semantic_decision_needed' and row['semantic_status'] != 'pending_semantic_review':
             raise ValueError('Semantic decision must remain pending')
         text = row['author_description']
@@ -731,6 +736,13 @@ def editorial_batch(result, root=ROOT):
                 raise ValueError('Engineering/status prose leaked into author help')
             if text == row['engineering_note']:
                 raise ValueError('Author help and engineering note must stay independent')
+        if filename == 'editorial-batch.json':
+            validate_editorial_receipt(batch, row)
+        else:
+            if row['proposed_description_owner'] != key:
+                raise ValueError('Each concept needs one exact proposed description owner')
+            for consumer in row['related_consumer_pointers']:
+                result['store'].node(consumer)
         for evidence in row['evidence']:
             result['store'].node(evidence)
         for case in row['checks']:
@@ -748,26 +760,69 @@ def editorial_batch(result, root=ROOT):
             if validator.is_valid(instance) != case['expected_valid']:
                 raise ValueError('Editorial syntax witness disagrees: ' + row['id'] + ' / ' + case['label'])
             checked += 1
+    if filename == 'editorial-batch.json':
+        reviewed = deepcopy(batch)
+        reviewed.pop('review_receipt')
+        reviewed['workflow']['editorial_review'] = 'pending ChatGPT editorial review'
+        for row in reviewed['proposals']:
+            row['author_description'] = row.pop('reviewed_author_description')
+            row.pop('editorial_review_url')
+            row['editorial_status'] = 'pending_editorial_review'
+        if digest(reviewed) != '03c146e78eb5dc30a4d5fd2133ce50f832d3d8c32fe38f0f6f596a2b3b9ce17b':
+            raise ValueError('Reviewed batch 1 source dossier must remain unchanged')
     return batch, checked
 
 
-def editorial_report(result):
-    validated = editorial_batch(result)
+def validate_editorial_receipt(batch, row):
+    """Record the explicit owner ID lists without upgrading semantic holds."""
+    receipt = batch['review_receipt']
+    review_url = 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815'
+    if (receipt['review_url'] != review_url or row.get('editorial_review_url') != review_url
+            or receipt['authorization_url'] != 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721594181'
+            or receipt['reviewed_commit'] != 'c742e0d6039c56d70eab973bc28f9ccb01f5241e'):
+        raise ValueError('Editorial receipt approval provenance drifted')
+    accepted = '01 02 03 05 06 08 09 10 11 12 14 19 20 22 23 24 25 27'.split()
+    revisions = {
+        '04': 'Combines Test and Assessment outcomes using Boolean operators and conditional expressions.',
+        '07': "Compares a collected field's values or checks for confirmed absence.",
+        '13': 'Sets how many observed values must be present for a field.'}
+    holds = '15 16 17 18 21 26'.split()
+    if (receipt['accepted_as_written'] != accepted or receipt['accepted_with_revision'] != sorted(revisions)
+            or receipt['semantic_holds'] != holds or receipt['withheld'] != ['28']):
+        raise ValueError('Editorial receipt must preserve explicit reviewed ID lists')
+    identifier = row['id']
+    status = ('accepted_as_written' if identifier in accepted else 'accepted_with_revision' if identifier in revisions
+              else 'draft_style_acceptable_semantic_hold' if identifier in holds else 'withheld' if identifier == '28' else None)
+    expected = revisions.get(identifier, row['reviewed_author_description'])
+    if status is None or row['editorial_status'] != status or row['author_description'] != expected:
+        raise ValueError('Editorial receipt status or approved wording drifted')
+    if identifier in holds + ['28'] and row['classification'] != 'semantic_decision_needed':
+        raise ValueError('Editorial receipt cannot clear semantic holds')
+    if identifier in accepted + list(revisions) and row['classification'] != 'editorial':
+        raise ValueError('Editorial subset classification drifted')
+
+
+def editorial_report(result, filename="editorial-batch.json"):
+    validated = editorial_batch(result, filename=filename)
     if validated is None:
         return None
     batch, checked = validated
     rows = batch['proposals']
-    lines = ['# Editorial review batch 1', '',
-             '**27 proposed descriptions and one withheld case; no canonical edits or normative approval.**', '',
-             'Prepared as a bounded Codex wording pass for ChatGPT editorial review. Jack decides the marked semantic questions. These are edited candidates, not a claim that an independent editor has approved them.', '',
-             'Native pin: `' + batch['native_commit'] + '`. Full schema URIs use `https://scap-ng.dev/schema/v0.4.0/`; every file/pointer and source hash is recorded in [editorial-batch.json](editorial-batch.json).', '',
-             str(checked) + ' positive/negative syntax witnesses were checked against the pinned definitions, including parent-context cases and an existing Assessment example. They do not execute collection, evaluation or transformations and do not establish runtime equivalence.', '',
+    number = 1 if filename == 'editorial-batch.json' else 2
+    lines = [f'# Editorial review batch {number}', '',
+             '**No canonical edits or normative approval.**', '',
+             ('Batch 1 editorial receipt: **21 accepted descriptions** (18 as written, 3 revised), **6 semantic holds**, **1 withheld**. '
+              'Uses the explicit reviewed list of 18 accepted IDs plus the three approved wording revisions. [Independent review]('
+              + batch['review_receipt']['review_url'] + ') · [Owner authorization](' + batch['review_receipt']['authorization_url'] + ').'
+              if number == 1 else f'**{len(rows)} new descriptions, all pending editorial review.** Jack decides marked semantic questions; no independent editorial approval is claimed.'), '',
+             'Native pin: `' + batch['native_commit'] + '`. Full schema URIs use `https://scap-ng.dev/schema/v0.4.0/`; every file/pointer and source hash is recorded in [' + filename + '](' + filename + ').', '',
+             str(checked) + ' positive/negative syntax witnesses were checked against the pinned definitions, including parent-context cases. They do not execute collection, evaluation or transformations and do not establish runtime equivalence.', '',
              '## Edited author-facing candidates', '',
-             '| Case / element | `author_description` | Classification |', '| --- | --- | --- |']
+             '| Case / element | `author_description` | Classification / disposition |', '| --- | --- | --- |']
     for row in rows:
         text = row['author_description'] or '**Withheld — no supported-placement description proposed.**'
         classification = 'editorial' if row['classification'] == 'editorial' else '**semantic decision needed**'
-        lines.append('| [' + row['id'] + ' ' + md(row['element']) + '](#case-' + row['id'] + ') | ' + md(text) + ' | ' + classification + ' |')
+        lines.append('| [' + row['id'] + ' ' + md(row['element']) + '](#case-' + row['id'] + ') | ' + md(text) + ' | ' + classification + '; ' + row['editorial_status'].replace('_', ' ') + ' |')
     lines += ['', '## Sources, initial drafts and engineering notes', '',
               'Open a case for its exact pointer, existing local/inherited help, original Codex proposal and separate engineering note. Source verification is an editorial prerequisite, not approval to install a description.', '']
     for row in rows:
@@ -780,13 +835,16 @@ def editorial_report(result):
                   '**Existing local wording:** ' + (row['existing_wording'] or 'No local description.'), '']
         if row['inherited_wording']:
             lines += ['**Existing inherited wording:** ' + row['inherited_wording']['text'], '', '**Inherited source:** `' + row['inherited_wording']['source'] + '`', '']
+        if row['editorial_status'] == 'accepted_with_revision':
+            lines += ['**Wording before editorial revision:** ' + row['reviewed_author_description'], '']
         lines += ['**Codex proposal:** ' + row['codex_proposal'], '', '**Draft provenance:** ' + origin_text, '',
                   '**Edited `author_description`:** ' + (row['author_description'] or 'Withheld.'), '',
                   '**Separate `engineering_note`:** ' + row['engineering_note'], '',
-                  '**Classification:** ' + row['classification'] + '; **editorial status:** pending editorial review; **semantic status:** ' + row['semantic_status'] + '.', '',
+                  '**Classification:** ' + row['classification'] + '; **editorial status:** ' + row['editorial_status'] + '; **semantic status:** ' + row['semantic_status'] + '.', '',
+                  '**Proposed description authority:** `' + row.get('proposed_description_owner', key) + '`; related consumers: ' + (', '.join('`' + p + '`' for p in row.get('related_consumer_pointers', [])) or 'none separately bound in this worksheet') + '.', '',
                   '**Source/syntax checks:** ' + str(len(row['checks'])) + ' witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.', '', '</details>', '']
     lines += ['## Review gate', '',
-              'Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The foreach case remains withheld until placement is decided. None of these candidates is added to the bulk patch bundle, installed in an editor or written to a canonical schema.', '',
+              'Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The batch 1 foreach case remains withheld until placement is decided. None of these candidates is added to the bulk patch bundle, installed in an editor or written to a canonical schema.', '',
               '**Stop for editorial review.** No bulk shortening of the 1,580 findings, schema edit, editor repin, migration or merge.', '']
     return '\n'.join(lines)
 
@@ -813,9 +871,16 @@ def artifacts(result):
               'crosswalk.jsonl': ''.join(encode(r) + '\n' for r in result['crosswalk']),
               'proposed-annotations.patch.json': json.dumps(bundle, indent=2) + '\n',
               'REPORT.md': report(result, catalog), 'CROSSWALK.md': crosswalk_report(result), 'PILOTS.md': pilot_report(result, catalog)}
-    editorial = editorial_report(result)
-    if editorial is not None:
-        output['EDITORIAL-REVIEW.md'] = editorial
+    seen = set()
+    for filename, report_name in [('editorial-batch.json', 'EDITORIAL-REVIEW.md'), ('editorial-batch-2.json', 'EDITORIAL-REVIEW-2.md')]:
+        validated = editorial_batch(result, filename=filename)
+        if validated is None:
+            continue
+        keys = {(r['schema_uri'], r['pointer']) for r in validated[0]['proposals']}
+        if seen & keys:
+            raise ValueError('Editorial batches must not repeat schema targets')
+        seen |= keys
+        output[report_name] = editorial_report(result, filename=filename)
     return output
 
 

@@ -1,45 +1,45 @@
 # Editorial review batch 1
 
-**27 proposed descriptions and one withheld case; no canonical edits or normative approval.**
+**No canonical edits or normative approval.**
 
-Prepared as a bounded Codex wording pass for ChatGPT editorial review. Jack decides the marked semantic questions. These are edited candidates, not a claim that an independent editor has approved them.
+Batch 1 editorial receipt: **21 accepted descriptions** (18 as written, 3 revised), **6 semantic holds**, **1 withheld**. Uses the explicit reviewed list of 18 accepted IDs plus the three approved wording revisions. [Independent review](https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815) · [Owner authorization](https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721594181).
 
 Native pin: `7354a24cdbfe18321153ccaef5d772801a10cd71`. Full schema URIs use `https://scap-ng.dev/schema/v0.4.0/`; every file/pointer and source hash is recorded in [editorial-batch.json](editorial-batch.json).
 
-55 positive/negative syntax witnesses were checked against the pinned definitions, including parent-context cases and an existing Assessment example. They do not execute collection, evaluation or transformations and do not establish runtime equivalence.
+55 positive/negative syntax witnesses were checked against the pinned definitions, including parent-context cases. They do not execute collection, evaluation or transformations and do not establish runtime equivalence.
 
 ## Edited author-facing candidates
 
-| Case / element | `author_description` | Classification |
+| Case / element | `author_description` | Classification / disposition |
 | --- | --- | --- |
-| [01 input_reference](#case-01) | Uses the value of a declared Input. | editorial |
-| [02 variable_reference](#case-02) | Uses the value of a declared Variable. | editorial |
-| [03 object_reference](#case-03) | Reuses a named Object for collection. | editorial |
-| [04 evaluate](#case-04) | Combines Test and Assessment results using Boolean operators and conditional expressions. | editorial |
-| [05 input_provided](#case-05) | Checks whether a declared Input was supplied, even if its value is empty. | editorial |
-| [06 Variable expression](#case-06) | Defines how this Variable's values are obtained. | editorial |
-| [07 canonical_field_predicate](#case-07) | Compares a collected field or checks whether it is absent. | editorial |
-| [08 Comparison Require](#case-08) | Defines the Item counts and field conditions for a comparison Test. | editorial |
-| [09 item_requirement](#case-09) | Sets how many Items must be found and how many must satisfy the comparison. | editorial |
-| [10 items_found](#case-10) | Sets how many selected Items must exist. | editorial |
-| [11 items_satisfying](#case-11) | Sets how many selected Items must satisfy the comparison. | editorial |
-| [12 field_requirement](#case-12) | Sets the shared value-count requirements for fields in this comparison. | editorial |
-| [13 values_found](#case-13) | Sets how many values a field must have. | editorial |
-| [14 values_matching](#case-14) | Sets how many values must match the field's condition. | editorial |
-| [15 concat](#case-15) | Joins values from two or more components into strings, producing one result for each combination. | **semantic decision needed** |
-| [16 regex_capture](#case-16) | Extracts the first capturing group's text from each input string. | **semantic decision needed** |
-| [17 unique](#case-17) | Removes duplicate scalar values from a collection. | **semantic decision needed** |
-| [18 merge](#case-18) | Joins a collection's values into a string with the chosen ordering and separator. | **semantic decision needed** |
-| [19 set_expression](#case-19) | Combines Object collections using union, intersection, or difference. | editorial |
-| [20 state_filter](#case-20) | Includes or excludes collected Items that match a field condition. | editorial |
-| [21 typed_value.value](#case-21) | The value represented using its declared datatype. | **semantic decision needed** |
-| [22 typed_value.status](#case-22) | Distinguishes an existing value from absence, an error, or a value that was not collected. | editorial |
-| [23 Collected Item document](#case-23) | Records one collected entity, its fields, and supporting provenance. | editorial |
-| [24 Object collection result](#case-24) | Records an Object's collection outcome and supporting Item references. | editorial |
-| [25 Assessment document](#case-25) | Defines an Assessment's metadata and its manual procedure or automated checks. | editorial |
-| [26 Benchmark document](#case-26) | Organizes Rules, Groups, Profiles, and shared policy settings. | **semantic decision needed** |
-| [27 Organizational Input Set](#case-27) | Supplies organizational values for Parameters delegated by a Benchmark publisher. | editorial |
-| [28 foreach_binding](#case-28) | **Withheld — no supported-placement description proposed.** | **semantic decision needed** |
+| [01 input_reference](#case-01) | Uses the value of a declared Input. | editorial; accepted as written |
+| [02 variable_reference](#case-02) | Uses the value of a declared Variable. | editorial; accepted as written |
+| [03 object_reference](#case-03) | Reuses a named Object for collection. | editorial; accepted as written |
+| [04 evaluate](#case-04) | Combines Test and Assessment outcomes using Boolean operators and conditional expressions. | editorial; accepted with revision |
+| [05 input_provided](#case-05) | Checks whether a declared Input was supplied, even if its value is empty. | editorial; accepted as written |
+| [06 Variable expression](#case-06) | Defines how this Variable's values are obtained. | editorial; accepted as written |
+| [07 canonical_field_predicate](#case-07) | Compares a collected field's values or checks for confirmed absence. | editorial; accepted with revision |
+| [08 Comparison Require](#case-08) | Defines the Item counts and field conditions for a comparison Test. | editorial; accepted as written |
+| [09 item_requirement](#case-09) | Sets how many Items must be found and how many must satisfy the comparison. | editorial; accepted as written |
+| [10 items_found](#case-10) | Sets how many selected Items must exist. | editorial; accepted as written |
+| [11 items_satisfying](#case-11) | Sets how many selected Items must satisfy the comparison. | editorial; accepted as written |
+| [12 field_requirement](#case-12) | Sets the shared value-count requirements for fields in this comparison. | editorial; accepted as written |
+| [13 values_found](#case-13) | Sets how many observed values must be present for a field. | editorial; accepted with revision |
+| [14 values_matching](#case-14) | Sets how many values must match the field's condition. | editorial; accepted as written |
+| [15 concat](#case-15) | Joins values from two or more components into strings, producing one result for each combination. | **semantic decision needed**; draft style acceptable semantic hold |
+| [16 regex_capture](#case-16) | Extracts the first capturing group's text from each input string. | **semantic decision needed**; draft style acceptable semantic hold |
+| [17 unique](#case-17) | Removes duplicate scalar values from a collection. | **semantic decision needed**; draft style acceptable semantic hold |
+| [18 merge](#case-18) | Joins a collection's values into a string with the chosen ordering and separator. | **semantic decision needed**; draft style acceptable semantic hold |
+| [19 set_expression](#case-19) | Combines Object collections using union, intersection, or difference. | editorial; accepted as written |
+| [20 state_filter](#case-20) | Includes or excludes collected Items that match a field condition. | editorial; accepted as written |
+| [21 typed_value.value](#case-21) | The value represented using its declared datatype. | **semantic decision needed**; draft style acceptable semantic hold |
+| [22 typed_value.status](#case-22) | Distinguishes an existing value from absence, an error, or a value that was not collected. | editorial; accepted as written |
+| [23 Collected Item document](#case-23) | Records one collected entity, its fields, and supporting provenance. | editorial; accepted as written |
+| [24 Object collection result](#case-24) | Records an Object's collection outcome and supporting Item references. | editorial; accepted as written |
+| [25 Assessment document](#case-25) | Defines an Assessment's metadata and its manual procedure or automated checks. | editorial; accepted as written |
+| [26 Benchmark document](#case-26) | Organizes Rules, Groups, Profiles, and shared policy settings. | **semantic decision needed**; draft style acceptable semantic hold |
+| [27 Organizational Input Set](#case-27) | Supplies organizational values for Parameters delegated by a Benchmark publisher. | editorial; accepted as written |
+| [28 foreach_binding](#case-28) | **Withheld — no supported-placement description proposed.** | **semantic decision needed**; withheld |
 
 ## Sources, initial drafts and engineering notes
 
@@ -63,7 +63,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The marker is an object with the required input identifier. Existence, provision, value typing and resolution are separate checks; this sentence does not promise that a supplied identifier resolves.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/input_reference`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -87,7 +89,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The variable marker and identifier pattern are explicit. Identifier existence, cycles and derived types are semantic checks; the wording does not claim that string validation resolves a declaration.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/variable_reference`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -111,7 +115,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** This reference is a string ending in -object, not an object_ref wrapper. Object existence, capability compatibility and collection reuse behavior are checked separately.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/object_reference`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -127,15 +133,19 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Existing local wording:** Combines Test outcomes with OVAL-aligned Boolean operators.
 
+**Wording before editorial revision:** Combines Test and Assessment results using Boolean operators and conditional expressions.
+
 **Codex proposal:** Evaluates Test or Assessment references using the Boolean groups and conditional branches defined by the shared expression grammar.
 
 **Draft provenance:** Phase 1 `proposal-d7cc4b7a798576c6` at `823ac12fbd0b5eaa7096ef4c6855ee25ff4f49a2`
 
-**Edited `author_description`:** Combines Test and Assessment results using Boolean operators and conditional expressions.
+**Edited `author_description`:** Combines Test and Assessment outcomes using Boolean operators and conditional expressions.
 
 **Separate `engineering_note`:** The accepted expression grammar includes and/or/one/xor/not and if/then/else with optional else_if. Input provision has a separate guard form. Do not advertise the inactive function-call vocabulary or for_each placement, and do not infer a new multi-state truth table.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_with_revision; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment.schema.json#/properties/assessment/properties/evaluate`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -159,7 +169,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The native description distinguishes provision from truthiness/nonemptiness. The check belongs only in direct if/else_if guards; it is not a standalone evaluate expression or a guarantee that the supplied value is valid.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/expression.schema.json#/$defs/input_presence/properties/input_provided`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 3 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -183,7 +195,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The declaration selects a retained expression form. Constant declarations are restricted to literal expressions; local expressions have separate type/status obligations. No broader inactive function library is implied.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/declaration/properties/expression`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -199,15 +213,19 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Existing local wording:** No local description.
 
+**Wording before editorial revision:** Compares a collected field or checks whether it is absent.
+
 **Codex proposal:** One field condition either compares observed values or asserts confirmed absence; local cardinality overrides must supply the complete pair required by the shared grammar.
 
 **Draft provenance:** Phase 1 `proposal-f22db930634fb1d9` at `823ac12fbd0b5eaa7096ef4c6855ee25ff4f49a2`
 
-**Edited `author_description`:** Compares a collected field or checks whether it is absent.
+**Edited `author_description`:** Compares a collected field's values or checks for confirmed absence.
 
 **Separate `engineering_note`:** Confirmed absence is comparator-free values_found: none; it forbids comparison properties. Keep complete local cardinality overrides in subordinate help, and do not equate collection errors/not_collected with confirmed absence.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_with_revision; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_field_predicate`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 3 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -231,7 +249,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** Item-presence-only requirements use a separate definition. The comparison form has independent Item policy, a complete shared field policy and a selected field/group condition; conditional occurrences remain in constraint help, not this sentence.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -255,7 +275,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** items_found and items_satisfying are distinct required members in this comparison context. These are quantifier choices, not numeric literals or a count of serialized evidence rows.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -279,7 +301,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The accepted quantifier vocabulary is distinct from field-value requirements. Do not copy historical existence spellings into author help, infer runtime defaults, or substitute retained evidence-list length for selected population.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement/properties/items_found`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -303,7 +327,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** This quantifies Items meeting the complete condition, independently of Items found. Empty/unknown/error behavior is not redefined by the shorter description; the default annotation is an authoring concern.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement/properties/items_satisfying`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -327,7 +353,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The values_found/values_matching pair is inherited together; a closer complete pair overrides it. Its authoring default annotation must not be presented as automatic runtime insertion.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/field_requirement`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -347,15 +375,19 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Inherited source:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/existence_cardinality`
 
+**Wording before editorial revision:** Sets how many values a field must have.
+
 **Codex proposal:** Specifies the field-value existence cardinality under the enclosing policy.
 
 **Draft provenance:** New bounded Codex draft from the pinned native sources; no earlier gap proposal is attributed to it.
 
-**Edited `author_description`:** Sets how many values a field must have.
+**Edited `author_description`:** Sets how many observed values must be present for a field.
 
 **Separate `engineering_note`:** Read this leaf in its parent context: the shared paired requirement forbids none, even though the referenced existence-cardinality definition allows it elsewhere. Standalone confirmed absence belongs on an individual field predicate.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_with_revision; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/paired_requirement/properties/values_found`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -383,7 +415,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** Value matching and value existence are independent decisions but are inherited as one policy pair. This sentence adds no rule that an unavailable value matches, fails or becomes an empty string.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/paired_requirement/properties/values_matching`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -407,7 +441,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** Existing native annotations state component order and Cartesian combinations. Casting, output representation and no-value/error-status mappings remain pending semantic review; examples demonstrate syntax only, not executed results.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/3/properties/concat`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 3 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -431,7 +467,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The current native annotation specifies the first group but delegates regex dialect, no-match/no-group behavior and statuses to inherited rules. The pattern member is only a string constraint; validating it does not prove capture semantics.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/4/properties/regex_capture`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 3 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -455,7 +493,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The native description excludes record operands, although the expression reference does not by itself close every operand type. Equality, ordering and unavailable-value propagation remain pending; no deduplication runtime is executed.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -479,7 +519,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** delimiter, sort, order and values are explicit required inputs; duplicates are not implicitly removed. Sorting edge cases, casting and unavailable/error behavior need semantic confirmation before unqualified publication.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -503,7 +545,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The native operator choices and operand shapes are explicit: one operand is permitted and difference has at most two. This sentence does not establish new Item identity, duplicate, filter-error or ordering rules.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/set_expression`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -527,7 +571,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** This is a collection-stage include/exclude action, not the compliance decision itself. The exclude choice is an editor authoring suggestion, not a runtime default; unknown/error predicate outcomes are not newly defined here.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/state_filter`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -551,7 +597,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** This describes intended representation, not a validation guarantee: generic 0.4 does not fully enforce non-record tag/payload consistency. Status/redaction can prohibit the payload, and record rules can require it; the intent/enforcement distinction needs semantic review.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value/properties/value`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -575,7 +623,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The four labels are exists, does_not_exist, error and not_collected. These are value statuses, not Boolean comparison results; propagation into Test outcomes remains a separate contract.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value/properties/status`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -599,7 +649,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The record requires id, capability, status, fields and provenance. Missing Items are omitted rather than emitted as synthetic does_not_exist Items; open provenance shape does not guarantee complete evidence.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/collected-item.schema.json#`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -623,7 +675,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** Collection status is not Boolean. item_refs can represent retained/materially referenced evidence rather than every collected Item; logical/population completeness and error reporting remain separate fields.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/collection-result.schema.json#`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 1 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -647,7 +701,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The mode branches distinguish a manual procedure from automated tests/evaluate and require different fields. This sentence introduces no new execution mode, branch syntax or default policy.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/assessment.schema.json#`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 1 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -671,7 +727,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** These named sections are required, but their internal policy objects are partly opaque. Confirm the organizing relationship before installing this sentence as normative; it does not define profile inheritance, selection precedence or scoring behavior. Only section-shape witnesses are supplied, not a complete Benchmark example.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/benchmark.schema.json#`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -695,7 +753,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** The existing root description limits this data to Parameters intentionally left unresolved by the publisher. Benchmark constraints remain authoritative; this wording does not permit overriding publisher-defined values or claim that this generic value map enforces all types/cardinalities.
 
-**Classification:** editorial; **editorial status:** pending editorial review; **semantic status:** no_new_semantics_claimed.
+**Classification:** editorial; **editorial status:** accepted_as_written; **semantic status:** no_new_semantics_claimed.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/organizational-input.schema.json#`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 1 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -719,7 +779,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Separate `engineering_note`:** No author-facing description is approved or offered. Neither foreach helper is reachable from accepted Assessment authoring; resolve placement/activation with Jack before advertising support or providing an authored for_each example.
 
-**Classification:** semantic_decision_needed; **editorial status:** pending editorial review; **semantic status:** pending_semantic_review.
+**Classification:** semantic_decision_needed; **editorial status:** withheld; **semantic status:** pending_semantic_review.
+
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/foreach_binding`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 0 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -727,6 +789,6 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 ## Review gate
 
-Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The foreach case remains withheld until placement is decided. None of these candidates is added to the bulk patch bundle, installed in an editor or written to a canonical schema.
+Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The batch 1 foreach case remains withheld until placement is decided. None of these candidates is added to the bulk patch bundle, installed in an editor or written to a canonical schema.
 
 **Stop for editorial review.** No bulk shortening of the 1,580 findings, schema edit, editor repin, migration or merge.

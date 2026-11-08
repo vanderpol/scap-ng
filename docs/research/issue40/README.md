@@ -51,3 +51,26 @@ The bundle has exact old text, new annotation destinations and file-hash precond
 Historical concat evidence is the already pinned 5.12.3 annotation reference recorded in the crosswalk. It is labelled as historical evidence rather than automatic native authority. Missing native casting, status/return, ordering and activation decisions remain owner questions; no legacy behavior is silently inherited.
 
 **Stop for Jack's review of the inventory, wording and generator design.** No Phase 2, schema-byte edits, semantic adoption, editor repin, merge, release or runtime-equivalence claim.
+
+## Bounded editorial iterations
+
+[Batch 1 receipt](EDITORIAL-REVIEW.md) records 21 accepted descriptions, six semantic
+holds and one withheld case, with the exact independent-review and owner-authorization
+links. Editorial acceptance does not authorize canonical installation or clear semantic
+holds. The three approved refinements are applied only to the review worksheet.
+The review's optional merge phrasing preference remains uninstalled: the continuation
+explicitly authorizes wording revisions only for 04, 07 and 13.
+
+[Batch 2](EDITORIAL-REVIEW-2.md) proposes 28 different high-value descriptions; all
+remain pending editorial review. Its [machine worksheet](editorial-batch-2.json)
+records a single proposed description owner per concept and related consumer pointers
+where duplicated structures need a future shared binding. It does not create a second
+canonical authority or copy descriptions into those consumers.
+
+Both review sheets regenerate with `python tools/audit_schema_documentation.py` and
+are checked by the existing `--check` gate after changes. The gate verifies source
+hashes, pointers, old/inherited text, witness validity, approval provenance and distinct
+batch targets. The Phase 1 baseline and bulk patch bundle remain unchanged.
+
+**Stop for editorial review.** No wording from either worksheet is applied to schemas,
+the editor, runtime contracts or the earlier bulk patch bundle.

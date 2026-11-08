@@ -35,11 +35,55 @@ class CoreEditorialBatch(unittest.TestCase):
         for row in rows:
             self.assertTrue(row['engineering_note'])
             self.assertTrue(row['codex_proposal'])
-            self.assertEqual(row['editorial_status'], 'pending_editorial_review')
+            self.assertIn(row['editorial_status'], {'accepted_as_written', 'accepted_with_revision', 'draft_style_acceptable_semantic_hold', 'withheld'})
             if row['author_description']:
                 self.assertNotEqual(row['author_description'], row['engineering_note'])
                 self.assertLessEqual(len(re.findall(r'[.!?](?:\s|$)', row['author_description'])), 2)
         self.assertFalse(self.batch['workflow']['canonical_installation_authorized'])
+
+    def test_batch_1_receipt_preserves_exact_owner_dispositions_and_source_dossier(self):
+        from collections import Counter
+        counts = Counter(r['editorial_status'] for r in self.batch['proposals'])
+        self.assertEqual(dict(counts), {'accepted_as_written': 18, 'accepted_with_revision': 3,
+                                     'draft_style_acceptable_semantic_hold': 6, 'withheld': 1})
+        for row in self.batch['proposals']:
+            self.assertEqual(row['editorial_review_url'], self.batch['review_receipt']['review_url'])
+        for mutation in ['status', 'note', 'approval']:
+            batch = deepcopy(self.batch)
+            if mutation == 'status':
+                batch['proposals'][14]['editorial_status'] = 'accepted_as_written'
+            elif mutation == 'note':
+                batch['proposals'][0]['engineering_note'] += ' Edited after review.'
+            else:
+                batch['review_receipt']['authorization_url'] = 'https://example.invalid/approval'
+            with tempfile.TemporaryDirectory() as directory:
+                root = Path(directory); self.temporary_batch(root, batch)
+                with self.assertRaisesRegex(ValueError, 'receipt|source dossier'):
+                    audit.editorial_batch(self.result, root)
+
+    def test_batch_2_is_distinct_diverse_pending_and_reproducible(self):
+        batch, checked = audit.editorial_batch(self.result, filename='editorial-batch-2.json')
+        self.assertEqual(len(batch['proposals']), 28)
+        self.assertEqual(checked, 56)
+        previous = {(r['schema_uri'], r['pointer']) for r in self.batch['proposals']}
+        self.assertFalse(previous & {(r['schema_uri'], r['pointer']) for r in batch['proposals']})
+        self.assertEqual(sum(r['classification'] == 'semantic_decision_needed' for r in batch['proposals']), 3)
+        for row in batch['proposals']:
+            self.assertEqual(row['editorial_status'], 'pending_editorial_review')
+            self.assertEqual(row['proposed_description_owner'], row['schema_uri'] + '#' + row['pointer'])
+            self.assertGreaterEqual(len(row['checks']), 2)
+            self.assertEqual({c['expected_valid'] for c in row['checks']}, {True, False})
+        sheet = audit.editorial_report(self.result, filename='editorial-batch-2.json')
+        self.assertEqual((ROOT / audit.DEST / 'EDITORIAL-REVIEW-2.md').read_text(), sheet)
+        for row in batch['proposals']:
+            for field in ['author_description', 'engineering_note', 'codex_proposal']:
+                self.assertIn(row[field], sheet)
+        batch['proposals'][0]['editorial_status'] = 'accepted_as_written'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory); self.temporary_batch(root, self.batch)
+            (root / audit.DEST / 'editorial-batch-2.json').write_text(json.dumps(batch))
+            with self.assertRaisesRegex(ValueError, 'must remain pending'):
+                audit.editorial_batch(self.result, root, 'editorial-batch-2.json')
 
     def test_existing_and_codex_wording_are_exactly_traceable(self):
         prior = {r['id']: r for r in self.result['crosswalk']}
