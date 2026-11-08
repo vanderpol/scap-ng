@@ -1,6 +1,8 @@
 # Issue #40 — Phase 1 review package
 
-Start with the generated [inventory summary](REPORT.md), [wording review table](CROSSWALK.md) and [Require/concat previews](PILOTS.md). The complete [node inventory](inventory.jsonl), [gap register](gaps.jsonl), [wording crosswalk](crosswalk.jsonl) and [annotation patch proposal](proposed-annotations.patch.json) are machine-readable research records, not an additional documentation authority.
+Start with the **[bounded editorial review batch](EDITORIAL-REVIEW.md)** and its [machine worksheet](editorial-batch.json): 27 author-facing candidates plus one withheld foreach case, prepared under the [owner editorial instruction](https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721264010). Each case separates original wording, the Codex draft, edited `author_description`, and `engineering_note`; semantic decisions remain pending. No candidate is added to the bulk patch bundle or installed.
+
+For the earlier Phase 1 discovery, use the generated [inventory summary](REPORT.md), [wording review table](CROSSWALK.md) and [Require/concat previews](PILOTS.md). The complete [node inventory](inventory.jsonl), [gap register](gaps.jsonl), [wording crosswalk](crosswalk.jsonl) and [annotation patch proposal](proposed-annotations.patch.json) are machine-readable research records, not an additional documentation authority.
 
 **Authorization:** [Phase 1 only](https://github.com/vanderpol/scap-ng/issues/40#issuecomment-6715925830), including the preceding owner requirements for actionable gaps and exact proposed language. Nothing in this package approves a language contract or applies a schema edit.
 
@@ -15,7 +17,7 @@ python tools/audit_schema_documentation.py --diff-baseline
 python -m unittest discover -s tests -v
 ```
 
-One generic command regenerates the inventory, findings, crosswalk, patch bundle, summary, review table and two previews. The read-only `--check` rejects stale output and new/changed baseline findings. `--diff-baseline` lists new/changed/disappearing IDs without writing anything. `--write-baseline` is an explicit research-baseline operation, not part of normal generation; review the change before using it. No command writes canonical schema files.
+One generic command regenerates the inventory, findings, crosswalk, patch bundle, summary, review tables and two previews. The same command also validates the bounded editorial worksheet and regenerates its small review sheet. The read-only `--check` rejects stale output and new/changed baseline findings. `--diff-baseline` lists new/changed/disappearing IDs without writing anything. `--write-baseline` is an explicit research-baseline operation, not part of normal generation; review the change before using it. No command writes canonical schema files.
 
 ## Pins, scope and branch relationship
 

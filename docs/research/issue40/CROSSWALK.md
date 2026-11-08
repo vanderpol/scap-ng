@@ -1,5 +1,7 @@
 # Proposed wording crosswalk
 
+For the owner-requested short author-facing candidates, start with [Editorial review batch 1](EDITORIAL-REVIEW.md). The table below retains the original Phase 1 Codex drafts, not editorial approval.
+
 The table shows the source-reviewed priority set; the [complete machine crosswalk](crosswalk.jsonl) includes every deficient canonical target. It is a review proposal, not a second documentation authority. Structural-only remainder text is explicitly provisional where meaning cannot be established; no proposal is approved or applied.
 
 | Schema URI + pointer | Role | Existing wording | Defect | Proposed replacement | Basis / decision | Status |
