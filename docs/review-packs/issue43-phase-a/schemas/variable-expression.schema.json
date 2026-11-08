@@ -1,0 +1,529 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-04",
+  "title": "Native Variable declarations and retained expressions",
+  "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or retained transformations. The schema describes the authoring shape; type compatibility, collection status, and evaluation results are checked separately by semantic validation or the runtime when those implementations exist.",
+  "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/pull/268#issuecomment-6550047257",
+  "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json#/$defs/declaration",
+  "$defs": {
+    "declaration": {
+      "type": "object",
+      "required": [
+        "kind",
+        "datatype",
+        "expression"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "local",
+            "constant"
+          ],
+          "title": "Variable kind",
+          "description": "Use `local` for a derived value or `constant` for a literal declaration."
+        },
+        "datatype": {
+          "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/capability-common.schema.json#/$defs/native_datatype",
+          "title": "Variable datatype",
+          "description": "Datatype promised by this Variable. The expression must produce compatible values."
+        },
+        "expression": {
+          "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json#/$defs/expression",
+          "title": "Variable expression",
+          "description": "Expression that supplies this Variable’s values."
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "title": "Authoring title",
+          "description": "Optional author-facing title for this Variable."
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "constant"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "expression": {
+                "type": "object",
+                "required": [
+                  "literal"
+                ],
+                "properties": {
+                  "literal": {
+                    "oneOf": [
+                      {
+                        "type": [
+                          "string",
+                          "number",
+                          "boolean"
+                        ]
+                      },
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": [
+                            "string",
+                            "number",
+                            "boolean"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "datatype",
+                          "value"
+                        ],
+                        "properties": {
+                          "datatype": {
+                            "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/capability-common.schema.json#/$defs/native_datatype",
+                            "title": "Literal datatype",
+                            "description": "Datatype of the supplied literal or record."
+                          },
+                          "value": {
+                            "type": [
+                              "string",
+                              "number",
+                              "boolean",
+                              "array",
+                              "object"
+                            ],
+                            "title": "Literal payload",
+                            "description": "Payload for the selected datatype; record data uses an object and scalar datatypes use scalar/list data."
+                          }
+                        },
+                        "additionalProperties": false,
+                        "allOf": [
+                          {
+                            "if": {
+                              "properties": {
+                                "datatype": {
+                                  "const": "record"
+                                }
+                              }
+                            },
+                            "then": {
+                              "properties": {
+                                "value": {
+                                  "type": "object",
+                                  "title": "Literal payload",
+                                  "description": "Record data for `record`; scalar or ordered list data for other datatypes."
+                                }
+                              }
+                            },
+                            "else": {
+                              "properties": {
+                                "value": {
+                                  "anyOf": [
+                                    {
+                                      "type": [
+                                        "string",
+                                        "number",
+                                        "boolean"
+                                      ]
+                                    },
+                                    {
+                                      "type": "array",
+                                      "items": {
+                                        "type": [
+                                          "string",
+                                          "number",
+                                          "boolean"
+                                        ]
+                                      }
+                                    }
+                                  ],
+                                  "title": "Literal payload",
+                                  "description": "Scalar or ordered list data for the selected datatype."
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "title": "Literal value",
+                    "description": "A scalar, ordered list, or explicitly typed value. Use the typed form when the datatype matters; lists preserve their supplied order and duplicates.",
+                    "examples": [
+                      {
+                        "datatype": "string",
+                        "value": "example"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "literal"
+          ],
+          "properties": {
+            "literal": {
+              "oneOf": [
+                {
+                  "type": [
+                    "string",
+                    "number",
+                    "boolean"
+                  ]
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "string",
+                      "number",
+                      "boolean"
+                    ]
+                  }
+                },
+                {
+                  "type": "object",
+                  "required": [
+                    "datatype",
+                    "value"
+                  ],
+                  "properties": {
+                    "datatype": {
+                      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/capability-common.schema.json#/$defs/native_datatype",
+                      "title": "Literal datatype",
+                      "description": "Datatype of the supplied literal or record."
+                    },
+                    "value": {
+                      "type": [
+                        "string",
+                        "number",
+                        "boolean",
+                        "array",
+                        "object"
+                      ],
+                      "title": "Literal payload",
+                      "description": "Payload for the selected datatype; record data uses an object and scalar datatypes use scalar/list data."
+                    }
+                  },
+                  "additionalProperties": false,
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "datatype": {
+                            "const": "record"
+                          }
+                        }
+                      },
+                      "then": {
+                        "properties": {
+                          "value": {
+                            "type": "object",
+                            "title": "Literal payload",
+                            "description": "Record data for `record`; scalar or ordered list data for other datatypes."
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "value": {
+                            "anyOf": [
+                              {
+                                "type": [
+                                  "string",
+                                  "number",
+                                  "boolean"
+                                ]
+                              },
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": [
+                                    "string",
+                                    "number",
+                                    "boolean"
+                                  ]
+                                }
+                              }
+                            ],
+                            "title": "Literal payload",
+                            "description": "Scalar or ordered list data for the selected datatype."
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "title": "Literal value",
+              "description": "A scalar, ordered list, or explicitly typed value. Use the typed form when the datatype matters; lists preserve their supplied order and duplicates.",
+              "examples": [
+                {
+                  "datatype": "string",
+                  "value": "example"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Literal expression",
+          "description": "Produce literal scalar, list, or typed data."
+        },
+        {
+          "type": "object",
+          "required": [
+            "variable"
+          ],
+          "properties": {
+            "variable": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+              "maxLength": 64,
+              "title": "Variable reference",
+              "description": "Reference another named Variable. The referenced Variable supplies values and evaluation status.",
+              "examples": [
+                "host-name-variable"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Variable reference expression",
+          "description": "Use values from another Variable."
+        },
+        {
+          "type": "object",
+          "required": [
+            "values"
+          ],
+          "properties": {
+            "values": {
+              "type": "object",
+              "required": [
+                "object",
+                "field"
+              ],
+              "properties": {
+                "object": {
+                  "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/capability-common.schema.json#/$defs/object_use",
+                  "title": "Collection Object",
+                  "description": "Object source whose collected Items supply the field values."
+                },
+                "field": {
+                  "type": "string",
+                  "minLength": 1,
+                  "title": "Collected field",
+                  "description": "Name of the collected field to read from each collected Item."
+                }
+              },
+              "additionalProperties": false,
+              "title": "Collected field values",
+              "description": "Read the selected field from the collected Object. Field availability, multiplicity, and collection status are semantic/runtime concerns.",
+              "examples": [
+                {
+                  "object": {
+                    "object_ref": "server-object"
+                  },
+                  "field": "hostname"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Collected values expression",
+          "description": "Produce values from a collected Object field."
+        },
+        {
+          "type": "object",
+          "required": [
+            "concat"
+          ],
+          "properties": {
+            "concat": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json#/$defs/expression"
+              },
+              "title": "Concatenated components",
+              "description": "Concatenate two or more components in order. Multiple values produce the Cartesian product of component values. Components follow inherited source casting rules when a string conversion is required; incompatible values produce an error. A missing or nonexistent component yields the inherited source status; Error, Incomplete, Not Collected, and Not Applicable statuses are not silently converted to strings.",
+              "examples": [
+                [
+                  {
+                    "literal": "https://"
+                  },
+                  {
+                    "variable": "host-name-variable"
+                  },
+                  {
+                    "literal": "/policy"
+                  }
+                ],
+                [
+                  {
+                    "literal": [
+                      "a",
+                      "b"
+                    ]
+                  },
+                  {
+                    "literal": ".conf"
+                  }
+                ]
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Concatenation expression",
+          "description": "Join two or more ordered expressions while retaining collection/status semantics."
+        },
+        {
+          "type": "object",
+          "required": [
+            "regex_capture"
+          ],
+          "properties": {
+            "regex_capture": {
+              "type": "object",
+              "required": [
+                "pattern",
+                "value"
+              ],
+              "properties": {
+                "pattern": {
+                  "type": "string",
+                  "title": "Capture pattern",
+                  "description": "Regular expression containing the capture group to return."
+                },
+                "value": {
+                  "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json#/$defs/expression",
+                  "title": "Input expression",
+                  "description": "Expression producing the string value(s) to search. Each value is processed independently."
+                }
+              },
+              "additionalProperties": false,
+              "title": "Regular-expression capture",
+              "description": "Capture text from each input string using the first capturing group. The source regex dialect and first-match behavior are retained; inputs with no capture group or no match produce an empty string under the inherited function contract.",
+              "examples": [
+                {
+                  "pattern": "^https://([^/]+)/",
+                  "value": {
+                    "variable": "url-variable"
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Regex capture expression",
+          "description": "Extract the first capture from each input string."
+        },
+        {
+          "type": "object",
+          "required": [
+            "unique"
+          ],
+          "properties": {
+            "unique": {
+              "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json#/$defs/expression",
+              "title": "Unique values",
+              "description": "Remove duplicate scalar values from the input. Record data is not a supported transformation operand; value ordering and status propagation remain governed by the inherited semantic contract.",
+              "examples": [
+                {
+                  "values": {
+                    "object": {
+                      "object_ref": "server-object"
+                    },
+                    "field": "tag"
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Remove duplicate scalar values.",
+          "title": "Unique expression"
+        },
+        {
+          "type": "object",
+          "required": [
+            "merge"
+          ],
+          "properties": {
+            "merge": {
+              "type": "object",
+              "required": [
+                "delimiter",
+                "sort",
+                "order",
+                "values"
+              ],
+              "properties": {
+                "delimiter": {
+                  "type": "string",
+                  "title": "Join delimiter",
+                  "description": "String inserted between adjacent values."
+                },
+                "sort": {
+                  "enum": [
+                    "document",
+                    "lexical",
+                    "numeric",
+                    "natural"
+                  ],
+                  "title": "Sort mode",
+                  "description": "`document` preserves input order; `lexical`, `numeric`, and `natural` select the corresponding explicit ordering."
+                },
+                "order": {
+                  "enum": [
+                    "ascending",
+                    "descending"
+                  ],
+                  "title": "Sort order",
+                  "description": "Ascending or descending order for the selected sort mode."
+                },
+                "values": {
+                  "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/variable-expression.schema.json#/$defs/expression",
+                  "title": "Values expression",
+                  "description": "Expression producing values to join. Collection and status propagation are semantic/runtime behavior, not schema execution."
+                }
+              },
+              "additionalProperties": false,
+              "title": "Merged values",
+              "description": "Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.",
+              "examples": [
+                {
+                  "delimiter": ",",
+                  "sort": "document",
+                  "order": "ascending",
+                  "values": {
+                    "variable": "tag-values-variable"
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Merge expression",
+          "description": "Sort and join values into one string."
+        }
+      ]
+    }
+  }
+}
