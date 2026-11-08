@@ -15,7 +15,7 @@ This repository provides the current schema candidate, a small set of readable e
 3. [Specification](specification/README.md) — current status and outstanding semantic documentation.
 4. [Reference](docs/generated/schema-reference.md) and [capabilities](docs/generated/capability-catalog.md) — generated from the schema.
 
-[Proposed documentation reference for all 104 capabilities](docs/reference/README.md) · [Regeneration and maintenance](proposed-schema/README.md). These review-only annotations preserve frozen 0.4.0 validation.
+[Proposed documentation reference for all 104 capabilities](docs/reference/README.md) · [Regeneration and maintenance](proposed-schema/README.md) · [Coverage and evidence](docs/DOCUMENTATION-PRODUCTION.md). These review-only annotations preserve frozen 0.4.0 validation.
 
 ## More content and tools
 

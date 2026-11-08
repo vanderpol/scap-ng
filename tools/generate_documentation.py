@@ -149,6 +149,23 @@ def shape(docs, uri, seen=()):
     return types, values
 
 
+def forms(docs, uri, seen=()):
+    """Preserve alternative object forms without flattening their required keys."""
+    uri = location(uri)
+    if uri in seen:
+        return
+    if properties(docs, uri):
+        yield uri
+        return
+    for owner, part in components(docs, uri):
+        for key in ('oneOf', 'anyOf'):
+            if key in part:
+                for i, _ in enumerate(part[key]):
+                    yield from forms(docs, owner+'/'+key+'/'+str(i), seen+(uri,))
+                return
+    yield uri
+
+
 def cardinality(docs, parent, name):
     """Named YAML keys occur at most once; arrays have separate item bounds."""
     required, conditional = False, False
@@ -290,10 +307,12 @@ def generate(root=ROOT):
                 page += 'Field meanings are shared with Item; comparisons use the [native Require grammar](../shared/assessment-language.md). '
                 page += 'This is a field vocabulary, not a whitelist or a promise that every field is collected.\n\n'
                 validation = node(docs, start)['x-doc-validation-ref']
-                page += TABLE
-                for name, child in properties(docs, validation).items():
-                    page += row(docs, validation, name, child) + '\n'
-                page += '\n'
+                for i, form in enumerate(forms(docs, validation)):
+                    title = next((p['title'] for _,p in components(docs,form) if 'title' in p), 'Alternative '+str(i+1))
+                    page += '### '+title+'\n\n'+TABLE
+                    for name, child in properties(docs, form).items():
+                        page += row(docs, form, name, child) + '\n'
+                    page += '\n'
             parent = start
             if role in ('Item', 'Require'):
                 parent += '/properties/fields'

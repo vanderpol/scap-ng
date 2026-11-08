@@ -98,7 +98,7 @@ Pre-alpha reusable authored-Assessment primitives shared by generated capability
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `max_depth` | integer, string | 1..1 (required) | Maximum downward hierarchy recursion depth; 0 means starting key only and unlimited maps OVAL -1. | [/$defs/hierarchy_traversal/properties/max_depth](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/hierarchy_traversal/properties/max_depth) |
+| `max_depth` | integer, string | 1..1 (required) | Maximum downward hierarchy recursion depth; 0 means the starting key only, and unlimited removes the depth limit. | [/$defs/hierarchy_traversal/properties/max_depth](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/hierarchy_traversal/properties/max_depth) |
 
 ## `/$defs/structured_value_predicate/oneOf/1`
 

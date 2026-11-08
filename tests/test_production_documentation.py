@@ -147,6 +147,17 @@ class ProductionDocumentationTests(unittest.TestCase):
         child=artifacts.capability_help(self.help,'windows.registry','Object',['traversal','max_depth'])
         self.assertEqual(child['status'],'semantic-hold')
 
+    def test_require_alternatives_keep_comparison_and_existence_separate(self):
+        uri=PREFIX+'assessment-language.schema.json#/$defs/test/properties/require'
+        forms=list(gen.forms(self.docs,uri))
+        self.assertEqual(len(forms),2)
+        self.assertEqual(set(gen.properties(self.docs,forms[1])),{'item_requirement'})
+        self.assertIn('field_requirement',gen.properties(self.docs,forms[0]))
+        self.assertEqual(gen.cardinality(self.docs,forms[0],'field_requirement'),'1..1 (required)')
+        page=self.outputs[gen.DEST/'capabilities/unix.file.md']
+        self.assertIn('### Item existence requirement',page)
+        self.assertIn('### Condition logic',page)
+
     def test_all_rendered_relative_links_resolve(self):
         for path,text in self.outputs.items():
             if path.suffix!='.md':continue
