@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/rule.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-02",
+  "title": "SCAP-NG Rule v0.4.0",
+  "type": "object",
+  "required": [
+    "rule"
+  ],
+  "properties": {
+    "rule": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "title",
+        "severity",
+        "role",
+        "weight",
+        "requires",
+        "conflicts",
+        "applicability",
+        "parameters",
+        "assessment_choices",
+        "default_assessment_choice"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number"
+        },
+        "discussion": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "extensions": {
+          "type": "object"
+        },
+        "warnings": {
+          "type": "array"
+        },
+        "identifiers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "requires": {
+          "type": "array",
+          "description": "Selection prerequisites. Each array entry is one requirement clause; clauses are ANDed. A clause's any_of members are ORed. A single string is shorthand for a one-member clause.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "any_of"
+                ],
+                "properties": {
+                  "any_of": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "applicability": {
+          "type": "array"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "remediation": {
+          "type": "object"
+        },
+        "assessment_choices": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Publisher-defined Assessment choices. The redundant source alias named default is prohibited; default_assessment_choice names an actual choice.",
+          "propertyNames": {
+            "not": {
+              "const": "default"
+            }
+          },
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "assessment"
+            ],
+            "properties": {
+              "assessment": {
+                "type": "string",
+                "minLength": 1
+              },
+              "inputs": {
+                "type": "object",
+                "description": "Assessment input name to Benchmark Parameter binding.",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "parameter"
+                      ],
+                      "properties": {
+                        "parameter": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              },
+              "expected_version": {
+                "type": [
+                  "integer",
+                  "string"
+                ],
+                "description": "Exact logical Assessment version required to disambiguate multiple versions in the declared source scope."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "default_assessment_choice": {
+          "type": "string",
+          "minLength": 1
+        },
+        "organizational_input_requirements": {
+          "type": "object",
+          "description": "Compiler-derived Organizational Input discovery by Assessment choice. Authoring may omit this map; an explicit map must agree exactly with references and bindings. Every compiled/package Rule must contain the complete derived map (possibly empty). Native locations are canonical RFC6901 pointers relative to the selected Assessment body.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "input",
+                "required",
+                "uses"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1,
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/input_identifier"
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "uses": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "source_path"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "value",
+                          "presence"
+                        ],
+                        "description": "Value consumption versus an explicit Input-provision guard."
+                      },
+                      "source_path": {
+                        "type": "string",
+                        "minLength": 2,
+                        "pattern": "^/(?:[^~]|~[01])*$",
+                        "description": "Canonical RFC6901 pointer to an actual Input reference scalar in the selected Assessment body; derived by the compiler, not manually authored coordinates."
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/rule.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

@@ -1,0 +1,185 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/collection-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-02",
+  "title": "SCAP-NG Object Collection Result pre-release v0.4.0",
+  "description": "Records an Object's collection outcome and supporting Item references.",
+  "type": "object",
+  "required": [
+    "id",
+    "capability",
+    "status",
+    "item_refs"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "object_title": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_object_title"
+    },
+    "capability": {
+      "type": "string",
+      "minLength": 1,
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/capability_name"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "error",
+        "complete",
+        "incomplete",
+        "does_not_exist",
+        "not_collected",
+        "not_applicable"
+      ],
+      "description": "Reports the outcome of collecting an Object’s Items.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch-2.json",
+        "case": "24",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+      }
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Identifies the Items retained or referenced by this collection result.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch-2.json",
+        "case": "26",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+      }
+    },
+    "logical_complete": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "population_complete": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "stop_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_execution_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_source_execution_ref"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_diagnostics"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "error",
+              "incomplete"
+            ],
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collection-result.schema.json#/properties/status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "stop_reason",
+          "diagnostics"
+        ],
+        "properties": {
+          "stop_reason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "diagnostics": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_code"
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_message"
+                }
+              }
+            },
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_diagnostics"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "incomplete",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collection-result.schema.json#/properties/status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "population_complete"
+        ],
+        "properties": {
+          "population_complete": {
+            "const": false
+          }
+        }
+      }
+    }
+  ],
+  "x-doc-review": {
+    "status": "editorially-approved",
+    "source": "editorial-batch.json",
+    "case": "24",
+    "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+  },
+  "x-doc-origin": "schema/collection-result.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

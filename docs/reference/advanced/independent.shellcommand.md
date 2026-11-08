@@ -1,0 +1,21 @@
+# independent.shellcommand — advanced constraints
+
+Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/meanings/properties/shell](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/shell) | {"declared_values_not_new_validation_restrictions": ["sh", "bash", "csh", "ksh", "zsh", "cmd", "powershell", "pwsh"]} | native-mapping-reviewed |
+| [/$defs/meanings/properties/command](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/command) | {} | native-mapping-reviewed |
+| [/$defs/meanings/properties/pattern](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/pattern) | {} | native-mapping-reviewed |
+| [/$defs/meanings/properties/exit_status](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/exit_status) | {} | native-mapping-reviewed |
+| [/$defs/meanings/properties/stdout_line](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/stdout_line) | {} | native-mapping-reviewed |
+| [/$defs/meanings/properties/subexpression](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/subexpression) | {} | native-mapping-reviewed |
+| [/$defs/meanings/properties/stderr_line](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/meanings/properties/stderr_line) | {} | native-mapping-reviewed |
+| [/$defs/object](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/object/properties/shell](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/object/properties/shell) | {"declaration_only": {"type": "string", "enum": ["sh", "bash", "csh", "ksh", "zsh", "cmd", "powershell", "pwsh"], "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/command](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/object/properties/command) | {"declaration_only": {"type": "string", "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/pattern](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/object/properties/pattern) | {"declaration_only": {"type": "string", "required": false, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/error_if_exit_status_not_0](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/object/properties/error_if_exit_status_not_0) | {"declaration_only": {"type": "boolean", "required": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/error_if_stderr_exists](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/object/properties/error_if_stderr_exists) | {"declaration_only": {"type": "boolean", "required": true}} | native-mapping-reviewed |
+| [/$defs/item](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/require](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json#/$defs/require) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement", "type_alternatives": ["object"]} | existing-native |

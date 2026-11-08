@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-28",
+  "title": "SCAP-NG Variable Result draft v0.4.0 strawman",
+  "description": "Resolved runtime Variable value set with explicit datatype, cardinality, status, and provenance.",
+  "type": "object",
+  "required": [
+    "id",
+    "datatype",
+    "status",
+    "cardinality",
+    "values",
+    "item_refs"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "variable_title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "datatype": {
+      "type": "string",
+      "minLength": 1,
+      "not": {
+        "const": "record"
+      },
+      "description": "OVAL-compatible Variable results are not record-typed; records are collected Item/entity structures."
+    },
+    "status": {
+      "type": "string",
+      "description": "Completeness/evaluation status of the resolved Variable value set. 'incomplete' explicitly preserves a partial known value stream; values and cardinality describe only observed values, not a proved total population. It does not establish evaluator propagation precedence.",
+      "enum": [
+        "complete",
+        "incomplete",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable",
+        "zero_values"
+      ]
+    },
+    "cardinality": {
+      "type": "string",
+      "enum": [
+        "zero",
+        "one",
+        "many"
+      ]
+    },
+    "values": {
+      "type": "array",
+      "items": {
+        "$ref": "result-types.schema.json#/$defs/typed_value"
+      }
+    },
+    "source": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_provenance"
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_diagnostics"
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true,
+      "description": "Local Items consumed while producing this Variable, including intermediate extraction/filter/selection use."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "zero_values",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "cardinality": {
+            "const": "zero"
+          },
+          "values": {
+            "maxItems": 0
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "complete",
+              "incomplete"
+            ],
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/variable-result.schema.json#/properties/status"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "oneOf": [
+          {
+            "properties": {
+              "cardinality": {
+                "const": "zero"
+              },
+              "values": {
+                "maxItems": 0
+              }
+            }
+          },
+          {
+            "properties": {
+              "cardinality": {
+                "const": "one"
+              },
+              "values": {
+                "minItems": 1,
+                "maxItems": 1
+              }
+            }
+          },
+          {
+            "properties": {
+              "cardinality": {
+                "const": "many"
+              },
+              "values": {
+                "minItems": 2
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "x-doc-origin": "schema/variable-result.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

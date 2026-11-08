@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/result-types.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-06",
+  "title": "Draft shared result types 0.4.0",
+  "description": "Reusable structural types for SCAP-NG result schemas. Runtime truth/aggregation semantics are defined by the specification and conformance tests, not by JSON Schema alone.",
+  "$defs": {
+    "technical_outcome": {
+      "type": "string",
+      "enum": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ],
+      "description": "Reports whether a Test or Assessment is true, false, errored, unknown, unevaluated, or inapplicable.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch-2.json",
+        "case": "23",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+      }
+    },
+    "assessment_purpose": {
+      "type": "string",
+      "enum": [
+        "assessment",
+        "applicability"
+      ]
+    },
+    "assessment_class": {
+      "type": "string",
+      "enum": [
+        "compliance",
+        "vulnerability",
+        "patch",
+        "inventory",
+        "miscellaneous"
+      ],
+      "description": "Defines what technical truth means. Policy-facing pass/fail interpretation belongs to the consuming Rule."
+    },
+    "completeness": {
+      "type": "object",
+      "required": [
+        "logical_complete",
+        "population_complete",
+        "evidence_complete"
+      ],
+      "properties": {
+        "logical_complete": {
+          "type": "boolean"
+        },
+        "population_complete": {
+          "type": "boolean"
+        },
+        "evidence_complete": {
+          "type": "boolean"
+        },
+        "stop_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "typed_value": {
+      "description": "A typed scalar or record result value. Multi-valued entities/Variables are represented by arrays of typed_value rather than by an implicit multi-value scalar.",
+      "type": "object",
+      "required": [
+        "datatype",
+        "status"
+      ],
+      "properties": {
+        "datatype": {
+          "type": "string",
+          "minLength": 1,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/datatype_tag"
+        },
+        "value": {
+          "x-doc-review": {
+            "status": "semantic-hold",
+            "source": "editorial-batch.json",
+            "case": "21",
+            "note": "This describes intended representation, not a validation guarantee: generic 0.4 does not fully enforce non-record tag/payload consistency. Status/redaction can prohibit the payload, and record rules can require it; the intent/enforcement distinction needs semantic review."
+          }
+        },
+        "status": {
+          "enum": [
+            "exists",
+            "does_not_exist",
+            "error",
+            "not_collected"
+          ],
+          "description": "Distinguishes an existing value from absence, an error, or a value that was not collected.",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch.json",
+            "case": "22",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+          }
+        },
+        "redacted": {
+          "type": "boolean",
+          "description": "Indicates that the value was intentionally omitted from the reported evidence.",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch-2.json",
+            "case": "25",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "status"
+            ],
+            "properties": {
+              "status": {
+                "enum": [
+                  "does_not_exist",
+                  "error",
+                  "not_collected"
+                ],
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/result-types.schema.json#/$defs/typed_value/properties/status"
+              }
+            }
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "redacted": {
+                "const": true,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_redacted"
+              }
+            },
+            "required": [
+              "redacted"
+            ]
+          },
+          "then": {
+            "not": {
+              "required": [
+                "value"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "datatype": {
+                    "const": "record",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/datatype_tag"
+                  }
+                },
+                "required": [
+                  "datatype"
+                ]
+              },
+              {
+                "not": {
+                  "properties": {
+                    "redacted": {
+                      "const": true,
+                      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_redacted"
+                    }
+                  },
+                  "required": [
+                    "redacted"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "required": [
+                    "status"
+                  ],
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "does_not_exist",
+                        "error",
+                        "not_collected"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": {
+            "required": [
+              "value"
+            ],
+            "properties": {
+              "value": {
+                "type": "object",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/typed_value"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/typed_value"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "bounded_evidence": {
+      "type": "object",
+      "required": [
+        "observed_failures",
+        "actual_failures",
+        "maximum",
+        "returned",
+        "truncated_population"
+      ],
+      "properties": {
+        "observed_failures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_failures": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "string",
+              "enum": [
+                "unknown"
+              ]
+            }
+          ]
+        },
+        "maximum": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "returned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated_population": {
+          "type": "boolean"
+        },
+        "stop_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "x-doc-origin": "schema/result-types.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

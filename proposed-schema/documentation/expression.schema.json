@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/expression.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-01",
+  "title": "Draft SCAP-NG 0.4.0 automated expression",
+  "description": "SCAP-NG 0.4.0 Test-result expression grammar. Logical and/or/one/xor are canonical; legacy all/any/odd are invalid. Item cardinalities are separate.",
+  "$ref": "#/$defs/expression",
+  "$defs": {
+    "expression": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "test"
+          ],
+          "properties": {
+            "test": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-test$",
+              "description": "Uses a named Test’s outcome in this expression.",
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "10",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "assessment"
+          ],
+          "properties": {
+            "assessment": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Uses a referenced Assessment’s outcome in this expression.",
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "11",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "if",
+            "then",
+            "else"
+          ],
+          "properties": {
+            "if": {
+              "$ref": "#/$defs/condition",
+              "description": "Tests the condition that selects a conditional branch.",
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "12",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            },
+            "then": {
+              "$ref": "#/$defs/expression"
+            },
+            "else_if": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Selects the first true alternative branch when preceding conditions are false.",
+              "items": {
+                "type": "object",
+                "required": [
+                  "if",
+                  "then"
+                ],
+                "properties": {
+                  "if": {
+                    "$ref": "#/$defs/condition"
+                  },
+                  "then": {
+                    "$ref": "#/$defs/expression"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "13",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            },
+            "else": {
+              "$ref": "#/$defs/expression"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not"
+          ],
+          "properties": {
+            "not": {
+              "$ref": "#/$defs/expression"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "and"
+          ],
+          "properties": {
+            "and": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "description": "Combines expression outcomes using logical AND.",
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "14",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "or"
+          ],
+          "properties": {
+            "or": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "description": "Combines expression outcomes using logical OR.",
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "15",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not_evaluated"
+          ],
+          "properties": {
+            "not_evaluated": {
+              "type": "object",
+              "description": "Declares that this branch cannot be evaluated and provides a reason.",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_reason"
+                },
+                "follow_up": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "What a reviewer or manual follow-up must inspect."
+                }
+              },
+              "additionalProperties": false,
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "18",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "not_applicable"
+          ],
+          "properties": {
+            "not_applicable": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_reason"
+                }
+              },
+              "additionalProperties": false,
+              "description": "Declares that this branch does not apply and provides a reason.",
+              "x-doc-review": {
+                "status": "editorially-approved",
+                "source": "editorial-batch-2.json",
+                "case": "19",
+                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "one"
+          ],
+          "properties": {
+            "one": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "x-doc-review": {
+                "status": "semantic-hold",
+                "source": "editorial-batch-2.json",
+                "case": "16",
+                "note": "The active grammar supports this operator and a nonempty recursive operand list. Confirm multi-state truth/indeterminate aggregation before clearing this proposed meaning; structural acceptance alone proves neither truth tables nor evaluation order."
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "xor"
+          ],
+          "properties": {
+            "xor": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/expression"
+              },
+              "description": "Logical XOR of complete Test outcomes; separate from Test Item matching.",
+              "x-doc-review": {
+                "status": "semantic-hold",
+                "source": "editorial-batch-2.json",
+                "case": "17",
+                "note": "The active grammar supports this operator and a nonempty recursive operand list. Confirm multi-state truth/indeterminate aggregation before clearing this proposed meaning; structural acceptance alone proves neither truth tables nor evaluation order."
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "x-scap-ng-authoring": {
+        "version": 1,
+        "control_id": "assessment_logic",
+        "group": "logic",
+        "representation": "key",
+        "hide_when_default": false,
+        "aggressive_preview": true,
+        "context": "explicit_logical_group",
+        "new_authoring_only": true,
+        "serialize_explicitly": true,
+        "preserve_overrides": true,
+        "authority": "https://github.com/vanderpol/scap-ng/issues/269",
+        "default_key": "and",
+        "hide_scope": "choice_only_arguments_remain_visible",
+        "oval_source": [
+          {
+            "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+            "source_line": 310,
+            "source_xpath": "/xsd:schema/xsd:complexType[6]/xsd:attribute[2]",
+            "attribute": "operator",
+            "declaration_kind": "attribute",
+            "source_type": "oval:OperatorEnumeration",
+            "source_default": "AND",
+            "declaration_context": [
+              "CriteriaType"
+            ],
+            "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+            "reachability_limit": "QName dependency census; occurrence-specific overrides require review",
+            "origin": "XSD_DECLARED_DEFAULT",
+            "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}CriteriaType/@operator",
+            "documentation": ""
+          }
+        ]
+      },
+      "title": "Assessment logic",
+      "description": "Explicit new-authoring selection for assessment logic; applies only in explicit logical group. Preserve source-effective values and visible overrides; no runtime fallback."
+    },
+    "input_presence": {
+      "type": "object",
+      "required": [
+        "input_provided"
+      ],
+      "properties": {
+        "input_provided": {
+          "type": "string",
+          "maxLength": 64,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-input$",
+          "description": "Checks whether a declared Input was supplied, even if its value is empty.",
+          "x-doc-review": {
+            "status": "editorially-approved",
+            "source": "editorial-batch.json",
+            "case": "05",
+            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "condition": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/expression"
+        },
+        {
+          "$ref": "#/$defs/input_presence"
+        }
+      ]
+    }
+  },
+  "x-doc-origin": "schema/expression.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

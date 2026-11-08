@@ -1,0 +1,24 @@
+# windows.cmdlet — advanced constraints
+
+Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/meanings/properties/module_name](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/module_name) | {} | source-derived |
+| [/$defs/meanings/properties/module_id](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/module_id) | {} | source-derived |
+| [/$defs/meanings/properties/module_version](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/module_version) | {} | source-derived |
+| [/$defs/meanings/properties/verb](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/verb) | {"declared_values_not_new_validation_restrictions": ["Approve", "Assert", "Compare", "Confirm", "Find", "Get", "Import", "Measure", "Read", "Request", "Resolve", "Search", "Select", "Show", "Test", "Trace", "Watch"]} | source-derived |
+| [/$defs/meanings/properties/noun](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/noun) | {} | source-derived |
+| [/$defs/meanings/properties/parameters](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/parameters) | {} | source-meaning-reviewed |
+| [/$defs/meanings/properties/select](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/select) | {} | source-meaning-reviewed |
+| [/$defs/meanings/properties/value](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/meanings/properties/value) | {} | source-meaning-reviewed |
+| [/$defs/object](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/object/properties/module_name](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/module_name) | {"declaration_only": {"type": "string", "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/module_id](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/module_id) | {"declaration_only": {"type": "string", "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/module_version](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/module_version) | {"declaration_only": {"type": "string", "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/verb](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/verb) | {"declaration_only": {"type": "string", "enum": ["Approve", "Assert", "Compare", "Confirm", "Find", "Get", "Import", "Measure", "Read", "Request", "Resolve", "Search", "Select", "Show", "Test", "Trace", "Watch"], "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/noun](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/noun) | {"declaration_only": {"type": "string", "required": true, "allow_variable": true}} | native-mapping-reviewed |
+| [/$defs/object/properties/parameters](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/parameters) | {"declaration_only": {"required": true}} | source-meaning-reviewed |
+| [/$defs/object/properties/select](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/object/properties/select) | {"declaration_only": {"required": true}} | source-meaning-reviewed |
+| [/$defs/item](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/require](../../../proposed-schema/documentation/capabilities/windows.cmdlet.schema.json#/$defs/require) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement", "type_alternatives": ["object"]} | existing-native |

@@ -1,0 +1,442 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-06",
+  "title": "Draft Assessment expression execution result 0.4.0",
+  "description": "Expression-stage result, not a complete Assessment Result or scanner result package.",
+  "type": "object",
+  "required": [
+    "outcome",
+    "executed_tests",
+    "trace",
+    "diagnostics",
+    "context",
+    "evaluation_scope",
+    "invocations"
+  ],
+  "properties": {
+    "outcome": {
+      "$ref": "#/$defs/outcome",
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+    },
+    "evaluation_scope": {
+      "const": "assessment_expression"
+    },
+    "executed_tests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "target",
+        "invocation_ref"
+      ],
+      "properties": {
+        "target": {
+          "type": "string"
+        },
+        "invocation_ref": {
+          "type": "string",
+          "minLength": 1,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_invocation_ref"
+        }
+      },
+      "additionalProperties": false
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code",
+          "test"
+        ],
+        "properties": {
+          "code": {
+            "const": "missing_test_result",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_code"
+          },
+          "test": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_diagnostics"
+    },
+    "trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "kind",
+          "outcome",
+          "owner_invocation_ref"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "expression",
+              "terminal",
+              "test",
+              "dependency",
+              "conditional",
+              "manual"
+            ],
+            "description": "Kind of evaluation step recorded in the expression trace.",
+            "x-doc-status": "native-structure-derived"
+          },
+          "outcome": {
+            "$ref": "#/$defs/outcome",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+          },
+          "condition_outcome": {
+            "$ref": "#/$defs/outcome",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+          },
+          "selected_branch": {
+            "enum": [
+              "then",
+              "else",
+              null
+            ],
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_reason"
+          },
+          "test": {
+            "type": "string"
+          },
+          "assessment": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "reused": {
+            "type": "boolean",
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_reused"
+          },
+          "invocation_ref": {
+            "type": "string",
+            "minLength": 1,
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_invocation_ref"
+          },
+          "owner_invocation_ref": {
+            "type": "string",
+            "minLength": 1,
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_owner_invocation_ref"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "condition_outcome",
+                "selected_branch"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "test",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "test",
+                "assessment",
+                "reused"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "dependency",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "alias",
+                "assessment",
+                "invocation_ref",
+                "reused"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "expression",
+                    "terminal"
+                  ],
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "reason"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "expression",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outcome": {
+                  "const": "not_evaluated",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "terminal",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "outcome": {
+                  "const": "not_applicable",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                },
+                "condition_outcome": {
+                  "const": "true",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": "then",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                },
+                "condition_outcome": {
+                  "const": "false",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": "else",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                },
+                "condition_outcome": {
+                  "const": "error",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null,
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+                },
+                "outcome": {
+                  "const": "error",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                },
+                "condition_outcome": {
+                  "const": "unknown",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null,
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+                },
+                "outcome": {
+                  "const": "unknown",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                },
+                "condition_outcome": {
+                  "const": "not_evaluated",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null,
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+                },
+                "outcome": {
+                  "const": "not_evaluated",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "conditional",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-result.schema.json#/properties/trace/items/properties/kind"
+                },
+                "condition_outcome": {
+                  "const": "not_applicable",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_condition_outcome"
+                }
+              },
+              "required": [
+                "condition_outcome"
+              ]
+            },
+            "then": {
+              "properties": {
+                "selected_branch": {
+                  "const": null,
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_selected_branch"
+                },
+                "outcome": {
+                  "const": "not_applicable",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_outcome"
+                }
+              }
+            }
+          }
+        ],
+        "additionalProperties": false
+      }
+    },
+    "invocations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "expression-invocation.schema.json"
+      }
+    }
+  },
+  "$defs": {
+    "outcome": {
+      "enum": [
+        "true",
+        "false",
+        "error",
+        "unknown",
+        "not_evaluated",
+        "not_applicable"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/expression-result.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}
