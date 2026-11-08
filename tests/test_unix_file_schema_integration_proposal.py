@@ -12,22 +12,23 @@ from test_draft202012_and_examples import schema_registry
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
-import propose_unix_file_schema_integration as integration
+import generate_unix_file_reference as integration
+DEST = integration.PILOT / "schema-next"
 
 
 class UnixFileCanonicalIntegrationProposal(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.documents = integration.proposal()
-        cls.capability = cls.documents[integration.DEST / 'capabilities/unix.file.schema.json']
+        cls.documents = {p.relative_to(ROOT): json.loads(p.read_text()) for p in (ROOT / DEST).rglob('*.schema.json')}
+        cls.capability = cls.documents[DEST / 'capabilities/unix.file.schema.json']
         cls.registry = schema_registry().with_resources(
             (doc['$id'], Resource.from_contents(doc)) for doc in cls.documents.values())
 
     def validator(self, uri):
         return Draft202012Validator({'$ref': uri}, registry=self.registry)
 
-    def test_candidate_files_are_deterministic_and_schema_valid(self):
-        self.assertEqual(self.documents, integration.proposal())
+    def test_candidate_files_are_explicit_canonical_schema_sources(self):
+        self.assertEqual(len(self.documents), 3)
         for file, doc in self.documents.items():
             self.assertEqual((ROOT / file).read_bytes(), (json.dumps(doc, indent=2) + '\n').encode())
             Draft202012Validator.check_schema(doc)

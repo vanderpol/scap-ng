@@ -1,74 +1,56 @@
-# Schema-description pilot: `unix.file`
+# `unix.file` schema-driven documentation pilot
 
-Issue [#38](https://github.com/vanderpol/scap-ng/issues/38). **Proposed annotation placement, for owner review; not an installed schema pack.** Single-capability demonstration only.
+[Basic reference](reference.md) · [Advanced constraints](constraints.md) · [Short parity/gap checklist](PARITY-CHECKLIST.md) · [Canonical integration proposal](CANONICAL-INTEGRATION.md)
 
-Read the [generated reference](reference.md), [advanced constraints](constraints.md), and [concrete canonical integration proposal](CANONICAL-INTEGRATION.md). Its field meanings come from JSON Schema `description` properties in [the proposed overlay](unix-file.annotations.schema.json), not a Markdown template or descriptive metadata sidecar. The renderer supplies layout and labels; pinned JSON Schemas supply types, enumerations, defaults and structural relationships. Capability metadata is used only to audit field identity and provenance; its datatype lists and selector alternatives do not drive the reference. Examples also live in standard JSON Schema `examples` annotations. The source map contains locations, hashes and review dispositions, not a second copy of the field descriptions.
+Implements the [consolidated owner review](https://github.com/vanderpol/scap-ng/pull/39#issuecomment-6715466923) for issue #38. PR #37 supplies the presentation baseline. This is one capability and an unapproved next-version proposal; it is not an installed schema pack.
 
-## Reproduce
+## After a schema change
 
-From the repository root, with `requirements-dev.txt` installed:
+Edit the proposed [canonical capability schema](schema-next/capabilities/unix.file.schema.json), then run **one command** from the repository root:
 
 ```sh
 python tools/generate_unix_file_reference.py
+```
+
+It regenerates the basic page, advanced page and parity checklist together. Do not edit generated Markdown. CI runs the matching read-only check:
+
+```sh
 python tools/generate_unix_file_reference.py --check
-python tools/generate_unix_file_reference.py --hover object.traversal.max_depth
-python tools/generate_unix_file_reference.py --hover item.fields.owner_uid
-python tools/generate_unix_file_reference.py --hover require.fields.owner_uid
+```
+
+A stale/missing output fails the check. Both commands use only local, pinned sources; no web download, source checkout, editor or scanner is needed. Existing `requirements-dev.txt` supplies the dependencies. Run the repository tests before pushing:
+
+```sh
 python -m unittest discover -s tests -v
 ```
 
-The last two hover requests return the **same description and schema pointer**: `/$defs/field_meanings/properties/owner_uid`. The source-level harness resolves local schema references offline. It demonstrates description availability for a proposed role-selected pack; it does not execute VS Code or prove live completion/hover coverage. It fails on unknown paths. No editor repository or production pack is modified.
+## One authoritative source
 
-## Proposed placement and explicit design gap
+Descriptions, types, datatype tags, occurrence constraints, enums/defaults and examples now live in the proposed canonical JSON Schemas. The transitional annotation overlay and metadata-to-schema migration script have been retired. The renderer does not import datatype lists or selector alternatives from capability metadata. The source map audits historical identity/coverage; it is not another field-description model.
 
-| Role | Proposed schema node | Existing structural authority |
-| --- | --- | --- |
-| Object | `/$defs/object/properties/<name>`; nested `traversal/properties/<child>` | Frozen `native-selector.schema.json#/$defs/unix_file_object` |
-| Item field meanings | `/$defs/field_meanings/properties/<native field>` | Frozen generic typed-value/array shape; capability field names audited against the native mapping |
-| Collected Item | `/$defs/item/properties/fields` references those field meanings | Frozen `collected-item.schema.json` |
-| Require field meanings | `/$defs/require/properties/fields` references the same meanings | Frozen `assessment-language.schema.json#/$defs/canonical_all_items_requirement` |
-| Shared requirement controls | `/$defs/require/properties/item_requirement` and `field_requirement` | Frozen Item/field cardinality grammar |
+The current `schema/` directory remains byte-identical to base `7354a24cdbfe18321153ccaef5d772801a10cd71`: all 145 frozen JSON hashes are verified before regeneration. Proposed `schema-next/` files are directly maintained review sources outside that directory. They reference frozen primitives to isolate the proposal's explicit datatype changes; `next` is an unassigned placeholder.
 
-The frozen collected Item and Require field maps use `additionalProperties`; they have no capability-specific property nodes at which to attach the 23 meanings. Putting UNIX descriptions directly on those generic maps would misdescribe other capabilities. This proposal therefore adds named, **description-only properties in a capability-scoped schema overlay**, shared through a local `$ref` by Item and Require. It adds no `type`, `required`, `enum`, default, field whitelist or semantic assertion. Existing role schemas remain the validation authority through their exact `$ref` identities. The proposal root is a container: consumers must explicitly select `#/$defs/object`, `#/$defs/item` or `#/$defs/require` in a `unix.file` context.
+## Types and occurrences
 
-This is an explicit schema mechanism for review, not an accepted new grammar or hidden documentation metadata platform. Frozen files under `schema/` are byte-identical to base commit `7354a24cdbfe18321153ccaef5d772801a10cd71`; all 145 JSON file hashes are checked before rendering.
+The four-column reference distinguishes property/map-key occurrence, total map entries, repeated typed wrappers and inner payload presence. Optional traversal has required children only when present. Comparison and existence-only Require branches retain separate contexts; no selector-pairing `oneOf` is fabricated.
 
-The [canonical integration proposal](CANONICAL-INTEGRATION.md) now supplies executable next-pack capability, Assessment-dispatch and Item-dispatch schemas. It recommends moving descriptions and datatype contracts into those canonical nodes after approval, retiring the transitional overlay. The exact validation tightening and remaining integration routes are documented separately; no candidate is installed in the frozen pack.
+The renderer follows local `$ref`/`allOf`, preserves branch boundaries, and evaluates `if` branches only with an explicit instance context. Required/minimum/maximum bounds are read in that context. Unknown dependent/conditional constraints are reported as `conditional` or `unspecified`; unsupported inspected shapes fail rather than being filled from historical conventions. This is a bounded pilot renderer, not a complete JSON Schema analysis engine. Shared operators/record/status grammars remain links.
 
-## Comparison with PR #37
+For offline editor-oriented description resolution:
 
-Presentation baseline: PR #37 head `5e6c49d0a34b3b5380d753fa0142037e494275bd`; its exact page hash is in [source-map.json](source-map.json). Latest [owner feedback](https://github.com/vanderpol/scap-ng/pull/37#issuecomment-6714957457) is incorporated without changing that PR.
+```sh
+python tools/generate_unix_file_reference.py --hover item.fields.owner_uid
+python tools/generate_unix_file_reference.py --hover require.fields.owner_uid
+```
 
-| Baseline feature | Generated pilot |
-| --- | --- |
-| Five resource/control rows | Short meanings; technical choices and shared predicate links moved to advanced constraints |
-| Nested traversal | One parent row, two child rows, exact required children and vocabulary |
-| 23 Item fields | Same field set and order; generic typed-value/array details accessible in advanced constraints |
-| Require | One shared-grammar statement/link; shared control descriptions available to the harness |
-| Behavior | Short table; neutral unresolved-runtime notes; historical rules not promoted |
-| Illustration | One nested YAML excerpt generated from schema `examples`; examples and displayed fragments validate; no scan |
-| Historical attribution | One concise attribution at the end; detailed mappings remain in research records |
+Both return `/$defs/field_meanings/properties/owner_uid` in the canonical capability schema. This source-level harness does not claim live VS Code coverage.
 
-Source-name translations and historical defaults no longer clutter the user reference. Unit/resolution, file-kind labels, directory-only name representation, unsupported ACLs and error propagation remain explicitly unspecified. Historical source restrictions such as absolute-only paths and empty filename prohibitions are not invented as native schema restrictions. The source mapping's traversal rules still use collected names (`full_path`/`directory`); their binding to authored selectors remains a contract gap, not a new validation rule in this pilot. Broader Sets/filters/operator documentation is linked through the existing native sources rather than reimplemented.
+## Parity and evidence
 
+The [checklist](PARITY-CHECKLIST.md) covers all 23 collected Item rows, Object controls, all four historical behavior attributes, useful choices/defaults, conditional behavior and inheritance links. Each entry is `present`, `native-undecided` or `intentionally shared/link-only`. Historical size/time units, file-kind labels, ACL status rules and directory access semantics are kept in the review records instead of being asserted as native requirements.
 
-### Frozen-schema structural gaps
+[source-map.json](source-map.json) records the exact PR #37 baseline, pinned XSD commit/files, per-description locations/hashes and both fetched 5.12.3 Read the Docs pages (full HTML, section and per-row hashes). Those URLs are mutable; hashes identify reviewed bytes, not an immutable RTD revision. No original annotation prose is copied into the schema. CI does not fetch the web pages.
 
-The canonical Object schema does not encode the metadata's `filepath` versus `path` + `filename` selector pairing as a schema alternative. Its actual `oneOf` is Object reference versus inline Object. The advanced reference shows that actual hierarchy rather than presenting a metadata relationship as schema structure.
+Tests include independent bound witnesses and mutations of schema types, required properties, arrays/maps, enums/defaults and contextual branches. They distinguish forbidden values from forbidden properties and absent map keys from status-dependent payloads. A metadata-only mutation leaves all three generated outputs unchanged. Datatype acceptance changes remain separately identified in the integration packet and tests; no schema test establishes scanner-runtime equivalence.
 
-Similarly, the collected Item schema permits a typed value or an array of typed values for every field, with a free-form string datatype tag. It does not encode capability-specific datatype constraints. The advanced reference shows the generic field-value shape and links its canonical definition. The separate next-schema proposal demonstrates named datatype constraints for review; they do not alter frozen grammar. Selector pairing remains a separate gap.
-
-The renderer follows native `$ref` and `allOf` for the small scalar/control definitions it renders and retains `oneOf`/`anyOf` boundaries. Complex shared selector/predicate definitions remain canonical schema links rather than being flattened into a partial operator grammar. This is a bounded renderer, not a complete JSON Schema documentation engine. All capabilities beyond `unix.file` remain out of scope.
-
-## Evidence and limits
-
-Four additional next-schema tests check all 23 canonical bindings, deterministic candidate generation, capability dispatch and the proposed acceptance delta. They do not qualify new grammar as approved.
-
-- Seven focused reference tests cover the annotation-only structural invariant, 35 independent valid/invalid acceptance vectors, shared Item/Require hover origins, all 23 rendered fields, minimal YAML shape, exact-byte regeneration, drift rejection and fail-closed mapping/pin checks.
-- Both frozen and proposed validators receive the same vectors and expected results. One intentionally counterintuitive vector records existing acceptance of an integer-tagged Item field with a string value: datatype/value consistency is outside that frozen structural check. Named annotation properties also preserve acceptance of future/unknown Item and Require field names.
-- Synthetic schema-keyword and example mutations drive the corresponding output. A re-pinned metadata-only datatype/alternative mutation leaves output unchanged, demonstrating that there is no parallel documentation model. A description mutation changes generated text; missing/unknown mappings and missing provenance cause explicit errors. CI discovers the focused tests through the existing workflow; no new upload workflow is introduced.
-- No runtime, scanner equivalence, compiler/converter or release-readiness claim. Role selection in a real editor and adoption of any semantic interpretation require separate review.
-
-The [source map](source-map.json) pins the historical XSD commit and full-file hashes, exact element/attribute lookup paths, hashes of normalized annotation text, native mapping pointers and review dispositions. Original annotations were inspected at that pin; only original paraphrases are published, with source notices retained at their linked origin. Annotation hashes use UTF-8 SHA-256 of joined direct `xsd:annotation/xsd:documentation` text (`itertext().strip()`, documents joined with a newline). Regeneration needs no external source checkout or network.
-
-**Stop after this pilot for owner review of content, schema placement and output. No expansion or merge.**
+**Stop for Jack's review.** No merge, pack installation, other capability expansion or changes to PR #30/#37, scanner/compiler/converter, editor or prior proofs.

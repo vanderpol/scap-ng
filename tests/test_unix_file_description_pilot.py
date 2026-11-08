@@ -26,30 +26,15 @@ class UnixFileDescriptionPilot(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.schema, cls.sources, cls.mapping, _, _ = pilot.load_schemas()
-        cls.registry = schema_registry().with_resource(cls.schema['$id'], Resource.from_contents(cls.schema))
+        cls.registry = pilot.registry(ROOT)
 
-    def test_overlay_has_no_new_validation_assertions(self):
+    def test_canonical_schema_is_the_only_description_and_datatype_authority(self):
         Draft202012Validator.check_schema(self.schema)
-        # Structural proof: every sibling of the existing role $ref is a
-        # description or a recursively annotation-only properties schema.
-        # No type, enum, required, closure, branching or new default is allowed.
-        def annotations_only(node):
-            self.assertLessEqual(set(node), {'description', 'properties', '$ref', 'examples'})
-            if '$ref' in node:
-                self.assertEqual(node['$ref'], '#/$defs/field_meanings')
-            for child in node.get('properties', {}).values():
-                annotations_only(child)
-        expected = {
-            'object': pilot.PREFIX + 'native-selector.schema.json#/$defs/unix_file_object',
-            'item': pilot.PREFIX + 'collected-item.schema.json',
-            'require': pilot.PREFIX + 'assessment-language.schema.json#/$defs/canonical_all_items_requirement',
-        }
-        self.assertEqual(set(self.schema['$defs']), set(expected) | {'field_meanings'})
-        annotations_only(self.schema['$defs']['field_meanings'])
-        for role, ref in expected.items():
-            node = deepcopy(self.schema['$defs'][role])
-            self.assertEqual(node.pop('$ref'), ref)
-            annotations_only(node)
+        self.assertFalse((ROOT / pilot.PILOT / 'unix-file.annotations.schema.json').exists())
+        for name in self.schema['$defs']['field_meanings']['properties']:
+            node = self.schema['$defs']['value_' + name]['properties']['value']
+            self.assertIn(node['type'], ['integer', 'string', 'boolean'])
+        self.assertEqual(len(self.sources['frozen_schema_sha256']), 145)
 
     def test_frozen_and_proposed_acceptance_match_positive_negative_vectors(self):
         base = {'path': {'equals': '/example'}, 'filename': {'equals': 'config'}, 'filesystem': 'all'}
@@ -90,7 +75,8 @@ class UnixFileDescriptionPilot(unittest.TestCase):
                 with self.subTest(role=role, value=value):
                     original = deepcopy(value)
                     self.assertEqual(frozen.is_valid(value), expected)
-                    self.assertEqual(proposed.is_valid(value), expected)
+                    future_expected = False if role == 'item' and isinstance(value.get('fields', {}).get('owner_uid'), dict) and value['fields']['owner_uid'].get('value') == 'invalid' else expected
+                    self.assertEqual(proposed.is_valid(value), future_expected)
                     self.assertEqual(value, original, 'validation must not insert defaults')
 
     def test_item_and_require_hovers_share_all_23_schema_descriptions(self):
@@ -115,17 +101,19 @@ class UnixFileDescriptionPilot(unittest.TestCase):
         text = pilot.render()
         item_table = text.split('## Collected Item')[1].split('## Require')[0]
         self.assertEqual(set(re.findall(r'^\| `([^`]+)`', item_table, re.M)), set(self.mapping['state_field_map'].values()))
-        self.assertIn('| `traversal` | Controls recursive searching', text)
+        self.assertIn('| `traversal` | object | 0..1 | Controls recursive searching', text)
         self.assertIn('### `traversal`', text)
         self.assertNotIn('in `traversal`', text)
         advanced = pilot.render_constraints()
-        self.assertIn('Schema choice (`oneOf`): `object_reference`:', advanced)
-        self.assertIn('**or** inline object', advanced)
+        self.assertIn('Object reference versus inline Object', advanced)
         self.assertNotIn('minimum length', text)
-        self.assertNotIn('authoring suggestion', text)
-        self.assertIn('[Advanced schema constraints](constraints.md)', text)
-        self.assertNotIn('`filepath` **or** `path` + `filename`', text)
-        self.assertIn('array; entries: [typed_value]', advanced)
+        self.assertIn('Editor suggestion', text)
+        self.assertIn('[Advanced constraints and shared grammar](constraints.md)', text)
+        self.assertIn('`filepath` **or** `path` + `filename`', text)
+        self.assertIn('does not enforce this pairing', text)
+        self.assertIn('0..n', advanced)
+        self.assertIn('| Field | Type | Occurrences | Description |', text)
+        self.assertIn('| `owner_uid` | integer | 0..1 key |', text)
         visible = re.sub(r'\]\([^)]+\)', ']', text)
         self.assertEqual(visible.count('OVAL'), 1)
         self.assertIn('Based on the OVAL', text.split('## Sources')[1])
@@ -144,9 +132,10 @@ class UnixFileDescriptionPilot(unittest.TestCase):
     def test_schema_keywords_and_examples_are_the_rendering_authority(self):
         uri = self.schema['$defs']['object']['$ref']
         node = {'oneOf': [{'type': 'integer', 'minimum': 2}, {'const': 'bounded'}]}
-        self.assertEqual(pilot.constraints(node, uri), 'oneOf(integer; minimum: 2 or value: `bounded`)')
+        self.assertEqual(pilot.types(node, uri), 'integer or string')
         node = {'type': 'string', 'enum': ['alpha', 'beta'], 'default': 'beta'}
-        self.assertEqual(pilot.constraints(node, uri), 'string; values: `alpha`, `beta`; default annotation: `beta`')
+        self.assertEqual(pilot.types(node, uri), 'string')
+        self.assertIn('Schema default annotation: `beta`', pilot.options(node, uri))
         for role in ['object', 'item']:
             validator = Draft202012Validator({'$ref': self.schema['$defs'][role]['$ref']}, registry=self.registry)
             for example in self.schema['$defs'][role]['examples']:
@@ -176,6 +165,7 @@ class UnixFileDescriptionPilot(unittest.TestCase):
     def test_generation_is_exact_and_rejects_stale_output(self):
         self.assertEqual((ROOT / pilot.OUTPUT).read_bytes(), pilot.render().encode())
         self.assertEqual((ROOT / pilot.ADVANCED).read_bytes(), pilot.render_constraints().encode())
+        self.assertEqual((ROOT / pilot.PARITY).read_bytes(), pilot.render_parity().encode())
         first = subprocess.check_output([sys.executable, str(ROOT / 'tools/generate_unix_file_reference.py'), '--hover', 'item.fields.owner_uid'])
         second = subprocess.check_output([sys.executable, str(ROOT / 'tools/generate_unix_file_reference.py'), '--hover', 'item.fields.owner_uid'])
         self.assertEqual(first, second)

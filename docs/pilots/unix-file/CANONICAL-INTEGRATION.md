@@ -62,14 +62,15 @@ No selector-pairing assertion, source-only restriction, new unit, filesystem rul
 ## Migration and verification
 
 ```sh
-python tools/propose_unix_file_schema_integration.py
-python tools/propose_unix_file_schema_integration.py --check
+python tools/generate_unix_file_reference.py
 python tools/generate_unix_file_reference.py --check
 python -m unittest discover -s tests -v
 ```
 
-The migration demonstration copies descriptions from the current proposed JSON Schema and imports the pinned native field datatype mapping once into actual `const`/`type` nodes. The generated candidate files are marked as proposals. **After adoption, the next canonical schemas would become the directly maintained authority**: retire this one-time migration and the transitional annotation overlay, and point the reference renderer/editor at the canonical capability schema. Do not maintain a metadata-to-documentation synchronization loop or edit generated candidate copies independently.
+The proposed canonical schema is now the directly maintained documentation source. The earlier one-time migration imported the existing field mapping into real `const`/`type` nodes; that script and the transitional annotation overlay have been retired. The renderer reads the canonical schema directly, without a metadata-to-documentation synchronization loop. Schema changes require only the one regeneration command above; the matching `--check` runs in existing CI and checks the basic, advanced and parity outputs together.
 
-Tests check exact regeneration of all three candidates, schema validity, all 23 description/type bindings, conditional entry dispatch, existing curated example acceptance, shared absence/error rules and explicit before/after datatype vectors. These are structural schema tests; they establish no scanner-runtime equivalence.
+The next-pack files remain isolated proposals. No acceptance change is introduced by the cardinality/parity refinement: updated schema content consists of descriptions and description-only children. The previously demonstrated datatype/tag tightening still requires owner approval before installation. Frozen 0.4.0 files remain unchanged.
+
+Tests check schema validity and all 23 description/type bindings, conditional entry dispatch, existing curated example acceptance, shared absence/error rules and explicit before/after datatype vectors. Reference/parity generation is byte-reproducible, including mutation tests for schema cardinality/type/enum/default changes. These are structural schema tests; they establish no scanner-runtime equivalence.
 
 **Stop for owner review.** No merge, pack publication, other capability expansion or frozen-schema modification.
