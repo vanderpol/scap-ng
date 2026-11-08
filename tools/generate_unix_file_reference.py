@@ -5,6 +5,9 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sys
+from urllib.parse import urljoin
+
+import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 PILOT = Path('docs/pilots/unix-file')
@@ -54,7 +57,7 @@ def hover(schema, role, path):
     return {'description': description(schema, location), 'schema': str(ANNOTATIONS), 'pointer': location}
 
 
-def load_model(root=ROOT):
+def load_schemas(root=ROOT):
     schema = json.loads((root / ANNOTATIONS).read_text())
     sources = json.loads((root / PILOT / 'source-map.json').read_text())
     actual = {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest()
@@ -67,8 +70,6 @@ def load_model(root=ROOT):
     fields = schema['$defs']['field_meanings']['properties']
     if set(fields) != set(mapping['state_field_map'].values()):
         raise ValueError('Missing or unknown Item field mapping')
-    if not set(fields) <= set(mapping['field_datatypes']):
-        raise ValueError('Missing Item datatype mapping')
     objects = schema['$defs']['object']['properties']
     if set(objects) != set(mapping['selector_map'].values()) | {'filesystem', 'traversal'}:
         raise ValueError('Missing or unknown Object selector/control mapping')
@@ -93,53 +94,121 @@ def code(value):
     return '`' + str(value) + '`'
 
 
-def suggestions(node):
-    policy = node['x-scap-ng-authoring']
-    if not all(policy.get(k) is True for k in ['new_authoring_only', 'serialize_explicitly', 'preserve_overrides']):
-        raise ValueError('Unsupported default policy')
-    return 'Authoring suggestion: ' + code(node['default']) + '; serialize explicitly, no runtime fallback.'
+def schema_node(root, uri):
+    """Resolve a pinned native JSON Schema URI locally; never fetch references."""
+    if not uri.startswith(PREFIX):
+        raise ValueError('Outside pinned schema pack: ' + uri)
+    file, _, fragment = uri[len(PREFIX):].partition('#')
+    return pointer(json.loads((root / 'schema' / file).read_text()), fragment)
+
+
+def structural(node, uri, root=ROOT):
+    """Inspect schema keywords across $ref/allOf without a documentation model.
+
+    oneOf/anyOf stay explicit. This is for rendering, never validation or schema
+    rewriting. Conflicting keyword values fail instead of choosing a branch.
+    """
+    result = {}
+    def combine(part):
+        for key, value in part.items():
+            if key in {'description', 'title', '$comment', 'x-scap-ng-authoring'}:
+                result[key] = value
+            elif key == 'properties':
+                for name, child in value.items():
+                    existing = result.setdefault('properties', {}).get(name)
+                    result['properties'][name] = child if existing is None else structural(
+                        {'allOf': [existing, child]}, uri, root)
+            elif key == 'required':
+                result[key] = list(dict.fromkeys(result.get(key, []) + value))
+            elif key in result and result[key] != value:
+                raise ValueError('Unrendered conflicting schema keyword: ' + key)
+            else:
+                result[key] = value
+    if '$ref' in node:
+        target = urljoin(uri, node['$ref'])
+        combine(structural(schema_node(root, target), target, root))
+    for part in node.get('allOf', []):
+        combine(structural(part, uri, root))
+    combine({key: value for key, value in node.items() if key not in {'$ref', 'allOf'}})
+    return result
+
+
+def constraints(node, uri, root=ROOT):
+    """Render actual types, alternatives, bounds, enums and default annotations."""
+    if '$ref' in node:
+        target = urljoin(uri, node['$ref'])
+        referenced = schema_node(root, target)
+        if referenced.get('type') not in {'string', 'integer', 'boolean', 'null'}:
+            file, _, fragment = target[len(PREFIX):].partition('#')
+            label = fragment.rsplit('/', 1)[-1] or file
+            return '[' + label + '](../../../schema/' + file + '#' + fragment + ')'
+    node = structural(node, uri, root)
+    parts = []
+    for choice in ['oneOf', 'anyOf']:
+        if choice in node:
+            parts.append(choice + '(' + ' or '.join(constraints(n, uri, root) for n in node[choice]) + ')')
+    if 'type' in node:
+        types = node['type'] if isinstance(node['type'], list) else [node['type']]
+        parts.append(' / '.join(types))
+    if 'enum' in node:
+        parts.append('values: ' + ', '.join(map(code, node['enum'])))
+    if 'const' in node:
+        parts.append('value: ' + code(node['const']))
+    for keyword, label in [('minimum', 'minimum'), ('minLength', 'minimum length'), ('maxLength', 'maximum length'), ('pattern', 'pattern'), ('minItems', 'minimum entries')]:
+        if keyword in node:
+            parts.append(label + ': ' + str(node[keyword]))
+    if 'items' in node:
+        parts.append('entries: ' + constraints(node['items'], uri, root))
+    if 'required' in node:
+        parts.append('required children: ' + ', '.join(map(code, node['required'])))
+    if 'default' in node:
+        policy = node.get('x-scap-ng-authoring', {})
+        authoring = all(policy.get(k) is True for k in ['new_authoring_only', 'serialize_explicitly', 'preserve_overrides'])
+        parts.append(('authoring suggestion: ' if authoring else 'default annotation: ') + code(node['default']))
+        if authoring:
+            parts.append('serialize explicitly; no runtime fallback')
+    return '; '.join(parts) or 'unconstrained value'
 
 
 def render(root=ROOT):
-    schema, sources, mapping, native, common = load_model(root)
+    schema, sources, _mapping, _native, _common = load_schemas(root)
     defs = schema['$defs']
     meaning = lambda role, path='': hover(schema, role, path)['description']
-    alternatives = mapping['object_selector_alternatives']
-    if alternatives != [['filepath'], ['path', 'filename']]:
-        raise ValueError('Unsupported selector alternatives; review renderer')
+    object_uri = defs['object']['$ref']
+    object_schema = schema_node(root, object_uri)
+    inline = next(n for n in object_schema['oneOf'] if n.get('type') == 'object')
+    shape = lambda n, uri=object_uri: constraints(n, uri, root)
     lines = ['# `unix.file`', '', '<!-- Generated by tools/generate_unix_file_reference.py; edit the proposed schema descriptions. -->', '',
              meaning('object'), '', '## Object', '',
-             'Selection form: ' + ' **or** '.join(' + '.join(map(code, alt)) for alt in alternatives) + '.', '',
-             '| Field | Meaning | Constraints / suggestions |', '| --- | --- | --- |']
+             'Schema choice (`oneOf`): ' + ' **or** '.join(
+                 'inline object' if n.get('type') == 'object' else code(n['$ref'].rsplit('/', 1)[-1]) + ': ' + shape(n)
+                 for n in object_schema['oneOf']) + '.', '',
+             '### Inline Object', '',
+             '| Field | Meaning | Schema constraints / suggestions |', '| --- | --- | --- |']
+    traversal = structural(inline['properties']['traversal'], object_uri, root)
     for name in defs['object']['properties']:
-        note = ''
-        if name == 'filesystem':
-            note = ', '.join(map(code, common['filesystem_scope']['enum'])) + '. ' + suggestions(common['filesystem_scope'])
-        elif name == 'traversal':
-            note = 'Optional object; both children below are required when present.'
-        lines.append(f'| {code(name)} | {meaning("object", name)} | {note} |')
-    base = common['file_traversal_base']
-    depth = base['properties']['max_depth']
-    recurse = common['file_traversal']['allOf'][1]['properties']['recurse']
-    if base['required'] != ['max_depth', 'recurse'] or depth['oneOf'] != [{'type': 'integer', 'minimum': 0}, {'const': 'unlimited'}]:
-        raise ValueError('Unsupported traversal constraints; review renderer')
-    lines += ['', '### `traversal`', '', '| Field | Meaning | Allowed values / constraints |', '| --- | --- | --- |']
-    values = {'max_depth': f'integer ≥ {depth["oneOf"][0]["minimum"]} or {code(depth["oneOf"][1]["const"])}',
-              'recurse': ', '.join(map(code, recurse['enum']))}
-    for name, node in [('max_depth', depth), ('recurse', recurse)]:
-        lines.append(f'| {code(name)} | {meaning("object", "traversal." + name)} | Required: {values[name]}. {suggestions(node)} |')
-    lines += ['', '## Collected Item', '', '| Field | Meaning | Datatype |', '| --- | --- | --- |']
+        node = traversal if name == 'traversal' else inline['properties'][name]
+        lines.append(f'| {code(name)} | {meaning("object", name)} | {shape(node)} |')
+    lines += ['', '#### `traversal`', '', '| Field | Meaning | Schema constraints / suggestions |', '| --- | --- | --- |']
+    for name in defs['object']['properties']['traversal']['properties']:
+        required = 'Required; ' if name in traversal.get('required', []) else 'Optional; '
+        lines.append(f'| {code(name)} | {meaning("object", "traversal." + name)} | {required}{shape(traversal["properties"][name])} |')
+    item_uri = defs['item']['$ref']
+    item_schema = schema_node(root, item_uri)
+    field_schema = item_schema['properties']['fields']['additionalProperties']
+    lines += ['', '## Collected Item', '', '### `fields`', '',
+              'Each field value: ' + shape(field_schema, item_uri) + '.', '',
+              '| Field | Meaning |', '| --- | --- |']
     for name in defs['field_meanings']['properties']:
-        lines.append(f'| {code(name)} | {meaning("item", "fields." + name)} | {", ".join(mapping["field_datatypes"][name])} |')
+        lines.append(f'| {code(name)} | {meaning("item", "fields." + name)} |')
     lines += ['', '## Require', '', meaning('require') + ' [Shared requirement grammar](../../../schema/assessment-language.schema.json#/$defs/canonical_all_items_requirement).', '',
               '## Important behavior', '', '| Topic | Meaning / caveat |', '| --- | --- |',
               '| Metadata | ' + meaning('field_meanings') + ' |',
               '| Absence / errors | ' + meaning('item') + ' |', '',
               '## Illustration', '', 'Illustrative Object → collected Item fields excerpt; not an executed scan:', '',
-              '```yaml', 'object:', '  path: {equals: /example}', '  filename: {equals: config}', '  filesystem: all',
-              '  traversal:', '    max_depth: 1', '    recurse: directories', '# → Item fields excerpt:', 'fields:',
-              '  full_path: {datatype: string, status: exists, value: /example/config}',
-              '  owner_uid: {datatype: integer, status: exists, value: 1000}', '```', '',
+              '```yaml', yaml.safe_dump({'object': defs['object']['examples'][0]}, sort_keys=False).rstrip(),
+              '# → Item fields excerpt:',
+              yaml.safe_dump({'fields': defs['item']['examples'][0]['fields']}, sort_keys=False).rstrip(), '```', '',
               '## Sources', '',
               '[Proposed schema descriptions](unix-file.annotations.schema.json); [pinned native sources and review records](source-map.json).', '',
               'Based on the OVAL 5.12.3 UNIX file test/object/item documentation: '
@@ -155,7 +224,7 @@ def main():
     args = parser.parse_args()
     try:
         if args.hover:
-            schema, *_ = load_model()
+            schema, *_ = load_schemas()
             role, _, path = args.hover.partition('.')
             print(json.dumps(hover(schema, role, path), indent=2))
             return 0

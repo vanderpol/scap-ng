@@ -25,7 +25,7 @@ spec.loader.exec_module(pilot)
 class UnixFileDescriptionPilot(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.schema, cls.sources, cls.mapping, _, _ = pilot.load_model()
+        cls.schema, cls.sources, cls.mapping, _, _ = pilot.load_schemas()
         cls.registry = schema_registry().with_resource(cls.schema['$id'], Resource.from_contents(cls.schema))
 
     def test_overlay_has_no_new_validation_assertions(self):
@@ -34,7 +34,7 @@ class UnixFileDescriptionPilot(unittest.TestCase):
         # description or a recursively annotation-only properties schema.
         # No type, enum, required, closure, branching or new default is allowed.
         def annotations_only(node):
-            self.assertLessEqual(set(node), {'description', 'properties', '$ref'})
+            self.assertLessEqual(set(node), {'description', 'properties', '$ref', 'examples'})
             if '$ref' in node:
                 self.assertEqual(node['$ref'], '#/$defs/field_meanings')
             for child in node.get('properties', {}).values():
@@ -116,9 +116,12 @@ class UnixFileDescriptionPilot(unittest.TestCase):
         item_table = text.split('## Collected Item')[1].split('## Require')[0]
         self.assertEqual(set(re.findall(r'^\| `([^`]+)`', item_table, re.M)), set(self.mapping['state_field_map'].values()))
         self.assertIn('| `traversal` | Controls recursive searching', text)
-        self.assertIn('### `traversal`', text)
+        self.assertIn('#### `traversal`', text)
         self.assertNotIn('in `traversal`', text)
-        self.assertIn('`filepath` **or** `path` + `filename`', text)
+        self.assertIn('Schema choice (`oneOf`): `object_reference`:', text)
+        self.assertIn('**or** inline object', text)
+        self.assertNotIn('`filepath` **or** `path` + `filename`', text)
+        self.assertIn('array; entries: [typed_value]', text)
         visible = re.sub(r'\]\([^)]+\)', ']', text)
         self.assertEqual(visible.count('OVAL'), 1)
         self.assertIn('Based on the OVAL', text.split('## Sources')[1])
@@ -133,6 +136,38 @@ class UnixFileDescriptionPilot(unittest.TestCase):
         for target in re.findall(r'\]\(([^)]+)\)', text):
             if not target.startswith('https:'):
                 self.assertTrue((path.parent / target.split('#')[0]).resolve().exists(), target)
+
+    def test_schema_keywords_and_examples_are_the_rendering_authority(self):
+        uri = self.schema['$defs']['object']['$ref']
+        node = {'oneOf': [{'type': 'integer', 'minimum': 2}, {'const': 'bounded'}]}
+        self.assertEqual(pilot.constraints(node, uri), 'oneOf(integer; minimum: 2 or value: `bounded`)')
+        node = {'type': 'string', 'enum': ['alpha', 'beta'], 'default': 'beta'}
+        self.assertEqual(pilot.constraints(node, uri), 'string; values: `alpha`, `beta`; default annotation: `beta`')
+        for role in ['object', 'item']:
+            validator = Draft202012Validator({'$ref': self.schema['$defs'][role]['$ref']}, registry=self.registry)
+            for example in self.schema['$defs'][role]['examples']:
+                validator.validate(example)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shutil.copytree(ROOT / 'schema', root / 'schema')
+            shutil.copytree(ROOT / pilot.PILOT, root / pilot.PILOT)
+            # Metadata is audited for field identity, not used for rendered types
+            # or structural alternatives. Re-pin this synthetic pack explicitly.
+            file = root / 'schema/capability-mappings/supported/unix.file.json'
+            mapping = json.loads(file.read_text())
+            mapping['native']['field_datatypes']['owner_uid'] = ['invented']
+            mapping['native']['object_selector_alternatives'] = [['invented']]
+            file.write_text(json.dumps(mapping))
+            source_file = root / pilot.PILOT / 'source-map.json'
+            sources = json.loads(source_file.read_text())
+            sources['frozen_schema_sha256'][str(file.relative_to(root))] = pilot.sha256(file.read_bytes()).hexdigest()
+            source_file.write_text(json.dumps(sources))
+            self.assertEqual(pilot.render(root), pilot.render())
+            schema_file = root / pilot.ANNOTATIONS
+            schema = json.loads(schema_file.read_text())
+            schema['$defs']['object']['examples'][0]['traversal']['max_depth'] = 2
+            schema_file.write_text(json.dumps(schema))
+            self.assertIn('max_depth: 2', pilot.render(root))
 
     def test_generation_is_exact_and_rejects_stale_output(self):
         self.assertEqual((ROOT / pilot.OUTPUT).read_bytes(), pilot.render().encode())
@@ -178,7 +213,7 @@ class UnixFileDescriptionPilot(unittest.TestCase):
             native = root / 'schema/capability-common.schema.json'
             native.write_bytes(native.read_bytes() + b'\n')
             with self.assertRaisesRegex(ValueError, 'Frozen schema pack differs'):
-                pilot.load_model(root)
+                pilot.load_schemas(root)
 
 
 if __name__ == '__main__':

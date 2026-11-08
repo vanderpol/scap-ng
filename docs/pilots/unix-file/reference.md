@@ -6,50 +6,56 @@ Select filesystem entries and collect their metadata for comparison.
 
 ## Object
 
-Selection form: `filepath` **or** `path` + `filename`.
+Schema choice (`oneOf`): `object_reference`: string; minimum length: 1; maximum length: 64; pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*-object$ **or** inline object.
 
-| Field | Meaning | Constraints / suggestions |
+### Inline Object
+
+| Field | Meaning | Schema constraints / suggestions |
 | --- | --- | --- |
-| `filepath` | Full path of the selected entry. |  |
-| `path` | Directory containing the selected entry. |  |
-| `filename` | Entry name within the selected directory; null selects the directory itself. |  |
-| `filesystem` | Filesystem scope: all, local, or the starting filesystem (same). | `all`, `local`, `same`. Authoring suggestion: `local`; serialize explicitly, no runtime fallback. |
-| `traversal` | Controls recursive searching through directories and symbolic links. | Optional object; both children below are required when present. |
+| `filepath` | Full path of the selected entry. | [unix_file_filepath_selector](../../../schema/native-selector.schema.json#/$defs/unix_file_filepath_selector) |
+| `path` | Directory containing the selected entry. | [unix_file_path_selector](../../../schema/native-selector.schema.json#/$defs/unix_file_path_selector) |
+| `filename` | Entry name within the selected directory; null selects the directory itself. | oneOf([unix_file_filename_selector](../../../schema/native-selector.schema.json#/$defs/unix_file_filename_selector) or null) |
+| `filesystem` | Filesystem scope: all, local, or the starting filesystem (same). | string; values: `all`, `local`, `same`; authoring suggestion: `local`; serialize explicitly; no runtime fallback |
+| `traversal` | Controls recursive searching through directories and symbolic links. | object; required children: `max_depth`, `recurse` |
 
-### `traversal`
+#### `traversal`
 
-| Field | Meaning | Allowed values / constraints |
+| Field | Meaning | Schema constraints / suggestions |
 | --- | --- | --- |
-| `max_depth` | Maximum downward recursion depth; 0 includes only the starting directory. | Required: integer ≥ 0 or `unlimited`. Authoring suggestion: `unlimited`; serialize explicitly, no runtime fallback. |
-| `recurse` | Entry types to follow during recursion. | Required: `directories`, `symlinks`, `symlinks_and_directories`. Authoring suggestion: `symlinks_and_directories`; serialize explicitly, no runtime fallback. |
+| `max_depth` | Maximum downward recursion depth; 0 includes only the starting directory. | Required; oneOf(integer; minimum: 0 or value: `unlimited`); authoring suggestion: `unlimited`; serialize explicitly; no runtime fallback |
+| `recurse` | Entry types to follow during recursion. | Required; string; values: `directories`, `symlinks`, `symlinks_and_directories`; minimum length: 1; authoring suggestion: `symlinks_and_directories`; serialize explicitly; no runtime fallback |
 
 ## Collected Item
 
-| Field | Meaning | Datatype |
-| --- | --- | --- |
-| `full_path` | Full path of the collected entry. | string |
-| `directory` | Directory component of the collected path. | string |
-| `name` | Entry name without the directory; directory-only representation is not yet specified. | string |
-| `type` | Kind of filesystem entry; value labels are not yet specified. | string |
-| `owner_uid` | Numeric user ID of the owner. | integer |
-| `owner_gid` | Numeric group ID of the owning group. | integer |
-| `size` | File size; unit is not yet specified. | integer |
-| `access_time` | Last data-access time; unit and resolution are not yet specified. | integer |
-| `change_time` | Last inode-status change, not creation time; unit and resolution are not yet specified. | integer |
-| `modify_time` | Last content-modification time; unit and resolution are not yet specified. | integer |
-| `setuid` | Set-user-ID permission flag. | boolean |
-| `setgid` | Set-group-ID permission flag. | boolean |
-| `sticky` | Sticky/restricted-deletion flag. | boolean |
-| `owner_read` | Whether the owner-read permission bit is set. | boolean |
-| `owner_write` | Whether the owner-write permission bit is set. | boolean |
-| `owner_execute` | Whether the owner-execute/search permission bit is set. | boolean |
-| `group_read` | Whether the group-read permission bit is set. | boolean |
-| `group_write` | Whether the group-write permission bit is set. | boolean |
-| `group_execute` | Whether the group-execute/search permission bit is set. | boolean |
-| `other_read` | Whether the other-read permission bit is set. | boolean |
-| `other_write` | Whether the other-write permission bit is set. | boolean |
-| `other_execute` | Whether the other-execute/search permission bit is set. | boolean |
-| `has_extended_acl` | Whether ACL permissions differ from standard UNIX permissions; unsupported-ACL handling is not yet specified. | boolean |
+### `fields`
+
+Each field value: oneOf([typed_value](../../../schema/result-types.schema.json#/$defs/typed_value) or array; entries: [typed_value](../../../schema/result-types.schema.json#/$defs/typed_value)).
+
+| Field | Meaning |
+| --- | --- |
+| `full_path` | Full path of the collected entry. |
+| `directory` | Directory component of the collected path. |
+| `name` | Entry name without the directory; directory-only representation is not yet specified. |
+| `type` | Kind of filesystem entry; value labels are not yet specified. |
+| `owner_uid` | Numeric user ID of the owner. |
+| `owner_gid` | Numeric group ID of the owning group. |
+| `size` | File size; unit is not yet specified. |
+| `access_time` | Last data-access time; unit and resolution are not yet specified. |
+| `change_time` | Last inode-status change, not creation time; unit and resolution are not yet specified. |
+| `modify_time` | Last content-modification time; unit and resolution are not yet specified. |
+| `setuid` | Set-user-ID permission flag. |
+| `setgid` | Set-group-ID permission flag. |
+| `sticky` | Sticky/restricted-deletion flag. |
+| `owner_read` | Whether the owner-read permission bit is set. |
+| `owner_write` | Whether the owner-write permission bit is set. |
+| `owner_execute` | Whether the owner-execute/search permission bit is set. |
+| `group_read` | Whether the group-read permission bit is set. |
+| `group_write` | Whether the group-write permission bit is set. |
+| `group_execute` | Whether the group-execute/search permission bit is set. |
+| `other_read` | Whether the other-read permission bit is set. |
+| `other_write` | Whether the other-write permission bit is set. |
+| `other_execute` | Whether the other-execute/search permission bit is set. |
+| `has_extended_acl` | Whether ACL permissions differ from standard UNIX permissions; unsupported-ACL handling is not yet specified. |
 
 ## Require
 
@@ -68,16 +74,24 @@ Illustrative Object → collected Item fields excerpt; not an executed scan:
 
 ```yaml
 object:
-  path: {equals: /example}
-  filename: {equals: config}
+  path:
+    equals: /example
+  filename:
+    equals: config
   filesystem: all
   traversal:
     max_depth: 1
     recurse: directories
 # → Item fields excerpt:
 fields:
-  full_path: {datatype: string, status: exists, value: /example/config}
-  owner_uid: {datatype: integer, status: exists, value: 1000}
+  full_path:
+    datatype: string
+    status: exists
+    value: /example/config
+  owner_uid:
+    datatype: integer
+    status: exists
+    value: 1000
 ```
 
 ## Sources
