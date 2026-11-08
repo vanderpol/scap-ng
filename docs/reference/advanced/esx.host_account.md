@@ -4,6 +4,14 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/esx.host_account.schema.json#) | {} | source-derived-proposal |
+
+[schema](../../../proposed-schema/documentation/capabilities/esx.host_account.schema.json#): Inspect account metadata on an ESXi host.
+
+This retained experimental mapping comes from the separate pinned 6.0 new-Test source; it has no corresponding 5.12.3 declaration. Its source contracts remain in the engineering ledger.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/account_name](../../../proposed-schema/documentation/capabilities/esx.host_account.schema.json#/$defs/meanings/properties/account_name) | {} | source-meaning-reviewed |
 | [/$defs/meanings/properties/domain](../../../proposed-schema/documentation/capabilities/esx.host_account.schema.json#/$defs/meanings/properties/domain) | {} | source-meaning-reviewed |
 | [/$defs/meanings/properties/description](../../../proposed-schema/documentation/capabilities/esx.host_account.schema.json#/$defs/meanings/properties/description) | {} | source-meaning-reviewed |

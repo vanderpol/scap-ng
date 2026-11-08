@@ -4,6 +4,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/macos.gatekeeper.schema.json#) | {} | source-derived-proposal |
 | [/$defs/meanings/properties/enabled](../../../proposed-schema/documentation/capabilities/macos.gatekeeper.schema.json#/$defs/meanings/properties/enabled) | {} | source-derived |
 | [/$defs/meanings/properties/require_developer_id](../../../proposed-schema/documentation/capabilities/macos.gatekeeper.schema.json#/$defs/meanings/properties/require_developer_id) | {} | source-derived |
 | [/$defs/meanings/properties/unlabeled](../../../proposed-schema/documentation/capabilities/macos.gatekeeper.schema.json#/$defs/meanings/properties/unlabeled) | {} | source-derived |

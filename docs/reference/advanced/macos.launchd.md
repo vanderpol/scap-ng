@@ -4,7 +4,19 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/macos.launchd.schema.json#) | {} | source-derived-proposal |
 | [/$defs/meanings/properties/label](../../../proposed-schema/documentation/capabilities/macos.launchd.schema.json#/$defs/meanings/properties/label) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/label](../../../proposed-schema/documentation/capabilities/macos.launchd.schema.json#/$defs/meanings/properties/label): Launch agent or daemon label.
+
+Specifies the name of the agent/daemon.
+
+Specifies the deamon to be queried.
+
+Specifies the name of the agent/daemon used to create the object.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/pid](../../../proposed-schema/documentation/capabilities/macos.launchd.schema.json#/$defs/meanings/properties/pid) | {} | source-derived |
 | [/$defs/meanings/properties/status](../../../proposed-schema/documentation/capabilities/macos.launchd.schema.json#/$defs/meanings/properties/status) | {} | source-meaning-reviewed |
 | [/$defs/object](../../../proposed-schema/documentation/capabilities/macos.launchd.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |

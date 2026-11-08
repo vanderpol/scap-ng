@@ -4,6 +4,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/solaris.package.ips.schema.json#) | {} | source-derived-proposal |
 | [/$defs/meanings/properties/publisher](../../../proposed-schema/documentation/capabilities/solaris.package.ips.schema.json#/$defs/meanings/properties/publisher) | {} | source-derived |
 | [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/solaris.package.ips.schema.json#/$defs/meanings/properties/name) | {} | source-derived |
 | [/$defs/meanings/properties/version](../../../proposed-schema/documentation/capabilities/solaris.package.ips.schema.json#/$defs/meanings/properties/version) | {} | source-derived |

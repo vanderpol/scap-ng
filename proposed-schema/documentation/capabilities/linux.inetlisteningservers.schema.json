@@ -32,7 +32,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "Specific transport-layer protocol, in lowercase: tcp or udp, associated with the inet listening server.",
+          "description": "Specific transport-layer protocol, in lowercase: tcp or udp, associated with the inet listening server.\n\nThis is the transport-layer protocol, in lowercase: tcp or udp.\n\n`protocol` defines the specific transport-layer protocol, in lowercase: tcp or udp, associated with the inet listening server.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -49,7 +49,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The IP address of the network interface on which the program listens.",
+          "description": "The IP address of the network interface on which the program listens.\n\nThis is the IP address associated with the inet listening server.\n\nThis is the IP address of the network interface on which the program listens.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -66,7 +66,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The TCP or UDP port number associated with the inet listening server.",
+          "description": "The TCP or UDP port number associated with the inet listening server.\n\nThis is the TCP or UDP port on which the program listens.\n\nThis is the TCP or UDP port number associated with the inet listening server.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -83,7 +83,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The IP address and network port number associated with the inet listening server, equivalent to local_address:local_port.",
+          "description": "The IP address and network port number associated with the inet listening server, equivalent to local_address:local_port.\n\nThis is the IP address and network port on which the program listens, equivalent to local_address:local_port.\n\nThis is the IP address and network port number associated with the inet listening server, equivalent to local_address:local_port.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -100,7 +100,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The name of the communicating program.",
+          "description": "The name of the communicating program.\n\nThis is the name of the communicating program.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -134,7 +134,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The TCP or UDP port to which the program communicates.",
+          "description": "The TCP or UDP port to which the program communicates.\n\nThis is the TCP or UDP port to which the program communicates.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -168,7 +168,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The pid is the process ID of a specific process.",
+          "description": "The pid is the process ID of a specific process.\n\nThis is the process ID of the process.\n\nThe process in question is that of the program communicating on the network.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -185,7 +185,7 @@
             }
           },
           "x-doc-status": "source-meaning-reviewed",
-          "description": "Numeric user identifier associated with the listening program.",
+          "description": "Numeric user identifier associated with the listening program.\n\nThe numeric user id, or uid, is the third column of each user's entry in /etc/passwd.\n\nIt represents the owner, and thus privilege level, of the specified program.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -206,7 +206,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "Certain transport-layer protocol, in lowercase: tcp or udp.",
+          "description": "Certain transport-layer protocol, in lowercase: tcp or udp.\n\n`protocol` defines a certain transport-layer protocol, in lowercase: tcp or udp.",
           "x-doc-datatypes": [
             "string"
           ],
@@ -224,7 +224,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The IP address of the network interface on which an application listens.",
+          "description": "The IP address of the network interface on which an application listens.\n\nThis is the IP address of the network interface on which an application listens.",
           "x-doc-datatypes": [
             "string"
           ],
@@ -242,7 +242,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The TCP or UDP port on which an application would listen.",
+          "description": "The TCP or UDP port on which an application would listen.\n\nThis is the TCP or UDP port on which an application would listen.",
           "x-doc-datatypes": [
             "integer"
           ],
@@ -256,7 +256,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object",
-      "x-doc-role": "Object"
+      "x-doc-role": "Object",
+      "description": "An inet listening servers object consists of three entities.\n\nThe first identifies a specific IP address.\n\nWhile the third identifies the protocol.\n\nThe Object is used by an inet listening servers test to define the specific protocol-address-port to be evaluated."
     },
     "item": {
       "properties": {
@@ -265,7 +266,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json",
-      "x-doc-role": "Item"
+      "x-doc-role": "Item",
+      "description": "An inet listening server item stores the results of checking for network servers currently active on a system.\n\nIt holds information pertaining to a specific protocol-address-port combination."
     },
     "require": {
       "properties": {
@@ -274,12 +276,21 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/test/properties/require",
-      "x-doc-role": "Require"
+      "x-doc-role": "Require",
+      "description": "This includes the local address, foreign address, port information, and process id."
     }
   },
   "x-doc-roles": {
     "Object": "#/$defs/object",
     "Item": "#/$defs/item",
     "Require": "#/$defs/require"
+  },
+  "description": "The inet listening servers test is used to check what applications are listening on the network.\n\nThis is limited to applications that are listening for connections that use the TCP or UDP protocols and have addresses represented as IPv4 or IPv6 addresses (AF_INET or AF_INET6).\n\nIt is generally using the parsed output of running the command netstat -tuwlnpe with root privilege.",
+  "x-doc-status": "source-derived-proposal",
+  "x-doc-fidelity": {
+    "source_version": "5.12.3",
+    "source_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+    "annotation_scope": "capability overview and mapped field explanations",
+    "native_runtime_approval": false
   }
 }

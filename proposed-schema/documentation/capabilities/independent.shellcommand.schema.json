@@ -32,7 +32,7 @@
             }
           },
           "x-doc-status": "native-mapping-reviewed",
-          "description": "Interpreter requested for command execution.",
+          "description": "Interpreter requested for command execution.\n\n`shell` defines the specific shell to use (e.g. bash, csh, ksh, etc.).",
           "x-doc-datatypes": [
             "string"
           ],
@@ -59,7 +59,7 @@
             }
           },
           "x-doc-status": "native-mapping-reviewed",
-          "description": "Command text supplied to the interpreter.",
+          "description": "Command text supplied to the interpreter.\n\n`command` specifies the command string to be run on the target system, which could be a single executable/binary or a one-liner which manipulates the output from one or more executables/binaries.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -93,7 +93,7 @@
             }
           },
           "x-doc-status": "native-mapping-reviewed",
-          "description": "Process exit status.",
+          "description": "Process exit status.\n\n`exit_status` represents the exit status returned by the system for the execution of the object command.",
           "x-doc-datatypes": [
             "integer"
           ]
@@ -141,7 +141,7 @@
             }
           },
           "x-doc-status": "native-mapping-reviewed",
-          "description": "Text captured by a parenthesized group in the output pattern.",
+          "description": "Text captured by a parenthesized group in the output pattern.\n\n`subexpression` represents the value of a subexpression in the specified pattern.\n\n`subexpression` represents a value to test against the subexpression in the specified pattern.",
           "x-doc-datatypes": [
             "string",
             "boolean",
@@ -169,7 +169,7 @@
             }
           },
           "x-doc-status": "native-mapping-reviewed",
-          "description": "A line from standard error.",
+          "description": "A line from standard error.\n\n`stderr_line` contains a single line of any output from STDERR.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -254,7 +254,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object",
-      "x-doc-role": "Object"
+      "x-doc-role": "Object",
+      "description": "The Object is used by `independent.shellcommand` to define a shell to use (e.g. sh, bash, ksh, etc.), a command (or shell script) to be run, and a pattern to filter result lines."
     },
     "item": {
       "properties": {
@@ -272,12 +273,21 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/test/properties/require",
-      "x-doc-role": "Require"
+      "x-doc-role": "Require",
+      "description": "The comparison fields contain the entities that are used to check the values returned by the Object."
     }
   },
   "x-doc-roles": {
     "Object": "#/$defs/object",
     "Item": "#/$defs/item",
     "Require": "#/$defs/require"
+  },
+  "description": "Collects evidence produced by an authored command. The Object declares an interpreter, command text and optional output pattern; Require evaluates the collected exit status, output lines and captured text.\n\n## Usage and safety guidance\n\nTreat a content-supplied command as executable code. Review its effects on the target and the privileges of the scanner process before allowing execution. Commands may run in a privileged deployment context; choose commands that do not harm the target system.\n\nPrefer robust commands with bounded, predictable output. Avoid fragile command strings that can fail noisily or produce excessive standard output or standard error. Well-formed output makes the resulting evidence easier to interpret.\n\nPrefer executables supplied by the target operating system. Identify and review any external executable dependencies rather than assuming they are installed or introducing them silently.\n\nEstablish content trust, integrity verification and signing policy before enabling command execution. The source's mandatory signing rule is historical; no additional native signing requirement is established by this documentation.\n\n## Evidence and contract boundaries\n\nStandard output and standard error have separate evidence fields. The Object declares whether nonzero exit status or standard-error output is to be treated as a collection error; these acquisition controls are distinct from Require comparisons.\n\nNative contracts for command-form restrictions, an omitted interpreter, output splitting and cardinality, empty output, unavailable interpreters and error propagation remain unresolved. The original single-Item and empty-output status conventions are retained in the semantic ledger rather than adopted as native behavior.",
+  "x-doc-status": "source-derived-proposal",
+  "x-doc-fidelity": {
+    "source_version": "5.12.3",
+    "source_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+    "annotation_scope": "capability overview and mapped field explanations",
+    "native_runtime_approval": false
   }
 }
