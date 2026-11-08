@@ -35,7 +35,7 @@ Description presence records own, `$ref` and same-instance applicator sources se
 
 Quality is a separate review dimension. Heuristics identify definite absence, malformed text, obvious filler and default/conditional explanations requiring review. They are not an exhaustive semantic quality certification: populated but unreviewed descriptions remain `present_not_semantically_reviewed`. Curated notes identify specific native-contract gaps. A provisional statement is not useful coverage and cannot resolve a semantic gap merely by becoming a populated string.
 
-Findings are keyed by canonical URI/pointer + role + category. The baseline permits preexisting findings; disappearing IDs are reported without automatically marking them resolved. `review-notes.json` contains source-guarded wording proposals and may hold proposal-ID dispositions with approval links and explicit resolution pointers. Accepted canonical wording is checked for drift when a resolution pointer exists; missing approval or a falsely closed gap is rejected. The current package has **no accepted/resolved annotations**.
+Findings are keyed by canonical URI/pointer + role + category. The baseline permits preexisting findings; disappearing IDs are reported without automatically marking them resolved. `review-notes.json` contains source-guarded wording proposals and may hold proposal-ID dispositions with approval links and explicit resolution pointers. Accepted canonical wording is checked for drift when a resolution pointer exists; missing approval or a falsely closed gap is rejected. The original bulk crosswalk has **no accepted/resolved annotations**; the bounded editorial receipts below track their separate wording approvals.
 
 ## How to review the crosswalk
 
@@ -57,12 +57,13 @@ Historical concat evidence is the already pinned 5.12.3 annotation reference rec
 [Batch 1 receipt](EDITORIAL-REVIEW.md) records 21 accepted descriptions, six semantic
 holds and one withheld case, with the exact independent-review and owner-authorization
 links. Editorial acceptance does not authorize canonical installation or clear semantic
-holds. The three approved refinements are applied only to the review worksheet.
+holds. The three approved refinements are recorded in the review worksheet; selected wording
+is exercised only by the bounded proposal below.
 The review's optional merge phrasing preference remains uninstalled: the continuation
 explicitly authorizes wording revisions only for 04, 07 and 13.
 
-[Batch 2](EDITORIAL-REVIEW-2.md) proposes 28 different high-value descriptions; all
-remain pending editorial review. Its [machine worksheet](editorial-batch-2.json)
+[Batch 2](EDITORIAL-REVIEW-2.md) records 25 editorial acceptances (22 unchanged and three
+revised), with three semantic holds retained. Its [machine worksheet](editorial-batch-2.json)
 records a single proposed description owner per concept and related consumer pointers
 where duplicated structures need a future shared binding. It does not create a second
 canonical authority or copy descriptions into those consumers.
@@ -72,5 +73,8 @@ are checked by the existing `--check` gate after changes. The gate verifies sour
 hashes, pointers, old/inherited text, witness validity, approval provenance and distinct
 batch targets. The Phase 1 baseline and bulk patch bundle remain unchanged.
 
-**Stop for editorial review.** No wording from either worksheet is applied to schemas,
-the editor, runtime contracts or the earlier bulk patch bundle.
+**Stop for editorial review.** Frozen schemas, the editor, runtime contracts and the earlier bulk patch bundle
+remain unchanged. The owner-authorized [eight-description integration prototype](../../pilots/approved-annotations/RECEIPT.md)
+materializes only those approved annotations in isolated next-version schema fixtures.
+Its reference and offline help read the actual proposal schema nodes; no live editor
+verification or canonical placement is claimed.

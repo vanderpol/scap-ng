@@ -239,3 +239,25 @@ def options(node, uri, root=ROOT):
     if enums:
         values = [code(v) for v in enums[0] if all(v in enum for enum in enums)] + values
     return ' '.join(([', '.join(dict.fromkeys(values)) + '.'] if values else []) + list(dict.fromkeys(suggestions)))
+
+
+def description_lookup(root, uri, seen=()):
+    """Offline lookup at an explicit schema node, following local-pack $refs.
+
+    Returns the exact annotation pointer, never a parent/alternative's prose.
+    This is source lookup, not instance-to-caret routing or a VS Code UI model.
+    """
+    if uri in seen:
+        raise ValueError('Cyclic description reference: ' + uri)
+    node = schema_node(root, uri)
+    if not isinstance(node, dict):
+        raise ValueError('Missing description at schema node: ' + uri)
+    if 'description' in node:
+        if not isinstance(node['description'], str) or not node['description'].strip():
+            raise ValueError('Missing description at schema node: ' + uri)
+        base, fragment = urldefrag(uri)
+        return {'description': node['description'], 'description_pointer': base + '#' + fragment + '/description',
+                'lookup_chain': list(seen) + [uri]}
+    if '$ref' in node:
+        return description_lookup(root, urljoin(uri, node['$ref']), seen + (uri,))
+    raise ValueError('Missing description at schema node: ' + uri)

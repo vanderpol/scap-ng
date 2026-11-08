@@ -789,6 +789,6 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 ## Review gate
 
-Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The batch 1 foreach case remains withheld until placement is decided. None of these candidates is added to the bulk patch bundle, installed in an editor or written to a canonical schema.
+Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The batch 1 foreach case remains withheld until placement is decided. The bulk patch and frozen schemas remain unchanged. Eight approved descriptions are demonstrated only in the [isolated next-version proposal](../../pilots/approved-annotations/RECEIPT.md); no production editor installation is authorized.
 
 **Stop for editorial review.** No bulk shortening of the 1,580 findings, schema edit, editor repin, migration or merge.

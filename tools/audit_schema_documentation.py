@@ -719,8 +719,6 @@ def editorial_batch(result, root=ROOT, filename="editorial-batch.json"):
             raise ValueError('Missing independent engineering note or original draft')
         if row['classification'] not in {'editorial', 'semantic_decision_needed'}:
             raise ValueError('Unsupported editorial classification')
-        if filename != 'editorial-batch.json' and (row['editorial_status'] != 'pending_editorial_review' or row.get('editorial_review_url') or not batch['workflow']['editorial_review'].startswith('pending')):
-            raise ValueError('Batch 2 must remain pending editorial review')
         if row['classification'] == 'semantic_decision_needed' and row['semantic_status'] != 'pending_semantic_review':
             raise ValueError('Semantic decision must remain pending')
         text = row['author_description']
@@ -736,9 +734,8 @@ def editorial_batch(result, root=ROOT, filename="editorial-batch.json"):
                 raise ValueError('Engineering/status prose leaked into author help')
             if text == row['engineering_note']:
                 raise ValueError('Author help and engineering note must stay independent')
-        if filename == 'editorial-batch.json':
-            validate_editorial_receipt(batch, row)
-        else:
+        validate_editorial_receipt(batch, row, filename)
+        if filename != 'editorial-batch.json':
             if row['proposed_description_owner'] != key:
                 raise ValueError('Each concept needs one exact proposed description owner')
             for consumer in row['related_consumer_pointers']:
@@ -760,26 +757,34 @@ def editorial_batch(result, root=ROOT, filename="editorial-batch.json"):
             if validator.is_valid(instance) != case['expected_valid']:
                 raise ValueError('Editorial syntax witness disagrees: ' + row['id'] + ' / ' + case['label'])
             checked += 1
-    if filename == 'editorial-batch.json':
+    if filename in {'editorial-batch.json', 'editorial-batch-2.json'}:
         reviewed = deepcopy(batch)
         reviewed.pop('review_receipt')
-        reviewed['workflow']['editorial_review'] = 'pending ChatGPT editorial review'
+        reviewed['workflow']['editorial_review'] = ('pending ChatGPT editorial review' if filename == 'editorial-batch.json' else 'pending owner editorial review')
         for row in reviewed['proposals']:
             row['author_description'] = row.pop('reviewed_author_description')
             row.pop('editorial_review_url')
             row['editorial_status'] = 'pending_editorial_review'
-        if digest(reviewed) != '03c146e78eb5dc30a4d5fd2133ce50f832d3d8c32fe38f0f6f596a2b3b9ce17b':
-            raise ValueError('Reviewed batch 1 source dossier must remain unchanged')
+        expected_digest = ('03c146e78eb5dc30a4d5fd2133ce50f832d3d8c32fe38f0f6f596a2b3b9ce17b'
+                           if filename == 'editorial-batch.json' else 'f65563d3723f15fbe9e9fe1d7a08649b4d8dfa6ff607a90382282a45ff942021')
+        if digest(reviewed) != expected_digest:
+            raise ValueError('Reviewed source dossier must remain unchanged')
     return batch, checked
 
 
-def validate_editorial_receipt(batch, row):
+def validate_editorial_receipt(batch, row, filename="editorial-batch.json"):
     """Record the explicit owner ID lists without upgrading semantic holds."""
     receipt = batch['review_receipt']
     review_url = 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815'
+    authorization = 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721594181'
+    commit = 'c742e0d6039c56d70eab973bc28f9ccb01f5241e'
+    if filename == 'editorial-batch-2.json':
+        review_url = 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939'
+        authorization = 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721723400'
+        commit = '47bbe94f65e970edffd35433b1d744596a671322'
     if (receipt['review_url'] != review_url or row.get('editorial_review_url') != review_url
-            or receipt['authorization_url'] != 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721594181'
-            or receipt['reviewed_commit'] != 'c742e0d6039c56d70eab973bc28f9ccb01f5241e'):
+            or receipt['authorization_url'] != authorization
+            or receipt['reviewed_commit'] != commit):
         raise ValueError('Editorial receipt approval provenance drifted')
     accepted = '01 02 03 05 06 08 09 10 11 12 14 19 20 22 23 24 25 27'.split()
     revisions = {
@@ -787,16 +792,24 @@ def validate_editorial_receipt(batch, row):
         '07': "Compares a collected field's values or checks for confirmed absence.",
         '13': 'Sets how many observed values must be present for a field.'}
     holds = '15 16 17 18 21 26'.split()
+    withheld = ['28']
+    if filename == 'editorial-batch-2.json':
+        accepted = '01 02 03 04 05 08 09 10 11 12 13 14 15 20 21 22 23 24 25 26 27 28'.split()
+        revisions = {
+            '06': 'Selects a constant or locally derived Variable.',
+            '18': 'Declares that this branch cannot be evaluated and provides a reason.',
+            '19': 'Declares that this branch does not apply and provides a reason.'}
+        holds, withheld = ['07', '16', '17'], []
     if (receipt['accepted_as_written'] != accepted or receipt['accepted_with_revision'] != sorted(revisions)
-            or receipt['semantic_holds'] != holds or receipt['withheld'] != ['28']):
+            or receipt['semantic_holds'] != holds or receipt['withheld'] != withheld):
         raise ValueError('Editorial receipt must preserve explicit reviewed ID lists')
     identifier = row['id']
     status = ('accepted_as_written' if identifier in accepted else 'accepted_with_revision' if identifier in revisions
-              else 'draft_style_acceptable_semantic_hold' if identifier in holds else 'withheld' if identifier == '28' else None)
+              else 'draft_style_acceptable_semantic_hold' if identifier in holds else 'withheld' if identifier in withheld else None)
     expected = revisions.get(identifier, row['reviewed_author_description'])
     if status is None or row['editorial_status'] != status or row['author_description'] != expected:
         raise ValueError('Editorial receipt status or approved wording drifted')
-    if identifier in holds + ['28'] and row['classification'] != 'semantic_decision_needed':
+    if identifier in holds + withheld and row['classification'] != 'semantic_decision_needed':
         raise ValueError('Editorial receipt cannot clear semantic holds')
     if identifier in accepted + list(revisions) and row['classification'] != 'editorial':
         raise ValueError('Editorial subset classification drifted')
@@ -814,7 +827,7 @@ def editorial_report(result, filename="editorial-batch.json"):
              ('Batch 1 editorial receipt: **21 accepted descriptions** (18 as written, 3 revised), **6 semantic holds**, **1 withheld**. '
               'Uses the explicit reviewed list of 18 accepted IDs plus the three approved wording revisions. [Independent review]('
               + batch['review_receipt']['review_url'] + ') · [Owner authorization](' + batch['review_receipt']['authorization_url'] + ').'
-              if number == 1 else f'**{len(rows)} new descriptions, all pending editorial review.** Jack decides marked semantic questions; no independent editorial approval is claimed.'), '',
+              if number == 1 else 'Batch 2 editorial receipt: **25 accepted descriptions** (22 as written, 3 revised), **3 semantic holds**. [Independent review](' + batch['review_receipt']['review_url'] + ') · [Owner authorization](' + batch['review_receipt']['authorization_url'] + ').'), '',
              'Native pin: `' + batch['native_commit'] + '`. Full schema URIs use `https://scap-ng.dev/schema/v0.4.0/`; every file/pointer and source hash is recorded in [' + filename + '](' + filename + ').', '',
              str(checked) + ' positive/negative syntax witnesses were checked against the pinned definitions, including parent-context cases. They do not execute collection, evaluation or transformations and do not establish runtime equivalence.', '',
              '## Edited author-facing candidates', '',
@@ -844,7 +857,7 @@ def editorial_report(result, filename="editorial-batch.json"):
                   '**Proposed description authority:** `' + row.get('proposed_description_owner', key) + '`; related consumers: ' + (', '.join('`' + p + '`' for p in row.get('related_consumer_pointers', [])) or 'none separately bound in this worksheet') + '.', '',
                   '**Source/syntax checks:** ' + str(len(row['checks'])) + ' witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.', '', '</details>', '']
     lines += ['## Review gate', '',
-              'Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The batch 1 foreach case remains withheld until placement is decided. None of these candidates is added to the bulk patch bundle, installed in an editor or written to a canonical schema.', '',
+              'Approve style separately from behavior. A semantic-decision row remains pending even if its sentence reads well. The batch 1 foreach case remains withheld until placement is decided. The bulk patch and frozen schemas remain unchanged. Eight approved descriptions are demonstrated only in the [isolated next-version proposal](../../pilots/approved-annotations/RECEIPT.md); no production editor installation is authorized.', '',
               '**Stop for editorial review.** No bulk shortening of the 1,580 findings, schema edit, editor repin, migration or merge.', '']
     return '\n'.join(lines)
 
