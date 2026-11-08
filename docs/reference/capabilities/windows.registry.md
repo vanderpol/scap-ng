@@ -64,4 +64,82 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 See the [schema](../../../proposed-schema/documentation/capabilities/windows.registry.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 
+## Examples
+
+**Illustrative expected outcomes; native evaluation unverified.** Syntax validation is reported separately from evaluation. For these compliance teaching cases only, technical `true` is labelled Pass and `false` Fail; a consuming Rule defines policy outcomes. Items are explicit synthetic evidence, not observations from a scanned host.
+
+Both cases use this native Test (inline Object and Require):
+
+```yaml
+tests:
+  windows-registry-example-test:
+    test_title: Compare the explicitly supplied value
+    capability: windows.registry
+    object:
+      hive: {equals: local_machine}
+      key: {equals: SOFTWARE\Policies\Microsoft\Windows\Personalization}
+      name: {equals: NoLockScreenSlideshow}
+    require:
+      item_requirement: {items_found: one_or_more, items_satisfying: every}
+      field_requirement: {values_found: one_or_more, values_matching: every}
+      fields:
+        value: {datatype: integer, equals: 1}
+    reported_elements: all
+evaluate: {test: windows-registry-example-test}
+```
+
+### Pass — expected `true` (unverified)
+
+The supplied Registry value is 1, so the explicit integer equality to 1 matches.
+
+```yaml
+collection_result:
+  id: windows-registry-pass-collection
+  capability: windows.registry
+  status: complete
+  item_refs: [windows-registry-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: windows-registry-pass-item
+  capability: windows.registry
+  status: exists
+  fields:
+    hive: {datatype: string, status: exists, value: local_machine}
+    key: {datatype: string, status: exists, value: SOFTWARE\Policies\Microsoft\Windows\Personalization}
+    name: {datatype: string, status: exists, value: NoLockScreenSlideshow}
+    type: {datatype: string, status: exists, value: dword}
+    value: {datatype: integer, status: exists, value: 1}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/windows.registry.pass.yaml).
+
+### Fail — expected `false` (unverified)
+
+The supplied Registry value is 0, so the explicit integer equality to 1 does not match.
+
+```yaml
+collection_result:
+  id: windows-registry-fail-collection
+  capability: windows.registry
+  status: complete
+  item_refs: [windows-registry-fail-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: windows-registry-fail-item
+  capability: windows.registry
+  status: exists
+  fields:
+    hive: {datatype: string, status: exists, value: local_machine}
+    key: {datatype: string, status: exists, value: SOFTWARE\Policies\Microsoft\Windows\Personalization}
+    name: {datatype: string, status: exists, value: NoLockScreenSlideshow}
+    type: {datatype: string, status: exists, value: dword}
+    value: {datatype: integer, status: exists, value: 0}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/windows.registry.fail.yaml).
+
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `windows-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

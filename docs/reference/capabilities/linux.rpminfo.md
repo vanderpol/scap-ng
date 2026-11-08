@@ -58,4 +58,75 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 See the [schema](../../../proposed-schema/documentation/capabilities/linux.rpminfo.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 
+## Examples
+
+**Illustrative expected outcomes; native evaluation unverified.** Syntax validation is reported separately from evaluation. For these compliance teaching cases only, technical `true` is labelled Pass and `false` Fail; a consuming Rule defines policy outcomes. Items are explicit synthetic evidence, not observations from a scanned host.
+
+Both cases use this native Test (inline Object and Require):
+
+```yaml
+tests:
+  linux-rpminfo-example-test:
+    test_title: Compare the explicitly supplied architecture
+    capability: linux.rpminfo
+    object:
+      package_name: {equals: openssh-server}
+      include_file_paths: false
+    require:
+      item_requirement: {items_found: one_or_more, items_satisfying: every}
+      field_requirement: {values_found: one_or_more, values_matching: every}
+      fields:
+        architecture: {datatype: string, equals: x86_64}
+    reported_elements: all
+evaluate: {test: linux-rpminfo-example-test}
+```
+
+### Pass — expected `true` (unverified)
+
+The supplied package architecture is 'x86_64', so the string equality to "x86_64" matches; no RPM version ordering is inferred.
+
+```yaml
+collection_result:
+  id: linux-rpminfo-pass-collection
+  capability: linux.rpminfo
+  status: complete
+  item_refs: [linux-rpminfo-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: linux-rpminfo-pass-item
+  capability: linux.rpminfo
+  status: exists
+  fields:
+    package_name: {datatype: string, status: exists, value: openssh-server}
+    architecture: {datatype: string, status: exists, value: x86_64}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/linux.rpminfo.pass.yaml).
+
+### Fail — expected `false` (unverified)
+
+The supplied package architecture is 'aarch64', so the string equality to "x86_64" does not match; no RPM version ordering is inferred.
+
+```yaml
+collection_result:
+  id: linux-rpminfo-fail-collection
+  capability: linux.rpminfo
+  status: complete
+  item_refs: [linux-rpminfo-fail-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: linux-rpminfo-fail-item
+  capability: linux.rpminfo
+  status: exists
+  fields:
+    package_name: {datatype: string, status: exists, value: openssh-server}
+    architecture: {datatype: string, status: exists, value: aarch64}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/linux.rpminfo.fail.yaml).
+
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `linux-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

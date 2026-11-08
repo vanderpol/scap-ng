@@ -62,4 +62,74 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 See the [schema](../../../proposed-schema/documentation/capabilities/windows.service.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 
+## Examples
+
+**Illustrative expected outcomes; native evaluation unverified.** Syntax validation is reported separately from evaluation. For these compliance teaching cases only, technical `true` is labelled Pass and `false` Fail; a consuming Rule defines policy outcomes. Items are explicit synthetic evidence, not observations from a scanned host.
+
+Both cases use this native Test (inline Object and Require):
+
+```yaml
+tests:
+  windows-service-example-test:
+    test_title: Compare the explicitly supplied start_type
+    capability: windows.service
+    object:
+      service_name: {equals: Spooler}
+    require:
+      item_requirement: {items_found: one_or_more, items_satisfying: every}
+      field_requirement: {values_found: one_or_more, values_matching: every}
+      fields:
+        start_type: {datatype: string, equals: SERVICE_DISABLED}
+    reported_elements: all
+evaluate: {test: windows-service-example-test}
+```
+
+### Pass — expected `true` (unverified)
+
+The supplied start_type is 'SERVICE_DISABLED', so the string equality to "SERVICE_DISABLED" matches; this does not assert whether the service is currently running.
+
+```yaml
+collection_result:
+  id: windows-service-pass-collection
+  capability: windows.service
+  status: complete
+  item_refs: [windows-service-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: windows-service-pass-item
+  capability: windows.service
+  status: exists
+  fields:
+    service_name: {datatype: string, status: exists, value: Spooler}
+    start_type: {datatype: string, status: exists, value: SERVICE_DISABLED}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/windows.service.pass.yaml).
+
+### Fail — expected `false` (unverified)
+
+The supplied start_type is 'SERVICE_AUTO_START', so the string equality to "SERVICE_DISABLED" does not match; this does not assert whether the service is currently running.
+
+```yaml
+collection_result:
+  id: windows-service-fail-collection
+  capability: windows.service
+  status: complete
+  item_refs: [windows-service-fail-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: windows-service-fail-item
+  capability: windows.service
+  status: exists
+  fields:
+    service_name: {datatype: string, status: exists, value: Spooler}
+    start_type: {datatype: string, status: exists, value: SERVICE_AUTO_START}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/windows.service.fail.yaml).
+
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `windows-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

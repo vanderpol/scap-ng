@@ -1,5 +1,7 @@
 # SCAP-NG 0.4 examples
 
+The [first five paired teaching examples](../docs/examples/README.md) add ten complete version-pinned fixtures with explicit collected Items and expected outcomes. Their generated reference sections and editor links share those fixture files. Native evaluation remains unverified; schema validation is reported separately.
+
 Four curated Assessments illustrate current authoring syntax. They are validated against the local 0.4 Assessment schema in CI.
 
 | Example | Demonstrates |

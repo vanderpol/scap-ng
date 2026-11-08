@@ -1,0 +1,47 @@
+id: windows-registry-pass
+pair_id: windows-registry
+capability: windows.registry
+schema_pin: examples/paired/v0.4.0/schema-pin.json
+assessment:
+  id: windows-registry-example-assessment
+  version: 1
+  assessment_title: Illustrative windows.registry field comparison
+  mode: automated
+  class: compliance
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.0}
+  tests:
+    windows-registry-example-test:
+      test_title: Compare the explicitly supplied value
+      capability: windows.registry
+      object:
+        hive: {equals: local_machine}
+        key: {equals: SOFTWARE\Policies\Microsoft\Windows\Personalization}
+        name: {equals: NoLockScreenSlideshow}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          value: {datatype: integer, equals: 1}
+      reported_elements: all
+  evaluate: {test: windows-registry-example-test}
+collection_result:
+  id: windows-registry-pass-collection
+  capability: windows.registry
+  status: complete
+  item_refs: [windows-registry-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: windows-registry-pass-item
+  capability: windows.registry
+  status: exists
+  fields:
+    hive: {datatype: string, status: exists, value: local_machine}
+    key: {datatype: string, status: exists, value: SOFTWARE\Policies\Microsoft\Windows\Personalization}
+    name: {datatype: string, status: exists, value: NoLockScreenSlideshow}
+    type: {datatype: string, status: exists, value: dword}
+    value: {datatype: integer, status: exists, value: 1}
+  provenance: {kind: synthetic-documentation-fixture}
+expected: {label: Pass, technical_outcome: 'true'}
+verification: {status: illustrative-unverified, native_evaluator: null}
+explanation: The supplied Registry value is 1, so the explicit integer equality to 1 matches.

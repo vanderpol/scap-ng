@@ -1,0 +1,144 @@
+{
+  "source_repository": "https://github.com/OVAL-Community/OVAL",
+  "scope": "Pinned XSD capability annotations, not a claim that explanations are absent from every OVAL specification or external tutorial.",
+  "categories": [
+    "Missing explanation",
+    "Unclear explanation",
+    "Incorrect or inconsistent explanation"
+  ],
+  "findings": [
+    {
+      "id": "registry-overview",
+      "category": "Missing explanation",
+      "source": {
+        "file": "oval-schemas/windows-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "b66f1547bfd0bb8ea6cf58a0eec9f8de417aad6642f741d0ed0ad7b6462314ff",
+        "xpath": "/xs:schema/xs:element[@name='registry_object']/xs:annotation[1]/xs:documentation[1]",
+        "quote": ""
+      },
+      "gap": "The Object overview annotation is empty; useful nil/default-value guidance exists only on child fields.",
+      "proposed_scap_ng_improvement": "Add a short native overview and link child selector cases; keep null, empty name and registry-view contracts separate.",
+      "status": "Documentation-only overview is safe; null/view behavior remains on hold."
+    },
+    {
+      "id": "service-evidence",
+      "category": "Missing explanation",
+      "source": {
+        "file": "oval-schemas/windows-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "b66f1547bfd0bb8ea6cf58a0eec9f8de417aad6642f741d0ed0ad7b6462314ff",
+        "xpath": "/xs:schema/xs:element[@name='service_state']/xs:complexType[1]/xs:complexContent[1]/xs:extension[1]/xs:sequence[1]/xs:element[@name='start_type']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The start_type element specifies when the service should be started."
+      },
+      "gap": "\"Specifies when the service should be started\" gives purpose but no local collected-value comparison example.",
+      "proposed_scap_ng_improvement": "Show SERVICE_DISABLED versus SERVICE_AUTO_START with explicit Items; distinguish startup configuration from current_state.",
+      "status": "Paired fixtures supplied; runtime evaluation unverified."
+    },
+    {
+      "id": "rpm-evidence",
+      "category": "Missing explanation",
+      "source": {
+        "file": "oval-schemas/linux-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "b3415940c8c3992463caed33a87599cd6c53af5a4310b53ec24b11bfcb2191c7",
+        "xpath": "/xs:schema/xs:element[@name='rpminfo_state']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The rpminfo_state element defines the different information that can be used to evaluate the specified rpm. This includes the architecture, epoch number, and version numbers. Most of this information can be obtained through the rpm function. Please refer to the individual elements in the schema for more details about what each represents."
+      },
+      "gap": "The overview lists fields and refers readers elsewhere; it has no local authoring/evidence/outcome example.",
+      "proposed_scap_ng_improvement": "Start with a typed architecture comparison; link version/epoch/EVR details separately instead of implying generic version ordering.",
+      "status": "Architecture pair supplied; no RPM ordering semantics added."
+    },
+    {
+      "id": "file-behavior-order",
+      "category": "Unclear explanation",
+      "source": {
+        "file": "oval-schemas/unix-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+        "xpath": "/xs:schema/xs:complexType[@name='FileBehaviors']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The FileBehaviors complex type defines a number of behaviors that allow a more detailed definition of the file_object being specified. Note that using these behaviors may result in some unique results. For example, a double negative type condition might be created where an object entity says include everything except a specific item, but a behavior is used that might then add that item back in."
+      },
+      "gap": "The \"double negative\" warning does not demonstrate which entries are added back or how behavior and selector scopes compose.",
+      "proposed_scap_ng_improvement": "Give a bounded worked collection example and explicit selector/traversal/filter boundaries after the native contract is approved.",
+      "status": "Traversal/collection semantic hold preserved."
+    },
+    {
+      "id": "file-acl-meaning",
+      "category": "Unclear explanation",
+      "source": {
+        "file": "oval-schemas/unix-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+        "xpath": "/xs:schema/xs:element[@name='file_state']/xs:complexType[1]/xs:complexContent[1]/xs:extension[1]/xs:sequence[1]/xs:element[@name='has_extended_acl']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "Does the file or directory have ACL permissions applied to it? If the file or directory doesn't have an ACL, or it matches the standard UNIX permissions, the value will be 'false'. Otherwise, if a file or directory has an ACL, the value will be 'true'."
+      },
+      "gap": "The prose alternates between having an ACL and having an ACL matching standard permissions; the name alone does not explain the distinction.",
+      "proposed_scap_ng_improvement": "Define the extended-ACL flag with a small decision table; distinguish recorded ACL metadata from effective access.",
+      "status": "ACL/effective-access interpretation remains unresolved."
+    },
+    {
+      "id": "shell-empty-output",
+      "category": "Unclear explanation",
+      "source": {
+        "file": "oval-schemas/independent-system-characteristics-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "631f9cfcd2898ae46ccd87f742b0c9d18d17c920f0da25fa1704b65d4b82a1aa",
+        "xpath": "/xs:schema/xs:element[@name='shellcommand_item']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The shellcommand_item stores information retrieved from the local system that results from the running of the command or embedded script in the associated object command element.\n\nThe evaluation of the object should always produce one item. If the object evaluation does not produce output via STDOUT that should result in an item, one should be created with a status of 'does not exist'. This facilitates that capture of the exit_status and stderr from the system call."
+      },
+      "gap": "Item prose says to create an Item with does-not-exist status, while Object prose places does-not-exist on stdout; the status owner needs clarification.",
+      "proposed_scap_ng_improvement": "Specify collection, Item and field statuses independently with an empty-stdout fixture after owner review.",
+      "status": "No empty-output or Item-cardinality convention adopted.",
+      "comparison_source": {
+        "file": "oval-schemas/independent-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "4b2c8b2d90c8fb4647c00f8d20a0cb031103e61e99e643463b9b87006664c953",
+        "xpath": "/xs:schema/xs:element[@name='shellcommand_object']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The shellcommand_object is used by a shellcommand_test to define a shell to use (e.g. sh, bash, ksh, etc.), a command (or shell script) to be run, and a pattern to filter result lines. The default shell is bash. Each object extends the standard ObjectType as defined in the oval-definitions-schema and one should refer to the ObjectType description for more information. The common set element allows complex objects to be created using filters and set logic.\n\nThe evaluation of the object should always produce one item. If the command execution does not produce output, an item should still be created with the exit_status (AKA process exit code), a stdout entity with a status of 'does not exist', and any STDERR from the execution captured in stderr_line entities."
+      }
+    },
+    {
+      "id": "firmware-copy-error",
+      "category": "Incorrect or inconsistent explanation",
+      "source": {
+        "file": "oval-schemas/macos-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "d5dd70c91397d0941df3be3f9e18c7bf711dfe346bdcb58938caf15999b68e66",
+        "xpath": "/xs:schema/xs:element[@name='firmwarepassword_test']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The firmwarepassword_test is used to determine the status of File Vault disk encryption. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an firmwarepassword_object and the optional state element references an firmwarepassword_state that specifies the information to check."
+      },
+      "gap": "The firmware-password Test overview describes File Vault disk encryption.",
+      "proposed_scap_ng_improvement": "Use firmware-password subject matter derived from matching fields/Item documentation; retain the source error in provenance.",
+      "status": "Already withheld by the fidelity ledger; no runtime change."
+    },
+    {
+      "id": "sestatus-copy-error",
+      "category": "Incorrect or inconsistent explanation",
+      "source": {
+        "file": "oval-schemas/linux-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "b3415940c8c3992463caed33a87599cd6c53af5a4310b53ec24b11bfcb2191c7",
+        "xpath": "/xs:schema/xs:element[@name='sestatus_test']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The SEStatus Test is used to check properties representing the counts of profiles and processes as per the results of the \"sestatus\" command. It extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references an sestatus_object and the optional state element specifies the data to check."
+      },
+      "gap": "The SELinux status Test overview describes counts of profiles and processes, mirroring AppArmor subject matter.",
+      "proposed_scap_ng_improvement": "Describe SELinux configuration/status fields; do not transfer the incorrect purpose statement.",
+      "status": "Already withheld by the fidelity ledger; no runtime change."
+    },
+    {
+      "id": "registry-rights-copy-error",
+      "category": "Incorrect or inconsistent explanation",
+      "source": {
+        "file": "oval-schemas/windows-definitions-schema.xsd",
+        "commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+        "file_sha256": "b66f1547bfd0bb8ea6cf58a0eec9f8de417aad6642f741d0ed0ad7b6462314ff",
+        "xpath": "/xs:schema/xs:element[@name='regkeyeffectiverights53_test']/xs:annotation[1]/xs:documentation[1]",
+        "quote": "The registry key effective rights test is used to check the effective rights associated with Windows files. Note that the trustee's effective access rights are the access rights that the DACL grants to the trustee or to any groups of which the trustee is a member. The regkeyeffectiverights53_test element extends the standard TestType as defined in the oval-definitions-schema and one should refer to the TestType description for more information. The required object element references a regkeyeffectiverights53_object and the optional state element specifies the metadata to check."
+      },
+      "gap": "The registry-key rights overview says it checks Windows files.",
+      "proposed_scap_ng_improvement": "Name registry keys and trustees explicitly; keep access-mask/view questions separate.",
+      "status": "Already withheld by the fidelity ledger; no runtime change."
+    }
+  ]
+}

@@ -4,6 +4,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import re
+import shutil
 import sys
 import tempfile
 import unittest
@@ -239,10 +240,13 @@ class ProductionDocumentationTests(unittest.TestCase):
         base=PREFIX+'capabilities/test.discovery.schema.json'
         doc=deepcopy(docs[PREFIX+'capabilities/linux.rpminfo.schema.json'][0])
         doc['$id']=base;doc['x-doc-capability']='test.discovery';doc['title']='test.discovery'
+        doc.pop('x-doc-examples',None)  # A new capability cannot inherit RPM fixture associations.
         doc['$defs']['meanings']['properties']['new_field']={'description':'New discovered field.'}
         docs[base]=(doc,gen.SOURCE/'capabilities/test.discovery.schema.json')
         with tempfile.TemporaryDirectory() as t:
             root=Path(t)
+            shutil.copytree(ROOT/'schema',root/'schema')
+            shutil.copytree(ROOT/'examples/paired',root/'examples/paired')
             for _,(d,path) in docs.items():
                 (root/path).parent.mkdir(parents=True,exist_ok=True);(root/path).write_text(gen.encode(d))
             (root/gen.SOURCE/'provenance.json').write_text('{}')
