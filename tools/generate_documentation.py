@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import re
 from urllib.parse import urldefrag, urljoin
+from documentation_examples import Examples, render as render_examples
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = Path('proposed-schema/documentation')
@@ -281,6 +282,7 @@ def advanced_page(docs, base, doc):
 
 
 def generate(root=ROOT):
+    examples = Examples(root)
     docs = schemas(root)
     check_links(docs)
     outputs, metadata, gaps, coverage, duplicates = {}, [], [], [], []
@@ -408,6 +410,7 @@ def generate(root=ROOT):
         page += 'See the [schema](../../../' + path.as_posix() + ') for exact description owners, native datatype declarations and collection-parameter declarations. '
         page += 'Declarations are documentation annotations; they add no datatype or required-field restriction. '
         page += 'Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.\n\n'
+        page += render_examples(examples.load(doc))
         src = doc['x-doc-source']
         page += f'Historical source: {src["language"]}, commit `{src["oval_commit"]}`, `{src["oval_schema"]}`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **{src["scope"]}**.\n'
         outputs[DEST / 'capabilities' / (cap + '.md')] = page
@@ -493,7 +496,7 @@ def generate(root=ROOT):
         'shared_gap_scopes':dict(sorted(Counter(g['scope'] for g in gaps if g['reason']=='missing shared description').items()))})
     outputs[DEST / 'gaps.jsonl'] = ''.join(json.dumps(g, sort_keys=True, ensure_ascii=False) + '\n' for g in gaps)
     outputs[DEST / 'duplicate-descriptions.json'] = encode(duplicates)
-    outputs[DEST / 'editor-help.json'] = encode({'format': 'schema-documentation-help-1', 'descriptions': metadata, 'schema_routes': schema_routes, 'routes': routes,
+    outputs[DEST / 'editor-help.json'] = encode({'format': 'schema-documentation-help-1', 'descriptions': metadata, 'schema_routes': schema_routes, 'routes': routes, 'examples': examples.routes,
         'policy': 'Exact capability/role/path only. No generic parent fallback. Missing or stale packs must not produce authoritative help.'})
     outputs[DEST / 'qualification.json'] = encode({'initial_ten': list(QUALIFICATION), 'initial_ten_present': all(c in {x['capability'] for x in coverage} for c in QUALIFICATION),
         'all_capabilities_processed': len(coverage), 'checks': ['local references resolve', 'exact capability associations', 'one mapping key per named field', 'nested properties retain parent', 'shared description owners resolve'],
@@ -519,7 +522,7 @@ def generate(root=ROOT):
     outputs[DEST / 'manifest.json'] = encode({'format': 'scap-ng-proposed-documentation-1', 'review_only': True,
                                              'provenance_sha256': sha256((root / SOURCE / 'provenance.json').read_bytes()).hexdigest(),
                                              'coverage_debt_sha256': sha256((root / SOURCE / 'coverage-debt.json').read_bytes()).hexdigest() if (root / SOURCE / 'coverage-debt.json').exists() else None,
-                                             'schemas': dict(sorted(inputs.items())), 'generated': files})
+                                             'schemas': dict(sorted(inputs.items())), 'examples': dict(sorted(examples.inputs.items())), 'generated': files})
     return outputs
 
 

@@ -82,4 +82,73 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 See the [schema](../../../proposed-schema/documentation/capabilities/independent.shellcommand.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 
+## Examples
+
+**Illustrative expected outcomes; native evaluation unverified.** Syntax validation is reported separately from evaluation. For these compliance teaching cases only, technical `true` is labelled Pass and `false` Fail; a consuming Rule defines policy outcomes. Items are explicit synthetic evidence, not observations from a scanned host.
+
+Both cases use this native Test (inline Object and Require):
+
+```yaml
+tests:
+  independent-shellcommand-example-test:
+    test_title: Compare the explicitly supplied stdout_line
+    capability: independent.shellcommand
+    object: {shell: sh, command: /usr/bin/getconf LONG_BIT, error_if_exit_status_not_0: false, error_if_stderr_exists: false}
+    require:
+      item_requirement: {items_found: one_or_more, items_satisfying: every}
+      field_requirement: {values_found: one_or_more, values_matching: every}
+      fields:
+        stdout_line: {datatype: string, equals: '64'}
+    reported_elements: all
+evaluate: {test: independent-shellcommand-example-test}
+```
+
+### Pass — expected `true` (unverified)
+
+The supplied stdout_line string is '64', so the string equality to "64" matches; the command was not executed for this fixture.
+
+```yaml
+collection_result:
+  id: independent-shellcommand-pass-collection
+  capability: independent.shellcommand
+  status: complete
+  item_refs: [independent-shellcommand-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: independent-shellcommand-pass-item
+  capability: independent.shellcommand
+  status: exists
+  fields:
+    exit_status: {datatype: integer, status: exists, value: 0}
+    stdout_line: {datatype: string, status: exists, value: '64'}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/independent.shellcommand.pass.yaml).
+
+### Fail — expected `false` (unverified)
+
+The supplied stdout_line string is '32', so the string equality to "64" does not match; the command was not executed for this fixture.
+
+```yaml
+collection_result:
+  id: independent-shellcommand-fail-collection
+  capability: independent.shellcommand
+  status: complete
+  item_refs: [independent-shellcommand-fail-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: independent-shellcommand-fail-item
+  capability: independent.shellcommand
+  status: exists
+  fields:
+    exit_status: {datatype: integer, status: exists, value: 0}
+    stdout_line: {datatype: string, status: exists, value: '32'}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/independent.shellcommand.fail.yaml).
+
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `independent-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.
