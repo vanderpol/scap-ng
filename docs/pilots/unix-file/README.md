@@ -2,7 +2,7 @@
 
 Issue [#38](https://github.com/vanderpol/scap-ng/issues/38). **Proposed annotation placement, for owner review; not an installed schema pack.** Single-capability demonstration only.
 
-Read the [generated reference](reference.md). Its field meanings come from JSON Schema `description` properties in [the proposed overlay](unix-file.annotations.schema.json), not a Markdown template or descriptive metadata sidecar. The renderer supplies layout and labels; pinned JSON Schemas supply types, enumerations, defaults and structural relationships. Capability metadata is used only to audit field identity and provenance; its datatype lists and selector alternatives do not drive the reference. Examples also live in standard JSON Schema `examples` annotations. The source map contains locations, hashes and review dispositions, not a second copy of the field descriptions.
+Read the [generated reference](reference.md), [advanced constraints](constraints.md), and [concrete canonical integration proposal](CANONICAL-INTEGRATION.md). Its field meanings come from JSON Schema `description` properties in [the proposed overlay](unix-file.annotations.schema.json), not a Markdown template or descriptive metadata sidecar. The renderer supplies layout and labels; pinned JSON Schemas supply types, enumerations, defaults and structural relationships. Capability metadata is used only to audit field identity and provenance; its datatype lists and selector alternatives do not drive the reference. Examples also live in standard JSON Schema `examples` annotations. The source map contains locations, hashes and review dispositions, not a second copy of the field descriptions.
 
 ## Reproduce
 
@@ -33,7 +33,7 @@ The frozen collected Item and Require field maps use `additionalProperties`; the
 
 This is an explicit schema mechanism for review, not an accepted new grammar or hidden documentation metadata platform. Frozen files under `schema/` are byte-identical to base commit `7354a24cdbfe18321153ccaef5d772801a10cd71`; all 145 JSON file hashes are checked before rendering.
 
-**Recommended owner decision before adoption:** approve capability-scoped annotation schemas with one shared field-meaning definition, then decide how a future pack selects them by Test/Item capability. Alternative: materialize named capability-specific Object/Item/Require definitions in a future schema version. The overlay avoids duplicating meaning and validation rules; materialized definitions may simplify editor dispatch but require a larger reviewed schema/generator change. Neither integration is implemented here. This pilot does not propose altering frozen 0.4.0 bytes.
+The [canonical integration proposal](CANONICAL-INTEGRATION.md) now supplies executable next-pack capability, Assessment-dispatch and Item-dispatch schemas. It recommends moving descriptions and datatype contracts into those canonical nodes after approval, retiring the transitional overlay. The exact validation tightening and remaining integration routes are documented separately; no candidate is installed in the frozen pack.
 
 ## Comparison with PR #37
 
@@ -41,9 +41,9 @@ Presentation baseline: PR #37 head `5e6c49d0a34b3b5380d753fa0142037e494275bd`; i
 
 | Baseline feature | Generated pilot |
 | --- | --- |
-| Five resource/control rows | Same exact names; actual schema `oneOf` (Object reference / inline Object) at parent level |
+| Five resource/control rows | Short meanings; technical choices and shared predicate links moved to advanced constraints |
 | Nested traversal | One parent row, two child rows, exact required children and vocabulary |
-| 23 Item fields | Same field set and order; generic typed-value/array relationship directly from the Item schema |
+| 23 Item fields | Same field set and order; generic typed-value/array details accessible in advanced constraints |
 | Require | One shared-grammar statement/link; shared control descriptions available to the harness |
 | Behavior | Short table; neutral unresolved-runtime notes; historical rules not promoted |
 | Illustration | One nested YAML excerpt generated from schema `examples`; examples and displayed fragments validate; no scan |
@@ -54,15 +54,17 @@ Source-name translations and historical defaults no longer clutter the user refe
 
 ### Frozen-schema structural gaps
 
-The canonical Object schema does not encode the metadata's `filepath` versus `path` + `filename` selector pairing as a schema alternative. Its actual `oneOf` is Object reference versus inline Object. The generated reference now shows that actual hierarchy rather than presenting a metadata relationship as schema structure.
+The canonical Object schema does not encode the metadata's `filepath` versus `path` + `filename` selector pairing as a schema alternative. Its actual `oneOf` is Object reference versus inline Object. The advanced reference shows that actual hierarchy rather than presenting a metadata relationship as schema structure.
 
-Similarly, the collected Item schema permits a typed value or an array of typed values for every field, with a free-form string datatype tag. It does not encode capability-specific datatype constraints. The reference therefore shows the generic field-value shape and links its canonical definition; the former per-field datatype column is removed. Adding named datatype constraints or selector alternatives would be a grammar change requiring separate approval. This pilot makes neither change.
+Similarly, the collected Item schema permits a typed value or an array of typed values for every field, with a free-form string datatype tag. It does not encode capability-specific datatype constraints. The advanced reference shows the generic field-value shape and links its canonical definition. The separate next-schema proposal demonstrates named datatype constraints for review; they do not alter frozen grammar. Selector pairing remains a separate gap.
 
 The renderer follows native `$ref` and `allOf` for the small scalar/control definitions it renders and retains `oneOf`/`anyOf` boundaries. Complex shared selector/predicate definitions remain canonical schema links rather than being flattened into a partial operator grammar. This is a bounded renderer, not a complete JSON Schema documentation engine. All capabilities beyond `unix.file` remain out of scope.
 
 ## Evidence and limits
 
-- Seven focused tests cover the annotation-only structural invariant, 35 independent valid/invalid acceptance vectors, shared Item/Require hover origins, all 23 rendered fields, minimal YAML shape, exact-byte regeneration, drift rejection and fail-closed mapping/pin checks.
+Four additional next-schema tests check all 23 canonical bindings, deterministic candidate generation, capability dispatch and the proposed acceptance delta. They do not qualify new grammar as approved.
+
+- Seven focused reference tests cover the annotation-only structural invariant, 35 independent valid/invalid acceptance vectors, shared Item/Require hover origins, all 23 rendered fields, minimal YAML shape, exact-byte regeneration, drift rejection and fail-closed mapping/pin checks.
 - Both frozen and proposed validators receive the same vectors and expected results. One intentionally counterintuitive vector records existing acceptance of an integer-tagged Item field with a string value: datatype/value consistency is outside that frozen structural check. Named annotation properties also preserve acceptance of future/unknown Item and Require field names.
 - Synthetic schema-keyword and example mutations drive the corresponding output. A re-pinned metadata-only datatype/alternative mutation leaves output unchanged, demonstrating that there is no parallel documentation model. A description mutation changes generated text; missing/unknown mappings and missing provenance cause explicit errors. CI discovers the focused tests through the existing workflow; no new upload workflow is introduced.
 - No runtime, scanner equivalence, compiler/converter or release-readiness claim. Role selection in a real editor and adoption of any semantic interpretation require separate review.

@@ -6,30 +6,26 @@ Select filesystem entries and collect their metadata for comparison.
 
 ## Object
 
-Schema choice (`oneOf`): `object_reference`: string; minimum length: 1; maximum length: 64; pattern: ^[a-z0-9]+(?:-[a-z0-9]+)*-object$ **or** inline object.
+[Advanced schema constraints](constraints.md).
 
-### Inline Object
+| Field | Meaning |
+| --- | --- |
+| `filepath` | Full path of the selected entry. |
+| `path` | Directory containing the selected entry. |
+| `filename` | Entry name within the selected directory; null selects the directory itself. |
+| `filesystem` | Filesystem scope: all, local, or the starting filesystem (same). |
+| `traversal` | Controls recursive searching through directories and symbolic links. |
 
-| Field | Meaning | Schema constraints / suggestions |
+### `traversal`
+
+When present, required children: `max_depth`, `recurse`.
+
+| Field | Meaning | Values |
 | --- | --- | --- |
-| `filepath` | Full path of the selected entry. | [unix_file_filepath_selector](../../../schema/native-selector.schema.json#/$defs/unix_file_filepath_selector) |
-| `path` | Directory containing the selected entry. | [unix_file_path_selector](../../../schema/native-selector.schema.json#/$defs/unix_file_path_selector) |
-| `filename` | Entry name within the selected directory; null selects the directory itself. | oneOf([unix_file_filename_selector](../../../schema/native-selector.schema.json#/$defs/unix_file_filename_selector) or null) |
-| `filesystem` | Filesystem scope: all, local, or the starting filesystem (same). | string; values: `all`, `local`, `same`; authoring suggestion: `local`; serialize explicitly; no runtime fallback |
-| `traversal` | Controls recursive searching through directories and symbolic links. | object; required children: `max_depth`, `recurse` |
-
-#### `traversal`
-
-| Field | Meaning | Schema constraints / suggestions |
-| --- | --- | --- |
-| `max_depth` | Maximum downward recursion depth; 0 includes only the starting directory. | Required; oneOf(integer; minimum: 0 or value: `unlimited`); authoring suggestion: `unlimited`; serialize explicitly; no runtime fallback |
-| `recurse` | Entry types to follow during recursion. | Required; string; values: `directories`, `symlinks`, `symlinks_and_directories`; minimum length: 1; authoring suggestion: `symlinks_and_directories`; serialize explicitly; no runtime fallback |
+| `max_depth` | Maximum downward recursion depth; 0 includes only the starting directory. | integer ≥ 0 or `unlimited` |
+| `recurse` | Entry types to follow during recursion. | `directories`, `symlinks`, `symlinks_and_directories` |
 
 ## Collected Item
-
-### `fields`
-
-Each field value: oneOf([typed_value](../../../schema/result-types.schema.json#/$defs/typed_value) or array; entries: [typed_value](../../../schema/result-types.schema.json#/$defs/typed_value)).
 
 | Field | Meaning |
 | --- | --- |
@@ -74,24 +70,14 @@ Illustrative Object → collected Item fields excerpt; not an executed scan:
 
 ```yaml
 object:
-  path:
-    equals: /example
-  filename:
-    equals: config
+  path: {equals: /example}
+  filename: {equals: config}
   filesystem: all
-  traversal:
-    max_depth: 1
-    recurse: directories
+  traversal: {max_depth: 1, recurse: directories}
 # → Item fields excerpt:
 fields:
-  full_path:
-    datatype: string
-    status: exists
-    value: /example/config
-  owner_uid:
-    datatype: integer
-    status: exists
-    value: 1000
+  full_path: {datatype: string, status: exists, value: /example/config}
+  owner_uid: {datatype: integer, status: exists, value: 1000}
 ```
 
 ## Sources

@@ -1,0 +1,1019 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Review-only next-schema proposal. next is an unassigned version placeholder. Not installed; frozen 0.4 primitives are reused to isolate the proposed delta.",
+  "$id": "https://scap-ng.dev/schema/next/capabilities/unix.file.schema.json",
+  "$defs": {
+    "field_meanings": {
+      "description": "Permission bits do not establish effective access; link/target metadata, cycle handling and mount classification are not yet specified.",
+      "properties": {
+        "full_path": {
+          "description": "Full path of the collected entry."
+        },
+        "directory": {
+          "description": "Directory component of the collected path."
+        },
+        "name": {
+          "description": "Entry name without the directory; directory-only representation is not yet specified."
+        },
+        "type": {
+          "description": "Kind of filesystem entry; value labels are not yet specified."
+        },
+        "owner_uid": {
+          "description": "Numeric user ID of the owner."
+        },
+        "owner_gid": {
+          "description": "Numeric group ID of the owning group."
+        },
+        "size": {
+          "description": "File size; unit is not yet specified."
+        },
+        "access_time": {
+          "description": "Last data-access time; unit and resolution are not yet specified."
+        },
+        "change_time": {
+          "description": "Last inode-status change, not creation time; unit and resolution are not yet specified."
+        },
+        "modify_time": {
+          "description": "Last content-modification time; unit and resolution are not yet specified."
+        },
+        "setuid": {
+          "description": "Set-user-ID permission flag."
+        },
+        "setgid": {
+          "description": "Set-group-ID permission flag."
+        },
+        "sticky": {
+          "description": "Sticky/restricted-deletion flag."
+        },
+        "owner_read": {
+          "description": "Whether the owner-read permission bit is set."
+        },
+        "owner_write": {
+          "description": "Whether the owner-write permission bit is set."
+        },
+        "owner_execute": {
+          "description": "Whether the owner-execute/search permission bit is set."
+        },
+        "group_read": {
+          "description": "Whether the group-read permission bit is set."
+        },
+        "group_write": {
+          "description": "Whether the group-write permission bit is set."
+        },
+        "group_execute": {
+          "description": "Whether the group-execute/search permission bit is set."
+        },
+        "other_read": {
+          "description": "Whether the other-read permission bit is set."
+        },
+        "other_write": {
+          "description": "Whether the other-write permission bit is set."
+        },
+        "other_execute": {
+          "description": "Whether the other-execute/search permission bit is set."
+        },
+        "has_extended_acl": {
+          "description": "Whether ACL permissions differ from standard UNIX permissions; unsupported-ACL handling is not yet specified."
+        }
+      }
+    },
+    "datatype_boolean": {
+      "const": "boolean"
+    },
+    "datatype_integer": {
+      "const": "integer"
+    },
+    "datatype_string": {
+      "const": "string"
+    },
+    "value_full_path": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "value_directory": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "value_name": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "value_type": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "value_owner_uid": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_integer"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "value_owner_gid": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_integer"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "value_size": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_integer"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "value_access_time": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_integer"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "value_change_time": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_integer"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "value_modify_time": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_integer"
+        },
+        "value": {
+          "type": "integer"
+        }
+      }
+    },
+    "value_setuid": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_setgid": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_sticky": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_owner_read": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_owner_write": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_owner_execute": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_group_read": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_group_write": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_group_execute": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_other_read": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_other_write": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_other_execute": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "value_has_extended_acl": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value",
+      "properties": {
+        "datatype": {
+          "$ref": "#/$defs/datatype_boolean"
+        },
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "item_fields": {
+      "properties": {
+        "full_path": {
+          "$ref": "#/$defs/field_meanings/properties/full_path",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_full_path"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_full_path"
+              }
+            }
+          ]
+        },
+        "directory": {
+          "$ref": "#/$defs/field_meanings/properties/directory",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_directory"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_directory"
+              }
+            }
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/field_meanings/properties/name",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_name"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_name"
+              }
+            }
+          ]
+        },
+        "type": {
+          "$ref": "#/$defs/field_meanings/properties/type",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_type"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_type"
+              }
+            }
+          ]
+        },
+        "owner_uid": {
+          "$ref": "#/$defs/field_meanings/properties/owner_uid",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_owner_uid"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_owner_uid"
+              }
+            }
+          ]
+        },
+        "owner_gid": {
+          "$ref": "#/$defs/field_meanings/properties/owner_gid",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_owner_gid"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_owner_gid"
+              }
+            }
+          ]
+        },
+        "size": {
+          "$ref": "#/$defs/field_meanings/properties/size",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_size"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_size"
+              }
+            }
+          ]
+        },
+        "access_time": {
+          "$ref": "#/$defs/field_meanings/properties/access_time",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_access_time"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_access_time"
+              }
+            }
+          ]
+        },
+        "change_time": {
+          "$ref": "#/$defs/field_meanings/properties/change_time",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_change_time"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_change_time"
+              }
+            }
+          ]
+        },
+        "modify_time": {
+          "$ref": "#/$defs/field_meanings/properties/modify_time",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_modify_time"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_modify_time"
+              }
+            }
+          ]
+        },
+        "setuid": {
+          "$ref": "#/$defs/field_meanings/properties/setuid",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_setuid"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_setuid"
+              }
+            }
+          ]
+        },
+        "setgid": {
+          "$ref": "#/$defs/field_meanings/properties/setgid",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_setgid"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_setgid"
+              }
+            }
+          ]
+        },
+        "sticky": {
+          "$ref": "#/$defs/field_meanings/properties/sticky",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_sticky"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_sticky"
+              }
+            }
+          ]
+        },
+        "owner_read": {
+          "$ref": "#/$defs/field_meanings/properties/owner_read",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_owner_read"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_owner_read"
+              }
+            }
+          ]
+        },
+        "owner_write": {
+          "$ref": "#/$defs/field_meanings/properties/owner_write",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_owner_write"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_owner_write"
+              }
+            }
+          ]
+        },
+        "owner_execute": {
+          "$ref": "#/$defs/field_meanings/properties/owner_execute",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_owner_execute"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_owner_execute"
+              }
+            }
+          ]
+        },
+        "group_read": {
+          "$ref": "#/$defs/field_meanings/properties/group_read",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_group_read"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_group_read"
+              }
+            }
+          ]
+        },
+        "group_write": {
+          "$ref": "#/$defs/field_meanings/properties/group_write",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_group_write"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_group_write"
+              }
+            }
+          ]
+        },
+        "group_execute": {
+          "$ref": "#/$defs/field_meanings/properties/group_execute",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_group_execute"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_group_execute"
+              }
+            }
+          ]
+        },
+        "other_read": {
+          "$ref": "#/$defs/field_meanings/properties/other_read",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_other_read"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_other_read"
+              }
+            }
+          ]
+        },
+        "other_write": {
+          "$ref": "#/$defs/field_meanings/properties/other_write",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_other_write"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_other_write"
+              }
+            }
+          ]
+        },
+        "other_execute": {
+          "$ref": "#/$defs/field_meanings/properties/other_execute",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_other_execute"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_other_execute"
+              }
+            }
+          ]
+        },
+        "has_extended_acl": {
+          "$ref": "#/$defs/field_meanings/properties/has_extended_acl",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/value_has_extended_acl"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/value_has_extended_acl"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "object": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/native-selector.schema.json#/$defs/unix_file_object",
+      "description": "Select filesystem entries and collect their metadata for comparison.",
+      "properties": {
+        "filepath": {
+          "description": "Full path of the selected entry."
+        },
+        "path": {
+          "description": "Directory containing the selected entry."
+        },
+        "filename": {
+          "description": "Entry name within the selected directory; null selects the directory itself."
+        },
+        "filesystem": {
+          "description": "Filesystem scope: all, local, or the starting filesystem (same)."
+        },
+        "traversal": {
+          "description": "Controls recursive searching through directories and symbolic links.",
+          "properties": {
+            "max_depth": {
+              "description": "Maximum downward recursion depth; 0 includes only the starting directory."
+            },
+            "recurse": {
+              "description": "Entry types to follow during recursion."
+            }
+          }
+        }
+      },
+      "examples": [
+        {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all",
+          "traversal": {
+            "max_depth": 1,
+            "recurse": "directories"
+          }
+        }
+      ]
+    },
+    "item": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/collected-item.schema.json",
+      "description": "Nonexistent Items are omitted; collection absence/errors and field statuses remain separate, with detailed error propagation not yet specified.",
+      "properties": {
+        "capability": {
+          "const": "unix.file"
+        },
+        "fields": {
+          "$ref": "#/$defs/item_fields"
+        }
+      },
+      "examples": [
+        {
+          "id": "example",
+          "capability": "unix.file",
+          "status": "exists",
+          "fields": {
+            "full_path": {
+              "datatype": "string",
+              "status": "exists",
+              "value": "/example/config"
+            },
+            "owner_uid": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 1000
+            }
+          },
+          "provenance": {}
+        }
+      ]
+    },
+    "require": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/test/properties/require",
+      "description": "Compare the collected fields using their declared datatypes and the shared Item/field cardinality rules.",
+      "properties": {
+        "item_requirement": {
+          "description": "Independent requirements for the number of selected Items and the number satisfying the comparison.",
+          "properties": {
+            "items_found": {
+              "description": "Required cardinality of selected Items."
+            },
+            "items_satisfying": {
+              "description": "Required cardinality of Items satisfying the comparison."
+            }
+          }
+        },
+        "field_requirement": {
+          "description": "Explicit shared values_found/values_matching pair; a closer complete pair overrides it without runtime defaults."
+        },
+        "fields": {
+          "$ref": "#/$defs/require_fields"
+        },
+        "and": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "or": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "one": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "xor": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+    "require_fields": {
+      "description": "One complete condition; distinct field predicates are combined with logical AND.",
+      "properties": {
+        "full_path": {
+          "$ref": "#/$defs/field_meanings/properties/full_path",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_string"
+            }
+          }
+        },
+        "directory": {
+          "$ref": "#/$defs/field_meanings/properties/directory",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_string"
+            }
+          }
+        },
+        "name": {
+          "$ref": "#/$defs/field_meanings/properties/name",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_string"
+            }
+          }
+        },
+        "type": {
+          "$ref": "#/$defs/field_meanings/properties/type",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_string"
+            }
+          }
+        },
+        "owner_uid": {
+          "$ref": "#/$defs/field_meanings/properties/owner_uid",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_integer"
+            }
+          }
+        },
+        "owner_gid": {
+          "$ref": "#/$defs/field_meanings/properties/owner_gid",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_integer"
+            }
+          }
+        },
+        "size": {
+          "$ref": "#/$defs/field_meanings/properties/size",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_integer"
+            }
+          }
+        },
+        "access_time": {
+          "$ref": "#/$defs/field_meanings/properties/access_time",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_integer"
+            }
+          }
+        },
+        "change_time": {
+          "$ref": "#/$defs/field_meanings/properties/change_time",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_integer"
+            }
+          }
+        },
+        "modify_time": {
+          "$ref": "#/$defs/field_meanings/properties/modify_time",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_integer"
+            }
+          }
+        },
+        "setuid": {
+          "$ref": "#/$defs/field_meanings/properties/setuid",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "setgid": {
+          "$ref": "#/$defs/field_meanings/properties/setgid",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "sticky": {
+          "$ref": "#/$defs/field_meanings/properties/sticky",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "owner_read": {
+          "$ref": "#/$defs/field_meanings/properties/owner_read",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "owner_write": {
+          "$ref": "#/$defs/field_meanings/properties/owner_write",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "owner_execute": {
+          "$ref": "#/$defs/field_meanings/properties/owner_execute",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "group_read": {
+          "$ref": "#/$defs/field_meanings/properties/group_read",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "group_write": {
+          "$ref": "#/$defs/field_meanings/properties/group_write",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "group_execute": {
+          "$ref": "#/$defs/field_meanings/properties/group_execute",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "other_read": {
+          "$ref": "#/$defs/field_meanings/properties/other_read",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "other_write": {
+          "$ref": "#/$defs/field_meanings/properties/other_write",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "other_execute": {
+          "$ref": "#/$defs/field_meanings/properties/other_execute",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        },
+        "has_extended_acl": {
+          "$ref": "#/$defs/field_meanings/properties/has_extended_acl",
+          "properties": {
+            "datatype": {
+              "$ref": "#/$defs/datatype_boolean"
+            }
+          }
+        }
+      }
+    },
+    "condition": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_inherited_condition",
+      "properties": {
+        "fields": {
+          "$ref": "#/$defs/require_fields"
+        },
+        "and": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "or": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "one": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        },
+        "xor": {
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+    "test": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/test",
+      "properties": {
+        "capability": {
+          "const": "unix.file"
+        },
+        "object": {
+          "$ref": "#/$defs/object"
+        },
+        "require": {
+          "$ref": "#/$defs/require"
+        }
+      }
+    }
+  }
+}

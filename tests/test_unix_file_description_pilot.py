@@ -116,12 +116,16 @@ class UnixFileDescriptionPilot(unittest.TestCase):
         item_table = text.split('## Collected Item')[1].split('## Require')[0]
         self.assertEqual(set(re.findall(r'^\| `([^`]+)`', item_table, re.M)), set(self.mapping['state_field_map'].values()))
         self.assertIn('| `traversal` | Controls recursive searching', text)
-        self.assertIn('#### `traversal`', text)
+        self.assertIn('### `traversal`', text)
         self.assertNotIn('in `traversal`', text)
-        self.assertIn('Schema choice (`oneOf`): `object_reference`:', text)
-        self.assertIn('**or** inline object', text)
+        advanced = pilot.render_constraints()
+        self.assertIn('Schema choice (`oneOf`): `object_reference`:', advanced)
+        self.assertIn('**or** inline object', advanced)
+        self.assertNotIn('minimum length', text)
+        self.assertNotIn('authoring suggestion', text)
+        self.assertIn('[Advanced schema constraints](constraints.md)', text)
         self.assertNotIn('`filepath` **or** `path` + `filename`', text)
-        self.assertIn('array; entries: [typed_value]', text)
+        self.assertIn('array; entries: [typed_value]', advanced)
         visible = re.sub(r'\]\([^)]+\)', ']', text)
         self.assertEqual(visible.count('OVAL'), 1)
         self.assertIn('Based on the OVAL', text.split('## Sources')[1])
@@ -171,6 +175,7 @@ class UnixFileDescriptionPilot(unittest.TestCase):
 
     def test_generation_is_exact_and_rejects_stale_output(self):
         self.assertEqual((ROOT / pilot.OUTPUT).read_bytes(), pilot.render().encode())
+        self.assertEqual((ROOT / pilot.ADVANCED).read_bytes(), pilot.render_constraints().encode())
         first = subprocess.check_output([sys.executable, str(ROOT / 'tools/generate_unix_file_reference.py'), '--hover', 'item.fields.owner_uid'])
         second = subprocess.check_output([sys.executable, str(ROOT / 'tools/generate_unix_file_reference.py'), '--hover', 'item.fields.owner_uid'])
         self.assertEqual(first, second)
