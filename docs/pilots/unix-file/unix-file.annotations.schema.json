@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/proposals/issue38/unix-file.schema.json",
+  "$comment": "Proposed documentation-only overlay. Not part of the frozen pack; select a role explicitly. Descriptions do not add validation constraints.",
+  "$defs": {
+    "object": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/native-selector.schema.json#/$defs/unix_file_object",
+      "description": "Select filesystem entries and collect their metadata for comparison.",
+      "properties": {
+        "filepath": {
+          "description": "Full path of the selected entry."
+        },
+        "path": {
+          "description": "Directory containing the selected entry."
+        },
+        "filename": {
+          "description": "Entry name within the selected directory; null selects the directory itself."
+        },
+        "filesystem": {
+          "description": "Filesystem scope: all, local, or the starting filesystem (same)."
+        },
+        "traversal": {
+          "description": "Controls recursive searching through directories and symbolic links.",
+          "properties": {
+            "max_depth": {
+              "description": "Maximum downward recursion depth; 0 includes only the starting directory."
+            },
+            "recurse": {
+              "description": "Entry types to follow during recursion."
+            }
+          }
+        }
+      }
+    },
+    "field_meanings": {
+      "description": "Permission bits do not establish effective access; link/target metadata, cycle handling and mount classification are not yet specified.",
+      "properties": {
+        "full_path": {
+          "description": "Full path of the collected entry."
+        },
+        "directory": {
+          "description": "Directory component of the collected path."
+        },
+        "name": {
+          "description": "Entry name without the directory; directory-only representation is not yet specified."
+        },
+        "type": {
+          "description": "Kind of filesystem entry; value labels are not yet specified."
+        },
+        "owner_uid": {
+          "description": "Numeric user ID of the owner."
+        },
+        "owner_gid": {
+          "description": "Numeric group ID of the owning group."
+        },
+        "size": {
+          "description": "File size; unit is not yet specified."
+        },
+        "access_time": {
+          "description": "Last data-access time; unit and resolution are not yet specified."
+        },
+        "change_time": {
+          "description": "Last inode-status change, not creation time; unit and resolution are not yet specified."
+        },
+        "modify_time": {
+          "description": "Last content-modification time; unit and resolution are not yet specified."
+        },
+        "setuid": {
+          "description": "Set-user-ID permission flag."
+        },
+        "setgid": {
+          "description": "Set-group-ID permission flag."
+        },
+        "sticky": {
+          "description": "Sticky/restricted-deletion flag."
+        },
+        "owner_read": {
+          "description": "Whether the owner-read permission bit is set."
+        },
+        "owner_write": {
+          "description": "Whether the owner-write permission bit is set."
+        },
+        "owner_execute": {
+          "description": "Whether the owner-execute/search permission bit is set."
+        },
+        "group_read": {
+          "description": "Whether the group-read permission bit is set."
+        },
+        "group_write": {
+          "description": "Whether the group-write permission bit is set."
+        },
+        "group_execute": {
+          "description": "Whether the group-execute/search permission bit is set."
+        },
+        "other_read": {
+          "description": "Whether the other-read permission bit is set."
+        },
+        "other_write": {
+          "description": "Whether the other-write permission bit is set."
+        },
+        "other_execute": {
+          "description": "Whether the other-execute/search permission bit is set."
+        },
+        "has_extended_acl": {
+          "description": "Whether ACL permissions differ from standard UNIX permissions; unsupported-ACL handling is not yet specified."
+        }
+      }
+    },
+    "item": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/collected-item.schema.json",
+      "description": "Nonexistent Items are omitted; collection absence/errors and field statuses remain separate, with detailed error propagation not yet specified.",
+      "properties": {
+        "fields": {
+          "$ref": "#/$defs/field_meanings"
+        }
+      }
+    },
+    "require": {
+      "$ref": "https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement",
+      "description": "Compare the collected fields using their declared datatypes and the shared Item/field cardinality rules.",
+      "properties": {
+        "item_requirement": {
+          "description": "Independent requirements for the number of selected Items and the number satisfying the comparison.",
+          "properties": {
+            "items_found": {
+              "description": "Required cardinality of selected Items."
+            },
+            "items_satisfying": {
+              "description": "Required cardinality of Items satisfying the comparison."
+            }
+          }
+        },
+        "field_requirement": {
+          "description": "Explicit shared values_found/values_matching pair; a closer complete pair overrides it without runtime defaults."
+        },
+        "fields": {
+          "$ref": "#/$defs/field_meanings",
+          "description": "One complete condition; distinct field predicates are combined with logical AND."
+        }
+      }
+    }
+  }
+}
