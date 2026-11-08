@@ -365,7 +365,11 @@ def render(root=ROOT):
         occurrence = property_occurrences(field_map, uri, name, root) + ' key'
         if len(common_values) != 1:
             occurrence += '; ' + values + ' values'
-        lines.append(table_row(code(name), kind, occurrence, meaning('item', 'fields.' + name)))
+        payload = child(defs['value_' + name], uri, 'value', root)
+        vocabulary = options(payload, uri, root)
+        if len(vocabulary) > 100:
+            vocabulary = '[Payload constraints](constraints.md).'
+        lines.append(table_row(code(name), kind, occurrence, meaning('item', 'fields.' + name) + ' ' + vocabulary))
     context = {'item_requirement': {'items_found': 'one_or_more', 'items_satisfying': 'every'}, 'field_requirement': {'values_found': 'one_or_more', 'values_matching': 'every'}, 'fields': {'owner_uid': {'equals': 1000}}}
     lines += ['', '## Require', '', meaning('require'), '',
               'For comparison Tests, in the selected requirement context; existence-only Tests use the [shared Item-presence requirement](../../../schema/assessment-language.schema.json#/$defs/item_presence_requirement).', '',
@@ -432,6 +436,15 @@ def render_constraints(root=ROOT):
         tag = next(p['const'] for p in parts(value['properties']['datatype'], uri, root) if 'const' in p)
         kind, count = item_shape(child(field_map, uri, name, root), uri, root)
         lines.append(table_row(code(name), code(tag), kind, count))
+    vocabulary = []
+    for name in defs['field_meanings']['properties']:
+        payload = child(defs['value_' + name], uri, 'value', root)
+        for p in parts(payload, uri, root):
+            facts = {k: p[k] for k in ['enum', 'default', 'minimum', 'maximum', 'pattern', 'minLength', 'maxLength'] if k in p}
+            if facts:
+                vocabulary.append(table_row(code(name), code(json.dumps(facts))))
+    if vocabulary:
+        lines += ['', '## Payload constraints', '', '| Field | Schema keywords |', '| --- | --- |'] + vocabulary
     lines += ['', 'These next-version assertions intentionally reject datatype/value inconsistencies accepted structurally by frozen 0.4.0. [Before/after vectors and integration limits](CANONICAL-INTEGRATION.md). No new bound or selector-pairing assertion is added by rendering.', '',
               '## Defaults and unresolved behavior', '',
               'Schema `default` is an annotation, not automatic value insertion. Existing new-authoring controls require explicit serialization and preservation of overrides. No runtime fallback is inferred. Missing descriptions/types/bounds or unsupported structures produce errors or `unspecified`/`conditional`, not historical defaults.', '']
@@ -441,7 +454,7 @@ def render_constraints(root=ROOT):
 def render_parity(root=ROOT):
     schema, sources, *_ = load_schemas(root)
     lines = ['# `unix.file`: parity and exact-pointer gaps', '', '<!-- Generated checklist; historical rows are coverage evidence, never native assertions. -->', '',
-             'Compared row-by-row with both fetched 5.12.3 Read the Docs pages and the pinned XSDs. URLs are mutable; full-page and section hashes identify the reviewed bytes in [source-map.json](source-map.json). Regeneration is offline.', '',
+             'Compared row-by-row with both fetched 5.12.3 Read the Docs pages and pinned XSDs. Status denotes coverage in the proposal, not acceptance of new runtime semantics. URLs are mutable; [source hashes](source-map.json) identify reviewed bytes. Regeneration is offline.', '',
              '| Coverage | Status | Native location / gap |', '| --- | --- | --- |']
     for name in schema['$defs']['object']['properties']:
         lines.append(table_row('Object `' + name + '`', 'present', '/$defs/object/properties/' + name + '; traversal children retain their parent'))
@@ -450,6 +463,9 @@ def render_parity(root=ROOT):
     lines.append(table_row('Object behaviors/filter inheritance', 'intentionally shared/link-only', 'behaviors split into traversal/filesystem; filters and Set shapes stay in native-selector.schema.json#/$defs/unix_file_object'))
     reverse = {record['source_field']: path.rsplit('/', 1)[-1] for path, record in sources['descriptions'].items() if 'source_field' in record}
     unresolved = {'name': 'directory-only representation unspecified', 'type': 'file-kind labels/enum unspecified', 'size': 'unit unspecified', 'access_time': 'time unit/resolution unspecified', 'change_time': 'time unit/resolution unspecified', 'modify_time': 'time unit/resolution unspecified', 'has_extended_acl': 'unsupported-ACL/status mapping unspecified'}
+    kind_payload = child(schema['$defs']['value_type'], schema['$id'], 'value', root)
+    if any('enum' in p for p in parts(kind_payload, schema['$id'], root)):
+        unresolved.pop('type', None)
     for row in sources['readthedocs']['items']['rows']:
         name = reverse[row['field']]
         status = 'native-undecided' if name in unresolved else 'present'
@@ -460,7 +476,7 @@ def render_parity(root=ROOT):
         ('Traversal eligibility', 'native-undecided', '/$defs/object/properties/traversal; mapping rules use collected names full_path/directory, so authored-selector binding remains unresolved'),
         ('Directory permissions', 'native-undecided', '/$defs/value_owner_read/description: bit flags do not establish directory effective-access/search semantics'),
         ('Links / filesystem classification', 'native-undecided', '/$defs/object/properties/filesystem: link/target, cycles and local/same classification unresolved'),
-        ('Units / file-kind vocabulary', 'native-undecided', '/$defs/value_size/properties/value; /$defs/value_access_time/properties/value; /$defs/value_change_time/properties/value; /$defs/value_modify_time/properties/value lack units; /$defs/value_type/properties/value lacks enum'),
+        ('Units', 'native-undecided', '/$defs/value_size/properties/value; /$defs/value_access_time/properties/value; /$defs/value_change_time/properties/value; /$defs/value_modify_time/properties/value lack units'),
         ('Absence / partial errors', 'native-undecided', '/$defs/item/description: no synthetic missing Item; detailed propagation remains unspecified'),
         ('Inherited Object/Item/Test/predicates', 'intentionally shared/link-only', '/$defs/object, /$defs/item, /$defs/test and /$defs/require reference canonical shared definitions'),
         ('Require named fields and groups', 'present', '/$defs/require_fields and /$defs/condition: generic map plus known optional keys; not a new whitelist'),

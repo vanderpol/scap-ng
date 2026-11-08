@@ -86,6 +86,7 @@ class CardinalityAndParity(unittest.TestCase):
             changed = deepcopy(original)
             defs = changed['$defs']
             defs['value_owner_uid']['properties']['value']['type'] = 'number'
+            defs['value_type']['properties']['value']['enum'] = ['regular', 'directory']
             defs['item_fields']['required'] = ['owner_uid']
             defs['item_fields']['minProperties'] = 2
             defs['item_fields']['maxProperties'] = 4
@@ -97,6 +98,10 @@ class CardinalityAndParity(unittest.TestCase):
             text, advanced = docs.render(root), docs.render_constraints(root)
             self.assertIn('| `owner_uid` | number | 1..1 key; 1..1 or 2..3 values |', text)
             self.assertIn('dynamic map (2..4 entries)', text)
+            self.assertIn('Kind of filesystem entry. `regular`, `directory`.', text)
+            self.assertIn('Payload constraints', advanced)
+            parity = docs.render_parity(root)
+            self.assertIn('| Item `type` → `type` | present |', parity)
             self.assertIn('Schema default annotation: `all`', text)
             row = next(line for line in text.splitlines() if line.startswith('| `filesystem`'))
             self.assertIn('`all`, `local`', row)

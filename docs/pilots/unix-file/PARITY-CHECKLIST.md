@@ -2,7 +2,7 @@
 
 <!-- Generated checklist; historical rows are coverage evidence, never native assertions. -->
 
-Compared row-by-row with both fetched 5.12.3 Read the Docs pages and the pinned XSDs. URLs are mutable; full-page and section hashes identify the reviewed bytes in [source-map.json](source-map.json). Regeneration is offline.
+Compared row-by-row with both fetched 5.12.3 Read the Docs pages and pinned XSDs. Status denotes coverage in the proposal, not acceptance of new runtime semantics. URLs are mutable; [source hashes](source-map.json) identify reviewed bytes. Regeneration is offline.
 
 | Coverage | Status | Native location / gap |
 | --- | --- | --- |
@@ -43,7 +43,7 @@ Compared row-by-row with both fetched 5.12.3 Read the Docs pages and the pinned 
 | Traversal eligibility | native-undecided | /$defs/object/properties/traversal; mapping rules use collected names full_path/directory, so authored-selector binding remains unresolved |
 | Directory permissions | native-undecided | /$defs/value_owner_read/description: bit flags do not establish directory effective-access/search semantics |
 | Links / filesystem classification | native-undecided | /$defs/object/properties/filesystem: link/target, cycles and local/same classification unresolved |
-| Units / file-kind vocabulary | native-undecided | /$defs/value_size/properties/value; /$defs/value_access_time/properties/value; /$defs/value_change_time/properties/value; /$defs/value_modify_time/properties/value lack units; /$defs/value_type/properties/value lacks enum |
+| Units | native-undecided | /$defs/value_size/properties/value; /$defs/value_access_time/properties/value; /$defs/value_change_time/properties/value; /$defs/value_modify_time/properties/value lack units |
 | Absence / partial errors | native-undecided | /$defs/item/description: no synthetic missing Item; detailed propagation remains unspecified |
 | Inherited Object/Item/Test/predicates | intentionally shared/link-only | /$defs/object, /$defs/item, /$defs/test and /$defs/require reference canonical shared definitions |
 | Require named fields and groups | present | /$defs/require_fields and /$defs/condition: generic map plus known optional keys; not a new whitelist |
