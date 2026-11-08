@@ -5,14 +5,24 @@ Meanings below paraphrase pinned OVAL 5.12.3 in frozen SCAP-NG 0.4 names; notes 
 
 ## Object
 
+Selection form: `filepath` **or** `path` + `filename` ([mapping][mapping]).
+
 | Field | Meaning | Notes / differences |
 | --- | --- | --- |
 | `filepath` | Full path to a file. | OVAL uses an absolute, non-directory path; alternative to `path` + `filename`. |
 | `path` | Directory containing the selected entry. | Used with `filename`. |
 | `filename` | Entry name within that directory. | `null` selects the directory itself; neither an empty string nor `.*`. |
 | `filesystem` | Filesystem scope of collection. | `all`: any; `local`: non-remote; `same`: starting filesystem (OVAL `defined`). |
-| `max_depth` in `traversal` | Maximum downward recursion depth. | Start included at depth `0`; nonnegative bound or `unlimited` (OVAL `-1`). |
-| `recurse` in `traversal` | Which entries recursion follows. | `directories`, `symlinks`, `symlinks_and_directories`; depth and kind are explicit when traversal is present. |
+| `traversal` | Controls recursive searching through directories and symbolic links. | Optional object; both children below are required when present. |
+
+### `traversal`
+
+| Field | Meaning | Allowed values / requirements |
+| --- | --- | --- |
+| `max_depth` | Maximum downward recursion depth. | Required: nonnegative integer or `unlimited` (OVAL `-1`); depth `0` includes the starting directory. |
+| `recurse` | Which entries recursion follows. | Required: `directories`, `symlinks`, `symlinks_and_directories`. |
+
+New-authoring suggestions are `unlimited` and `symlinks_and_directories`. Serialize both explicitly; these are not runtime fallbacks. Preserve source-effective values.
 
 ## Collected Item
 
@@ -54,7 +64,7 @@ Renamed source fields: `filepath/path/filename` → `full_path/directory/name`; 
 
 | Topic | Meaning / caveat |
 | --- | --- |
-| Selection | Choose `filepath` or `path` + `filename`; OVAL collects all UNIX file types, including directories and symbolic links. Native regex token: `matches_regex`. |
+| Selection | OVAL collects all UNIX file types, including directories and symbolic links. Native regex token: `matches_regex`. |
 | Traversal | OVAL recurses only for equality-selected `path`, not `filepath`. Native traversal is downward; deprecated source `up` is not represented. Rule binding uses collected names `full_path`/`directory` and remains undecided. |
 | Sets / filters | Compose collections before comparison; filter State references must use `unix.file`. |
 | Links / boundaries | Native link-versus-target metadata, cycle handling, mount identity and `local`/`same` classification are undecided. |
@@ -68,10 +78,16 @@ Renamed source fields: `filepath/path/filename` → `full_path/directory/name`; 
 Illustrative Object → collected Item fields excerpt; not an executed scan:
 
 ```yaml
-object: {filepath: {equals: /example.conf}, filesystem: all}
+object:
+  path: {equals: /example}
+  filename: {equals: config}
+  filesystem: all
+  traversal:
+    max_depth: 1
+    recurse: directories
 # → Item fields excerpt:
 fields:
-  full_path: {datatype: string, status: exists, value: /example.conf}
+  full_path: {datatype: string, status: exists, value: /example/config}
   owner_uid: {datatype: integer, status: exists, value: 1000}
 ```
 
@@ -79,7 +95,7 @@ fields:
 
 - OVAL 5.12.3, pinned commit `2f140ee5…`: [file Object and State][oval-def], [file Item][oval-item], [FileBehaviors][oval-behaviors], [shared Item/error documentation][oval-status]. Descriptions are paraphrased; OVAL facts are not automatically native requirements.
 - Native [mapping][mapping]: `/native/selector_map`, `/native/state_field_map`, `/native/field_datatypes`, `/semantic_validator_rules`.
-- Native [selector contracts][selectors]: `/resolved/unix.file`; [Object schema][object-schema]: `/$defs/unix_file_object`.
+- Native [selector contracts][selectors]: `/resolved/unix.file`; [Object schema][object-schema]: `/$defs/unix_file_object`; nested control: `/$defs/unix_file_object/oneOf/1/properties/traversal`.
 - Native [file controls][controls]: `/$defs/filesystem_scope`, `/$defs/file_traversal_base`, `/$defs/file_traversal`; [Item][item-schema] and [typed field][field-schema] status shapes.
 
 [oval-def]: https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L167-L462
