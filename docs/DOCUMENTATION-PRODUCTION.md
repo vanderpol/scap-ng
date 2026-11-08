@@ -8,7 +8,7 @@ PR #44 at `b1bdefa6bc07f5e78db7951be92cef9e8414d1df`.
 
 [Reference and platform indexes](reference/README.md) ·
 [Regenerate and maintain](../proposed-schema/README.md) ·
-[Exact command receipt](evidence/documentation-production/checks.json) ·
+[Exact command receipt](evidence/documentation-production/shared-expansion-checks.json) ·
 [Coverage](reference/coverage.json) · [Gaps](reference/gaps.jsonl) ·
 [Duplicate-text inventory](reference/duplicate-descriptions.json).
 
@@ -21,9 +21,9 @@ PR #44 at `b1bdefa6bc07f5e78db7951be92cef9e8414d1df`.
 | Partial draft field-description coverage | 2 capabilities |
 | Documented capability field routes | 1,858 / 1,866 (99.57%) |
 | Unique description owners used by capability routes | 794 |
-| Shared/core named schema nodes documented | 2,445 / 3,020 (80.96%) |
-| Basic shared-reference nodes documented | 981 / 1,449 (67.70%) |
-| Remaining shared-node description gaps | 575 |
+| Shared/core named schema nodes documented | 2,872 / 3,020 (95.10%) |
+| Basic shared-reference nodes documented | 1,378 / 1,449 (95.10%) |
+| Remaining shared-node description gaps | 148 |
 | Basic / advanced / platform reference pages | 139 / 139 / 15 |
 | Generated files, including help and ledgers | 300 |
 | Earlier editorial acceptances preserved exactly | 46 |
@@ -40,7 +40,7 @@ excluded from these coverage denominators.
 unresolved-contract records mean full collection/evaluation behavior has not
 been independently qualified here, not that this work discovered 104 defects.
 New source-derived sentences are draft proposals; prior editorial approval is
-identified separately. The 575 remaining shared gaps stay visible rather than
+identified separately. The 148 remaining shared gaps stay visible rather than
 being filled with field-name boilerplate. When no safe wording is established,
 the ledger explicitly withholds a proposal instead of inventing behavior.
 
@@ -98,7 +98,7 @@ policy description referred to the currently loaded policy. Collection
 parameters describe acquisition controls, and collected audit-policy/right
 fields describe evidence rather than instructing scanners to change the system.
 
-Identical text at 135 groups of distinct pointers is reported for review.
+Identical text at 141 groups of distinct pointers is reported for review.
 Identical wording alone does not establish identical semantics across capability
 contexts. Existing approvals are preserved; shared Item/Require meanings and
 shared grammar explanations already resolve to one owner.
@@ -137,11 +137,33 @@ owners resolve the nine existing holds. Do not expand the debt list to hide new
 undocumented fields. Issue #42 paired examples remain the next phase; existing
 schema example pointers remain available for a generic extension.
 
+## Continued shared-language expansion
+
+After the first tested publication, 427 additional named shared-schema nodes
+received descriptions or explicit links to their description owners. This
+covers Rule/Benchmark authoring, Organizational Inputs, manual procedures,
+result identities, evidence locators, invocation traces, and manifest metadata.
+Corresponding manual-result and Item-report fields reuse existing owners.
+
+The remaining 148 gaps are scoped in the machine ledger: **48 inactive migration
+nodes**, **27 nodes in a helper unreferenced by the Assessment schema**, and
+**73 declared-schema nodes** involving held or insufficiently specified contracts.
+The older helper's unreviewed OVAL-backend wording was removed from the proposed
+schema and replaced by its verified structural scope. The frozen original is
+unchanged. Help metadata carries context scope, with a regression test keeping
+inactive/unreferenced help distinct from retained native concat syntax.
+
+[Read the concrete decision packet](DOCUMENTATION-CONTRACT-DECISIONS.md) for
+remaining completeness/counting, materialization, trace, package entry-point/size,
+and capability-field questions. Recommendations are engineering proposals only.
+The [first 106-test receipt](evidence/documentation-production/checks.json) remains
+unchanged and bound to its earlier manifest; the current receipt is separate.
+
 ## Verification
 
-The [machine receipt](evidence/documentation-production/checks.json) records the
+The [machine receipt](evidence/documentation-production/shared-expansion-checks.json) records the
 exact commands, return codes, package versions, code hashes, manifest hash and
-output aggregate. **106 tests passed** using Python 3.12 with the exact
+output aggregate. **107 tests passed** using Python 3.12 with the exact
 `requirements-dev.txt` dependencies: jsonschema 4.24.0, referencing 0.36.2,
 PyYAML 6.0.3. The seven existing/new generation checks and `git diff --check`
 passed. No alternate test runner was substituted.

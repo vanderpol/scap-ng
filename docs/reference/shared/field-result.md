@@ -8,11 +8,11 @@ Supplied field observations bound to a native require predicate and an exact ret
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `field` | string | 1..1 (required) | **Unresolved description** | [/properties/field](../../../proposed-schema/documentation/field-result.schema.json#/properties/field) |
+| `field` | string | 1..1 (required) | Name of the field described by this observation. | [/properties/field](../../../proposed-schema/documentation/field-result.schema.json#/properties/field) |
 | `require_ref` | string | 1..1 (required) | Canonical RFC6901 location in the owning Assessment; semantic validation must resolve it to a requirement node of this Test. | [/properties/require_ref](../../../proposed-schema/documentation/field-result.schema.json#/properties/require_ref) |
 | `record_ref` | string | 0..1 | Canonical RFC6901 pointer into the retained Item to this exact typed record instance, including array index when multivalued. | [/properties/record_ref](../../../proposed-schema/documentation/field-result.schema.json#/properties/record_ref) |
 | `outcome` | string | 1..1 (required) | Reports whether a Test or Assessment is true, false, errored, unknown, unevaluated, or inapplicable. | [/properties/outcome](../../../proposed-schema/documentation/field-result.schema.json#/properties/outcome) |
-| `operation` | string | Conditional (at most 1) | **Unresolved description** | [/properties/operation](../../../proposed-schema/documentation/field-result.schema.json#/properties/operation) |
+| `operation` | string | Conditional (at most 1) | Comparison operation recorded for this field observation. | [/properties/operation](../../../proposed-schema/documentation/field-result.schema.json#/properties/operation) |
 | `datatype` | string | 0..1 | Datatype used to interpret the value; payload validation and conversion rules are separate constraints. | [/properties/datatype](../../../proposed-schema/documentation/field-result.schema.json#/properties/datatype) |
 | `values_found` | string | Conditional (at most 1) | State field/record existence cardinality. | [/properties/values_found](../../../proposed-schema/documentation/field-result.schema.json#/properties/values_found) |
 | `values_matching` | string | Conditional (at most 1) | Consistent 0.4 authoring cardinality vocabulary. 'every' means all relevant results satisfy the specified comparison; source OVAL lexical values belong in provenance only. | [/properties/values_matching](../../../proposed-schema/documentation/field-result.schema.json#/properties/values_matching) |

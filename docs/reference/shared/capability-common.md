@@ -44,7 +44,7 @@ Pre-alpha reusable authored-Assessment primitives shared by generated capability
 | `literal_collection` | array | Definition | Non-empty ordered literal collection. | [/$defs/literal_collection](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/literal_collection) |
 | `input_reference` | object | Definition | Uses the value of a declared Input. | [/$defs/input_reference](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/input_reference) |
 | `inline_predicate` | object | Definition | A field predicate or logical combination of predicates applied to one collected Item. | [/$defs/inline_predicate](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_predicate) |
-| `authoring_type_resolution` | See schema | Definition | Native 0.4 authoring permits omission of datatype only when a literal and operation unambiguously establish comparison type. | [/$defs/authoring_type_resolution](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/authoring_type_resolution) |
+| `authoring_type_resolution` | See schema | Definition | Retained type-resolution helper. | [/$defs/authoring_type_resolution](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/authoring_type_resolution) |
 
 ## `/$defs/variable_reference`
 
@@ -126,7 +126,7 @@ Pre-alpha reusable authored-Assessment primitives shared by generated capability
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `max_depth` | integer, string | 1..1 (required) | Maximum downward recursion depth; 0 includes only the starting directory. | [/$defs/file_traversal_base/properties/max_depth](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal_base/properties/max_depth) |
-| `recurse` | string | 1..1 (required) | **Unresolved description** | [/$defs/file_traversal_base/properties/recurse](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal_base/properties/recurse) |
+| `recurse` | string | 1..1 (required) | Entry types to follow during recursion. | [/$defs/file_traversal_base/properties/recurse](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/file_traversal_base/properties/recurse) |
 
 ## `/$defs/object_record`
 

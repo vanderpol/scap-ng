@@ -17,19 +17,25 @@
   "properties": {
     "rule_id": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Identifier of the Rule being reported.",
+      "x-doc-status": "native-structure-derived"
     },
     "title": {
       "type": [
         "string",
         "null"
-      ]
+      ],
+      "description": "Title of the Rule being reported.",
+      "x-doc-status": "native-structure-derived"
     },
     "severity": {
       "type": [
         "string",
         "null"
-      ]
+      ],
+      "description": "Severity label recorded for the Rule result.",
+      "x-doc-status": "native-structure-derived"
     },
     "outcome": {
       "type": "string",
@@ -57,13 +63,17 @@
           "properties": {
             "id": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Identifier of the Assessment used for this Rule result.",
+              "x-doc-status": "native-structure-derived"
             },
             "version": {
               "type": [
                 "string",
                 "integer"
-              ]
+              ],
+              "description": "Version of the Assessment used for this Rule result.",
+              "x-doc-status": "native-structure-derived"
             },
             "digest": {
               "type": [
@@ -81,7 +91,9 @@
                 "automated",
                 "manual",
                 null
-              ]
+              ],
+              "description": "Mode recorded for the selected Assessment.",
+              "x-doc-status": "native-structure-derived"
             }
           },
           "additionalProperties": false
@@ -165,7 +177,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Identifier of this reported Rule instance.",
+            "x-doc-status": "native-structure-derived"
           },
           "outcome": {
             "type": "string",
@@ -190,19 +204,25 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Identifier of the Assessment invocation associated with this Rule instance.",
+            "x-doc-status": "native-structure-derived"
           },
           "target_instance": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Target-instance label recorded for this Rule instance.",
+            "x-doc-status": "native-structure-derived"
           },
           "check_instance": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Check-instance label recorded for this Rule instance.",
+            "x-doc-status": "native-structure-derived"
           },
           "message": {
             "type": [
@@ -365,7 +385,9 @@
             "properties": {
               "id": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "description": "Identifier of the reported applicability condition.",
+                "x-doc-status": "native-structure-derived"
               },
               "outcome": {
                 "type": "string",
@@ -382,13 +404,17 @@
                 "type": [
                   "string",
                   "null"
-                ]
+                ],
+                "description": "Reference to the Assessment result supporting the applicability observation.",
+                "x-doc-status": "native-structure-derived"
               },
               "assessment_invocation_id": {
                 "type": [
                   "string",
                   "null"
-                ]
+                ],
+                "description": "Identifier of the Assessment invocation supporting the applicability observation.",
+                "x-doc-status": "native-structure-derived"
               },
               "reason": {
                 "type": [
@@ -400,7 +426,9 @@
               }
             },
             "additionalProperties": false
-          }
+          },
+          "description": "Individual applicability-condition observations for this Rule.",
+          "x-doc-status": "native-structure-derived"
         }
       },
       "required": [
@@ -500,14 +528,20 @@
       "properties": {
         "kind": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Kind of subject identified by the finding.",
+          "x-doc-status": "native-structure-derived"
         },
         "identifier": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Identifier of the subject described by the finding.",
+          "x-doc-status": "native-structure-derived"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Identity metadata for the subject of a finding.",
+      "x-doc-status": "native-structure-derived"
     },
     "comparison_finding": {
       "type": "object",
@@ -523,22 +557,32 @@
       ],
       "properties": {
         "kind": {
-          "const": "comparison"
+          "const": "comparison",
+          "description": "Identifies a finding from a comparison.",
+          "x-doc-status": "native-structure-derived"
         },
         "instance_id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Identifier of the Rule instance associated with this finding.",
+          "x-doc-status": "native-structure-derived"
         },
         "subject": {
-          "$ref": "#/$defs/subject"
+          "$ref": "#/$defs/subject",
+          "description": "Subject to which the comparison finding applies.",
+          "x-doc-status": "native-structure-derived"
         },
         "field": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Name of the field involved in the comparison.",
+          "x-doc-status": "native-structure-derived"
         },
         "operation": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Comparison operation recorded for the finding.",
+          "x-doc-status": "native-structure-derived"
         },
         "expected": {
           "$ref": "result-types.schema.json#/$defs/typed_value"
@@ -569,7 +613,9 @@
           "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_item_ref"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Comparison finding with its subject, field and operation.",
+      "x-doc-status": "native-structure-derived"
     },
     "missing_finding": {
       "type": "object",
@@ -585,24 +631,34 @@
       ],
       "properties": {
         "kind": {
-          "const": "missing"
+          "const": "missing",
+          "description": "Identifies a finding about expected presence or absence.",
+          "x-doc-status": "native-structure-derived"
         },
         "instance_id": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Identifier of the Rule instance associated with this finding.",
+          "x-doc-status": "native-structure-derived"
         },
         "subject": {
-          "$ref": "#/$defs/subject"
+          "$ref": "#/$defs/subject",
+          "description": "Subject to which the presence finding applies.",
+          "x-doc-status": "native-structure-derived"
         },
         "predicate": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "description": "Presence predicate recorded for the finding.",
+          "x-doc-status": "native-structure-derived"
         },
         "expected_existence": {
           "enum": [
             "exists",
             "does_not_exist"
-          ]
+          ],
+          "description": "Presence or absence expected by the predicate.",
+          "x-doc-status": "native-structure-derived"
         },
         "observed_existence": {
           "enum": [
@@ -610,7 +666,9 @@
             "does_not_exist",
             "not_collected",
             "error"
-          ]
+          ],
+          "description": "Presence status reported for the subject.",
+          "x-doc-status": "native-structure-derived"
         },
         "outcome": {
           "type": "string",

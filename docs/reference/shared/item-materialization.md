@@ -2,6 +2,8 @@
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 
+Record of which available Items are included in the result and which are omitted.
+
 ## `/`
 
 | Field | Schema type | Occurrences | Description | Details |
@@ -10,14 +12,14 @@ Proposed documentation. Defaults are schema annotations, not inferred scanner fa
 | `available_count` | integer | 1..1 (required) | **Unresolved description** | [/properties/available_count](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/available_count) |
 | `included_count` | integer | 1..1 (required) | **Unresolved description** | [/properties/included_count](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/included_count) |
 | `omitted_count` | integer | 1..1 (required) | **Unresolved description** | [/properties/omitted_count](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/omitted_count) |
-| `consumed_item_refs` | array | 1..1 (required) | **Unresolved description** | [/properties/consumed_item_refs](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/consumed_item_refs) |
-| `collections` | array | 1..1 (required) | **Unresolved description** | [/properties/collections](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections) |
+| `consumed_item_refs` | array | 1..1 (required) | References to consumed Items identified by this materialization record. | [/properties/consumed_item_refs](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/consumed_item_refs) |
+| `collections` | array | 1..1 (required) | Per-collection entries describing the Item materialization. | [/properties/collections](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections) |
 
 ## `/properties/collections/items`
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `object_ref` | string | 1..1 (required) | **Unresolved description** | [/properties/collections/items/properties/object_ref](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections/items/properties/object_ref) |
+| `object_ref` | string | 1..1 (required) | Object reference associated with this materialization entry. | [/properties/collections/items/properties/object_ref](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections/items/properties/object_ref) |
 | `available_count` | integer | 1..1 (required) | **Unresolved description** | [/properties/collections/items/properties/available_count](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections/items/properties/available_count) |
 | `included_count` | integer | 1..1 (required) | **Unresolved description** | [/properties/collections/items/properties/included_count](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections/items/properties/included_count) |
 | `omitted_count` | integer | 1..1 (required) | **Unresolved description** | [/properties/collections/items/properties/omitted_count](../../../proposed-schema/documentation/item-materialization.schema.json#/properties/collections/items/properties/omitted_count) |

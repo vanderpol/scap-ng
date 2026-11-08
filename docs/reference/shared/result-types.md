@@ -9,11 +9,11 @@ Reusable structural types for SCAP-NG result schemas. Runtime truth/aggregation 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `technical_outcome` | string | Definition | Reports whether a Test or Assessment is true, false, errored, unknown, unevaluated, or inapplicable. | [/$defs/technical_outcome](../../../proposed-schema/documentation/result-types.schema.json#/$defs/technical_outcome) |
-| `assessment_purpose` | string | Definition | **Unresolved description** | [/$defs/assessment_purpose](../../../proposed-schema/documentation/result-types.schema.json#/$defs/assessment_purpose) |
+| `assessment_purpose` | string | Definition | Purpose label distinguishing assessment and applicability evaluations. | [/$defs/assessment_purpose](../../../proposed-schema/documentation/result-types.schema.json#/$defs/assessment_purpose) |
 | `assessment_class` | string | Definition | Defines what technical truth means. | [/$defs/assessment_class](../../../proposed-schema/documentation/result-types.schema.json#/$defs/assessment_class) |
 | `completeness` | object | Definition | **Unresolved description** | [/$defs/completeness](../../../proposed-schema/documentation/result-types.schema.json#/$defs/completeness) |
 | `typed_value` | object | Definition | A typed scalar or record result value. | [/$defs/typed_value](../../../proposed-schema/documentation/result-types.schema.json#/$defs/typed_value) |
-| `bounded_evidence` | object | Definition | **Unresolved description** | [/$defs/bounded_evidence](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence) |
+| `bounded_evidence` | object | Definition | Reported evidence limits and failure counts; counting policy remains a separate contract. | [/$defs/bounded_evidence](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence) |
 
 ## `/$defs/completeness`
 

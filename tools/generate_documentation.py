@@ -74,6 +74,18 @@ def resolve(docs, uri, seen=()):
     return None, None
 
 
+def documentation_scope(docs, uri):
+    """Inherit availability metadata, never a description or validation rule."""
+    base, fragment = urldefrag(uri)
+    while True:
+        value = node(docs, base+'#'+fragment)
+        if isinstance(value,dict) and isinstance(value.get('x-doc-scope'),str):
+            return value['x-doc-scope']
+        if not fragment:
+            return 'declared-schema'
+        fragment = fragment.rsplit('/',1)[0]
+
+
 def walk(value, uri):
     """Actual schema nodes only; custom annotations are data, not subschemas."""
     if not isinstance(value, dict):
@@ -277,11 +289,13 @@ def generate(root=ROOT):
             description, owner = resolve(docs, uri)
             if description:
                 schema_routes.append({'schema_pointer': uri, 'description_pointer': owner + '/description',
+                                      'scope':documentation_scope(docs,uri),
                                       'status': node(docs, owner).get('x-doc-review', {}).get('status', node(docs, owner).get('x-doc-status', 'existing-native'))})
             if value.get('description'):
                 texts[value['description']].append(uri)
                 metadata.append({'schema_pointer': uri, 'description_pointer': uri + '/description',
                                  'description': value['description'],
+                                 'scope':documentation_scope(docs,uri),
                                  'status': value.get('x-doc-review', {}).get('status', value.get('x-doc-status', 'existing-native'))})
     for text, owners in sorted(texts.items()):
         if len(owners) > 1:
@@ -431,6 +445,7 @@ def generate(root=ROOT):
                     basic_documented += bool(basic and description)
                     if not description:
                         gaps.append({'schema_pointer': target, 'reason': 'missing shared description',
+                                     'scope':documentation_scope(docs,target),
                                      'proposed_wording': child.get('x-doc-gap-proposal'), 'status': 'No safe wording established for this exact context; research required.'})
             if basic:
                 page += '\n'
@@ -459,7 +474,8 @@ def generate(root=ROOT):
     totals['shared_fields_documented'] = sum(c['fields_documented'] for c in shared_coverage)
     totals['shared_basic_fields_discovered'] = sum(c['basic_fields_discovered'] for c in shared_coverage)
     totals['shared_basic_fields_documented'] = sum(c['basic_fields_documented'] for c in shared_coverage)
-    outputs[DEST / 'coverage.json'] = encode({'totals': totals, 'capabilities': coverage, 'shared_schemas':shared_coverage})
+    outputs[DEST / 'coverage.json'] = encode({'totals': totals, 'capabilities': coverage, 'shared_schemas':shared_coverage,
+        'shared_gap_scopes':dict(sorted(Counter(g['scope'] for g in gaps if g['reason']=='missing shared description').items()))})
     outputs[DEST / 'gaps.jsonl'] = ''.join(json.dumps(g, sort_keys=True, ensure_ascii=False) + '\n' for g in gaps)
     outputs[DEST / 'duplicate-descriptions.json'] = encode(duplicates)
     outputs[DEST / 'editor-help.json'] = encode({'format': 'schema-documentation-help-1', 'descriptions': metadata, 'schema_routes': schema_routes, 'routes': routes,

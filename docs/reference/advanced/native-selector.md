@@ -4,6 +4,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [/$defs/selector_value_reference](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/selector_value_reference) | {} | native-structure-derived |
 | [/$defs/linux_dpkginfo_name_selector/allOf/1/propertyNames](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/linux_dpkginfo_name_selector/allOf/1/propertyNames) | {"enum": ["datatype", "value_match", "redact_result", "equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "matches_regex"]} | existing-native |
 | [/$defs/linux_dpkginfo_name_selector/allOf/2/properties/datatype](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/linux_dpkginfo_name_selector/allOf/2/properties/datatype) | {"type": "string", "const": "string"} | existing-native |
 | [/$defs/linux_dpkginfo_name_selector/allOf/2/properties/redact_result](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/linux_dpkginfo_name_selector/allOf/2/properties/redact_result) | {"const": true} | existing-native |

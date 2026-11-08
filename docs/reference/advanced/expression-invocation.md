@@ -4,20 +4,20 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [schema](../../../proposed-schema/documentation/expression-invocation.schema.json#) | {"type": "object", "required": ["assessment", "invocation_ref", "outcome", "executed_tests", "trace", "diagnostics"], "additionalProperties": false} | existing-native |
-| [/properties/assessment](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/assessment) | {"type": "string", "minLength": 1} | existing-native |
+| [schema](../../../proposed-schema/documentation/expression-invocation.schema.json#) | {"type": "object", "required": ["assessment", "invocation_ref", "outcome", "executed_tests", "trace", "diagnostics"], "additionalProperties": false} | native-structure-derived |
+| [/properties/assessment](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/assessment) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/invocation_ref](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/invocation_ref) | {"type": "string", "minLength": 1} | existing-native |
-| [/properties/executed_tests](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/executed_tests) | {"type": "array"} | existing-native |
+| [/properties/executed_tests](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/executed_tests) | {"type": "array"} | native-structure-derived |
 | [/properties/executed_tests/items](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/executed_tests/items) | {"type": "string"} | existing-native |
-| [/properties/trace](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace) | {"type": "array"} | existing-native |
+| [/properties/trace](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace) | {"type": "array"} | native-structure-derived |
 | [/properties/trace/items](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items) | {"type": "object", "required": ["path", "kind", "outcome", "owner_invocation_ref"], "additionalProperties": false} | existing-native |
-| [/properties/trace/items/properties/path](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/path) | {"type": "string"} | existing-native |
+| [/properties/trace/items/properties/path](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/path) | {"type": "string"} | native-structure-derived |
 | [/properties/trace/items/properties/kind](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/kind) | {"enum": ["expression", "terminal", "test", "dependency", "conditional", "manual", "input_presence", "logical"]} | native-structure-derived |
 | [/properties/trace/items/properties/selected_branch](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/selected_branch) | {"enum": ["then", "else", null]} | existing-native |
 | [/properties/trace/items/properties/reason](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/reason) | {"type": "string", "minLength": 1} | existing-native |
-| [/properties/trace/items/properties/test](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/test) | {"type": "string"} | existing-native |
-| [/properties/trace/items/properties/assessment](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/assessment) | {"type": "string"} | existing-native |
-| [/properties/trace/items/properties/alias](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/alias) | {"type": "string"} | existing-native |
+| [/properties/trace/items/properties/test](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/test) | {"type": "string"} | native-structure-derived |
+| [/properties/trace/items/properties/assessment](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/assessment) | {"type": "string"} | native-structure-derived |
+| [/properties/trace/items/properties/alias](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/alias) | {"type": "string"} | native-structure-derived |
 | [/properties/trace/items/properties/reused](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/reused) | {"type": "boolean"} | existing-native |
 | [/properties/trace/items/properties/invocation_ref](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/invocation_ref) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/trace/items/properties/owner_invocation_ref](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/owner_invocation_ref) | {"type": "string", "minLength": 1} | existing-native |
@@ -26,7 +26,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [/properties/trace/items/properties/source_ref](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/source_ref) | {"type": ["string", "null"]} | existing-native |
 | [/properties/trace/items/properties/follow_up](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/follow_up) | {"type": "string", "minLength": 1, "pattern": "\\S"} | existing-native |
 | [/properties/trace/items/properties/branch_index](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/branch_index) | {"type": "integer", "minimum": 0} | existing-native |
-| [/properties/trace/items/properties/condition_path](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/condition_path) | {"type": "string"} | existing-native |
+| [/properties/trace/items/properties/condition_path](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/properties/condition_path) | {"type": "string"} | native-structure-derived |
 | [/properties/trace/items/allOf/0/if/properties/kind](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/allOf/0/if/properties/kind) | {"const": "conditional"} | existing-native |
 | [/properties/trace/items/allOf/0/then](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/allOf/0/then) | {"required": ["condition_outcome", "selected_branch"]} | existing-native |
 | [/properties/trace/items/allOf/1/if/properties/kind](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/trace/items/allOf/1/if/properties/kind) | {"const": "test"} | existing-native |
@@ -79,10 +79,10 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [/properties/diagnostics](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/diagnostics) | {"type": "array"} | existing-native |
 | [/properties/diagnostics/items](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/diagnostics/items) | {"type": "object", "required": ["code", "test"], "additionalProperties": false} | existing-native |
 | [/properties/diagnostics/items/properties/code](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/diagnostics/items/properties/code) | {"const": "missing_test_result"} | existing-native |
-| [/properties/diagnostics/items/properties/test](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/diagnostics/items/properties/test) | {"type": "string"} | existing-native |
+| [/properties/diagnostics/items/properties/test](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/diagnostics/items/properties/test) | {"type": "string"} | native-structure-derived |
 | [/properties/binding_set_id](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/binding_set_id) | {"type": "string", "pattern": "^[0-9a-f]{64}$"} | existing-native |
-| [/properties/input_presence_version](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/input_presence_version) | {"const": 1} | existing-native |
-| [/$defs/outcome](../../../proposed-schema/documentation/expression-invocation.schema.json#/$defs/outcome) | {"enum": ["true", "false", "error", "unknown", "not_evaluated", "not_applicable"]} | existing-native |
+| [/properties/input_presence_version](../../../proposed-schema/documentation/expression-invocation.schema.json#/properties/input_presence_version) | {"const": 1} | native-structure-derived |
+| [/$defs/outcome](../../../proposed-schema/documentation/expression-invocation.schema.json#/$defs/outcome) | {"enum": ["true", "false", "error", "unknown", "not_evaluated", "not_applicable"]} | native-structure-derived |
 | [/allOf/0/if](../../../proposed-schema/documentation/expression-invocation.schema.json#/allOf/0/if) | {"required": ["trace"]} | existing-native |
 | [/allOf/0/if/properties/trace/contains](../../../proposed-schema/documentation/expression-invocation.schema.json#/allOf/0/if/properties/trace/contains) | {"required": ["kind"]} | existing-native |
 | [/allOf/0/if/properties/trace/contains/properties/kind](../../../proposed-schema/documentation/expression-invocation.schema.json#/allOf/0/if/properties/trace/contains/properties/kind) | {"const": "input_presence"} | existing-native |

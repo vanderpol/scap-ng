@@ -158,6 +158,16 @@ class ProductionDocumentationTests(unittest.TestCase):
         self.assertIn('### Item existence requirement',page)
         self.assertIn('### Condition logic',page)
 
+    def test_inactive_and_unreferenced_help_is_explicitly_scoped(self):
+        inactive=artifacts.schema_help(self.help,PREFIX+'variable-function-expression.schema.json#')
+        self.assertEqual(inactive['scope'],'inactive-migration')
+        legacy=artifacts.schema_help(self.help,PREFIX+'capability-common.schema.json#/$defs/authoring_type_resolution')
+        self.assertEqual(legacy['scope'],'unreferenced-schema-helper')
+        self.assertEqual(legacy['status'],'unresolved-legacy-helper')
+        active=artifacts.schema_help(self.help,PREFIX+'variable-expression.schema.json#/$defs/expression/oneOf/3/properties/concat')
+        self.assertEqual(active['scope'],'declared-schema')
+        self.assertEqual(active['status'],'semantic-hold')
+
     def test_all_rendered_relative_links_resolve(self):
         for path,text in self.outputs.items():
             if path.suffix!='.md':continue

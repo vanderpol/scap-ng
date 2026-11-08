@@ -12,7 +12,7 @@ Editorial receipt: editorial-batch.json case 24
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/properties/id](../../../proposed-schema/documentation/collection-result.schema.json#/properties/id) | {"type": "string", "minLength": 1} | existing-native |
+| [/properties/id](../../../proposed-schema/documentation/collection-result.schema.json#/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/object_title](../../../proposed-schema/documentation/collection-result.schema.json#/properties/object_title) | {"type": ["string", "null"]} | existing-native |
 | [/properties/capability](../../../proposed-schema/documentation/collection-result.schema.json#/properties/capability) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/status](../../../proposed-schema/documentation/collection-result.schema.json#/properties/status) | {"type": "string", "enum": ["error", "complete", "incomplete", "does_not_exist", "not_collected", "not_applicable"]} | editorially-approved |
@@ -34,7 +34,7 @@ Editorial receipt: editorial-batch-2.json case 26
 | [/properties/item_refs/items](../../../proposed-schema/documentation/collection-result.schema.json#/properties/item_refs/items) | {"type": "string"} | existing-native |
 | [/properties/logical_complete](../../../proposed-schema/documentation/collection-result.schema.json#/properties/logical_complete) | {"type": ["boolean", "null"]} | existing-native |
 | [/properties/population_complete](../../../proposed-schema/documentation/collection-result.schema.json#/properties/population_complete) | {"type": ["boolean", "null"]} | existing-native |
-| [/properties/stop_reason](../../../proposed-schema/documentation/collection-result.schema.json#/properties/stop_reason) | {"type": ["string", "null"]} | existing-native |
+| [/properties/stop_reason](../../../proposed-schema/documentation/collection-result.schema.json#/properties/stop_reason) | {"type": ["string", "null"]} | native-structure-derived |
 | [/properties/source_execution_ref](../../../proposed-schema/documentation/collection-result.schema.json#/properties/source_execution_ref) | {"type": ["string", "null"]} | existing-native |
 | [/properties/diagnostics](../../../proposed-schema/documentation/collection-result.schema.json#/properties/diagnostics) | {"type": "array"} | existing-native |
 | [/properties/diagnostics/items](../../../proposed-schema/documentation/collection-result.schema.json#/properties/diagnostics/items) | {"type": "object"} | existing-native |

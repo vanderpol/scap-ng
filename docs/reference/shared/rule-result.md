@@ -8,9 +8,9 @@ Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `rule_id` | string | 1..1 (required) | **Unresolved description** | [/properties/rule_id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/rule_id) |
-| `title` | null, string | 0..1 | **Unresolved description** | [/properties/title](../../../proposed-schema/documentation/rule-result.schema.json#/properties/title) |
-| `severity` | null, string | 0..1 | **Unresolved description** | [/properties/severity](../../../proposed-schema/documentation/rule-result.schema.json#/properties/severity) |
+| `rule_id` | string | 1..1 (required) | Identifier of the Rule being reported. | [/properties/rule_id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/rule_id) |
+| `title` | null, string | 0..1 | Title of the Rule being reported. | [/properties/title](../../../proposed-schema/documentation/rule-result.schema.json#/properties/title) |
+| `severity` | null, string | 0..1 | Severity label recorded for the Rule result. | [/properties/severity](../../../proposed-schema/documentation/rule-result.schema.json#/properties/severity) |
 | `outcome` | string | 1..1 (required) | Deterministic aggregate policy outcome derived from all Rule result instances. | [/properties/outcome](../../../proposed-schema/documentation/rule-result.schema.json#/properties/outcome) |
 | `assessment` | null, object | 1..1 (required) | Identity of the effective selected Assessment for this Rule. | [/properties/assessment](../../../proposed-schema/documentation/rule-result.schema.json#/properties/assessment) |
 | `summary` | string | 1..1 (required) | Required concise deterministic human-readable explanation of the Rule outcome and decisive cause, consistent with findings, finding_counts, and the referenced Assessment Results; never just the outcome label. | [/properties/summary](../../../proposed-schema/documentation/rule-result.schema.json#/properties/summary) |
@@ -24,20 +24,20 @@ Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment
 | `applicability` | null, object | 0..1 | Rule-level applicability disposition plus references to the applicability Assessment Results that produced it; detailed execution data is not embedded here. | [/properties/applicability](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability) |
 | `findings` | array | 1..1 (required) | Bounded decisive Assessment-derived typed facts. | [/properties/findings](../../../proposed-schema/documentation/rule-result.schema.json#/properties/findings) |
 | `finding_counts` | object | 0..1 | Optional collection summary: evaluated population and actual failures are distinct from returned evidence. | [/properties/finding_counts](../../../proposed-schema/documentation/rule-result.schema.json#/properties/finding_counts) |
-| `subject` | object | Definition | **Unresolved description** | [/$defs/subject](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/subject) |
-| `comparison_finding` | object | Definition | **Unresolved description** | [/$defs/comparison_finding](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding) |
+| `subject` | object | Definition | Identity metadata for the subject of a finding. | [/$defs/subject](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/subject) |
+| `comparison_finding` | object | Definition | Comparison finding with its subject, field and operation. | [/$defs/comparison_finding](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding) |
 | `missing_finding` | object | Definition | Missing required resource or inconclusive collection; no fictional Item. | [/$defs/missing_finding](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding) |
 
 ## `/properties/instances/items`
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `id` | string | 1..1 (required) | **Unresolved description** | [/properties/instances/items/properties/id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/id) |
+| `id` | string | 1..1 (required) | Identifier of this reported Rule instance. | [/properties/instances/items/properties/id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/id) |
 | `outcome` | string | 1..1 (required) | Recorded evaluation outcome. | [/properties/instances/items/properties/outcome](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/outcome) |
 | `assessment_result_ref` | null, string | 1..1 (required) | Manifest logical Assessment execution identity, never a guessed artifact filename. | [/properties/instances/items/properties/assessment_result_ref](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/assessment_result_ref) |
-| `assessment_invocation_id` | null, string | 0..1 | **Unresolved description** | [/properties/instances/items/properties/assessment_invocation_id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/assessment_invocation_id) |
-| `target_instance` | null, string | 0..1 | **Unresolved description** | [/properties/instances/items/properties/target_instance](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/target_instance) |
-| `check_instance` | null, string | 0..1 | **Unresolved description** | [/properties/instances/items/properties/check_instance](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/check_instance) |
+| `assessment_invocation_id` | null, string | 0..1 | Identifier of the Assessment invocation associated with this Rule instance. | [/properties/instances/items/properties/assessment_invocation_id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/assessment_invocation_id) |
+| `target_instance` | null, string | 0..1 | Target-instance label recorded for this Rule instance. | [/properties/instances/items/properties/target_instance](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/target_instance) |
+| `check_instance` | null, string | 0..1 | Check-instance label recorded for this Rule instance. | [/properties/instances/items/properties/check_instance](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/check_instance) |
 | `message` | null, string | 0..1 | Human-readable diagnostic message. | [/properties/instances/items/properties/message](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/message) |
 | `reason` | null, object, string | 0..1 | Explanation of the reported outcome. | [/properties/instances/items/properties/reason](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/reason) |
 | `evidence_refs` | array | 0..1 | References to the evidence supporting this result. | [/properties/instances/items/properties/evidence_refs](../../../proposed-schema/documentation/rule-result.schema.json#/properties/instances/items/properties/evidence_refs) |
@@ -66,16 +66,16 @@ Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `outcome` | string | 1..1 (required) | Recorded evaluation outcome. | [/properties/applicability/properties/outcome](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/outcome) |
-| `conditions` | array | 1..1 (required) | **Unresolved description** | [/properties/applicability/properties/conditions](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions) |
+| `conditions` | array | 1..1 (required) | Individual applicability-condition observations for this Rule. | [/properties/applicability/properties/conditions](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions) |
 
 ## `/properties/applicability/properties/conditions/items`
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `id` | string | 1..1 (required) | **Unresolved description** | [/properties/applicability/properties/conditions/items/properties/id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/id) |
+| `id` | string | 1..1 (required) | Identifier of the reported applicability condition. | [/properties/applicability/properties/conditions/items/properties/id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/id) |
 | `outcome` | string | 1..1 (required) | Recorded evaluation outcome. | [/properties/applicability/properties/conditions/items/properties/outcome](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/outcome) |
-| `assessment_result_ref` | null, string | 0..1 | **Unresolved description** | [/properties/applicability/properties/conditions/items/properties/assessment_result_ref](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/assessment_result_ref) |
-| `assessment_invocation_id` | null, string | 0..1 | **Unresolved description** | [/properties/applicability/properties/conditions/items/properties/assessment_invocation_id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/assessment_invocation_id) |
+| `assessment_result_ref` | null, string | 0..1 | Reference to the Assessment result supporting the applicability observation. | [/properties/applicability/properties/conditions/items/properties/assessment_result_ref](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/assessment_result_ref) |
+| `assessment_invocation_id` | null, string | 0..1 | Identifier of the Assessment invocation supporting the applicability observation. | [/properties/applicability/properties/conditions/items/properties/assessment_invocation_id](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/assessment_invocation_id) |
 | `reason` | null, object, string | 0..1 | Explanation of the reported outcome. | [/properties/applicability/properties/conditions/items/properties/reason](../../../proposed-schema/documentation/rule-result.schema.json#/properties/applicability/properties/conditions/items/properties/reason) |
 
 ## `/properties/finding_counts`
@@ -93,18 +93,18 @@ Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `kind` | string | 1..1 (required) | **Unresolved description** | [/$defs/subject/properties/kind](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/subject/properties/kind) |
-| `identifier` | string | 1..1 (required) | **Unresolved description** | [/$defs/subject/properties/identifier](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/subject/properties/identifier) |
+| `kind` | string | 1..1 (required) | Kind of subject identified by the finding. | [/$defs/subject/properties/kind](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/subject/properties/kind) |
+| `identifier` | string | 1..1 (required) | Identifier of the subject described by the finding. | [/$defs/subject/properties/identifier](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/subject/properties/identifier) |
 
 ## `/$defs/comparison_finding`
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `kind` | string | 1..1 (required) | **Unresolved description** | [/$defs/comparison_finding/properties/kind](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/kind) |
-| `instance_id` | string | 1..1 (required) | **Unresolved description** | [/$defs/comparison_finding/properties/instance_id](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/instance_id) |
-| `subject` | object | 1..1 (required) | **Unresolved description** | [/$defs/comparison_finding/properties/subject](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/subject) |
-| `field` | string | 1..1 (required) | **Unresolved description** | [/$defs/comparison_finding/properties/field](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/field) |
-| `operation` | string | 1..1 (required) | **Unresolved description** | [/$defs/comparison_finding/properties/operation](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/operation) |
+| `kind` | string | 1..1 (required) | Identifies a finding from a comparison. | [/$defs/comparison_finding/properties/kind](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/kind) |
+| `instance_id` | string | 1..1 (required) | Identifier of the Rule instance associated with this finding. | [/$defs/comparison_finding/properties/instance_id](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/instance_id) |
+| `subject` | object | 1..1 (required) | Subject to which the comparison finding applies. | [/$defs/comparison_finding/properties/subject](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/subject) |
+| `field` | string | 1..1 (required) | Name of the field involved in the comparison. | [/$defs/comparison_finding/properties/field](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/field) |
+| `operation` | string | 1..1 (required) | Comparison operation recorded for the finding. | [/$defs/comparison_finding/properties/operation](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/operation) |
 | `expected` | object | 1..1 (required) | A typed scalar or record result value. | [/$defs/comparison_finding/properties/expected](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/expected) |
 | `observed` | object | 1..1 (required) | A typed scalar or record result value. | [/$defs/comparison_finding/properties/observed](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/observed) |
 | `outcome` | string | 1..1 (required) | Recorded evaluation outcome. | [/$defs/comparison_finding/properties/outcome](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/comparison_finding/properties/outcome) |
@@ -115,12 +115,12 @@ Embedded policy-facing Rule Result with bounded typed decisive facts. Assessment
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `kind` | string | 1..1 (required) | **Unresolved description** | [/$defs/missing_finding/properties/kind](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/kind) |
-| `instance_id` | string | 1..1 (required) | **Unresolved description** | [/$defs/missing_finding/properties/instance_id](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/instance_id) |
-| `subject` | object | 1..1 (required) | **Unresolved description** | [/$defs/missing_finding/properties/subject](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/subject) |
-| `predicate` | string | 1..1 (required) | **Unresolved description** | [/$defs/missing_finding/properties/predicate](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/predicate) |
-| `expected_existence` | string | 1..1 (required) | **Unresolved description** | [/$defs/missing_finding/properties/expected_existence](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/expected_existence) |
-| `observed_existence` | string | 1..1 (required) | **Unresolved description** | [/$defs/missing_finding/properties/observed_existence](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/observed_existence) |
+| `kind` | string | 1..1 (required) | Identifies a finding about expected presence or absence. | [/$defs/missing_finding/properties/kind](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/kind) |
+| `instance_id` | string | 1..1 (required) | Identifier of the Rule instance associated with this finding. | [/$defs/missing_finding/properties/instance_id](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/instance_id) |
+| `subject` | object | 1..1 (required) | Subject to which the presence finding applies. | [/$defs/missing_finding/properties/subject](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/subject) |
+| `predicate` | string | 1..1 (required) | Presence predicate recorded for the finding. | [/$defs/missing_finding/properties/predicate](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/predicate) |
+| `expected_existence` | string | 1..1 (required) | Presence or absence expected by the predicate. | [/$defs/missing_finding/properties/expected_existence](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/expected_existence) |
+| `observed_existence` | string | 1..1 (required) | Presence status reported for the subject. | [/$defs/missing_finding/properties/observed_existence](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/observed_existence) |
 | `outcome` | string | 1..1 (required) | Recorded evaluation outcome. | [/$defs/missing_finding/properties/outcome](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/outcome) |
 | `test_ref` | string | 0..1 | Reference to the Test associated with this result. | [/$defs/missing_finding/properties/test_ref](../../../proposed-schema/documentation/rule-result.schema.json#/$defs/missing_finding/properties/test_ref) |
 

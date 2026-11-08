@@ -19,20 +19,30 @@
   ],
   "properties": {
     "format": {
-      "const": "scap-ng-package-manifest"
+      "const": "scap-ng-package-manifest",
+      "description": "Discriminator identifying the SCAP-NG package-manifest format.",
+      "x-doc-status": "native-structure-derived"
     },
     "format_version": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Version label of the package-manifest format.",
+      "x-doc-status": "native-structure-derived"
     },
     "benchmark_id": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Logical identifier of the package Benchmark.",
+      "x-doc-status": "native-structure-derived"
     },
-    "benchmark_version": {},
+    "benchmark_version": {
+      "description": "Version recorded for the package Benchmark.",
+      "x-doc-status": "native-structure-derived"
+    },
     "entrypoint": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "x-doc-gap-proposal": "Package entry point: decide whether the value is a logical object ID or a stored member path. Prefer a logical ID consistently with the manifest root contract."
     },
     "objects": {
       "type": "object",
@@ -43,16 +53,24 @@
       },
       "additionalProperties": {
         "$ref": "#/$defs/object_record"
-      }
+      },
+      "description": "Packaged document members, keyed by their logical identifiers.",
+      "x-doc-status": "native-structure-derived"
     },
     "integrity": {
-      "$ref": "#/$defs/integrity"
+      "$ref": "#/$defs/integrity",
+      "description": "Digest-algorithm and container-membership policy declarations.",
+      "x-doc-status": "native-structure-derived"
     },
     "build_provenance": {
-      "type": "object"
+      "type": "object",
+      "description": "Provenance metadata describing creation of the package.",
+      "x-doc-status": "native-structure-derived"
     },
     "signature": {
-      "$ref": "#/$defs/signature"
+      "$ref": "#/$defs/signature",
+      "description": "Detached-signature metadata carried by the package manifest.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "additionalProperties": false,
@@ -73,25 +91,37 @@
             "rule",
             "assessment",
             "applicability_catalog"
-          ]
+          ],
+          "description": "Kind of SCAP-NG document stored in this member.",
+          "x-doc-status": "native-structure-derived"
         },
-        "version": {},
+        "version": {
+          "description": "Logical version recorded for the packaged document.",
+          "x-doc-status": "native-structure-derived"
+        },
         "path": {
           "type": "string",
           "minLength": 1,
           "maxLength": 160,
-          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[^\\\\]+$"
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?![A-Za-z]:)[^\\\\]+$",
+          "description": "Path recorded for this package member.",
+          "x-doc-status": "native-structure-derived"
         },
         "sha256": {
           "type": "string",
-          "pattern": "^[0-9a-f]{64}$"
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 digest declared for this member.",
+          "x-doc-status": "native-structure-derived"
         },
         "size": {
           "type": "integer",
-          "minimum": 0
+          "minimum": 0,
+          "x-doc-gap-proposal": "Declared member size: specify whether this is a byte length and which representation is counted before publishing a normative unit."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Metadata binding a logical document to a stored package member.",
+      "x-doc-status": "native-structure-derived"
     },
     "integrity": {
       "type": "object",
@@ -101,13 +131,19 @@
       ],
       "properties": {
         "algorithm": {
-          "const": "sha-256"
+          "const": "sha-256",
+          "description": "Digest algorithm declared for package integrity metadata.",
+          "x-doc-status": "native-structure-derived"
         },
         "unexpected_members": {
-          "const": "reject"
+          "const": "reject",
+          "description": "Policy marker for container members absent from the manifest inventory.",
+          "x-doc-status": "native-structure-derived"
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Integrity policy declarations carried by the package manifest.",
+      "x-doc-status": "native-structure-derived"
     },
     "signature": {
       "type": "object",
@@ -122,13 +158,17 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "description": "Format label of the detached-signature metadata.",
+          "x-doc-status": "native-structure-derived"
         },
         "path": {
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "description": "Location recorded for the detached signature.",
+          "x-doc-status": "native-structure-derived"
         },
         "certificate_path": {
           "type": [
@@ -141,7 +181,9 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "description": "Trust-policy label carried with the signature metadata.",
+          "x-doc-status": "native-structure-derived"
         }
       },
       "additionalProperties": false,
@@ -150,7 +192,8 @@
           "if": {
             "properties": {
               "format": {
-                "type": "string"
+                "type": "string",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/format"
               }
             },
             "required": [
@@ -160,11 +203,13 @@
           "then": {
             "properties": {
               "format": {
-                "const": "cms-detached-der"
+                "const": "cms-detached-der",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/format"
               },
               "path": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/path"
               },
               "certificate_path": {
                 "type": "string",
@@ -173,7 +218,8 @@
               },
               "trust": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/trust"
               }
             }
           }
@@ -182,7 +228,8 @@
           "if": {
             "properties": {
               "format": {
-                "type": "null"
+                "type": "null",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/format"
               }
             },
             "required": [
@@ -192,19 +239,23 @@
           "then": {
             "properties": {
               "path": {
-                "type": "null"
+                "type": "null",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/path"
               },
               "certificate_path": {
                 "type": "null",
                 "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_certificate_path"
               },
               "trust": {
-                "type": "null"
+                "type": "null",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/package-manifest.schema.json#/$defs/signature/properties/trust"
               }
             }
           }
         }
-      ]
+      ],
+      "description": "Format, location and trust-policy labels for the package signature.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "x-doc-origin": "schema/package-manifest.schema.json",

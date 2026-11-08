@@ -7,7 +7,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [schema](../../../proposed-schema/documentation/require-result.schema.json#) | {"type": "object", "required": ["require_ref", "outcome", "field_results"], "additionalProperties": false} | existing-native |
 | [/properties/require_ref](../../../proposed-schema/documentation/require-result.schema.json#/properties/require_ref) | {"type": "string", "pattern": "^/tests/(?:[^~/]\|~[01])+/require(?:/(?:[^~]\|~[01])*)?$"} | existing-native |
 | [/properties/record_ref](../../../proposed-schema/documentation/require-result.schema.json#/properties/record_ref) | {"type": "string", "pattern": "^/fields/(?:[^~]\|~[01])+$"} | existing-native |
-| [/properties/operator](../../../proposed-schema/documentation/require-result.schema.json#/properties/operator) | {"enum": ["and", "or", "one", "xor"]} | existing-native |
+| [/properties/operator](../../../proposed-schema/documentation/require-result.schema.json#/properties/operator) | {"enum": ["and", "or", "one", "xor"]} | native-structure-derived |
 | [/properties/field_results](../../../proposed-schema/documentation/require-result.schema.json#/properties/field_results) | {"type": "array"} | existing-native |
 | [/properties/require_results](../../../proposed-schema/documentation/require-result.schema.json#/properties/require_results) | {"type": "array"} | existing-native |
 | [/properties/reason](../../../proposed-schema/documentation/require-result.schema.json#/properties/reason) | {"type": "string", "minLength": 1, "pattern": "\\S"} | existing-native |

@@ -8,35 +8,35 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `assessment` | object | 1..1 (required) | **Unresolved description** | [/properties/assessment](../../../proposed-schema/documentation/assessment-language.schema.json#/properties/assessment) |
+| `assessment` | object | 1..1 (required) | Native automated Assessment language body. | [/properties/assessment](../../../proposed-schema/documentation/assessment-language.schema.json#/properties/assessment) |
 | `typed_comparison_datatype_consistency` | See schema | Definition | A redundant explicit datatype, when supplied with a self-describing comparison, must agree with its comparison domain. | [/$defs/typed_comparison_datatype_consistency](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/typed_comparison_datatype_consistency) |
 | `cardinality` | string | Definition | Consistent 0.4 authoring cardinality vocabulary. 'every' means all relevant results satisfy the specified comparison; source OVAL lexical values belong in provenance only. | [/$defs/cardinality](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/cardinality) |
 | `existence_cardinality` | string | Definition | State field/record existence cardinality. | [/$defs/existence_cardinality](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/existence_cardinality) |
 | `item_existence_cardinality` | string | Definition | Collected NG Items have no synthetic does-not-exist entries. | [/$defs/item_existence_cardinality](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/item_existence_cardinality) |
 | `paired_requirement` | object | Definition | Explicit field existence and matching cardinalities inherited together. | [/$defs/paired_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/paired_requirement) |
-| `scalar_field_predicate` | object | Definition | **Unresolved description** | [/$defs/scalar_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/scalar_field_predicate) |
-| `record_field_predicate` | object | Definition | **Unresolved description** | [/$defs/record_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_field_predicate) |
-| `record_wrapper_predicate` | object | Definition | **Unresolved description** | [/$defs/record_wrapper_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate) |
+| `scalar_field_predicate` | object | Definition | Value-count requirements and comparisons for a scalar field. | [/$defs/scalar_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/scalar_field_predicate) |
+| `record_field_predicate` | object | Definition | Value-count requirements and comparisons for a field within a record. | [/$defs/record_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_field_predicate) |
+| `record_wrapper_predicate` | object | Definition | Wraps record-field conditions under record.fields. | [/$defs/record_wrapper_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate) |
 | `state_entry` | object | Definition | A field predicate or logical combination of predicates applied to one collected Item. | [/$defs/state_entry](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/state_entry) |
 | `test` | object | Definition | Use a Test Object or reference and a structured require; no separate State layer. | [/$defs/test](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/test) |
 | `object_selector_predicate` | object | Definition | Object selector: one explicit comparison operator key plus typed operand, independent value_match when operand has multiple values; never an observed-Item/State require and never Organizational Input. | [/$defs/object_selector_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/object_selector_predicate) |
 | `object_record_field_predicate` | object | Definition | WMI/cmdlet native collector record field. | [/$defs/object_record_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/object_record_field_predicate) |
 | `item_presence_requirement` | object | Definition | Checks whether the required number of Items exists without comparing fields. | [/$defs/item_presence_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/item_presence_requirement) |
 | `scoped_state_entry` | object | Definition | A field predicate or logical combination of predicates applied to one collected Item. | [/$defs/scoped_state_entry](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/scoped_state_entry) |
-| `field_predicate_body` | object | Definition | **Unresolved description** | [/$defs/field_predicate_body](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/field_predicate_body) |
+| `field_predicate_body` | object | Definition | Comparison operators and their operands for a field. | [/$defs/field_predicate_body](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/field_predicate_body) |
 | `absence_only_field_predicate` | object | Definition | Requires confirmed absence of the field’s values. | [/$defs/absence_only_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/absence_only_field_predicate) |
 | `canonical_field_predicate` | object | Definition | Compares a collected field's values or checks for confirmed absence. | [/$defs/canonical_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_field_predicate) |
-| `explicit_field_predicate` | object | Definition | **Unresolved description** | [/$defs/explicit_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/explicit_field_predicate) |
+| `explicit_field_predicate` | object | Definition | Field predicate carrying its own value-count requirements. | [/$defs/explicit_field_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/explicit_field_predicate) |
 | `canonical_inherited_record_predicate` | object | Definition | Record correlation and aggregation retained; member comparisons inherit the nearest complete Test/group/record field policy. | [/$defs/canonical_inherited_record_predicate](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate) |
-| `canonical_inherited_condition` | object | Definition | **Unresolved description** | [/$defs/canonical_inherited_condition](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_condition) |
-| `canonical_condition` | object | Definition | **Unresolved description** | [/$defs/canonical_condition](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_condition) |
+| `canonical_inherited_condition` | object | Definition | Field conditions using an enclosing field-count policy. | [/$defs/canonical_inherited_condition](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_condition) |
+| `canonical_condition` | object | Definition | A field-condition map or one logical group of field conditions. | [/$defs/canonical_condition](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_condition) |
 | `canonical_all_items_requirement` | object | Definition | Defines the Item counts and field conditions for a comparison Test. | [/$defs/canonical_all_items_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement) |
 
 ## `/properties/assessment`
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `tests` | object | 1..1 (required) | **Unresolved description** | [/properties/assessment/properties/tests](../../../proposed-schema/documentation/assessment-language.schema.json#/properties/assessment/properties/tests) |
+| `tests` | object | 1..1 (required) | Map of Test names to their definitions. | [/properties/assessment/properties/tests](../../../proposed-schema/documentation/assessment-language.schema.json#/properties/assessment/properties/tests) |
 
 ## `/$defs/typed_comparison_datatype_consistency/dependentSchemas/float_equals`
 
@@ -527,7 +527,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `record` | object | 1..1 (required) | **Unresolved description** | [/$defs/record_wrapper_predicate/properties/record](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record) |
+| `record` | object | 1..1 (required) | Conditions on fields within one record. | [/$defs/record_wrapper_predicate/properties/record](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record) |
 
 ## `/$defs/record_wrapper_predicate/properties/record`
 
@@ -535,7 +535,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 | --- | --- | --- | --- | --- |
 | `records_found` | string | 1..1 (required) | State field/record existence cardinality. | [/$defs/record_wrapper_predicate/properties/record/properties/records_found](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record/properties/records_found) |
 | `records_matching` | string | Conditional (at most 1) | Consistent 0.4 authoring cardinality vocabulary. 'every' means all relevant results satisfy the specified comparison; source OVAL lexical values belong in provenance only. | [/$defs/record_wrapper_predicate/properties/record/properties/records_matching](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record/properties/records_matching) |
-| `fields` | object | Conditional (at most 1) | **Unresolved description** | [/$defs/record_wrapper_predicate/properties/record/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record/properties/fields) |
+| `fields` | object | Conditional (at most 1) | Named field conditions within this record. | [/$defs/record_wrapper_predicate/properties/record/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record/properties/fields) |
 | `redact_result` | boolean | 0..1 | Requests redaction of the corresponding value in reported evidence. | [/$defs/record_wrapper_predicate/properties/record/properties/redact_result](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record/properties/redact_result) |
 
 ## `/$defs/state_entry/oneOf/1`
@@ -847,7 +847,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `values_found` | string | 1..1 (required) | **Unresolved description** | [/$defs/absence_only_field_predicate/properties/values_found](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/absence_only_field_predicate/properties/values_found) |
+| `values_found` | string | 1..1 (required) | Selects the comparator-free field-absence form. | [/$defs/absence_only_field_predicate/properties/values_found](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/absence_only_field_predicate/properties/values_found) |
 
 ## `/$defs/canonical_field_predicate`
 
@@ -860,7 +860,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `record` | object | 1..1 (required) | **Unresolved description** | [/$defs/canonical_inherited_record_predicate/properties/record](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record) |
+| `record` | object | 1..1 (required) | Conditions on fields within one record. | [/$defs/canonical_inherited_record_predicate/properties/record](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record) |
 
 ## `/$defs/canonical_inherited_record_predicate/properties/record`
 
@@ -868,7 +868,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 | --- | --- | --- | --- | --- |
 | `records_found` | string | 1..1 (required) | State field/record existence cardinality. | [/$defs/canonical_inherited_record_predicate/properties/record/properties/records_found](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record/properties/records_found) |
 | `records_matching` | string | Conditional (at most 1) | Consistent 0.4 authoring cardinality vocabulary. 'every' means all relevant results satisfy the specified comparison; source OVAL lexical values belong in provenance only. | [/$defs/canonical_inherited_record_predicate/properties/record/properties/records_matching](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record/properties/records_matching) |
-| `fields` | object | Conditional (at most 1) | **Unresolved description** | [/$defs/canonical_inherited_record_predicate/properties/record/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record/properties/fields) |
+| `fields` | object | Conditional (at most 1) | Named field conditions within this record. | [/$defs/canonical_inherited_record_predicate/properties/record/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record/properties/fields) |
 | `redact_result` | boolean | 0..1 | Requests redaction of the corresponding value in reported evidence. | [/$defs/canonical_inherited_record_predicate/properties/record/properties/redact_result](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record/properties/redact_result) |
 | `field_requirement` | object | 0..1 | Explicit field existence and matching cardinalities inherited together. | [/$defs/canonical_inherited_record_predicate/properties/record/properties/field_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_record_predicate/properties/record/properties/field_requirement) |
 
@@ -877,7 +877,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `field_requirement` | object | 0..1 | Applies to all fields listed under this condition's fields, except fields with an explicit individual field_requirement; sibling conditions are unaffected. | [/$defs/canonical_inherited_condition/oneOf/0/properties/field_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_condition/oneOf/0/properties/field_requirement) |
-| `fields` | object | 1..1 (required) | **Unresolved description** | [/$defs/canonical_inherited_condition/oneOf/0/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_condition/oneOf/0/properties/fields) |
+| `fields` | object | 1..1 (required) | Requires all listed field conditions to hold for an Item. | [/$defs/canonical_inherited_condition/oneOf/0/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_inherited_condition/oneOf/0/properties/fields) |
 
 ## `/$defs/canonical_inherited_condition/oneOf/1`
 
@@ -912,7 +912,7 @@ SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit f
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `field_requirement` | object | 0..1 | Applies to all fields listed under this condition's fields, except fields with an explicit individual field_requirement; sibling conditions are unaffected. | [/$defs/canonical_condition/oneOf/0/properties/field_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_condition/oneOf/0/properties/field_requirement) |
-| `fields` | object | 1..1 (required) | **Unresolved description** | [/$defs/canonical_condition/oneOf/0/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_condition/oneOf/0/properties/fields) |
+| `fields` | object | 1..1 (required) | Requires all listed field conditions to hold for an Item. | [/$defs/canonical_condition/oneOf/0/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_condition/oneOf/0/properties/fields) |
 
 ## `/$defs/canonical_condition/oneOf/1`
 

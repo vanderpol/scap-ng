@@ -5,14 +5,14 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
 | [schema](../../../proposed-schema/documentation/variable-result.schema.json#) | {"type": "object", "required": ["id", "datatype", "status", "cardinality", "values", "item_refs"], "additionalProperties": false} | existing-native |
-| [/properties/id](../../../proposed-schema/documentation/variable-result.schema.json#/properties/id) | {"type": "string", "minLength": 1} | existing-native |
-| [/properties/variable_title](../../../proposed-schema/documentation/variable-result.schema.json#/properties/variable_title) | {"type": ["string", "null"]} | existing-native |
+| [/properties/id](../../../proposed-schema/documentation/variable-result.schema.json#/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
+| [/properties/variable_title](../../../proposed-schema/documentation/variable-result.schema.json#/properties/variable_title) | {"type": ["string", "null"]} | native-structure-derived |
 | [/properties/datatype](../../../proposed-schema/documentation/variable-result.schema.json#/properties/datatype) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/datatype/not](../../../proposed-schema/documentation/variable-result.schema.json#/properties/datatype/not) | {"const": "record"} | existing-native |
 | [/properties/status](../../../proposed-schema/documentation/variable-result.schema.json#/properties/status) | {"type": "string", "enum": ["complete", "incomplete", "error", "unknown", "not_evaluated", "not_applicable", "zero_values"]} | existing-native |
-| [/properties/cardinality](../../../proposed-schema/documentation/variable-result.schema.json#/properties/cardinality) | {"type": "string", "enum": ["zero", "one", "many"]} | existing-native |
-| [/properties/values](../../../proposed-schema/documentation/variable-result.schema.json#/properties/values) | {"type": "array"} | existing-native |
-| [/properties/source](../../../proposed-schema/documentation/variable-result.schema.json#/properties/source) | {"type": ["string", "null"]} | existing-native |
+| [/properties/cardinality](../../../proposed-schema/documentation/variable-result.schema.json#/properties/cardinality) | {"type": "string", "enum": ["zero", "one", "many"]} | native-structure-derived |
+| [/properties/values](../../../proposed-schema/documentation/variable-result.schema.json#/properties/values) | {"type": "array"} | native-structure-derived |
+| [/properties/source](../../../proposed-schema/documentation/variable-result.schema.json#/properties/source) | {"type": ["string", "null"]} | native-structure-derived |
 | [/properties/provenance](../../../proposed-schema/documentation/variable-result.schema.json#/properties/provenance) | {"type": "object"} | existing-native |
 | [/properties/diagnostics](../../../proposed-schema/documentation/variable-result.schema.json#/properties/diagnostics) | {"type": "array"} | existing-native |
 | [/properties/diagnostics/items](../../../proposed-schema/documentation/variable-result.schema.json#/properties/diagnostics/items) | {"type": "object"} | existing-native |

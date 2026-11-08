@@ -120,6 +120,7 @@ Editorial receipt: editorial-batch.json case 01
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
 | [/$defs/input_reference/properties/input](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/input_reference/properties/input) | {"type": "string", "minLength": 1} | existing-native |
+| [/$defs/authoring_type_resolution](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/authoring_type_resolution) | {} | unresolved-legacy-helper |
 | [/$defs/authoring_type_resolution/if](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/authoring_type_resolution/if) | {"required": ["datatype"]} | existing-native |
 | [/$defs/authoring_type_resolution/then/properties/operation](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/authoring_type_resolution/then/properties/operation) | {"enum": ["equals", "not_equal", "case_insensitive_equals", "case_insensitive_not_equal", "greater_than", "greater_than_or_equal", "less_than", "less_than_or_equal", "bitwise_and", "bitwise_or", "pattern_match", "subset_of", "superset_of"]} | existing-native |
 | [/$defs/authoring_type_resolution/else/anyOf/0](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/authoring_type_resolution/else/anyOf/0) | {"required": ["value", "operation"]} | existing-native |

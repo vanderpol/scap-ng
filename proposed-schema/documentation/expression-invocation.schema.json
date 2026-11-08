@@ -15,7 +15,9 @@
   "properties": {
     "assessment": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Assessment reference associated with this invocation.",
+      "x-doc-status": "native-structure-derived"
     },
     "invocation_ref": {
       "type": "string",
@@ -31,7 +33,9 @@
       "items": {
         "type": "string"
       },
-      "uniqueItems": true
+      "uniqueItems": true,
+      "description": "Test references recorded as executed during this invocation.",
+      "x-doc-status": "native-structure-derived"
     },
     "trace": {
       "type": "array",
@@ -45,7 +49,9 @@
         ],
         "properties": {
           "path": {
-            "type": "string"
+            "type": "string",
+            "description": "Recorded location of this step in the expression structure.",
+            "x-doc-status": "native-structure-derived"
           },
           "kind": {
             "enum": [
@@ -83,13 +89,19 @@
             "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_reason"
           },
           "test": {
-            "type": "string"
+            "type": "string",
+            "description": "Test reference associated with this trace step.",
+            "x-doc-status": "native-structure-derived"
           },
           "assessment": {
-            "type": "string"
+            "type": "string",
+            "description": "Assessment reference associated with this trace step.",
+            "x-doc-status": "native-structure-derived"
           },
           "alias": {
-            "type": "string"
+            "type": "string",
+            "description": "Dependency alias associated with this trace step.",
+            "x-doc-status": "native-structure-derived"
           },
           "reused": {
             "type": "boolean",
@@ -136,7 +148,9 @@
             "description": "Initial if is index0; ordered else_if branches follow. No branch reordering."
           },
           "condition_path": {
-            "type": "string"
+            "type": "string",
+            "description": "Recorded path to the condition evaluated in this step.",
+            "x-doc-status": "native-structure-derived"
           }
         },
         "allOf": [
@@ -478,7 +492,9 @@
           }
         ],
         "additionalProperties": false
-      }
+      },
+      "description": "Evaluation steps recorded for this invocation.",
+      "x-doc-status": "native-structure-derived"
     },
     "diagnostics": {
       "type": "array",
@@ -494,7 +510,9 @@
             "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_code"
           },
           "test": {
-            "type": "string"
+            "type": "string",
+            "description": "Test reference associated with this diagnostic.",
+            "x-doc-status": "native-structure-derived"
           }
         },
         "additionalProperties": false
@@ -507,7 +525,9 @@
       "description": "Digest of immutable effective bindings and explicit invocation identity; never an inferred empty binding."
     },
     "input_presence_version": {
-      "const": 1
+      "const": 1,
+      "description": "Version marker required by the Input-provision trace form.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "additionalProperties": false,
@@ -520,7 +540,9 @@
         "unknown",
         "not_evaluated",
         "not_applicable"
-      ]
+      ],
+      "description": "Expression outcome encoded with the schema string vocabulary.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "allOf": [
@@ -531,13 +553,15 @@
             "contains": {
               "properties": {
                 "kind": {
-                  "const": "input_presence"
+                  "const": "input_presence",
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-invocation.schema.json#/properties/trace/items/properties/kind"
                 }
               },
               "required": [
                 "kind"
               ]
-            }
+            },
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/expression-invocation.schema.json#/properties/trace"
           }
         },
         "required": [
@@ -553,5 +577,7 @@
     }
   ],
   "x-doc-origin": "schema/expression-invocation.schema.json",
-  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release.",
+  "description": "Expression invocation record with its outcome, trace and executed-Test references.",
+  "x-doc-status": "native-structure-derived"
 }

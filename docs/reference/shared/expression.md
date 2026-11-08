@@ -9,8 +9,8 @@ SCAP-NG 0.4.0 Test-result expression grammar. Logical and/or/one/xor are canonic
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `expression` | object | Definition | Explicit new-authoring selection for assessment logic; applies only in explicit logical group. | [/$defs/expression](../../../proposed-schema/documentation/expression.schema.json#/$defs/expression) |
-| `input_presence` | object | Definition | **Unresolved description** | [/$defs/input_presence](../../../proposed-schema/documentation/expression.schema.json#/$defs/input_presence) |
-| `condition` | object | Definition | **Unresolved description** | [/$defs/condition](../../../proposed-schema/documentation/expression.schema.json#/$defs/condition) |
+| `input_presence` | object | Definition | Input-provision guard expressed with input_provided. | [/$defs/input_presence](../../../proposed-schema/documentation/expression.schema.json#/$defs/input_presence) |
+| `condition` | object | Definition | A logical expression or an Input-provision guard. | [/$defs/condition](../../../proposed-schema/documentation/expression.schema.json#/$defs/condition) |
 
 ## `/$defs/expression/oneOf/0`
 
@@ -37,7 +37,7 @@ SCAP-NG 0.4.0 Test-result expression grammar. Logical and/or/one/xor are canonic
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `if` | object | 1..1 (required) | **Unresolved description** | [/$defs/expression/oneOf/2/properties/else_if/items/properties/if](../../../proposed-schema/documentation/expression.schema.json#/$defs/expression/oneOf/2/properties/else_if/items/properties/if) |
+| `if` | object | 1..1 (required) | A logical expression or an Input-provision guard. | [/$defs/expression/oneOf/2/properties/else_if/items/properties/if](../../../proposed-schema/documentation/expression.schema.json#/$defs/expression/oneOf/2/properties/else_if/items/properties/if) |
 | `then` | object | 1..1 (required) | Explicit new-authoring selection for assessment logic; applies only in explicit logical group. | [/$defs/expression/oneOf/2/properties/else_if/items/properties/then](../../../proposed-schema/documentation/expression.schema.json#/$defs/expression/oneOf/2/properties/else_if/items/properties/then) |
 
 ## `/$defs/expression/oneOf/3`

@@ -17,17 +17,23 @@
   ],
   "properties": {
     "format_version": {
-      "const": "scap-ng.result-package.draft-1"
+      "const": "scap-ng.result-package.draft-1",
+      "description": "Discriminator for the draft result-package manifest format.",
+      "x-doc-status": "native-structure-derived"
     },
     "result_schema_version": {
       "const": "0.4.0",
       "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_result_schema_version"
     },
     "digest_algorithm": {
-      "const": "sha256"
+      "const": "sha256",
+      "description": "Algorithm label used by the member digest fields.",
+      "x-doc-status": "native-structure-derived"
     },
     "signature_status": {
-      "const": "unsigned"
+      "const": "unsigned",
+      "description": "Declares the draft result package unsigned.",
+      "x-doc-status": "native-structure-derived"
     },
     "run_id": {
       "type": "string",
@@ -36,7 +42,9 @@
     },
     "scan_result_ref": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "description": "Reference to the scan-level result document.",
+      "x-doc-status": "native-structure-derived"
     },
     "members": {
       "type": "array",
@@ -54,7 +62,9 @@
         "properties": {
           "id": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Logical identifier of the result-package member.",
+            "x-doc-status": "native-structure-derived"
           },
           "kind": {
             "enum": [
@@ -67,22 +77,31 @@
           },
           "path": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Path recorded for this result-package member.",
+            "x-doc-status": "native-structure-derived"
           },
           "sha256": {
             "type": "string",
-            "pattern": "^[0-9a-f]{64}$"
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "SHA-256 digest declared for this result-package member.",
+            "x-doc-status": "native-structure-derived"
           },
           "size": {
             "type": "integer",
-            "minimum": 0
+            "minimum": 0,
+            "x-doc-gap-proposal": "Declared result-member size: specify its unit and counted representation consistently with the package-member contract."
           },
           "schema_version": {
-            "const": "0.4.0"
+            "const": "0.4.0",
+            "description": "SCAP-NG schema version declared for the result document.",
+            "x-doc-status": "native-structure-derived"
           }
         },
         "additionalProperties": false
-      }
+      },
+      "description": "Inventory of the result documents carried by the package.",
+      "x-doc-status": "native-structure-derived"
     },
     "evaluation_groups": {
       "type": "array",
@@ -96,7 +115,9 @@
         "properties": {
           "entry_execution_id": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "description": "Entry-execution identifier recorded for this evaluation group.",
+            "x-doc-status": "native-structure-derived"
           },
           "target_ref": {
             "type": "string",
@@ -110,14 +131,20 @@
               "type": "string",
               "minLength": 1
             },
-            "uniqueItems": true
+            "uniqueItems": true,
+            "description": "Execution identifiers listed as members of this evaluation group.",
+            "x-doc-status": "native-structure-derived"
           }
         },
         "additionalProperties": false
-      }
+      },
+      "description": "Evaluation-group records associating entry executions with their related executions.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "additionalProperties": false,
   "x-doc-origin": "schema/result-package-manifest.schema.json",
-  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release.",
+  "description": "Inventory of result-package members and their evaluation groups.",
+  "x-doc-status": "native-structure-derived"
 }

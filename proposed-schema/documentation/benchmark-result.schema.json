@@ -55,22 +55,30 @@
           "properties": {
             "id": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Identifier of the Benchmark being reported.",
+              "x-doc-status": "native-structure-derived"
             },
             "version": {
               "type": [
                 "string",
                 "integer"
-              ]
+              ],
+              "description": "Version of the Benchmark being reported.",
+              "x-doc-status": "native-structure-derived"
             },
             "package_digest": {
               "type": [
                 "string",
                 "null"
-              ]
+              ],
+              "description": "Digest recorded for the Benchmark package.",
+              "x-doc-status": "native-structure-derived"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "Identity of the Benchmark being reported.",
+          "x-doc-status": "native-structure-derived"
         },
         "effective_policy": {
           "type": "object",
@@ -88,36 +96,48 @@
               "type": [
                 "string",
                 "null"
-              ]
+              ],
+              "description": "Profile identifier recorded for this evaluation.",
+              "x-doc-status": "native-structure-derived"
             },
             "tailoring": {
               "type": [
                 "object",
                 "null"
-              ]
+              ],
+              "description": "Tailoring information recorded for this evaluation.",
+              "x-doc-status": "native-structure-derived"
             },
             "selected_rules": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "uniqueItems": true
+              "uniqueItems": true,
+              "description": "Rule identifiers recorded as selected.",
+              "x-doc-status": "native-structure-derived"
             },
             "disabled_rules": {
               "type": "array",
               "items": {
                 "type": "string"
               },
-              "uniqueItems": true
+              "uniqueItems": true,
+              "description": "Rule identifiers recorded as disabled.",
+              "x-doc-status": "native-structure-derived"
             },
             "check_selectors": {
               "type": "object",
               "additionalProperties": {
                 "type": "string"
-              }
+              },
+              "description": "Assessment-choice selections recorded for the Rules.",
+              "x-doc-status": "native-structure-derived"
             },
             "parameters": {
-              "type": "object"
+              "type": "object",
+              "description": "Effective Parameter bindings recorded for the evaluation.",
+              "x-doc-status": "native-structure-derived"
             },
             "organizational_inputs": {
               "type": "object",
@@ -132,9 +152,14 @@
                 "properties": {
                   "parameter": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 1,
+                    "description": "Identifier of the Parameter supplied by this binding.",
+                    "x-doc-status": "native-structure-derived"
                   },
-                  "value": {},
+                  "value": {
+                    "description": "Value supplied for the Parameter; redaction is specified separately.",
+                    "x-doc-status": "native-structure-derived"
+                  },
                   "source": {
                     "type": "string",
                     "enum": [
@@ -143,7 +168,9 @@
                       "api",
                       "integration",
                       "other"
-                    ]
+                    ],
+                    "description": "Source category recorded for the supplied policy value.",
+                    "x-doc-status": "native-structure-derived"
                   },
                   "input_set": {
                     "type": [
@@ -153,16 +180,22 @@
                     "properties": {
                       "id": {
                         "type": "string",
-                        "minLength": 1
+                        "minLength": 1,
+                        "description": "Identifier of the supplying Organizational Input Set.",
+                        "x-doc-status": "native-structure-derived"
                       },
                       "version": {
                         "type": [
                           "string",
                           "integer"
-                        ]
+                        ],
+                        "description": "Version of the supplying Organizational Input Set.",
+                        "x-doc-status": "native-structure-derived"
                       }
                     },
-                    "additionalProperties": false
+                    "additionalProperties": false,
+                    "description": "Identity of the Organizational Input Set recorded for the binding.",
+                    "x-doc-status": "native-structure-derived"
                   },
                   "provenance": {
                     "type": "object",
@@ -172,7 +205,9 @@
                     "type": [
                       "object",
                       "null"
-                    ]
+                    ],
+                    "description": "Scope metadata recorded for this policy binding.",
+                    "x-doc-status": "native-structure-derived"
                   },
                   "effective_from": {
                     "type": [
@@ -226,7 +261,9 @@
               }
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "Policy selections and Parameter bindings recorded for this evaluation.",
+          "x-doc-status": "native-structure-derived"
         },
         "summary": {
           "type": "object",
@@ -269,13 +306,17 @@
               "minimum": 0
             }
           },
-          "additionalProperties": true
+          "additionalProperties": true,
+          "description": "Reported outcome counters; counting and rollup policy remain separate contracts.",
+          "x-doc-status": "native-structure-derived"
         },
         "rule_results": {
           "type": "array",
           "items": {
             "$ref": "rule-result.schema.json"
-          }
+          },
+          "description": "Rule-result entries associated with this Benchmark evaluation.",
+          "x-doc-status": "native-structure-derived"
         },
         "target_ref": {
           "type": "string",
@@ -283,7 +324,9 @@
           "description": "Reference to the scan-level target evaluated by this Benchmark Result. Target identity and inventory are owned by Scan Result."
         }
       },
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Benchmark evaluation result with its recorded policy and Rule-result entries.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "additionalProperties": false,

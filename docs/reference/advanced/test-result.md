@@ -5,10 +5,11 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
 | [schema](../../../proposed-schema/documentation/test-result.schema.json#) | {"type": "object", "required": ["id", "outcome", "object_refs", "item_refs", "per_item_results", "item_summary", "invocation_ref", "require_refs", "items_found", "items_observed"], "additionalProperties": false} | existing-native |
-| [/properties/id](../../../proposed-schema/documentation/test-result.schema.json#/properties/id) | {"type": "string", "minLength": 1} | existing-native |
+| [/properties/id](../../../proposed-schema/documentation/test-result.schema.json#/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/test_title](../../../proposed-schema/documentation/test-result.schema.json#/properties/test_title) | {"type": ["string", "null"]} | existing-native |
+| [/properties/existence_outcome](../../../proposed-schema/documentation/test-result.schema.json#/properties/existence_outcome) | {} | native-structure-derived |
 | [/properties/existence_outcome/oneOf/1](../../../proposed-schema/documentation/test-result.schema.json#/properties/existence_outcome/oneOf/1) | {"type": "null"} | existing-native |
-| [/properties/object_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/object_refs) | {"type": "array"} | existing-native |
+| [/properties/object_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/object_refs) | {"type": "array"} | native-structure-derived |
 | [/properties/object_refs/items](../../../proposed-schema/documentation/test-result.schema.json#/properties/object_refs/items) | {"type": "string"} | existing-native |
 | [/properties/item_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/item_refs) | {"type": "array"} | existing-native |
 | [/properties/item_refs/items](../../../proposed-schema/documentation/test-result.schema.json#/properties/item_refs/items) | {"type": "string"} | existing-native |
@@ -33,12 +34,12 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [/properties/item_summary/properties/returned_items](../../../proposed-schema/documentation/test-result.schema.json#/properties/item_summary/properties/returned_items) | {"type": "integer", "minimum": 0} | existing-native |
 | [/properties/item_summary/properties/truncated_evidence](../../../proposed-schema/documentation/test-result.schema.json#/properties/item_summary/properties/truncated_evidence) | {"type": "boolean"} | existing-native |
 | [/properties/invocation_ref](../../../proposed-schema/documentation/test-result.schema.json#/properties/invocation_ref) | {"type": "string", "minLength": 1, "pattern": "\\S"} | existing-native |
-| [/properties/require_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/require_refs) | {"type": "array", "minItems": 1} | existing-native |
+| [/properties/require_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/require_refs) | {"type": "array", "minItems": 1} | native-structure-derived |
 | [/properties/require_refs/items](../../../proposed-schema/documentation/test-result.schema.json#/properties/require_refs/items) | {"type": "string", "pattern": "^/tests/(?:[^~/]\|~[01])+/require(?:/(?:[^~]\|~[01])*)?$"} | existing-native |
-| [/properties/binding_set_id](../../../proposed-schema/documentation/test-result.schema.json#/properties/binding_set_id) | {"type": "string", "pattern": "^[0-9a-f]{64}$"} | existing-native |
+| [/properties/binding_set_id](../../../proposed-schema/documentation/test-result.schema.json#/properties/binding_set_id) | {"type": "string", "pattern": "^[0-9a-f]{64}$"} | native-structure-derived |
 | [/properties/evidence_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/evidence_refs) | {"type": "array"} | existing-native |
 | [/properties/evidence_refs/items](../../../proposed-schema/documentation/test-result.schema.json#/properties/evidence_refs/items) | {"type": "string", "minLength": 1, "pattern": "\\S"} | existing-native |
-| [/properties/decisive_require_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/decisive_require_refs) | {"type": "array"} | existing-native |
+| [/properties/decisive_require_refs](../../../proposed-schema/documentation/test-result.schema.json#/properties/decisive_require_refs) | {"type": "array"} | native-structure-derived |
 | [/properties/decisive_require_refs/items](../../../proposed-schema/documentation/test-result.schema.json#/properties/decisive_require_refs/items) | {"type": "string", "pattern": "^/tests/(?:[^~/]\|~[01])+/require(?:/(?:[^~]\|~[01])*)?$"} | existing-native |
 | [/properties/items_observed/oneOf/0](../../../proposed-schema/documentation/test-result.schema.json#/properties/items_observed/oneOf/0) | {"type": "integer", "minimum": 0} | existing-native |
 | [/properties/items_observed/oneOf/1](../../../proposed-schema/documentation/test-result.schema.json#/properties/items_observed/oneOf/1) | {"const": "unknown"} | existing-native |

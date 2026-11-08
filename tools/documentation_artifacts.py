@@ -54,4 +54,4 @@ def schema_help(data, schema_pointer):
     if not route:
         return None
     owner = next(r for r in data['descriptions'] if r['description_pointer'] == route['description_pointer'])
-    return dict(owner, status=route['status'])
+    return dict(owner, status=route['status'], scope=route.get('scope','declared-schema'))

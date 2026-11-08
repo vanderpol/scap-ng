@@ -12,7 +12,7 @@ Editorial receipt: editorial-batch-2.json case 23
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/assessment_purpose](../../../proposed-schema/documentation/result-types.schema.json#/$defs/assessment_purpose) | {"type": "string", "enum": ["assessment", "applicability"]} | existing-native |
+| [/$defs/assessment_purpose](../../../proposed-schema/documentation/result-types.schema.json#/$defs/assessment_purpose) | {"type": "string", "enum": ["assessment", "applicability"]} | native-structure-derived |
 | [/$defs/assessment_class](../../../proposed-schema/documentation/result-types.schema.json#/$defs/assessment_class) | {"type": "string", "enum": ["compliance", "vulnerability", "patch", "inventory", "miscellaneous"]} | existing-native |
 | [/$defs/completeness](../../../proposed-schema/documentation/result-types.schema.json#/$defs/completeness) | {"type": "object", "required": ["logical_complete", "population_complete", "evidence_complete"], "additionalProperties": false} | existing-native |
 | [/$defs/completeness/properties/logical_complete](../../../proposed-schema/documentation/result-types.schema.json#/$defs/completeness/properties/logical_complete) | {"type": "boolean"} | existing-native |
@@ -60,7 +60,7 @@ Editorial receipt: editorial-batch-2.json case 25
 | [/$defs/typed_value/allOf/2/then](../../../proposed-schema/documentation/result-types.schema.json#/$defs/typed_value/allOf/2/then) | {"required": ["value"]} | existing-native |
 | [/$defs/typed_value/allOf/2/then/properties/value](../../../proposed-schema/documentation/result-types.schema.json#/$defs/typed_value/allOf/2/then/properties/value) | {"type": "object"} | existing-native |
 | [/$defs/typed_value/allOf/2/then/properties/value/additionalProperties/oneOf/1](../../../proposed-schema/documentation/result-types.schema.json#/$defs/typed_value/allOf/2/then/properties/value/additionalProperties/oneOf/1) | {"type": "array"} | existing-native |
-| [/$defs/bounded_evidence](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence) | {"type": "object", "required": ["observed_failures", "actual_failures", "maximum", "returned", "truncated_population"], "additionalProperties": false} | existing-native |
+| [/$defs/bounded_evidence](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence) | {"type": "object", "required": ["observed_failures", "actual_failures", "maximum", "returned", "truncated_population"], "additionalProperties": false} | native-structure-derived |
 | [/$defs/bounded_evidence/properties/observed_failures](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence/properties/observed_failures) | {"type": "integer", "minimum": 0} | existing-native |
 | [/$defs/bounded_evidence/properties/actual_failures/oneOf/0](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence/properties/actual_failures/oneOf/0) | {"type": "integer", "minimum": 0} | existing-native |
 | [/$defs/bounded_evidence/properties/actual_failures/oneOf/1](../../../proposed-schema/documentation/result-types.schema.json#/$defs/bounded_evidence/properties/actual_failures/oneOf/1) | {"type": "string", "enum": ["unknown"]} | existing-native |

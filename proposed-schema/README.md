@@ -61,7 +61,7 @@ python -m unittest discover -s tests -v
 | `x-doc-declared-shape` | Collection-parameter declaration; distinguished from what validation enforces |
 | `x-doc-source`, `x-doc-review`, `x-doc-status` | Source identity, editorial receipt and documentation status |
 | `x-doc-availability`, `x-doc-contract`, `x-doc-gap-proposal` | Discrepancies, unresolved behavior and draft wording |
-| `x-doc-expand`, `x-doc-scope` | Keep shared predicate controls/libraries out of basic capability tables |
+| `x-doc-expand`, `x-doc-scope` | Keep shared controls/libraries out of basic tables and identify inactive or unreferenced schema contexts |
 
 These are proposed, passive schema annotations. Types, required keys, enums,
 default annotations and validation structure come from the actual schemas.
@@ -71,7 +71,8 @@ this work does not settle the previously held datatype questions.
 `tools/documentation_artifacts.py` loads the offline transport only with an
 externally supplied manifest SHA-256, verifies source/output hashes, and resolves
 exact capability/role/path or schema-pointer help. Missing or stale packs fail
-closed. It does not provide raw YAML-language-service integration or prove a
+closed. Schema help carries its context scope so inactive migration shapes and
+unreferenced helpers are distinguishable from declared grammar. It does not provide raw YAML-language-service integration or prove a
 VS Code host result. Production editor pins are unchanged.
 
 JSON Schema `examples` remain available at their source pointers. Issue #42 can

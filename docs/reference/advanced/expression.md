@@ -98,7 +98,7 @@ The active grammar supports this operator and a nonempty recursive operand list.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/input_presence](../../../proposed-schema/documentation/expression.schema.json#/$defs/input_presence) | {"type": "object", "required": ["input_provided"], "additionalProperties": false} | existing-native |
+| [/$defs/input_presence](../../../proposed-schema/documentation/expression.schema.json#/$defs/input_presence) | {"type": "object", "required": ["input_provided"], "additionalProperties": false} | native-structure-derived |
 | [/$defs/input_presence/properties/input_provided](../../../proposed-schema/documentation/expression.schema.json#/$defs/input_presence/properties/input_provided) | {"type": "string", "maxLength": 64, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-input$"} | editorially-approved |
 
 [/$defs/input_presence/properties/input_provided](../../../proposed-schema/documentation/expression.schema.json#/$defs/input_presence/properties/input_provided): Checks whether a declared Input was supplied, even if its value is empty.
@@ -107,3 +107,4 @@ Editorial receipt: editorial-batch.json case 05
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [/$defs/condition](../../../proposed-schema/documentation/expression.schema.json#/$defs/condition) | {} | native-structure-derived |

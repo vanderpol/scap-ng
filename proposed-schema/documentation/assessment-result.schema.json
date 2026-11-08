@@ -52,13 +52,17 @@
           "properties": {
             "id": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Identifier of the Assessment being reported.",
+              "x-doc-status": "native-structure-derived"
             },
             "version": {
               "type": [
                 "integer",
                 "string"
-              ]
+              ],
+              "description": "Version of the Assessment being reported.",
+              "x-doc-status": "native-structure-derived"
             },
             "digest": {
               "type": [
@@ -68,7 +72,9 @@
               "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_digest"
             }
           },
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "Identity and version of the Assessment being reported.",
+          "x-doc-status": "native-structure-derived"
         },
         "purpose": {
           "$ref": "result-types.schema.json#/$defs/assessment_purpose"
@@ -80,7 +86,9 @@
           "enum": [
             "automated",
             "manual"
-          ]
+          ],
+          "description": "Whether the reported Assessment is automated or manual.",
+          "x-doc-status": "native-structure-derived"
         },
         "outcome": {
           "$ref": "result-types.schema.json#/$defs/technical_outcome"
@@ -125,7 +133,9 @@
           "type": "array",
           "items": {
             "$ref": "variable-result.schema.json"
-          }
+          },
+          "description": "Variable results associated with this Assessment execution.",
+          "x-doc-status": "native-structure-derived"
         },
         "diagnostics": {
           "type": "array",
@@ -138,7 +148,9 @@
           "type": "array",
           "items": {
             "type": "object"
-          }
+          },
+          "description": "Evidence records associated with this Assessment result.",
+          "x-doc-status": "native-structure-derived"
         },
         "manual_response": {
           "type": [
@@ -178,7 +190,9 @@
                 "direct",
                 "imported",
                 "delegated"
-              ]
+              ],
+              "description": "Reported source of the manual response.",
+              "x-doc-status": "native-structure-derived"
             },
             "evaluator": {
               "type": "object",
@@ -195,20 +209,28 @@
                   "properties": {
                     "scheme": {
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "description": "Naming scheme of the evaluator identifier.",
+                      "x-doc-status": "native-structure-derived"
                     },
                     "value": {
                       "type": "string",
-                      "minLength": 1
+                      "minLength": 1,
+                      "description": "Evaluator identifier within the named scheme.",
+                      "x-doc-status": "native-structure-derived"
                     }
                   },
-                  "additionalProperties": false
+                  "additionalProperties": false,
+                  "description": "Structured identifier declared for the evaluator.",
+                  "x-doc-status": "native-structure-derived"
                 },
                 "display_name": {
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "description": "Display name recorded for the evaluator.",
+                  "x-doc-status": "native-structure-derived"
                 },
                 "organization": {
                   "type": [
@@ -221,13 +243,17 @@
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "description": "Role label declared for the evaluator.",
+                  "x-doc-status": "native-structure-derived"
                 },
                 "identity_source": {
                   "type": [
                     "string",
                     "null"
-                  ]
+                  ],
+                  "description": "Source named for the evaluator identity.",
+                  "x-doc-status": "native-structure-derived"
                 },
                 "organizational_unit": {
                   "type": [
@@ -246,38 +272,50 @@
                       "type": [
                         "string",
                         "null"
-                      ]
+                      ],
+                      "description": "Email address recorded for the evaluator.",
+                      "x-doc-status": "native-structure-derived"
                     },
                     "phone": {
                       "type": [
                         "string",
                         "null"
-                      ]
+                      ],
+                      "description": "Telephone number recorded for the evaluator.",
+                      "x-doc-status": "native-structure-derived"
                     },
                     "uri": {
                       "type": [
                         "string",
                         "null"
-                      ]
+                      ],
+                      "description": "Contact URI recorded for the evaluator.",
+                      "x-doc-status": "native-structure-derived"
                     }
                   },
                   "additionalProperties": false,
                   "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_contact"
                 }
               },
-              "additionalProperties": false
+              "additionalProperties": false,
+              "description": "Identity and contact information recorded for the manual evaluator.",
+              "x-doc-status": "native-structure-derived"
             },
             "review": {
               "type": [
                 "object",
                 "null"
-              ]
+              ],
+              "description": "Review metadata associated with the manual response.",
+              "x-doc-status": "native-structure-derived"
             },
             "comments": {
               "type": [
                 "string",
                 "null"
-              ]
+              ],
+              "description": "Comments accompanying the manual response.",
+              "x-doc-status": "native-structure-derived"
             },
             "evidence_refs": {
               "type": "array",
@@ -305,23 +343,31 @@
                 "minLength": 1,
                 "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/input_identifier"
               },
-              "value": {},
+              "value": {
+                "description": "Consumed policy value; omitted when redacted.",
+                "x-doc-status": "native-structure-derived"
+              },
               "redacted": {
                 "type": "boolean",
                 "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_redacted"
               },
               "organizational_input_ref": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "description": "Reference to the Organizational Input Set supplying the binding.",
+                "x-doc-status": "native-structure-derived"
               },
               "materialized": {
-                "type": "boolean"
+                "type": "boolean",
+                "x-doc-gap-proposal": "Whether a consumed binding is materialized in retained evidence; clarify interaction with redaction and imported bindings before defining the flag."
               },
               "validation_status": {
                 "type": [
                   "string",
                   "null"
-                ]
+                ],
+                "description": "Status recorded for validation of the consumed binding.",
+                "x-doc-status": "native-structure-derived"
               }
             },
             "additionalProperties": false,
@@ -408,7 +454,9 @@
             "properties": {
               "alias": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "description": "Alias associated with this dependency result.",
+                "x-doc-status": "native-structure-derived"
               },
               "assessment": {
                 "type": "object",
@@ -419,13 +467,17 @@
                 "properties": {
                   "id": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 1,
+                    "description": "Identifier of the dependent Assessment.",
+                    "x-doc-status": "native-structure-derived"
                   },
                   "version": {
                     "type": [
                       "string",
                       "integer"
-                    ]
+                    ],
+                    "description": "Version of the dependent Assessment.",
+                    "x-doc-status": "native-structure-derived"
                   },
                   "digest": {
                     "type": [
@@ -435,7 +487,9 @@
                     "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_digest"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "description": "Identity of the dependent Assessment.",
+                "x-doc-status": "native-structure-derived"
               },
               "execution_id": {
                 "type": "string",
@@ -463,7 +517,9 @@
                   "assessment",
                   "applicability",
                   null
-                ]
+                ],
+                "description": "Purpose recorded for this dependency execution.",
+                "x-doc-status": "native-structure-derived"
               },
               "reused": {
                 "type": "boolean",
@@ -495,20 +551,27 @@
                 "minLength": 1,
                 "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/input_identifier"
               },
-              "value": {},
+              "value": {
+                "description": "Effective value of this Input binding; omitted when redacted.",
+                "x-doc-status": "native-structure-derived"
+              },
               "redacted": {
                 "type": "boolean",
                 "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_redacted"
               },
               "source": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "description": "Source label for the effective Input binding.",
+                "x-doc-status": "native-structure-derived"
               },
               "source_ref": {
                 "type": [
                   "string",
                   "null"
-                ]
+                ],
+                "description": "Reference associated with the Input binding source.",
+                "x-doc-status": "native-structure-derived"
               }
             },
             "additionalProperties": false,
@@ -575,7 +638,9 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "uniqueItems": true
+                "uniqueItems": true,
+                "description": "Evidence elements recorded as used by the Test.",
+                "x-doc-status": "native-structure-derived"
               },
               "required_elements": {
                 "type": "array",
@@ -583,7 +648,9 @@
                   "type": "string",
                   "minLength": 1
                 },
-                "uniqueItems": true
+                "uniqueItems": true,
+                "description": "Evidence elements recorded as required for the Test.",
+                "x-doc-status": "native-structure-derived"
               },
               "relationship": {
                 "enum": [
@@ -591,11 +658,15 @@
                   "variable",
                   "filter",
                   "selection"
-                ]
+                ],
+                "description": "How the Test is related to the recorded evidence elements.",
+                "x-doc-status": "native-structure-derived"
               }
             },
             "additionalProperties": false
-          }
+          },
+          "description": "Records how Tests use evidence elements.",
+          "x-doc-status": "native-structure-derived"
         },
         "item_report": {
           "$ref": "item-report.schema.json#/properties/item_report"
@@ -613,7 +684,9 @@
           ],
           "properties": {
             "scope": {
-              "const": "per_test"
+              "const": "per_test",
+              "description": "Scope of the reported evidence-retention limit.",
+              "x-doc-status": "native-structure-derived"
             },
             "maximum_items": {
               "type": [
@@ -628,15 +701,21 @@
                 "scanner_configuration",
                 "run_request",
                 "operator_override"
-              ]
+              ],
+              "description": "Origin of the effective evidence-retention limit.",
+              "x-doc-status": "native-structure-derived"
             },
             "override_reason": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Explanation for an operator override of the reporting limit.",
+              "x-doc-status": "native-structure-derived"
             },
             "operator_ref": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Reference to the operator recorded for the reporting override.",
+              "x-doc-status": "native-structure-derived"
             }
           },
           "allOf": [
@@ -644,7 +723,8 @@
               "if": {
                 "properties": {
                   "source": {
-                    "const": "operator_override"
+                    "const": "operator_override",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-result.schema.json#/properties/assessment_result/properties/evidence_retention/properties/source"
                   }
                 },
                 "required": [
@@ -689,7 +769,8 @@
           "if": {
             "properties": {
               "mode": {
-                "const": "manual"
+                "const": "manual",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-result.schema.json#/properties/assessment_result/properties/mode"
               },
               "outcome": {
                 "enum": [
@@ -729,7 +810,8 @@
           "if": {
             "properties": {
               "mode": {
-                "const": "automated"
+                "const": "automated",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-result.schema.json#/properties/assessment_result/properties/mode"
               }
             },
             "required": [
@@ -742,7 +824,9 @@
             ]
           }
         }
-      ]
+      ],
+      "description": "Result of one Assessment execution with its observations and evidence references.",
+      "x-doc-status": "native-structure-derived"
     }
   },
   "additionalProperties": false,
