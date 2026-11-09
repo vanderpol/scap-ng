@@ -38,3 +38,5 @@ For exact schema hashes, source history and example origins, see [provenance](do
 ## License
 
 Project-owned source is licensed under [Apache-2.0](LICENSE). Referenced SCAP/OVAL materials and converted third-party content retain their respective rights; see [third-party notices](docs/THIRD-PARTY.md).
+
+The [0.4 evaluation addendum](docs/contracts/0.4-evaluation.md) documents approved Model A Variable grouping, independent cardinality layers and remaining status holds. Its [conformance pack](conformance/0.4/model-a/manifest.json) and compatibility matrix are required companions to RI implementation work; [semantic maintenance requirements](AGENTS.md) apply to every capability increment.
