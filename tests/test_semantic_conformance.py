@@ -29,3 +29,8 @@ class SemanticConformance(unittest.TestCase):
                 token = token.replace('~1', '/').replace('~0', '~')
                 value = value[int(token)] if isinstance(value, list) else value[token]
             self.assertEqual(value, row['source_annotation'])
+
+    def test_existing_four_capability_catalog(self):
+        result = check(supplied_evidence=True)
+        self.assertEqual(result['schema_validated'], 23)
+        self.assertEqual(result['actually_executed'], 0)
