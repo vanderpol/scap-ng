@@ -12,7 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
+      - name: Verify the exact reviewed head
+        env:
+          REVIEW_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$REVIEW_HEAD"
       - name: Read exact shared publication policy and checker
         uses: actions/checkout@v4
         with:
