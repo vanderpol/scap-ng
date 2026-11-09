@@ -23,6 +23,8 @@ This repository provides the current schema candidate, a small set of readable e
 
 ## Validation and provenance
 
+Converted content represented as current native authoring must pass the shared [Tools publication admission gate](https://github.com/vanderpol/scap-ng-tools/pull/41). This repository's schema/documentation checks do not qualify a converted corpus or establish scanner equivalence. CI rejects publication sinks that bypass the shared boundary. Historical artifacts and server/ref permission limitations remain tracked in [Tools #40](https://github.com/vanderpol/scap-ng-tools/issues/40).
+
 The versioned 0.4 schema files are in flat `schema/`. Pin the **whole repository** to an exact commit until a release tag exists.
 
 Run the baseline integrity tests:
