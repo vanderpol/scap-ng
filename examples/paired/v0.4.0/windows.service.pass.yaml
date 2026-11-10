@@ -1,0 +1,43 @@
+id: windows-service-pass
+pair_id: windows-service
+capability: windows.service
+schema_pin: examples/paired/v0.4.0/schema-pin.json
+assessment:
+  id: windows-service-example-assessment
+  version: 1
+  assessment_title: Illustrative windows.service field comparison
+  mode: automated
+  class: compliance
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.0}
+  tests:
+    windows-service-example-test:
+      test_title: Compare the explicitly supplied start_type
+      capability: windows.service
+      object:
+        service_name: {equals: Spooler}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          start_type: {datatype: string, equals: SERVICE_DISABLED}
+      reported_elements: all
+  evaluate: {test: windows-service-example-test}
+collection_result:
+  id: windows-service-pass-collection
+  capability: windows.service
+  status: complete
+  item_refs: [windows-service-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: windows-service-pass-item
+  capability: windows.service
+  status: exists
+  fields:
+    service_name: {datatype: string, status: exists, value: Spooler}
+    start_type: {datatype: string, status: exists, value: SERVICE_DISABLED}
+  provenance: {kind: synthetic-documentation-fixture}
+expected: {label: Pass, technical_outcome: 'true'}
+verification: {status: illustrative-unverified, native_evaluator: null}
+explanation: The supplied start_type is 'SERVICE_DISABLED', so the string equality to "SERVICE_DISABLED"
+  matches; this does not assert whether the service is currently running.

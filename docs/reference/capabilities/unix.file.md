@@ -94,4 +94,74 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 See the [schema](../../../proposed-schema/documentation/capabilities/unix.file.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 
+## Examples
+
+**Illustrative expected outcomes; native evaluation unverified.** Syntax validation is reported separately from evaluation. For these compliance teaching cases only, technical `true` is labelled Pass and `false` Fail; a consuming Rule defines policy outcomes. Items are explicit synthetic evidence, not observations from a scanned host.
+
+Both cases use this native Test (inline Object and Require):
+
+```yaml
+tests:
+  unix-file-example-test:
+    test_title: Compare the explicitly supplied owner_uid
+    capability: unix.file
+    object:
+      filepath: {equals: /etc/passwd}
+    require:
+      item_requirement: {items_found: one_or_more, items_satisfying: every}
+      field_requirement: {values_found: one_or_more, values_matching: every}
+      fields:
+        owner_uid: {datatype: integer, equals: 0}
+    reported_elements: all
+evaluate: {test: unix-file-example-test}
+```
+
+### Pass — expected `true` (unverified)
+
+The supplied owner_uid is 0, so the explicit integer equality to 0 matches.
+
+```yaml
+collection_result:
+  id: unix-file-pass-collection
+  capability: unix.file
+  status: complete
+  item_refs: [unix-file-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: unix-file-pass-item
+  capability: unix.file
+  status: exists
+  fields:
+    full_path: {datatype: string, status: exists, value: /etc/passwd}
+    owner_uid: {datatype: integer, status: exists, value: 0}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/unix.file.pass.yaml).
+
+### Fail — expected `false` (unverified)
+
+The supplied owner_uid is 1000, so the explicit integer equality to 0 does not match.
+
+```yaml
+collection_result:
+  id: unix-file-fail-collection
+  capability: unix.file
+  status: complete
+  item_refs: [unix-file-fail-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: unix-file-fail-item
+  capability: unix.file
+  status: exists
+  fields:
+    full_path: {datatype: string, status: exists, value: /etc/passwd}
+    owner_uid: {datatype: integer, status: exists, value: 1000}
+  provenance: {kind: synthetic-documentation-fixture}
+```
+
+[Complete version-pinned fixture](../../../examples/paired/v0.4.0/unix.file.fail.yaml).
+
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `unix-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

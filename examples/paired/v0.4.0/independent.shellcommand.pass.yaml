@@ -1,0 +1,42 @@
+id: independent-shellcommand-pass
+pair_id: independent-shellcommand
+capability: independent.shellcommand
+schema_pin: examples/paired/v0.4.0/schema-pin.json
+assessment:
+  id: independent-shellcommand-example-assessment
+  version: 1
+  assessment_title: Illustrative independent.shellcommand field comparison
+  mode: automated
+  class: compliance
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.0}
+  tests:
+    independent-shellcommand-example-test:
+      test_title: Compare the explicitly supplied stdout_line
+      capability: independent.shellcommand
+      object: {shell: sh, command: /usr/bin/getconf LONG_BIT, error_if_exit_status_not_0: false, error_if_stderr_exists: false}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          stdout_line: {datatype: string, equals: '64'}
+      reported_elements: all
+  evaluate: {test: independent-shellcommand-example-test}
+collection_result:
+  id: independent-shellcommand-pass-collection
+  capability: independent.shellcommand
+  status: complete
+  item_refs: [independent-shellcommand-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: independent-shellcommand-pass-item
+  capability: independent.shellcommand
+  status: exists
+  fields:
+    exit_status: {datatype: integer, status: exists, value: 0}
+    stdout_line: {datatype: string, status: exists, value: '64'}
+  provenance: {kind: synthetic-documentation-fixture}
+expected: {label: Pass, technical_outcome: 'true'}
+verification: {status: illustrative-unverified, native_evaluator: null}
+explanation: The supplied stdout_line string is '64', so the string equality to "64" matches; the command
+  was not executed for this fixture.
