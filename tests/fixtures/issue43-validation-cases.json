@@ -1,0 +1,2721 @@
+{
+  "format": "scap-ng-review-pack-validation-cases-1",
+  "scope": "Structural witnesses only; no scanner equivalence.",
+  "cases": [
+    {
+      "name": "object-reference",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": "shared-object",
+      "expected_valid": true
+    },
+    {
+      "name": "legacy-object-wrapper-invalid",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "object_ref": "shared-object"
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "filepath",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "filepath": {
+          "equals": "/example/config"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "directory",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": null,
+        "filesystem": "all"
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-0-directories",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 0,
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-0-symlinks",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 0,
+          "recurse": "symlinks"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-0-symlinks_and_directories",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 0,
+          "recurse": "symlinks_and_directories"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-1-directories",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 1,
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-1-symlinks",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 1,
+          "recurse": "symlinks"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-1-symlinks_and_directories",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 1,
+          "recurse": "symlinks_and_directories"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-unlimited-directories",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": "unlimited",
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-unlimited-symlinks",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": "unlimited",
+          "recurse": "symlinks"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "traversal-unlimited-symlinks_and_directories",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": "unlimited",
+          "recurse": "symlinks_and_directories"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "bad-traversal-0",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-traversal-1",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 0
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-traversal-2",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-traversal-3",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": -1,
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-traversal-4",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": true,
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-traversal-5",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": "1",
+          "recurse": "directories"
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-traversal-6",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "traversal": {
+          "max_depth": 1,
+          "recurse": "files"
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "unknown-filesystem",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "remote"
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "pairing-not-enforced",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "full_path-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "full_path-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "full_path-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "full_path-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "full_path": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "directory-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "directory": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "directory-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "directory": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "directory-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "directory": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "directory-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "directory": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "name-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "name": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "name-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "name": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "name-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "name": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "name-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "name": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "type-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "type": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "type-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "type": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "type-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "type": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "type-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "type": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "owner_uid-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_uid": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_uid-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_uid": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_uid-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_uid": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_uid-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_uid": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "owner_gid-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_gid": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_gid-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_gid": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_gid-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_gid": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_gid-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_gid": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "size-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "size": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "size-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "size": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "size-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "size": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "size-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "size": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "access_time-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "access_time": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "access_time-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "access_time": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "access_time-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "access_time": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "access_time-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "access_time": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "change_time-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "change_time": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "change_time-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "change_time": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "change_time-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "change_time": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "change_time-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "change_time": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "modify_time-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "modify_time": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "modify_time-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "modify_time": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "modify_time-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "modify_time": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "modify_time-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "modify_time": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "setuid-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setuid": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "setuid-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setuid": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "setuid-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setuid": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "setuid-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setuid": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "setgid-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setgid": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "setgid-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setgid": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "setgid-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setgid": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "setgid-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "setgid": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "sticky-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "sticky": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "sticky-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "sticky": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "sticky-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "sticky": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "sticky-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "sticky": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "owner_read-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_read": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_read-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_read": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_read-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_read": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_read-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_read": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "owner_write-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_write": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_write-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_write": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_write-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_write": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_write-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_write": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "owner_execute-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_execute": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_execute-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_execute": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_execute-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_execute": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "owner_execute-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_execute": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "group_read-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_read": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_read-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_read": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_read-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_read": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_read-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_read": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "group_write-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_write": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_write-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_write": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_write-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_write": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_write-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_write": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "group_execute-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_execute": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_execute-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_execute": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_execute-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_execute": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "group_execute-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "group_execute": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "other_read-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_read": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_read-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_read": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_read-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_read": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_read-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_read": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "other_write-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_write": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_write-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_write": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_write-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_write": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_write-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_write": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "other_execute-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_execute": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_execute-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_execute": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_execute-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_execute": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "other_execute-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "other_execute": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "has_extended_acl-string-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "has_extended_acl": {
+            "datatype": "integer",
+            "status": "exists",
+            "value": "not-an-integer"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "has_extended_acl-wrong-tag",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "has_extended_acl": {
+            "datatype": "string",
+            "status": "exists",
+            "value": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "has_extended_acl-repeated",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "has_extended_acl": []
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "has_extended_acl-error-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "has_extended_acl": {
+            "datatype": "integer",
+            "status": "error",
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "future-field",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "future_field": {
+            "datatype": "string",
+            "status": "exists",
+            "value": "x"
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "nonexistent-item-invalid",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "does_not_exist",
+        "fields": {},
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "redacted-with-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_uid": {
+            "datatype": "integer",
+            "status": "exists",
+            "redacted": true,
+            "value": 1
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "redacted-no-payload",
+      "schema_file": "collected-item.schema.json",
+      "pointer": "",
+      "instance": {
+        "id": "example",
+        "capability": "unix.file",
+        "status": "exists",
+        "fields": {
+          "owner_uid": {
+            "datatype": "integer",
+            "status": "exists",
+            "redacted": true
+          }
+        },
+        "provenance": {}
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "comparison",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {
+          "owner_uid": {
+            "equals": 1000
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "test-comparison",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "fields": {
+            "owner_uid": {
+              "equals": 1000
+            }
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "existence-only",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "none"
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "test-existence-only",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "none"
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "absence-field",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {
+          "owner_uid": {
+            "values_found": "none"
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "test-absence-field",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "fields": {
+            "owner_uid": {
+              "values_found": "none"
+            }
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "empty-fields",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {}
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "test-empty-fields",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "fields": {}
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "bad-pair",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "none",
+          "values_matching": "every"
+        },
+        "fields": {
+          "owner_uid": {
+            "equals": 1000
+          }
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "test-bad-pair",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "none",
+            "values_matching": "every"
+          },
+          "fields": {
+            "owner_uid": {
+              "equals": 1000
+            }
+          }
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "wrong-field-datatype",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {
+          "owner_uid": {
+            "datatype": "string",
+            "equals": 1000
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "test-wrong-field-datatype",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "fields": {
+            "owner_uid": {
+              "datatype": "string",
+              "equals": 1000
+            }
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "unknown-field",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {
+          "future_field": {
+            "equals": "x"
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "test-unknown-field",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "fields": {
+            "future_field": {
+              "equals": "x"
+            }
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "nested-group",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "or": [
+          {
+            "fields": {
+              "owner_uid": {
+                "equals": 1000
+              }
+            }
+          },
+          {
+            "and": [
+              {
+                "fields": {
+                  "name": {
+                    "equals": "config"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "test-nested-group",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "test_title": "Example",
+        "reported_elements": "all",
+        "object": {
+          "path": {
+            "equals": "/example"
+          },
+          "filename": {
+            "equals": "config"
+          },
+          "filesystem": "all"
+        },
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "or": [
+            {
+              "fields": {
+                "owner_uid": {
+                  "equals": 1000
+                }
+              }
+            },
+            {
+              "and": [
+                {
+                  "fields": {
+                    "name": {
+                      "equals": "config"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "complete-assessment",
+      "schema_file": "assessment.schema.json",
+      "pointer": "",
+      "instance": {
+        "assessment": {
+          "id": "example-assessment",
+          "version": 1,
+          "assessment_title": "Example",
+          "mode": "automated",
+          "class": "compliance",
+          "specification": {
+            "id": "scap-ng.pre-alpha.assessment",
+            "version": "0.4.0"
+          },
+          "tests": {
+            "example-test": {
+              "test_title": "Example",
+              "reported_elements": "all",
+              "capability": "unix.file",
+              "object": {
+                "path": {
+                  "equals": "/example"
+                },
+                "filename": {
+                  "equals": "config"
+                },
+                "filesystem": "all"
+              },
+              "require": {
+                "item_requirement": {
+                  "items_found": "one_or_more",
+                  "items_satisfying": "every"
+                },
+                "field_requirement": {
+                  "values_found": "one_or_more",
+                  "values_matching": "every"
+                },
+                "fields": {
+                  "owner_uid": {
+                    "equals": 1000
+                  }
+                }
+              }
+            }
+          },
+          "evaluate": {
+            "test": "example-test"
+          }
+        }
+      },
+      "expected_valid": true
+    },
+    {
+      "name": "legacy-require-invalid",
+      "schema_file": "assessment.schema.json",
+      "pointer": "",
+      "instance": {
+        "assessment": {
+          "id": "example-assessment",
+          "version": 1,
+          "assessment_title": "Example",
+          "mode": "automated",
+          "class": "compliance",
+          "specification": {
+            "id": "scap-ng.pre-alpha.assessment",
+            "version": "0.4.0"
+          },
+          "tests": {
+            "example-test": {
+              "test_title": "Example",
+              "reported_elements": "all",
+              "capability": "unix.file",
+              "object": {
+                "path": {
+                  "equals": "/example"
+                },
+                "filename": {
+                  "equals": "config"
+                },
+                "filesystem": "all"
+              },
+              "require": "all"
+            }
+          },
+          "evaluate": {
+            "test": "example-test"
+          }
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "object-unknown-selector-rejected",
+      "schema_file": "native-selector.schema.json",
+      "pointer": "/$defs/unix_file_object",
+      "instance": {
+        "path": {
+          "equals": "/example"
+        },
+        "filename": {
+          "equals": "config"
+        },
+        "filesystem": "all",
+        "unknown_selector": true
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "annotation-does-not-open-predicate",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every"
+        },
+        "field_requirement": {
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {
+          "owner_uid": {
+            "equals": 1000,
+            "unknown_property": true
+          }
+        }
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "annotation-does-not-open-require",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test/properties/require",
+      "instance": {
+        "item_requirement": {
+          "items_found": "none"
+        },
+        "unknown_property": true
+      },
+      "expected_valid": false
+    },
+    {
+      "name": "annotation-does-not-open-group",
+      "schema_file": "assessment-language.schema.json",
+      "pointer": "/$defs/test",
+      "instance": {
+        "capability": "unix.file",
+        "require": {
+          "item_requirement": {
+            "items_found": "one_or_more",
+            "items_satisfying": "every"
+          },
+          "field_requirement": {
+            "values_found": "one_or_more",
+            "values_matching": "every"
+          },
+          "and": [
+            {
+              "fields": {
+                "owner_uid": {
+                  "equals": 1000
+                }
+              },
+              "unknown_property": true
+            }
+          ]
+        }
+      },
+      "expected_valid": false
+    }
+  ]
+}
