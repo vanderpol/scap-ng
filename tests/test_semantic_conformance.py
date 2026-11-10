@@ -34,3 +34,22 @@ class SemanticConformance(unittest.TestCase):
         result = check(supplied_evidence=True)
         self.assertEqual(result['schema_validated'], 23)
         self.assertEqual(result['actually_executed'], 0)
+
+    def test_case_sensitive_evidence_members(self):
+        from copy import deepcopy
+        import yaml
+        from jsonschema import Draft202012Validator
+        from referencing import Registry, Resource
+        cases=json.loads((ROOT/'conformance/0.4/evidence-member-negatives.json').read_text())
+        fixture=yaml.safe_load((ROOT/cases['fixture']).read_text())
+        schemas=[json.loads(p.read_text()) for p in (ROOT/'schema').glob('*.schema.json')]
+        registry=Registry().with_resources((s['$id'],Resource.from_contents(s)) for s in schemas)
+        schema=next(s for s in schemas if s['$id'].endswith('/collected-item.schema.json'))
+        validator=Draft202012Validator(schema,registry=registry)
+        validator.validate(fixture['collected_items'][0])
+        for case in cases['cases']:
+            changed=deepcopy(fixture);node=changed
+            for part in case['object_pointer'].strip('/').split('/'):
+                node=node[int(part)] if isinstance(node,list) else node[part]
+            node[case['invalid_spelling']]=node.pop(case['member'])
+            self.assertTrue(list(validator.iter_errors(changed['collected_items'][0])),case['id'])
