@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/review/issue43-phase-a/test-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-02",
+  "title": "Native 0.4 Test Result",
+  "description": "Test-centered supplied observations with source-bound native requirements. No OVAL check aliases or synthetic State positions.",
+  "type": "object",
+  "required": [
+    "id",
+    "outcome",
+    "object_refs",
+    "item_refs",
+    "per_item_results",
+    "item_summary",
+    "invocation_ref",
+    "require_refs",
+    "items_found",
+    "items_observed"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "test_title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "outcome": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/result-types.schema.json#/$defs/technical_outcome"
+    },
+    "existence_outcome": {
+      "oneOf": [
+        {
+          "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/result-types.schema.json#/$defs/technical_outcome"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "object_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "item_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Only the collected Item IDs retained under per_item_results or otherwise needed to explain the Test. This list is not an unbounded enumeration of every evaluated Item; the required item_summary provides evaluated, failing and retained counts when reporting is capped."
+    },
+    "per_item_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "item_ref",
+          "outcome",
+          "require_results",
+          "item"
+        ],
+        "properties": {
+          "item_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "outcome": {
+            "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/result-types.schema.json#/$defs/technical_outcome"
+          },
+          "item": {
+            "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/collected-item.schema.json",
+            "description": "Retained system Item beside the verdict and native requirement observations; its id must equal item_ref. No synthetic missing Item."
+          },
+          "require_results": {
+            "type": "array",
+            "items": {
+              "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/require-result.schema.json"
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "uniqueItems": true
+          }
+        },
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "outcome": {
+                  "const": "error"
+                }
+              },
+              "required": [
+                "outcome"
+              ]
+            },
+            "then": {
+              "required": [
+                "reason",
+                "evidence_refs"
+              ],
+              "properties": {
+                "evidence_refs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "pattern": "\\S"
+                  },
+                  "uniqueItems": true,
+                  "minItems": 1
+                }
+              }
+            }
+          }
+        ]
+      },
+      "description": "Test-local reported system Items and their evaluated State/Entity comparisons, subject to scanner-controlled evidence retention. This array can be a sample; never infer counts or collection completeness from its length."
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "item_summary": {
+      "type": "object",
+      "description": "Required counts for every technical Test, including no-item, unknown and capped-evidence cases. Evaluated Items and mismatches describe execution; returned_items counts retained per_item_results; actual_mismatches is unknown if full relevant population was not evaluated. Consistency between these values, the assessment retention cap and retained Items SHALL be validated beyond JSON Schema.",
+      "required": [
+        "evaluated_items",
+        "observed_mismatches",
+        "actual_mismatches",
+        "returned_items",
+        "truncated_evidence"
+      ],
+      "properties": {
+        "evaluated_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "observed_mismatches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "actual_mismatches": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unknown"
+            }
+          ]
+        },
+        "returned_items": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "truncated_evidence": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "invocation_ref": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "require_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^/tests/(?:[^~/]|~[01])+/require(?:/(?:[^~]|~[01])*)?$",
+        "description": "Canonical RFC6901 location in the owning Assessment; semantic validation must resolve it to a requirement node of this Test."
+      },
+      "uniqueItems": true
+    },
+    "items_found": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/assessment-language.schema.json#/$defs/item_existence_cardinality"
+    },
+    "items_satisfying": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/assessment-language.schema.json#/$defs/cardinality"
+    },
+    "field_requirement": {
+      "$ref": "https://scap-ng.dev/schema/review/issue43-phase-a/assessment-language.schema.json#/$defs/paired_requirement"
+    },
+    "binding_set_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "uniqueItems": true
+    },
+    "decisive_require_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^/tests/(?:[^~/]|~[01])+/require(?:/(?:[^~]|~[01])*)?$",
+        "description": "Canonical RFC6901 location in the owning Assessment; semantic validation must resolve it to a requirement node of this Test."
+      },
+      "uniqueItems": true
+    },
+    "items_observed": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "const": "unknown"
+        }
+      ],
+      "description": "Explicit observed Item population, independent from evaluated/retained counts. Never infer zero from an empty reporting projection."
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "error"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "required": [
+          "reason",
+          "evidence_refs"
+        ],
+        "properties": {
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "uniqueItems": true,
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

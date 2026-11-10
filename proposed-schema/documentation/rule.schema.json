@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/rule.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-02",
+  "title": "SCAP-NG Rule v0.4.0",
+  "type": "object",
+  "required": [
+    "rule"
+  ],
+  "properties": {
+    "rule": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "title",
+        "severity",
+        "role",
+        "weight",
+        "requires",
+        "conflicts",
+        "applicability",
+        "parameters",
+        "assessment_choices",
+        "default_assessment_choice"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Rule identifier.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of this Rule content.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable Rule title.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "severity": {
+          "type": "string",
+          "description": "Severity label assigned to the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role label assigned to the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "weight": {
+          "type": "number",
+          "description": "Scoring weight declared for the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "discussion": {
+          "type": "string",
+          "description": "Discussion explaining the condition addressed by the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Reason for the Rule and its security objective.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "extensions": {
+          "type": "object",
+          "description": "Extension metadata carried by the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "warnings": {
+          "type": "array",
+          "description": "Warnings associated with using the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "identifiers": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "External identifiers associated with the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "External references supporting the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "requires": {
+          "type": "array",
+          "description": "Selection prerequisites. Each array entry is one requirement clause; clauses are ANDed. A clause's any_of members are ORed. A single string is shorthand for a one-member clause.",
+          "items": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "object",
+                "required": [
+                  "any_of"
+                ],
+                "properties": {
+                  "any_of": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "description": "Alternative Rule identifiers within one selection-prerequisite clause.",
+                    "x-doc-status": "native-structure-derived"
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "conflicts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Rule identifiers declared as selection conflicts.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "applicability": {
+          "type": "array",
+          "description": "Applicability declarations associated with the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Parameter declarations or bindings associated with the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "remediation": {
+          "type": "object",
+          "description": "Remediation information associated with the Rule.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "assessment_choices": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Publisher-defined Assessment choices. The redundant source alias named default is prohibited; default_assessment_choice names an actual choice.",
+          "propertyNames": {
+            "not": {
+              "const": "default"
+            }
+          },
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "assessment"
+            ],
+            "properties": {
+              "assessment": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Reference to the Assessment used by this choice.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "inputs": {
+                "type": "object",
+                "description": "Assessment input name to Benchmark Parameter binding.",
+                "additionalProperties": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "parameter"
+                      ],
+                      "properties": {
+                        "parameter": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Identifier of the Benchmark Parameter supplying this Input.",
+                          "x-doc-status": "native-structure-derived"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  ]
+                }
+              },
+              "expected_version": {
+                "type": [
+                  "integer",
+                  "string"
+                ],
+                "description": "Exact logical Assessment version required to disambiguate multiple versions in the declared source scope."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "default_assessment_choice": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name of the publisher-defined Assessment choice selected as the default.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "organizational_input_requirements": {
+          "type": "object",
+          "description": "Compiler-derived Organizational Input discovery by Assessment choice. Authoring may omit this map; an explicit map must agree exactly with references and bindings. Every compiled/package Rule must contain the complete derived map (possibly empty). Native locations are canonical RFC6901 pointers relative to the selected Assessment body.",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "input",
+                "required",
+                "uses"
+              ],
+              "properties": {
+                "input": {
+                  "type": "string",
+                  "minLength": 1,
+                  "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/input_identifier"
+                },
+                "required": {
+                  "type": "boolean",
+                  "description": "Requiredness recorded for this discovered Input.",
+                  "x-doc-status": "native-structure-derived"
+                },
+                "uses": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "source_path"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "value",
+                          "presence"
+                        ],
+                        "description": "Value consumption versus an explicit Input-provision guard."
+                      },
+                      "source_path": {
+                        "type": "string",
+                        "minLength": 2,
+                        "pattern": "^/(?:[^~]|~[01])*$",
+                        "description": "Canonical RFC6901 pointer to an actual Input reference scalar in the selected Assessment body; derived by the compiler, not manually authored coordinates."
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "description": "Locations where the selected Assessment references the Input.",
+                  "x-doc-status": "native-structure-derived"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "readOnly": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Rule content, Assessment choices, and selection metadata.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/rule.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

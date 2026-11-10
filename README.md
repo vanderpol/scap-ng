@@ -15,13 +15,18 @@ This repository provides the current schema candidate, a small set of readable e
 3. [Specification](specification/README.md) — current status and outstanding semantic documentation.
 4. [Reference](docs/generated/schema-reference.md) and [capabilities](docs/generated/capability-catalog.md) — generated from the schema.
 
+[Proposed documentation reference for all 104 capabilities](docs/reference/README.md) · [Regeneration and maintenance](proposed-schema/README.md) · [Coverage and evidence](docs/DOCUMENTATION-PRODUCTION.md). These review-only annotations preserve frozen 0.4.0 validation.
+
 ## More content and tools
 
 - [VS Code authoring editor](https://github.com/vanderpol/scap-ng-vscode)
 - [Conversion and authoring tools](https://github.com/vanderpol/scap-ng-tools)
 - [Scanner implementation reference](docs/generated/scanner-implementation-catalog.md)
+- [Application developer guide (platform references and reviewed pilots)](docs/developer-guide/README.md)
 
 ## Validation and provenance
+
+Converted content represented as current native authoring must pass the shared [Tools publication admission gate](https://github.com/vanderpol/scap-ng-tools/pull/41). This repository's schema/documentation checks do not qualify a converted corpus or establish scanner equivalence. CI rejects publication sinks that bypass the shared boundary. Final deployment verification and administrative inspection limits remain tracked in [Tools #40](https://github.com/vanderpol/scap-ng-tools/issues/40).
 
 The versioned 0.4 schema files are in flat `schema/`. Pin the **whole repository** to an exact commit until a release tag exists.
 
@@ -36,3 +41,5 @@ For exact schema hashes, source history and example origins, see [provenance](do
 ## License
 
 Project-owned source is licensed under [Apache-2.0](LICENSE). Referenced SCAP/OVAL materials and converted third-party content retain their respective rights; see [third-party notices](docs/THIRD-PARTY.md).
+
+The [0.4 evaluation addendum](docs/contracts/0.4-evaluation.md) documents approved Model A Variable grouping, independent cardinality layers and remaining status holds. Its [conformance pack](conformance/0.4/model-a/manifest.json) and compatibility matrix are required companions to RI implementation work; [semantic maintenance requirements](AGENTS.md) apply to every capability increment.

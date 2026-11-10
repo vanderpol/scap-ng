@@ -44,8 +44,8 @@ def frontmatter(heading, version):
     return (f'{NOTICE}\n\n# {heading} — {version}\n\n'
             'This is a **generated reference** from the frozen schema and capability '
             'metadata, not a statement of scanner implementation conformance. '
-            'The repository release tag pins this documentation, the schema, '
-            'the specification and examples together.\n\n')
+            'Pin the entire repository commit (or release tag when available), including '
+            'documentation, schemas, specification and examples.\n\n')
 
 
 def assessment_properties(schema):
@@ -172,12 +172,15 @@ def render_scanner_catalog(version, mappings, coverage):
                      f'**Contract:** [mapping](../../schema/capability-mappings/{group}/{path.name}).\n\n')
         selectors = ', '.join(f'`{field}`' for field in native.get('selector_map', {}))
         parameters = ', '.join(f'`{field}`' for field in native.get('collection_parameters', {}))
-        fields = ', '.join(f'`{field}`' for field in native.get('state_field_map', {}))
+        fields = ', '.join(f'`{field}`' for field in sorted(set(native.get('state_field_map', {}).values())))
         lines.append(f'- Authoring selectors: {selectors or "none declared"}.\n')
         lines.append(f'- Collection parameters: {parameters or "none declared"}.\n')
         lines.append(f'- Returned/state fields: {fields or "none declared"}.\n')
         if record.get('reason'):
             lines.append(f'- Research status: {record["reason"]}\n')
+        if record.get('semantic_research_ref'):
+            family = name.split('.')[0]
+            lines.append(f'- [Semantic research: native facts versus proposals](developer-contract-research-{family}.md#{name.replace(".", "")}).\n')
         steps = record.get('scanner_steps', [])
         if steps:
             lines.append('\n**Curated implementation steps:**\n\n')
@@ -200,6 +203,12 @@ def render_scanner_catalog(version, mappings, coverage):
                          'are crosswalked but not yet promoted.\n')
         lines.append('\n')
     return ''.join(lines).rstrip() + '\n'
+
+
+def render_developer_pilot(version, mappings, proposal):
+    """Render author/scanner views from a shared frozen-contract model."""
+    from developer_guide import render
+    return render(version, mappings, proposal, frontmatter, entries_table)
 
 
 def render_ntuser(version, mapping, notes, audit):
@@ -306,6 +315,7 @@ def generated_documents():
     notes = load(METADATA / 'windows.ntuser-source-notes.json')
     audit = load(METADATA / 'windows.ntuser-oval-audit.json')
     coverage = load(METADATA / 'scanner-guidance-status.json')
+    proposal = load(METADATA / 'schema-documentation-pilot.json')
     ntuser = next(item for group, _, item in mappings
                   if group == 'supported' and item['capability'] == 'windows.ntuser')
     md_files = {
@@ -316,6 +326,9 @@ def generated_documents():
             version, mappings, coverage),
         'scanner-windows-ntuser.md': render_ntuser(version, ntuser, notes, audit),
     }
+    md_files.update(render_developer_pilot(version, mappings, proposal))
+    from render_contract_research import render as render_research
+    md_files.update(render_research(version, frontmatter, entries_table))
     immutable = sorted((*SCHEMAS.glob('*.json'),
                         *(SCHEMAS / 'capability-mappings').rglob('*.json')))
     fingerprint = sha256()
@@ -351,8 +364,9 @@ def verify_documents(expected, output_dir):
     failures = {}
     for filename, content in expected.items():
         path = output_dir / filename
-        actual = path.read_text(encoding='utf-8') if path.exists() else ''
-        if actual != content:
+        raw = path.read_bytes() if path.exists() else None
+        actual = raw.decode('utf-8', errors='replace') if raw is not None else ''
+        if raw != content.encode('utf-8'):
             failures[filename] = '\n'.join(list(difflib.unified_diff(
                 actual.splitlines(), content.splitlines(), fromfile='committed',
                 tofile='expected', lineterm=''))[:24])
@@ -376,7 +390,7 @@ def main():
     else:
         GENERATED.mkdir(parents=True, exist_ok=True)
         for filename, content in expected.items():
-            (GENERATED / filename).write_text(content, encoding='utf-8')
+            (GENERATED / filename).write_text(content, encoding='utf-8', newline='\n')
         print(f'Generated {len(expected)} documentation files from immutable 0.4 metadata')
 
 

@@ -9,7 +9,7 @@ import unittest
 
 PROJECT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT / 'tools'))
-from generate_docs import generated_documents, verify_documents  # noqa: E402
+from generate_docs import generated_documents, render_developer_pilot, verify_documents  # noqa: E402
 
 
 class DocumentationDriftTests(unittest.TestCase):
@@ -55,6 +55,37 @@ class DocumentationDriftTests(unittest.TestCase):
             self.assertEqual(native_fields, set(audit['nodes'][node]['fields']))
         self.assertEqual(notes['review_status'], 'pending_native_equivalence_review')
         self.assertIn('Legacy review status:', self.docs['scanner-windows-ntuser.md'])
+
+    def test_platform_pilots_remain_separate_and_non_normative(self):
+        expected = {
+            'windows': ('windows.registry', 'unix.file'),
+            'unix': ('unix.file', 'windows.registry'),
+            'independent': ('independent.shellcommand', 'windows.registry'),
+        }
+        for platform, (included, excluded) in expected.items():
+            with self.subTest(platform=platform):
+                page = self.docs[f'developer-guide-{platform}-pilot.md']
+                self.assertIn(f'## {included}\n', page)
+                self.assertNotIn(f'## {excluded}\n', page)
+                self.assertIn('Proposal only:', page)
+                self.assertIn('Pending research', page)
+                self.assertIn('not yet qualified', page)
+
+    def test_pilot_annotations_cannot_invent_capability_fields(self):
+        proposal = json.loads((PROJECT / 'docs' / 'metadata' /
+                               'schema-documentation-pilot.json').read_text())
+        mapping_paths = sorted((PROJECT / 'schema' / 'capability-mappings' /
+                                'supported').glob('*.json'))
+        mappings = [('supported', path, json.loads(path.read_text()))
+                    for path in mapping_paths]
+        proposal['capabilities']['windows.registry']['properties']['not_a_field'] = {
+            'description': 'bad',
+            'x-scap-ng-scanner': {'documentation_status': 'partial',
+                                  'known_contract': 'unknown',
+                                  'open_question': 'unknown'}
+        }
+        with self.assertRaisesRegex(ValueError, 'not_a_field'):
+            render_developer_pilot('0.4.0', mappings, proposal)
 
 
 if __name__ == '__main__':

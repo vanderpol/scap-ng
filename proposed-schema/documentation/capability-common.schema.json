@@ -1,0 +1,1200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-11-01",
+  "title": "SCAP-NG shared capability schema primitives v0.4.0",
+  "description": "Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern. Native 0.4 authoring may omit an inferred literal comparison datatype or use a self-describing typed operation; published compiled Assessments retain fully explicit canonical datatypes. compare_as is not supported.",
+  "$defs": {
+    "variable_reference": {
+      "type": "object",
+      "required": [
+        "variable"
+      ],
+      "properties": {
+        "variable": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-variable$",
+          "maxLength": 64,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/variable_identifier"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Uses the value of a declared Variable.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch.json",
+        "case": "02",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+      }
+    },
+    "entity_value": {
+      "oneOf": [
+        {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ]
+        },
+        {
+          "$ref": "#/$defs/literal_collection"
+        },
+        {
+          "$ref": "#/$defs/variable_reference"
+        },
+        {
+          "$ref": "#/$defs/input_reference"
+        }
+      ],
+      "description": "Literal scalar, literal collection, Variable reference, or Input reference.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "object_entity_base": {
+      "$ref": "assessment-language.schema.json#/$defs/object_selector_predicate",
+      "description": "Version-local 0.4 Object selector, no 0.3 value+operation longhand."
+    },
+    "state_entity_base": {
+      "$ref": "assessment-language.schema.json#/$defs/scalar_field_predicate",
+      "description": "Shared scalar field comparison grammar.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "state_filter": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "include"
+          ],
+          "properties": {
+            "include": {
+              "$ref": "assessment-language.schema.json#/$defs/state_entry"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "exclude"
+          ],
+          "properties": {
+            "exclude": {
+              "$ref": "assessment-language.schema.json#/$defs/state_entry"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "Includes or excludes collected Items that match a field condition.",
+      "x-scap-ng-authoring": {
+        "version": 1,
+        "control_id": "filter_action",
+        "group": "collection",
+        "representation": "key",
+        "hide_when_default": true,
+        "aggressive_preview": false,
+        "context": "present_filter",
+        "new_authoring_only": true,
+        "serialize_explicitly": true,
+        "preserve_overrides": true,
+        "authority": "https://github.com/vanderpol/scap-ng/issues/269",
+        "default_key": "exclude",
+        "hide_scope": "choice_only_arguments_remain_visible",
+        "oval_source": [
+          {
+            "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/oval-definitions-schema.xsd",
+            "source_line": 464,
+            "source_xpath": "/xsd:schema/xsd:element[7]/xsd:complexType/xsd:simpleContent/xsd:extension/xsd:attribute",
+            "attribute": "action",
+            "declaration_kind": "attribute",
+            "source_type": "oval-def:FilterActionEnumeration",
+            "source_default": "exclude",
+            "declaration_context": [
+              "filter"
+            ],
+            "source_sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+            "reachability_limit": "QName dependency census; occurrence-specific overrides require review",
+            "origin": "XSD_DECLARED_DEFAULT",
+            "omission": "Use effective default after occurrence/restriction resolution; not native editor authority",
+            "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5}filter/@action",
+            "documentation": ""
+          }
+        ]
+      },
+      "title": "Filter action",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch.json",
+        "case": "20",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+      }
+    },
+    "test_reference_set": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/inline_predicate"
+      },
+      "description": "Test-local comparison expressions; no State IDs or redundant capability declarations."
+    },
+    "comparison_operation": {
+      "type": "string",
+      "enum": [
+        "equals",
+        "not_equal",
+        "case_insensitive_equals",
+        "case_insensitive_not_equal",
+        "greater_than",
+        "greater_than_or_equal",
+        "less_than",
+        "less_than_or_equal",
+        "bitwise_and",
+        "bitwise_or",
+        "pattern_match",
+        "subset_of",
+        "superset_of",
+        "float_equals",
+        "float_not_equal",
+        "float_greater_than",
+        "float_greater_than_or_equal",
+        "float_less_than",
+        "float_less_than_or_equal",
+        "binary_equals",
+        "binary_not_equal",
+        "version_equals",
+        "version_not_equal",
+        "version_greater_than",
+        "version_greater_than_or_equal",
+        "version_less_than",
+        "version_less_than_or_equal",
+        "ipv4_equals",
+        "ipv4_not_equal",
+        "ipv4_greater_than",
+        "ipv4_greater_than_or_equal",
+        "ipv4_less_than",
+        "ipv4_less_than_or_equal",
+        "ipv4_subset_of",
+        "ipv4_superset_of",
+        "ipv6_equals",
+        "ipv6_not_equal",
+        "ipv6_greater_than",
+        "ipv6_greater_than_or_equal",
+        "ipv6_less_than",
+        "ipv6_less_than_or_equal",
+        "ipv6_subset_of",
+        "ipv6_superset_of",
+        "rpm_evr_equals",
+        "rpm_evr_not_equal",
+        "rpm_evr_greater_than",
+        "rpm_evr_greater_than_or_equal",
+        "rpm_evr_less_than",
+        "rpm_evr_less_than_or_equal",
+        "debian_evr_equals",
+        "debian_evr_not_equal",
+        "debian_evr_greater_than",
+        "debian_evr_greater_than_or_equal",
+        "debian_evr_less_than",
+        "debian_evr_less_than_or_equal",
+        "fileset_revision_equals",
+        "fileset_revision_not_equal",
+        "fileset_revision_greater_than",
+        "fileset_revision_greater_than_or_equal",
+        "fileset_revision_less_than",
+        "fileset_revision_less_than_or_equal",
+        "ios_version_equals",
+        "ios_version_not_equal",
+        "ios_version_greater_than",
+        "ios_version_greater_than_or_equal",
+        "ios_version_less_than",
+        "ios_version_less_than_or_equal"
+      ],
+      "description": "Names a comparison operation from the retained vocabulary.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "match_quantifier": {
+      "type": "string",
+      "enum": [
+        "every",
+        "one_or_more",
+        "exactly_one",
+        "none"
+      ],
+      "description": "Specifies how many values must match a condition.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "existence_requirement": {
+      "type": "string",
+      "enum": [
+        "every",
+        "one_or_more",
+        "none",
+        "exactly_one",
+        "zero_or_more"
+      ],
+      "description": "Specifies how many values must be present.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "logical_operator": {
+      "type": "string",
+      "enum": [
+        "and",
+        "or",
+        "one",
+        "xor"
+      ],
+      "description": "Names a logical grouping operator.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "native_datatype": {
+      "type": "string",
+      "enum": [
+        "string",
+        "boolean",
+        "integer",
+        "float",
+        "binary",
+        "version",
+        "ipv4",
+        "ipv6",
+        "rpm_evr",
+        "debian_evr",
+        "fileset_revision",
+        "ios_version",
+        "record"
+      ],
+      "description": "Names the datatype used for a native value.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "symlinks",
+                "symlinks_and_directories"
+              ],
+              "x-scap-ng-authoring": {
+                "version": 1,
+                "control_id": "traversal_kind",
+                "group": "traversal",
+                "representation": "value",
+                "hide_when_default": false,
+                "aggressive_preview": true,
+                "context": "present_traversal",
+                "new_authoring_only": true,
+                "serialize_explicitly": true,
+                "preserve_overrides": true,
+                "authority": "https://github.com/vanderpol/scap-ng/issues/269"
+              },
+              "default": "symlinks_and_directories",
+              "title": "Traversal kind",
+              "description": "Entry types to follow during recursion."
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Controls recursive searching through directories and symbolic links.\n\nTraversal is downward. Its binding to equality-selected path versus filepath is not yet specified consistently by the native contracts."
+    },
+    "file_selection": {
+      "type": "object",
+      "properties": {
+        "full_path": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "directory": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "name": {
+          "$ref": "#/$defs/object_entity_base"
+        },
+        "traversal": {
+          "$ref": "#/$defs/file_traversal"
+        },
+        "filesystem": {
+          "$ref": "#/$defs/filesystem_scope"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "full_path"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "directory"
+                ]
+              },
+              {
+                "required": [
+                  "name"
+                ]
+              },
+              {
+                "required": [
+                  "traversal"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "directory",
+            "name"
+          ],
+          "not": {
+            "required": [
+              "full_path"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "description": "File selection fields shared by file-oriented capabilities.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "set_object_operand": {
+      "type": "object",
+      "required": [
+        "object",
+        "filters"
+      ],
+      "properties": {
+        "object": {
+          "$ref": "#/$defs/object_use"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/state_filter"
+          },
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/filters"
+        }
+      },
+      "additionalProperties": false,
+      "description": "References an Object used as a Set operand.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "set_nested_operand": {
+      "type": "object",
+      "required": [
+        "set"
+      ],
+      "properties": {
+        "set": {
+          "$ref": "#/$defs/set_expression"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Supplies a nested Set expression as an operand.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "set_operand": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/set_object_operand"
+        },
+        {
+          "$ref": "#/$defs/set_nested_operand"
+        }
+      ],
+      "description": "An Object reference or nested Set expression.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "set_expression": {
+      "type": "object",
+      "required": [
+        "operator",
+        "operands"
+      ],
+      "properties": {
+        "operator": {
+          "type": "string",
+          "enum": [
+            "union",
+            "intersection",
+            "difference"
+          ],
+          "description": "Set operation applied to the operands.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "operands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/set_operand"
+          },
+          "description": "Ordered Object references or nested Set expressions.",
+          "x-doc-status": "native-grammar-derived"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "operator": {
+                "const": "difference",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/set_expression/properties/operator"
+              }
+            },
+            "required": [
+              "operator"
+            ]
+          },
+          "then": {
+            "properties": {
+              "operands": {
+                "maxItems": 2,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/set_expression/properties/operands"
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "description": "Combines Object collections using union, intersection, or difference.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch.json",
+        "case": "19",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+      }
+    },
+    "hierarchy_traversal": {
+      "type": "object",
+      "required": [
+        "max_depth"
+      ],
+      "properties": {
+        "max_depth": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unlimited"
+            }
+          ],
+          "description": "Maximum downward hierarchy recursion depth; 0 means the starting key only, and unlimited removes the depth limit.",
+          "x-scap-ng-authoring": {
+            "version": 1,
+            "control_id": "traversal_depth",
+            "group": "traversal",
+            "representation": "value",
+            "hide_when_default": false,
+            "aggressive_preview": true,
+            "context": "present_traversal",
+            "new_authoring_only": true,
+            "serialize_explicitly": true,
+            "preserve_overrides": true,
+            "authority": "https://github.com/vanderpol/scap-ng/issues/269"
+          },
+          "default": "unlimited",
+          "title": "Traversal depth"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Controls downward traversal from the selected hierarchy entry."
+    },
+    "record_field_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/record_field_predicate",
+      "description": "Comparison condition for one field within a record.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "record_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/record_wrapper_predicate/properties/record",
+      "description": "Conditions on named fields within a record.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "scalar_value_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/scalar_field_predicate",
+      "description": "Comparison condition for a scalar value.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "structured_value_predicate": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/scalar_value_predicate"
+        },
+        {
+          "type": "object",
+          "required": [
+            "record"
+          ],
+          "properties": {
+            "record": {
+              "$ref": "#/$defs/record_predicate"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": [
+            "list"
+          ],
+          "properties": {
+            "list": {
+              "$ref": "#/$defs/list_predicate"
+            }
+          },
+          "additionalProperties": false
+        }
+      ],
+      "description": "Condition on a scalar, record, or list value.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "list_predicate": {
+      "type": "object",
+      "required": [
+        "item",
+        "values_matching",
+        "values_found"
+      ],
+      "properties": {
+        "item": {
+          "$ref": "#/$defs/structured_value_predicate"
+        },
+        "values_matching": {
+          "$ref": "#/$defs/match_quantifier"
+        },
+        "values_found": {
+          "$ref": "#/$defs/existence_requirement"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Condition on the members of a collected list.",
+      "x-doc-status": "native-grammar-derived"
+    },
+    "file_traversal_base": {
+      "type": "object",
+      "required": [
+        "max_depth",
+        "recurse"
+      ],
+      "properties": {
+        "max_depth": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "const": "unlimited"
+            }
+          ],
+          "description": "Maximum downward recursion depth; 0 includes only the starting directory.",
+          "x-scap-ng-authoring": {
+            "version": 1,
+            "control_id": "traversal_depth",
+            "group": "traversal",
+            "representation": "value",
+            "hide_when_default": false,
+            "aggressive_preview": true,
+            "context": "present_traversal",
+            "new_authoring_only": true,
+            "serialize_explicitly": true,
+            "preserve_overrides": true,
+            "authority": "https://github.com/vanderpol/scap-ng/issues/269"
+          },
+          "default": "unlimited",
+          "title": "Traversal depth"
+        },
+        "recurse": {
+          "type": "string",
+          "minLength": 1,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/file_traversal/allOf/1/properties/recurse"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Shared non-deprecated downward file recursion structure. Traversal direction is fixed by this construct as downward; deprecated OVAL recurse_direction=up is not representable."
+    },
+    "windows_file_traversal": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/file_traversal_base"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "recurse": {
+              "type": "string",
+              "enum": [
+                "directories",
+                "junctions",
+                "junctions_and_directories"
+              ],
+              "x-scap-ng-authoring": {
+                "version": 1,
+                "control_id": "traversal_kind",
+                "group": "traversal",
+                "representation": "value",
+                "hide_when_default": false,
+                "aggressive_preview": true,
+                "context": "present_traversal",
+                "new_authoring_only": true,
+                "serialize_explicitly": true,
+                "preserve_overrides": true,
+                "authority": "https://github.com/vanderpol/scap-ng/issues/269"
+              },
+              "default": "directories",
+              "title": "Traversal kind",
+              "description": "Explicit new-authoring selection for traversal kind; applies only in present traversal. Preserve source-effective values and visible overrides; no runtime fallback."
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false,
+      "description": "Windows file traversal. Preserves the non-deprecated OVAL junction terminology rather than silently treating it as Unix symlink syntax."
+    },
+    "object_record_field": {
+      "$ref": "assessment-language.schema.json#/$defs/object_record_field_predicate",
+      "description": "Collector Object record field. Required selection_match is independent from expected-value value_match and Test/State require; legacy match/value/operation not accepted."
+    },
+    "object_record": {
+      "type": "object",
+      "required": [
+        "fields"
+      ],
+      "properties": {
+        "fields": {
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/object_record_field"
+          },
+          "description": "Named fields forming the record selector.",
+          "x-doc-status": "native-grammar-derived"
+        },
+        "redact_result": {
+          "type": "boolean",
+          "description": "When present, this value requests omission/redaction of the corresponding collected value from emitted result/evidence payloads. The only valid authored value is true; omit the property when redaction is not requested. This directive does not alter collection, comparison, aggregation, or technical truth.",
+          "const": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Authored WMI/cmdlet collector input record. Named fields use one comparator-as-key and explicit selection_match, not the old match/value/operation syntax. Record names are structurally unique."
+    },
+    "filesystem_scope": {
+      "type": "string",
+      "enum": [
+        "all",
+        "local",
+        "same"
+      ],
+      "default": "local",
+      "x-scap-ng-authoring": {
+        "group": "acquisition",
+        "hide_when_default": true,
+        "version": 1,
+        "control_id": "filesystem",
+        "representation": "value",
+        "aggressive_preview": false,
+        "context": "file_object",
+        "new_authoring_only": true,
+        "serialize_explicitly": true,
+        "preserve_overrides": true,
+        "authority": "https://github.com/vanderpol/scap-ng/issues/269",
+        "oval_source": [
+          {
+            "source_path": "third_party/scap-1.4-schemas/oval_5.12.3/independent-definitions-schema.xsd",
+            "source_line": 2932,
+            "source_xpath": "/xsd:schema/xsd:complexType[6]/xsd:attribute[4]",
+            "attribute": "recurse_file_system",
+            "declaration_kind": "attribute",
+            "source_type": null,
+            "source_default": "all",
+            "declaration_context": [
+              "FileBehaviors"
+            ],
+            "source_sha256": "fdb8ab59e6f7c72c4c96666c84ce73603c6172d1cba6d3b2e168bb77ef6df566",
+            "reachability_limit": "QName dependency census; occurrence-specific overrides require review",
+            "origin": "XSD_DECLARED_DEFAULT",
+            "omission": "Use effective default after occurrence/restriction resolution; not native editor authority",
+            "oval_qname": "{http://oval.mitre.org/XMLSchema/oval-definitions-5#independent}FileBehaviors/@recurse_file_system",
+            "documentation": "'recurse_file_system' defines the file system limitation of any searching and applies to all operations as specified on the path or filepath entity. The value of 'local' limits the search scope to local file systems (as opposed to file systems mounted from an external system). The value of 'defined' keeps any recursion within the file system that the file_object (path+filename or filepath) has specified. For example, on Windows, if the path specified was \"C:\\\", you would search only the C: drive, not other filesystems mounted to descendant paths. Similarly, on UNIX, if the path specified was \"/\", you would search only the filesystem mounted there, not other filesystems mounted to descendant paths. The value of 'defined' only applies when an equality operation is used for searching because the path or filepath entity must explicitly define a file system. The default value is 'all' meaning to search all available file systems for data collection. Note that in most cases it is recommended that the value of 'local' be used to ensure that file system searching is limited to only the local file systems. Searching 'all' file systems may have performance implications."
+          }
+        ]
+      },
+      "description": "Filesystem scope: all, local, or the starting filesystem (same).\n\nFilesystem scope is independent of recursion. Link/target metadata, cycle handling and precise local/same mount classification remain unspecified.",
+      "title": "Filesystem"
+    },
+    "foreach_binding": {
+      "type": "object",
+      "required": [
+        "item",
+        "in"
+      ],
+      "properties": {
+        "item": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$",
+          "description": "Lexical name for one Item produced by the source Object."
+        },
+        "in": {
+          "$ref": "#/$defs/object_reference"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Native 0.4 collection-expansion foreach binding. The source is one named shared/referenceable Object. Chaining is permitted: a source Object may itself use for_each, creating correlated lexical lineage. Independent multi-source Cartesian expansion is not implicit.",
+      "x-doc-review": {
+        "status": "withheld",
+        "source": "editorial-batch.json",
+        "case": "28",
+        "note": "No author-facing description is approved or offered. Neither foreach helper is reachable from accepted Assessment authoring; resolve placement/activation with Jack before advertising support or providing an authored for_each example."
+      }
+    },
+    "foreach_selector_binding": {
+      "type": "object",
+      "required": [
+        "from"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*\\.[A-Za-z_][A-Za-z0-9_-]*$",
+          "description": "Bind this target selector from one field of the current foreach Item, e.g. user.home_dir."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Bind this selector from one field of a visible foreach lineage alias, e.g. user.home_dir. In a chained foreach, aliases inherited from the source Object remain correlated and visible."
+    },
+    "object_reference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$",
+      "description": "Reuses a named Object for collection.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch.json",
+        "case": "03",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+      }
+    },
+    "inline_object": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Collection capability",
+          "description": "Optional for inline Objects only, whose capability is inherited from the enclosing Test; when supplied it must agree with the Test capability."
+        },
+        "filters": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/state_filter"
+          },
+          "description": "Leaf Object post-collection Filters; observed Items, not selectors or compliance States."
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "result"
+            ]
+          },
+          {
+            "required": [
+              "collect"
+            ]
+          }
+        ]
+      },
+      "additionalProperties": true,
+      "description": "Inline native Object. Capability-specific resource selectors and acquisition parameters are direct Object fields; generic select/collect wrappers are not part of the 0.4.0 grammar. The capability-specific generated schema validates each direct field, including native windows.cmdlet select. Filters and Set operations retain their own semantic boundaries.",
+      "title": "Inline collection Object",
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "set",
+              "filters"
+            ]
+          }
+        }
+      ]
+    },
+    "object_use": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/object_reference"
+        },
+        {
+          "$ref": "#/$defs/inline_object"
+        }
+      ],
+      "title": "Object declaration or reference",
+      "description": "Use an inline Object or an existing shared Object."
+    },
+    "literal_collection": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": [
+          "string",
+          "number",
+          "integer",
+          "boolean"
+        ]
+      },
+      "description": "Non-empty ordered literal collection. Duplicates are preserved; datatype validity and source-equivalent matching quantifier are validated separately."
+    },
+    "input_reference": {
+      "type": "object",
+      "required": [
+        "input"
+      ],
+      "properties": {
+        "input": {
+          "type": "string",
+          "minLength": 1,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/input_identifier"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Uses the value of a declared Input.",
+      "x-doc-review": {
+        "status": "editorially-approved",
+        "source": "editorial-batch.json",
+        "case": "01",
+        "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+      }
+    },
+    "inline_predicate": {
+      "$ref": "assessment-language.schema.json#/$defs/state_entry"
+    },
+    "authoring_type_resolution": {
+      "description": "Retained type-resolution helper. It is not referenced by the current Assessment schema and does not define additional native authoring forms.",
+      "if": {
+        "required": [
+          "datatype"
+        ]
+      },
+      "then": {
+        "properties": {
+          "operation": {
+            "enum": [
+              "equals",
+              "not_equal",
+              "case_insensitive_equals",
+              "case_insensitive_not_equal",
+              "greater_than",
+              "greater_than_or_equal",
+              "less_than",
+              "less_than_or_equal",
+              "bitwise_and",
+              "bitwise_or",
+              "pattern_match",
+              "subset_of",
+              "superset_of"
+            ]
+          }
+        }
+      },
+      "else": {
+        "anyOf": [
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "case_insensitive_equals",
+                  "case_insensitive_not_equal",
+                  "pattern_match"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal"
+                ]
+              },
+              "value": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "greater_than",
+                  "greater_than_or_equal",
+                  "less_than",
+                  "less_than_or_equal",
+                  "bitwise_and",
+                  "bitwise_or"
+                ]
+              },
+              "value": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "equals",
+                  "not_equal",
+                  "greater_than",
+                  "greater_than_or_equal",
+                  "less_than",
+                  "less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "float_equals",
+                  "float_not_equal",
+                  "float_greater_than",
+                  "float_greater_than_or_equal",
+                  "float_less_than",
+                  "float_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "binary_equals",
+                  "binary_not_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "version_equals",
+                  "version_not_equal",
+                  "version_greater_than",
+                  "version_greater_than_or_equal",
+                  "version_less_than",
+                  "version_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ipv4_equals",
+                  "ipv4_not_equal",
+                  "ipv4_greater_than",
+                  "ipv4_greater_than_or_equal",
+                  "ipv4_less_than",
+                  "ipv4_less_than_or_equal",
+                  "ipv4_subset_of",
+                  "ipv4_superset_of"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ipv6_equals",
+                  "ipv6_not_equal",
+                  "ipv6_greater_than",
+                  "ipv6_greater_than_or_equal",
+                  "ipv6_less_than",
+                  "ipv6_less_than_or_equal",
+                  "ipv6_subset_of",
+                  "ipv6_superset_of"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "rpm_evr_equals",
+                  "rpm_evr_not_equal",
+                  "rpm_evr_greater_than",
+                  "rpm_evr_greater_than_or_equal",
+                  "rpm_evr_less_than",
+                  "rpm_evr_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "debian_evr_equals",
+                  "debian_evr_not_equal",
+                  "debian_evr_greater_than",
+                  "debian_evr_greater_than_or_equal",
+                  "debian_evr_less_than",
+                  "debian_evr_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "fileset_revision_equals",
+                  "fileset_revision_not_equal",
+                  "fileset_revision_greater_than",
+                  "fileset_revision_greater_than_or_equal",
+                  "fileset_revision_less_than",
+                  "fileset_revision_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          },
+          {
+            "properties": {
+              "operation": {
+                "enum": [
+                  "ios_version_equals",
+                  "ios_version_not_equal",
+                  "ios_version_greater_than",
+                  "ios_version_greater_than_or_equal",
+                  "ios_version_less_than",
+                  "ios_version_less_than_or_equal"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "operation"
+            ]
+          }
+        ]
+      },
+      "x-doc-scope": "unreferenced-schema-helper",
+      "x-doc-status": "unresolved-legacy-helper"
+    }
+  },
+  "x-doc-origin": "schema/capability-common.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

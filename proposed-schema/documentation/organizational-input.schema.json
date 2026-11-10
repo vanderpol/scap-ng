@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/organizational-input.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-06",
+  "title": "SCAP-NG Organizational Input Set v0.4.0 draft",
+  "description": "Supplies organizational values for Parameters delegated by a Benchmark publisher.",
+  "type": "object",
+  "required": [
+    "organizational_input"
+  ],
+  "properties": {
+    "organizational_input": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "purpose",
+        "benchmark",
+        "values",
+        "provenance"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Organizational Input Set identifier.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "version": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "description": "Version of this Organizational Input Set.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Purpose for which the organization supplies these policy values.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "benchmark": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Identifier of the target Benchmark.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Version of the target Benchmark.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Benchmark identity and version to which the supplied values refer.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "intended_scope": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Descriptive intended scope only. It does not cause implicit selection or application.",
+          "properties": {
+            "organization": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_organization"
+            },
+            "organizational_unit": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_organizational_unit"
+            },
+            "system_or_environment": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "System or environment named in the descriptive intended scope.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Description of the intended scope of the supplied values.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": false
+        },
+        "values": {
+          "type": "object",
+          "description": "Parameter ID to supplied typed value. Parameter type/cardinality/constraints are authoritative in the Benchmark.",
+          "minProperties": 1,
+          "additionalProperties": true
+        },
+        "value_provenance": {
+          "type": "object",
+          "description": "Optional per-Parameter provenance when values have different authorities or sources.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "organization": {
+                "type": [
+                  "string",
+                  "object",
+                  "null"
+                ],
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_organization"
+              },
+              "supplied_by": {
+                "type": [
+                  "string",
+                  "object",
+                  "null"
+                ],
+                "description": "Person or system recorded as supplying this value.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "supplied_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "description": "Timestamp recorded for provision of this value.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "authority_basis": {
+                "type": [
+                  "string",
+                  "object",
+                  "null"
+                ],
+                "description": "Recorded basis for the supplier authority for this value.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "authorization_reference": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorization_reference"
+              },
+              "authorized_by": {
+                "type": [
+                  "string",
+                  "object",
+                  "null"
+                ],
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorized_by"
+              },
+              "authorized_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorized_at"
+              },
+              "source_system": {
+                "type": [
+                  "string",
+                  "object",
+                  "null"
+                ],
+                "description": "System identified as the source of this value.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "intended_scope": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "description": "Descriptive scope associated with this supplied value.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "effective_from": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_effective_from"
+              },
+              "expires_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_expires_at"
+              },
+              "contact": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_contact"
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "effective_from": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_effective_from"
+        },
+        "expires_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_expires_at"
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "organization",
+            "supplied_by",
+            "supplied_at",
+            "authorization_status"
+          ],
+          "properties": {
+            "organization": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_organization"
+            },
+            "supplied_by": {
+              "type": [
+                "string",
+                "object"
+              ],
+              "description": "Person, service, or authoritative system that supplied the Input Set."
+            },
+            "supplied_at": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Timestamp recorded for provision of the Input Set.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "source_system": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "description": "System identified as the source of the Input Set.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "authorized_by": {
+              "type": [
+                "string",
+                "object",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorized_by"
+            },
+            "authorized_at": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "format": "date-time",
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorized_at"
+            },
+            "authorization_reference": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_authorization_reference"
+            },
+            "authorization_status": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Authorization status declared for the supplied policy data.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "contact": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_contact"
+            }
+          },
+          "additionalProperties": true,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_provenance"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Organization-supplied Parameter values and their provenance.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-review": {
+    "status": "editorially-approved",
+    "source": "editorial-batch.json",
+    "case": "27",
+    "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+  },
+  "x-doc-origin": "schema/organizational-input.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

@@ -2,7 +2,7 @@
 
 # Scanner implementation guidance coverage — 0.4.0
 
-This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. The repository release tag pins this documentation, the schema, the specification and examples together.
+This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. Pin the entire repository commit (or release tag when available), including documentation, schemas, specification and examples.
 
 Every known capability has a dedicated section, including capabilities with **documentation gaps**. These sections identify physical acquisition requirements separately from the Assessment authoring contract. Absence of scanner steps is an explicit gap, not permission for vendors to guess.
 
@@ -17,9 +17,9 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`file.hash`](#filehash) | supported | `documentation_gap` |
 | [`independent.environmentvariable`](#independentenvironmentvariable) | supported | `documentation_gap` |
 | [`independent.family`](#independentfamily) | supported | `documentation_gap` |
-| [`independent.shellcommand`](#independentshellcommand) | supported | `research_priority` |
+| [`independent.shellcommand`](#independentshellcommand) | supported | `legacy_researched_unqualified` |
 | [`independent.sql`](#independentsql) | supported | `documentation_gap` |
-| [`independent.textfilecontent`](#independenttextfilecontent) | supported | `documentation_gap` |
+| [`independent.textfilecontent`](#independenttextfilecontent) | supported | `legacy_researched_unqualified` |
 | [`independent.unknown`](#independentunknown) | supported | `documentation_gap` |
 | [`independent.xmlfilecontent`](#independentxmlfilecontent) | supported | `documentation_gap` |
 | [`independent.yamlfilecontent`](#independentyamlfilecontent) | supported | `documentation_gap` |
@@ -49,8 +49,8 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`linux.dpkginfo`](#linuxdpkginfo) | supported | `documentation_gap` |
 | [`linux.inetlisteningservers`](#linuxinetlisteningservers) | supported | `documentation_gap` |
 | [`linux.kernelmodule`](#linuxkernelmodule) | supported | `documentation_gap` |
-| [`linux.partition`](#linuxpartition) | supported | `documentation_gap` |
-| [`linux.rpminfo`](#linuxrpminfo) | supported | `documentation_gap` |
+| [`linux.partition`](#linuxpartition) | supported | `legacy_researched_unqualified` |
+| [`linux.rpminfo`](#linuxrpminfo) | supported | `legacy_researched_unqualified` |
 | [`linux.rpmverifyfile`](#linuxrpmverifyfile) | supported | `documentation_gap` |
 | [`linux.rpmverifypackage`](#linuxrpmverifypackage) | supported | `documentation_gap` |
 | [`linux.selinuxboolean`](#linuxselinuxboolean) | supported | `documentation_gap` |
@@ -81,7 +81,7 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`solaris.package`](#solarispackage) | supported | `documentation_gap` |
 | [`solaris.smf`](#solarissmf) | supported | `documentation_gap` |
 | [`solaris.smfproperty`](#solarissmfproperty) | supported | `documentation_gap` |
-| [`unix.file`](#unixfile) | supported | `documentation_gap` |
+| [`unix.file`](#unixfile) | supported | `legacy_researched_unqualified` |
 | [`unix.interface`](#unixinterface) | supported | `documentation_gap` |
 | [`unix.password`](#unixpassword) | supported | `documentation_gap` |
 | [`unix.process`](#unixprocess) | supported | `documentation_gap` |
@@ -95,15 +95,15 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`windows.appcmdlistconfig`](#windowsappcmdlistconfig) | supported | `research_priority` |
 | [`windows.auditeventpolicysubcategories`](#windowsauditeventpolicysubcategories) | supported | `documentation_gap` |
 | [`windows.cmdlet`](#windowscmdlet) | supported | `documentation_gap` |
-| [`windows.file`](#windowsfile) | supported | `documentation_gap` |
+| [`windows.file`](#windowsfile) | supported | `legacy_researched_unqualified` |
 | [`windows.fileeffectiverights`](#windowsfileeffectiverights) | supported | `documentation_gap` |
 | [`windows.group_sid`](#windowsgroup_sid) | supported | `documentation_gap` |
 | [`windows.lockoutpolicy`](#windowslockoutpolicy) | supported | `documentation_gap` |
 | [`windows.ntuser`](#windowsntuser) | supported | `legacy_candidate_unreviewed` |
 | [`windows.passwordpolicy`](#windowspasswordpolicy) | supported | `documentation_gap` |
-| [`windows.registry`](#windowsregistry) | supported | `documentation_gap` |
+| [`windows.registry`](#windowsregistry) | supported | `legacy_researched_unqualified` |
 | [`windows.regkeyeffectiverights`](#windowsregkeyeffectiverights) | supported | `documentation_gap` |
-| [`windows.service`](#windowsservice) | supported | `documentation_gap` |
+| [`windows.service`](#windowsservice) | supported | `legacy_researched_unqualified` |
 | [`windows.sid`](#windowssid) | supported | `documentation_gap` |
 | [`windows.sid_sid`](#windowssid_sid) | supported | `documentation_gap` |
 | [`windows.user_sid`](#windowsuser_sid) | supported | `documentation_gap` |
@@ -123,7 +123,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `flstinst`.
 - Collection parameters: none declared.
-- Returned/state fields: `flstinst`, `level`, `state`, `description`.
+- Returned/state fields: `description`, `flstinst`, `level`, `state`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -133,7 +133,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `apar_number`.
 - Collection parameters: none declared.
-- Returned/state fields: `apar_number`, `abstract`, `symptom`, `installation_status`.
+- Returned/state fields: `abstract`, `apar_number`, `installation_status`, `symptom`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -143,7 +143,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `show_subcommand`.
 - Collection parameters: none declared.
-- Returned/state fields: `show_subcommand`, `config_line`.
+- Returned/state fields: `config_line`, `show_subcommand`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -153,7 +153,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `asa_release`, `asa_major_release`, `asa_minor_release`, `asa_build`.
+- Returned/state fields: `asa_build`, `asa_major_release`, `asa_minor_release`, `asa_release`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -163,7 +163,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `filepath`, `path`, `filename`, `hash_type`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `path`, `filename`, `hash_type`, `hash`.
+- Returned/state fields: `algorithm`, `digest`, `directory`, `full_path`, `name`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -173,7 +173,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `pid`, `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `pid`, `name`, `value`.
+- Returned/state fields: `name`, `pid`, `value`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -189,14 +189,19 @@ Every known capability has a dedicated section, including capabilities with **do
 
 ### independent.shellcommand
 
-**Guidance status:** `research_priority`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.shellcommand.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.shellcommand.json).
 
 - Authoring selectors: none declared.
 - Collection parameters: `shell`, `command`, `pattern`, `error_if_exit_status_not_0`, `error_if_stderr_exists`.
-- Returned/state fields: `shell`, `command`, `pattern`, `exit_status`, `stdout_line`, `subexpression`, `stderr_line`.
-- Research status: Legacy OVAL shellcommand work is expected to contain detailed implementation notes; source and platform documentation still need review.
+- Returned/state fields: `command`, `exit_status`, `pattern`, `shell`, `stderr_line`, `stdout_line`, `subexpression`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-independent.md#independentshellcommand).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 independent definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 independent system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### independent.sql
 
@@ -204,19 +209,25 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: `engine`, `version`, `instance`, `database`, `sql`.
-- Returned/state fields: `engine`, `version`, `instance`, `database`, `sql`, `result`.
+- Returned/state fields: `database`, `engine`, `instance`, `result`, `sql`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
 ### independent.textfilecontent
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.textfilecontent.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/independent.textfilecontent.json).
 
 - Authoring selectors: `filepath`, `path`, `filename`, `pattern`, `instance`.
 - Collection parameters: `ignore_case`, `multiline`, `singleline`, `item_creation`.
-- Returned/state fields: `filepath`, `path`, `filename`, `pattern`, `instance`, `text`, `subexpression`.
+- Returned/state fields: `directory`, `full_path`, `instance`, `name`, `pattern`, `subexpression`, `text`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-independent.md#independenttextfilecontent).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 independent definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 independent system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/independent-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### independent.unknown
 
@@ -234,7 +245,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `filepath`, `path`, `filename`, `xpath`.
 - Collection parameters: `item_creation`.
-- Returned/state fields: `filepath`, `path`, `filename`, `xpath`, `value_of`.
+- Returned/state fields: `directory`, `full_path`, `name`, `value_of`, `xpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -244,7 +255,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `filepath`, `path`, `filename`, `content`, `yamlpath`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `path`, `filename`, `content`, `yamlpath`, `value`.
+- Returned/state fields: `content`, `directory`, `full_path`, `name`, `value`, `yamlpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -274,7 +285,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `ip_directed_broadcast_command`, `proxy_arp_command`, `shutdown_command`, `hardware_addr`, `ipv4_address`, `ipv6_address`, `ipv4_access_list`, `ipv6_access_list`, `crypto_map`, `ipv4_urpf_command`, `ipv6_urpf_command`, `switchport_trunk_encapsulation`, `switchport_mode`, `switchport_native_vlan`, `switchport_access_vlan`, `switchport_trunked_vlans`, `switchport_pruned_vlans`, `switchport_port_security`.
+- Returned/state fields: `crypto_map`, `hardware_addr`, `ip_directed_broadcast_command`, `ipv4_access_list`, `ipv4_address`, `ipv4_urpf_command`, `ipv6_access_list`, `ipv6_address`, `ipv6_urpf_command`, `name`, `proxy_arp_command`, `shutdown_command`, `switchport_access_vlan`, `switchport_mode`, `switchport_native_vlan`, `switchport_port_security`, `switchport_pruned_vlans`, `switchport_trunk_encapsulation`, `switchport_trunked_vlans`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -284,7 +295,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `show_subcommand`.
 - Collection parameters: none declared.
-- Returned/state fields: `show_subcommand`, `config_line`.
+- Returned/state fields: `config_line`, `show_subcommand`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -294,7 +305,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `interface`, `protocol`.
 - Collection parameters: none declared.
-- Returned/state fields: `interface`, `protocol`, `id`, `auth_type`, `ospf_area`, `key_chain`.
+- Returned/state fields: `auth_type`, `id`, `interface`, `key_chain`, `ospf_area`, `protocol`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -304,7 +315,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `section_command`.
 - Collection parameters: none declared.
-- Returned/state fields: `section_command`, `section_config_lines`, `config_line`.
+- Returned/state fields: `config_line`, `section_command`, `section_config_lines`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -314,7 +325,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `view`, `mode`, `ipv4_acl`, `ipv6_acl`.
+- Returned/state fields: `ipv4_acl`, `ipv6_acl`, `mode`, `name`, `view`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -324,7 +335,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `version`, `snmpv3_sec_level`, `ipv4_acl`, `ipv6_acl`, `read_view`, `write_view`, `notify_view`.
+- Returned/state fields: `ipv4_acl`, `ipv6_acl`, `name`, `notify_view`, `read_view`, `snmpv3_sec_level`, `version`, `write_view`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -334,7 +345,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `host`.
 - Collection parameters: none declared.
-- Returned/state fields: `host`, `community_or_user`, `version`, `snmpv3_sec_level`, `traps`.
+- Returned/state fields: `community_or_user`, `host`, `snmpv3_sec_level`, `traps`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -344,7 +355,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `group`, `version`, `ipv4_acl`, `ipv6_acl`, `priv`, `auth`.
+- Returned/state fields: `auth`, `group`, `ipv4_acl`, `ipv6_acl`, `name`, `priv`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -374,7 +385,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `ip_directed_broadcast`, `proxy_arp`, `shutdown`, `hardware_addr`, `ipv4_address`, `ipv6_address`, `ipv4_access_list`, `ipv6_access_list`, `crypto_map`, `ipv4_urpf_command`, `ipv6_urpf_command`, `switchport_trunk_encapsulation`, `switchport_mode`, `switchport_native_vlan`, `switchport_access_vlan`, `switchport_trunked_vlans`, `switchport_pruned_vlans`, `switchport_port_security`.
+- Returned/state fields: `crypto_map`, `hardware_addr`, `ip_directed_broadcast`, `ipv4_access_list`, `ipv4_address`, `ipv4_urpf_command`, `ipv6_access_list`, `ipv6_address`, `ipv6_urpf_command`, `name`, `proxy_arp`, `shutdown`, `switchport_access_vlan`, `switchport_mode`, `switchport_native_vlan`, `switchport_port_security`, `switchport_pruned_vlans`, `switchport_trunk_encapsulation`, `switchport_trunked_vlans`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -384,7 +395,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `show_subcommand`.
 - Collection parameters: none declared.
-- Returned/state fields: `show_subcommand`, `config_line`.
+- Returned/state fields: `config_line`, `show_subcommand`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -394,7 +405,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `interface`, `protocol`.
 - Collection parameters: none declared.
-- Returned/state fields: `interface`, `protocol`, `id`, `auth_type`, `ospf_area`, `key_chain`.
+- Returned/state fields: `auth_type`, `id`, `interface`, `key_chain`, `ospf_area`, `protocol`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -404,7 +415,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `section_command`.
 - Collection parameters: none declared.
-- Returned/state fields: `section_command`, `section_config_lines`, `config_line`.
+- Returned/state fields: `config_line`, `section_command`, `section_config_lines`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -414,7 +425,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `view`, `mode`, `ipv4_acl`, `ipv6_acl`.
+- Returned/state fields: `ipv4_acl`, `ipv6_acl`, `mode`, `name`, `view`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -424,7 +435,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `version`, `snmpv3_sec_level`, `ipv4_acl`, `ipv6_acl`, `read_view`, `write_view`, `notify_view`.
+- Returned/state fields: `ipv4_acl`, `ipv6_acl`, `name`, `notify_view`, `read_view`, `snmpv3_sec_level`, `version`, `write_view`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -434,7 +445,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `host`.
 - Collection parameters: none declared.
-- Returned/state fields: `host`, `community_or_user`, `version`, `snmpv3_sec_level`, `traps`.
+- Returned/state fields: `community_or_user`, `host`, `snmpv3_sec_level`, `traps`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -444,7 +455,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `group`, `version`, `ipv4_acl`, `ipv6_acl`, `priv`, `auth`.
+- Returned/state fields: `auth`, `group`, `ipv4_acl`, `ipv6_acl`, `name`, `priv`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -454,7 +465,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `version_string`, `major_release`, `release`, `rebuild`, `train`.
+- Returned/state fields: `major_release`, `rebuild`, `release`, `train`, `version_string`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -474,7 +485,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `loaded_profiles_count`, `enforce_mode_profiles_count`, `complain_mode_profiles_count`, `processes_with_profiles_count`, `enforce_mode_processes_count`, `complain_mode_processes_count`, `unconfined_processes_with_profiles_count`.
+- Returned/state fields: `complain_mode_processes_count`, `complain_mode_profiles_count`, `enforce_mode_processes_count`, `enforce_mode_profiles_count`, `loaded_profiles_count`, `processes_with_profiles_count`, `unconfined_processes_with_profiles_count`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -484,7 +495,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `arch`, `epoch`, `release`, `version`, `evr`.
+- Returned/state fields: `arch`, `epoch`, `evr`, `name`, `release`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -494,7 +505,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `protocol`, `local_address`, `local_port`.
 - Collection parameters: none declared.
-- Returned/state fields: `protocol`, `local_address`, `local_port`, `local_full_address`, `program_name`, `foreign_address`, `foreign_port`, `foreign_full_address`, `pid`, `user_id`.
+- Returned/state fields: `foreign_address`, `foreign_full_address`, `foreign_port`, `local_address`, `local_full_address`, `local_port`, `pid`, `program_name`, `protocol`, `user_id`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -504,29 +515,41 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `module_name`.
 - Collection parameters: none declared.
-- Returned/state fields: `module_name`, `loaded`, `loadable`.
+- Returned/state fields: `loadable`, `loaded`, `module_name`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
 ### linux.partition
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.partition.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.partition.json).
 
 - Authoring selectors: `mount_point`.
 - Collection parameters: none declared.
-- Returned/state fields: `mount_point`, `device`, `uuid`, `fs_type`, `mount_options`, `total_space`, `space_used`, `space_left`, `space_left_for_unprivileged_users`, `block_size`.
+- Returned/state fields: `block_size`, `device`, `fs_type`, `mount_options`, `mount_point`, `space_left`, `space_left_for_unprivileged_users`, `space_used`, `total_space`, `uuid`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-linux.md#linuxpartition).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 linux definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 linux system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### linux.rpminfo
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.rpminfo.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/linux.rpminfo.json).
 
 - Authoring selectors: `name`.
 - Collection parameters: `include_file_paths`.
-- Returned/state fields: `name`, `arch`, `epoch`, `release`, `version`, `evr`, `signature_keyid`, `extended_name`, `filepath`.
+- Returned/state fields: `architecture`, `epoch`, `evr`, `extended_name`, `full_path`, `package_name`, `release`, `signature_key_id`, `version`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-linux.md#linuxrpminfo).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 linux definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 linux system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/linux-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### linux.rpmverifyfile
 
@@ -534,7 +557,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`, `epoch`, `version`, `release`, `arch`, `filepath`.
 - Collection parameters: `skip_link_target`, `skip_size`, `skip_owner`, `skip_group`, `skip_mtime`, `skip_mode`, `skip_rdev`, `skip_config_files`, `skip_ghost_files`, `skip_file_digest`, `skip_capabilities`.
-- Returned/state fields: `name`, `epoch`, `version`, `release`, `arch`, `filepath`, `extended_name`, `size_differs`, `mode_differs`, `filedigest_differs`, `device_differs`, `link_mismatch`, `ownership_differs`, `group_differs`, `mtime_differs`, `capabilities_differ`, `configuration_file`, `documentation_file`, `ghost_file`, `license_file`, `readme_file`.
+- Returned/state fields: `arch`, `capabilities_differ`, `configuration_file`, `device_differs`, `documentation_file`, `epoch`, `extended_name`, `filedigest_differs`, `filepath`, `ghost_file`, `group_differs`, `license_file`, `link_mismatch`, `mode_differs`, `mtime_differs`, `name`, `ownership_differs`, `readme_file`, `release`, `size_differs`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -544,7 +567,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`, `epoch`, `version`, `release`, `arch`.
 - Collection parameters: `skip_dependencies`, `skip_scripts`.
-- Returned/state fields: `name`, `epoch`, `version`, `release`, `arch`, `extended_name`, `dependency_check_passed`, `verification_script_successful`.
+- Returned/state fields: `arch`, `dependency_check_passed`, `epoch`, `extended_name`, `name`, `release`, `verification_script_successful`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -554,7 +577,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `current_status`, `pending_status`.
+- Returned/state fields: `current_status`, `name`, `pending_status`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -564,7 +587,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `filepath`, `path`, `filename`, `pid`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `path`, `filename`, `pid`, `user`, `role`, `type`, `low_sensitivity`, `low_category`, `high_sensitivity`, `high_category`, `rawlow_sensitivity`, `rawlow_category`, `rawhigh_sensitivity`, `rawhigh_category`.
+- Returned/state fields: `directory`, `full_path`, `high_category`, `high_sensitivity`, `low_category`, `low_sensitivity`, `name`, `pid`, `rawhigh_category`, `rawhigh_sensitivity`, `rawlow_category`, `rawlow_sensitivity`, `role`, `type`, `user`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -574,7 +597,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `selinux_status`, `current_mode`, `mode_from_config_file`, `loaded_policy_name`, `policy_from_config_file`.
+- Returned/state fields: `current_mode`, `loaded_policy_name`, `mode_from_config_file`, `policy_from_config_file`, `selinux_status`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -584,7 +607,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `unit`.
 - Collection parameters: none declared.
-- Returned/state fields: `unit`, `dependency`.
+- Returned/state fields: `dependency`, `unit`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -594,7 +617,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `unit`, `property`.
 - Collection parameters: none declared.
-- Returned/state fields: `unit`, `property`, `value`.
+- Returned/state fields: `property`, `unit`, `value`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -604,7 +627,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `username`.
 - Collection parameters: none declared.
-- Returned/state fields: `username`, `password`, `uid`, `gid`, `realname`, `home_dir`, `login_shell`, `generated_uid`.
+- Returned/state fields: `generated_uid`, `gid`, `home_dir`, `login_shell`, `password`, `realname`, `uid`, `username`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -614,7 +637,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `right_name`, `xpath`.
 - Collection parameters: none declared.
-- Returned/state fields: `right_name`, `xpath`, `value_of`.
+- Returned/state fields: `right_name`, `value_of`, `xpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -624,7 +647,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `label`, `disabled`.
+- Returned/state fields: `disabled`, `label`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -634,7 +657,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `device_identifier`.
 - Collection parameters: none declared.
-- Returned/state fields: `device_identifier`, `volume_name`, `file_system_personality`, `removable_media`, `device_location`, `solid_state`, `read_only`, `file_vault`, `mount_point`, `smart_status`, `encrypted`, `apfs_uid`.
+- Returned/state fields: `apfs_uid`, `device_identifier`, `device_location`, `encrypted`, `file_system_personality`, `file_vault`, `mount_point`, `read_only`, `removable_media`, `smart_status`, `solid_state`, `volume_name`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -674,7 +697,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `install_version`, `install_date`, `package_source`.
+- Returned/state fields: `install_date`, `install_version`, `name`, `package_source`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -704,7 +727,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `variable`.
 - Collection parameters: none declared.
-- Returned/state fields: `variable`, `value`.
+- Returned/state fields: `value`, `variable`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -714,7 +737,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `app_id`, `filepath`, `xpath`.
 - Collection parameters: none declared.
-- Returned/state fields: `app_id`, `filepath`, `xpath`, `value_of`.
+- Returned/state fields: `app_id`, `filepath`, `value_of`, `xpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -724,7 +747,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `mdm_enrolled`, `dep_enrolled`.
+- Returned/state fields: `dep_enrolled`, `mdm_enrolled`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -734,7 +757,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `username`, `authenticator`, `authenticator_password`, `directory_node`, `xpath`.
 - Collection parameters: none declared.
-- Returned/state fields: `username`, `authenticator`, `authenticator_password`, `directory_node`, `xpath`, `value_of`.
+- Returned/state fields: `authenticator`, `authenticator_password`, `directory_node`, `username`, `value_of`, `xpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -754,7 +777,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `data_type`, `xpath`.
 - Collection parameters: none declared.
-- Returned/state fields: `data_type`, `xpath`, `value_of`.
+- Returned/state fields: `data_type`, `value_of`, `xpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -764,7 +787,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `timezone`, `usingnetworktime`, `networktimeserver`, `computersleep`, `displaysleep`, `harddisksleep`, `wakeonmodem`, `wakeonnetworkaccess`, `restartfreeze`, `allowpowerbuttontosleepcomputer`, `restartpowerfailure`, `remotelogin`, `remoteappleevents`, `computername`, `localsubnetname`, `startupdisk`, `waitforstartupafterpowerfailure`, `disablekeyboardwhenenclosurelockisengaged`, `kernelbootarchitecturesetting`.
+- Returned/state fields: `allowpowerbuttontosleepcomputer`, `computername`, `computersleep`, `disablekeyboardwhenenclosurelockisengaged`, `displaysleep`, `harddisksleep`, `kernelbootarchitecturesetting`, `localsubnetname`, `networktimeserver`, `remoteappleevents`, `remotelogin`, `restartfreeze`, `restartpowerfailure`, `startupdisk`, `timezone`, `usingnetworktime`, `waitforstartupafterpowerfailure`, `wakeonmodem`, `wakeonnetworkaccess`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -774,7 +797,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `xpath`.
 - Collection parameters: none declared.
-- Returned/state fields: `xpath`, `value_of`.
+- Returned/state fields: `value_of`, `xpath`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -784,7 +807,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `major_version`, `minor_version`, `release`, `hotfix`, `version_string`, `model_name`.
+- Returned/state fields: `hotfix`, `major_version`, `minor_version`, `model_name`, `release`, `version_string`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -794,7 +817,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `publisher`, `name`, `version`, `timestamp`.
 - Collection parameters: none declared.
-- Returned/state fields: `publisher`, `name`, `version`, `timestamp`, `fmri`, `summary`, `description`, `category`, `updates_available`.
+- Returned/state fields: `category`, `description`, `fmri`, `name`, `publisher`, `summary`, `timestamp`, `updates_available`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -804,7 +827,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `pkginst`.
 - Collection parameters: none declared.
-- Returned/state fields: `pkginst`, `name`, `category`, `version`, `vendor`, `description`.
+- Returned/state fields: `category`, `description`, `name`, `pkginst`, `vendor`, `version`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -814,7 +837,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `fmri`.
 - Collection parameters: none declared.
-- Returned/state fields: `fmri`, `service_name`, `service_state`, `protocol`, `server_executable`, `server_arguements`, `exec_as_user`.
+- Returned/state fields: `exec_as_user`, `fmri`, `protocol`, `server_arguements`, `server_executable`, `service_name`, `service_state`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -824,19 +847,25 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `service`, `instance`, `property`.
 - Collection parameters: none declared.
-- Returned/state fields: `service`, `instance`, `property`, `fmri`, `value`.
+- Returned/state fields: `fmri`, `instance`, `property`, `service`, `value`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
 ### unix.file
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/unix.file.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/unix.file.json).
 
 - Authoring selectors: `filepath`, `path`, `filename`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `path`, `filename`, `type`, `group_id`, `user_id`, `a_time`, `c_time`, `m_time`, `size`, `suid`, `sgid`, `sticky`, `uread`, `uwrite`, `uexec`, `gread`, `gwrite`, `gexec`, `oread`, `owrite`, `oexec`, `has_extended_acl`.
+- Returned/state fields: `access_time`, `change_time`, `directory`, `full_path`, `group_execute`, `group_read`, `group_write`, `has_extended_acl`, `modify_time`, `name`, `other_execute`, `other_read`, `other_write`, `owner_execute`, `owner_gid`, `owner_read`, `owner_uid`, `owner_write`, `setgid`, `setuid`, `size`, `sticky`, `type`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-unix.md#unixfile).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 unix definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 unix system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### unix.interface
 
@@ -844,7 +873,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `name`, `type`, `hardware_addr`, `inet_addr`, `broadcast_addr`, `netmask`, `flag`.
+- Returned/state fields: `broadcast_addr`, `flag`, `hardware_addr`, `inet_addr`, `name`, `netmask`, `type`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -854,7 +883,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `username`.
 - Collection parameters: none declared.
-- Returned/state fields: `username`, `password`, `user_id`, `group_id`, `gcos`, `home_dir`, `login_shell`, `last_login`.
+- Returned/state fields: `gcos`, `group_id`, `home_dir`, `last_login`, `login_shell`, `password`, `user_id`, `username`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -864,7 +893,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `command_line`, `pid`.
 - Collection parameters: none declared.
-- Returned/state fields: `command_line`, `exec_time`, `pid`, `ppid`, `priority`, `ruid`, `scheduling_class`, `start_time`, `tty`, `user_id`, `exec_shield`, `loginuid`, `posix_capability`, `selinux_domain_label`, `session_id`.
+- Returned/state fields: `command_line`, `exec_shield`, `exec_time`, `loginuid`, `pid`, `posix_capability`, `ppid`, `priority`, `ruid`, `scheduling_class`, `selinux_domain_label`, `session_id`, `start_time`, `tty`, `user_id`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -874,7 +903,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `username`.
 - Collection parameters: none declared.
-- Returned/state fields: `username`, `password`, `chg_lst`, `chg_allow`, `chg_req`, `exp_warn`, `exp_inact`, `exp_date`, `flag`, `encrypt_method`.
+- Returned/state fields: `chg_allow`, `chg_lst`, `chg_req`, `encrypt_method`, `exp_date`, `exp_inact`, `exp_warn`, `flag`, `password`, `username`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -894,7 +923,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `filepath`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `canonical_path`.
+- Returned/state fields: `canonical_path`, `full_path`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -934,7 +963,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `identifier_type`, `identifier`, `parameter`.
 - Collection parameters: none declared.
-- Returned/state fields: `identifier_type`, `identifier`, `parameter`, `result`.
+- Returned/state fields: `identifier`, `identifier_type`, `parameter`, `result`.
 - Research status: Historical Windows IIS AppCmd scanner documentation should be audited before authoring native instructions.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
@@ -945,7 +974,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `identifier_type`, `identifier`, `section`, `parameter`.
 - Collection parameters: none declared.
-- Returned/state fields: `identifier_type`, `identifier`, `section`, `parameter`, `result`.
+- Returned/state fields: `identifier`, `identifier_type`, `parameter`, `result`, `section`.
 - Research status: Historical IIS AppCmd list-config documentation should be audited with its companion appcmd capability.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
@@ -956,7 +985,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `credential_validation`, `kerberos_authentication_service`, `kerberos_service_ticket_operations`, `other_account_logon_events`, `application_group_management`, `computer_account_management`, `distribution_group_management`, `other_account_management_events`, `security_group_management`, `user_account_management`, `dpapi_activity`, `process_creation`, `process_termination`, `rpc_events`, `directory_service_access`, `directory_service_changes`, `directory_service_replication`, `detailed_directory_service_replication`, `account_lockout`, `ipsec_extended_mode`, `ipsec_main_mode`, `ipsec_quick_mode`, `logoff`, `logon`, `network_policy_server`, `other_logon_logoff_events`, `special_logon`, `logon_claims`, `application_generated`, `certification_services`, `detailed_file_share`, `file_share`, `file_system`, `filtering_platform_connection`, `filtering_platform_packet_drop`, `handle_manipulation`, `kernel_object`, `other_object_access_events`, `registry`, `sam`, `removable_storage`, `central_access_policy_staging`, `audit_policy_change`, `authentication_policy_change`, `authorization_policy_change`, `filtering_platform_policy_change`, `mpssvc_rule_level_policy_change`, `other_policy_change_events`, `non_sensitive_privilege_use`, `other_privilege_use_events`, `sensitive_privilege_use`, `ipsec_driver`, `other_system_events`, `security_state_change`, `security_system_extension`, `system_integrity`, `group_membership`, `pnp_activity`, `user_device_claims`, `audit_detailedtracking_tokenrightadjusted`.
+- Returned/state fields: `account_lockout`, `application_generated`, `application_group_management`, `audit_detailedtracking_tokenrightadjusted`, `audit_policy_change`, `authentication_policy_change`, `authorization_policy_change`, `central_access_policy_staging`, `certification_services`, `computer_account_management`, `credential_validation`, `detailed_directory_service_replication`, `detailed_file_share`, `directory_service_access`, `directory_service_changes`, `directory_service_replication`, `distribution_group_management`, `dpapi_activity`, `file_share`, `file_system`, `filtering_platform_connection`, `filtering_platform_packet_drop`, `filtering_platform_policy_change`, `group_membership`, `handle_manipulation`, `ipsec_driver`, `ipsec_extended_mode`, `ipsec_main_mode`, `ipsec_quick_mode`, `kerberos_authentication_service`, `kerberos_service_ticket_operations`, `kernel_object`, `logoff`, `logon`, `logon_claims`, `mpssvc_rule_level_policy_change`, `network_policy_server`, `non_sensitive_privilege_use`, `other_account_logon_events`, `other_account_management_events`, `other_logon_logoff_events`, `other_object_access_events`, `other_policy_change_events`, `other_privilege_use_events`, `other_system_events`, `pnp_activity`, `process_creation`, `process_termination`, `registry`, `removable_storage`, `rpc_events`, `sam`, `security_group_management`, `security_state_change`, `security_system_extension`, `sensitive_privilege_use`, `special_logon`, `system_integrity`, `user_account_management`, `user_device_claims`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -966,19 +995,25 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: `module_name`, `module_id`, `module_version`, `verb`, `noun`, `parameters`, `select`.
-- Returned/state fields: `module_name`, `module_id`, `module_version`, `verb`, `noun`, `parameters`, `select`, `value`.
+- Returned/state fields: `module_id`, `module_name`, `module_version`, `noun`, `parameters`, `select`, `value`, `verb`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
 ### windows.file
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.file.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.file.json).
 
 - Authoring selectors: `filepath`, `path`, `filename`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `path`, `filename`, `owner`, `size`, `a_time`, `c_time`, `m_time`, `ms_checksum`, `version`, `type`, `attribute`, `development_class`, `company`, `internal_name`, `language`, `original_filename`, `product_name`, `product_version`.
+- Returned/state fields: `access_time`, `attribute`, `company`, `creation_time`, `development_class`, `directory`, `full_path`, `internal_name`, `language`, `microsoft_checksum`, `modify_time`, `name`, `original_name`, `owner`, `product_name`, `product_version`, `size`, `type`, `version`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-windows.md#windowsfile).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 windows definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 windows system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### windows.fileeffectiverights
 
@@ -986,7 +1021,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `filepath`, `path`, `filename`, `trustee_sid`.
 - Collection parameters: none declared.
-- Returned/state fields: `filepath`, `path`, `filename`, `trustee_sid`, `trustee_name`, `standard_delete`, `standard_read_control`, `standard_write_dac`, `standard_write_owner`, `standard_synchronize`, `access_system_security`, `generic_read`, `generic_write`, `generic_execute`, `generic_all`, `file_read_data`, `file_write_data`, `file_append_data`, `file_read_ea`, `file_write_ea`, `file_execute`, `file_delete_child`, `file_read_attributes`, `file_write_attributes`.
+- Returned/state fields: `access_system_security`, `directory`, `file_append_data`, `file_delete_child`, `file_execute`, `file_read_attributes`, `file_read_data`, `file_read_ea`, `file_write_attributes`, `file_write_data`, `file_write_ea`, `full_path`, `generic_all`, `generic_execute`, `generic_read`, `generic_write`, `name`, `standard_delete`, `standard_read_control`, `standard_synchronize`, `standard_write_dac`, `standard_write_owner`, `trustee_name`, `trustee_sid`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -996,7 +1031,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `group_sid`.
 - Collection parameters: none declared.
-- Returned/state fields: `group_sid`, `user_sid`, `subgroup_sid`, `group`, `user`, `subgroup`.
+- Returned/state fields: `group`, `group_sid`, `subgroup`, `subgroup_sid`, `user`, `user_sid`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1016,7 +1051,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `key`, `name`.
 - Collection parameters: `include_default`, `item_creation`.
-- Returned/state fields: `key`, `name`, `sid`, `username`, `account_type`, `logged_on`, `days_since_last_logon`, `user_has_signed_into_explorer`, `enabled`, `date_modified`, `days_since_modified`, `filepath`, `last_write_time`, `type`, `value`.
+- Returned/state fields: `account_type`, `date_modified`, `days_since_last_logon`, `days_since_modified`, `enabled`, `filepath`, `key`, `last_write_time`, `logged_on`, `name`, `sid`, `type`, `user_has_signed_into_explorer`, `username`, `value`.
 - Research status: An OVAL XSD annotation inventory and paraphrased implementation candidates are available, but native equivalence and scanner qualification remain pending.
 - **Implementation steps:** Not yet reviewed/documented.
 
@@ -1031,19 +1066,25 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: none declared.
-- Returned/state fields: `max_passwd_age`, `min_passwd_age`, `min_passwd_len`, `password_hist_len`, `password_complexity`, `reversible_encryption`, `anonymous_name_lookup`.
+- Returned/state fields: `anonymous_name_lookup`, `max_passwd_age`, `min_passwd_age`, `min_passwd_len`, `password_complexity`, `password_hist_len`, `reversible_encryption`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
 ### windows.registry
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.registry.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.registry.json).
 
 - Authoring selectors: `hive`, `key`, `name`.
 - Collection parameters: none declared.
-- Returned/state fields: `hive`, `key`, `name`, `last_write_time`, `type`, `value`, `expanded_value`.
+- Returned/state fields: `expanded_value`, `hive`, `key`, `last_write_time`, `name`, `type`, `value`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-windows.md#windowsregistry).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 windows definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 windows system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### windows.regkeyeffectiverights
 
@@ -1051,19 +1092,25 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `hive`, `key`, `trustee_sid`.
 - Collection parameters: none declared.
-- Returned/state fields: `hive`, `key`, `trustee_sid`, `trustee_name`, `standard_delete`, `standard_read_control`, `standard_write_dac`, `standard_write_owner`, `access_system_security`, `generic_read`, `generic_write`, `generic_execute`, `generic_all`, `key_query_value`, `key_set_value`, `key_create_sub_key`, `key_enumerate_sub_keys`, `key_notify`, `key_create_link`, `key_wow64_64key`, `key_wow64_32key`, `key_wow64_res`.
+- Returned/state fields: `access_system_security`, `generic_all`, `generic_execute`, `generic_read`, `generic_write`, `hive`, `key`, `key_create_link`, `key_create_sub_key`, `key_enumerate_sub_keys`, `key_notify`, `key_query_value`, `key_set_value`, `key_wow64_32key`, `key_wow64_64key`, `key_wow64_res`, `standard_delete`, `standard_read_control`, `standard_write_dac`, `standard_write_owner`, `trustee_name`, `trustee_sid`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
 ### windows.service
 
-**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.service.json).
+**Guidance status:** `legacy_researched_unqualified`. **Contract:** [mapping](../../schema/capability-mappings/supported/windows.service.json).
 
 - Authoring selectors: `service_name`.
 - Collection parameters: none declared.
-- Returned/state fields: `service_name`, `display_name`, `description`, `service_type`, `start_type`, `current_state`, `controls_accepted`, `start_name`, `path`, `pid`, `service_flag`, `dependencies`.
+- Returned/state fields: `controls_accepted`, `current_state`, `dependencies`, `description`, `display_name`, `path`, `pid`, `service_flag`, `service_name`, `service_type`, `start_name`, `start_type`.
+- Research status: Pinned native/OVAL/content comparison and proposed vectors are documented; native acquisition/status adoption and runtime qualification remain pending.
+- [Semantic research: native facts versus proposals](developer-contract-research-windows.md#windowsservice).
 - **Implementation steps:** Not yet reviewed/documented.
-- **Vendor/source references:** Not yet reviewed/documented.
+
+**Source documentation:**
+
+- [OVAL 5.12.3 windows definitions XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-definitions-schema.xsd) (`legacy_source`; not automatically normative)
+- [OVAL 5.12.3 windows system-characteristics XSD](https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/windows-system-characteristics-schema.xsd) (`legacy_source`; not automatically normative)
 
 ### windows.sid
 
@@ -1071,7 +1118,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `trustee_name`.
 - Collection parameters: `include_group`, `resolve_group`.
-- Returned/state fields: `trustee_name`, `trustee_sid`, `trustee_domain`.
+- Returned/state fields: `trustee_domain`, `trustee_name`, `trustee_sid`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1081,7 +1128,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `trustee_sid`.
 - Collection parameters: `include_group`, `resolve_group`.
-- Returned/state fields: `trustee_sid`, `trustee_name`, `trustee_domain`.
+- Returned/state fields: `trustee_domain`, `trustee_name`, `trustee_sid`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1091,7 +1138,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `user_sid`.
 - Collection parameters: none declared.
-- Returned/state fields: `user_sid`, `enabled`, `group_sid`, `last_logon`, `user`, `group`, `full_name`, `comment`, `password_age_days`.
+- Returned/state fields: `comment`, `enabled`, `full_name`, `group`, `group_sid`, `last_logon`, `password_age_days`, `user`, `user_sid`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1101,7 +1148,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `userright`.
 - Collection parameters: none declared.
-- Returned/state fields: `userright`, `trustee_name`, `trustee_sid`.
+- Returned/state fields: `trustee_name`, `trustee_sid`, `userright`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1111,7 +1158,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: none declared.
 - Collection parameters: `namespace`, `query`.
-- Returned/state fields: `namespace`, `wql`, `result`.
+- Returned/state fields: `namespace`, `query`, `result`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1121,7 +1168,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `search_criteria`.
 - Collection parameters: `include_superseded_updates`.
-- Returned/state fields: `search_criteria`, `update_id`, `title`, `support_url`, `is_installed`, `is_hidden`, `msrc_severity`, `last_deployment_change_time`, `source`, `days_since_source_modified`.
+- Returned/state fields: `days_since_source_modified`, `is_hidden`, `is_installed`, `last_deployment_change_time`, `msrc_severity`, `search_criteria`, `source`, `support_url`, `title`, `update_id`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1131,7 +1178,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `account_name`.
 - Collection parameters: none declared.
-- Returned/state fields: `account_name`, `domain`, `description`, `shell_access_enabled`, `role`.
+- Returned/state fields: `account_name`, `description`, `domain`, `role`, `shell_access_enabled`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1151,7 +1198,7 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `service_name`.
 - Collection parameters: none declared.
-- Returned/state fields: `service_name`, `service_label`, `service_policy`, `service_running`, `service_required`.
+- Returned/state fields: `service_label`, `service_name`, `service_policy`, `service_required`, `service_running`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 
@@ -1161,6 +1208,6 @@ Every known capability has a dedicated section, including capabilities with **do
 
 - Authoring selectors: `vib_name`.
 - Collection parameters: none declared.
-- Returned/state fields: `vib_name`, `acceptance_level`, `creation_date`, `vendor`, `version`.
+- Returned/state fields: `acceptance_level`, `creation_date`, `vendor`, `version`, `vib_name`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.

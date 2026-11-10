@@ -1,0 +1,487 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-23",
+  "title": "Draft canonical collected Item 0.4.0",
+  "description": "Records one collected entity, its fields, and supporting provenance.",
+  "type": "object",
+  "required": [
+    "id",
+    "capability",
+    "status",
+    "fields",
+    "provenance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identifier of this collected Item.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "capability": {
+      "type": "string",
+      "minLength": 1,
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/capability_name"
+    },
+    "status": {
+      "enum": [
+        "exists",
+        "error",
+        "not_collected"
+      ],
+      "description": "Collection status of this observed Item.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "imported": {
+      "type": "boolean",
+      "description": "Whether this Item was imported from retained evidence.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "https://scap-ng.dev/schema/proposed/documentation/result-types.schema.json#/$defs/typed_value"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "https://scap-ng.dev/schema/proposed/documentation/result-types.schema.json#/$defs/typed_value"
+            }
+          }
+        ]
+      },
+      "description": "Named evidence fields carried by this Item.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "provenance": {
+      "type": "object",
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_provenance"
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "name_resolution": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": [
+              "source_field",
+              "target_context_ref",
+              "source_ref",
+              "observed_at"
+            ],
+            "properties": {
+              "source_field": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Name of the source field for this resolution record.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "target_context_ref": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Reference to the target context associated with this resolution.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "source_ref": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Reference to the source of the resolution observation.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "observed_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp recorded for this name-resolution observation.",
+                "x-doc-status": "native-structure-derived"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Context records associated with resolving collected names.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "locators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "kind",
+              "source_ref"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "text",
+                  "structured",
+                  "record"
+                ],
+                "description": "Kind of evidence location: text position, structured path, or record position.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "source_ref": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Reference to the evidence source containing this location.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Line number in the referenced text evidence.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Column number in the referenced text evidence.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Path selecting a location in structured evidence.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "path_language": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Language used to express the structured evidence path.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Record index in the referenced evidence.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "field": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Collected field identified by this record locator.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "value_index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Index of the referenced field value.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "property": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Property name within the referenced record value.",
+                "x-doc-status": "native-structure-derived"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "text",
+                      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json#/properties/context/properties/locators/items/properties/kind"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "line"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "path"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "path_language"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "structured",
+                      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json#/properties/context/properties/locators/items/properties/kind"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "path",
+                    "path_language"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "line"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "column"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "index"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "record",
+                      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json#/properties/context/properties/locators/items/properties/kind"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "index"
+                  ],
+                  "not": {
+                    "anyOf": [
+                      {
+                        "required": [
+                          "line"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "column"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "path"
+                        ]
+                      },
+                      {
+                        "required": [
+                          "path_language"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "required": [
+                        "value_index"
+                      ]
+                    },
+                    {
+                      "required": [
+                        "property"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "field"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "const": "record",
+                      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json#/properties/context/properties/locators/items/properties/kind"
+                    }
+                  }
+                }
+              }
+            ],
+            "additionalProperties": false
+          },
+          "description": "Locations of the evidence represented by this Item.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "origin": {
+          "type": "object",
+          "required": [
+            "result_ref",
+            "item_ref"
+          ],
+          "properties": {
+            "result_ref": {
+              "type": "string",
+              "minLength": 1,
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_result_ref"
+            },
+            "item_ref": {
+              "type": "string",
+              "minLength": 1,
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_item_ref"
+            },
+            "source_execution_ref": {
+              "type": "string",
+              "minLength": 1,
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_source_execution_ref"
+            },
+            "source_digest": {
+              "type": "string",
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_source_digest"
+            },
+            "binding_set_id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Binding-set identifier recorded for the imported Item origin.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "source_completeness": {
+              "$ref": "result-types.schema.json#/$defs/completeness",
+              "description": "Completeness information retained from the source result.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "required": [
+                  "source_digest"
+                ]
+              },
+              "then": {
+                "required": [
+                  "source_execution_ref",
+                  "binding_set_id",
+                  "source_completeness"
+                ]
+              }
+            }
+          ],
+          "description": "Source context recorded for an imported Item.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "import_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "result_ref",
+              "item_ref"
+            ],
+            "properties": {
+              "result_ref": {
+                "type": "string",
+                "minLength": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_result_ref"
+              },
+              "item_ref": {
+                "type": "string",
+                "minLength": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_item_ref"
+              },
+              "source_execution_ref": {
+                "type": "string",
+                "minLength": 1,
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_source_execution_ref"
+              },
+              "source_digest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$",
+                "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_source_digest"
+              },
+              "binding_set_id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Binding-set identifier recorded in this import-history entry.",
+                "x-doc-status": "native-structure-derived"
+              },
+              "source_completeness": {
+                "$ref": "result-types.schema.json#/$defs/completeness",
+                "description": "Completeness information retained from the source result.",
+                "x-doc-status": "native-structure-derived"
+              }
+            },
+            "additionalProperties": false,
+            "allOf": [
+              {
+                "if": {
+                  "required": [
+                    "source_digest"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "source_execution_ref",
+                    "binding_set_id",
+                    "source_completeness"
+                  ]
+                }
+              }
+            ]
+          },
+          "description": "Context records retained for imports of this Item.",
+          "x-doc-status": "native-structure-derived"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Collection and reuse context associated with this Item.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "imported"
+        ],
+        "properties": {
+          "imported": {
+            "const": true,
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json#/properties/imported"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "context"
+        ],
+        "properties": {
+          "context": {
+            "required": [
+              "origin"
+            ],
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json#/properties/context"
+          }
+        }
+      }
+    }
+  ],
+  "x-doc-review": {
+    "status": "editorially-approved",
+    "source": "editorial-batch.json",
+    "case": "23",
+    "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
+  },
+  "x-doc-origin": "schema/collected-item.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

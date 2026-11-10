@@ -1,0 +1,1940 @@
+{
+  "format": "scap-ng/unix-file-stop-go-ledger/1",
+  "issue": 35,
+  "capability": "unix.file",
+  "native_commit": "8d42814ba3bc197e0dc9f31384642ee863805155",
+  "oval_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+  "status": "single_prototype_owner_review_required",
+  "gate_result": "FAIL",
+  "gate_reason": "No demonstrated improvement in approved native implementer utility while value normalization and error propagation remain unadopted; no self-certified GO.",
+  "scope": "Linux current filesystem namespace, regular files, two literal equality identity forms, filesystem all, no traversal; 21 selected fields.",
+  "source_note": "The Open Group Issue 8 publisher pages returned HTTP 403 to the web reader. POSIX citations use the licensed POSIX.1-2017 reproduction, labeled separately from Linux behavior. No copied HTML/XSD prose is redistributed.",
+  "sources": {
+    "N-map": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native"
+    },
+    "N-selectors": {
+      "kind": "pinned_native_contract",
+      "file": "schema/native-selector-contracts.json",
+      "file_sha256": "1de05276044afacb020433ef92effb20fa5e6a3885a86c7d55a9b1bad2d9812b",
+      "json_pointer": "/resolved/unix.file",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/native-selector-contracts.json#/resolved/unix.file"
+    },
+    "N-rules": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/semantic_validator_rules",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/semantic_validator_rules"
+    },
+    "N-fs": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-common.schema.json",
+      "file_sha256": "1f7a73b559945c4d4e1ed7df2133118896863f0f9c485babf6a6ef9121e9762c",
+      "json_pointer": "/$defs/filesystem_scope",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-common.schema.json#/$defs/filesystem_scope"
+    },
+    "N-depth": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-common.schema.json",
+      "file_sha256": "1f7a73b559945c4d4e1ed7df2133118896863f0f9c485babf6a6ef9121e9762c",
+      "json_pointer": "/$defs/file_traversal_base",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-common.schema.json#/$defs/file_traversal_base"
+    },
+    "N-recurse": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-common.schema.json",
+      "file_sha256": "1f7a73b559945c4d4e1ed7df2133118896863f0f9c485babf6a6ef9121e9762c",
+      "json_pointer": "/$defs/file_traversal",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-common.schema.json#/$defs/file_traversal"
+    },
+    "N-item": {
+      "kind": "pinned_native_contract",
+      "file": "schema/collected-item.schema.json",
+      "file_sha256": "c16a7549acbde6020007ee4bcbc4a8095d2cc615b67bd65c3ec6b92d5b9c5630",
+      "json_pointer": "",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/collected-item.schema.json"
+    },
+    "N-item-status": {
+      "kind": "pinned_native_contract",
+      "file": "schema/collected-item.schema.json",
+      "file_sha256": "c16a7549acbde6020007ee4bcbc4a8095d2cc615b67bd65c3ec6b92d5b9c5630",
+      "json_pointer": "/properties/status",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/collected-item.schema.json#/properties/status"
+    },
+    "N-field-status": {
+      "kind": "pinned_native_contract",
+      "file": "schema/result-types.schema.json",
+      "file_sha256": "259eb551f04cefaa95f579dd5720bbe938834b1274e39bd31765b23d279cbf9a",
+      "json_pointer": "/$defs/typed_value",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/result-types.schema.json#/$defs/typed_value"
+    },
+    "N-collection": {
+      "kind": "pinned_native_contract",
+      "file": "schema/collection-result.schema.json",
+      "file_sha256": "f97f82a8e3e0900ecf80dd9154c400108732c28466063849a19ca033286138b5",
+      "json_pointer": "/properties/status",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/collection-result.schema.json#/properties/status"
+    },
+    "N-collection-errors": {
+      "kind": "pinned_native_contract",
+      "file": "schema/collection-result.schema.json",
+      "file_sha256": "f97f82a8e3e0900ecf80dd9154c400108732c28466063849a19ca033286138b5",
+      "json_pointer": "/allOf",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/collection-result.schema.json#/allOf"
+    },
+    "O-test": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_test\"]",
+      "lines": [
+        134,
+        166
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L134-L166",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "ebf034287f0bf9b845f91cc92ac2056598ba2ca77a6a402e056e54d2bc90fdeb"
+    },
+    "O-object": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_object\"]",
+      "lines": [
+        167,
+        250
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L167-L250",
+      "direct_documentation_count": 4,
+      "documentation_sha256": "86eeaba4427c91c5348b804bd1abfb777c1a657a83b3c6628446965ccf5bb674"
+    },
+    "O-state": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]",
+      "lines": [
+        251,
+        462
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L251-L462",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "e53e244426b9257c2a0ab3fe225d8bfc40acb31e5cd35b14eeab3240f0c1a4c0"
+    },
+    "O-item": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]",
+      "lines": [
+        59,
+        270
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L59-L270",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "7944a7d4ca6f2645396a640a11d41aea194617e2498be067946757823e7af7c3"
+    },
+    "O-item-status": {
+      "kind": "pinned_oval_documentation",
+      "file": "oval-system-characteristics-schema.xsd",
+      "file_sha256": "6ba97190fe54ce4874fe182986dc2f48c04f3386f16afb58b1e16e7f9ec38112",
+      "xpath": "/xsd:schema/xsd:complexType[@name=\"ItemType\"]",
+      "lines": [
+        250,
+        262
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/oval-system-characteristics-schema.xsd#L250-L262",
+      "direct_documentation_count": 4,
+      "documentation_sha256": "165a556dfa56e03e13a0f4af6acd2fcfa16dca4cc44d8cf6b1a1157c9e9ff10a"
+    },
+    "O-collection-status": {
+      "kind": "pinned_oval_documentation",
+      "file": "oval-system-characteristics-schema.xsd",
+      "file_sha256": "6ba97190fe54ce4874fe182986dc2f48c04f3386f16afb58b1e16e7f9ec38112",
+      "xpath": "/xsd:schema/xsd:simpleType[@name=\"FlagEnumeration\"]",
+      "lines": [
+        275,
+        327
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/oval-system-characteristics-schema.xsd#L275-L327",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "b2cca24cb04531e0110b7260f8649095f99175fbbc2c69b065842bf41cd0648c"
+    },
+    "O-field-status": {
+      "kind": "pinned_oval_documentation",
+      "file": "oval-system-characteristics-schema.xsd",
+      "file_sha256": "6ba97190fe54ce4874fe182986dc2f48c04f3386f16afb58b1e16e7f9ec38112",
+      "xpath": "/xsd:schema/xsd:simpleType[@name=\"StatusEnumeration\"]",
+      "lines": [
+        328,
+        354
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/oval-system-characteristics-schema.xsd#L328-L354",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "fb23f9c3596c9959301add32a108ae609d414e9c9c993a86fdbbdfc1d9422a08"
+    },
+    "O-selector-filepath": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_object\"]//xsd:element[@name=\"filepath\"]",
+      "lines": [
+        196,
+        212
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L196-L212",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "c4c38e30f322f0eeb596d198a672009300de03b8985d5b09a0cec6289c2d6fa3"
+    },
+    "O-selector-path": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_object\"]//xsd:element[@name=\"path\"]",
+      "lines": [
+        214,
+        228
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L214-L228",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "7ac5c1dcadbc5eeac182f9885e1254c13a93411cddb6e19f5173336e7d25618b"
+    },
+    "O-selector-filename": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_object\"]//xsd:element[@name=\"filename\"]",
+      "lines": [
+        229,
+        240
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L229-L240",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "b5de447f39fcff53d0afa1fc233e884cc70381361583ec83c6a99635b27c3750"
+    },
+    "O-behavior-max_depth": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:complexType[@name=\"FileBehaviors\"]//xsd:attribute[@name=\"max_depth\"]",
+      "lines": [
+        468,
+        480
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L468-L480",
+      "direct_documentation_count": 3,
+      "documentation_sha256": "7d3643e0c8cde279bd724e8f373d9ca9e57b14441fc7d7e9a1fc31a01ee2c7d7"
+    },
+    "O-behavior-recurse": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:complexType[@name=\"FileBehaviors\"]//xsd:attribute[@name=\"recurse\"]",
+      "lines": [
+        481,
+        535
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L481-L535",
+      "direct_documentation_count": 2,
+      "documentation_sha256": "6617cb26b4413a8c3cec5b5b246deea3af47b8eb2e4b6de150dffeca43e578f1"
+    },
+    "O-behavior-recurse_direction": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:complexType[@name=\"FileBehaviors\"]//xsd:attribute[@name=\"recurse_direction\"]",
+      "lines": [
+        536,
+        558
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L536-L558",
+      "direct_documentation_count": 2,
+      "documentation_sha256": "2af2e565d477a2237face05e6c88057288080b7d81f1c115731824b853166e5e"
+    },
+    "O-behavior-recurse_file_system": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:complexType[@name=\"FileBehaviors\"]//xsd:attribute[@name=\"recurse_file_system\"]",
+      "lines": [
+        559,
+        571
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L559-L571",
+      "direct_documentation_count": 2,
+      "documentation_sha256": "391a33438225049bd51a3b74fe3f55e86a51bbc44a6be1febd31915580f16ca1"
+    },
+    "O-field-full_path": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"filepath\"]",
+      "lines": [
+        67,
+        71
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L67-L71",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "c4c38e30f322f0eeb596d198a672009300de03b8985d5b09a0cec6289c2d6fa3"
+    },
+    "O-state-full_path": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"filepath\"]",
+      "lines": [
+        259,
+        263
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L259-L263",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "c4c38e30f322f0eeb596d198a672009300de03b8985d5b09a0cec6289c2d6fa3"
+    },
+    "N-field-full_path": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/full_path",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/full_path"
+    },
+    "N-crosswalk-full_path": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/filepath",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/filepath"
+    },
+    "O-field-directory": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"path\"]",
+      "lines": [
+        72,
+        76
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L72-L76",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "7ac5c1dcadbc5eeac182f9885e1254c13a93411cddb6e19f5173336e7d25618b"
+    },
+    "O-state-directory": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"path\"]",
+      "lines": [
+        264,
+        268
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L264-L268",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "7ac5c1dcadbc5eeac182f9885e1254c13a93411cddb6e19f5173336e7d25618b"
+    },
+    "N-field-directory": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/directory",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/directory"
+    },
+    "N-crosswalk-directory": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/path",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/path"
+    },
+    "O-field-name": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"filename\"]",
+      "lines": [
+        77,
+        81
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L77-L81",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "0e07d742a914aa12081360f0e684463ff828033562e263932f2b67c7c41fa44f"
+    },
+    "O-state-name": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"filename\"]",
+      "lines": [
+        269,
+        273
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L269-L273",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "6b85945297217991f1aced2d1c9ed5eac0aa9a2b9bc59ffe38cbc48f63d2a5db"
+    },
+    "N-field-name": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/name",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/name"
+    },
+    "N-crosswalk-name": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/filename",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/filename"
+    },
+    "O-field-type": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"type\"]",
+      "lines": [
+        82,
+        86
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L82-L86",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "be9c9b976bd95162f4e856c8010b66f312e2835af844cc5bc70d1f80078d76b6"
+    },
+    "O-state-type": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"type\"]",
+      "lines": [
+        274,
+        278
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L274-L278",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "be9c9b976bd95162f4e856c8010b66f312e2835af844cc5bc70d1f80078d76b6"
+    },
+    "N-field-type": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/type",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/type"
+    },
+    "N-crosswalk-type": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/type",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/type"
+    },
+    "O-field-owner_gid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"group_id\"]",
+      "lines": [
+        87,
+        112
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L87-L112",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "610b5b3193372336235239709883265dc9332cf957a471541b744b75b5b72c21"
+    },
+    "O-state-owner_gid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"group_id\"]",
+      "lines": [
+        279,
+        304
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L279-L304",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "b77d6507fa720fec383343d5f27bdc721d0e056c17a19dfa1e0214eccb22137c"
+    },
+    "N-field-owner_gid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/owner_gid",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/owner_gid"
+    },
+    "N-crosswalk-owner_gid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/group_id",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/group_id"
+    },
+    "O-field-owner_uid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"user_id\"]",
+      "lines": [
+        113,
+        138
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L113-L138",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "457dcf03c67fb784ba50b81a033a0703bb681df82365c952cf52b60428748313"
+    },
+    "O-state-owner_uid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"user_id\"]",
+      "lines": [
+        305,
+        330
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L305-L330",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "457dcf03c67fb784ba50b81a033a0703bb681df82365c952cf52b60428748313"
+    },
+    "N-field-owner_uid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/owner_uid",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/owner_uid"
+    },
+    "N-crosswalk-owner_uid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/user_id",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/user_id"
+    },
+    "O-field-access_time": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"a_time\"]",
+      "lines": [
+        139,
+        157
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L139-L157",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "f81ac2b5420c7273e29d48a498ecfd2184bbf4260e62a94744446f5395c64a9c"
+    },
+    "O-state-access_time": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"a_time\"]",
+      "lines": [
+        331,
+        349
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L331-L349",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "f81ac2b5420c7273e29d48a498ecfd2184bbf4260e62a94744446f5395c64a9c"
+    },
+    "N-field-access_time": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/access_time",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/access_time"
+    },
+    "N-crosswalk-access_time": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/a_time",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/a_time"
+    },
+    "O-field-change_time": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"c_time\"]",
+      "lines": [
+        158,
+        176
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L158-L176",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "5f5b814e43dcbd94cc1ec9e85ff6ade56d95d83f5aebce62e6b8774b1639c633"
+    },
+    "O-state-change_time": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"c_time\"]",
+      "lines": [
+        350,
+        368
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L350-L368",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "5f5b814e43dcbd94cc1ec9e85ff6ade56d95d83f5aebce62e6b8774b1639c633"
+    },
+    "N-field-change_time": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/change_time",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/change_time"
+    },
+    "N-crosswalk-change_time": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/c_time",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/c_time"
+    },
+    "O-field-modify_time": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"m_time\"]",
+      "lines": [
+        177,
+        195
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L177-L195",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "7f5489e1b094888370e24bf36fe0dde399052d555167dc26ca20e5ef748f1152"
+    },
+    "O-state-modify_time": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"m_time\"]",
+      "lines": [
+        369,
+        387
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L369-L387",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "7f5489e1b094888370e24bf36fe0dde399052d555167dc26ca20e5ef748f1152"
+    },
+    "N-field-modify_time": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/modify_time",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/modify_time"
+    },
+    "N-crosswalk-modify_time": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/m_time",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/m_time"
+    },
+    "O-field-size": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"size\"]",
+      "lines": [
+        196,
+        200
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L196-L200",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "9e0f44e00b3dc707a9beedf43807c1aa2f4d040e82f54e49e0fb419b24a3bbb0"
+    },
+    "O-state-size": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"size\"]",
+      "lines": [
+        388,
+        392
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L388-L392",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "9e0f44e00b3dc707a9beedf43807c1aa2f4d040e82f54e49e0fb419b24a3bbb0"
+    },
+    "N-field-size": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/size",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/size"
+    },
+    "N-crosswalk-size": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/size",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/size"
+    },
+    "O-field-setuid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"suid\"]",
+      "lines": [
+        201,
+        205
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L201-L205",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "ce75cf060fa96e5bb22114bcb1af03339fc64630acf211ac5d6fb7a347f64f8a"
+    },
+    "O-state-setuid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"suid\"]",
+      "lines": [
+        393,
+        397
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L393-L397",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "ce75cf060fa96e5bb22114bcb1af03339fc64630acf211ac5d6fb7a347f64f8a"
+    },
+    "N-field-setuid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/setuid",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/setuid"
+    },
+    "N-crosswalk-setuid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/suid",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/suid"
+    },
+    "O-field-setgid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"sgid\"]",
+      "lines": [
+        206,
+        210
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L206-L210",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "afc4f5707e85cfaadce7997cba0f2308d62e3a897c92ed412746f9d0220e21ef"
+    },
+    "O-state-setgid": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"sgid\"]",
+      "lines": [
+        398,
+        402
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L398-L402",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "afc4f5707e85cfaadce7997cba0f2308d62e3a897c92ed412746f9d0220e21ef"
+    },
+    "N-field-setgid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/setgid",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/setgid"
+    },
+    "N-crosswalk-setgid": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/sgid",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/sgid"
+    },
+    "O-field-sticky": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"sticky\"]",
+      "lines": [
+        211,
+        215
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L211-L215",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "83c4c8f542a89de2bea5a30ebea028c76820c351cb701a4d9640dafff198d56e"
+    },
+    "O-state-sticky": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"sticky\"]",
+      "lines": [
+        403,
+        407
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L403-L407",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "83c4c8f542a89de2bea5a30ebea028c76820c351cb701a4d9640dafff198d56e"
+    },
+    "N-field-sticky": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/sticky",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/sticky"
+    },
+    "N-crosswalk-sticky": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/sticky",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/sticky"
+    },
+    "O-field-owner_read": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"uread\"]",
+      "lines": [
+        216,
+        220
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L216-L220",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "b868ddc464b4d721089ccffbebc7b4fa693ccdb724cb63ec42e64967449ababc"
+    },
+    "O-state-owner_read": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"uread\"]",
+      "lines": [
+        408,
+        412
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L408-L412",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "b868ddc464b4d721089ccffbebc7b4fa693ccdb724cb63ec42e64967449ababc"
+    },
+    "N-field-owner_read": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/owner_read",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/owner_read"
+    },
+    "N-crosswalk-owner_read": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/uread",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/uread"
+    },
+    "O-field-owner_write": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"uwrite\"]",
+      "lines": [
+        221,
+        225
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L221-L225",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "177ef0acac1591fa94943f3d458278470f6732d010f47465a19400069565ae85"
+    },
+    "O-state-owner_write": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"uwrite\"]",
+      "lines": [
+        413,
+        417
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L413-L417",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "177ef0acac1591fa94943f3d458278470f6732d010f47465a19400069565ae85"
+    },
+    "N-field-owner_write": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/owner_write",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/owner_write"
+    },
+    "N-crosswalk-owner_write": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/uwrite",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/uwrite"
+    },
+    "O-field-owner_execute": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"uexec\"]",
+      "lines": [
+        226,
+        230
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L226-L230",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "a15a5ff3cf47285499affaeb972d819ac83fa4f5641a001eeafbc18c582f70b1"
+    },
+    "O-state-owner_execute": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"uexec\"]",
+      "lines": [
+        418,
+        422
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L418-L422",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "a15a5ff3cf47285499affaeb972d819ac83fa4f5641a001eeafbc18c582f70b1"
+    },
+    "N-field-owner_execute": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/owner_execute",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/owner_execute"
+    },
+    "N-crosswalk-owner_execute": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/uexec",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/uexec"
+    },
+    "O-field-group_read": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"gread\"]",
+      "lines": [
+        231,
+        235
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L231-L235",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "999efca5c2b9fda5abbb96b62a717db8888e27d37676eacf642da922bd7e9b6c"
+    },
+    "O-state-group_read": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"gread\"]",
+      "lines": [
+        423,
+        427
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L423-L427",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "999efca5c2b9fda5abbb96b62a717db8888e27d37676eacf642da922bd7e9b6c"
+    },
+    "N-field-group_read": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/group_read",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/group_read"
+    },
+    "N-crosswalk-group_read": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/gread",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/gread"
+    },
+    "O-field-group_write": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"gwrite\"]",
+      "lines": [
+        236,
+        240
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L236-L240",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "88c044800d91cafefae468c2490c5c295764ba974d855bdfa0cf02bdbc940e34"
+    },
+    "O-state-group_write": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"gwrite\"]",
+      "lines": [
+        428,
+        432
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L428-L432",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "e3527bb1cf553f74404aeb175d4eed5b8d5ce54a4055a770b08d2c6306aefe13"
+    },
+    "N-field-group_write": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/group_write",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/group_write"
+    },
+    "N-crosswalk-group_write": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/gwrite",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/gwrite"
+    },
+    "O-field-group_execute": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"gexec\"]",
+      "lines": [
+        241,
+        245
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L241-L245",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "c8f20dc48e0e3a70e05269c994249b943347a9fd332b8a57ad054c9037725ec2"
+    },
+    "O-state-group_execute": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"gexec\"]",
+      "lines": [
+        433,
+        437
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L433-L437",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "c8f20dc48e0e3a70e05269c994249b943347a9fd332b8a57ad054c9037725ec2"
+    },
+    "N-field-group_execute": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/group_execute",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/group_execute"
+    },
+    "N-crosswalk-group_execute": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/gexec",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/gexec"
+    },
+    "O-field-other_read": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"oread\"]",
+      "lines": [
+        246,
+        250
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L246-L250",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "07e4efabcb447da2795a703ebd9a4834f2795a0d2d67426d83008f3d5b69cc0d"
+    },
+    "O-state-other_read": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"oread\"]",
+      "lines": [
+        438,
+        442
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L438-L442",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "07e4efabcb447da2795a703ebd9a4834f2795a0d2d67426d83008f3d5b69cc0d"
+    },
+    "N-field-other_read": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/other_read",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/other_read"
+    },
+    "N-crosswalk-other_read": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/oread",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/oread"
+    },
+    "O-field-other_write": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"owrite\"]",
+      "lines": [
+        251,
+        255
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L251-L255",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "17c32f6e73a5f99a48435b741d3f72f93b196d7d7d1b8bf1fb89e022d87a99e0"
+    },
+    "O-state-other_write": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"owrite\"]",
+      "lines": [
+        443,
+        447
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L443-L447",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "77d16a54ec51dfd4cdc24d1a86c00a58a2ba45d4d2d1f455f2f68fd4ef2da7c4"
+    },
+    "N-field-other_write": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/other_write",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/other_write"
+    },
+    "N-crosswalk-other_write": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/owrite",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/owrite"
+    },
+    "O-field-other_execute": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"oexec\"]",
+      "lines": [
+        256,
+        260
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L256-L260",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "9d04469694bf415a75f24fcc1865fb0cc309662dbf802d0d54be0e7802ccd979"
+    },
+    "O-state-other_execute": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"oexec\"]",
+      "lines": [
+        448,
+        452
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L448-L452",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "9d04469694bf415a75f24fcc1865fb0cc309662dbf802d0d54be0e7802ccd979"
+    },
+    "N-field-other_execute": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/other_execute",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/other_execute"
+    },
+    "N-crosswalk-other_execute": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/oexec",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/oexec"
+    },
+    "O-field-has_extended_acl": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-system-characteristics-schema.xsd",
+      "file_sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_item\"]//xsd:element[@name=\"has_extended_acl\"]",
+      "lines": [
+        261,
+        265
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-system-characteristics-schema.xsd#L261-L265",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "0c49c1858d17b7bb991d7f1d781c6c22af8faf0036e9d3256ae1d7b9a5860aa3"
+    },
+    "O-state-has_extended_acl": {
+      "kind": "pinned_oval_documentation",
+      "file": "unix-definitions-schema.xsd",
+      "file_sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1",
+      "xpath": "/xsd:schema/xsd:element[@name=\"file_state\"]//xsd:element[@name=\"has_extended_acl\"]",
+      "lines": [
+        453,
+        457
+      ],
+      "url": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/unix-definitions-schema.xsd#L453-L457",
+      "direct_documentation_count": 1,
+      "documentation_sha256": "673d5327d861d1e3c74e520fc8ee7e41fd6f8b6f346a244f77166f2ae63af686"
+    },
+    "N-field-has_extended_acl": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/field_datatypes/has_extended_acl",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/field_datatypes/has_extended_acl"
+    },
+    "N-crosswalk-has_extended_acl": {
+      "kind": "pinned_native_contract",
+      "file": "schema/capability-mappings/supported/unix.file.json",
+      "file_sha256": "4f0fcfeb7d03e92bbe44d60add06b1959dc97401ba292787309381cc39b76466",
+      "json_pointer": "/native/state_field_map/has_extended_acl",
+      "url": "https://raw.githubusercontent.com/vanderpol/scap-ng/8d42814ba3bc197e0dc9f31384642ee863805155/schema/capability-mappings/supported/unix.file.json#/native/state_field_map/has_extended_acl"
+    },
+    "linux-stat": {
+      "kind": "platform_primary_source",
+      "url": "https://man7.org/linux/man-pages/man2/stat.2.html",
+      "resolved_url": "https://man7.org/linux/man-pages/man2/stat.2.html",
+      "sha256": "0067346ded7cc8259ad614874993bd99b3edff372b61057d236c9dfe5e40501e",
+      "bytes": 25836,
+      "retrieved_on": "2026-11-07",
+      "edition": "Linux man-pages 6.19 (2026-02-08)",
+      "anchors": [
+        "DESCRIPTION",
+        "ERRORS",
+        "SYNOPSIS"
+      ]
+    },
+    "linux-stat-struct": {
+      "kind": "platform_primary_source",
+      "url": "https://man7.org/linux/man-pages/man3/stat.3type.html",
+      "resolved_url": "https://man7.org/linux/man-pages/man3/stat.3type.html",
+      "sha256": "9c460ebd2598a34d797976e091788ebaf7fa47c700a15fc429a0591ff4f977f0",
+      "bytes": 13720,
+      "retrieved_on": "2026-11-07",
+      "edition": "Linux man-pages 6.19 (2026-02-08)",
+      "anchors": [
+        "DESCRIPTION",
+        "SYNOPSIS"
+      ]
+    },
+    "linux-open": {
+      "kind": "platform_primary_source",
+      "url": "https://man7.org/linux/man-pages/man2/open.2.html",
+      "resolved_url": "https://man7.org/linux/man-pages/man2/open.2.html",
+      "sha256": "d665489cadb85624d98fae03a8d8d06209030f32735cff8aeba949ad8491c789",
+      "bytes": 76506,
+      "retrieved_on": "2026-11-07",
+      "edition": "Linux man-pages 6.19 (2026-02-08)",
+      "anchors": [
+        "DESCRIPTION",
+        "ERRORS",
+        "SYNOPSIS"
+      ]
+    },
+    "posix-stat": {
+      "kind": "platform_primary_source",
+      "url": "https://man7.org/linux/man-pages/man3/fstatat.3p.html",
+      "resolved_url": "https://man7.org/linux/man-pages/man3/fstatat.3p.html",
+      "sha256": "15adccc2c9291f8a4e2d1593ac9940c49fb737944ac95609493411808d0e597c",
+      "bytes": 22920,
+      "retrieved_on": "2026-11-07",
+      "edition": "POSIX.1-2017 licensed reproduction",
+      "anchors": [
+        "DESCRIPTION",
+        "ERRORS",
+        "SYNOPSIS"
+      ]
+    },
+    "posix-mode": {
+      "kind": "platform_primary_source",
+      "url": "https://man7.org/linux/man-pages/man0/sys_stat.h.0p.html",
+      "resolved_url": "https://man7.org/linux/man-pages/man0/sys_stat.h.0p.html",
+      "sha256": "b7971693a221f1176016cac1a79fdb2a42636a52d78953a3dc41895842281514",
+      "bytes": 23552,
+      "retrieved_on": "2026-11-07",
+      "edition": "POSIX.1-2017 licensed reproduction",
+      "anchors": [
+        "DESCRIPTION",
+        "SYNOPSIS"
+      ]
+    }
+  },
+  "claims": [
+    {
+      "id": "selector-filepath",
+      "subject": "Object.filepath",
+      "disposition": "changed",
+      "summary": "Object keeps source selector spelling; native Item field is renamed. Alternative scalar equality forms are used without inferring other operators.",
+      "sources": [
+        "N-selectors",
+        "N-map",
+        "O-selector-filepath",
+        "N-crosswalk-full_path"
+      ]
+    },
+    {
+      "id": "selector-path",
+      "subject": "Object.path",
+      "disposition": "changed",
+      "summary": "Object keeps source selector spelling; native Item field is renamed. Alternative scalar equality forms are used without inferring other operators.",
+      "sources": [
+        "N-selectors",
+        "N-map",
+        "O-selector-path",
+        "N-crosswalk-directory"
+      ]
+    },
+    {
+      "id": "selector-filename",
+      "subject": "Object.filename",
+      "disposition": "changed",
+      "summary": "Object keeps source selector spelling; native Item field is renamed. Alternative scalar equality forms are used without inferring other operators.",
+      "sources": [
+        "N-selectors",
+        "N-map",
+        "O-selector-filename",
+        "N-crosswalk-name"
+      ]
+    },
+    {
+      "id": "selector-operators",
+      "subject": "Object selector operators",
+      "disposition": "preserved",
+      "summary": "Native five-string-operator crosswalk is documented. Prototype executes only scalar equals; references/arrays/regex are outside its profile.",
+      "sources": [
+        "N-selectors",
+        "O-object"
+      ]
+    },
+    {
+      "id": "directory-null",
+      "subject": "Object.filename null",
+      "disposition": "preserved",
+      "summary": "Resolved native selector notes preserve directory-object selection; empty string is a string operand, not null. Directory acquisition is outside the regular-file profile.",
+      "sources": [
+        "N-selectors",
+        "O-selector-filename"
+      ]
+    },
+    {
+      "id": "scope",
+      "subject": "Profile",
+      "disposition": "unresolved",
+      "summary": "Absolute paths and no dot/repeated/trailing separators define a narrow prototype input profile, not new native grammar. filepath absolute-path meaning is explicit in OVAL; native resolved literal grammar is broader.",
+      "sources": [
+        "O-selector-filepath",
+        "N-selectors",
+        "N-rules"
+      ],
+      "decisions": [
+        "D-scope"
+      ]
+    },
+    {
+      "id": "acquire",
+      "subject": "Suggested API recipe",
+      "disposition": "unresolved",
+      "summary": "Linux parent directory descriptor plus one-component fstatat(AT_SYMLINK_NOFOLLOW); S_ISREG guard. This is an implementation suggestion, not approved SCAP-NG link policy.",
+      "sources": [
+        "O-test",
+        "O-object",
+        "linux-open",
+        "linux-stat",
+        "posix-stat",
+        "posix-mode"
+      ],
+      "decisions": [
+        "D-links"
+      ]
+    },
+    {
+      "id": "races",
+      "subject": "Observation consistency",
+      "disposition": "unresolved",
+      "summary": "Parent descriptor reduces pathname races but does not prevent ancestor symlinks, enforce mount containment or make stat fields an atomic snapshot. No retry-to-success completeness guarantee.",
+      "sources": [
+        "linux-open",
+        "linux-stat",
+        "posix-stat"
+      ],
+      "decisions": [
+        "D-errors",
+        "D-links"
+      ]
+    },
+    {
+      "id": "field-full_path",
+      "subject": "Item.full_path",
+      "disposition": "changed",
+      "summary": "Use selected lexical identity for this profile; native field name differs from source. Do not substitute realpath/cwd/host-name resolution.",
+      "sources": [
+        "N-crosswalk-full_path",
+        "N-field-full_path",
+        "O-field-full_path",
+        "O-state-full_path"
+      ],
+      "acquisition": "Selected path or its explicit parent/basename; lexical normalization outside profile is unresolved.",
+      "decisions": [
+        "D-scope"
+      ]
+    },
+    {
+      "id": "field-directory",
+      "subject": "Item.directory",
+      "disposition": "changed",
+      "summary": "Use selected lexical identity for this profile; native field name differs from source. Do not substitute realpath/cwd/host-name resolution.",
+      "sources": [
+        "N-crosswalk-directory",
+        "N-field-directory",
+        "O-field-directory",
+        "O-state-directory"
+      ],
+      "acquisition": "Selected path or its explicit parent/basename; lexical normalization outside profile is unresolved.",
+      "decisions": [
+        "D-scope"
+      ]
+    },
+    {
+      "id": "field-name",
+      "subject": "Item.name",
+      "disposition": "changed",
+      "summary": "Use selected lexical identity for this profile; native field name differs from source. Do not substitute realpath/cwd/host-name resolution.",
+      "sources": [
+        "N-crosswalk-name",
+        "N-field-name",
+        "O-field-name",
+        "O-state-name"
+      ],
+      "acquisition": "Selected path or its explicit parent/basename; lexical normalization outside profile is unresolved.",
+      "decisions": [
+        "D-scope"
+      ]
+    },
+    {
+      "id": "field-type",
+      "subject": "Item.type",
+      "disposition": "unresolved",
+      "summary": "Native allows string but does not enumerate file-type spellings. S_ISREG detects regular; regular is a proposed source-derived serialization.",
+      "sources": [
+        "N-field-type",
+        "N-crosswalk-type",
+        "O-field-type",
+        "O-state-type",
+        "posix-mode"
+      ],
+      "acquisition": "S_ISREG(st_mode); proposed token regular.",
+      "decisions": [
+        "D-type"
+      ]
+    },
+    {
+      "id": "field-owner_uid",
+      "subject": "Item.owner_uid",
+      "disposition": "changed",
+      "summary": "Native field is renamed and integer-valued. Read the selected target namespace numeric ID directly; do not resolve account/group names or narrow through a signed/float cast.",
+      "sources": [
+        "N-crosswalk-owner_uid",
+        "N-field-owner_uid",
+        "O-field-owner_uid",
+        "O-state-owner_uid",
+        "posix-mode",
+        "linux-stat-struct"
+      ],
+      "acquisition": "st_uid; exact integer.",
+      "decisions": []
+    },
+    {
+      "id": "field-owner_gid",
+      "subject": "Item.owner_gid",
+      "disposition": "changed",
+      "summary": "Native field is renamed and integer-valued. Read the selected target namespace numeric ID directly; do not resolve account/group names or narrow through a signed/float cast.",
+      "sources": [
+        "N-crosswalk-owner_gid",
+        "N-field-owner_gid",
+        "O-field-owner_gid",
+        "O-state-owner_gid",
+        "posix-mode",
+        "linux-stat-struct"
+      ],
+      "acquisition": "st_gid; exact integer.",
+      "decisions": []
+    },
+    {
+      "id": "field-setuid",
+      "subject": "Item.setuid",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-setuid",
+        "N-field-setuid",
+        "O-field-setuid",
+        "O-state-setuid",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_ISUID) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-setgid",
+      "subject": "Item.setgid",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-setgid",
+        "N-field-setgid",
+        "O-field-setgid",
+        "O-state-setgid",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_ISGID) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-sticky",
+      "subject": "Item.sticky",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-sticky",
+        "N-field-sticky",
+        "O-field-sticky",
+        "O-state-sticky",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_ISVTX) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-owner_read",
+      "subject": "Item.owner_read",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-owner_read",
+        "N-field-owner_read",
+        "O-field-owner_read",
+        "O-state-owner_read",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IRUSR) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-owner_write",
+      "subject": "Item.owner_write",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-owner_write",
+        "N-field-owner_write",
+        "O-field-owner_write",
+        "O-state-owner_write",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IWUSR) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-owner_execute",
+      "subject": "Item.owner_execute",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-owner_execute",
+        "N-field-owner_execute",
+        "O-field-owner_execute",
+        "O-state-owner_execute",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IXUSR) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-group_read",
+      "subject": "Item.group_read",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-group_read",
+        "N-field-group_read",
+        "O-field-group_read",
+        "O-state-group_read",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IRGRP) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-group_write",
+      "subject": "Item.group_write",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-group_write",
+        "N-field-group_write",
+        "O-field-group_write",
+        "O-state-group_write",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IWGRP) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-group_execute",
+      "subject": "Item.group_execute",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-group_execute",
+        "N-field-group_execute",
+        "O-field-group_execute",
+        "O-state-group_execute",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IXGRP) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-other_read",
+      "subject": "Item.other_read",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-other_read",
+        "N-field-other_read",
+        "O-field-other_read",
+        "O-state-other_read",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IROTH) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-other_write",
+      "subject": "Item.other_write",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-other_write",
+        "N-field-other_write",
+        "O-field-other_write",
+        "O-state-other_write",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IWOTH) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-other_execute",
+      "subject": "Item.other_execute",
+      "disposition": "unresolved",
+      "summary": "Native boolean shape/name mapping is known. Raw mode-bit interpretation is the prototype proposal; it does not establish effective access, ACL permission, mount behavior or actual privilege transitions.",
+      "sources": [
+        "N-crosswalk-other_execute",
+        "N-field-other_execute",
+        "O-field-other_execute",
+        "O-state-other_execute",
+        "posix-mode"
+      ],
+      "acquisition": "(st_mode & S_IXOTH) != 0",
+      "decisions": [
+        "D-permissions"
+      ]
+    },
+    {
+      "id": "field-access_time",
+      "subject": "Item.access_time",
+      "disposition": "unresolved",
+      "summary": "Native declares integer but no epoch/unit/resolution. OVAL specifies epoch seconds; use tv_sec only as an explicit proposal, keep tv_nsec raw, and never interpret ctime as creation time.",
+      "sources": [
+        "N-crosswalk-access_time",
+        "N-field-access_time",
+        "O-field-access_time",
+        "O-state-access_time",
+        "posix-mode",
+        "linux-stat-struct"
+      ],
+      "acquisition": "st_atim.tv_sec; proposed integer epoch seconds, no floating conversion.",
+      "decisions": [
+        "D-time"
+      ]
+    },
+    {
+      "id": "field-change_time",
+      "subject": "Item.change_time",
+      "disposition": "unresolved",
+      "summary": "Native declares integer but no epoch/unit/resolution. OVAL specifies epoch seconds; use tv_sec only as an explicit proposal, keep tv_nsec raw, and never interpret ctime as creation time.",
+      "sources": [
+        "N-crosswalk-change_time",
+        "N-field-change_time",
+        "O-field-change_time",
+        "O-state-change_time",
+        "posix-mode",
+        "linux-stat-struct"
+      ],
+      "acquisition": "st_ctim.tv_sec; proposed integer epoch seconds, no floating conversion.",
+      "decisions": [
+        "D-time"
+      ]
+    },
+    {
+      "id": "field-modify_time",
+      "subject": "Item.modify_time",
+      "disposition": "unresolved",
+      "summary": "Native declares integer but no epoch/unit/resolution. OVAL specifies epoch seconds; use tv_sec only as an explicit proposal, keep tv_nsec raw, and never interpret ctime as creation time.",
+      "sources": [
+        "N-crosswalk-modify_time",
+        "N-field-modify_time",
+        "O-field-modify_time",
+        "O-state-modify_time",
+        "posix-mode",
+        "linux-stat-struct"
+      ],
+      "acquisition": "st_mtim.tv_sec; proposed integer epoch seconds, no floating conversion.",
+      "decisions": [
+        "D-time"
+      ]
+    },
+    {
+      "id": "status-item",
+      "subject": "Item statuses",
+      "disposition": "changed",
+      "summary": "OVAL permits optional diagnostic does-not-exist Items; native Item status excludes does_not_exist. Missing selected Items are omitted.",
+      "sources": [
+        "O-item-status",
+        "N-item",
+        "N-item-status"
+      ]
+    },
+    {
+      "id": "status-collection",
+      "subject": "Collection statuses",
+      "disposition": "changed",
+      "summary": "Native serializes collection states with underscore tokens and requires diagnostics for error/incomplete. Source flags are not automatically native Test-outcome rules.",
+      "sources": [
+        "O-collection-status",
+        "N-collection",
+        "N-collection-errors"
+      ]
+    },
+    {
+      "id": "status-field",
+      "subject": "Typed field statuses",
+      "disposition": "changed",
+      "summary": "Native typed fields distinguish exists, does_not_exist, error and not_collected; non-existing/error/not-collected fields carry no value. No new field-error propagation policy is adopted.",
+      "sources": [
+        "O-field-status",
+        "O-item-status",
+        "N-field-status"
+      ],
+      "decisions": [
+        "D-errors"
+      ]
+    },
+    {
+      "id": "status-missing",
+      "subject": "ENOENT",
+      "disposition": "unresolved",
+      "summary": "Proposed collection does_not_exist with zero Items only under the controlled missing-leaf fixture assumptions; errno alone is not proof of global absence.",
+      "sources": [
+        "posix-stat",
+        "linux-stat",
+        "O-collection-status",
+        "O-item-status",
+        "N-collection-errors"
+      ],
+      "decisions": [
+        "D-errors"
+      ]
+    },
+    {
+      "id": "status-denied",
+      "subject": "EACCES",
+      "disposition": "unresolved",
+      "summary": "Proposed collection error, population_complete false and diagnostic, not a successful empty collection.",
+      "sources": [
+        "posix-stat",
+        "linux-stat",
+        "O-collection-status",
+        "O-item-status",
+        "N-collection-errors"
+      ],
+      "decisions": [
+        "D-errors"
+      ]
+    },
+    {
+      "id": "status-other-errors",
+      "subject": "ENOTDIR/ELOOP/EOVERFLOW/EIO and other errno",
+      "disposition": "unresolved",
+      "summary": "Retain lookup failure and diagnostic; do not erase it as absence or use an uninitialized stat buffer.",
+      "sources": [
+        "posix-stat",
+        "linux-stat",
+        "O-collection-status",
+        "O-item-status",
+        "N-collection-errors"
+      ],
+      "decisions": [
+        "D-errors"
+      ]
+    },
+    {
+      "id": "traversal",
+      "subject": "Traversal and filesystem boundaries",
+      "disposition": "unresolved",
+      "summary": "Frozen depth/token syntax and imported defined-to-same names are known; full_path/directory semantic-rule names, symlink following, same/local classification and mount boundaries remain unresolved. Profile uses explicit filesystem all and no traversal.",
+      "sources": [
+        "N-depth",
+        "N-recurse",
+        "N-fs",
+        "N-rules",
+        "O-behavior-max_depth",
+        "O-behavior-recurse",
+        "O-behavior-recurse_direction",
+        "O-behavior-recurse_file_system"
+      ],
+      "decisions": [
+        "D-links",
+        "D-scope"
+      ]
+    },
+    {
+      "id": "excluded",
+      "subject": "Size and ACL",
+      "disposition": "unresolved",
+      "summary": "Source size units and ACL unsupported convention exist; they are not implemented by this selected 21-field prototype. Omission does not mean zero/false or absent field, and does not establish full-capability completeness.",
+      "sources": [
+        "O-field-size",
+        "O-field-has_extended_acl",
+        "N-field-size",
+        "N-field-has_extended_acl"
+      ],
+      "decisions": [
+        "D-acl"
+      ]
+    },
+    {
+      "id": "example-regular",
+      "subject": "Worked example regular",
+      "disposition": "unresolved",
+      "summary": "Authored Object and illustrative Collection/Item fragments are structurally checked. Fixture OS observations and proposed mappings are hand-authored, not scanner results.",
+      "sources": [
+        "N-item",
+        "N-field-status",
+        "N-collection-errors",
+        "O-object",
+        "O-item",
+        "O-collection-status",
+        "posix-stat",
+        "linux-stat"
+      ],
+      "example_id": "regular",
+      "decisions": [
+        "D-type",
+        "D-time",
+        "D-permissions",
+        "D-errors"
+      ]
+    },
+    {
+      "id": "example-missing",
+      "subject": "Worked example missing",
+      "disposition": "unresolved",
+      "summary": "Authored Object and illustrative Collection/Item fragments are structurally checked. Fixture OS observations and proposed mappings are hand-authored, not scanner results.",
+      "sources": [
+        "N-item",
+        "N-field-status",
+        "N-collection-errors",
+        "O-object",
+        "O-item",
+        "O-collection-status",
+        "posix-stat",
+        "linux-stat"
+      ],
+      "example_id": "missing",
+      "decisions": [
+        "D-type",
+        "D-time",
+        "D-permissions",
+        "D-errors"
+      ]
+    },
+    {
+      "id": "example-denied",
+      "subject": "Worked example denied",
+      "disposition": "unresolved",
+      "summary": "Authored Object and illustrative Collection/Item fragments are structurally checked. Fixture OS observations and proposed mappings are hand-authored, not scanner results.",
+      "sources": [
+        "N-item",
+        "N-field-status",
+        "N-collection-errors",
+        "O-object",
+        "O-item",
+        "O-collection-status",
+        "posix-stat",
+        "linux-stat"
+      ],
+      "example_id": "denied",
+      "decisions": [
+        "D-type",
+        "D-time",
+        "D-permissions",
+        "D-errors"
+      ]
+    }
+  ],
+  "core_fields": [
+    "full_path",
+    "directory",
+    "name",
+    "type",
+    "owner_uid",
+    "owner_gid",
+    "setuid",
+    "setgid",
+    "sticky",
+    "owner_read",
+    "owner_write",
+    "owner_execute",
+    "group_read",
+    "group_write",
+    "group_execute",
+    "other_read",
+    "other_write",
+    "other_execute",
+    "access_time",
+    "change_time",
+    "modify_time"
+  ],
+  "decisions": {
+    "D-scope": "Profile subset is not the complete native selector/normalization/traversal contract.",
+    "D-type": "Native file-type string vocabulary, including regular, is not enumerated by the frozen mapping.",
+    "D-time": "Native epoch, units, precision and negative-time normalization require adoption.",
+    "D-permissions": "Raw mode-bit versus effective-access/privilege meaning needs an explicit native contract.",
+    "D-errors": "Errno-to-collection/Item/field mapping and native Test propagation need adoption; no outcome rule is inferred from schema acceptance.",
+    "D-links": "Target/link and ancestor-link, traversal, mount and race policies remain unresolved.",
+    "D-acl": "ACL acquisition and unsupported-status mapping remain unresolved and excluded."
+  }
+}

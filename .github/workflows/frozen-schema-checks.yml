@@ -10,6 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Verify the exact reviewed head
+        env:
+          REVIEW_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$REVIEW_HEAD"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -24,3 +30,22 @@ jobs:
       - name: Reject stale schema-derived and scanner documentation
         run: python tools/generate_docs.py --check
 
+      - name: Reject stale unix.file basic, advanced and parity references
+        run: python tools/generate_unix_file_reference.py --check
+      - name: Reject stale or regressed core/shared documentation inventory
+        run: python tools/audit_schema_documentation.py --check
+
+      - name: Verify bounded approved-annotation reference and offline help
+        run: python tools/generate_approved_annotation_pilot.py --check
+
+      - name: Verify Issue 43 coordinated review-only documentation pack
+        run: python tools/generate_review_documentation_pack.py --check
+
+      - name: Verify generalized schema-derived reference, editor help and coverage
+        run: python tools/generate_documentation.py --check
+
+      - name: Verify pinned-source documentation reconciliation and native destinations
+        run: python tools/audit_documentation_fidelity.py --check
+
+      - name: Check paired example syntax and honest evaluation proof status
+        run: python tools/check_documentation_examples.py --check

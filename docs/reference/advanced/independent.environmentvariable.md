@@ -1,0 +1,36 @@
+# independent.environmentvariable — advanced constraints
+
+Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#) | {} | source-derived-proposal |
+| [/$defs/meanings/properties/pid](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/meanings/properties/pid) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/pid](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/meanings/properties/pid): Process identifier for the environment being inspected.
+
+The process ID of the process from which the environment variable was retrieved.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/meanings/properties/name) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/meanings/properties/name): Environment variable name.
+
+This element describes the name of an environment variable.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/meanings/properties/value](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/meanings/properties/value) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/value](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/meanings/properties/value): Environment variable value.
+
+The actual value of the specified environment variable.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
+| [/$defs/object](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/object/properties/pid](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/object/properties/pid) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-meaning-reviewed |
+| [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/object/properties/name) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-meaning-reviewed |
+| [/$defs/item](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |
+| [/$defs/require](../../../proposed-schema/documentation/capabilities/independent.environmentvariable.schema.json#/$defs/require) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/test/properties/require", "type_alternatives": ["object"]} | existing-native |
