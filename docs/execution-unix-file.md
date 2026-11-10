@@ -63,7 +63,9 @@ completeness cannot be established.
 
 The RI currently uses the frozen Result booleans and free-form `evidence`
 provenance member to report acquisition, completeness, and trust separately.
-The RI evidence entry uses the documented keys `collection_ref`, `collector`,
+Internally, the RI carries these facts as a typed acquisition receipt through
+its existing Source boundary; the receipt is not a new native Result member.
+The RI evidence entry uses the documented keys `acquisition_status`, `collection_ref`, `collector`,
 `authority`, `acquired_at`, `completed_at`, `duration_ns`, `privilege_mode`,
 `observation_scope`, `trust`, and `limitations`; these remain implementation
 metadata, not native Result members.
