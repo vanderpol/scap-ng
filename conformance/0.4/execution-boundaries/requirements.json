@@ -1,0 +1,265 @@
+{
+  "format": "scap-ng-execution-boundary-requirements/1",
+  "native_schema_commit": "6012ae25281352a9c2d8a4fde7cb5a4968b4432c",
+  "schema_family_sha256": "63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5",
+  "oval_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+  "preserved_conformance_cases": 23,
+  "scope": "existing requirements and explicit implementation/semantic holds; no new native truth table",
+  "requirements": [
+    {
+      "id": "C1",
+      "topic": "logical population and cardinality",
+      "status": "existing",
+      "native": [
+        {
+          "file": "schema/assessment-language.schema.json",
+          "pointer": "/$defs/cardinality",
+          "sha256": "f6bb95ee6b9fe51128d0a9d018aa2cc9f089df9917897486bf3ecd0f0cdb5986"
+        },
+        {
+          "file": "schema/collection-result.schema.json",
+          "pointer": "/properties/population_complete",
+          "sha256": "f97f82a8e3e0900ecf80dd9154c400108732c28466063849a19ca033286138b5"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/oval-definitions-schema.xsd",
+        "xpath": "./xs:element[@name='filter']",
+        "sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc"
+      },
+      "classification": "intentionally_different",
+      "required_witnesses": [
+        "shared-versus-separate logical population and multiplicity; source filter/Require distinction"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C2",
+      "topic": "status and completeness",
+      "status": "existing",
+      "native": [
+        {
+          "file": "schema/collection-result.schema.json",
+          "pointer": "/properties/logical_complete",
+          "sha256": "f97f82a8e3e0900ecf80dd9154c400108732c28466063849a19ca033286138b5"
+        },
+        {
+          "file": "schema/collected-item.schema.json",
+          "pointer": "/properties/status",
+          "sha256": "c16a7549acbde6020007ee4bcbc4a8095d2cc615b67bd65c3ec6b92d5b9c5630"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/unix-system-characteristics-schema.xsd",
+        "xpath": "./xs:element[@name='file_item']",
+        "sha256": "c667327ad49b056bc220ef2fb0d408d42a1a87c4d501015824a2a5f76c99d33f"
+      },
+      "classification": "intentionally_different",
+      "required_witnesses": [
+        "EOF/storage/display limits do not establish native completeness; no fabricated missing Item"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C3",
+      "topic": "context and authorization",
+      "status": "implementation_policy",
+      "native": [
+        {
+          "file": "schema/collected-item.schema.json",
+          "pointer": "/properties/context",
+          "sha256": "c16a7549acbde6020007ee4bcbc4a8095d2cc615b67bd65c3ec6b92d5b9c5630"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/windows-definitions-schema.xsd",
+        "xpath": "./xs:element[@name='registry_object']",
+        "sha256": "b66f1547bfd0bb8ea6cf58a0eec9f8de417aad6642f741d0ed0ad7b6462314ff"
+      },
+      "classification": "unresolved",
+      "required_witnesses": [
+        "view/token/context mismatch cannot silently reuse evidence; policy is not schema validation"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C4",
+      "topic": "source requirement pointers",
+      "status": "existing",
+      "native": [
+        {
+          "file": "schema/field-result.schema.json",
+          "pointer": "/properties/requirement_ref",
+          "sha256": "13181c0a578d342dfd5b090de599c47f707b4acffcf0dce1b15ca77ea0c9bd53"
+        },
+        {
+          "file": "schema/test-result.schema.json",
+          "pointer": "/properties/require_refs",
+          "sha256": "412a743690459187a6fece064d5fbef7c01421d9bf1be206f8511beaf1510702"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/oval-results-schema.xsd",
+        "xpath": "./xs:complexType[@name='TestType']",
+        "sha256": "6b15ebb8c58f29fd0c2b0cc7854a16a650bce6ec32afead1fdae858a8a3b5cee"
+      },
+      "classification": "intentionally_different",
+      "required_witnesses": [
+        "resolve native assessment-relative requirement; never use invented State positions"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C5",
+      "topic": "reported versus observed counts",
+      "status": "existing",
+      "native": [
+        {
+          "file": "schema/test-result.schema.json",
+          "pointer": "/properties/item_summary",
+          "sha256": "412a743690459187a6fece064d5fbef7c01421d9bf1be206f8511beaf1510702"
+        },
+        {
+          "file": "schema/test-result.schema.json",
+          "pointer": "/properties/items_observed",
+          "sha256": "412a743690459187a6fece064d5fbef7c01421d9bf1be206f8511beaf1510702"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/oval-results-schema.xsd",
+        "xpath": "./xs:complexType[@name='TestType']",
+        "sha256": "6b15ebb8c58f29fd0c2b0cc7854a16a650bce6ec32afead1fdae858a8a3b5cee"
+      },
+      "classification": "intentionally_different",
+      "required_witnesses": [
+        "bounded retained evidence does not change authoritative actual counts"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C6",
+      "topic": "redaction",
+      "status": "existing",
+      "native": [
+        {
+          "file": "schema/result-types.schema.json",
+          "pointer": "/$defs/typed_value/properties/redacted",
+          "sha256": "259eb551f04cefaa95f579dd5720bbe938834b1274e39bd31765b23d279cbf9a"
+        },
+        {
+          "file": "schema/result-types.schema.json",
+          "pointer": "/$defs/typed_value/allOf/1",
+          "sha256": "259eb551f04cefaa95f579dd5720bbe938834b1274e39bd31765b23d279cbf9a"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/independent-system-characteristics-schema.xsd",
+        "xpath": "./xs:element[@name='shellcommand_item']",
+        "sha256": "631f9cfcd2898ae46ccd87f742b0c9d18d17c920f0da25fa1704b65d4b82a1aa"
+      },
+      "classification": "intentionally_different",
+      "required_witnesses": [
+        "redacted true without value accepted; redacted with value rejected; evaluate before export"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C7",
+      "topic": "result scope and diagnostic presentation",
+      "status": "RI_limitation",
+      "native": [
+        {
+          "file": "schema/test-result.schema.json",
+          "pointer": "/required",
+          "sha256": "412a743690459187a6fece064d5fbef7c01421d9bf1be206f8511beaf1510702"
+        },
+        {
+          "file": "schema/field-result.schema.json",
+          "pointer": "/additionalProperties",
+          "sha256": "13181c0a578d342dfd5b090de599c47f707b4acffcf0dce1b15ca77ea0c9bd53"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/oval-results-schema.xsd",
+        "xpath": "./xs:complexType[@name='TestType']",
+        "sha256": "6b15ebb8c58f29fd0c2b0cc7854a16a650bce6ec32afead1fdae858a8a3b5cee"
+      },
+      "classification": "unsupported_by_RI",
+      "required_witnesses": [
+        "internal Decision/view cannot be passed off as complete native Result; no extra reason_code property"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C8",
+      "topic": "observation state/consistency",
+      "status": "held",
+      "native": [
+        {
+          "file": "schema/native-selector.schema.json",
+          "pointer": "/$defs/unix_file_object",
+          "sha256": "304565a0917d90df92c4070a68dd28c0bffb56b3d6f217f0af344c7171fbb329"
+        },
+        {
+          "file": "schema/native-selector.schema.json",
+          "pointer": "/$defs/windows_registry_object",
+          "sha256": "304565a0917d90df92c4070a68dd28c0bffb56b3d6f217f0af344c7171fbb329"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/unix-definitions-schema.xsd",
+        "xpath": "./xs:element[@name='file_object']",
+        "sha256": "02932ac19f02fbfa967529e4d96006d87c42220db273db6fbb6a1701a21bbec1"
+      },
+      "classification": "unresolved",
+      "required_witnesses": [
+        "saved/loaded inverse witnesses; effective-context and mutation fixtures require source-authority decisions"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C9",
+      "topic": "execution parameters and no-output behavior",
+      "status": "held",
+      "native": [
+        {
+          "file": "schema/capability-mappings/supported/independent.shellcommand.json",
+          "pointer": "/native",
+          "sha256": "09c7d44518add11804162b62ce078c2a6b8f7b8c662d170ad5da281732ff60f2"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/independent-definitions-schema.xsd",
+        "xpath": "./xs:element[@name='shellcommand_object']",
+        "sha256": "4b2c8b2d90c8fb4647c00f8d20a0cb031103e61e99e643463b9b87006664c953"
+      },
+      "classification": "unresolved",
+      "required_witnesses": [
+        "no implicit shell/flags or imported no-output truth table; preserve canonical Issue31 hold"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    },
+    {
+      "id": "C10",
+      "topic": "text itemization/captures",
+      "status": "held",
+      "native": [
+        {
+          "file": "schema/capability-mappings/supported/independent.textfilecontent.json",
+          "pointer": "/native",
+          "sha256": "8c73d9f7e8b9cd026686861c2dad1331c75c6390be441c2133c296740c820166"
+        }
+      ],
+      "oval": {
+        "file": "oval-schemas/independent-definitions-schema.xsd",
+        "xpath": "./xs:element[@name='textfilecontent54_object']",
+        "sha256": "4b2c8b2d90c8fb4647c00f8d20a0cb031103e61e99e643463b9b87006664c953"
+      },
+      "classification": "unresolved",
+      "required_witnesses": [
+        "duplicate capture association, no-match/denial and flags require canonical Issue34 decision"
+      ],
+      "runtime_witness_status": "required; not executed by this design increment"
+    }
+  ]
+}
