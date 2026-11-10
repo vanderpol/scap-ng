@@ -4,6 +4,14 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/esx.host_service.schema.json#) | {} | source-derived-proposal |
+
+[schema](../../../proposed-schema/documentation/capabilities/esx.host_service.schema.json#): Inspect service configuration and state on an ESXi host.
+
+This retained experimental mapping comes from the separate pinned 6.0 new-Test source; it has no corresponding 5.12.3 declaration. Its source contracts remain in the engineering ledger.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/service_name](../../../proposed-schema/documentation/capabilities/esx.host_service.schema.json#/$defs/meanings/properties/service_name) | {} | source-meaning-reviewed |
 | [/$defs/meanings/properties/service_label](../../../proposed-schema/documentation/capabilities/esx.host_service.schema.json#/$defs/meanings/properties/service_label) | {} | source-meaning-reviewed |
 | [/$defs/meanings/properties/service_policy](../../../proposed-schema/documentation/capabilities/esx.host_service.schema.json#/$defs/meanings/properties/service_policy) | {} | source-meaning-reviewed |

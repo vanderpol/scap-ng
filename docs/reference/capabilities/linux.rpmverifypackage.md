@@ -2,64 +2,50 @@
 
 Proposed documentation; frozen 0.4.0 validation is unchanged.
 
+The `linux.rpmverifypackage` is used to verify the integrity of installed RPMs.
+
+This test aligns with the rpm -V command for verifying RPMs.
+
 **Contract status: unresolved.** Native collection boundaries, field multiplicity, missing values and error propagation are not established by field descriptions. Legacy source documentation is not a native execution contract.
 
-Field meanings below are documentation proposals derived from the pinned sources. Reviewed wording and unresolved entries are identified in the [coverage ledger](../coverage.json) and schema annotations.
-
-Occurrences indicate how many times a field may appear within its parent object; a field may separately contain multiple values. Object tables describe inline forms; named Object references and Set composition use the [shared collection grammar](../shared/capability-common.md). Item fields use the shared [typed-value wrapper](../shared/result-types.md); a field may contain one wrapper or an array. Capability-specific units, multiplicity and error behavior require evidence.
+Occurrences indicate how many times a field may appear within its parent object; a field may separately contain multiple values. Value datatypes are declarations; [advanced constraints](../advanced/linux.rpmverifypackage.md) retain the validated encodings and any broader schema acceptance.
 
 ## Object
 
-| Field | Schema type | Occurrences | Description | Details |
+| Field | Value datatype | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `capability` | string | 0..1 | Optional for inline Objects only, whose capability is inherited from the enclosing Test; when supplied it must agree with the Test capability. | [/$defs/object/properties/capability](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/capability) |
 | `filters` | array | 0..1 | Leaf Object post-collection Filters; observed Items, not selectors or compliance States. | [/$defs/object/properties/filters](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/filters) |
-| `name` | object | 0..1 | Package name. | [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/name) |
-| `epoch` | object | 0..1 | Package epoch. | [/$defs/object/properties/epoch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/epoch) |
-| `version` | object | 0..1 | Package version component. | [/$defs/object/properties/version](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/version) |
-| `release` | object | 0..1 | Package release component. | [/$defs/object/properties/release](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/release) |
-| `arch` | object | 0..1 | Package architecture. | [/$defs/object/properties/arch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/arch) |
-| `skip_dependencies` | See schema | 0..1 | Whether RPM dependency verification is skipped. | [/$defs/object/properties/skip_dependencies](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/skip_dependencies) |
-| `skip_scripts` | See schema | 0..1 | Whether RPM verification scripts are skipped. | [/$defs/object/properties/skip_scripts](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/skip_scripts) |
+| `name` | string | 0..1 | Package name. | [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/name) |
+| `epoch` | integer, string | 0..1 | Package epoch. | [/$defs/object/properties/epoch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/epoch) |
+| `version` | string, version | 0..1 | Package version component. | [/$defs/object/properties/version](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/version) |
+| `release` | string, version | 0..1 | Package release component. | [/$defs/object/properties/release](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/release) |
+| `arch` | string | 0..1 | Package architecture. | [/$defs/object/properties/arch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/arch) |
+| `skip_dependencies` | boolean | 0..1 | Whether RPM dependency verification is skipped. | [/$defs/object/properties/skip_dependencies](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/skip_dependencies) |
+| `skip_scripts` | boolean | 0..1 | Whether RPM verification scripts are skipped. | [/$defs/object/properties/skip_scripts](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/object/properties/skip_scripts) |
 
 Validation shape: [/$defs/inline_object](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object).
 
 ## Item
 
-| Field | Schema type | Occurrences | Description | Details |
+This item stores the rpm verification results of an rpm similar to what is produced by the rpm -V command.
+
+| Field | Value datatype | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `name` | array, object | 0..1 | Package name. | [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/name) |
-| `epoch` | array, object | 0..1 | Package epoch. | [/$defs/meanings/properties/epoch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/epoch) |
-| `version` | array, object | 0..1 | Package version component. | [/$defs/meanings/properties/version](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/version) |
-| `release` | array, object | 0..1 | Package release component. | [/$defs/meanings/properties/release](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/release) |
-| `arch` | array, object | 0..1 | Package architecture. | [/$defs/meanings/properties/arch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/arch) |
-| `extended_name` | array, object | 0..1 | Package name including epoch, version, release, and architecture. | [/$defs/meanings/properties/extended_name](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/extended_name) |
-| `dependency_check_passed` | array, object | 0..1 | The dependency_check_passed field indicates whether or not the dependency check passed. | [/$defs/meanings/properties/dependency_check_passed](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/dependency_check_passed) |
-| `verification_script_successful` | array, object | 0..1 | The verification_script_successful field indicates whether or not the verification script executed successfully. | [/$defs/meanings/properties/verification_script_successful](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/verification_script_successful) |
+| `name` | string | 0..1 | Package name. | [/$defs/meanings/properties/name](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/name) |
+| `epoch` | integer, string | 0..1 | Package epoch. | [/$defs/meanings/properties/epoch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/epoch) |
+| `version` | string, version | 0..1 | Package version component. | [/$defs/meanings/properties/version](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/version) |
+| `release` | string, version | 0..1 | Package release component. | [/$defs/meanings/properties/release](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/release) |
+| `arch` | string | 0..1 | Package architecture. | [/$defs/meanings/properties/arch](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/arch) |
+| `extended_name` | string | 0..1 | Package name including epoch, version, release, and architecture. | [/$defs/meanings/properties/extended_name](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/extended_name) |
+| `dependency_check_passed` | boolean | 0..1 | The dependency_check_passed field indicates whether or not the dependency check passed. | [/$defs/meanings/properties/dependency_check_passed](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/dependency_check_passed) |
+| `verification_script_successful` | boolean | 0..1 | The verification_script_successful field indicates whether or not the verification script executed successfully. | [/$defs/meanings/properties/verification_script_successful](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json#/$defs/meanings/properties/verification_script_successful) |
 
 Validation shape: [schema](../../../proposed-schema/documentation/collected-item.schema.json#).
 
 ## Require
 
-Field meanings are shared with Item; comparisons use the [native Require grammar](../shared/assessment-language.md). This is a field vocabulary, not a whitelist or a promise that every field is collected.
-
-### Condition logic
-
-| Field | Schema type | Occurrences | Description | Details |
-| --- | --- | --- | --- | --- |
-| `item_requirement` | object | 1..1 (required) | Sets how many Items must be found and how many must satisfy the comparison. | [/$defs/canonical_all_items_requirement/properties/item_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement) |
-| `field_requirement` | object | 1..1 (required) | Sets the shared value-count requirements for fields in this comparison. | [/$defs/canonical_all_items_requirement/properties/field_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/field_requirement) |
-| `fields` | object | Conditional (at most 1) | Requires all listed field conditions to hold for an Item. | [/$defs/canonical_all_items_requirement/properties/fields](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/fields) |
-| `and` | array | Conditional (at most 1) | Groups child conditions using logical AND. | [/$defs/canonical_all_items_requirement/properties/and](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/and) |
-| `or` | array | Conditional (at most 1) | Groups child conditions using logical OR. | [/$defs/canonical_all_items_requirement/properties/or](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/or) |
-| `one` | array | Conditional (at most 1) | **Unresolved description** | [/$defs/canonical_all_items_requirement/properties/one](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/one) |
-| `xor` | array | Conditional (at most 1) | **Unresolved description** | [/$defs/canonical_all_items_requirement/properties/xor](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/xor) |
-
-### Item existence requirement
-
-| Field | Schema type | Occurrences | Description | Details |
-| --- | --- | --- | --- | --- |
-| `item_requirement` | object | 1..1 (required) | Existence only; there is no satisfaction operation without a comparison. | [/$defs/item_presence_requirement/properties/item_requirement](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/item_presence_requirement/properties/item_requirement) |
+Use the Item fields above with the [shared Require forms and count policies](../shared/assessment-language.md). Capability-specific comparison-domain declarations, where different, are listed below.
 
 
 Validation shape: [/$defs/test/properties/require](../../../proposed-schema/documentation/assessment-language.schema.json#/$defs/test/properties/require).
@@ -70,21 +56,8 @@ Validation shape: [/$defs/test/properties/require](../../../proposed-schema/docu
 
 | Role / field | Declared datatype or collection shape | Annotation status |
 | --- | --- | --- |
-| Object.`name` | string | source-meaning-reviewed |
-| Object.`epoch` | string, integer | source-meaning-reviewed |
-| Object.`version` | string, version | source-meaning-reviewed |
-| Object.`release` | string, version | source-meaning-reviewed |
-| Object.`arch` | string | source-meaning-reviewed |
 | Object.`skip_dependencies` | {"required": true, "type": "boolean"} | native-mapping-reviewed |
 | Object.`skip_scripts` | {"required": true, "type": "boolean"} | native-mapping-reviewed |
-| Item.`name` | string | source-meaning-reviewed |
-| Item.`epoch` | string, integer | source-meaning-reviewed |
-| Item.`version` | string, version | source-meaning-reviewed |
-| Item.`release` | string, version | source-meaning-reviewed |
-| Item.`arch` | string | source-meaning-reviewed |
-| Item.`extended_name` | string | source-meaning-reviewed |
-| Item.`dependency_check_passed` | boolean | source-derived |
-| Item.`verification_script_successful` | boolean | source-derived |
 
 See the [schema](../../../proposed-schema/documentation/capabilities/linux.rpmverifypackage.schema.json) for exact description owners, native datatype declarations and collection-parameter declarations. Declarations are documentation annotations; they add no datatype or required-field restriction. Read [shared collection and evaluation schemas](../shared/assessment-language.md) for syntax; compilation and schema acceptance do not establish scanner equivalence.
 

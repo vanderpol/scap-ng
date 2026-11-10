@@ -4,6 +4,14 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/esx.host_vib.schema.json#) | {} | source-derived-proposal |
+
+[schema](../../../proposed-schema/documentation/capabilities/esx.host_vib.schema.json#): Inspect installed vSphere Installation Bundle metadata on an ESXi host.
+
+This retained experimental mapping comes from the separate pinned 6.0 new-Test source; it has no corresponding 5.12.3 declaration. Its source contracts remain in the engineering ledger.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/vib_name](../../../proposed-schema/documentation/capabilities/esx.host_vib.schema.json#/$defs/meanings/properties/vib_name) | {} | source-meaning-reviewed |
 | [/$defs/meanings/properties/acceptance_level](../../../proposed-schema/documentation/capabilities/esx.host_vib.schema.json#/$defs/meanings/properties/acceptance_level) | {"declared_values_not_new_validation_restrictions": ["VMwareCertified", "VMwareAccepted", "PartnerSupported", "CommunitySupported", "Unknown"]} | source-meaning-reviewed |
 | [/$defs/meanings/properties/creation_date](../../../proposed-schema/documentation/capabilities/esx.host_vib.schema.json#/$defs/meanings/properties/creation_date) | {} | source-meaning-reviewed |

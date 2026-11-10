@@ -4,8 +4,27 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
+| [schema](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#) | {} | source-derived-proposal |
 | [/$defs/meanings/properties/subcommand](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/meanings/properties/subcommand) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/subcommand](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/meanings/properties/subcommand): SHOW subcommand text.
+
+The name of the SHOW sub-command.
+
+The name of a SHOW sub-command to be tested.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/meanings/properties/value](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/meanings/properties/value) | {} | source-meaning-reviewed |
+
+[/$defs/meanings/properties/value](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/meanings/properties/value): Output returned by the SHOW subcommand.
+
+The value returned from by the specified SHOW sub-command.
+
+This may consist of multiple lines of information.
+
+| Pointer | Local constraints | Documentation status |
+| --- | --- | --- |
 | [/$defs/object](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/object) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object", "type_alternatives": ["object"]} | existing-native |
 | [/$defs/object/properties/subcommand](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/object/properties/subcommand) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/object_selector_predicate", "type_alternatives": ["object"]} | source-meaning-reviewed |
 | [/$defs/item](../../../proposed-schema/documentation/capabilities/junos.show.schema.json#/$defs/item) | {"validation_reference": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json", "type_alternatives": ["object"]} | existing-native |

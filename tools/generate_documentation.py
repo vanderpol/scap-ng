@@ -202,7 +202,7 @@ def link(root, path, uri):
     return f'[{cell(fragment or "schema")}](' + '../../../' + target.as_posix() + '#' + fragment + ')'
 
 
-def row(docs, parent, name, uri, description=None, validation=None, definition=False):
+def row(docs, parent, name, uri, description=None, validation=None, definition=False, value_datatypes=None):
     value = node(docs, uri)
     validation = validation or value.get('x-doc-validation-ref', uri)
     t, _ = shape(docs, validation)
@@ -214,6 +214,8 @@ def row(docs, parent, name, uri, description=None, validation=None, definition=F
     if value.get('x-doc-availability'):
         brief = '**Not accepted in this inline form.** ' + brief
         t = {'not accepted'}
+    elif value_datatypes:
+        t = set(value_datatypes) if len(value_datatypes)<=4 else {str(len(value_datatypes))+' declared types; see details'}
     if value.get('x-doc-review', {}).get('status') == 'semantic-hold':
         brief = '**Semantic hold.** Existing wording requires a native contract decision; see details.'
     elif value.get('x-doc-review', {}).get('status') == 'withheld':
@@ -222,6 +224,7 @@ def row(docs, parent, name, uri, description=None, validation=None, definition=F
 
 
 TABLE = '| Field | Schema type | Occurrences | Description | Details |\n| --- | --- | --- | --- | --- |\n'
+CAP_TABLE = TABLE.replace('Schema type','Value datatype')
 
 
 def check_links(docs):
@@ -271,6 +274,9 @@ def advanced_page(docs, base, doc):
                 text += '\n' + link(docs,None,uri) + ': ' + value.get('description','No description approved.') + '\n\n'
                 text += value['x-doc-review'].get('note','Editorial receipt: '+value['x-doc-review']['source']+' case '+value['x-doc-review']['case']) + '\n\n'
                 text += '| Pointer | Local constraints | Documentation status |\n| --- | --- | --- |\n'
+            elif '\n\n' in value.get('description',''):
+                text += '\n'+link(docs,None,uri)+': '+value['description']+'\n\n'
+                text += '| Pointer | Local constraints | Documentation status |\n| --- | --- | --- |\n'
     return text
 
 
@@ -306,26 +312,30 @@ def generate(root=ROOT):
             continue
         cap = doc['x-doc-capability']
         page = f'# {cap}\n\nProposed documentation; frozen 0.4.0 validation is unchanged.\n\n'
+        if doc.get('description'):
+            page += doc['description']+'\n\n'
         page += '**Contract status: unresolved.** ' + doc['x-doc-contract']['note'] + '\n\n'
-        page += 'Field meanings below are documentation proposals derived from the pinned sources. '
-        page += 'Reviewed wording and unresolved entries are identified in the [coverage ledger](../coverage.json) and schema annotations.\n\n'
         page += 'Occurrences indicate how many times a field may appear within its parent object; a field may separately contain multiple values. '
-        page += 'Object tables describe inline forms; named Object references and Set composition use the [shared collection grammar](../shared/capability-common.md). '
-        page += 'Item fields use the shared [typed-value wrapper](../shared/result-types.md); a field may contain one wrapper or an array. '
-        page += 'Capability-specific units, multiplicity and error behavior require evidence.\n\n'
+        page += 'Value datatypes are declarations; [advanced constraints](../advanced/'+cap+'.md) retain the validated encodings and any broader schema acceptance.\n\n'
         caprows = []
         for role, target in doc['x-doc-roles'].items():
             start = urljoin(base, target)
             page += '## ' + role + '\n\n'
+            role_description, _ = resolve(docs,start)
+            if role_description:
+                page += role_description+'\n\n'
             if role == 'Require':
-                page += 'Field meanings are shared with Item; comparisons use the [native Require grammar](../shared/assessment-language.md). '
-                page += 'This is a field vocabulary, not a whitelist or a promise that every field is collected.\n\n'
-                validation = node(docs, start)['x-doc-validation-ref']
-                for i, form in enumerate(forms(docs, validation)):
-                    title = next((p['title'] for _,p in components(docs,form) if 'title' in p), 'Alternative '+str(i+1))
-                    page += '### '+title+'\n\n'+TABLE
-                    for name, child in properties(docs, form).items():
-                        page += row(docs, form, name, child) + '\n'
+                page += 'Use the Item fields above with the [shared Require forms and count policies](../shared/assessment-language.md). '
+                page += 'Capability-specific comparison-domain declarations, where different, are listed below.\n\n'
+                overrides=[]
+                for name, child in properties(docs,start+'/properties/fields').items():
+                    value=node(docs,child)
+                    if value.get('x-doc-comparison-datatypes') and value['x-doc-comparison-datatypes']!=value.get('x-doc-datatypes'):
+                        overrides.append((name,child,value['x-doc-comparison-datatypes']))
+                if overrides:
+                    page += CAP_TABLE
+                    for name,child,domains in overrides:
+                        page += row(docs,start+'/properties/fields',name,child,value_datatypes=domains)+'\n'
                     page += '\n'
             parent = start
             if role in ('Item', 'Require'):
@@ -342,7 +352,7 @@ def generate(root=ROOT):
                     if inherited_status == 'semantic-hold':
                         page += '**Semantic hold inherited from the parent field; these children do not make the parent accepted.**\n\n'
                 if role != 'Require':
-                    page += TABLE
+                    page += CAP_TABLE
                 for name, target_uri in properties(docs, current).items():
                     value = node(docs, target_uri)
                     text, owner = resolve(docs, target_uri)
@@ -356,13 +366,16 @@ def generate(root=ROOT):
                     if role == 'Require':
                         validation = urljoin(base, '../assessment-language.schema.json#/$defs/canonical_field_predicate')
                     display = 'Shared Item field meaning.' if role == 'Require' and text else None
+                    domains=value.get('x-doc-datatypes',actual.get('x-doc-datatypes',[]))
+                    declared=value.get('x-doc-declared-shape',{}).get('type')
+                    if not domains and declared:domains=[declared]
                     if role != 'Require':
-                        page += row(docs, current, name, target_uri, display, validation) + '\n'
+                        page += row(docs, current, name, target_uri, display, validation,value_datatypes=domains) + '\n'
                     route = {'capability': cap, 'role': role, 'path': (title.split('.') if title else []) + [name],
                              'schema_pointer': target_uri, 'description_pointer': owner + '/description' if owner else None,
                              'description': text, 'status': status, 'mapping_key_occurrence': cardinality(docs, current, name),
                              'validation_pointer': validation or value.get('x-doc-validation-ref'),
-                             'declared_datatypes': actual.get('x-doc-datatypes', []),
+                             'declared_datatypes': domains,
                              'comparison_datatypes': actual.get('x-doc-comparison-datatypes', []),
                              'declared_collection_shape': value.get('x-doc-declared-shape')}
                     routes.append(route); caprows.append(route)
@@ -387,7 +400,9 @@ def generate(root=ROOT):
             declared = ', '.join(r['declared_datatypes'])
             if r['declared_collection_shape']:
                 declared = json.dumps(r['declared_collection_shape'], sort_keys=True)
-            if declared:
+            # Routine scalar domains are already prominent in the basic table.
+            # Keep only parameter declarations and broad domains here.
+            if declared and (r['declared_collection_shape'] or len(r['declared_datatypes'])>4):
                 page += f'| {r["role"]}.`{".".join(r["path"])}` | {cell(declared)} | {r["status"]} |\n'
         page += '\n'
         page += 'See the [schema](../../../' + path.as_posix() + ') for exact description owners, native datatype declarations and collection-parameter declarations. '

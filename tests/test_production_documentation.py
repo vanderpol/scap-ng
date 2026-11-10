@@ -155,8 +155,9 @@ class ProductionDocumentationTests(unittest.TestCase):
         self.assertIn('field_requirement',gen.properties(self.docs,forms[0]))
         self.assertEqual(gen.cardinality(self.docs,forms[0],'field_requirement'),'1..1 (required)')
         page=self.outputs[gen.DEST/'capabilities/unix.file.md']
-        self.assertIn('### Item existence requirement',page)
-        self.assertIn('### Condition logic',page)
+        self.assertIn('shared Require forms and count policies',page)
+        self.assertNotIn('### Condition logic',page)
+        self.assertIn('item_presence_requirement',self.outputs[gen.DEST/'shared/assessment-language.md'])
 
     def test_inactive_and_unreferenced_help_is_explicitly_scoped(self):
         inactive=artifacts.schema_help(self.help,PREFIX+'variable-function-expression.schema.json#')

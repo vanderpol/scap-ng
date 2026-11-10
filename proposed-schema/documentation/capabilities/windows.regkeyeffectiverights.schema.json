@@ -32,7 +32,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The hive of a registry key on the machine from which to retrieve the SACL.",
+          "description": "The hive of a registry key on the machine from which to retrieve the SACL.\n\nThe hive that the registry key belongs to.\n\nThis element specifies the hive of a registry key on the machine from which to retrieve the SACL.",
           "x-doc-datatypes": [
             "string"
           ],
@@ -57,7 +57,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "A registry key on the machine from which to retrieve the SACL.",
+          "description": "A registry key on the machine from which to retrieve the SACL.\n\nThis element describes a registry key to be gathered.\n\nThis element specifies a registry key on the machine from which to retrieve the SACL.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -74,7 +74,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "Unique SID that associated a user, group, system, or program (such as a Windows service).",
+          "description": "Unique SID that associated a user, group, system, or program (such as a Windows service).\n\n`trustee_sid` specifies the SID that associated a user, group, system, or program (such as a Windows service).\n\n`trustee_sid` is the unique SID that associated a user, group, system, or program (such as a Windows service).",
           "x-doc-datatypes": [
             "string"
           ]
@@ -91,7 +91,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The trustee name associated with this particular DACL.",
+          "description": "The trustee name associated with this particular DACL.\n\nThis element specifies the trustee name associated with this particular DACL.\n\nIn Windows, trustee names are case-insensitive.\n\nAs a result, it is recommended that the case-insensitive operations are used for this field.\n\nFor local trustee names use: \"computer name\\trustee name\".\n\nFor built-in accounts on the system, use the trustee name without a domain.",
           "x-doc-datatypes": [
             "string"
           ]
@@ -125,7 +125,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The right to read the information in the object's Security Descriptor, not including the information in the SACL.",
+          "description": "The right to read the information in the object's Security Descriptor, not including the information in the SACL.\n\nThe right to read the information in the object's security descriptor, not including the information in the SACL.",
           "x-doc-datatypes": [
             "boolean"
           ]
@@ -142,7 +142,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The right to modify the DACL in the object's Security Descriptor.",
+          "description": "The right to modify the DACL in the object's Security Descriptor.\n\nThe right to modify the DACL in the object's security descriptor.",
           "x-doc-datatypes": [
             "boolean"
           ]
@@ -159,7 +159,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The right to change the owner in the object's Security Descriptor.",
+          "description": "The right to change the owner in the object's Security Descriptor.\n\nThe right to change the owner in the object's security descriptor.",
           "x-doc-datatypes": [
             "boolean"
           ]
@@ -418,7 +418,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "The hive that the registry key belongs to.",
+          "description": "The hive that the registry key belongs to.\n\nThis is restricted to a specific set of values: HKEY_CLASSES_ROOT, HKEY_CURRENT_CONFIG, HKEY_CURRENT_USER, HKEY_CURRENT_USER_LOCAL_SETTINGS,HKEY_LOCAL_MACHINE, and HKEY_USERS.",
           "x-doc-datatypes": [
             "string"
           ],
@@ -444,7 +444,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "Registry key to be collected.",
+          "description": "Registry key to be collected.\n\n`key` describes a registry key to be collected.\n\nA .* pattern match says to collect every key under a given hive.",
           "x-doc-datatypes": [
             "string"
           ],
@@ -462,7 +462,7 @@
             }
           },
           "x-doc-status": "source-derived",
-          "description": "Unique SID associated with a user, group, system, or program (such as a Windows service).",
+          "description": "Unique SID associated with a user, group, system, or program (such as a Windows service).\n\n`trustee_sid` identifies a unique SID associated with a user, group, system, or program (such as a Windows service).",
           "x-doc-datatypes": [
             "string"
           ],
@@ -485,7 +485,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/native-selector.schema.json#/$defs/windows_regkeyeffectiverights_object/oneOf/1",
-      "x-doc-role": "Object"
+      "x-doc-role": "Object",
+      "description": "The Object is used by a registry key effective rights test to define the objects used to evalutate against the specified state.\n\nAn Object is defined as a combination of a Windows registry and trustee SID.\n\nThe key field represents the registry key to be evaluated while the trustee SID represents the account (SID) to check effective rights of.\n\nIn addition, a number of behaviors may be provided that help guide the collection of objects."
     },
     "item": {
       "properties": {
@@ -494,7 +495,8 @@
         }
       },
       "x-doc-validation-ref": "https://scap-ng.dev/schema/proposed/documentation/collected-item.schema.json",
-      "x-doc-role": "Item"
+      "x-doc-role": "Item",
+      "description": "This item stores the effective rights of a registry key that a discretionary access control list (DACL) structure grants to a specified trustee.\n\nThe trustee's effective rights are determined checking all access-allowed and access-denied access control entries (ACEs) in the DACL."
     },
     "require": {
       "properties": {
@@ -510,5 +512,13 @@
     "Object": "#/$defs/object",
     "Item": "#/$defs/item",
     "Require": "#/$defs/require"
+  },
+  "description": "Inspects effective access-right fields for a Windows registry key and trustee.",
+  "x-doc-status": "source-derived-proposal",
+  "x-doc-fidelity": {
+    "source_version": "5.12.3",
+    "source_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+    "annotation_scope": "capability overview and mapped field explanations",
+    "native_runtime_approval": false
   }
 }
