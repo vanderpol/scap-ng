@@ -1,0 +1,36 @@
+name: Native publication boundary inventory
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  publication-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify the exact reviewed head
+        env:
+          REVIEW_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$REVIEW_HEAD"
+      - name: Read exact shared publication policy and checker
+        uses: actions/checkout@v4
+        with:
+          repository: vanderpol/scap-ng-tools
+          ref: 053eeeb3b33e3ee5f683604fd66ae8c833450cd0
+          path: publication-gate
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'PyYAML>=6,<7'
+      - name: Reject any new upload or remote writer outside the shared boundary
+        run: |
+          python publication-gate/scripts/audit_publication_paths.py --root . \
+            --repository vanderpol/scap-ng \
+            --trusted-gate-commit 053eeeb3b33e3ee5f683604fd66ae8c833450cd0 --check
