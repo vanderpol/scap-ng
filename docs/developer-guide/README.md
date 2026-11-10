@@ -1,5 +1,10 @@
 # SCAP-NG application developer guide
 
+Historical PR #30 research and STOP/GO prototype, retained for provenance.
+The current schema-derived documentation is the [proposed reference](../reference/README.md);
+its authoritative descriptions live in [proposed JSON Schemas](../../proposed-schema/README.md).
+The sidecar model below records an earlier design and is not the current documentation authority.
+
 SCAP-NG 0.4.0 is pre-alpha. This guide describes contracts and implementation
 gaps; structural validation does not establish scanner support or equivalence.
 Pin the entire repository commit, including schemas, specification and examples.
