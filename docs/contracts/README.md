@@ -20,5 +20,10 @@ The first conformance command checks syntax only and reports zero executions. Th
 
 [Result simplification design](result-simplification-design.md) is an owner-review
 proposal for a smaller interoperable production Result and a separate optional
-diagnostic/evidence contract. It does not modify frozen schemas, historical
-Results, or conformance fixtures.
+diagnostic/evidence contract. It does not modify frozen 0.4.0 schemas or historical Results. The candidate
+0.4.1 schema and fixtures are isolated under `proposed-schema/result-0.4.1/` and
+`evidence/result-0.4.1/` for owner review.
+
+The [0.4.1 candidate receipt](result-0.4.1-candidate.md) records the exact
+candidate schema/sidecar pins and coordinated RI validation status. It is not a
+release approval.

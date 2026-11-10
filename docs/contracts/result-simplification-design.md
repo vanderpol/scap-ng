@@ -7,7 +7,7 @@ Frozen 0.4 schemas, historical goldens, and existing consumers are unchanged.
 
 This is the canonical design companion to the RI review at
 [RI Issue #43](https://github.com/vanderpol/scap-ng-ri/issues/43) and
-[RI Result simplification design](https://github.com/vanderpol/scap-ng-ri/blob/codex/result-simplification-design-ri/docs/result-simplification-design.md).
+[RI Result simplification design](https://github.com/vanderpol/scap-ng-ri/blob/codex/result-0.4.1-candidate-ri/docs/result-simplification-design.md).
 
 ## 1. Baseline: actual `rhel9-passwd-owner-test`
 
@@ -241,7 +241,7 @@ invented by a renderer:
 | Multiple field values | One Item field with a typed value array; preserve `values_found`, `values_matching`, expected/observed arrays and the decisive comparison. |
 | Item cardinality | `items_found`/`items_satisfying` `none`, `exactly_one`, `one_or_more`, `every`, and a failing count; no empty-set inference. |
 | Field cardinality | `values_found`/`values_matching` `none`, `one_or_more`, `every`, and a mismatch; distinguish field absence from Item absence. |
-| AND / OR | Assessment expression with two authored Test references; report each Test and the expression outcome without serializing an engine trace. |
+| AND / OR | Assessment expression with two authored Test references; report each Test and the expression outcome without serializing an engine trace. | A terminal Test expression uses `operator: "test"`; a renderer must not rewrite it as an AND group.
 | Variables | Use actual authored identifiers such as `oval-org-mitre-oval-test-var-641-variable` and `oval-org-mitre-oval-test-tst-695-test` from the pinned constant fixture; report resolved expected values and preserve variable references. |
 | Inputs | Add a canonical organizational-input fixture with its authored input-set/parameter identifiers; report presence, provenance and redaction without fabricating an input name. This is an unresolved fixture gap, not a claim of current RI Input execution. |
 | Missing / error | Missing file, denied access and unsupported operation remain acquisition states with no synthetic Item. |
@@ -354,6 +354,10 @@ operator explicitly authorizes that disclosure. The production Result remains
 self-explanatory without opening the sidecar.
 
 ## 7. Size and structural comparison
+
+The candidate 0.4.1 schema is pinned at SHA-256
+`1a3b4b68d4b54bdc71f66460e74dd8eb184d7fbec10bbc63941aee28e96adab2`. The optional diagnostic sidecar schema is pinned at SHA-256
+`7f322797deb2cd105e32f896e2a32c2f50a1723e7a2a510f30160f84049a7406`.
 
 The actual current baseline is 7,064 bytes pretty JSON, 21 Assessment members,
 16 Test members, 1 Item, 7 Item fields, 1 Require result and 1 Field result.

@@ -1,0 +1,96 @@
+{
+  "result_schema_version": "0.4.1",
+  "assessment": {
+    "id": "rhel9-unix-file-assessment",
+    "version": 1,
+    "title": "RHEL 9 passwd ownership example"
+  },
+  "purpose": "assessment",
+  "class": "compliance",
+  "target": {
+    "id": "local-linux"
+  },
+  "outcome": "true",
+  "summary": "The decisive comparison passed.",
+  "completeness": {
+    "logical_complete": true,
+    "population_complete": true,
+    "evidence_complete": true
+  },
+  "tests": [
+    {
+      "id": "rhel9-passwd-owner-test",
+      "test_title": "The passwd file is owned by root",
+      "outcome": "true",
+      "object": {
+        "object_ref": "/tests/rhel9-passwd-owner-test/object",
+        "capability": "unix.file"
+      },
+      "require": {
+        "require_ref": "/tests/rhel9-passwd-owner-test/require",
+        "cardinality": {
+          "items_found": "one_or_more",
+          "items_satisfying": "every",
+          "values_found": "one_or_more",
+          "values_matching": "every"
+        },
+        "fields": {
+          "owner_uid": {
+            "kind": "value",
+            "operation": "equals",
+            "outcome": "true",
+            "observation_complete": true,
+            "reason": "Observed value equals expected value.",
+            "expected": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 0
+            },
+            "observed": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 0
+            }
+          }
+        }
+      },
+      "reason": "The decisive comparison passed.",
+      "counts": {
+        "items_observed": 1,
+        "items_evaluated": 1,
+        "items_retained": 1,
+        "observed_mismatches": 0,
+        "actual_mismatches": 0
+      },
+      "items": [
+        {
+          "item_ref": "item-1",
+          "outcome": "true",
+          "fields": {
+            "owner_uid": {
+              "datatype": "integer",
+              "status": "exists",
+              "value": 0
+            }
+          },
+          "reason": "Observed Item comparison."
+        }
+      ]
+    }
+  ],
+  "expression": {
+    "operator": "test",
+    "test_refs": ["/tests/rhel9-passwd-owner-test"],
+    "outcome": "true"
+  },
+  "provenance": [
+    {
+      "collector": "linux.unix-file.exact.v1",
+      "acquisition_status": "success",
+      "privilege_context": "root",
+      "observation_scope": "current-mount-namespace",
+      "evidence_trust": "authoritative-within-current-mount-namespace",
+      "authority": "authoritative-within-current-mount-namespace"
+    }
+  ]
+}
