@@ -17,3 +17,8 @@ The first conformance command checks syntax only and reports zero executions. Th
 [Supplied-evidence fidelity](0.4-evidence.md) and [semantic holds](0.4-semantic-holds.md) accompany the shared storage increment. Run `python tools/check_semantic_conformance.py --supplied-evidence --ri-binary /path/to/ri-evaluate --output /tmp/new-combined-receipt.json` for all 23 executable fixtures. Source example files remain immutable; the catalog references their hashes.
 
 [Actual combined conformance execution](evidence/combined-conformance.json) and [qualification/pins](evidence/qualification.json) bind the 23 cases to compiled RI runtime producer `3e05fb8cdd2765d0d0a94f197795ad0513a97911`, independently of subsequent SQLite work. The canonical 129-test suite passed locally. Separate RI backend parity/100,001-Item evidence must be reviewed in the linked SQLite draft; it is not inferred from this syntax/equality receipt.
+
+[Result simplification design](result-simplification-design.md) is an owner-review
+proposal for a smaller interoperable production Result and a separate optional
+diagnostic/evidence contract. It does not modify frozen schemas, historical
+Results, or conformance fixtures.
