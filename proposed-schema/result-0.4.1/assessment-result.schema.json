@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.1/assessment-result.schema.json",
+  "x-scap-ng-version": "0.4.1",
+  "x-scap-ng-compatibility": "SCAP-NG 0.4; successor to the frozen 0.4.0 Assessment Result",
+  "title": "SCAP-NG 0.4.1 minimal Assessment Result",
+  "description": "One canonical production Result contract. Historical 0.4.0 Results remain valid under their original schema; diagnostic execution traces are not required here.",
+  "type": "object",
+  "required": ["result_schema_version", "assessment", "purpose", "class", "target", "outcome", "summary", "completeness", "tests", "provenance"],
+  "properties": {
+    "result_schema_version": {"const": "0.4.1"},
+    "assessment": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "version": {"type": ["integer", "string"]},
+        "title": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "purpose": {"enum": ["assessment", "applicability"]},
+    "class": {"enum": ["compliance", "vulnerability", "patch", "inventory", "miscellaneous"]},
+    "target": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "namespace": {"type": "string", "minLength": 1},
+        "authority": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "outcome": {"$ref": "#/$defs/technical_outcome"},
+    "summary": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "completeness": {"$ref": "#/$defs/completeness"},
+    "tests": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/test_result"}},
+    "expression": {"$ref": "#/$defs/expression"},
+    "variables": {"type": "array", "items": {"$ref": "#/$defs/variable_result"}},
+    "inputs": {"type": "array", "items": {"$ref": "#/$defs/input_result"}},
+    "diagnostics": {"type": "array", "items": {"$ref": "#/$defs/diagnostic"}},
+    "provenance": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/provenance"}}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "technical_outcome": {"enum": ["true", "false", "unknown", "error", "not_evaluated", "not_applicable"]},
+    "expression": {
+      "type": "object",
+      "required": ["operator", "test_refs", "outcome"],
+      "properties": {
+        "operator": {"enum": ["and", "or"]},
+        "test_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "outcome": {"$ref": "#/$defs/technical_outcome"}
+      },
+      "additionalProperties": false
+    },
+    "completeness": {
+      "type": "object",
+      "required": ["logical_complete", "population_complete", "evidence_complete"],
+      "properties": {
+        "logical_complete": {"type": "boolean"},
+        "population_complete": {"type": "boolean"},
+        "evidence_complete": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "cardinality": {
+      "type": "object",
+      "required": ["items_found", "items_satisfying", "values_found", "values_matching"],
+      "properties": {
+        "items_found": {"enum": ["none", "one_or_more", "exactly_one", "zero_or_more"]},
+        "items_satisfying": {"enum": ["none", "one_or_more", "exactly_one", "every", "zero_or_more"]},
+        "values_found": {"enum": ["none", "one_or_more", "exactly_one", "zero_or_more"]},
+        "values_matching": {"enum": ["none", "one_or_more", "exactly_one", "every", "zero_or_more"]}
+      },
+      "additionalProperties": false
+    },
+    "typed_value": {
+      "type": "object",
+      "required": ["datatype", "status"],
+      "properties": {
+        "datatype": {"type": "string", "minLength": 1},
+        "status": {"enum": ["exists", "does_not_exist", "error", "not_collected"]},
+        "value": {},
+        "redacted": {"const": true}
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {"if": {"properties": {"status": {"enum": ["does_not_exist", "error", "not_collected"]}}, "required": ["status"]}, "then": {"not": {"required": ["value"]}}},
+        {"if": {"required": ["redacted"]}, "then": {"not": {"required": ["value"]}}}
+      ]
+    },
+    "typed_values": {"oneOf": [{"$ref": "#/$defs/typed_value"}, {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/typed_value"}}]},
+    "field_comparison": {
+      "type": "object",
+      "required": ["outcome", "observation_complete"],
+      "properties": {
+        "operation": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["value", "existence", "cardinality"]},
+        "expected": {"$ref": "#/$defs/typed_values"},
+        "observed": {"$ref": "#/$defs/typed_values"},
+        "outcome": {"$ref": "#/$defs/technical_outcome"},
+        "observation_complete": {"type": "boolean"},
+        "reason": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "decisive_item_refs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "value"}}, "required": ["kind"]}, "then": {"required": ["operation", "expected", "observed"]}},
+        {"if": {"properties": {"kind": {"enum": ["existence", "cardinality"]}}, "required": ["kind"]}, "then": {"not": {"anyOf": [{"required": ["expected"]}, {"required": ["observed"]}]}}},
+        {"if": {"properties": {"outcome": {"enum": ["unknown", "error", "not_evaluated", "not_applicable"]}}, "required": ["outcome"]}, "then": {"not": {"anyOf": [{"required": ["expected"]}, {"required": ["observed"]}]}}}
+      ]
+    },
+    "item_result": {
+      "type": "object",
+      "required": ["item_ref", "outcome", "fields"],
+      "properties": {
+        "item_ref": {"type": "string", "minLength": 1},
+        "outcome": {"$ref": "#/$defs/technical_outcome"},
+        "fields": {"type": "object", "additionalProperties": {"$ref": "#/$defs/typed_values"}},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "object_result": {
+      "type": "object",
+      "required": ["object_ref", "capability"],
+      "properties": {
+        "object_ref": {"type": "string", "pattern": "^/tests/(?:[^~/]|~[01])+/object$"},
+        "capability": {"type": "string", "minLength": 1},
+        "selector": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "require_result": {
+      "type": "object",
+      "required": ["require_ref", "cardinality", "fields"],
+      "properties": {
+        "require_ref": {"type": "string", "pattern": "^/tests/(?:[^~/]|~[01])+/require(?:/(?:[^~]|~[01])*)?$"},
+        "cardinality": {"$ref": "#/$defs/cardinality"},
+        "fields": {"type": "object", "additionalProperties": {"$ref": "#/$defs/field_comparison"}},
+        "reason": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": ["items_observed", "items_evaluated", "items_retained"],
+      "properties": {
+        "items_observed": {"type": "integer", "minimum": 0},
+        "items_evaluated": {"type": "integer", "minimum": 0},
+        "items_retained": {"type": "integer", "minimum": 0},
+        "observed_mismatches": {"type": "integer", "minimum": 0},
+        "actual_mismatches": {"oneOf": [{"type": "integer", "minimum": 0}, {"const": "unknown"}]}
+      },
+      "additionalProperties": false
+    },
+    "test_result": {
+      "type": "object",
+      "required": ["id", "test_title", "outcome", "object", "require", "reason", "counts"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "test_title": {"type": "string", "minLength": 1},
+        "outcome": {"$ref": "#/$defs/technical_outcome"},
+        "object": {"$ref": "#/$defs/object_result"},
+        "require": {"$ref": "#/$defs/require_result"},
+        "items": {"type": "array", "items": {"$ref": "#/$defs/item_result"}},
+        "reason": {"type": "string", "minLength": 1, "pattern": "\\S"},
+        "counts": {"$ref": "#/$defs/counts"},
+        "evidence_refs": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      },
+      "additionalProperties": false
+    },
+    "variable_result": {
+      "type": "object",
+      "required": ["ref", "outcome"],
+      "properties": {"ref": {"type": "string", "minLength": 1}, "outcome": {"$ref": "#/$defs/technical_outcome"}, "values": {"$ref": "#/$defs/typed_values"}, "reason": {"type": "string", "minLength": 1}},
+      "additionalProperties": false,
+      "allOf": [{"if": {"properties": {"outcome": {"enum": ["unknown", "error", "not_evaluated", "not_applicable"]}}, "required": ["outcome"]}, "then": {"not": {"required": ["values"]}}}]
+    },
+    "input_result": {
+      "type": "object",
+      "required": ["ref", "status"],
+      "properties": {"ref": {"type": "string", "minLength": 1}, "status": {"enum": ["present", "missing", "error", "redacted"]}, "source": {"type": "string", "minLength": 1}, "reason": {"type": "string", "minLength": 1}},
+      "additionalProperties": false
+    },
+    "diagnostic": {"type": "object", "required": ["code", "message"], "properties": {"code": {"type": "string", "minLength": 1}, "message": {"type": "string", "minLength": 1}}, "additionalProperties": false},
+    "provenance": {
+      "type": "object",
+      "required": ["collector", "acquisition_status", "privilege_context", "observation_scope", "evidence_trust", "authority"],
+      "properties": {
+        "collector": {"type": "string", "minLength": 1},
+        "acquisition_status": {"enum": ["success", "missing", "permission_denied", "unsupported_operation", "incomplete", "cancelled", "error"]},
+        "privilege_context": {"type": "string", "minLength": 1},
+        "observation_scope": {"type": "string", "minLength": 1},
+        "evidence_trust": {"type": "string", "minLength": 1},
+        "authority": {"type": "string", "minLength": 1},
+        "acquired_at": {"type": "string", "format": "date-time"},
+        "completed_at": {"type": "string", "format": "date-time"},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  }
+}

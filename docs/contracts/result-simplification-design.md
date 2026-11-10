@@ -7,7 +7,7 @@ Frozen 0.4 schemas, historical goldens, and existing consumers are unchanged.
 
 This is the canonical design companion to the RI review at
 [RI Issue #43](https://github.com/vanderpol/scap-ng-ri/issues/43) and
-[RI Result simplification design](https://github.com/vanderpol/scap-ng-ri/blob/codex/result-simplification-design-ri/docs/result-simplification-design.md).
+[RI Result simplification design](https://github.com/vanderpol/scap-ng-ri/blob/codex/result-0.4.1-candidate-ri/docs/result-simplification-design.md).
 
 ## 1. Baseline: actual `rhel9-passwd-owner-test`
 
@@ -354,6 +354,10 @@ operator explicitly authorizes that disclosure. The production Result remains
 self-explanatory without opening the sidecar.
 
 ## 7. Size and structural comparison
+
+The candidate 0.4.1 schema is pinned at SHA-256
+`27118f3f7a28fc351c743d30acc967ec388f75b89a162761fae7b37abfa14a68`. The optional diagnostic sidecar schema is pinned at SHA-256
+`7f322797deb2cd105e32f896e2a32c2f50a1723e7a2a510f30160f84049a7406`.
 
 The actual current baseline is 7,064 bytes pretty JSON, 21 Assessment members,
 16 Test members, 1 Item, 7 Item fields, 1 Require result and 1 Field result.

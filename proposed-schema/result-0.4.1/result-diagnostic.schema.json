@@ -1,0 +1,16 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://scap-ng.dev/schema/v0.4.1/result-diagnostic.schema.json",
+  "x-scap-ng-version":"0.4.1",
+  "title":"SCAP-NG 0.4.1 optional Result diagnostic sidecar",
+  "description":"Optional execution evidence bound to exact production Result bytes; never required for compliance interpretation.",
+  "type":"object",
+  "required":["diagnostic_schema","result_digest","execution","acquisition"],
+  "properties":{
+    "diagnostic_schema":{"const":"scap-ng.result-diagnostic.0.1"},
+    "result_digest":{"type":"string","pattern":"^sha256:[0-9a-f]{64}$"},
+    "execution":{"type":"object","required":["execution_id","expression_execution","evidence_retention"],"properties":{"execution_id":{"type":"string","minLength":1},"expression_execution":{"type":"object"},"evidence_retention":{"type":"object"}},"additionalProperties":false},
+    "acquisition":{"type":"object","required":["evidence"],"properties":{"evidence":{"type":"array","items":{"type":"object"}}},"additionalProperties":false}
+  },
+  "additionalProperties":false
+}
