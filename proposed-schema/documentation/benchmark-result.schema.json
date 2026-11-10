@@ -1,0 +1,335 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/benchmark-result.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-06",
+  "title": "SCAP-NG Benchmark Result pre-release v0.4.0",
+  "description": "Benchmark-scoped policy result for one Benchmark evaluation against one scan-level target reference. Run-wide scanner and target details are not duplicated here.",
+  "type": "object",
+  "required": [
+    "benchmark_result"
+  ],
+  "properties": {
+    "benchmark_result": {
+      "type": "object",
+      "required": [
+        "result_schema_version",
+        "run_id",
+        "started_at",
+        "completed_at",
+        "benchmark",
+        "target_ref",
+        "effective_policy",
+        "summary",
+        "rule_results"
+      ],
+      "properties": {
+        "result_schema_version": {
+          "const": "0.4.0",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_result_schema_version"
+        },
+        "run_id": {
+          "type": "string",
+          "minLength": 1,
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_run_id"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_started_at"
+        },
+        "completed_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_completed_at"
+        },
+        "benchmark": {
+          "type": "object",
+          "required": [
+            "id",
+            "version"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Identifier of the Benchmark being reported.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "version": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Version of the Benchmark being reported.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "package_digest": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Digest recorded for the Benchmark package.",
+              "x-doc-status": "native-structure-derived"
+            }
+          },
+          "additionalProperties": false,
+          "description": "Identity of the Benchmark being reported.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "effective_policy": {
+          "type": "object",
+          "required": [
+            "profile",
+            "tailoring",
+            "selected_rules",
+            "disabled_rules",
+            "check_selectors",
+            "parameters",
+            "organizational_inputs"
+          ],
+          "properties": {
+            "profile": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "description": "Profile identifier recorded for this evaluation.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "tailoring": {
+              "type": [
+                "object",
+                "null"
+              ],
+              "description": "Tailoring information recorded for this evaluation.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "selected_rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true,
+              "description": "Rule identifiers recorded as selected.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "disabled_rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "uniqueItems": true,
+              "description": "Rule identifiers recorded as disabled.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "check_selectors": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Assessment-choice selections recorded for the Rules.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "parameters": {
+              "type": "object",
+              "description": "Effective Parameter bindings recorded for the evaluation.",
+              "x-doc-status": "native-structure-derived"
+            },
+            "organizational_inputs": {
+              "type": "object",
+              "description": "Run-local registry of effective Organizational Input assertions used by the run.",
+              "additionalProperties": {
+                "type": "object",
+                "required": [
+                  "parameter",
+                  "source",
+                  "provenance"
+                ],
+                "properties": {
+                  "parameter": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Identifier of the Parameter supplied by this binding.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "value": {
+                    "description": "Value supplied for the Parameter; redaction is specified separately.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "organizational_input",
+                      "interactive",
+                      "api",
+                      "integration",
+                      "other"
+                    ],
+                    "description": "Source category recorded for the supplied policy value.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "input_set": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "description": "Identifier of the supplying Organizational Input Set.",
+                        "x-doc-status": "native-structure-derived"
+                      },
+                      "version": {
+                        "type": [
+                          "string",
+                          "integer"
+                        ],
+                        "description": "Version of the supplying Organizational Input Set.",
+                        "x-doc-status": "native-structure-derived"
+                      }
+                    },
+                    "additionalProperties": false,
+                    "description": "Identity of the Organizational Input Set recorded for the binding.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "provenance": {
+                    "type": "object",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_provenance"
+                  },
+                  "scope": {
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "description": "Scope metadata recorded for this policy binding.",
+                    "x-doc-status": "native-structure-derived"
+                  },
+                  "effective_from": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_effective_from"
+                  },
+                  "expires_at": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_expires_at"
+                  },
+                  "redacted": {
+                    "type": "boolean",
+                    "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_redacted"
+                  }
+                },
+                "additionalProperties": true,
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "redacted": {
+                          "const": true,
+                          "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_redacted"
+                        }
+                      },
+                      "required": [
+                        "redacted"
+                      ]
+                    },
+                    "then": {
+                      "not": {
+                        "required": [
+                          "value"
+                        ]
+                      }
+                    },
+                    "else": {
+                      "required": [
+                        "value"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "additionalProperties": false,
+          "description": "Policy selections and Parameter bindings recorded for this evaluation.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "summary": {
+          "type": "object",
+          "required": [
+            "total",
+            "pass",
+            "fail",
+            "not_applicable",
+            "not_evaluated",
+            "error",
+            "unknown"
+          ],
+          "properties": {
+            "total": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "pass": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "fail": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_applicable": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "not_evaluated": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "error": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "unknown": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "additionalProperties": true,
+          "description": "Reported outcome counters; counting and rollup policy remain separate contracts.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "rule_results": {
+          "type": "array",
+          "items": {
+            "$ref": "rule-result.schema.json"
+          },
+          "description": "Rule-result entries associated with this Benchmark evaluation.",
+          "x-doc-status": "native-structure-derived"
+        },
+        "target_ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Reference to the scan-level target evaluated by this Benchmark Result. Target identity and inventory are owned by Scan Result."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Benchmark evaluation result with its recorded policy and Rule-result entries.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/benchmark-result.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+}

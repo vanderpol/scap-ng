@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/proposed/documentation/result-package-manifest.schema.json",
+  "x-scap-ng-version": "0.4.0",
+  "x-last-modified": "2026-10-06",
+  "title": "Draft unsigned result-package integrity manifest",
+  "type": "object",
+  "required": [
+    "format_version",
+    "result_schema_version",
+    "digest_algorithm",
+    "signature_status",
+    "run_id",
+    "scan_result_ref",
+    "members",
+    "evaluation_groups"
+  ],
+  "properties": {
+    "format_version": {
+      "const": "scap-ng.result-package.draft-1",
+      "description": "Discriminator for the draft result-package manifest format.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "result_schema_version": {
+      "const": "0.4.0",
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_result_schema_version"
+    },
+    "digest_algorithm": {
+      "const": "sha256",
+      "description": "Algorithm label used by the member digest fields.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "signature_status": {
+      "const": "unsigned",
+      "description": "Declares the draft result package unsigned.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_run_id"
+    },
+    "scan_result_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to the scan-level result document.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "members": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "path",
+          "sha256",
+          "size",
+          "schema_version"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Logical identifier of the result-package member.",
+            "x-doc-status": "native-structure-derived"
+          },
+          "kind": {
+            "enum": [
+              "scan_result",
+              "benchmark_result",
+              "assessment_result"
+            ],
+            "description": "Kind of result document contained in this package member.",
+            "x-doc-status": "native-structure-derived"
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path recorded for this result-package member.",
+            "x-doc-status": "native-structure-derived"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "SHA-256 digest declared for this result-package member.",
+            "x-doc-status": "native-structure-derived"
+          },
+          "size": {
+            "type": "integer",
+            "minimum": 0,
+            "x-doc-gap-proposal": "Declared result-member size: specify its unit and counted representation consistently with the package-member contract."
+          },
+          "schema_version": {
+            "const": "0.4.0",
+            "description": "SCAP-NG schema version declared for the result document.",
+            "x-doc-status": "native-structure-derived"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Inventory of the result documents carried by the package.",
+      "x-doc-status": "native-structure-derived"
+    },
+    "evaluation_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "entry_execution_id",
+          "target_ref",
+          "execution_ids"
+        ],
+        "properties": {
+          "entry_execution_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Entry-execution identifier recorded for this evaluation group.",
+            "x-doc-status": "native-structure-derived"
+          },
+          "target_ref": {
+            "type": "string",
+            "minLength": 1,
+            "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_target_ref"
+          },
+          "execution_ids": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uniqueItems": true,
+            "description": "Execution identifiers listed as members of this evaluation group.",
+            "x-doc-status": "native-structure-derived"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Evaluation-group records associating entry executions with their related executions.",
+      "x-doc-status": "native-structure-derived"
+    }
+  },
+  "additionalProperties": false,
+  "x-doc-origin": "schema/result-package-manifest.schema.json",
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release.",
+  "description": "Inventory of result-package members and their evaluation groups.",
+  "x-doc-status": "native-structure-derived"
+}
