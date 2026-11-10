@@ -6,14 +6,14 @@ historical Result bytes.
 
 The single proposed 0.4.1 contract is
 `proposed-schema/result-0.4.1/assessment-result.schema.json`, SHA-256
-`27118f3f7a28fc351c743d30acc967ec388f75b89a162761fae7b37abfa14a68`.
+`1a3b4b68d4b54bdc71f66460e74dd8eb184d7fbec10bbc63941aee28e96adab2`.
 The optional diagnostic sidecar is
 `proposed-schema/result-0.4.1/result-diagnostic.schema.json`, SHA-256
 `7f322797deb2cd105e32f896e2a32c2f50a1723e7a2a510f30160f84049a7406`.
 
 The contract requires essential Assessment identity, target, purpose/class,
 outcome, completeness, authority context, authored Object/Require references,
-cardinality and conditional typed comparisons. It forbids expected/observed
+cardinality and conditional typed comparisons. A terminal authored Test expression is represented with `operator: "test"`; `and` and `or` are reserved for authored groups, so the Result never fabricates grouping semantics. It forbids expected/observed
 values when no actual value comparison occurred. It preserves distinct Items,
 multivalue values, missing/error/unknown/incomplete semantics and redaction.
 
