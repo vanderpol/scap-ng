@@ -15,7 +15,7 @@ are the single source for those generated views.
 
 | Evidence | Exact identity / result | What it establishes |
 | --- | --- | --- |
-| Frozen native contracts | 145 JSON files; aggregate `63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5` | Native structure, declared metadata and recorded semantic rules; not collector execution |
+| Frozen native contracts | 145 JSON files; aggregate `5d3b7f9507318c5ca2e85009fd8bc284d906d357b58cd278219c84f9481536a1` | Native structure, declared metadata and recorded semantic rules; not collector execution |
 | OVAL 5.12.3 | Commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`; eight XSD files / 39 element or behavior inventories | Legacy implementation research and cryptographic provenance, not automatic native adoption |
 | Published 65-stream preview | Evidence commit `7dc17f0982cdb5b17281f8f8e4373dbd87f86f58`; ZIP SHA-256 `a01ea589501bf8a53e5df68e50ca9478f19543d2bd3844546667fde743c28d8c` | 6,817 automated Assessment files in the actual historical snapshot; no grammar upgrade or new source proof |
 | Original signed sources | NIWC commit `8c8e5dff860af6b1290ee9273a282db24278f8d5`, `Archive/2026_Q3`; selected ZIP/XML hashes checked against pinned source traces | Original test/object/state dependencies for the chosen specimens; not per-Test scanner equivalence |
