@@ -19,7 +19,7 @@ class VariableFunctionDocumentationTests(unittest.TestCase):
 
     def test_retained_expression_inventory_is_complete_and_documented(self):
         expected = {'literal', 'variable', 'values', 'concat',
-                    'regex_capture', 'unique', 'merge', 'count'}
+                    'regex_capture', 'unique', 'merge', 'count', 'split', 'substring', 'arithmetic', 'begin', 'end'}
         self.assertEqual(set(self.branches), expected)
         for name, branch in self.branches.items():
             with self.subTest(expression=name):
@@ -56,6 +56,26 @@ class VariableFunctionDocumentationTests(unittest.TestCase):
                 self.assertTrue(merge[key].get('description'))
         self.assertIn('duplicate',
                       self.branches['unique']['properties']['unique']['description'].lower())
+
+    def test_restored_function_help_and_explicit_options(self):
+        for name, required in {
+                'split': {'delimiter', 'value'},
+                'substring': {'substring_start', 'substring_length', 'value'},
+                'arithmetic': {'arithmetic_operation', 'values'},
+                'begin': {'character', 'value'},
+                'end': {'character', 'value'},
+        }.items():
+            with self.subTest(function=name):
+                node = self.branches[name]['properties'][name]
+                self.assertEqual(set(node['required']), required)
+                self.assertTrue(node.get('description'))
+                for key in required:
+                    self.assertTrue(node['properties'][key].get('title'))
+                    self.assertTrue(node['properties'][key].get('description'))
+        unique = self.branches['unique']['properties']['unique']
+        self.assertEqual(len(unique['oneOf']), 2)
+        merge = self.branches['merge']['properties']['merge']['properties']['values']
+        self.assertEqual(len(merge['oneOf']), 2)
 
     def test_documentation_does_not_claim_runtime_execution(self):
         text = json.dumps(self.document).lower()

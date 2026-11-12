@@ -1,7 +1,7 @@
 {
   "format": "scap-ng-variable-function-audit/0.1",
   "schema_version": "0.4.0",
-  "status": "schema_documentation_complete_runtime_unverified",
+  "status": "schema_shape_complete_runtime_unverified_issue48",
   "source": {
     "language": "OVAL 5.12.3",
     "repository": "OVAL-Community/OVAL",
@@ -72,36 +72,90 @@
     },
     {
       "name": "unique",
-      "native_shape": "{unique: expression}",
+      "native_shape": "{unique: expression|[expression, ...]}",
       "source_construct": "UniqueFunctionType",
       "source_lines": "954-962",
-      "input_cardinality": "one native expression in the current grammar",
+      "input_cardinality": "one or more ordered expressions",
       "input_types": "scalar values; record literals are explicitly outside the retained transformation domain",
-      "result_semantics": "Remove duplicate values while preserving inherited collection/status semantics; this native schema does not redefine ordering",
+      "result_semantics": "Flatten source populations in order, remove later duplicate values, preserve first occurrence and diagnostic status",
       "status": "schema_shape_verified_runtime_unverified",
       "approved_deviation": "The current native grammar accepts one expression, while OVAL UniqueFunctionType permits one or more components; no owner decision authorizing that narrowing was identified. Widening or preserving this boundary requires semantic review."
     },
     {
       "name": "merge",
-      "native_shape": "{merge: {delimiter, sort, order, values}}",
+      "native_shape": "{merge: {delimiter, sort, order, values: expression|[...]}}",
       "source_construct": "Native composition; no one-to-one OVAL function",
-      "input_cardinality": "one values expression",
+      "input_cardinality": "one or more ordered expressions",
       "input_types": "string-compatible values; explicit sort mode and order",
-      "result_semantics": "Join with the explicit delimiter; document order preserves input order and other modes request lexical, numeric, or natural sorting. Duplicates are not removed implicitly",
+      "result_semantics": "Flatten source populations in order, preserve duplicates, apply explicit sort/order, and join with delimiter",
       "status": "schema_shape_verified_runtime_unverified",
       "approved_deviation": "native composition; no approved semantic deviation identified"
+    },
+    {
+      "name": "count",
+      "native_shape": "{count: expression}",
+      "source_construct": "CountFunctionType",
+      "input_cardinality": "one source expression",
+      "result_semantics": "integer; duplicates count, successful empty is zero, statuses remain statuses",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified; runtime qualification pending"
+    },
+    {
+      "name": "split",
+      "native_shape": "{split: {delimiter, value}}",
+      "source_construct": "SplitFunctionType",
+      "input_cardinality": "one string expression",
+      "result_semantics": "literal delimiter; preserve empty parts, duplicates, order and statuses",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified; runtime qualification pending"
+    },
+    {
+      "name": "substring",
+      "native_shape": "{substring: {substring_start, substring_length, value}}",
+      "source_construct": "SubstringFunctionType",
+      "input_cardinality": "one string expression",
+      "result_semantics": "signed 32-bit options and OVAL one-based boundaries; errors/statuses remain visible",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified; runtime qualification pending"
+    },
+    {
+      "name": "arithmetic",
+      "native_shape": "{arithmetic: {arithmetic_operation, values: [...]}}",
+      "source_construct": "ArithmeticFunctionType",
+      "input_cardinality": "two or more numeric expressions",
+      "result_semantics": "Cartesian product; add/multiply; integer/float widening; no implicit coercion",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified; runtime qualification pending"
+    },
+    {
+      "name": "begin",
+      "native_shape": "{begin: {character, value}}",
+      "source_construct": "BeginFunctionType",
+      "input_cardinality": "one string expression",
+      "result_semantics": "prepend complete boundary string only when absent",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified; runtime qualification pending"
+    },
+    {
+      "name": "end",
+      "native_shape": "{end: {character, value}}",
+      "source_construct": "EndFunctionType",
+      "input_cardinality": "one string expression",
+      "result_semantics": "append complete boundary string only when absent",
+      "status": "schema_shape_verified_runtime_unverified",
+      "approved_deviation": "none identified; runtime qualification pending"
     }
   ],
   "oval_function_disposition": [
     {
       "name": "arithmetic",
-      "disposition": "deferred",
-      "reason": "Not in active variable-expression grammar; inactive canonical-call candidate is not authorization."
+      "disposition": "retained",
+      "reason": "Explicit native 0.4 form restored under Issue #48; runtime equivalence remains unproved."
     },
     {
       "name": "begin",
-      "disposition": "deferred",
-      "reason": "Not retained in active native grammar."
+      "disposition": "retained",
+      "reason": "Explicit native 0.4 form restored under Issue #48; runtime equivalence remains unproved."
     },
     {
       "name": "concat",
@@ -110,8 +164,8 @@
     },
     {
       "name": "end",
-      "disposition": "deferred",
-      "reason": "Not retained in active native grammar."
+      "disposition": "retained",
+      "reason": "Explicit native 0.4 form restored under Issue #48; runtime equivalence remains unproved."
     },
     {
       "name": "escape_regex",
@@ -120,13 +174,13 @@
     },
     {
       "name": "split",
-      "disposition": "deferred",
-      "reason": "Not retained in active native grammar."
+      "disposition": "retained",
+      "reason": "Explicit native 0.4 form restored under Issue #48; runtime equivalence remains unproved."
     },
     {
       "name": "substring",
-      "disposition": "deferred",
-      "reason": "Not retained in active native grammar."
+      "disposition": "retained",
+      "reason": "Explicit native 0.4 form restored under Issue #48; runtime equivalence remains unproved."
     },
     {
       "name": "time_difference",
@@ -145,8 +199,8 @@
     },
     {
       "name": "count",
-      "disposition": "deferred",
-      "reason": "Not retained in active native grammar."
+      "disposition": "retained",
+      "reason": "Explicit native 0.4 form restored under Issue #48; runtime equivalence remains unproved."
     },
     {
       "name": "glob_to_regex",
@@ -167,5 +221,10 @@
     "compatibility_gap": "Runtime collection/status propagation, casting, regex dialect, ordering, and error behavior require a runnable evaluator and conformance vectors before qualification."
   },
   "unsupported_functions": [],
-  "unsupported_policy": "No OVAL function is labeled unsupported without an explicit owner decision; functions outside the active grammar are deferred rather than silently treated as equivalent."
+  "unsupported_policy": "Functions without active source uses remain deferred; no inactive generic envelope is emitted.",
+  "owner_decisions": [
+    "https://github.com/vanderpol/scap-ng/issues/10",
+    "https://github.com/vanderpol/scap-ng/pull/60",
+    "https://github.com/vanderpol/scap-ng-tools/issues/48"
+  ]
 }
