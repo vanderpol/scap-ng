@@ -36,6 +36,9 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
         self.assertIn("oval-5.12.3-text-behaviors", evidence)
         self.assertIn("pcre2-resource-and-unicode-policy", evidence)
         self.assertIn("pcre2-wasm-vector-smoke", evidence)
+        self.assertIn("pcre2-10.49-release-and-ucd", evidence)
+        self.assertIn("pcre2-wasm-wrapper-error-and-utf-policy", evidence)
+        self.assertEqual(evidence["pcre2-10.49-release-and-ucd"]["unicode_version"], "17.0.0")
         self.assertEqual(evidence["oval-5.12.3-capture-xsd"]["sha256"],
                          "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc")
 
@@ -51,7 +54,7 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
                 self.assertGreater(len(vector["cases"]), 0)
                 for case in vector["cases"]:
                     self.assertIn(case["status"], self.pack["result_statuses"])
-                    if case["status"] in {"compile_error", "unsupported_feature", "invalid_utf8", "input_limit", "resource_limit", "cancelled"}:
+                    if case["status"] in {"compile_error", "unsupported_feature", "invalid_utf8", "engine_unavailable", "input_limit", "resource_limit", "cancelled"}:
                         self.assertNotEqual(case.get("must_not_report"), None)
 
     def test_canonical_examples_are_used_without_rewriting_them(self):
@@ -79,6 +82,8 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
         self.assertIn("invalid-pattern", ids)
         self.assertIn("editor-pathological-match-limit", ids)
         self.assertIn("editor-worker-cancellation", ids)
+        self.assertIn("empty-participating-versus-unmatched-capture", ids)
+        self.assertIn("engine-unavailable-is-not-nonmatch", ids)
 
 
     def test_evidence_resolves_capture_value_rules_but_not_wire_status(self):
@@ -89,6 +94,16 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
                          "source-preserved-pcre2-hold")
         self.assertEqual(self.by_id["absolute-and-line-anchors"]["compatibility_class"],
                          "pcre2-extension-hold")
+        optional = self.by_id["optional-unmatched-versus-empty-capture"]
+        self.assertEqual(optional["cases"][0]["captures"], [""])
+        self.assertEqual(self.by_id["empty-participating-versus-unmatched-capture"]["cases"][0]["captures"], [""])
+
+    def test_error_contract_never_coerces_diagnostics_to_nonmatch(self):
+        contract = self.pack["error_contract"]
+        self.assertIn("engine_unavailable", contract["diagnostic_statuses"])
+        self.assertIn("nonmatch", contract["successful_statuses"])
+        unavailable = self.by_id["engine-unavailable-is-not-nonmatch"]["cases"][0]
+        self.assertEqual(unavailable["must_not_report"], "match_or_nonmatch")
 
     def test_resource_vectors_are_controls_not_matches(self):
         for vector_id in ("editor-input-limit", "editor-pathological-match-limit", "editor-worker-cancellation"):

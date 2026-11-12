@@ -37,8 +37,9 @@ holds. It is pinned as review evidence, not as a new runtime dependency:
 | OVAL 5.12.3 checkout `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `oval-definitions-schema.xsd` SHA-256 `06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc`, lines 910–915 | `regex_capture` applies per input, uses the first match and first capture, returns empty string for no capture/no match, and uses the last participation of a quantified capture. |
 | The same OVAL checkout, `independent-definitions-schema.xsd` lines 1940–1952 | `ignore_case`, `multiline`, and `singleline` explicitly document their `i/m/s` intent and defaults (`false/true/false`) for text content. |
 | [PCRE2 pattern documentation](https://www.pcre.org/current/doc/html/pcre2pattern.html), retrieved body SHA-256 `e1ae7a7a415031293d774f2b9ee94075f258c2eba1695b40d412dbff957e6681` | PCRE2 defaults `\d/\s/\w` to ASCII even in UTF mode unless UCP is enabled; newline convention affects anchors and dot; JIT ignores depth and heap limits, so limit claims must name the execution mode. |
+| [PCRE2 10.49 release](https://github.com/PCRE2Project/pcre2/releases/tag/pcre2-10.49), tag commit `6f9d7c1373262c541324a16a358785b33ef116cf`, source tarball SHA-256 `53c156e1ba416a20da8e65395daa132da0d80e76910424caca3fcdae7831d384`; `src/pcre2_ucd.c` SHA-256 `cfa8bcb3ad316e09ebfdf3e4b07d708a9d4e53795cc7c0bf04ce5156d7695adc` | The current PCRE2 release is a concrete candidate baseline, and its checked-in Unicode table reports Unicode `17.0.0`. This is a recommendation for owner approval, not a runtime pin in Phase 1. |
 | VS Code commit `6f5a2bc38261586ea3e7badb95592a039b72e5da`, `test/source.test.mjs` and `src/playground.ts` | The existing preview proves only bounded PCRE2-WASM UX cases: inline modifiers, named captures, invalid input, input limits, pathological patterns, and cancellation. |
-| VS Code dependency `pcre2-wasm` 10.49.2 (package-lock integrity `sha512-KT/xILUIPAgxAFA9ZbwMUBrRbt06B31DlS88dt7DsaHbLTfvfx+thRtnhLyZ9kX+JvzOqwStHDzzg9szDjQLWg==`) | A local non-qualification smoke check produced `aa`/`ab` results for `^(a|b)\1$`, `ipp` for `(i..)+` over `mississippi`, and Unicode `\w+` matching `café` only with `FLAGS.UTF|FLAGS.UCP`. This supports vector expectations while leaving cross-platform/runtime qualification open. |
+| VS Code dependency `pcre2-wasm` 10.49.2 (package-lock integrity `sha512-KT/xILUIPAgxAFA9ZbwMUBrRbt06B31DlS88dt7DsaHbLTfvfx+thRtnhLyZ9kX+JvzOqwStHDzzg9szDjQLWg==`; package README SHA-256 `2d01a6401390401cca6403471cb0cb19a08e7591471b33bf7f59eac725a8bf0d`) | The wrapper documents byte mode by default, requires `UTF` or `UCP` for non-ASCII, maps match-limit exhaustion to PCRE2 error `-47`, and treats `g` as a no-op. A local non-qualification smoke check produced `aa`/`ab` results for `^(a|b)\1$`, `ipp` for `(i..)+` over `mississippi`, and Unicode `\w+` matching `café` only with `FLAGS.UTF|FLAGS.UCP`. This supports vector expectations while leaving cross-platform/runtime qualification open. |
 
 The OVAL policy evidence changes the classification of inline `(?i)` in the
 existing Windows converted example: PCRE2 can evaluate it, but it is not an
@@ -206,6 +207,25 @@ The vector pack is derived from, and links back to, the existing preview tests:
   or RI result. Its numeric bounds are test inputs for Phase 1, not normative
   runtime limits.
 
+## Proposed decision record for owner approval
+
+The evidence supports the following narrow choices. They are recorded here to
+turn the remaining discussions into explicit approval items rather than leaving
+runtime implementers to infer behavior:
+
+| Decision | Evidence-backed recommendation | Why this is the safe Phase 1 choice |
+| --- | --- | --- |
+| PCRE2/Unicode baseline | PCRE2 10.49 with Unicode 17.0.0, built with the 8-bit UTF and UCP support; the editor oracle remains the separately pinned `pcre2-wasm` 10.49.2 package. | The official release and checked-in UCD are content-addressed above; version drift otherwise changes character classes and case folding. |
+| UCP and normalization | UCP on whenever UTF-8 mode is on; reject invalid UTF-8; perform no normalization. | OVAL requires Unicode character matching, while PCRE2 documents that UCP changes `\w/\d/\s`; byte mode and normalization would silently change existing text. |
+| Newline and framing | Preserve bytes; use `ANYCRLF` only for multiline text-block matching. A line-framed caller supplies a terminator-free line; a scalar caller supplies exactly its scalar. No global CRLF rewrite. | PCRE2 newline mode affects `^/$` and dot, but OVAL acquisition determines whether a subject is a line or block. A single global rewrite would conflate shell-command and text-file semantics. |
+| Failure mapping | Only a completed engine operation may produce `match` or `nonmatch`. Compile, unsupported-feature, invalid-UTF-8, unavailable-engine, cancellation, and resource-limit outcomes remain diagnostics/indeterminate and never become nonmatch. | The editor wrapper exposes compile/match errors and PCRE2 documents match-limit errors; treating them as false would create false compliance results. |
+| RI distribution | Preserve the current `CGO_ENABLED=0` Go build as the release baseline. Prefer a separately versioned, signed native helper for the first cross-platform proof-of-concept; compare cgo/static-linking in the same matrix before selecting in-tree linkage. | A helper preserves the existing Go cross-build and gives an OS-level cancellation/memory boundary. It costs packaging/IPC complexity, which must be measured rather than hidden in a collector. |
+| Frozen 0.4 association | Do not add a profile field or rewrite 0.4 YAML. If association is needed, publish an external profile manifest keyed by the frozen schema/content pins. | Frozen 0.4 has no engine contract; external metadata avoids changing schema meaning or released bytes. |
+
+These are recommended dispositions, not owner approval and not runtime
+implementation. The owner must explicitly accept or reject each row before the
+profile can become normative.
+
 ## Owner decisions required before Phase 2
 
 The following contract points are now evidence-resolved for this proposal:
@@ -223,17 +243,17 @@ The following contract points are now evidence-resolved for this proposal:
 * the initial adapter should disable JIT until separate JIT resource semantics
   are qualified.
 
-Remaining genuine owner decisions:
+Remaining owner approvals (the recommended disposition is in the table above):
 
-1. Exact PCRE2 minimum/version and Unicode data version.
-2. Adoption of the proposed UCP-on policy versus a stricter Unicode profile.
-3. CRLF/newline convention and whether each text capability strips line endings.
-4. Native wire/status mapping for invalid patterns, unavailable engines,
-   cancellation, and resource limits, while preserving no-false-nonmatch.
-5. RI distribution choice (cgo/native library, helper process, or portable
-   implementation), supported Windows architectures, and packaging/signing.
-6. Whether a profile identifier is introduced only in a later language version
-   or can be associated externally with frozen 0.4.0 content.
+1. Accept or revise the PCRE2 10.49 / Unicode 17.0.0 baseline and UCP-on policy.
+2. Accept or revise `ANYCRLF`, terminator-free line framing, and no global
+   line-ending rewrite.
+3. Accept the no-false-nonmatch failure rule and choose the concrete native
+   wire/status names for indeterminate diagnostics.
+4. Choose the RI helper versus cgo/static-link implementation, supported
+   Windows architectures, and signing/reproducible packaging requirements.
+5. Confirm that any 0.4 association is external metadata only, not a frozen
+   schema/profile field.
 
 Until these decisions are approved, this PR is documentation and vector
 provenance only. It does not authorize schema changes, converter changes, RI

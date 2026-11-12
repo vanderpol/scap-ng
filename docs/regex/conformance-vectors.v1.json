@@ -8,7 +8,9 @@
     "scap_ng_schema_commit": "354c9c962c77488a3d939cab56f6ceecfd495d27",
     "oval_schema_version": "5.12.3",
     "vscode_reference_commit": "6f5a2bc38261586ea3e7badb95592a039b72e5da",
-    "vscode_test_file": "test/source.test.mjs"
+    "vscode_test_file": "test/source.test.mjs",
+    "pcre2_reference_release": "pcre2-10.49 (tag 6f9d7c1373262c541324a16a358785b33ef116cf)",
+    "pcre2_unicode_data": "17.0.0 (src/pcre2_ucd.c at pcre2-10.49)"
   },
   "result_statuses": [
     "match",
@@ -20,6 +22,7 @@
     "input_limit",
     "resource_limit",
     "cancelled",
+    "engine_unavailable",
     "owner_decision"
   ],
   "vectors": [
@@ -263,11 +266,23 @@
       "subject_framing": "multiline-scalar",
       "cases": [
         {
-          "subject": "user=alice\\r\\nuser=bob",
+          "subject": "user=alice\nuser=bob",
           "status": "match"
+        },
+        {
+          "subject": "user=alice\r\nuser=bob",
+          "status": "match"
+        },
+        {
+          "subject": "user=alice\ruser=bob",
+          "status": "match"
+        },
+        {
+          "subject": "header\r\nUSER=alice",
+          "status": "nonmatch"
         }
       ],
-      "owner_decision": "Confirm ANYCRLF versus source-layer line-ending normalization and line framing."
+      "owner_decision": "Approve ANYCRLF for multiline text-block matching; source framing remains caller-owned and no line-ending normalization is performed."
     },
     {
       "id": "anchor-search-versus-full-match",
@@ -438,18 +453,68 @@
       "cases": [
         {
           "subject": "b",
-          "status": "owner_decision",
-          "capture_state": "unmatched"
+          "status": "capture",
+          "captures": [
+            ""
+          ],
+          "capture_state": "unmatched",
+          "source_value": ""
         },
         {
           "subject": "ab",
           "status": "capture",
           "captures": [
             "a"
-          ]
+          ],
+          "capture_state": "participating",
+          "source_value": "a"
         }
       ],
-      "owner_decision": "Distinguish absent optional capture from an empty participating capture in native Variables/Results."
+      "owner_decision": "OVAL value is the empty string for an unmatched optional group. Implementations may retain an internal diagnostic distinction from a participating empty group, but native value output must not expose a different source value.",
+      "compatibility_class": "oval-evidence-backed"
+    },
+    {
+      "id": "empty-participating-versus-unmatched-capture",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "oval-schema-value-rule",
+        "source": "oval-definitions-schema.xsd lines 910-915"
+      },
+      "pattern": "^()b$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "b",
+          "status": "capture",
+          "captures": [
+            ""
+          ],
+          "capture_state": "participating",
+          "source_value": ""
+        }
+      ],
+      "owner_decision": "Both this case and an unmatched optional group serialize as the OVAL empty-string value; internal provenance may distinguish participation.",
+      "compatibility_class": "oval-evidence-backed"
+    },
+    {
+      "id": "engine-unavailable-is-not-nonmatch",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "failure mapping decision"
+      },
+      "pattern": "x",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "engine_unavailable",
+          "must_not_report": "match_or_nonmatch"
+        }
+      ],
+      "owner_decision": "Unavailable engine is a diagnostic/indeterminate result. It must not be converted to match or nonmatch.",
+      "compatibility_class": "profile-error-contract"
     },
     {
       "id": "invalid-pattern",
@@ -664,6 +729,51 @@
         "UTF_UCP_word_class_cafe"
       ],
       "qualification": "local smoke only; not cross-platform or RI qualification"
+    },
+    {
+      "id": "pcre2-10.49-release-and-ucd",
+      "repository_tag": "pcre2-10.49",
+      "repository_commit": "6f9d7c1373262c541324a16a358785b33ef116cf",
+      "source_tar_sha256": "53c156e1ba416a20da8e65395daa132da0d80e76910424caca3fcdae7831d384",
+      "ucd_path": "src/pcre2_ucd.c",
+      "ucd_sha256": "cfa8bcb3ad316e09ebfdf3e4b07d708a9d4e53795cc7c0bf04ce5156d7695adc",
+      "unicode_version": "17.0.0",
+      "claims": [
+        "candidate_engine_baseline",
+        "pinned_unicode_data"
+      ],
+      "url": "https://github.com/PCRE2Project/pcre2/releases/tag/pcre2-10.49"
+    },
+    {
+      "id": "pcre2-wasm-wrapper-error-and-utf-policy",
+      "package": "pcre2-wasm@10.49.2",
+      "package_lock_integrity": "sha512-KT/xILUIPAgxAFA9ZbwMUBrRbt06B31DlS88dt7DsaHbLTfvfx+thRtnhLyZ9kX+JvzOqwStHDzzg9szDjQLWg==",
+      "readme_sha256": "2d01a6401390401cca6403471cb0cb19a08e7591471b33bf7f59eac725a8bf0d",
+      "claims": [
+        "byte_mode_default",
+        "UTF_or_UCP_for_non_ascii",
+        "match_limit_error_code_minus_47",
+        "global_flag_noop"
+      ],
+      "qualification": "package documentation only; not RI qualification"
     }
-  ]
+  ],
+  "error_contract": {
+    "successful_statuses": [
+      "match",
+      "nonmatch",
+      "capture"
+    ],
+    "diagnostic_statuses": [
+      "compile_error",
+      "unsupported_feature",
+      "invalid_utf8",
+      "engine_unavailable",
+      "input_limit",
+      "resource_limit",
+      "cancelled"
+    ],
+    "rule": "Only successful engine operations may report match/nonmatch/capture; diagnostics never become a genuine nonmatch.",
+    "owner_approval_required": true
+  }
 }
