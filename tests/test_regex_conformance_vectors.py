@@ -28,6 +28,17 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
         self.assertEqual(len(self.by_id), len(self.vectors))
         self.assertIn("owner_decision", self.pack["result_statuses"])
 
+    def test_evidence_register_covers_oval_and_pcre2_claims(self):
+        evidence = {item["id"]: item for item in self.pack["evidence"]}
+        self.assertEqual(len(evidence), len(self.pack["evidence"]))
+        self.assertIn("oval-regex-policy", evidence)
+        self.assertIn("oval-5.12.3-capture-xsd", evidence)
+        self.assertIn("oval-5.12.3-text-behaviors", evidence)
+        self.assertIn("pcre2-resource-and-unicode-policy", evidence)
+        self.assertIn("pcre2-wasm-vector-smoke", evidence)
+        self.assertEqual(evidence["oval-5.12.3-capture-xsd"]["sha256"],
+                         "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc")
+
     def test_vectors_have_engine_neutral_shape(self):
         allowed_operations = {"matches_regex", "regex_capture"}
         for vector in self.vectors:
@@ -58,14 +69,26 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
         ids = set(self.by_id)
         self.assertIn("oval-negative-lookahead-comment-exclusion", ids)
         self.assertIn("oval-positive-lookahead-presence", ids)
+        self.assertIn("oval-single-digit-numbered-backreference", ids)
         self.assertIn("native-windows-inline-case-insensitive", ids)
         self.assertIn("oval-behavior-flags-to-effective-options", ids)
         self.assertIn("unicode-literal-no-normalization", ids)
+        self.assertIn("unicode-ucp-word-class-policy", ids)
         self.assertIn("crlf-multiline-anchor-policy", ids)
         self.assertIn("named-and-numbered-captures", ids)
         self.assertIn("invalid-pattern", ids)
         self.assertIn("editor-pathological-match-limit", ids)
         self.assertIn("editor-worker-cancellation", ids)
+
+
+    def test_evidence_resolves_capture_value_rules_but_not_wire_status(self):
+        repeated = self.by_id["oval-repeated-capture-last-participation"]
+        self.assertEqual(repeated["compatibility_class"], "oval-evidence-backed")
+        self.assertEqual(repeated["cases"][0]["captures"], ["ipp"])
+        self.assertEqual(self.by_id["native-windows-inline-case-insensitive"]["compatibility_class"],
+                         "source-preserved-pcre2-hold")
+        self.assertEqual(self.by_id["absolute-and-line-anchors"]["compatibility_class"],
+                         "pcre2-extension-hold")
 
     def test_resource_vectors_are_controls_not_matches(self):
         for vector_id in ("editor-input-limit", "editor-pathological-match-limit", "editor-worker-cancellation"):
