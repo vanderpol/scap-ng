@@ -65,9 +65,10 @@ class AuthoringDocumentationTests(unittest.TestCase):
     def test_variable_expression_descriptions_match_expression_semantics(self):
         document = json.loads((ROOT / 'variable-expression.schema.json').read_text())
         expressions = document['$defs']['expression']['oneOf']
-        regex = expressions[4]['properties']['regex_capture']['properties']
-        merge = expressions[6]['properties']['merge']['properties']
-        values = expressions[2]['properties']['values']['properties']
+        by_name = {branch['required'][0]: branch for branch in expressions}
+        regex = by_name['regex_capture']['properties']['regex_capture']['properties']
+        merge = by_name['merge']['properties']['merge']['properties']
+        values = by_name['values']['properties']['values']['properties']
         self.assertEqual(regex['value']['title'], 'Input expression')
         self.assertIn('string value', regex['value']['description'])
         self.assertEqual(merge['values']['title'], 'Values expression')
