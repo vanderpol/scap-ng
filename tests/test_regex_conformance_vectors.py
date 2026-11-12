@@ -56,6 +56,8 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
                     self.assertIn(case["status"], self.pack["result_statuses"])
                     if case["status"] in {"compile_error", "unsupported_feature", "invalid_utf8", "engine_unavailable", "input_limit", "resource_limit", "cancelled"}:
                         self.assertNotEqual(case.get("must_not_report"), None)
+                    for accepted in case.get("acceptable_statuses", []):
+                        self.assertIn(accepted, {"compile_error", "unsupported_feature", "invalid_utf8", "engine_unavailable", "input_limit", "resource_limit", "cancelled"})
 
     def test_canonical_examples_are_used_without_rewriting_them(self):
         linux = (ROOT / "examples/linux-home-nosuid.assessment.yaml").read_text(encoding="utf-8")
@@ -82,6 +84,8 @@ class RegexConformanceVectorIntegrityTests(unittest.TestCase):
         self.assertIn("invalid-pattern", ids)
         self.assertIn("editor-pathological-match-limit", ids)
         self.assertIn("editor-worker-cancellation", ids)
+        cancellation = self.by_id["editor-worker-cancellation"]["cases"][0]
+        self.assertEqual(cancellation["acceptable_statuses"], ["cancelled", "resource_limit"])
         self.assertIn("empty-participating-versus-unmatched-capture", ids)
         self.assertIn("engine-unavailable-is-not-nonmatch", ids)
 
