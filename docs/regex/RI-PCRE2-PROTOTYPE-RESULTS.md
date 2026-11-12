@@ -4,8 +4,8 @@
 
 The RI prototype is in unmerged RI review PR
 [#57](https://github.com/vanderpol/scap-ng-ri/pull/57), branch
-[`codex/issue62-regex-prototype`](https://github.com/vanderpol/scap-ng-ri/tree/261ef7e/prototype/regex),
-at commit `261ef7e`. Its source and machine-readable result receipt are
+[`codex/issue62-regex-prototype`](https://github.com/vanderpol/scap-ng-ri/tree/a80d1d2/prototype/regex),
+at commit `a80d1d2`. Its source and machine-readable result receipt are
 published in the RI repository; this canonical document records the result
 against the Phase 1 profile and vector pin. No RI evaluator entry point,
 collector, schema, converter, archive, fixture, or pin was changed.
@@ -47,6 +47,37 @@ The helper is approximately 14.1x slower in this microbenchmark because each
 Item crosses the persistent process protocol. This is not a scanner benchmark:
 all Items reuse one pattern and one short subject, and no collector or
 Assessment evaluation path is involved.
+
+## Batched/streaming helper results
+
+The follow-up prototype adds a streaming batch protocol. One pattern and batch
+count are sent once; subject frames and result frames stream in order. The
+helper retains one subject/result, while the Go client retains only the current
+batch. Five trials used 100,001 Items at each batch size:
+
+| Batch size | cgo median Items/s | Helper median Items/s | cgo median ms | Helper median ms | Max client input/result buffers |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | 566,225 | 21,658 | 176.610 | 4,617.253 | 10 bytes / 1 result |
+| 100 | 588,750 | 362,130 | 169.853 | 276.147 | 1,000 bytes / 100 results |
+| 1,000 | 601,166 | 409,474 | 166.345 | 244.218 | 10,000 bytes / 1,000 results |
+| 10,000 | 590,116 | 416,751 | 169.460 | 239.954 | 100,000 bytes / 10,000 results |
+
+Streaming improves helper throughput by about 19.2x from batch 1 to 10,000,
+while cgo remains faster. The one-trial process RSS observations were 11,176
+KiB for cgo and 9,336 KiB for the helper; Go heap deltas varied with allocator
+state and are not memory-budget claims.
+
+The batch contract probes passed: ordering was preserved, each Item received a
+separate status/capture diagnostic, the malicious `(a+)+$` batch produced only
+diagnostic outcomes, and terminating the helper made the next operation return
+`engine_unavailable`. In-flight cancellation is not claimed; it requires a
+supervisor contract.
+
+The Windows plan is now explicit in the prototype README: build and hash
+Unicode-enabled PCRE2 10.49 with JIT disabled using pinned MinGW-w64 (or a
+separately qualified MSVC/DLL route), produce signed amd64/arm64 helper and
+cgo artifacts, run the full vector/batch/crash/timeout/RSS matrix on clean
+Windows hosts, and record SBOM/license/DLL-loading evidence.
 
 ## Linux/Windows comparison
 
