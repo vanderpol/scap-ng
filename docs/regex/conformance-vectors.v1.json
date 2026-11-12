@@ -1,0 +1,553 @@
+{
+  "format": "scap-ng-regex-conformance-vectors/1",
+  "status": "owner-review-proposal",
+  "profile_id": "scap-ng-pcre2-oval-compatible/0.1",
+  "normative": false,
+  "purpose": "Engine-neutral Phase 1 vectors for a proposed PCRE2 compatibility profile. No vector is scanner or RI proof.",
+  "source_pins": {
+    "scap_ng_schema_commit": "354c9c962c77488a3d939cab56f6ceecfd495d27",
+    "oval_schema_version": "5.12.3",
+    "vscode_reference_commit": "6f5a2bc38261586ea3e7badb95592a039b72e5da",
+    "vscode_test_file": "test/source.test.mjs"
+  },
+  "result_statuses": [
+    "match",
+    "nonmatch",
+    "capture",
+    "compile_error",
+    "unsupported_feature",
+    "invalid_utf8",
+    "input_limit",
+    "resource_limit",
+    "cancelled",
+    "owner_decision"
+  ],
+  "vectors": [
+    {
+      "id": "native-linux-home-unanchored-search",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "canonical-converted-yaml",
+        "path": "examples/linux-home-nosuid.assessment.yaml",
+        "line": 15
+      },
+      "pattern": ".*\\/home",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "/dev/mapper/root on /home type ext4",
+          "status": "match"
+        },
+        {
+          "subject": "/dev/mapper/root on /var type ext4",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "native-windows-inline-case-insensitive",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "canonical-converted-yaml",
+        "path": "examples/windows-server-2025-sysvol-permissions.assessment.yaml",
+        "line": 47
+      },
+      "pattern": "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)",
+      "flags": "",
+      "subject_framing": "shellcommand-stdout-line",
+      "cases": [
+        {
+          "subject": "nt authority\\system:(F)",
+          "status": "match"
+        },
+        {
+          "subject": "BUILTIN\\SYSTEM:(RX)",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "native-windows-regex-capture-path",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "canonical-converted-yaml",
+        "path": "examples/windows-server-2025-sysvol-permissions.assessment.yaml",
+        "lines": "17-21"
+      },
+      "pattern": "(^[a-zA-Z]:\\\\.+)\\\\sysvol",
+      "flags": "",
+      "subject_framing": "variable-input-scalar",
+      "cases": [
+        {
+          "subject": "C:\\Windows\\sysvol",
+          "status": "capture",
+          "captures": [
+            "C:\\Windows\\"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oval-negative-lookahead-comment-exclusion",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "converted-content-audit-witness",
+        "path": "docs/generated/developer-contract-research-independent.md",
+        "line": 112,
+        "note": "The pattern is also represented in the generated converted-content audit; qualify against the pinned OVAL subset before runtime use."
+      },
+      "pattern": "^(?!#).*\\s+NOPASSWD[\\s]*\\:.*$",
+      "flags": "",
+      "subject_framing": "text-line",
+      "cases": [
+        {
+          "subject": "alice ALL=(ALL) NOPASSWD: /bin/id",
+          "status": "match"
+        },
+        {
+          "subject": "# alice ALL=(ALL) NOPASSWD: /bin/id",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "oval-positive-lookahead-presence",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "converted-content-audit-witness",
+        "path": "docs/metadata/developer-guide-content-audit.json",
+        "line": 359,
+        "note": "Positive lookahead occurs in the pinned converted-content audit; profile qualification remains required."
+      },
+      "pattern": "^(?=.*\\bDNSOverHTTPS\\b).*$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "policy DNSOverHTTPS Enabled",
+          "status": "match"
+        },
+        {
+          "subject": "policy DNSOverHTTP Enabled",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "oval-behavior-flags-to-effective-options",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "oval-5.12.3-behavior-contract",
+        "source": "Textfilecontent54Behaviors/@ignore_case,@multiline,@singleline"
+      },
+      "pattern": "^user=(.+)$",
+      "source_behavior": {
+        "ignore_case": false,
+        "multiline": true,
+        "singleline": false
+      },
+      "flags": "m",
+      "subject_framing": "text-block",
+      "cases": [
+        {
+          "subject": "header\nuser=alice\nfooter",
+          "status": "match"
+        },
+        {
+          "subject": "header\nUSER=alice\nfooter",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "inline-modifier-and-explicit-flag-composition",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "151-156"
+      },
+      "pattern": "^user=(.+)$",
+      "flags": "i",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "USER=alice",
+          "status": "match"
+        },
+        {
+          "subject": "user=",
+          "status": "nonmatch"
+        }
+      ],
+      "owner_decision": "Resolve precedence when source behavior flags conflict with inline modifiers."
+    },
+    {
+      "id": "editor-flag-allowlist-boundary",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "src/extension.ts",
+        "note": "The preview UI currently advertises i,m,s,x,u,U,A,D and g; this vector prevents that UI list from becoming an unreviewed native contract."
+      },
+      "pattern": "^ user = [A-Za-z]+ $",
+      "flags": "x",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "user = alice",
+          "status": "owner_decision"
+        }
+      ],
+      "owner_decision": "Decide whether extended/UTF/ungreedy/anchored/end-only flags are admitted in a later profile; g is editor-only unless a native global-match cardinality contract is defined."
+    },
+    {
+      "id": "dotall-newline-flag",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "src/playground.ts"
+      },
+      "pattern": "^BEGIN.*END$",
+      "flags": "s",
+      "subject_framing": "multiline-scalar",
+      "cases": [
+        {
+          "subject": "BEGIN\nEND",
+          "status": "match"
+        },
+        {
+          "subject": "BEGIN\nMIDDLE",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "crlf-multiline-anchor-policy",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "newline policy"
+      },
+      "pattern": "^user=(.+)$",
+      "flags": "m",
+      "newline_mode": "ANYCRLF",
+      "subject_framing": "multiline-scalar",
+      "cases": [
+        {
+          "subject": "user=alice\\r\\nuser=bob",
+          "status": "match"
+        }
+      ],
+      "owner_decision": "Confirm ANYCRLF versus source-layer line-ending normalization and line framing."
+    },
+    {
+      "id": "anchor-search-versus-full-match",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "OVAL pattern-match search semantics"
+      },
+      "pattern": "user",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "prefix user suffix",
+          "status": "match"
+        }
+      ],
+      "assertions": [
+        "No implicit full-match anchoring"
+      ]
+    },
+    {
+      "id": "absolute-and-line-anchors",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "anchor distinction"
+      },
+      "pattern": "\\Auser=alice\\z",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "user=alice",
+          "status": "match"
+        },
+        {
+          "subject": "prefix user=alice",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "unicode-literal-no-normalization",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "UTF-8/no-normalization baseline"
+      },
+      "pattern": "café",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "café",
+          "status": "match"
+        },
+        {
+          "subject": "café",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "unicode-casefold-and-ucp-hold",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "Unicode policy"
+      },
+      "pattern": "(?i)Ångström",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "ångström",
+          "status": "owner_decision"
+        }
+      ],
+      "owner_decision": "Select Unicode case-fold/UCP and Unicode-data policy before assigning match/nonmatch."
+    },
+    {
+      "id": "named-and-numbered-captures",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "192-197"
+      },
+      "pattern": "^(?<user>[^:]+):(.+)$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "alice:secret",
+          "status": "capture",
+          "captures": [
+            "alice",
+            "secret"
+          ],
+          "named_captures": {
+            "user": "alice"
+          }
+        }
+      ],
+      "owner_decision": "Named captures are preview data until native wire semantics are approved."
+    },
+    {
+      "id": "oval-repeated-capture-last-participation",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "oval-self-assertion-witness",
+        "source": "OVAL-Community/SCAP-Self-Assertion oval-def_regex_capture_function.xml",
+        "note": "The source comment expects ipp for (i..)+ over mississippi; this remains source evidence, not runtime proof."
+      },
+      "pattern": "(i..)+",
+      "flags": "",
+      "subject_framing": "variable-input-scalar",
+      "cases": [
+        {
+          "subject": "mississippi",
+          "status": "owner_decision",
+          "source_expected_capture": "ipp"
+        }
+      ],
+      "owner_decision": "Confirm repeated-group capture normalization and first/last participation."
+    },
+    {
+      "id": "optional-unmatched-versus-empty-capture",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "capture absence distinction"
+      },
+      "pattern": "^(a)?b$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "b",
+          "status": "owner_decision",
+          "capture_state": "unmatched"
+        },
+        {
+          "subject": "ab",
+          "status": "capture",
+          "captures": [
+            "a"
+          ]
+        }
+      ],
+      "owner_decision": "Distinguish absent optional capture from an empty participating capture in native Variables/Results."
+    },
+    {
+      "id": "invalid-pattern",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "line": 156
+      },
+      "pattern": "(",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "x",
+          "status": "compile_error",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "invalid-flag",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "flag allow-list"
+      },
+      "pattern": "x",
+      "flags": "z",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "x",
+          "status": "compile_error",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "invalid-utf8-subject",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "UTF-8 boundary"
+      },
+      "pattern": "x",
+      "subject_encoding": "hex",
+      "subject": "ff",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "invalid_utf8",
+          "must_not_report": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "unsupported-lookbehind",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "PCRE2 extension boundary"
+      },
+      "pattern": "(?<=a)b",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "ab",
+          "status": "unsupported_feature",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "editor-input-limit",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "line": 157
+      },
+      "pattern": "x",
+      "flags": "",
+      "subject_framing": "scalar",
+      "limits": {
+        "subject_characters": 100000
+      },
+      "subject_generator": {
+        "repeat": "a",
+        "count": 100001
+      },
+      "cases": [
+        {
+          "status": "input_limit",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "editor-pathological-match-limit",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "171-174"
+      },
+      "pattern": "(a+)+$",
+      "flags": "",
+      "limits": {
+        "subject_characters": 100000,
+        "match_limit": 1000000,
+        "depth_limit": 1000,
+        "timeout_ms": 100
+      },
+      "subject_generator": {
+        "prefix": "a",
+        "count": 10000,
+        "suffix": "!"
+      },
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "resource_limit",
+          "must_not_report": "match"
+        }
+      ],
+      "owner_decision": "Map match/depth/heap exhaustion to diagnostics without a technical nonmatch."
+    },
+    {
+      "id": "editor-worker-cancellation",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "171-176"
+      },
+      "pattern": "^(a|aa)+$",
+      "flags": "",
+      "limits": {
+        "timeout_ms": 25
+      },
+      "subject_generator": {
+        "prefix": "a",
+        "count": 50000,
+        "suffix": "!"
+      },
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "cancelled",
+          "must_not_report": "match"
+        }
+      ]
+    }
+  ]
+}

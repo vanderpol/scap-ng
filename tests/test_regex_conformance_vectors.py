@@ -1,0 +1,85 @@
+"""Phase 1 integrity checks for the proposed Issue #62 regex vector pack.
+
+These tests validate provenance and vector shape only. They deliberately do not
+invoke a regex engine or claim evaluator/scanner conformance.
+"""
+
+import json
+from pathlib import Path
+import unittest
+
+
+ROOT = Path(__file__).resolve().parents[1]
+VECTORS = ROOT / "docs/regex/conformance-vectors.v1.json"
+
+
+class RegexConformanceVectorIntegrityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.pack = json.loads(VECTORS.read_text(encoding="utf-8"))
+        cls.vectors = cls.pack["vectors"]
+        cls.by_id = {vector["id"]: vector for vector in cls.vectors}
+
+    def test_pack_is_versioned_and_proposal_only(self):
+        self.assertEqual(self.pack["format"], "scap-ng-regex-conformance-vectors/1")
+        self.assertEqual(self.pack["profile_id"], "scap-ng-pcre2-oval-compatible/0.1")
+        self.assertEqual(self.pack["status"], "owner-review-proposal")
+        self.assertFalse(self.pack["normative"])
+        self.assertEqual(len(self.by_id), len(self.vectors))
+        self.assertIn("owner_decision", self.pack["result_statuses"])
+
+    def test_vectors_have_engine_neutral_shape(self):
+        allowed_operations = {"matches_regex", "regex_capture"}
+        for vector in self.vectors:
+            with self.subTest(vector=vector["id"]):
+                self.assertIn(vector["operation"], allowed_operations)
+                self.assertIsInstance(vector["pattern"], str)
+                self.assertIn("flags", vector)
+                self.assertIsInstance(vector["provenance"], dict)
+                self.assertIn("cases", vector)
+                self.assertGreater(len(vector["cases"]), 0)
+                for case in vector["cases"]:
+                    self.assertIn(case["status"], self.pack["result_statuses"])
+                    if case["status"] in {"compile_error", "unsupported_feature", "invalid_utf8", "input_limit", "resource_limit", "cancelled"}:
+                        self.assertNotEqual(case.get("must_not_report"), None)
+
+    def test_canonical_examples_are_used_without_rewriting_them(self):
+        linux = (ROOT / "examples/linux-home-nosuid.assessment.yaml").read_text(encoding="utf-8")
+        windows = (ROOT / "examples/windows-server-2025-sysvol-permissions.assessment.yaml").read_text(encoding="utf-8")
+        self.assertIn(r"mount_point: {matches_regex: '.*\/home'}", linux)
+        self.assertIn(r"pattern: '(^[a-zA-Z]:\\.+)\\sysvol'", windows)
+        self.assertEqual(windows.count("- '(?i)"), 9)
+        self.assertEqual(self.by_id["native-linux-home-unanchored-search"]["provenance"]["path"],
+                         "examples/linux-home-nosuid.assessment.yaml")
+        self.assertEqual(self.by_id["native-windows-regex-capture-path"]["provenance"]["path"],
+                         "examples/windows-server-2025-sysvol-permissions.assessment.yaml")
+
+    def test_required_phase_one_categories_are_present(self):
+        ids = set(self.by_id)
+        self.assertIn("oval-negative-lookahead-comment-exclusion", ids)
+        self.assertIn("oval-positive-lookahead-presence", ids)
+        self.assertIn("native-windows-inline-case-insensitive", ids)
+        self.assertIn("oval-behavior-flags-to-effective-options", ids)
+        self.assertIn("unicode-literal-no-normalization", ids)
+        self.assertIn("crlf-multiline-anchor-policy", ids)
+        self.assertIn("named-and-numbered-captures", ids)
+        self.assertIn("invalid-pattern", ids)
+        self.assertIn("editor-pathological-match-limit", ids)
+        self.assertIn("editor-worker-cancellation", ids)
+
+    def test_resource_vectors_are_controls_not_matches(self):
+        for vector_id in ("editor-input-limit", "editor-pathological-match-limit", "editor-worker-cancellation"):
+            vector = self.by_id[vector_id]
+            with self.subTest(vector=vector_id):
+                self.assertIn("limits", vector)
+                self.assertTrue(any(case.get("must_not_report") == "match" for case in vector["cases"]))
+                self.assertNotIn("match", {case["status"] for case in vector["cases"]})
+
+    def test_no_vector_claims_runtime_qualification(self):
+        for vector in self.vectors:
+            self.assertNotEqual(vector.get("qualification"), "qualified")
+            self.assertNotEqual(vector.get("status"), "qualified")
+
+
+if __name__ == "__main__":
+    unittest.main()
