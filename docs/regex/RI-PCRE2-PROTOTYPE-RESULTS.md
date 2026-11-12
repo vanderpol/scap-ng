@@ -2,8 +2,9 @@
 
 **Status: isolated prototype only; not a production RI implementation.**
 
-The RI prototype is in the unmerged branch
-[`codex/issue62-regex-prototype`](https://github.com/vanderpol/scap-ng-ri/tree/261ef7e/prototype/regex)
+The RI prototype is in unmerged RI review PR
+[#57](https://github.com/vanderpol/scap-ng-ri/pull/57), branch
+[`codex/issue62-regex-prototype`](https://github.com/vanderpol/scap-ng-ri/tree/261ef7e/prototype/regex),
 at commit `261ef7e`. Its source and machine-readable result receipt are
 published in the RI repository; this canonical document records the result
 against the Phase 1 profile and vector pin. No RI evaluator entry point,
