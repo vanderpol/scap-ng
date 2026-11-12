@@ -1,6 +1,6 @@
 {
-  "native_schema_commit": "6012ae25281352a9c2d8a4fde7cb5a4968b4432c",
-  "schema_family_sha256": "63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5",
+  "native_schema_commit": "b29643cd0129a5aff2311e0dc270c3e16e37e796",
+  "schema_family_sha256": "5d3b7f9507318c5ca2e85009fd8bc284d906d357b58cd278219c84f9481536a1",
   "oval_repository": "OVAL-Community/OVAL",
   "oval_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
   "self_assertion_repository": "OVAL-Community/SCAP-Self-Assertion",
@@ -27,7 +27,7 @@
     {
       "file": "schema/variable-expression.schema.json",
       "pointer": "/$defs/declaration/allOf/0/then/properties/expression/properties/literal",
-      "sha256": "f642b2a6acfb5ba5db9c598f139bc63d468beb4ff21805c178961f8a28a737f4",
+      "sha256": "47da0ed32dd8686a1bd1905d5ef8a0778cbb9093f123b7f7083a3a4c06dca12c",
       "source_annotation": {
         "oneOf": [
           {
@@ -135,7 +135,7 @@
     {
       "file": "schema/variable-expression.schema.json",
       "pointer": "/$defs/expression/oneOf/1",
-      "sha256": "f642b2a6acfb5ba5db9c598f139bc63d468beb4ff21805c178961f8a28a737f4",
+      "sha256": "47da0ed32dd8686a1bd1905d5ef8a0778cbb9093f123b7f7083a3a4c06dca12c",
       "source_annotation": {
         "type": "object",
         "required": [
@@ -452,7 +452,7 @@
     {
       "file": "schema/variable-expression.schema.json",
       "pointer": "/$defs/expression",
-      "sha256": "f642b2a6acfb5ba5db9c598f139bc63d468beb4ff21805c178961f8a28a737f4",
+      "sha256": "47da0ed32dd8686a1bd1905d5ef8a0778cbb9093f123b7f7083a3a4c06dca12c",
       "source_annotation": {
         "oneOf": [
           {
@@ -723,9 +723,8 @@
             ],
             "properties": {
               "unique": {
-                "$ref": "#/$defs/expression",
-                "title": "Unique values",
-                "description": "Remove duplicate scalar values from the input. Record data is not a supported transformation operand; value ordering and status propagation remain governed by the inherited semantic contract.",
+                "title": "Unique values or ordered populations",
+                "description": "Remove duplicate scalar values from one expression or from multiple ordered component populations. Multiple components are flattened in source order before first-occurrence deduplication; duplicates and diagnostic statuses are preserved. Record data is not a supported transformation operand.",
                 "examples": [
                   {
                     "values": {
@@ -734,6 +733,34 @@
                       },
                       "field": "tag"
                     }
+                  },
+                  {
+                    "unique": [
+                      {
+                        "literal": [
+                          "a",
+                          "a"
+                        ]
+                      },
+                      {
+                        "literal": [
+                          "b",
+                          "a"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "oneOf": [
+                  {
+                    "$ref": "#/$defs/expression"
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/expression"
+                    }
                   }
                 ]
               }
@@ -741,6 +768,270 @@
             "additionalProperties": false,
             "description": "Remove duplicate scalar values.",
             "title": "Unique expression"
+          },
+          {
+            "type": "object",
+            "required": [
+              "count"
+            ],
+            "properties": {
+              "count": {
+                "$ref": "#/$defs/expression",
+                "title": "Counted values",
+                "description": "Evaluate the nested expression and return the number of values it produces as one integer. Count each produced value, including duplicates; do not count unique values unless the author explicitly wraps the input with unique. An empty, successfully evaluated collection produces zero. Missing, incomplete, not-collected, error, and other non-success states must retain the native status contract instead of silently becoming zero. Runtime equivalence is subject to independent conformance tests.",
+                "examples": [
+                  {
+                    "literal": [
+                      "one",
+                      "one",
+                      "two"
+                    ]
+                  },
+                  {
+                    "values": {
+                      "object": {
+                        "object_ref": "example-object"
+                      },
+                      "field": "name"
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "title": "Count expression",
+            "description": "Return the cardinality of values from a nested Variable expression as one integer. Duplicates contribute to the count; non-success statuses are not coerced to zero."
+          },
+          {
+            "type": "object",
+            "required": [
+              "split"
+            ],
+            "properties": {
+              "split": {
+                "type": "object",
+                "required": [
+                  "delimiter",
+                  "value"
+                ],
+                "properties": {
+                  "delimiter": {
+                    "type": "string",
+                    "title": "Delimiter",
+                    "description": "Literal delimiter; an empty delimiter is literal, not a regular expression."
+                  },
+                  "value": {
+                    "$ref": "#/$defs/expression",
+                    "title": "Input expression",
+                    "description": "Expression producing string values to split independently."
+                  }
+                },
+                "additionalProperties": false,
+                "title": "Split values",
+                "description": "Split each input string on the explicit literal delimiter. Preserve leading, trailing, and adjacent empty parts, duplicates, collection order, and diagnostic statuses.",
+                "examples": [
+                  {
+                    "delimiter": ",",
+                    "value": {
+                      "literal": "a,,b"
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "title": "Split values expression",
+            "description": "Split each input string on the explicit literal delimiter. Preserve leading, trailing, and adjacent empty parts, duplicates, collection order, and diagnostic statuses."
+          },
+          {
+            "type": "object",
+            "required": [
+              "substring"
+            ],
+            "properties": {
+              "substring": {
+                "type": "object",
+                "required": [
+                  "substring_start",
+                  "substring_length",
+                  "value"
+                ],
+                "properties": {
+                  "substring_start": {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647,
+                    "title": "Start",
+                    "description": "Signed 32-bit OVAL start position; evaluation applies the source one-based boundary rules."
+                  },
+                  "substring_length": {
+                    "type": "integer",
+                    "minimum": -2147483648,
+                    "maximum": 2147483647,
+                    "title": "Length",
+                    "description": "Signed 32-bit length; negative or oversized lengths retain the source remainder behavior."
+                  },
+                  "value": {
+                    "$ref": "#/$defs/expression",
+                    "title": "Input expression",
+                    "description": "Expression producing string values to slice independently."
+                  }
+                },
+                "additionalProperties": false,
+                "title": "Substring values",
+                "description": "Extract a substring from each input string using explicit signed 32-bit source options. Out-of-range and diagnostic outcomes remain errors/statuses; no defaults are inferred.",
+                "examples": [
+                  {
+                    "substring_start": 1,
+                    "substring_length": 3,
+                    "value": {
+                      "literal": "abcdef"
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "title": "Substring values expression",
+            "description": "Extract a substring from each input string using explicit signed 32-bit source options. Out-of-range and diagnostic outcomes remain errors/statuses; no defaults are inferred."
+          },
+          {
+            "type": "object",
+            "required": [
+              "arithmetic"
+            ],
+            "properties": {
+              "arithmetic": {
+                "type": "object",
+                "required": [
+                  "arithmetic_operation",
+                  "values"
+                ],
+                "properties": {
+                  "arithmetic_operation": {
+                    "enum": [
+                      "add",
+                      "multiply"
+                    ],
+                    "title": "Arithmetic operation",
+                    "description": "Numeric addition or multiplication; no boolean or string coercion."
+                  },
+                  "values": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                      "$ref": "#/$defs/expression"
+                    },
+                    "title": "Numeric operands",
+                    "description": "Two or more ordered numeric expressions. Multiple-valued operands use the source Cartesian-product semantics and retain multiplicity/status."
+                  }
+                },
+                "additionalProperties": false,
+                "title": "Arithmetic values",
+                "description": "Add or multiply two or more numeric populations over the source Cartesian product. Integer-only inputs produce integers; any float input produces floats. Invalid types and diagnostic populations are not coerced.",
+                "examples": [
+                  {
+                    "arithmetic_operation": "add",
+                    "values": [
+                      {
+                        "literal": 1
+                      },
+                      {
+                        "literal": [
+                          2,
+                          3
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "title": "Arithmetic values expression",
+            "description": "Add or multiply two or more numeric populations over the source Cartesian product. Integer-only inputs produce integers; any float input produces floats. Invalid types and diagnostic populations are not coerced."
+          },
+          {
+            "type": "object",
+            "required": [
+              "begin"
+            ],
+            "properties": {
+              "begin": {
+                "type": "object",
+                "required": [
+                  "character",
+                  "value"
+                ],
+                "properties": {
+                  "character": {
+                    "type": "string",
+                    "title": "Boundary character",
+                    "description": "Explicit character used by the source begin operation."
+                  },
+                  "value": {
+                    "$ref": "#/$defs/expression",
+                    "title": "Input expression",
+                    "description": "Expression producing string values to test."
+                  }
+                },
+                "additionalProperties": false,
+                "title": "Begin boundary",
+                "description": "Retain the source begin-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation.",
+                "examples": [
+                  {
+                    "character": "/",
+                    "value": {
+                      "literal": "/etc"
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "title": "Begin boundary expression",
+            "description": "Retain the source begin-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation."
+          },
+          {
+            "type": "object",
+            "required": [
+              "end"
+            ],
+            "properties": {
+              "end": {
+                "type": "object",
+                "required": [
+                  "character",
+                  "value"
+                ],
+                "properties": {
+                  "character": {
+                    "type": "string",
+                    "title": "Boundary character",
+                    "description": "Explicit character used by the source end operation."
+                  },
+                  "value": {
+                    "$ref": "#/$defs/expression",
+                    "title": "Input expression",
+                    "description": "Expression producing string values to test."
+                  }
+                },
+                "additionalProperties": false,
+                "title": "End boundary",
+                "description": "Retain the source end-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation.",
+                "examples": [
+                  {
+                    "character": "/",
+                    "value": {
+                      "literal": "/etc"
+                    }
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false,
+            "title": "End boundary expression",
+            "description": "Retain the source end-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation."
           },
           {
             "type": "object",
@@ -781,14 +1072,25 @@
                     "description": "Ascending or descending order for the selected sort mode."
                   },
                   "values": {
-                    "$ref": "#/$defs/expression",
-                    "title": "Values expression",
-                    "description": "Expression producing values to join. Collection and status propagation are semantic/runtime behavior, not schema execution."
+                    "title": "Values expression or ordered populations",
+                    "description": "Expression or ordered component populations to join. Multiple populations are flattened in source order; values, duplicates, and diagnostic statuses are preserved.",
+                    "oneOf": [
+                      {
+                        "$ref": "#/$defs/expression"
+                      },
+                      {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                          "$ref": "#/$defs/expression"
+                        }
+                      }
+                    ]
                   }
                 },
                 "additionalProperties": false,
                 "title": "Merged values",
-                "description": "Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.",
+                "description": "Combine one or more ordered input populations into one string using an explicit delimiter, sort mode, and order. document preserves flattened input order; other modes sort before joining. Duplicates are preserved unless a separate unique expression removes them.",
                 "examples": [
                   {
                     "delimiter": ",",
@@ -797,6 +1099,25 @@
                     "values": {
                       "variable": "tag-values-variable"
                     }
+                  },
+                  {
+                    "delimiter": ",",
+                    "sort": "document",
+                    "order": "ascending",
+                    "values": [
+                      {
+                        "literal": [
+                          "a",
+                          "b"
+                        ]
+                      },
+                      {
+                        "literal": [
+                          "c",
+                          "a"
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
@@ -1869,7 +2190,7 @@
       "classification": "equivalent",
       "native_contract": "For each observed value compare against each expected value, then apply explicit value_match. No zip pairing.",
       "oval_source_identifier": "EntityAttributeGroup",
-      "evidence_or_hold": "Definition 538 Tests 1\u20134; Definition 170 Tests 719,735.",
+      "evidence_or_hold": "Definition 538 Tests 1–4; Definition 170 Tests 719,735.",
       "native_source": {
         "file": "schema/assessment-language.schema.json",
         "pointer": "/$defs/field_predicate_body/properties/value_match",
