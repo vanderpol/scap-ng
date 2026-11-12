@@ -169,7 +169,7 @@ class CoreDocumentationAudit(unittest.TestCase):
 
     def test_active_language_reachability_and_inactive_candidates_are_distinct(self):
         language = audit.language_catalog(self.result)
-        self.assertEqual({r['name'] for r in language['active_variable_forms']}, {'literal', 'variable', 'values', 'concat', 'regex_capture', 'unique', 'merge'})
+        self.assertEqual({r['name'] for r in language['active_variable_forms']}, {'literal', 'variable', 'values', 'concat', 'regex_capture', 'unique', 'count', 'merge'})
         self.assertTrue(all(r['assessment_reachable'] for r in language['active_variable_forms']))
         self.assertTrue(language['spelling_notes']['else_if'])
         self.assertFalse(language['spelling_notes']['elseif'])

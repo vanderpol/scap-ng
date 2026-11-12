@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json",
   "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-11-04",
+  "x-last-modified": "2026-11-12",
   "title": "Native Variable declarations and retained expressions",
   "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or retained transformations. The schema describes the authoring shape; type compatibility, collection status, and evaluation results are checked separately by semantic validation or the runtime when those implementations exist.",
   "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng/pull/268#issuecomment-6550047257",
@@ -513,6 +513,39 @@
           "additionalProperties": false,
           "description": "Remove duplicate scalar values.",
           "title": "Unique expression"
+        },
+        {
+          "type": "object",
+          "required": [
+            "count"
+          ],
+          "properties": {
+            "count": {
+              "$ref": "#/$defs/expression",
+              "title": "Counted values",
+              "description": "Evaluate the nested expression and return the number of values it produces as one integer. Count each produced value, including duplicates; do not count unique values unless the author explicitly wraps the input with unique. An empty, successfully evaluated collection produces zero. Missing, incomplete, not-collected, error, and other non-success states must retain the native status contract instead of silently becoming zero. Runtime equivalence is subject to independent conformance tests.",
+              "examples": [
+                {
+                  "literal": [
+                    "one",
+                    "one",
+                    "two"
+                  ]
+                },
+                {
+                  "values": {
+                    "object": {
+                      "object_ref": "example-object"
+                    },
+                    "field": "name"
+                  }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Count expression",
+          "description": "Return the cardinality of values from a nested Variable expression as one integer. Duplicates contribute to the count; non-success statuses are not coerced to zero."
         },
         {
           "type": "object",
