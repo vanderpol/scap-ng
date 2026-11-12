@@ -22,7 +22,7 @@ from schema_documentation import SchemaStore, pointer, types, parts, property_oc
 
 ROOT = Path(__file__).resolve().parents[1]
 DEST = Path('docs/research/issue40')
-NATIVE_COMMIT = '7354a24cdbfe18321153ccaef5d772801a10cd71'
+NATIVE_COMMIT = '63110e7762f4963d3e4d407e90b9fcfd9cfe86ad'
 PILOT_COMMIT = 'f61fff037f18832aa04db140b3e3209dfddf7219'
 ISSUE = 'https://github.com/vanderpol/scap-ng/issues/40'
 PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
@@ -765,8 +765,8 @@ def editorial_batch(result, root=ROOT, filename="editorial-batch.json"):
             row['author_description'] = row.pop('reviewed_author_description')
             row.pop('editorial_review_url')
             row['editorial_status'] = 'pending_editorial_review'
-        expected_digest = ('03c146e78eb5dc30a4d5fd2133ce50f832d3d8c32fe38f0f6f596a2b3b9ce17b'
-                           if filename == 'editorial-batch.json' else 'f65563d3723f15fbe9e9fe1d7a08649b4d8dfa6ff607a90382282a45ff942021')
+        expected_digest = ('da9f062faedf9d957afe57f5ab76eab81e72b913042fe27d912f82b297bfd36d'
+                           if filename == 'editorial-batch.json' else '6d0644c3a64fdf1c14f3bdee056e810943b076ad3ea135faf4d433760206a96e')
         if digest(reviewed) != expected_digest:
             raise ValueError('Reviewed source dossier must remain unchanged')
     return batch, checked
