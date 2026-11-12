@@ -23,7 +23,8 @@ class ActiveCountContract(unittest.TestCase):
         self.assertEqual(
             set(forms),
             {"literal", "variable", "values", "concat", "regex_capture",
-             "unique", "merge", "count"},
+             "unique", "merge", "count", "split", "substring", "arithmetic",
+             "begin", "end"},
         )
         counted = forms["count"]
         self.assertEqual(counted["properties"]["count"]["$ref"], "#/$defs/expression")
@@ -32,7 +33,7 @@ class ActiveCountContract(unittest.TestCase):
 
     def test_existing_variable_shapes_remain_unchanged_in_number(self):
         self.assertEqual(self.schema["x-scap-ng-version"], "0.4.0")
-        self.assertEqual(len(self.branches), 8)
+        self.assertEqual(len(self.branches), 13)
 
     def test_count_describes_duplicates_and_failed_collection(self):
         definition = next(branch for branch in self.branches if branch["required"] == ["count"])

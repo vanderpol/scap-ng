@@ -71,7 +71,7 @@ class AuthoringDocumentationTests(unittest.TestCase):
         values = by_name['values']['properties']['values']['properties']
         self.assertEqual(regex['value']['title'], 'Input expression')
         self.assertIn('string value', regex['value']['description'])
-        self.assertEqual(merge['values']['title'], 'Values expression')
+        self.assertEqual(merge['values']['title'], 'Values expression or ordered populations')
         self.assertIn('values to join', merge['values']['description'])
         self.assertEqual(values['field']['title'], 'Collected field')
         self.assertIn('collected field', values['field']['description'])
