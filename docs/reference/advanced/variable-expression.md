@@ -102,15 +102,16 @@ The native description excludes record operands, although the expression referen
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/expression/oneOf/6](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6) | {"type": "object", "required": ["merge"], "additionalProperties": false} | existing-native |
-| [/$defs/expression/oneOf/6/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge) | {"type": "object", "required": ["delimiter", "sort", "order", "values"], "additionalProperties": false} | semantic-hold |
+| [/$defs/expression/oneOf/6](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6) | {"type": "object", "required": ["count"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/7](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7) | {"type": "object", "required": ["merge"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/7/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge) | {"type": "object", "required": ["delimiter", "sort", "order", "values"], "additionalProperties": false} | semantic-hold |
 
-[/$defs/expression/oneOf/6/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge): Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.
+[/$defs/expression/oneOf/7/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge): Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.
 
 delimiter, sort, order and values are explicit required inputs; duplicates are not implicitly removed. Sorting edge cases, casting and unavailable/error behavior need semantic confirmation before unqualified publication.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/expression/oneOf/6/properties/merge/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter) | {"type": "string"} | existing-native |
-| [/$defs/expression/oneOf/6/properties/merge/properties/sort](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort) | {"enum": ["document", "lexical", "numeric", "natural"]} | existing-native |
-| [/$defs/expression/oneOf/6/properties/merge/properties/order](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order) | {"enum": ["ascending", "descending"]} | existing-native |
+| [/$defs/expression/oneOf/7/properties/merge/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/delimiter) | {"type": "string"} | existing-native |
+| [/$defs/expression/oneOf/7/properties/merge/properties/sort](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/sort) | {"enum": ["document", "lexical", "numeric", "natural"]} | existing-native |
+| [/$defs/expression/oneOf/7/properties/merge/properties/order](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/order) | {"enum": ["ascending", "descending"]} | existing-native |

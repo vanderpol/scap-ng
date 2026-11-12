@@ -45,3 +45,54 @@ class ActiveCountContract(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ActiveCountQualification(unittest.TestCase):
+    """Schema admission plus explicit status contract vectors.
+
+    These tests qualify authoring shape and the declared semantic contract;
+    they are not scanner/runtime equivalence evidence.
+    """
+    @classmethod
+    def setUpClass(cls):
+        from jsonschema import Draft202012Validator
+        from referencing import Registry, Resource
+        cls.schema = json.loads(SCHEMA.read_text(encoding='utf-8'))
+        resources = {}
+        for path in (SCHEMA.parent).glob('*.json'):
+            value = json.loads(path.read_text(encoding='utf-8'))
+            if '$id' in value:
+                resources[value['$id']] = Resource.from_contents(value)
+        cls.validator = Draft202012Validator(cls.schema, registry=Registry().with_resources(resources.items()))
+
+    def assert_valid(self, expression, datatype='integer'):
+        declaration = {'kind': 'local', 'datatype': datatype, 'expression': expression}
+        errors = list(self.validator.iter_errors(declaration))
+        self.assertFalse(errors, [e.message for e in errors])
+
+    def assert_invalid(self, expression, datatype='integer'):
+        declaration = {'kind': 'local', 'datatype': datatype, 'expression': expression}
+        self.assertTrue(list(self.validator.iter_errors(declaration)))
+
+    def test_nested_duplicate_unique_empty_and_integer_shape(self):
+        self.assert_valid({'count': {'count': {'literal': ['a', 'a']}}})
+        self.assert_valid({'count': {'unique': {'literal': ['a', 'a']}}})
+        self.assert_valid({'count': {'literal': []}})
+        self.assert_invalid({'function_call': {'name': 'count', 'arguments': []}})
+        # Datatype derivation is a semantic gate, not a JSON Schema claim.
+        self.assert_valid({'count': {'literal': ['a']}}, datatype='string')
+
+    def test_missing_input_is_a_semantic_error_not_schema_zero(self):
+        # JSON Schema admits a reference-shaped expression; resolution is a
+        # separate semantic gate and must not fabricate an empty population.
+        self.assert_invalid({'count': {}})
+
+    def test_count_status_contract(self):
+        def count_status(status, values=()):
+            if status != 'complete':
+                return status, None
+            return 'complete', len(values)
+        for status in ('error', 'unknown', 'not_evaluated', 'incomplete'):
+            self.assertEqual(count_status(status), (status, None))
+        self.assertEqual(count_status('complete', []), ('complete', 0))
+        self.assertEqual(count_status('complete', ['x', 'x']), ('complete', 2))

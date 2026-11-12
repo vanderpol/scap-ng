@@ -4,7 +4,7 @@
 
 Batch 1 editorial receipt: **21 accepted descriptions** (18 as written, 3 revised), **6 semantic holds**, **1 withheld**. Uses the explicit reviewed list of 18 accepted IDs plus the three approved wording revisions. [Independent review](https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815) · [Owner authorization](https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721594181).
 
-Native pin: `7354a24cdbfe18321153ccaef5d772801a10cd71`. Full schema URIs use `https://scap-ng.dev/schema/v0.4.0/`; every file/pointer and source hash is recorded in [editorial-batch.json](editorial-batch.json).
+Native pin: `8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3`. Full schema URIs use `https://scap-ng.dev/schema/v0.4.0/`; every file/pointer and source hash is recorded in [editorial-batch.json](editorial-batch.json).
 
 55 positive/negative syntax witnesses were checked against the pinned definitions, including parent-context cases. They do not execute collection, evaluation or transformations and do not establish runtime equivalence.
 
@@ -51,7 +51,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/input_reference`
 
-**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/capability-common.schema.json)
+**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/capability-common.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -77,7 +77,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/variable_reference`
 
-**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/capability-common.schema.json)
+**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/capability-common.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -103,7 +103,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/object_reference`
 
-**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/capability-common.schema.json)
+**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/capability-common.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -129,7 +129,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment.schema.json#/properties/assessment/properties/evaluate`
 
-**Source file:** [schema/assessment.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment.schema.json)
+**Source file:** [schema/assessment.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment.schema.json)
 
 **Existing local wording:** Combines Test outcomes with OVAL-aligned Boolean operators.
 
@@ -157,7 +157,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/expression.schema.json#/$defs/input_presence/properties/input_provided`
 
-**Source file:** [schema/expression.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/expression.schema.json)
+**Source file:** [schema/expression.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/expression.schema.json)
 
 **Existing local wording:** Declared local Input provision, not truthiness or nonemptiness. Only direct evaluate if/else_if guards; absent and provided empty remain distinct.
 
@@ -183,7 +183,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/declaration/properties/expression`
 
-**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/variable-expression.schema.json)
+**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/variable-expression.schema.json)
 
 **Existing local wording:** Expression that supplies this Variable’s values.
 
@@ -209,7 +209,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_field_predicate`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -237,7 +237,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** One complete Test requirement: item_requirement gives explicit existence and satisfaction counts; conditions follow as fields/and/or/one/xor. Field cardinality must be explicit.
 
@@ -263,7 +263,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** Explicit Item existence and satisfaction quantifiers; the two decisions remain independent.
 
@@ -289,7 +289,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement/properties/items_found`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** Selected-Item existence requirement (OVAL Test check_existence). Both source all_exist and at_least_one_exists map to one_or_more; preserve their distinct source spellings only in provenance.
 
@@ -315,7 +315,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/item_requirement/properties/items_satisfying`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** How many collected Items must satisfy the complete condition (OVAL Test check). Never conflated with items_found.
 
@@ -341,7 +341,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/canonical_all_items_requirement/properties/field_requirement`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** Required shared values_found/values_matching pair for comparison Tests. The editor may offer these defaults but must serialize the complete pair. A closer complete pair overrides it; no runtime default.
 
@@ -367,7 +367,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/paired_requirement/properties/values_found`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -399,7 +399,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment-language.schema.json#/$defs/paired_requirement/properties/values_matching`
 
-**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment-language.schema.json)
+**Source file:** [schema/assessment-language.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment-language.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -429,7 +429,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/3/properties/concat`
 
-**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/variable-expression.schema.json)
+**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/variable-expression.schema.json)
 
 **Existing local wording:** Concatenate two or more components in order. Multiple values produce the Cartesian product of component values. Components follow inherited source casting rules when a string conversion is required; incompatible values produce an error. A missing or nonexistent component yields the inherited source status; Error, Incomplete, Not Collected, and Not Applicable statuses are not silently converted to strings.
 
@@ -455,7 +455,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/4/properties/regex_capture`
 
-**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/variable-expression.schema.json)
+**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/variable-expression.schema.json)
 
 **Existing local wording:** Capture text from each input string using the first capturing group. The source regex dialect and first-match behavior are retained; inputs with no capture group or no match produce an empty string under the inherited function contract.
 
@@ -481,7 +481,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique`
 
-**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/variable-expression.schema.json)
+**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/variable-expression.schema.json)
 
 **Existing local wording:** Remove duplicate scalar values from the input. Record data is not a supported transformation operand; value ordering and status propagation remain governed by the inherited semantic contract.
 
@@ -505,9 +505,9 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 <details>
 <summary>18 — merge</summary>
 
-**Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge`
+**Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge`
 
-**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/variable-expression.schema.json)
+**Source file:** [schema/variable-expression.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/variable-expression.schema.json)
 
 **Existing local wording:** Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.
 
@@ -521,7 +521,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Classification:** semantic_decision_needed; **editorial status:** draft_style_acceptable_semantic_hold; **semantic status:** pending_semantic_review.
 
-**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge`; related consumers: none separately bound in this worksheet.
+**Proposed description authority:** `https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge`; related consumers: none separately bound in this worksheet.
 
 **Source/syntax checks:** 2 witnesses; exact instances, target/parent pointers and expected validity are in the machine sheet.
 
@@ -533,7 +533,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/set_expression`
 
-**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/capability-common.schema.json)
+**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/capability-common.schema.json)
 
 **Existing local wording:** Set composition compatible with OVAL 5.12.3 set semantics. A single operand is valid for union, intersection, or difference and evaluates to that operand after its filters are applied; difference is limited to at most two operands.
 
@@ -559,7 +559,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/state_filter`
 
-**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/capability-common.schema.json)
+**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/capability-common.schema.json)
 
 **Existing local wording:** One field-key predicate with an explicit include/exclude Set filter action.
 
@@ -585,7 +585,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value/properties/value`
 
-**Source file:** [schema/result-types.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/result-types.schema.json)
+**Source file:** [schema/result-types.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/result-types.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -611,7 +611,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value/properties/status`
 
-**Source file:** [schema/result-types.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/result-types.schema.json)
+**Source file:** [schema/result-types.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/result-types.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -637,7 +637,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/collected-item.schema.json#`
 
-**Source file:** [schema/collected-item.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/collected-item.schema.json)
+**Source file:** [schema/collected-item.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/collected-item.schema.json)
 
 **Existing local wording:** Reusable runtime Item shape. Missing Items are absent from the collection, not represented as synthetic does_not_exist Items. Collection-level absence and field-level statuses remain separate.
 
@@ -663,7 +663,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/collection-result.schema.json#`
 
-**Source file:** [schema/collection-result.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/collection-result.schema.json)
+**Source file:** [schema/collection-result.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/collection-result.schema.json)
 
 **Existing local wording:** Runtime result of evaluating an authored Object and producing Items. Collection status is intentionally not Boolean.
 
@@ -689,7 +689,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/assessment.schema.json#`
 
-**Source file:** [schema/assessment.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/assessment.schema.json)
+**Source file:** [schema/assessment.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/assessment.schema.json)
 
 **Existing local wording:** Pre-alpha 0.4 Assessment single authoring grammar. Source conversion must emit this native grammar.
 
@@ -715,7 +715,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/benchmark.schema.json#`
 
-**Source file:** [schema/benchmark.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/benchmark.schema.json)
+**Source file:** [schema/benchmark.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/benchmark.schema.json)
 
 **Existing local wording:** No local description.
 
@@ -741,7 +741,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/organizational-input.schema.json#`
 
-**Source file:** [schema/organizational-input.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/organizational-input.schema.json)
+**Source file:** [schema/organizational-input.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/organizational-input.schema.json)
 
 **Existing local wording:** External organization-supplied policy data for Parameters intentionally left unresolved by a Benchmark publisher.
 
@@ -767,7 +767,7 @@ Open a case for its exact pointer, existing local/inherited help, original Codex
 
 **Exact schema pointer:** `https://scap-ng.dev/schema/v0.4.0/capability-common.schema.json#/$defs/foreach_binding`
 
-**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/7354a24cdbfe18321153ccaef5d772801a10cd71/schema/capability-common.schema.json)
+**Source file:** [schema/capability-common.schema.json](https://github.com/vanderpol/scap-ng/blob/8f8e219e4fb2db8b37a6d0e1ca418e8a392c38e3/schema/capability-common.schema.json)
 
 **Existing local wording:** Native 0.4 collection-expansion foreach binding. The source is one named shared/referenceable Object. Chaining is permitted: a source Object may itself use for_each, creating correlated lexical lineage. Independent multi-source Cartesian expansion is not implicit.
 

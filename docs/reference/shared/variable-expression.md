@@ -74,16 +74,22 @@ Declare typed local or constant Variables from literal data, other Variables, co
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `merge` | object | 1..1 (required) | **Semantic hold.** Existing wording requires a native contract decision; see details. | [/$defs/expression/oneOf/6/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge) |
+| `count` | object | 1..1 (required) | Evaluate the nested expression and return the number of values it produces as one integer. | [/$defs/expression/oneOf/6/properties/count](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/count) |
 
-## `/$defs/expression/oneOf/6/properties/merge`
+## `/$defs/expression/oneOf/7`
 
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
-| `delimiter` | string | 1..1 (required) | String inserted between adjacent values. | [/$defs/expression/oneOf/6/properties/merge/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter) |
-| `sort` | string | 1..1 (required) | `document` preserves input order; `lexical`, `numeric`, and `natural` select the corresponding explicit ordering. | [/$defs/expression/oneOf/6/properties/merge/properties/sort](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort) |
-| `order` | string | 1..1 (required) | Ascending or descending order for the selected sort mode. | [/$defs/expression/oneOf/6/properties/merge/properties/order](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order) |
-| `values` | object | 1..1 (required) | Expression producing values to join. | [/$defs/expression/oneOf/6/properties/merge/properties/values](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/values) |
+| `merge` | object | 1..1 (required) | **Semantic hold.** Existing wording requires a native contract decision; see details. | [/$defs/expression/oneOf/7/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge) |
+
+## `/$defs/expression/oneOf/7/properties/merge`
+
+| Field | Schema type | Occurrences | Description | Details |
+| --- | --- | --- | --- | --- |
+| `delimiter` | string | 1..1 (required) | String inserted between adjacent values. | [/$defs/expression/oneOf/7/properties/merge/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/delimiter) |
+| `sort` | string | 1..1 (required) | `document` preserves input order; `lexical`, `numeric`, and `natural` select the corresponding explicit ordering. | [/$defs/expression/oneOf/7/properties/merge/properties/sort](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/sort) |
+| `order` | string | 1..1 (required) | Ascending or descending order for the selected sort mode. | [/$defs/expression/oneOf/7/properties/merge/properties/order](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/order) |
+| `values` | object | 1..1 (required) | Expression producing values to join. | [/$defs/expression/oneOf/7/properties/merge/properties/values](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/merge/properties/values) |
 
 ## Advanced constraints
 
