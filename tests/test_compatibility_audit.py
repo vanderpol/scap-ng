@@ -33,7 +33,7 @@ class CompatibilityAuditTests(unittest.TestCase):
             if "$schema" not in document:
                 continue
             resource = Resource.from_contents(document)
-            resources["https://scap-ng.dev/schema/v0.4.0/" + path.relative_to(schema_root).as_posix()] = resource
+            resources["https://scap-ng.dev/schema/v0.4.1/" + path.relative_to(schema_root).as_posix()] = resource
             if "$id" in document:
                 resources[document["$id"]] = resource
         cls.assessment_validator = Draft202012Validator(
