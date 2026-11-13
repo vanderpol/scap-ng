@@ -45,8 +45,8 @@ class InferenceSchema(unittest.TestCase):
         self.assertTrue(errors)
 
     def test_explicit_typed_evidence_and_require_are_preserved(self):
-        self.assertIn('datatype',self.common['$defs']['native_datatype'].get('title','')+
-                      'datatype' if self.common['$defs'].get('native_datatype') else '')
+        self.assertIn('string',self.common['$defs']['native_datatype']['enum'])
+        self.assertIn('version',self.common['$defs']['native_datatype']['enum'])
         self.assertIn('datatype',
                       self.language['$defs']['scalar_field_predicate']['properties'])
         self.assertNotIn('datatype',
