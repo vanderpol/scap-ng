@@ -1,10 +1,10 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://scap-ng.dev/schema/v0.4.0/variable-expression.schema.json",
-  "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-11-12",
+  "$id": "https://scap-ng.dev/schema/v0.4.1/variable-expression.schema.json",
+  "x-scap-ng-version": "0.4.1",
+  "x-last-modified": "2026-11-13",
   "title": "Native Variable declarations and retained OVAL transformations",
-  "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or explicit recursive transformations. Active 0.4 forms preserve source operand order, collection multiplicity, empty values, and evaluation status; datatype compatibility and status propagation are checked separately by semantic validation or a qualified runtime.",
+  "description": "SCAP-NG 0.4.1 native Variable declarations. Value type, collection cardinality, and observation status are separate semantic dimensions.",
   "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng-tools/issues/48",
   "$ref": "#/$defs/declaration",
   "$defs": {
@@ -12,7 +12,6 @@
       "type": "object",
       "required": [
         "kind",
-        "datatype",
         "expression"
       ],
       "properties": {
@@ -23,11 +22,6 @@
           ],
           "title": "Variable kind",
           "description": "Use `local` for a derived value or `constant` for a literal declaration."
-        },
-        "datatype": {
-          "$ref": "capability-common.schema.json#/$defs/native_datatype",
-          "title": "Variable datatype",
-          "description": "Datatype promised by this Variable. The expression must produce compatible values."
         },
         "expression": {
           "$ref": "#/$defs/expression",
@@ -168,209 +162,9 @@
               }
             }
           }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "arithmetic"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "integer",
-                  "float"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "substring"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "split"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "begin"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "end"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "count"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "integer"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "concat"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "regex_capture"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "unique"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "merge"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
         }
-      ]
+      ],
+      "description": "Declare a native Variable with kind and expression. Result datatypes are inferred from typed literal values, canonical collected fields, referenced Variables, and defined operations. No declaration datatype is accepted; implicit lexical casts are forbidden."
     },
     "expression": {
       "oneOf": [
