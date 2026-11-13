@@ -1,0 +1,44 @@
+name: Read-only schema-doc regeneration receipt
+
+on:
+  pull_request:
+    paths:
+      - 'schema/**'
+      - 'docs/generated/**'
+      - 'tools/generate_docs.py'
+      - '.github/workflows/schema-doc-review-receipt.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reviewed-generated-bytes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Generate reference files locally without publishing or pushing
+        run: |
+          set -euo pipefail
+          python tools/generate_docs.py
+          python tools/generate_docs.py --check
+          git diff --stat -- docs/generated/
+      - name: Emit chunked exact output for separately authorized GitHub review
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo 'This CI run is a read-only generation receipt, not a release or publication.'
+          for f in docs/generated/*; do
+            test -f "$f" || continue
+            printf 'GENBEGIN::%s::%s\n' "$f" "$(sha256sum "$f" | cut -d' ' -f1)"
+            base64 -w 800 "$f" | awk -v file="$f" '{printf "GENCHUNK::%s::%06d::%s\n", file, NR, $0}'
+            printf 'GENEND::%s\n' "$f"
+          done
