@@ -1,4 +1,4 @@
-name: Schema change cascade — generated artifacts and downstream dispatch
+name: Schema change cascade — generated artifacts and downstream pin checks
 
 on:
   pull_request:
@@ -25,7 +25,6 @@ on:
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
   generated-content-contract:
@@ -83,45 +82,42 @@ jobs:
             echo "- The above consumers must pin the exact reviewed 0.4.1 main SHA."
           } >> "$GITHUB_STEP_SUMMARY"
 
-  notify-consumers:
+  check-consumer-pins:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: generated-content-contract
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      CASCADE_TOKEN: ${{ secrets.SCAP_NG_CASCADE_TOKEN }}
       GH_TOKEN: ${{ github.token }}
-      SOURCE_SHA: ${{ github.sha }}
-      GH_REPO: ${{ github.repository }}
+      CANONICAL_SHA: ${{ github.sha }}
     steps:
-      - name: Require authorized cross-repo dispatcher, report missing configuration
-        if: env.CASCADE_TOKEN == ''
-        run: |
-          echo "::error::SCAP_NG_CASCADE_TOKEN is not configured. Downstream Tools/Editor/RI dispatch UNDELIVERED."
-          echo "Cross-repository dispatch UNDELIVERED for $SOURCE_SHA: configure an authorized GitHub App token or PAT with repository_dispatch permission." >> "$GITHUB_STEP_SUMMARY"
-          marker="schema-cascade-sha:$SOURCE_SHA"
-          if ! gh api "repos/$GH_REPO/issues/66/comments?per_page=100" --jq '.[].body' | grep -Fq "$marker"; then
-            gh issue comment 66 -R "$GH_REPO" --body "0.4.1 schema cascade for commit $SOURCE_SHA: **UNDELIVERED** (missing SCAP_NG_CASCADE_TOKEN). Open downstream gates: Tools #59, VS Code #65, RI #66. $marker"
-          fi
-          exit 1
-      - name: Dispatch exact source SHA to all three consumers
-        if: env.CASCADE_TOKEN != ''
+      - name: Read-only exact-version pin audit of every consumer
+        shell: bash
         run: |
           set -euo pipefail
+          missing=0
           for repo in scap-ng-tools scap-ng-vscode scap-ng-ri; do
-            payload="$(jq -cn --arg sha "$SOURCE_SHA" --arg repo "$GH_REPO" '{event_type:"scap-ng-schema-changed",client_payload:{canonical_repository:$repo,canonical_sha:$sha,schema_version:"0.4.1",single_version:true}}')"
-            curl --fail-with-body --silent --show-error --retry 2 \
-              -X POST \
-              -H "Accept: application/vnd.github+json" \
-              -H "Authorization: Bearer $CASCADE_TOKEN" \
-              -H "X-GitHub-Api-Version: 2022-11-28" \
-              "https://api.github.com/repos/vanderpol/$repo/dispatches" -d "$payload"
-            echo "Dispatched $SOURCE_SHA to vanderpol/$repo" >> "$GITHUB_STEP_SUMMARY"
+            echo "Checking vanderpol/$repo against $CANONICAL_SHA"
+            if ! raw="$(gh api "repos/vanderpol/$repo/contents/canonical-schema-pin.json" -H "Accept: application/vnd.github.raw" 2>/dev/null)"; then
+              echo "::error::vanderpol/$repo has no accessible canonical-schema-pin.json; downstream qualification required."
+              missing=1
+              continue
+            fi
+            if ! jq -e --arg sha "$CANONICAL_SHA" '
+              .schema_version == "0.4.1" and .canonical_sha == $sha
+              and .single_version == true
+            ' <<<"$raw" >/dev/null; then
+              echo "::error::vanderpol/$repo has a stale or alternate schema pin."
+              missing=1
+            fi
           done
-      - name: Record dispatched commit for review
-        if: env.CASCADE_TOKEN != ''
-        run: |
-          marker="schema-cascade-sha:$SOURCE_SHA"
-          if ! gh api "repos/$GH_REPO/issues/66/comments?per_page=100" --jq '.[].body' | grep -Fq "$marker"; then
-            gh issue comment 66 -R "$GH_REPO" --body "0.4.1 schema cascade dispatched for exact main commit $SOURCE_SHA to Tools #59, VS Code #65 and RI #66. Independent consumer qualification remains mandatory. $marker"
-          fi
+          {
+            echo "## Exact SCAP-NG 0.4.1 consumer handoff"
+            echo "Canonical commit: $CANONICAL_SHA"
+            echo "Tools: https://github.com/vanderpol/scap-ng-tools/issues/59"
+            echo "VS Code: https://github.com/vanderpol/scap-ng-vscode/issues/65"
+            echo "RI: https://github.com/vanderpol/scap-ng-ri/issues/66"
+            echo "Read-only audit; **no remote repository write or dispatch** is attempted."
+            echo "Any mismatch requires a separately authorized, reviewed consumer PR."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$missing"
