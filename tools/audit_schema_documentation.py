@@ -6,13 +6,18 @@ explicitly baselined; new/regressed gaps fail --check. Quality rules are triage,
 not a claim that every populated description has passed semantic review.
 """
 import argparse
+from contextlib import contextmanager
 from collections import Counter, defaultdict, deque
 from copy import deepcopy
 from hashlib import sha256
 import json
 from pathlib import Path
 import re
+import shutil
+import subprocess
 import sys
+import tarfile
+import tempfile
 
 import yaml
 from urllib.parse import urljoin, urldefrag
@@ -21,11 +26,21 @@ from jsonschema import Draft202012Validator
 from schema_documentation import SchemaStore, pointer, types, parts, property_occurrences, collection_occurrences
 
 ROOT = Path(__file__).resolve().parents[1]
-DEST = Path('docs/research/issue40')
-NATIVE_COMMIT = '63110e7762f4963d3e4d407e90b9fcfd9cfe86ad'
-PILOT_COMMIT = 'f61fff037f18832aa04db140b3e3209dfddf7219'
-ISSUE = 'https://github.com/vanderpol/scap-ng/issues/40'
-PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
+# The old Issue #40 workbook is an immutable historical receipt.  The active
+# command profile below audits only the current 0.4.1 schema family.
+HISTORICAL_DEST = Path('docs/research/issue40')
+HISTORICAL_NATIVE_COMMIT = '63110e7762f4963d3e4d407e90b9fcfd9cfe86ad'
+HISTORICAL_PILOT_COMMIT = 'f61fff037f18832aa04db140b3e3209dfddf7219'
+HISTORICAL_PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
+ACTIVE_DEST = Path('docs/metadata/documentation-0.4.1')
+ACTIVE_NATIVE_COMMIT = '0683bbf6fdcbba65c5ffb79f2bf8d41d920e43d9'
+ACTIVE_PILOT_COMMIT = HISTORICAL_PILOT_COMMIT
+ACTIVE_PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
+DEST = HISTORICAL_DEST
+NATIVE_COMMIT = HISTORICAL_NATIVE_COMMIT
+PILOT_COMMIT = HISTORICAL_PILOT_COMMIT
+ISSUE = 'https://github.com/scap-ng/issues/40'
+PREFIX = HISTORICAL_PREFIX
 MAPS = {'properties', 'patternProperties', '$defs', 'definitions', 'dependentSchemas'}
 ARRAYS = {'allOf', 'oneOf', 'anyOf', 'prefixItems'}
 SINGLES = {'items', 'additionalProperties', 'unevaluatedProperties', 'propertyNames', 'if', 'then', 'else', 'not', 'contains', 'unevaluatedItems', 'additionalItems', 'contentSchema'}
@@ -249,7 +264,7 @@ def source_link(entry):
     return 'https://github.com/vanderpol/scap-ng/blob/' + NATIVE_COMMIT + '/' + entry['schema_file']
 
 
-def audit(root=ROOT):
+def _audit(root=ROOT):
     schemas, documents, nodes, excluded, manifest = discover(root)
     store = SchemaStore(documents)
     notes = json.loads((root / DEST / 'review-notes.json').read_text())
@@ -417,7 +432,57 @@ def audit(root=ROOT):
     ordered = sorted(findings.values(), key=lambda g: (SEVERITIES[g['severity']], g['schema_uri'], g['pointer'], g['category']))
     crosswalk = sorted(proposals.values(), key=lambda p: (p['review_priority'], p['basis'] != 'curated_native_contract_review', p['schema_uri'], p['pointer']))
     return {'schemas': schemas, 'documents': documents, 'nodes': nodes, 'store': store, 'inventory': inventory, 'findings': ordered, 'crosswalk': crosswalk,
-            'manifest': manifest, 'excluded': excluded, 'notes': notes}
+            'manifest': manifest, 'excluded': excluded, 'notes': notes,
+            'documentation_profile': 'historical-0.4.0' if PREFIX == HISTORICAL_PREFIX else 'active-0.4.1'}
+
+
+@contextmanager
+def profile(active=False):
+    global DEST, NATIVE_COMMIT, PILOT_COMMIT, ISSUE, PREFIX
+    previous = DEST, NATIVE_COMMIT, PILOT_COMMIT, ISSUE, PREFIX
+    if active:
+        DEST, NATIVE_COMMIT, PILOT_COMMIT, ISSUE, PREFIX = (ACTIVE_DEST, ACTIVE_NATIVE_COMMIT,
+            ACTIVE_PILOT_COMMIT, 'https://github.com/scap-ng/issues/67', ACTIVE_PREFIX)
+    else:
+        DEST, NATIVE_COMMIT, PILOT_COMMIT, ISSUE, PREFIX = (HISTORICAL_DEST,
+            HISTORICAL_NATIVE_COMMIT, HISTORICAL_PILOT_COMMIT, 'https://github.com/scap-ng/issues/40', HISTORICAL_PREFIX)
+    try:
+        yield
+    finally:
+        DEST, NATIVE_COMMIT, PILOT_COMMIT, ISSUE, PREFIX = previous
+
+
+@contextmanager
+def historical_workspace(root):
+    # Historical research is read from its recorded Git commit, never from
+    # today's active schema directory. This keeps old receipts byte-provable.
+    with tempfile.TemporaryDirectory(prefix='scap-ng-historical-docs-') as directory:
+        workspace = Path(directory)
+        archive = subprocess.run(['git', '-C', str(root), 'archive', HISTORICAL_NATIVE_COMMIT],
+                                 check=True, capture_output=True).stdout
+        with tarfile.open(fileobj=__import__('io').BytesIO(archive), mode='r:') as stream:
+            stream.extractall(workspace)
+        yield workspace
+
+
+def audit(root=ROOT, *, active=None):
+    # ``active`` is explicit for production callers. The None compatibility
+    # form retains the pre-migration Python API for isolated unit fixtures;
+    # it does not drive the active CLI or publish artifacts.
+    if active is None:
+        with profile(False):
+            return _audit(root)
+    if active:
+        with profile(True):
+            return _audit(root)
+    # Callers that already materialized an archival workspace can avoid a
+    # second archive operation (review-pack generation uses this path).
+    if (root / '.git').exists() is False and (root / 'schema').is_dir():
+        with profile(False):
+            return _audit(root)
+    with historical_workspace(root) as workspace:
+        with profile(False):
+            return _audit(workspace)
 
 
 def schema_children(node, path):
@@ -862,7 +927,7 @@ def editorial_report(result, filename="editorial-batch.json"):
     return '\n'.join(lines)
 
 
-def artifacts(result):
+def _artifacts(result):
     catalog = language_catalog(result)
     validate_register(result)
     public = [r for r in result['inventory'] if r['public'] and r['language_status'] != 'inactive_migration_candidate']
@@ -883,7 +948,9 @@ def artifacts(result):
               'gaps.jsonl': ''.join(encode(r) + '\n' for r in result['findings']),
               'crosswalk.jsonl': ''.join(encode(r) + '\n' for r in result['crosswalk']),
               'proposed-annotations.patch.json': json.dumps(bundle, indent=2) + '\n',
-              'REPORT.md': report(result, catalog), 'CROSSWALK.md': crosswalk_report(result), 'PILOTS.md': pilot_report(result, catalog)}
+              'REPORT.md': report(result, catalog), 'CROSSWALK.md': crosswalk_report(result)}
+    if result.get('documentation_profile') == 'historical-0.4.0':
+        output['PILOTS.md'] = pilot_report(result, catalog)
     seen = set()
     for filename, report_name in [('editorial-batch.json', 'EDITORIAL-REVIEW.md'), ('editorial-batch-2.json', 'EDITORIAL-REVIEW-2.md')]:
         validated = editorial_batch(result, filename=filename)
@@ -897,6 +964,11 @@ def artifacts(result):
     return output
 
 
+
+def artifacts(result):
+    with profile(result.get('documentation_profile') == 'active-0.4.1'):
+        return _artifacts(result)
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true')
@@ -904,32 +976,33 @@ def main():
     parser.add_argument('--write-baseline', action='store_true', help='Explicit research-baseline action; never applies schema annotations')
     args = parser.parse_args()
     try:
-        result = audit()
-        outputs = artifacts(result)
-        baseline_path = ROOT / DEST / 'baseline.json'
-        if args.write_baseline:
-            if args.check or args.diff_baseline:
-                raise ValueError('Read-only checks cannot write a baseline')
-            baseline_path.write_text(json.dumps(baseline_for(result), indent=2, sort_keys=True) + '\n')
-        if not baseline_path.exists():
-            raise ValueError('Explicit baseline missing; review the inventory before creating it')
-        differences = baseline_regressions(result, json.loads(baseline_path.read_text()))
-        if args.diff_baseline:
-            print(json.dumps(differences, indent=2))
-            return 1 if differences['new'] or differences['changed'] else 0
-        if differences['no_longer_detected_not_automatically_resolved']:
-            print(str(len(differences['no_longer_detected_not_automatically_resolved'])) + ' findings no longer detected; no resolution is inferred.')
-        if differences['new'] or differences['changed']:
-            raise ValueError('New/regressed documentation findings: ' + encode(differences))
-        for name, content in outputs.items():
-            target = ROOT / DEST / name
-            if args.check:
-                if not target.exists() or target.read_bytes() != content.encode():
-                    raise ValueError('Stale documentation inventory: ' + str(target.relative_to(ROOT)))
-            else:
-                target.write_bytes(content.encode())
-        print(('Checked' if args.check else 'Generated') + f' {len(outputs)} Phase-1 artifacts; {len(result["findings"])} baselined findings; no canonical schemas written.')
-        return 0
+        with profile(True):
+            result = _audit()
+            outputs = _artifacts(result)
+            baseline_path = ROOT / DEST / 'baseline.json'
+            if args.write_baseline:
+                if args.check or args.diff_baseline:
+                    raise ValueError('Read-only checks cannot write a baseline')
+                baseline_path.write_text(json.dumps(baseline_for(result), indent=2, sort_keys=True) + '\n')
+            if not baseline_path.exists():
+                raise ValueError('Explicit baseline missing; review the inventory before creating it')
+            differences = baseline_regressions(result, json.loads(baseline_path.read_text()))
+            if args.diff_baseline:
+                print(json.dumps(differences, indent=2))
+                return 1 if differences['new'] or differences['changed'] else 0
+            if differences['no_longer_detected_not_automatically_resolved']:
+                print(str(len(differences['no_longer_detected_not_automatically_resolved'])) + ' findings no longer detected; no resolution is inferred.')
+            if differences['new'] or differences['changed']:
+                raise ValueError('New/regressed documentation findings: ' + encode(differences))
+            for name, content in outputs.items():
+                target = ROOT / DEST / name
+                if args.check:
+                    if not target.exists() or target.read_bytes() != content.encode():
+                        raise ValueError('Stale documentation inventory: ' + str(target.relative_to(ROOT)))
+                else:
+                    target.write_bytes(content.encode())
+            print(('Checked' if args.check else 'Generated') + f' {len(outputs)} Phase-1 artifacts; {len(result["findings"])} baselined findings; no canonical schemas written.')
+            return 0
     except (ValueError, KeyError) as exc:
         print('Core/shared documentation audit: ' + str(exc), file=sys.stderr)
         return 1
