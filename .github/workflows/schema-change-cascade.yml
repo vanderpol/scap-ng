@@ -1,0 +1,127 @@
+name: Schema change cascade — generated artifacts and downstream dispatch
+
+on:
+  pull_request:
+    paths:
+      - 'schema/**'
+      - 'examples/**'
+      - 'docs/contracts/**'
+      - 'docs/generated/**'
+      - 'AGENTS.md'
+      - 'tools/generate_*.py'
+      - 'tools/check_documentation_examples.py'
+      - '.github/workflows/schema-change-cascade.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'schema/**'
+      - 'examples/**'
+      - 'docs/contracts/**'
+      - 'docs/generated/**'
+      - 'AGENTS.md'
+      - 'tools/generate_*.py'
+      - 'tools/check_documentation_examples.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  generated-content-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Enforce exactly one flat 0.4.1 schema family
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('schema')
+          assert not any(root.glob('v0.*')), 'parallel schema version directories are forbidden'
+          schemas = sorted(root.glob('*.schema.json'))
+          assert schemas, 'missing canonical schema'
+          for p in schemas:
+              j=json.loads(p.read_text())
+              assert j['$id']=='https://scap-ng.dev/schema/v0.4.1/'+p.name, str(p)
+              assert j['x-scap-ng-version']=='0.4.1', str(p)
+          assert json.loads((root/'scan-result.schema.json').read_text())['properties']['scan_result']['properties']['result_schema_version']['const']=='0.4.1'
+          print('Single active 0.4.1 schema family:',len(schemas),'root schemas')
+          PY
+      - name: Reject stale schema-generated selector content
+        run: python tools/generate_native_selector_schema.py --check
+      - name: Reject stale Markdown and scanner documentation
+        run: |
+          python tools/generate_docs.py --check
+          python tools/generate_unix_file_reference.py --check
+          python tools/generate_approved_annotation_pilot.py --check
+          python tools/generate_review_documentation_pack.py --check
+          python tools/generate_documentation.py --check
+          python tools/audit_schema_documentation.py --check
+          python tools/audit_documentation_fidelity.py --check
+      - name: Validate current authoring examples and SIEM Result sample
+        run: |
+          python tools/check_documentation_examples.py --check
+          python -m unittest discover -s tests -p 'test_result_correlation_guids.py' -v
+          python -m unittest discover -s tests -p 'test_variable_type_inference_contract.py' -v
+      - name: Record downstream obligations
+        run: |
+          {
+            echo "## Every schema change requires all three consumer gates"
+            echo "- Converter: https://github.com/vanderpol/scap-ng-tools/issues/59"
+            echo "- Editor: https://github.com/vanderpol/scap-ng-vscode/issues/65"
+            echo "- RI: https://github.com/vanderpol/scap-ng-ri/issues/66"
+            echo "- Canonical tracking: https://github.com/vanderpol/scap-ng/issues/66"
+            echo "- The above consumers must pin the exact reviewed 0.4.1 main SHA."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notify-consumers:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: generated-content-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      CASCADE_TOKEN: ${{ secrets.SCAP_NG_CASCADE_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+      SOURCE_SHA: ${{ github.sha }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Require authorized cross-repo dispatcher, report missing configuration
+        if: env.CASCADE_TOKEN == ''
+        run: |
+          echo "::error::SCAP_NG_CASCADE_TOKEN is not configured. Downstream Tools/Editor/RI dispatch UNDELIVERED."
+          echo "Cross-repository dispatch UNDELIVERED for $SOURCE_SHA: configure an authorized GitHub App token or PAT with repository_dispatch permission." >> "$GITHUB_STEP_SUMMARY"
+          marker="schema-cascade-sha:$SOURCE_SHA"
+          if ! gh api "repos/$GH_REPO/issues/66/comments?per_page=100" --jq '.[].body' | grep -Fq "$marker"; then
+            gh issue comment 66 -R "$GH_REPO" --body "0.4.1 schema cascade for commit $SOURCE_SHA: **UNDELIVERED** (missing SCAP_NG_CASCADE_TOKEN). Open downstream gates: Tools #59, VS Code #65, RI #66. $marker"
+          fi
+          exit 1
+      - name: Dispatch exact source SHA to all three consumers
+        if: env.CASCADE_TOKEN != ''
+        run: |
+          set -euo pipefail
+          for repo in scap-ng-tools scap-ng-vscode scap-ng-ri; do
+            payload="$(jq -cn --arg sha "$SOURCE_SHA" --arg repo "$GH_REPO" '{event_type:"scap-ng-schema-changed",client_payload:{canonical_repository:$repo,canonical_sha:$sha,schema_version:"0.4.1",single_version:true}}')"
+            curl --fail-with-body --silent --show-error --retry 2 \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer $CASCADE_TOKEN" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/vanderpol/$repo/dispatches" -d "$payload"
+            echo "Dispatched $SOURCE_SHA to vanderpol/$repo" >> "$GITHUB_STEP_SUMMARY"
+          done
+      - name: Record dispatched commit for review
+        if: env.CASCADE_TOKEN != ''
+        run: |
+          marker="schema-cascade-sha:$SOURCE_SHA"
+          if ! gh api "repos/$GH_REPO/issues/66/comments?per_page=100" --jq '.[].body' | grep -Fq "$marker"; then
+            gh issue comment 66 -R "$GH_REPO" --body "0.4.1 schema cascade dispatched for exact main commit $SOURCE_SHA to Tools #59, VS Code #65 and RI #66. Independent consumer qualification remains mandatory. $marker"
+          fi
