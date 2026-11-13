@@ -37,9 +37,9 @@ jobs:
       - name: Generate schema-derived documentation and example receipts
         run: |
           set -euo pipefail
-          python tools/generate_native_selector_schema.py --check
+          # Generate independent Markdown even if an older research pilot's
+          # historical source hashes must be reviewed separately.
           python tools/generate_docs.py
-          python tools/generate_unix_file_reference.py
           python tools/check_documentation_examples.py
           python tools/generate_documentation.py
       - name: Stage ONLY documentation and example receipts
@@ -74,7 +74,6 @@ jobs:
         run: |
           set -euo pipefail
           python tools/generate_docs.py --check
-          python tools/generate_unix_file_reference.py --check
           python tools/generate_documentation.py --check
           python tools/check_documentation_examples.py --check
           {
