@@ -10,7 +10,7 @@ from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_ROOT = ROOT / 'schema'
-PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
+PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
 
 
 def registry():
@@ -72,7 +72,7 @@ class NativeVariableFunctionSchema(unittest.TestCase):
             'extra': True}})
         self.assert_invalid({'arithmetic': {
             'arithmetic_operation': 'add', 'values': [literal(1)]}})
-        self.assert_invalid({'arithmetic': {
+        self.assert_valid({'arithmetic': {
             'arithmetic_operation': 'add', 'values': [literal(1), literal(2)]}})
         self.assert_invalid({'begin': {'character': '/', 'value': literal('a'), 'x': 1}})
         self.assert_invalid({'unique': []})

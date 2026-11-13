@@ -67,7 +67,7 @@ def assessment_properties(schema):
 
 def render_schema_reference(version, roots, assessment):
     lines = [frontmatter('Structural schema reference', version),
-             'The JSON Schema `$id` URIs retain their versioned `v0.4.0` '
+             'The JSON Schema `$id` URIs retain their versioned `v0.4.1` '
              'identity. The physical repository layout is flat under `schema/`; '
              'resolvers should use the pinned release snapshot rather than '
              'fetching unversioned files over the network.\n\n',

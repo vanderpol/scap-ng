@@ -1,4 +1,4 @@
-"""Guard the active SCAP-NG 0.4.0 native count expression contract.
+"""Guard the active SCAP-NG 0.4.1 native count expression contract.
 
 Run: python3 -m unittest tests/test_active_count_expression.py
 This is a schema-shape test, NOT a runtime or OVAL equivalence proof.
@@ -32,7 +32,7 @@ class ActiveCountContract(unittest.TestCase):
         self.assertEqual(counted["required"], ["count"])
 
     def test_existing_variable_shapes_remain_unchanged_in_number(self):
-        self.assertEqual(self.schema["x-scap-ng-version"], "0.4.0")
+        self.assertEqual(self.schema["x-scap-ng-version"], "0.4.1")
         self.assertEqual(len(self.branches), 13)
 
     def test_count_describes_duplicates_and_failed_collection(self):
