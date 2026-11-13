@@ -210,7 +210,7 @@ class UnixFileDescriptionPilot(unittest.TestCase):
             target.write_text(json.dumps(self.schema))
             native = root / 'schema/capability-common.schema.json'
             native.write_bytes(native.read_bytes() + b'\n')
-            with self.assertRaisesRegex(ValueError, 'Frozen schema pack differs'):
+            with self.assertRaisesRegex(ValueError, 'Active 0.4.1 schema differs from the reviewed pilot input'):
                 pilot.load_schemas(root)
 
 
