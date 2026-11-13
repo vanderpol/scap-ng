@@ -36,6 +36,8 @@ class UnixFileDescriptionPilot(unittest.TestCase):
             node = self.schema['$defs']['value_' + name]['properties']['value']
             self.assertIn(node['type'], ['integer', 'string', 'boolean'])
         self.assertEqual(len(self.sources['frozen_schema_sha256']), 145)
+        self.assertEqual(len(self.sources['current_schema_sha256']), 145)
+        self.assertEqual(self.sources['current_schema_version'], '0.4.1')
 
     def test_frozen_and_proposed_acceptance_match_positive_negative_vectors(self):
         base = {'path': {'equals': '/example'}, 'filename': {'equals': 'config'}, 'filesystem': 'all'}
@@ -154,7 +156,7 @@ class UnixFileDescriptionPilot(unittest.TestCase):
             file.write_text(json.dumps(mapping))
             source_file = root / pilot.PILOT / 'source-map.json'
             sources = json.loads(source_file.read_text())
-            sources['frozen_schema_sha256'][str(file.relative_to(root))] = pilot.sha256(file.read_bytes()).hexdigest()
+            sources['current_schema_sha256'][str(file.relative_to(root))] = pilot.sha256(file.read_bytes()).hexdigest()
             source_file.write_text(json.dumps(sources))
             self.assertEqual(pilot.render(root), pilot.render())
             schema_file = root / pilot.ANNOTATIONS
