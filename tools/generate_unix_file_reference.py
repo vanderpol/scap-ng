@@ -14,7 +14,7 @@ from schema_documentation import (pointer, code, absolute, parts, bounds, affect
 
 ROOT = Path(__file__).resolve().parents[1]
 PILOT = Path('docs/pilots/unix-file')
-PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
+PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
 ANNOTATIONS = PILOT / 'schema-next/capabilities/unix.file.schema.json'
 NEXT = 'https://scap-ng.dev/schema/next/'
 OUTPUT = PILOT / 'reference.md'
@@ -64,8 +64,12 @@ def load_schemas(root=ROOT):
     sources = json.loads((root / PILOT / 'source-map.json').read_text())
     actual = {str(p.relative_to(root)): sha256(p.read_bytes()).hexdigest()
               for p in sorted((root / 'schema').rglob('*.json'))}
-    if actual != sources['frozen_schema_sha256']:
-        raise ValueError('Frozen schema pack differs from the pinned pilot input')
+    # Archive source hashes are retained for the original research receipt,
+    # but cannot validate the ONE active 0.4.1 authoring schema.
+    if sources.get('current_schema_version') != '0.4.1':
+        raise ValueError('Pilot has not been explicitly qualified against active SCAP-NG 0.4.1')
+    if actual != sources.get('current_schema_sha256'):
+        raise ValueError('Active 0.4.1 schema differs from the reviewed pilot input')
     mapping = json.loads((root / 'schema/capability-mappings/supported/unix.file.json').read_text())['native']
     native = json.loads((root / 'schema/native-selector.schema.json').read_text())['$defs']['unix_file_object']['oneOf'][1]
     common = json.loads((root / 'schema/capability-common.schema.json').read_text())['$defs']
@@ -134,7 +138,7 @@ def render(root=ROOT):
     schema, sources, uri, defs, obj, field_map = inputs(root)
     meaning = lambda role, path='': hover(schema, role, path)['description'].split('\n\n')[0]
     lines = ['# `unix.file`', '', '<!-- Generated: python tools/generate_unix_file_reference.py -->', '',
-             '**Proposed next-version schema reference; not the frozen 0.4.0 validation contract.**', '',
+             '**Review-only proposed overlay; not an accepted replacement for active SCAP-NG 0.4.1.**', '',
              meaning('object'), '', '`n` means no schema upper bound. Occurrences count properties or named map keys; array values are counted separately.', '',
              '## Object', '', 'Selection forms: `filepath` **or** `path` + `filename`. The schema does not enforce this pairing; see the [gap checklist](PARITY-CHECKLIST.md).', '',
              '[Advanced constraints and shared grammar](constraints.md).', '',
@@ -240,7 +244,7 @@ def render_constraints(root=ROOT):
                 vocabulary.append(table_row(code(name), code(json.dumps(facts))))
     if vocabulary:
         lines += ['', '## Payload constraints', '', '| Field | Schema keywords |', '| --- | --- |'] + vocabulary
-    lines += ['', 'These next-version assertions intentionally reject datatype/value inconsistencies accepted structurally by frozen 0.4.0. [Before/after vectors and integration limits](CANONICAL-INTEGRATION.md). No new bound or selector-pairing assertion is added by rendering.', '',
+    lines += ['', 'These next-version assertions intentionally reject datatype/value inconsistencies accepted structurally by active 0.4.1. [Before/after vectors and integration limits](CANONICAL-INTEGRATION.md). No new bound or selector-pairing assertion is added by rendering.', '',
               '## Defaults and unresolved behavior', '',
               'Schema `default` is an annotation, not automatic value insertion. Existing new-authoring controls require explicit serialization and preservation of overrides. No runtime fallback is inferred. Missing descriptions/types/bounds or unsupported structures produce errors or `unspecified`/`conditional`, not historical defaults.', '']
     return '\n'.join(lines)
