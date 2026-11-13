@@ -23,8 +23,8 @@ def registry():
     return Registry().with_resources(resources.items())
 
 
-def declaration(expression):
-    return {'kind': 'local', 'expression': expression}
+def declaration(datatype, expression):
+    return {'kind': 'local', 'datatype': datatype, 'expression': expression}
 
 
 class NativeVariableFunctionSchema(unittest.TestCase):
@@ -33,59 +33,44 @@ class NativeVariableFunctionSchema(unittest.TestCase):
         cls.schema = json.loads((SCHEMA_ROOT / 'variable-expression.schema.json').read_text())
         cls.validator = Draft202012Validator(cls.schema, registry=registry())
 
-    def assert_valid(self, expression):
-        self.validator.validate(declaration(expression))
+    def assert_valid(self, datatype, expression):
+        self.validator.validate(declaration(datatype, expression))
 
-    def assert_invalid(self, expression):
+    def assert_invalid(self, datatype, expression):
         with self.assertRaises(Exception):
-            self.validator.validate(declaration(expression))
+            self.validator.validate(declaration(datatype, expression))
 
     def test_positive_native_forms_and_nested_composition(self):
         literal = lambda value: {'literal': value}
-        self.assert_valid({'split': {'delimiter': ',', 'value': literal('a,,b')}})
-        self.assert_valid({'substring': {
+        self.assert_valid('string', {'split': {'delimiter': ',', 'value': literal('a,,b')}})
+        self.assert_valid('string', {'substring': {
             'substring_start': 1, 'substring_length': 3, 'value': literal('abcdef')}})
-        self.assert_valid({'arithmetic': {
+        self.assert_valid('integer', {'arithmetic': {
             'arithmetic_operation': 'add', 'values': [literal(1), literal([2, 3])]}})
-        self.assert_valid({'begin': {'character': '/', 'value': literal('/etc')}})
-        self.assert_valid({'end': {'character': '/', 'value': literal('etc/')}})
-        self.assert_valid({'unique': [literal(['a', 'a']), literal(['b', 'a'])]})
-        self.assert_valid({'merge': {
+        self.assert_valid('string', {'begin': {'character': '/', 'value': literal('/etc')}})
+        self.assert_valid('string', {'end': {'character': '/', 'value': literal('etc/')}})
+        self.assert_valid('string', {'unique': [literal(['a', 'a']), literal(['b', 'a'])]})
+        self.assert_valid('string', {'merge': {
             'delimiter': ',', 'sort': 'document', 'order': 'ascending',
             'values': [literal(['a', 'b']), literal(['c', 'a'])]}})
-        self.assert_valid({'count': {'unique': [
+        self.assert_valid('integer', {'count': {'unique': [
             literal(['a', 'a']), literal(['b'])]}})
-
-    def test_no_declaration_level_datatype_and_typed_literal_kept(self):
-        value = declaration({'count': {'literal': ['a', 'a', 'b']}})
-        self.validator.validate(value)
-        assert 'datatype' not in value
-        # Type labels remain available on explicit literal payloads,
-        # but must not be repeated on the containing Variable.
-        self.validator.validate(declaration({
-            'literal': {'datatype': 'version', 'value': '1.02'}}))
-        with self.assertRaises(Exception):
-            self.validator.validate({
-                'kind': 'local', 'datatype': 'integer',
-                'expression': {'count': {'literal': ['a']}}})
-        with self.assertRaises(Exception):
-            self.validator.validate({'kind': 'local'})
 
     def test_negative_arity_options_and_datatypes(self):
         literal = lambda value: {'literal': value}
-        self.assert_invalid({'split': {'value': literal('a')}})
-        self.assert_invalid({'substring': {
+        self.assert_invalid('string', {'split': {'value': literal('a')}})
+        self.assert_invalid('string', {'substring': {
             'substring_start': 1, 'substring_length': 1, 'value': literal('a'),
             'extra': True}})
-        self.assert_invalid({'arithmetic': {
+        self.assert_invalid('integer', {'arithmetic': {
             'arithmetic_operation': 'add', 'values': [literal(1)]}})
-        self.assert_valid({'arithmetic': {
+        self.assert_invalid('string', {'arithmetic': {
             'arithmetic_operation': 'add', 'values': [literal(1), literal(2)]}})
-        self.assert_invalid({'begin': {'character': '/', 'value': literal('a'), 'x': 1}})
-        self.assert_invalid({'unique': []})
-        self.assert_invalid({'merge': {
+        self.assert_invalid('string', {'begin': {'character': '/', 'value': literal('a'), 'x': 1}})
+        self.assert_invalid('string', {'unique': []})
+        self.assert_invalid('string', {'merge': {
             'delimiter': ',', 'sort': 'document', 'order': 'ascending', 'values': []}})
-        self.assert_invalid({'function': {
+        self.assert_invalid('string', {'function': {
             'name': 'split', 'arguments': [literal('a')], 'options': {'delimiter': ','}}})
 
 
