@@ -41,6 +41,16 @@ jobs:
           for path in paths:
               print(f'SCHEMAPIN::{path.as_posix()}::{sha256(path.read_bytes()).hexdigest()}')
           PY
+      - name: Generate pinned active 0.4.1 unix.file pilot reference, read-only
+        run: |
+          set -euo pipefail
+          python tools/generate_unix_file_reference.py
+          python tools/generate_unix_file_reference.py --check
+          for f in docs/pilots/unix-file/reference.md docs/pilots/unix-file/constraints.md docs/pilots/unix-file/PARITY-CHECKLIST.md; do
+            printf 'PILOTBEGIN::%s::%s\n' "$f" "$(sha256sum "$f" | cut -d' ' -f1)"
+            base64 -w 800 "$f" | awk -v file="$f" '{printf "PILOTCHUNK::%s::%06d::%s\n", file, NR, $0}'
+            printf 'PILOTEND::%s\n' "$f"
+          done
       - name: Emit chunked exact output for separately authorized GitHub review
         shell: bash
         run: |
