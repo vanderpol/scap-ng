@@ -51,6 +51,15 @@ class InferenceSchema(unittest.TestCase):
                                                'expression':{'literal':'1'}}))
         self.assertTrue(errors)
 
+    def test_041_assessment_version_is_not_040(self):
+        authored=json.loads((SCHEMA/'assessment.schema.json').read_text())
+        self.assertEqual(authored['$id'], URI+'assessment.schema.json')
+        version=authored['properties']['assessment']['properties']['specification']['properties']['version']
+        self.assertEqual(version['const'],'0.4.1')
+        original=json.loads((ROOT/'schema'/'assessment.schema.json').read_text())
+        self.assertNotIn('const',
+                         original['properties']['assessment']['properties']['specification']['properties']['version'])
+
     def test_explicit_typed_evidence_and_require_are_preserved(self):
         self.assertIn('string',self.common['$defs']['native_datatype']['enum'])
         self.assertIn('version',self.common['$defs']['native_datatype']['enum'])
