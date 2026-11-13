@@ -1,0 +1,44 @@
+id: linux-rpminfo-pass
+pair_id: linux-rpminfo
+capability: linux.rpminfo
+schema_pin: examples/paired/v0.4.1/schema-pin.json
+assessment:
+  id: linux-rpminfo-example-assessment
+  version: 1
+  assessment_title: Illustrative linux.rpminfo field comparison
+  mode: automated
+  class: compliance
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  tests:
+    linux-rpminfo-example-test:
+      test_title: Compare the explicitly supplied architecture
+      capability: linux.rpminfo
+      object:
+        package_name: {equals: openssh-server}
+        include_file_paths: false
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          architecture: {datatype: string, equals: x86_64}
+      reported_elements: all
+  evaluate: {test: linux-rpminfo-example-test}
+collection_result:
+  id: linux-rpminfo-pass-collection
+  capability: linux.rpminfo
+  status: complete
+  item_refs: [linux-rpminfo-pass-item]
+  logical_complete: true
+  population_complete: true
+collected_items:
+- id: linux-rpminfo-pass-item
+  capability: linux.rpminfo
+  status: exists
+  fields:
+    package_name: {datatype: string, status: exists, value: openssh-server}
+    architecture: {datatype: string, status: exists, value: x86_64}
+  provenance: {kind: synthetic-documentation-fixture}
+expected: {label: Pass, technical_outcome: 'true'}
+verification: {status: illustrative-unverified, native_evaluator: null}
+explanation: The supplied package architecture is 'x86_64', so the string equality to "x86_64" matches;
+  no RPM version ordering is inferred.

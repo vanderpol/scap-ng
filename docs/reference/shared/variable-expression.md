@@ -16,7 +16,6 @@ Declare typed local or constant Variables from literal data, other Variables, co
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `kind` | string | 1..1 (required) | Selects a constant or locally derived Variable. | [/$defs/declaration/properties/kind](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/kind) |
-| `datatype` | string | 1..1 (required) | **Semantic hold.** Existing wording requires a native contract decision; see details. | [/$defs/declaration/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype) |
 | `expression` | object | 1..1 (required) | Defines how this Variable's values are obtained. | [/$defs/declaration/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/expression) |
 | `title` | null, string | 0..1 | Optional author-facing title for this Variable. | [/$defs/declaration/properties/title](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/title) |
 

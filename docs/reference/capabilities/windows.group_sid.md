@@ -1,6 +1,6 @@
 # windows.group_sid
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `windows.group_sid` allows the different users and subgroups, that directly belong to specific groups (identified by SID), to be tested.
 

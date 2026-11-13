@@ -1,4 +1,4 @@
-# SCAP-NG Benchmark Result pre-release v0.4.0 — advanced constraints
+# SCAP-NG Benchmark Result pre-release v0.4.1 — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 
@@ -6,7 +6,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | --- | --- | --- |
 | [schema](../../../proposed-schema/documentation/benchmark-result.schema.json#) | {"type": "object", "required": ["benchmark_result"], "additionalProperties": false} | existing-native |
 | [/properties/benchmark_result](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result) | {"type": "object", "required": ["result_schema_version", "run_id", "started_at", "completed_at", "benchmark", "target_ref", "effective_policy", "summary", "rule_results"], "additionalProperties": false} | native-structure-derived |
-| [/properties/benchmark_result/properties/result_schema_version](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/result_schema_version) | {"const": "0.4.0"} | existing-native |
+| [/properties/benchmark_result/properties/result_schema_version](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/result_schema_version) | {"const": "0.4.1"} | existing-native |
 | [/properties/benchmark_result/properties/run_id](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/run_id) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/benchmark_result/properties/started_at](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/started_at) | {"type": "string"} | existing-native |
 | [/properties/benchmark_result/properties/completed_at](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/completed_at) | {"type": ["string", "null"]} | existing-native |

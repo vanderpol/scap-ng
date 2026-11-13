@@ -1,6 +1,6 @@
 # linux.rpmverifyfile
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `linux.rpmverifyfile` is used to verify the integrity of the individual files in installed RPMs.
 

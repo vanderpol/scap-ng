@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json",
-  "x-scap-ng-version": "0.4.0",
-  "x-last-modified": "2026-11-12",
+  "x-scap-ng-version": "0.4.1",
+  "x-last-modified": "2026-11-13",
   "title": "Native Variable declarations and retained OVAL transformations",
   "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or explicit recursive transformations. Active 0.4 forms preserve source operand order, collection multiplicity, empty values, and evaluation status; datatype compatibility and status propagation are checked separately by semantic validation or a qualified runtime.",
   "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng-tools/issues/48",
@@ -12,7 +12,6 @@
       "type": "object",
       "required": [
         "kind",
-        "datatype",
         "expression"
       ],
       "properties": {
@@ -28,17 +27,6 @@
             "source": "editorial-batch-2.json",
             "case": "06",
             "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
-          }
-        },
-        "datatype": {
-          "$ref": "capability-common.schema.json#/$defs/native_datatype",
-          "title": "Variable datatype",
-          "description": "Datatype promised by this Variable. The expression must produce compatible values.",
-          "x-doc-review": {
-            "status": "semantic-hold",
-            "source": "editorial-batch-2.json",
-            "case": "07",
-            "note": "The enum is enforced, but full declaration-to-expression compatibility and casts are not established by these witnesses. Retain a semantic hold for the strength of this promise; do not imply coercion or complete tag/payload validation."
           }
         },
         "expression": {
@@ -186,211 +174,10 @@
               }
             }
           }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "arithmetic"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "integer",
-                  "float"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "substring"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "split"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "begin"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "end"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "count"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "integer"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "concat"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "regex_capture"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "unique"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "expression": {
-                "required": [
-                  "merge"
-                ]
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "datatype": {
-                "enum": [
-                  "string"
-                ]
-              }
-            }
-          }
         }
       ],
-      "x-doc-status": "native-grammar-derived",
-      "description": "Declares a constant or locally derived Variable."
+      "description": "Declares a constant or locally derived Variable.",
+      "x-doc-status": "native-grammar-derived"
     },
     "expression": {
       "oneOf": [
@@ -1107,5 +894,5 @@
     }
   },
   "x-doc-origin": "schema/variable-expression.schema.json",
-  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.1. This URI is not a release."
 }

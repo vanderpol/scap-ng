@@ -1,6 +1,6 @@
 # independent.environmentvariable
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `independent.environmentvariable` element is used to check an environment variable for the specified process, which is identified by its process ID, on the system .
 

@@ -1,6 +1,6 @@
 # windows.userright
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `windows.userright` is used to enumerate all of the trustees/SIDs that have been granted a specific user right/privilege.
 

@@ -1,6 +1,6 @@
 # macos.disabledservice
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `macos.disabledservice` is used to check the status of daemons/agents disabled via the launchd service, via the command 'launchctl print-disabled system'.
 

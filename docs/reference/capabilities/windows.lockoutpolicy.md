@@ -1,6 +1,6 @@
 # windows.lockoutpolicy
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The lockout policy test enumerates various attributes associated with lockout information for users and global groups in the security database.
 

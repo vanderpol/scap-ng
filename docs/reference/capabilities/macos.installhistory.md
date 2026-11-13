@@ -1,6 +1,6 @@
 # macos.installhistory
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `macos.installhistory` is used to inspect the install history (SPInstallHistoryDataType) section of the system_profiler command output.
 

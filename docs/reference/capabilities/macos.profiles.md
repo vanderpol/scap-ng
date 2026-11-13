@@ -1,6 +1,6 @@
 # macos.profiles
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `macos.profiles` is used to test aspects of the device configuration profiles installed on the device.
 

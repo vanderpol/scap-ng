@@ -1,6 +1,6 @@
 # unix.shadow
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The shadow test is used to check information from the /etc/shadow file for a specific user.
 

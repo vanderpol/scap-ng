@@ -1,4 +1,4 @@
-# Draft SCAP-NG 0.4.0 automated expression — advanced constraints
+# Draft SCAP-NG 0.4.1 automated expression — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 

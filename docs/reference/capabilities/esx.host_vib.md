@@ -1,6 +1,6 @@
 # esx.host_vib
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 Inspect installed vSphere Installation Bundle metadata on an ESXi host.
 

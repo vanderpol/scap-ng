@@ -1,4 +1,4 @@
-# SCAP-NG Organizational Input Set v0.4.0 draft — advanced constraints
+# SCAP-NG Organizational Input Set v0.4.1 draft — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 

@@ -1,6 +1,6 @@
 # solaris.smf
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `solaris.smf` is used to check service management facility controlled services including traditional unix rc level start/kill scrips and inetd daemon services.
 

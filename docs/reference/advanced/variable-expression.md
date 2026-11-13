@@ -4,20 +4,12 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/declaration](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration) | {"type": "object", "required": ["kind", "datatype", "expression"], "additionalProperties": false} | native-grammar-derived |
+| [/$defs/declaration](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration) | {"type": "object", "required": ["kind", "expression"], "additionalProperties": false} | native-grammar-derived |
 | [/$defs/declaration/properties/kind](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/kind) | {"enum": ["local", "constant"]} | editorially-approved |
 
 [/$defs/declaration/properties/kind](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/kind): Selects a constant or locally derived Variable.
 
 Editorial receipt: editorial-batch-2.json case 06
-
-| Pointer | Local constraints | Documentation status |
-| --- | --- | --- |
-| [/$defs/declaration/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype) | {} | semantic-hold |
-
-[/$defs/declaration/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype): Datatype promised by this Variable. The expression must produce compatible values.
-
-The enum is enforced, but full declaration-to-expression compatibility and casts are not established by these witnesses. Retain a semantic hold for the strength of this promise; do not imply coercion or complete tag/payload validation.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
@@ -42,26 +34,6 @@ Editorial receipt: editorial-batch.json case 06
 | [/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/else/properties/value/anyOf/0](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/else/properties/value/anyOf/0) | {"type": ["string", "number", "boolean"]} | existing-native |
 | [/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/else/properties/value/anyOf/1](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/else/properties/value/anyOf/1) | {"type": "array"} | existing-native |
 | [/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/else/properties/value/anyOf/1/items](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/else/properties/value/anyOf/1/items) | {"type": ["string", "number", "boolean"]} | existing-native |
-| [/$defs/declaration/allOf/1/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/1/if/properties/expression) | {"required": ["arithmetic"]} | existing-native |
-| [/$defs/declaration/allOf/1/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/1/then/properties/datatype) | {"enum": ["integer", "float"]} | existing-native |
-| [/$defs/declaration/allOf/2/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/2/if/properties/expression) | {"required": ["substring"]} | existing-native |
-| [/$defs/declaration/allOf/2/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/2/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/3/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/3/if/properties/expression) | {"required": ["split"]} | existing-native |
-| [/$defs/declaration/allOf/3/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/3/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/4/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/4/if/properties/expression) | {"required": ["begin"]} | existing-native |
-| [/$defs/declaration/allOf/4/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/4/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/5/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/5/if/properties/expression) | {"required": ["end"]} | existing-native |
-| [/$defs/declaration/allOf/5/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/5/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/6/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/6/if/properties/expression) | {"required": ["count"]} | existing-native |
-| [/$defs/declaration/allOf/6/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/6/then/properties/datatype) | {"enum": ["integer"]} | existing-native |
-| [/$defs/declaration/allOf/7/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/7/if/properties/expression) | {"required": ["concat"]} | existing-native |
-| [/$defs/declaration/allOf/7/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/7/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/8/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/8/if/properties/expression) | {"required": ["regex_capture"]} | existing-native |
-| [/$defs/declaration/allOf/8/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/8/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/9/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/9/if/properties/expression) | {"required": ["unique"]} | existing-native |
-| [/$defs/declaration/allOf/9/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/9/then/properties/datatype) | {"enum": ["string"]} | existing-native |
-| [/$defs/declaration/allOf/10/if/properties/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/10/if/properties/expression) | {"required": ["merge"]} | existing-native |
-| [/$defs/declaration/allOf/10/then/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/allOf/10/then/properties/datatype) | {"enum": ["string"]} | existing-native |
 | [/$defs/expression](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression) | {} | native-grammar-derived |
 | [/$defs/expression/oneOf/0](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/0) | {"type": "object", "required": ["literal"], "additionalProperties": false} | existing-native |
 | [/$defs/expression/oneOf/0/properties/literal](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/0/properties/literal) | {} | editorially-approved |

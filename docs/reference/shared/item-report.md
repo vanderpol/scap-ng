@@ -1,4 +1,4 @@
-# Draft derived Item report 0.4.0
+# Draft derived Item report 0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

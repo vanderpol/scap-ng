@@ -1,6 +1,6 @@
 # independent.family
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `independent.family` element is used to check the family a certain system belongs to.
 

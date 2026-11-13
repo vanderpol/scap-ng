@@ -1,6 +1,6 @@
 # linux.systemdunitdependency
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `linux.systemdunitdependency` is used to retrieve information about dependencies of a single systemd unit in the form of a list.
 

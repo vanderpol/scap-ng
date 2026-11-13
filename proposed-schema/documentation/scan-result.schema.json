@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json",
-  "x-scap-ng-version": "0.4.0",
+  "x-scap-ng-version": "0.4.1",
   "x-last-modified": "2026-10-06",
-  "title": "SCAP-NG Scan Result pre-release v0.4.0",
+  "title": "SCAP-NG Scan Result pre-release v0.4.1",
   "description": "Run-level index for one scanner execution. Detailed Benchmark and Assessment results remain normalized package members referenced by identity/path.",
   "type": "object",
   "required": [
@@ -22,7 +22,7 @@
       ],
       "properties": {
         "result_schema_version": {
-          "const": "0.4.0",
+          "const": "0.4.1",
           "x-doc-description-ref": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/report_result_schema_version"
         },
         "run_id": {
@@ -46,6 +46,15 @@
         "scanner": {
           "type": "object",
           "description": "Scanner identity metadata recorded for the scan.",
+          "properties": {
+            "app_guid": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "format": "uuid",
+              "description": "Stable scanner application/agent installation GUID for enterprise SIEM correlation; sourced from scanner/enterprise inventory, not inferred from hostname or content."
+            }
+          },
+          "additionalProperties": true,
           "x-doc-status": "native-structure-derived"
         },
         "targets": {
@@ -86,6 +95,12 @@
                 },
                 "description": "Network addresses recorded for the target.",
                 "x-doc-status": "native-structure-derived"
+              },
+              "machine_guid": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                "format": "uuid",
+                "description": "Stable target-machine GUID supplied by authoritative system or enterprise asset inventory. This belongs to each target (a scan may have multiple targets); it is not the scanner application GUID, hostname, address, or per-scan session ID. Do not fabricate from hostnames or MAC addresses; omit when unavailable."
               }
             },
             "additionalProperties": false
@@ -171,6 +186,12 @@
           ],
           "description": "Signature status recorded for the scan result.",
           "x-doc-status": "native-structure-derived"
+        },
+        "scan_session_guid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "format": "uuid",
+          "description": "Globally unique scan/session correlation identifier, newly generated once per scan session and shared by all result events belonging to that session. This is distinct from the existing run_id and from any compliance or evidence identity. Canonical lowercase hyphenated UUID; it must never be regenerated per Rule/Assessment event."
         }
       },
       "additionalProperties": false,
@@ -180,5 +201,5 @@
   },
   "additionalProperties": false,
   "x-doc-origin": "schema/scan-result.schema.json",
-  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.0. This URI is not a release."
+  "x-doc-proposal": "Documentation-only proposal; specification_version and validation remain 0.4.1. This URI is not a release."
 }

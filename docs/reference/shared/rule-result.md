@@ -1,4 +1,4 @@
-# SCAP-NG Rule Result pre-release v0.4.0
+# SCAP-NG Rule Result pre-release v0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

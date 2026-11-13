@@ -15,7 +15,7 @@ EXAMPLES = {
     'windows-server-2025-lock-screen.assessment.yaml':
         'ed166e8da4209d0b08e9f9a6891e1aba844f7aa5e2349899a8d5830968f02e21',
     'windows-server-2025-sysvol-permissions.assessment.yaml':
-        '2987568f0cd666992616c6f9982d72b68af8302c79a5ed3250e9b25518a9f65c',
+        'c2ae580ce346911a7ab1921b9cf9760d38885da33741e8bd25105270e9e863a0',
     'linux-home-nosuid.assessment.yaml':
         '9522416a793f1db62e1530ccfbcdd5cc14ddc0e35e5788c215443423e398ac6d',
     'windows-optional-organizational-input.assessment.yaml':

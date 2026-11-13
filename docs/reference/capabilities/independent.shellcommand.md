@@ -1,6 +1,6 @@
 # independent.shellcommand
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 Collects evidence produced by an authored command. The Object declares an interpreter, command text and optional output pattern; Require evaluates the collected exit status, output lines and captured text.
 
@@ -125,7 +125,7 @@ collected_items:
   provenance: {kind: synthetic-documentation-fixture}
 ```
 
-[Complete version-pinned fixture](../../../examples/paired/v0.4.0/independent.shellcommand.pass.yaml).
+[Complete version-pinned fixture](../../../examples/paired/v0.4.1/independent.shellcommand.pass.yaml).
 
 ### Fail — expected `false` (unverified)
 
@@ -149,6 +149,6 @@ collected_items:
   provenance: {kind: synthetic-documentation-fixture}
 ```
 
-[Complete version-pinned fixture](../../../examples/paired/v0.4.0/independent.shellcommand.fail.yaml).
+[Complete version-pinned fixture](../../../examples/paired/v0.4.1/independent.shellcommand.fail.yaml).
 
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `independent-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

@@ -1,6 +1,6 @@
 # macos.gatekeeper
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `macos.gatekeeper` is used to check the status of Gatekeeper and any unsigned applications that have been granted execute permission.
 

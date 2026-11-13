@@ -1,4 +1,4 @@
-# SCAP-NG Scan Result pre-release v0.4.0 — advanced constraints
+# SCAP-NG Scan Result pre-release v0.4.1 — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 
@@ -6,11 +6,12 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | --- | --- | --- |
 | [schema](../../../proposed-schema/documentation/scan-result.schema.json#) | {"type": "object", "required": ["scan_result"], "additionalProperties": false} | existing-native |
 | [/properties/scan_result](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result) | {"type": "object", "required": ["result_schema_version", "run_id", "started_at", "scanner", "targets", "benchmark_results"], "additionalProperties": false} | native-structure-derived |
-| [/properties/scan_result/properties/result_schema_version](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/result_schema_version) | {"const": "0.4.0"} | existing-native |
+| [/properties/scan_result/properties/result_schema_version](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/result_schema_version) | {"const": "0.4.1"} | existing-native |
 | [/properties/scan_result/properties/run_id](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/run_id) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/scan_result/properties/started_at](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/started_at) | {"type": "string"} | existing-native |
 | [/properties/scan_result/properties/completed_at](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/completed_at) | {"type": ["string", "null"]} | existing-native |
-| [/properties/scan_result/properties/scanner](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner) | {"type": "object"} | native-structure-derived |
+| [/properties/scan_result/properties/scanner](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner) | {"type": "object", "additionalProperties": true} | native-structure-derived |
+| [/properties/scan_result/properties/scanner/properties/app_guid](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner/properties/app_guid) | {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"} | existing-native |
 | [/properties/scan_result/properties/targets](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets) | {"type": "array", "minItems": 1} | native-structure-derived |
 | [/properties/scan_result/properties/targets/items](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items) | {"type": "object", "required": ["id"], "additionalProperties": false} | existing-native |
 | [/properties/scan_result/properties/targets/items/properties/id](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
@@ -19,6 +20,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [/properties/scan_result/properties/targets/items/properties/hostname](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/hostname) | {"type": ["string", "null"]} | native-structure-derived |
 | [/properties/scan_result/properties/targets/items/properties/addresses](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/addresses) | {"type": "array"} | native-structure-derived |
 | [/properties/scan_result/properties/targets/items/properties/addresses/items](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/addresses/items) | {"type": "string"} | existing-native |
+| [/properties/scan_result/properties/targets/items/properties/machine_guid](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/machine_guid) | {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"} | existing-native |
 | [/properties/scan_result/properties/benchmark_results](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/benchmark_results) | {"type": "array", "minItems": 1} | native-structure-derived |
 | [/properties/scan_result/properties/benchmark_results/items](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/benchmark_results/items) | {"type": "object", "required": ["benchmark_result_ref", "benchmark_id", "target_ref"], "additionalProperties": false} | existing-native |
 | [/properties/scan_result/properties/benchmark_results/items/properties/benchmark_result_ref](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/benchmark_results/items/properties/benchmark_result_ref) | {"type": "string", "minLength": 1} | native-structure-derived |
@@ -31,3 +33,4 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [/properties/scan_result/properties/assessment_result_refs](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/assessment_result_refs) | {"type": "array"} | native-structure-derived |
 | [/properties/scan_result/properties/assessment_result_refs/items](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/assessment_result_refs/items) | {"type": "string"} | existing-native |
 | [/properties/scan_result/properties/signature_status](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/signature_status) | {"type": ["string", "null"]} | native-structure-derived |
+| [/properties/scan_result/properties/scan_session_guid](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/scan_session_guid) | {"type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"} | existing-native |

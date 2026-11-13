@@ -1,6 +1,6 @@
 # linux.selinuxboolean
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `linux.selinuxboolean` is used to check the current and pending status of a SELinux boolean.
 
