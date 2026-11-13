@@ -65,6 +65,11 @@ def normalized_content(relative: Path, original: bytes) -> bytes:
             "expression. No redundant declaration datatype is accepted. "
             "Typed literal payloads and collected field contracts are retained."
         )
+        schema["properties"]["assessment"]["properties"]["specification"][
+            "properties"]["version"] = {
+                "const": "0.4.1",
+                "description": "This Assessment uses the 0.4.1 authoring contract."
+            }
         schema["x-last-modified"] = "2026-11-13"
         text = json.dumps(schema, ensure_ascii=False, indent=2) + "\n"
     return text.encode("utf-8")
