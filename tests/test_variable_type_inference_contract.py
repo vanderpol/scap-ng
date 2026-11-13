@@ -1,4 +1,4 @@
-"""Candidate-only contract checks for owner-approved 0.4 Variable inference.
+"""Candidate-only contract checks for owner-approved 0.4.1 Variable inference.
 
 These tests prove schema shape, not runtime expression/status equivalence.
 """
@@ -10,18 +10,13 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 ROOT=Path(__file__).resolve().parents[1]
-SCHEMA=ROOT/'schema'/'v0.4.1'
+SCHEMA=ROOT/'schema'
 URI='https://scap-ng.dev/schema/v0.4.1/'
 
 
 class InferenceSchema(unittest.TestCase):
     @classmethod
-    def tearDownClass(cls):
-        pass
-    @classmethod
     def setUpClass(cls):
-        if not SCHEMA.is_dir():
-            raise unittest.SkipTest('Versioned 0.4.1 pack is generated only by candidate qualification CI')
         sources={}
         for file in SCHEMA.glob('*.schema.json'):
             doc=json.loads(file.read_text(encoding='utf-8'))
@@ -38,7 +33,6 @@ class InferenceSchema(unittest.TestCase):
         declaration=self.variable['$defs']['declaration']
         self.assertEqual(declaration['required'],['kind','expression'])
         self.assertEqual(self.variable['$id'],URI+'variable-expression.schema.json')
-        self.assertEqual(json.loads((ROOT/'schema'/'variable-expression.schema.json').read_text())['$defs']['declaration']['required'],['kind','datatype','expression'])
         self.assertNotIn('datatype',declaration['properties'])
         self.assertFalse(any('datatype' in c.get('then',{}).get('properties',{})
                              for c in declaration['allOf']))
@@ -56,9 +50,8 @@ class InferenceSchema(unittest.TestCase):
         self.assertEqual(authored['$id'], URI+'assessment.schema.json')
         version=authored['properties']['assessment']['properties']['specification']['properties']['version']
         self.assertEqual(version['const'],'0.4.1')
-        original=json.loads((ROOT/'schema'/'assessment.schema.json').read_text())
-        self.assertNotIn('const',
-                         original['properties']['assessment']['properties']['specification']['properties']['version'])
+        self.assertFalse((ROOT/'schema'/'v0.4.0').exists())
+        self.assertFalse((ROOT/'schema'/'v0.4.1').exists())
 
     def test_explicit_typed_evidence_and_require_are_preserved(self):
         self.assertIn('string',self.common['$defs']['native_datatype']['enum'])

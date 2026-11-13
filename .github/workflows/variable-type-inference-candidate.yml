@@ -1,9 +1,8 @@
-name: Candidate 0.4.0 Variable type inference qualification
+name: Active 0.4.1 Variable inference qualification
 on:
   pull_request:
     paths:
       - 'schema/variable-expression.schema.json'
-      - 'tools/build_schema_v041.py'
       - 'schema/assessment.schema.json'
       - 'tests/test_issue48_variable_functions.py'
       - 'tests/test_variable_type_inference_contract.py'
@@ -19,14 +18,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install candidate-only validation dependencies
+      - name: Install single-version validation dependencies
         run: python -m pip install 'jsonschema>=4.20,<5' 'referencing>=0.34'
-      - name: Generate isolated 0.4.1 family and verify byte-identical reproduction
-        run: |
-          python3 tools/build_schema_v041.py
-          python3 tools/build_schema_v041.py --check
-          sha256sum schema/v0.4.1/source-and-output-sha256.json
-      - name: Validate candidate Variable schema and negative shapes
+      - name: Validate active Variable schema and negative shapes
         run: |
           python -m unittest discover -s tests -p 'test_issue48_variable_functions.py' -v
           python -m unittest discover -s tests -p 'test_variable_type_inference_contract.py' -v
