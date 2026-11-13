@@ -117,14 +117,24 @@ class CompatibilityAuditTests(unittest.TestCase):
 
     def test_filesystem_alternatives_have_recorded_compatibility_outcomes(self):
         evidence = ROOT / "docs/evidence/issue21/filesystem-selector-alternatives"
-        valid = yaml.safe_load((evidence / "alternative-a.assessment.yaml").read_text())
+        def migrated_copy(filename):
+            # Preserve signed historical evidence at 0.4.0. Change only the
+            # in-memory version marker to isolate selector compatibility
+            # under the sole active 0.4.1 grammar.
+            original = yaml.safe_load((evidence / filename).read_text())
+            self.assertEqual(original["assessment"]["specification"]["version"], "0.4.0")
+            candidate = json.loads(json.dumps(original))
+            candidate["assessment"]["specification"]["version"] = "0.4.1"
+            return candidate
+
+        valid = migrated_copy("alternative-a.assessment.yaml")
         self.assertEqual(list(self.assessment_validator.iter_errors(valid)), [])
         for name in ("alternative-b.assessment.yaml", "tools-emission.assessment.yaml"):
             with self.subTest(name=name):
-                candidate = yaml.safe_load((evidence / name).read_text())
+                candidate = migrated_copy(name)
                 errors = list(self.assessment_validator.iter_errors(candidate))
                 self.assertTrue(errors)
-                self.assertIn("full_path", errors[0].message)
+                self.assertTrue(any("full_path" in error.message for error in errors))
 
     def test_source_resolved_count_remains_distinct_from_matrix_count(self):
         # The contract input and generated audit both cover the accumulated
