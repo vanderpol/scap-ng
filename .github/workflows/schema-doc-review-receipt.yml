@@ -31,6 +31,16 @@ jobs:
           python tools/generate_docs.py
           python tools/generate_docs.py --check
           git diff --stat -- docs/generated/
+      - name: Report exact active schema JSON hashes for independent pilot requalification
+        run: |
+          python - <<'PY'
+          from hashlib import sha256
+          from pathlib import Path
+          paths=sorted(Path('schema').rglob('*.json'))
+          assert len(paths)==145, f'Unexpected active schema resource count: {len(paths)}'
+          for path in paths:
+              print(f'SCHEMAPIN::{path.as_posix()}::{sha256(path.read_bytes()).hexdigest()}')
+          PY
       - name: Emit chunked exact output for separately authorized GitHub review
         shell: bash
         run: |
