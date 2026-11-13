@@ -10,13 +10,18 @@ from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
 ROOT=Path(__file__).resolve().parents[1]
-SCHEMA=ROOT/'schema'
-URI='https://scap-ng.dev/schema/v0.4.0/'
+SCHEMA=ROOT/'schema'/'v0.4.1'
+URI='https://scap-ng.dev/schema/v0.4.1/'
 
 
 class InferenceSchema(unittest.TestCase):
     @classmethod
+    def tearDownClass(cls):
+        pass
+    @classmethod
     def setUpClass(cls):
+        if not SCHEMA.is_dir():
+            raise RuntimeError('Generate 0.4.1 schema first with tools/build_schema_v041.py')
         sources={}
         for file in SCHEMA.glob('*.schema.json'):
             doc=json.loads(file.read_text(encoding='utf-8'))
@@ -32,6 +37,8 @@ class InferenceSchema(unittest.TestCase):
     def test_declaration_has_no_datatype_and_is_not_a_cast(self):
         declaration=self.variable['$defs']['declaration']
         self.assertEqual(declaration['required'],['kind','expression'])
+        self.assertEqual(self.variable['$id'],URI+'variable-expression.schema.json')
+        self.assertEqual(json.loads((ROOT/'schema'/'variable-expression.schema.json').read_text())['$defs']['declaration']['required'],['kind','datatype','expression'])
         self.assertNotIn('datatype',declaration['properties'])
         self.assertFalse(any('datatype' in c.get('then',{}).get('properties',{})
                              for c in declaration['allOf']))
