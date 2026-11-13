@@ -136,7 +136,7 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
     "class": "compliance",
     "specification": {
       "id": "scap-ng.pre-alpha.assessment",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     "tests": {
       "sample-test": {

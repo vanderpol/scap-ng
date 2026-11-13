@@ -573,7 +573,7 @@ Closed Object overlay: [native-selector.schema.json](../../schema/native-selecto
     "class": "compliance",
     "specification": {
       "id": "scap-ng.pre-alpha.assessment",
-      "version": "0.4.0"
+      "version": "0.4.1"
     },
     "tests": {
       "sample-test": {
