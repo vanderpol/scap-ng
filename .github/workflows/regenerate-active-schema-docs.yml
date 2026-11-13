@@ -1,0 +1,84 @@
+name: Regenerate active 0.4.1 schema documentation
+
+on:
+  pull_request:
+    paths:
+      - 'schema/**'
+      - 'tools/generate_docs.py'
+      - 'tools/generate_unix_file_reference.py'
+      - 'tools/generate_documentation.py'
+      - 'tools/check_documentation_examples.py'
+      - 'examples/**'
+      - '.github/workflows/regenerate-active-schema-docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: schema-docgen-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  generated-docs:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deterministic documentation dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Generate schema-derived documentation and example receipts
+        run: |
+          set -euo pipefail
+          python tools/generate_native_selector_schema.py --check
+          python tools/generate_docs.py
+          python tools/generate_unix_file_reference.py
+          python tools/check_documentation_examples.py
+          python tools/generate_documentation.py
+      - name: Stage ONLY documentation and example receipts
+        id: stage
+        run: |
+          set -euo pipefail
+          git add -A docs/generated docs/reference docs/examples/validation.json proposed-schema/documentation 2>/dev/null || true
+          # Never let this doc generator modify the canonical schema or an
+          # authored/curated example, a human requirement, or runtime code.
+          if git diff --cached --name-only | grep -Ev '^(docs/generated/|docs/reference/|docs/examples/validation\.json$|proposed-schema/documentation/)' ; then
+            echo "::error::Generated output escaped allowed documentation paths."
+            exit 1
+          fi
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --cached --stat
+          fi
+      - name: Commit generated documents back to review branch
+        if: steps.stage.outputs.changed == 'true'
+        env:
+          REVIEW_BRANCH: ${{ github.event.pull_request.head.ref }}
+          ORIGINAL_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name 'scap-ng-schema-docgen[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "docs(0.4.1): regenerate schema-dependent references for ${ORIGINAL_SHA:0:12}"
+          git push origin "HEAD:refs/heads/$REVIEW_BRANCH"
+      - name: Verify exactly regenerated Markdown and example reports
+        run: |
+          set -euo pipefail
+          python tools/generate_docs.py --check
+          python tools/generate_unix_file_reference.py --check
+          python tools/generate_documentation.py --check
+          python tools/check_documentation_examples.py --check
+          {
+            echo 'Schema documentation regenerated from the review branch.'
+            echo 'Source schema and curated authored examples are not automatically rewritten.'
+            echo 'Full semantic/historical-golden qualification remains mandatory.'
+          } >> "$GITHUB_STEP_SUMMARY"
