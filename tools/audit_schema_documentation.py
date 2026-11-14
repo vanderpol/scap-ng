@@ -433,6 +433,7 @@ def _audit(root=ROOT):
     crosswalk = sorted(proposals.values(), key=lambda p: (p['review_priority'], p['basis'] != 'curated_native_contract_review', p['schema_uri'], p['pointer']))
     return {'schemas': schemas, 'documents': documents, 'nodes': nodes, 'store': store, 'inventory': inventory, 'findings': ordered, 'crosswalk': crosswalk,
             'manifest': manifest, 'excluded': excluded, 'notes': notes,
+            'source_root': root,
             'documentation_profile': 'historical-0.4.0' if PREFIX == HISTORICAL_PREFIX else 'active-0.4.1'}
 
 
@@ -737,8 +738,14 @@ def pilot_report(result, catalog):
     return '\n'.join(rows)
 
 
-def editorial_batch(result, root=ROOT, filename="editorial-batch.json"):
-    """Validate the bounded editorial worksheet; never emit/apply schema edits."""
+def editorial_batch(result, root=None, filename="editorial-batch.json"):
+    """Validate a review receipt against the exact schema snapshot that produced it.
+
+    Inference from result['source_root'] prevents an archived 0.4.0 worksheet
+    from silently reading today's active 0.4.1 files. An explicitly supplied
+    root remains available for negative fixture tests.
+    """
+    root = Path(root) if root is not None else Path(result.get('source_root', ROOT))
     file = root / DEST / filename
     if not file.exists():
         return None
