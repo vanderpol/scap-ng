@@ -39,7 +39,7 @@ ACTIVE_PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
 DEST = HISTORICAL_DEST
 NATIVE_COMMIT = HISTORICAL_NATIVE_COMMIT
 PILOT_COMMIT = HISTORICAL_PILOT_COMMIT
-ISSUE = 'https://github.com/scap-ng/issues/40'
+ISSUE = 'https://github.com/vanderpol/scap-ng/issues/40'
 PREFIX = HISTORICAL_PREFIX
 MAPS = {'properties', 'patternProperties', '$defs', 'definitions', 'dependentSchemas'}
 ARRAYS = {'allOf', 'oneOf', 'anyOf', 'prefixItems'}
@@ -446,7 +446,7 @@ def profile(active=False):
             ACTIVE_PILOT_COMMIT, 'https://github.com/scap-ng/issues/67', ACTIVE_PREFIX)
     else:
         DEST, NATIVE_COMMIT, PILOT_COMMIT, ISSUE, PREFIX = (HISTORICAL_DEST,
-            HISTORICAL_NATIVE_COMMIT, HISTORICAL_PILOT_COMMIT, 'https://github.com/scap-ng/issues/40', HISTORICAL_PREFIX)
+            HISTORICAL_NATIVE_COMMIT, HISTORICAL_PILOT_COMMIT, 'https://github.com/vanderpol/scap-ng/issues/40', HISTORICAL_PREFIX)
     try:
         yield
     finally:
