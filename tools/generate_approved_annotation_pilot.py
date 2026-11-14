@@ -84,12 +84,13 @@ def _historical_input_workspace(root, workspace, git_root=None):
             text=True).split()
         for commit in candidates:
             try:
-                raw = subprocess.check_output(
+                candidate_raw = subprocess.check_output(
                     ['git', '-C', str(git_root), 'show', f'{commit}:{path}'],
                     stderr=subprocess.DEVNULL)
             except subprocess.CalledProcessError:
                 continue
-            if sha256(raw).hexdigest() == expected_hash:
+            if sha256(candidate_raw).hexdigest() == expected_hash:
+                raw = candidate_raw
                 break
         target = workspace / path
         target.parent.mkdir(parents=True, exist_ok=True)
