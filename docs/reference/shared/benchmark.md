@@ -1,4 +1,4 @@
-# SCAP-NG Benchmark v0.4.0
+# SCAP-NG Benchmark v0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

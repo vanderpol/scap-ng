@@ -1,6 +1,6 @@
 # macos.systemprofiler
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `macos.systemprofiler` is used to check the properties of the plist-style XML output from the "system_profiler -xml <data type>" command, for reading information about system inventory data on MacOSX.
 

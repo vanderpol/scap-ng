@@ -18,7 +18,7 @@ class ExecutionBoundaries(unittest.TestCase):
         cls.registry=Registry().with_resources((d['$id'],Resource.from_contents(d)) for d in docs)
 
     def validator(self,name):
-        return Draft202012Validator(self.docs['https://scap-ng.dev/schema/v0.4.0/'+name+'.schema.json'],registry=self.registry)
+        return Draft202012Validator(self.docs['https://scap-ng.dev/schema/v0.4.1/'+name+'.schema.json'],registry=self.registry)
 
     def test_source_locations_and_honest_status(self):
         d=json.loads((ROOT/'conformance/0.4/execution-boundaries/requirements.json').read_text())
@@ -32,7 +32,7 @@ class ExecutionBoundaries(unittest.TestCase):
                     token=token.replace('~1','/').replace('~0','~');v=v[int(token)] if isinstance(v,list) else v[token]
 
     def test_existing_redaction_excludes_value(self):
-        schema={'$ref':'https://scap-ng.dev/schema/v0.4.0/result-types.schema.json#/$defs/typed_value'}
+        schema={'$ref':'https://scap-ng.dev/schema/v0.4.1/result-types.schema.json#/$defs/typed_value'}
         validator=Draft202012Validator(schema,registry=self.registry)
         value={'datatype':'integer','status':'exists','redacted':True}
         validator.validate(value)

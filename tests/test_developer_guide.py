@@ -51,8 +51,8 @@ class DeveloperGuideTests(unittest.TestCase):
         proposal['capabilities'] = dict(reversed(list(proposal['capabilities'].items())))
         for cap in proposal['capabilities'].values():
             cap['properties'] = dict(reversed(list(cap['properties'].items())))
-        expected = render_developer_pilot('0.4.0', self.mappings, self.proposal)
-        self.assertEqual(expected, render_developer_pilot('0.4.0', list(reversed(self.mappings)), proposal))
+        expected = render_developer_pilot('0.4.1', self.mappings, self.proposal)
+        self.assertEqual(expected, render_developer_pilot('0.4.1', list(reversed(self.mappings)), proposal))
         self.assertEqual(self.docs, generated_documents())
 
     def test_byte_gate_detects_crlf_and_missing_empty_files(self):

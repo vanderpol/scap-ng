@@ -1,0 +1,124 @@
+name: Schema change cascade — generated artifacts and downstream pin checks
+
+on:
+  pull_request:
+    paths:
+      - 'schema/**'
+      - 'examples/**'
+      - 'docs/contracts/**'
+      - 'docs/generated/**'
+      - 'AGENTS.md'
+      - 'tools/generate_*.py'
+      - 'tools/check_documentation_examples.py'
+      - '.github/workflows/schema-change-cascade.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'schema/**'
+      - 'examples/**'
+      - 'docs/contracts/**'
+      - 'docs/generated/**'
+      - 'AGENTS.md'
+      - 'tools/generate_*.py'
+      - 'tools/check_documentation_examples.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generated-content-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Enforce exactly one flat 0.4.1 schema family
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('schema')
+          assert not any(root.glob('v0.*')), 'parallel schema version directories are forbidden'
+          schemas = sorted(root.glob('*.schema.json'))
+          assert schemas, 'missing canonical schema'
+          for p in schemas:
+              j=json.loads(p.read_text())
+              assert j['$id']=='https://scap-ng.dev/schema/v0.4.1/'+p.name, str(p)
+              assert j['x-scap-ng-version']=='0.4.1', str(p)
+          assert json.loads((root/'scan-result.schema.json').read_text())['properties']['scan_result']['properties']['result_schema_version']['const']=='0.4.1'
+          print('Single active 0.4.1 schema family:',len(schemas),'root schemas')
+          PY
+      - name: Reject stale schema-generated selector content
+        run: python tools/generate_native_selector_schema.py --check
+      - name: Reject stale Markdown and scanner documentation
+        run: |
+          python tools/generate_docs.py --check
+          python tools/generate_unix_file_reference.py --check
+          python tools/generate_approved_annotation_pilot.py --check
+          python tools/generate_review_documentation_pack.py --check
+          python tools/generate_documentation.py --check
+          python tools/audit_schema_documentation.py --check
+          python tools/audit_documentation_fidelity.py --check
+      - name: Validate current authoring examples and SIEM Result sample
+        run: |
+          python tools/check_documentation_examples.py --check
+          python -m unittest discover -s tests -p 'test_result_correlation_guids.py' -v
+          python -m unittest discover -s tests -p 'test_variable_type_inference_contract.py' -v
+      - name: Record downstream obligations
+        run: |
+          {
+            echo "## Every schema change requires all three consumer gates"
+            echo "- Converter: https://github.com/vanderpol/scap-ng-tools/issues/59"
+            echo "- Editor: https://github.com/vanderpol/scap-ng-vscode/issues/65"
+            echo "- RI: https://github.com/vanderpol/scap-ng-ri/issues/66"
+            echo "- Canonical tracking: https://github.com/vanderpol/scap-ng/issues/66"
+            echo "- The above consumers must pin the exact reviewed 0.4.1 main SHA."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  check-consumer-pins:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: generated-content-contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      CANONICAL_SHA: ${{ github.sha }}
+    steps:
+      - name: Read-only exact-version pin audit of every consumer
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          for repo in scap-ng-tools scap-ng-vscode scap-ng-ri; do
+            echo "Checking vanderpol/$repo against $CANONICAL_SHA"
+            if ! raw="$(gh api "repos/vanderpol/$repo/contents/canonical-schema-pin.json" -H "Accept: application/vnd.github.raw" 2>/dev/null)"; then
+              echo "::error::vanderpol/$repo has no accessible canonical-schema-pin.json; downstream qualification required."
+              missing=1
+              continue
+            fi
+            if ! jq -e --arg sha "$CANONICAL_SHA" '
+              .schema_version == "0.4.1" and .canonical_sha == $sha
+              and .single_version == true
+            ' <<<"$raw" >/dev/null; then
+              echo "::error::vanderpol/$repo has a stale or alternate schema pin."
+              missing=1
+            fi
+          done
+          {
+            echo "## Exact SCAP-NG 0.4.1 consumer handoff"
+            echo "Canonical commit: $CANONICAL_SHA"
+            echo "Tools: https://github.com/vanderpol/scap-ng-tools/issues/59"
+            echo "VS Code: https://github.com/vanderpol/scap-ng-vscode/issues/65"
+            echo "RI: https://github.com/vanderpol/scap-ng-ri/issues/66"
+            echo "Read-only audit; **no remote repository write or dispatch** is attempted."
+            echo "Any mismatch requires a separately authorized, reviewed consumer PR."
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit "$missing"

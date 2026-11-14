@@ -127,7 +127,7 @@ class CardinalityAndParity(unittest.TestCase):
             file.write_text(json.dumps(mapping))
             source = root / docs.PILOT / 'source-map.json'
             pins = json.loads(source.read_text())
-            pins['frozen_schema_sha256'][str(file.relative_to(root))] = docs.sha256(file.read_bytes()).hexdigest()
+            pins['current_schema_sha256'][str(file.relative_to(root))] = docs.sha256(file.read_bytes()).hexdigest()
             source.write_text(json.dumps(pins))
             for render in [docs.render, docs.render_constraints, docs.render_parity]:
                 self.assertEqual(render(root), render())

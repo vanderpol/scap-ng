@@ -1,6 +1,6 @@
 # unix.interface
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The interface test enumerates various attributes about the interfaces on a system.
 

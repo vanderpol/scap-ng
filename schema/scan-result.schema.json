@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://scap-ng.dev/schema/v0.4.0/scan-result.schema.json",
-  "x-scap-ng-version": "0.4.0",
+  "$id": "https://scap-ng.dev/schema/v0.4.1/scan-result.schema.json",
+  "x-scap-ng-version": "0.4.1",
   "x-last-modified": "2026-10-06",
-  "title": "SCAP-NG Scan Result pre-release v0.4.0",
+  "title": "SCAP-NG Scan Result pre-release v0.4.1",
   "description": "Run-level index for one scanner execution. Detailed Benchmark and Assessment results remain normalized package members referenced by identity/path.",
   "type": "object",
   "required": [
@@ -22,7 +22,7 @@
       ],
       "properties": {
         "result_schema_version": {
-          "const": "0.4.0"
+          "const": "0.4.1"
         },
         "run_id": {
           "type": "string",
@@ -40,7 +40,17 @@
           "format": "date-time"
         },
         "scanner": {
-          "type": "object"
+          "type": "object",
+          "description": "Scanner application/agent metadata for the scan session. app_guid identifies the scanner application installation or enterprise agent identity, not the scanner version, target machine or individual scan. Other existing scanner metadata remains permitted.",
+          "properties": {
+            "app_guid": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+              "format": "uuid",
+              "description": "Stable scanner application/agent installation GUID for enterprise SIEM correlation; sourced from scanner/enterprise inventory, not inferred from hostname or content."
+            }
+          },
+          "additionalProperties": true
         },
         "targets": {
           "type": "array",
@@ -72,6 +82,12 @@
                 "items": {
                   "type": "string"
                 }
+              },
+              "machine_guid": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+                "format": "uuid",
+                "description": "Stable target-machine GUID supplied by authoritative system or enterprise asset inventory. This belongs to each target (a scan may have multiple targets); it is not the scanner application GUID, hostname, address, or per-scan session ID. Do not fabricate from hostnames or MAC addresses; omit when unavailable."
               }
             },
             "additionalProperties": false
@@ -137,6 +153,12 @@
             "string",
             "null"
           ]
+        },
+        "scan_session_guid": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "format": "uuid",
+          "description": "Globally unique scan/session correlation identifier, newly generated once per scan session and shared by all result events belonging to that session. This is distinct from the existing run_id and from any compliance or evidence identity. Canonical lowercase hyphenated UUID; it must never be regenerated per Rule/Assessment event."
         }
       },
       "additionalProperties": false

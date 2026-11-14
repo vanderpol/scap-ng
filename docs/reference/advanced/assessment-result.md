@@ -1,4 +1,4 @@
-# SCAP-NG Assessment Result draft v0.4.0 strawman — advanced constraints
+# SCAP-NG Assessment Result draft v0.4.1 strawman — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 
@@ -6,7 +6,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | --- | --- | --- |
 | [schema](../../../proposed-schema/documentation/assessment-result.schema.json#) | {"type": "object", "required": ["assessment_result"], "additionalProperties": false} | existing-native |
 | [/properties/assessment_result](../../../proposed-schema/documentation/assessment-result.schema.json#/properties/assessment_result) | {"type": "object", "required": ["result_schema_version", "execution_id", "assessment", "purpose", "class", "outcome", "summary", "logical_complete", "population_complete", "evidence_complete", "tests", "objects", "variables", "diagnostics", "mode", "target_ref", "expression_execution", "field_uses", "dependent_assessments"], "additionalProperties": false} | native-structure-derived |
-| [/properties/assessment_result/properties/result_schema_version](../../../proposed-schema/documentation/assessment-result.schema.json#/properties/assessment_result/properties/result_schema_version) | {"const": "0.4.0"} | existing-native |
+| [/properties/assessment_result/properties/result_schema_version](../../../proposed-schema/documentation/assessment-result.schema.json#/properties/assessment_result/properties/result_schema_version) | {"const": "0.4.1"} | existing-native |
 | [/properties/assessment_result/properties/execution_id](../../../proposed-schema/documentation/assessment-result.schema.json#/properties/assessment_result/properties/execution_id) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/assessment_result/properties/assessment](../../../proposed-schema/documentation/assessment-result.schema.json#/properties/assessment_result/properties/assessment) | {"type": "object", "required": ["id", "version"], "additionalProperties": false} | native-structure-derived |
 | [/properties/assessment_result/properties/assessment/properties/id](../../../proposed-schema/documentation/assessment-result.schema.json#/properties/assessment_result/properties/assessment/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |

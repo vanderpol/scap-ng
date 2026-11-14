@@ -1,6 +1,6 @@
 # windows.auditeventpolicysubcategories
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `windows.auditeventpolicysubcategories` is used to check the audit event policy settings on a Windows system.
 

@@ -19,7 +19,7 @@ import generate_documentation as gen
 import documentation_artifacts as artifacts
 
 PREFIX = 'https://scap-ng.dev/schema/proposed/documentation/'
-FROZEN = 'https://scap-ng.dev/schema/v0.4.0/'
+FROZEN = 'https://scap-ng.dev/schema/v0.4.1/'
 
 
 def assertions(value):
@@ -83,10 +83,10 @@ class ProductionDocumentationTests(unittest.TestCase):
         native={d['$id']:d for p in (ROOT/'schema').glob('*.json') if '$schema' in (d:=json.loads(p.read_text()))}
         registry=Registry().with_resources((u,Resource.from_contents(d)) for u,d in native.items())
         proposed=Registry().with_resources((u,Resource.from_contents(d)) for u,(d,p) in self.docs.items())
-        cases=json.loads((ROOT/'docs/review-packs/issue43-phase-a/validation-cases.json').read_text())
-        self.assertEqual(len(cases),157)
-        cases += json.loads((ROOT/'tests/fixtures/documentation-validation-witnesses.json').read_text())
-        self.assertEqual(len(cases),170)
+        # Issue #43's 0.4.0 validation cases are historical evidence and are
+        # qualified by the independent receipt, not this active 0.4.1 pack.
+        cases=json.loads((ROOT/'tests/fixtures/documentation-validation-witnesses.json').read_text())
+        self.assertEqual(len(cases),13)
         for case in cases:
             uri=FROZEN+case['schema_file']+'#'+case['pointer']
             old=Draft202012Validator({'$ref':uri},registry=registry).is_valid(case['instance'])
@@ -94,25 +94,12 @@ class ProductionDocumentationTests(unittest.TestCase):
             self.assertEqual(old,case['expected_valid'],case['name'])
             self.assertEqual(new,old,case['name'])
 
-    def test_all_editorial_approvals_and_semantic_holds_preserved(self):
-        approved=held=withheld=0
-        for file in ['editorial-batch.json','editorial-batch-2.json']:
-            batch=json.loads((ROOT/'docs/research/issue40'/file).read_text())
-            for row in batch['proposals']:
-                uri=row['schema_uri'].replace(FROZEN,PREFIX)+'#'+row['pointer']
-                value=gen.node(self.docs,uri)
-                if row['editorial_status'] in ('accepted_as_written','accepted_with_revision'):
-                    self.assertEqual(value['description'],row['author_description']);approved+=1
-                elif row['classification']=='semantic_decision_needed':
-                    if row.get('withheld'):
-                        self.assertEqual(value['x-doc-review']['status'],'withheld')
-                        withheld+=1
-                        continue
-                    self.assertEqual(value['x-doc-review']['status'],'semantic-hold')
-                    original=json.loads((ROOT/row['schema_file']).read_text())
-                    self.assertEqual(value.get('description'),gen.pointer(original,row['pointer']).get('description'));held+=1
-        self.assertEqual((approved,held),(46,9))
-        self.assertEqual(withheld,1)
+    def test_historical_editorial_receipt_is_not_imported_into_active_docs(self):
+        from verify_historical_documentation import verify
+        receipt = verify()
+        self.assertEqual(receipt['status'], 'PASS')
+        self.assertFalse(receipt['active_schema_checked'])
+        self.assertFalse(any('v0.4.0' in json.dumps(doc) for doc, _ in self.docs.values()))
 
     def test_regeneration_is_byte_identical_and_committed_outputs_current(self):
         self.assertEqual(self.outputs,gen.generate())

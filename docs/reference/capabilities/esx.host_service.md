@@ -1,6 +1,6 @@
 # esx.host_service
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 Inspect service configuration and state on an ESXi host.
 

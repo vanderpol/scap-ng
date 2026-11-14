@@ -1,6 +1,6 @@
 # aix.fileset
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `aix.fileset` is used to check information associated with different filesets installed on the system.
 

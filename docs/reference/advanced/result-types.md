@@ -1,4 +1,4 @@
-# Draft shared result types 0.4.0 — advanced constraints
+# Draft shared result types 0.4.1 — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 

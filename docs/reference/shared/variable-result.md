@@ -1,4 +1,4 @@
-# SCAP-NG Variable Result draft v0.4.0 strawman
+# SCAP-NG Variable Result draft v0.4.1 strawman
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

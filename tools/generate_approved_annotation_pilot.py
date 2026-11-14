@@ -9,7 +9,9 @@ from copy import deepcopy
 from hashlib import sha256
 import json
 from pathlib import Path
+import subprocess
 import sys
+import shutil
 from urllib.parse import urljoin, urldefrag
 
 from jsonschema import Draft202012Validator
@@ -45,8 +47,58 @@ def remap(node, base, routes):
     return result
 
 
-def proposal(root=ROOT):
-    result = audit.audit(root)
+def _historical_input_workspace(root, workspace, git_root=None):
+    """Overlay the later historical receipts needed by the pilot.
+
+    The native schema comes from the frozen Issue #40 commit, while the
+    reviewed wording/selection files were recorded by later review commits.
+    Resolve those exact blobs into the isolated archive instead of reading
+    today's active 0.4.1 files as if they were 0.4.0 evidence.
+    """
+    git_root = Path(git_root or root)
+    paths = [
+        'docs/research/issue40/review-notes.json',
+        'docs/research/issue40/editorial-batch.json',
+        'docs/research/issue40/editorial-batch-2.json',
+        'docs/research/issue40/schema-manifest.json',
+        'docs/pilots/approved-annotations/selection.json',
+        'docs/pilots/approved-annotations/source-map.json',
+    ]
+    desired_hashes = {}
+    # Editorial witnesses are deliberately restricted to repository examples.
+    for name in ('docs/research/issue40/editorial-batch.json',
+                 'docs/research/issue40/editorial-batch-2.json'):
+        data = json.loads((root / name).read_text())
+        for row in data['proposals']:
+            for check in row['checks']:
+                if 'instance_file' in check:
+                    path = check['instance_file']
+                    paths.append(path)
+                    desired_hashes[path] = check['instance_sha256']
+    for path in dict.fromkeys(paths):
+        source_raw = (root / path).read_bytes()
+        expected_hash = desired_hashes.get(path, sha256(source_raw).hexdigest())
+        raw = source_raw
+        candidates = subprocess.check_output(
+            ['git', '-C', str(git_root), 'log', '--all', '--format=%H', '--', path],
+            text=True).split()
+        for commit in candidates:
+            try:
+                candidate_raw = subprocess.check_output(
+                    ['git', '-C', str(git_root), 'show', f'{commit}:{path}'],
+                    stderr=subprocess.DEVNULL)
+            except subprocess.CalledProcessError:
+                continue
+            if sha256(candidate_raw).hexdigest() == expected_hash:
+                raw = candidate_raw
+                break
+        target = workspace / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(raw)
+
+
+def _proposal(root):
+    result = audit.audit(root, active=False)
     selection = json.loads((root / DEST / 'selection.json').read_text())
     if selection['production_installation_authorized'] is not False or selection['authorization'] != 'https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721723400':
         raise ValueError('Proposal must not authorize production installation')
@@ -61,7 +113,7 @@ def proposal(root=ROOT):
             raise ValueError('Integration cannot install a semantic hold or unapproved description')
         selected.append((entry, row))
     owners = {(row['schema_uri'], row['pointer']) for _, row in selected}
-    if len(owners) != len(entries) or len({uri for uri in sorted({uri for uri, _ in owners})}) < 3:
+    if len(owners) != len(entries) or len({uri for uri, _ in sorted(owners)}) < 3:
         raise ValueError('Descriptions require distinct owners across at least three schema families')
     routes = {uri: NEXT + Path(urldefrag(uri)[0]).name for uri in sorted({uri for uri, _ in owners})}
     proposed = {routes[uri]: remap(result['documents'][uri], uri, routes) for uri in sorted(routes)}
@@ -87,8 +139,6 @@ def proposal(root=ROOT):
             'new_pointer': uri + '#' + row['pointer'] + '/description', 'lookup_pointer': lookup,
             'fixture_file': str(SCHEMAS / Path(uri).name), 'help_route': ROUTES + '#/$defs/' + entry['name']})
         witnesses.extend(row['checks'])
-    # Aside from these eight approved descriptions and reversible URI routing,
-    # every source keyword/value must remain byte-for-value identical.
     normalized = deepcopy(proposed)
     for _, row in selected:
         node = pointer(normalized[routes[row['schema_uri']]], row['pointer'])
@@ -103,6 +153,48 @@ def proposal(root=ROOT):
     proposed[ROUTES] = help_schema
     expected = {str(SCHEMAS / Path(uri).name): encode(doc) for uri, doc in proposed.items()}
     return result, source_map, proposed, expected, witnesses
+
+
+def proposal(root=ROOT):
+    # The pilot is historical evidence even when a unit test supplies an
+    # isolated root. Rebuild the native 0.4.0 workspace from Git and overlay
+    # only that test's reviewed receipt inputs; never reinterpret active 0.4.1
+    # schema files as the old pilot contract.
+    if root == ROOT or (root / 'docs/research/issue40').is_dir():
+        source = root if root != ROOT else ROOT
+        with audit.historical_workspace(ROOT) as workspace:
+            if root != ROOT:
+                for relative in ('docs/research/issue40', 'docs/pilots/approved-annotations'):
+                    source_path = root / relative
+                    target = workspace / relative
+                    if source_path.exists():
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        if source_path.is_dir():
+                            shutil.copytree(source_path, target, dirs_exist_ok=True)
+                        else:
+                            shutil.copy2(source_path, target)
+            _historical_input_workspace(source, workspace, ROOT)
+            return _proposal(workspace)
+    return _proposal(root)
+
+
+def _witness_bytes(root, path, expected_hash):
+    raw = (root / path).read_bytes()
+    if sha256(raw).hexdigest() == expected_hash:
+        return raw
+    commits = subprocess.check_output(
+        ['git', '-C', str(ROOT), 'log', '--all', '--format=%H', '--', path],
+        text=True).split()
+    for commit in commits:
+        try:
+            raw = subprocess.check_output(
+                ['git', '-C', str(ROOT), 'show', f'{commit}:{path}'],
+                stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            continue
+        if sha256(raw).hexdigest() == expected_hash:
+            return raw
+    raise ValueError('Unable to resolve pinned pilot witness: ' + path)
 
 
 def load(root=ROOT):
@@ -134,9 +226,7 @@ def load(root=ROOT):
             store.node(urljoin(uri, ref))
     for case in witnesses:
         if 'instance_file' in case:
-            raw = (root / case['instance_file']).read_bytes()
-            if sha256(raw).hexdigest() != case['instance_sha256']:
-                raise ValueError('Pinned witness drifted')
+            raw = _witness_bytes(root, case['instance_file'], case['instance_sha256'])
             instance = yaml.safe_load(raw)
         else:
             instance = case['instance']

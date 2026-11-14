@@ -1,6 +1,6 @@
 # windows.cmdlet
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `windows.cmdlet` is used to leverage a PowerShell cmdlet to check a Windows system.
 

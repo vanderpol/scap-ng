@@ -1,6 +1,6 @@
 # unix.process
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `unix.process` is used to check information found in the UNIX processes.
 

@@ -1,6 +1,6 @@
 # linux.selinuxsecuritycontext
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `linux.selinuxsecuritycontext` is used to check the security context of a file or process on the local system.
 

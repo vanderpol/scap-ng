@@ -32,7 +32,7 @@
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/description",
-      "description": "SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit field_requirement scopes. Legacy State arrays and scalar Test.require are invalid. Schema acceptance does not establish scanner conformance.",
+      "description": "SCAP-NG 0.4.1 Assessment predicates: structured Item requirements and explicit field_requirement scopes. Legacy State arrays and scalar Test.require are invalid. Schema acceptance does not establish scanner conformance.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
@@ -11757,7 +11757,7 @@
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/capability-common.schema.json#/$defs/inline_object/description",
-      "description": "Inline native Object. Capability-specific resource selectors and acquisition parameters are direct Object fields; generic select/collect wrappers are not part of the 0.4.0 grammar. The capability-specific generated schema validates each direct field, including native windows.cmdlet select. Filters and Set operations retain their own semantic boundaries.",
+      "description": "Inline native Object. Capability-specific resource selectors and acquisition parameters are direct Object fields; generic select/collect wrappers are not part of the 0.4.1 grammar. The capability-specific generated schema validates each direct field, including native windows.cmdlet select. Filters and Set operations retain their own semantic boundaries.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
@@ -12205,7 +12205,7 @@
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/expression.schema.json#",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/expression.schema.json#/description",
-      "description": "SCAP-NG 0.4.0 Test-result expression grammar. Logical and/or/one/xor are canonical; legacy all/any/odd are invalid. Item cardinalities are separate.",
+      "description": "SCAP-NG 0.4.1 Test-result expression grammar. Logical and/or/one/xor are canonical; legacy all/any/odd are invalid. Item cardinalities are separate.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
@@ -13995,6 +13995,13 @@
       "status": "native-structure-derived"
     },
     {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner/properties/app_guid",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner/properties/app_guid/description",
+      "description": "Stable scanner application/agent installation GUID for enterprise SIEM correlation; sourced from scanner/enterprise inventory, not inferred from hostname or content.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/description",
       "description": "Target identity records associated with the scan.",
@@ -14028,6 +14035,13 @@
       "description": "Network addresses recorded for the target.",
       "scope": "declared-schema",
       "status": "native-structure-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/machine_guid",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/machine_guid/description",
+      "description": "Stable target-machine GUID supplied by authoritative system or enterprise asset inventory. This belongs to each target (a scan may have multiple targets); it is not the scanner application GUID, hostname, address, or per-scan session ID. Do not fabricate from hostnames or MAC addresses; omit when unavailable.",
+      "scope": "declared-schema",
+      "status": "existing-native"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/benchmark_results",
@@ -14084,6 +14098,13 @@
       "description": "Signature status recorded for the scan result.",
       "scope": "declared-schema",
       "status": "native-structure-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scan_session_guid",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scan_session_guid/description",
+      "description": "Globally unique scan/session correlation identifier, newly generated once per scan session and shared by all result events belonging to that session. This is distinct from the existing run_id and from any compliance or evidence identity. Canonical lowercase hyphenated UUID; it must never be regenerated per Rule/Assessment event.",
+      "scope": "declared-schema",
+      "status": "existing-native"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/state-result.schema.json#",
@@ -14347,7 +14368,7 @@
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/description",
-      "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or retained transformations. The schema describes the authoring shape; type compatibility, collection status, and evaluation results are checked separately by semantic validation or the runtime when those implementations exist.",
+      "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or explicit recursive transformations. Active 0.4 forms preserve source operand order, collection multiplicity, empty values, and evaluation status; datatype compatibility and status propagation are checked separately by semantic validation or a qualified runtime.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
@@ -14364,13 +14385,6 @@
       "description": "Selects a constant or locally derived Variable.",
       "scope": "declared-schema",
       "status": "editorially-approved"
-    },
-    {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype/description",
-      "description": "Datatype promised by this Variable. The expression must produce compatible values.",
-      "scope": "declared-schema",
-      "status": "semantic-hold"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/expression",
@@ -14564,49 +14578,210 @@
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique/description",
-      "description": "Remove duplicate scalar values from the input. Record data is not a supported transformation operand; value ordering and status propagation remain governed by the inherited semantic contract.",
+      "description": "Remove duplicate scalar values from one expression or from multiple ordered component populations. Multiple components are flattened in source order before first-occurrence deduplication; duplicates and diagnostic statuses are preserved. Record data is not a supported transformation operand.",
       "scope": "declared-schema",
       "status": "semantic-hold"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/description",
+      "description": "Return the cardinality of values from a nested Variable expression as one integer. Duplicates contribute to the count; non-success statuses are not coerced to zero.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/count",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/count/description",
+      "description": "Evaluate the nested expression and return the number of values it produces as one integer. Count each produced value, including duplicates; do not count unique values unless the author explicitly wraps the input with unique. An empty, successfully evaluated collection produces zero. Missing, incomplete, not-collected, error, and other non-success states must retain the native status contract instead of silently becoming zero. Runtime equivalence is subject to independent conformance tests.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/description",
+      "description": "Split each input string on the explicit literal delimiter. Preserve leading, trailing, and adjacent empty parts, duplicates, collection order, and diagnostic statuses.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/description",
+      "description": "Split each input string on the explicit literal delimiter. Preserve leading, trailing, and adjacent empty parts, duplicates, collection order, and diagnostic statuses.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/delimiter",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/delimiter/description",
+      "description": "Literal delimiter; an empty delimiter is literal, not a regular expression.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/value/description",
+      "description": "Expression producing string values to split independently.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/description",
+      "description": "Extract a substring from each input string using explicit signed 32-bit source options. Out-of-range and diagnostic outcomes remain errors/statuses; no defaults are inferred.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/description",
+      "description": "Extract a substring from each input string using explicit signed 32-bit source options. Out-of-range and diagnostic outcomes remain errors/statuses; no defaults are inferred.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_start",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_start/description",
+      "description": "Signed 32-bit OVAL start position; evaluation applies the source one-based boundary rules.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_length",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_length/description",
+      "description": "Signed 32-bit length; negative or oversized lengths retain the source remainder behavior.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/value/description",
+      "description": "Expression producing string values to slice independently.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/description",
+      "description": "Add or multiply two or more numeric populations over the source Cartesian product. Integer-only inputs produce integers; any float input produces floats. Invalid types and diagnostic populations are not coerced.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/description",
+      "description": "Add or multiply two or more numeric populations over the source Cartesian product. Integer-only inputs produce integers; any float input produces floats. Invalid types and diagnostic populations are not coerced.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/arithmetic_operation",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/arithmetic_operation/description",
+      "description": "Numeric addition or multiplication; no boolean or string coercion.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/values",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/values/description",
+      "description": "Two or more ordered numeric expressions. Multiple-valued operands use the source Cartesian-product semantics and retain multiplicity/status.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/description",
+      "description": "Retain the source begin-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/description",
+      "description": "Retain the source begin-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/character",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/character/description",
+      "description": "Explicit character used by the source begin operation.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/value/description",
+      "description": "Expression producing string values to test.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/description",
+      "description": "Retain the source end-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/description",
+      "description": "Retain the source end-character transformation with one explicit input and character. Collection and status behavior remains source-defined and is not approximated by schema validation.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/character",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/character/description",
+      "description": "Explicit character used by the source end operation.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/value/description",
+      "description": "Expression producing string values to test.",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/description",
       "description": "Sort and join values into one string.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/description",
-      "description": "Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/description",
+      "description": "Combine one or more ordered input populations into one string using an explicit delimiter, sort mode, and order. document preserves flattened input order; other modes sort before joining. Duplicates are preserved unless a separate unique expression removes them.",
       "scope": "declared-schema",
       "status": "semantic-hold"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/delimiter",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/delimiter/description",
       "description": "String inserted between adjacent values.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/sort",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/sort/description",
       "description": "`document` preserves input order; `lexical`, `numeric`, and `natural` select the corresponding explicit ordering.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/order",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/order/description",
       "description": "Ascending or descending order for the selected sort mode.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/values",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/values/description",
-      "description": "Expression producing values to join. Collection and status propagation are semantic/runtime behavior, not schema execution.",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values/description",
+      "description": "Expression or ordered component populations to join. Multiple populations are flattened in source order; values, duplicates, and diagnostic statuses are preserved.",
       "scope": "declared-schema",
       "status": "existing-native"
     },
@@ -43777,6 +43952,12 @@
       "status": "native-structure-derived"
     },
     {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner/properties/app_guid",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner/properties/app_guid/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/description",
       "scope": "declared-schema",
@@ -43805,6 +43986,12 @@
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/addresses/description",
       "scope": "declared-schema",
       "status": "native-structure-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/machine_guid",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/machine_guid/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/benchmark_results",
@@ -43865,6 +44052,12 @@
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/signature_status/description",
       "scope": "declared-schema",
       "status": "native-structure-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scan_session_guid",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/scan-result.schema.json#/properties/scan_result/properties/scan_session_guid/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/state-result.schema.json#",
@@ -44251,12 +44444,6 @@
       "status": "editorially-approved"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype/description",
-      "scope": "declared-schema",
-      "status": "semantic-hold"
-    },
-    {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/expression",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/expression/description",
       "scope": "declared-schema",
@@ -44267,18 +44454,6 @@
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/title/description",
       "scope": "declared-schema",
       "status": "existing-native"
-    },
-    {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/if/properties/kind",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/kind/description",
-      "scope": "declared-schema",
-      "status": "editorially-approved"
-    },
-    {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/properties/expression/description",
-      "scope": "declared-schema",
-      "status": "editorially-approved"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal",
@@ -44297,12 +44472,6 @@
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/properties/value/description",
       "scope": "declared-schema",
       "status": "existing-native"
-    },
-    {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/if/properties/datatype",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/datatype_tag/description",
-      "scope": "declared-schema",
-      "status": "native-grammar-derived"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/declaration/allOf/0/then/properties/expression/properties/literal/oneOf/2/allOf/0/then/properties/value",
@@ -44345,12 +44514,6 @@
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/0/properties/literal/oneOf/2/properties/value/description",
       "scope": "declared-schema",
       "status": "existing-native"
-    },
-    {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/0/properties/literal/oneOf/2/allOf/0/if/properties/datatype",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/assessment-language.schema.json#/$defs/documentation_terms/$defs/datatype_tag/description",
-      "scope": "declared-schema",
-      "status": "native-grammar-derived"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/0/properties/literal/oneOf/2/allOf/0/then/properties/value",
@@ -44455,40 +44618,208 @@
       "status": "semantic-hold"
     },
     {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique/oneOf/0",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/description",
+      "scope": "declared-schema",
+      "status": "native-grammar-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique/oneOf/1/items",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/description",
+      "scope": "declared-schema",
+      "status": "native-grammar-derived"
+    },
+    {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6",
       "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/description",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/count",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/count/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/delimiter",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/delimiter/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/value/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_start",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_start/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_length",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_length/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/value/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/arithmetic_operation",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/arithmetic_operation/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/values",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/values/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/values/items",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/description",
+      "scope": "declared-schema",
+      "status": "native-grammar-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/character",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/character/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/value/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/character",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/character/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/value",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/value/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/description",
+      "scope": "declared-schema",
+      "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/description",
       "scope": "declared-schema",
       "status": "semantic-hold"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/delimiter",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/delimiter/description",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/sort",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/sort/description",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/order",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/order/description",
       "scope": "declared-schema",
       "status": "existing-native"
     },
     {
-      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/values",
-      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/values/description",
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values/description",
       "scope": "declared-schema",
       "status": "existing-native"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values/oneOf/0",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/description",
+      "scope": "declared-schema",
+      "status": "native-grammar-derived"
+    },
+    {
+      "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values/oneOf/1/items",
+      "description_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json#/$defs/expression/description",
+      "scope": "declared-schema",
+      "status": "native-grammar-derived"
     },
     {
       "schema_pointer": "https://scap-ng.dev/schema/proposed/documentation/variable-function-expression.schema.json#",
@@ -78332,11 +78663,11 @@
     {
       "capability": "independent.shellcommand",
       "id": "independent-shellcommand-pass",
-      "path": "examples/paired/v0.4.0/independent.shellcommand.pass.yaml",
-      "sha256": "46641b01cc3daaa649ffba77ef58d55f40d5d65e2499f8ea79deaa43a7a0b6e1",
+      "path": "examples/paired/v0.4.1/independent.shellcommand.pass.yaml",
+      "sha256": "de2b7007ea92c42ebd406608808533c915555558b6b69a91952baf7ab1bab8d1",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Pass",
@@ -78350,11 +78681,11 @@
     {
       "capability": "independent.shellcommand",
       "id": "independent-shellcommand-fail",
-      "path": "examples/paired/v0.4.0/independent.shellcommand.fail.yaml",
-      "sha256": "7883d14a177007740c2f491d721eef85517607642353e6cb7b08262bdec28090",
+      "path": "examples/paired/v0.4.1/independent.shellcommand.fail.yaml",
+      "sha256": "57b17a91e0299c1da40fd5a0a35875f8f259f413d6c71c3b98bf77303bb67c3a",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Fail",
@@ -78368,11 +78699,11 @@
     {
       "capability": "linux.rpminfo",
       "id": "linux-rpminfo-pass",
-      "path": "examples/paired/v0.4.0/linux.rpminfo.pass.yaml",
-      "sha256": "15f126e14b42dfea0f2cf62286899297bae863045c46e1c1b9e406d64d7f2a59",
+      "path": "examples/paired/v0.4.1/linux.rpminfo.pass.yaml",
+      "sha256": "45d1e643044a7b52ce727ae87134f0a8a4597d16cd51bdf96602a93493fe3f9a",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Pass",
@@ -78386,11 +78717,11 @@
     {
       "capability": "linux.rpminfo",
       "id": "linux-rpminfo-fail",
-      "path": "examples/paired/v0.4.0/linux.rpminfo.fail.yaml",
-      "sha256": "8bc93293a6b12632f10612101b86a961946a4e5c12573940414125aabd88b3c2",
+      "path": "examples/paired/v0.4.1/linux.rpminfo.fail.yaml",
+      "sha256": "deaa73c793e81affea91a48f0029aa0eadeb2f9516b75cea9ce9cc68640ab466",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Fail",
@@ -78404,11 +78735,11 @@
     {
       "capability": "unix.file",
       "id": "unix-file-pass",
-      "path": "examples/paired/v0.4.0/unix.file.pass.yaml",
-      "sha256": "99ca688926ed218b0180b451ae9eed76051411b31550132f8447a1d59e126f3d",
+      "path": "examples/paired/v0.4.1/unix.file.pass.yaml",
+      "sha256": "c8e132dd8cdb8362f679952fe2e75b5a8a8ac9a036ab8c3c5a3549aafa2787d4",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Pass",
@@ -78422,11 +78753,11 @@
     {
       "capability": "unix.file",
       "id": "unix-file-fail",
-      "path": "examples/paired/v0.4.0/unix.file.fail.yaml",
-      "sha256": "e3e56ecd6349ad00c747ac57b5f8383538925cfa4d5534128ba8b200220ae5d2",
+      "path": "examples/paired/v0.4.1/unix.file.fail.yaml",
+      "sha256": "d751b0f1e734a63a38a2adfa28c1e0d192659bfd2978356b63c0d6ce5cfd33b3",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Fail",
@@ -78440,11 +78771,11 @@
     {
       "capability": "windows.registry",
       "id": "windows-registry-pass",
-      "path": "examples/paired/v0.4.0/windows.registry.pass.yaml",
-      "sha256": "446a74fc5e26c12ce787055a562b5150c2f3c73ba2b97651308b9aebc3bfd88c",
+      "path": "examples/paired/v0.4.1/windows.registry.pass.yaml",
+      "sha256": "a79c0699b30f9c46e9e9dac0d428d13cb328c40410a545ba11888c975ad1fee1",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Pass",
@@ -78458,11 +78789,11 @@
     {
       "capability": "windows.registry",
       "id": "windows-registry-fail",
-      "path": "examples/paired/v0.4.0/windows.registry.fail.yaml",
-      "sha256": "aae839929c596e38b56bcbaacb4583d8129798be2eaa8ca945fa6ae7b0aa40e1",
+      "path": "examples/paired/v0.4.1/windows.registry.fail.yaml",
+      "sha256": "6c9923232fe36c9f3414ed4951e508cf866e64fe7fe9b6503e570ebeb37d4bc6",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Fail",
@@ -78476,11 +78807,11 @@
     {
       "capability": "windows.service",
       "id": "windows-service-pass",
-      "path": "examples/paired/v0.4.0/windows.service.pass.yaml",
-      "sha256": "e93bb20458f6a5ccbf2b65defa8c4c9dfc5da1fdd8882d7d796af1285b2c05df",
+      "path": "examples/paired/v0.4.1/windows.service.pass.yaml",
+      "sha256": "c4e4e853ea654efc97f919292170796fbf4339cd2d51b78c6780d4d115fd2c89",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Pass",
@@ -78494,11 +78825,11 @@
     {
       "capability": "windows.service",
       "id": "windows-service-fail",
-      "path": "examples/paired/v0.4.0/windows.service.fail.yaml",
-      "sha256": "ad04c6ad0febc9efaf3130791405ab791c31eca232563390646fbd2dff7df8ab",
+      "path": "examples/paired/v0.4.1/windows.service.fail.yaml",
+      "sha256": "7daca9fb4ac11d42b098e81423257fe2b7987055eaefb17ba9dafef12cea2737",
       "schema_pin": {
-        "path": "examples/paired/v0.4.0/schema-pin.json",
-        "sha256": "9a567f96cdec4ac82207b576f2fbfaa3bffc7fccc5fde34a2074ab84c6c435db"
+        "path": "examples/paired/v0.4.1/schema-pin.json",
+        "sha256": "fe401448e5b7e22173dbda6c6444f5b410e5773dea90b95f9d7efc9ce030591d"
       },
       "expected": {
         "label": "Fail",

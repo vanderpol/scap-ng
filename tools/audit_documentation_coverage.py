@@ -27,7 +27,7 @@ def audit():
     for path in frozen:
         fingerprint.update(path.relative_to(schema).as_posix().encode() + b'\0')
         fingerprint.update(path.read_bytes())
-    if len(frozen) != 145 or fingerprint.hexdigest() != '63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5':
+    if len(frozen) != 145 or fingerprint.hexdigest() != '5d3b7f9507318c5ca2e85009fd8bc284d906d357b58cd278219c84f9481536a1':
         raise ValueError('Audit requires the pinned frozen baseline')
     documents = {p.name: json.loads(p.read_text(encoding='utf-8')) for p in schema.glob('*.json')}
     overlays = documents['native-selector.schema.json']['$defs']

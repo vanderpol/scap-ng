@@ -1,23 +1,15 @@
-# Native Variable declarations and retained expressions — advanced constraints
+# Native Variable declarations and retained OVAL transformations — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/declaration](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration) | {"type": "object", "required": ["kind", "datatype", "expression"], "additionalProperties": false} | native-grammar-derived |
+| [/$defs/declaration](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration) | {"type": "object", "required": ["kind", "expression"], "additionalProperties": false} | native-grammar-derived |
 | [/$defs/declaration/properties/kind](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/kind) | {"enum": ["local", "constant"]} | editorially-approved |
 
 [/$defs/declaration/properties/kind](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/kind): Selects a constant or locally derived Variable.
 
 Editorial receipt: editorial-batch-2.json case 06
-
-| Pointer | Local constraints | Documentation status |
-| --- | --- | --- |
-| [/$defs/declaration/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype) | {} | semantic-hold |
-
-[/$defs/declaration/properties/datatype](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/declaration/properties/datatype): Datatype promised by this Variable. The expression must produce compatible values.
-
-The enum is enforced, but full declaration-to-expression compatibility and casts are not established by these witnesses. Retain a semantic hold for the strength of this promise; do not imply coercion or complete tag/payload validation.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
@@ -96,21 +88,41 @@ The current native annotation specifies the first group but delegates regex dial
 | [/$defs/expression/oneOf/5](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5) | {"type": "object", "required": ["unique"], "additionalProperties": false} | existing-native |
 | [/$defs/expression/oneOf/5/properties/unique](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique) | {} | semantic-hold |
 
-[/$defs/expression/oneOf/5/properties/unique](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique): Remove duplicate scalar values from the input. Record data is not a supported transformation operand; value ordering and status propagation remain governed by the inherited semantic contract.
+[/$defs/expression/oneOf/5/properties/unique](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique): Remove duplicate scalar values from one expression or from multiple ordered component populations. Multiple components are flattened in source order before first-occurrence deduplication; duplicates and diagnostic statuses are preserved. Record data is not a supported transformation operand.
 
 The native description excludes record operands, although the expression reference does not by itself close every operand type. Equality, ordering and unavailable-value propagation remain pending; no deduplication runtime is executed.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/expression/oneOf/6](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6) | {"type": "object", "required": ["merge"], "additionalProperties": false} | existing-native |
-| [/$defs/expression/oneOf/6/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge) | {"type": "object", "required": ["delimiter", "sort", "order", "values"], "additionalProperties": false} | semantic-hold |
+| [/$defs/expression/oneOf/5/properties/unique/oneOf/1](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/5/properties/unique/oneOf/1) | {"type": "array", "minItems": 1} | existing-native |
+| [/$defs/expression/oneOf/6](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6) | {"type": "object", "required": ["count"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/7](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7) | {"type": "object", "required": ["split"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/7/properties/split](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split) | {"type": "object", "required": ["delimiter", "value"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/7/properties/split/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/7/properties/split/properties/delimiter) | {"type": "string"} | existing-native |
+| [/$defs/expression/oneOf/8](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8) | {"type": "object", "required": ["substring"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/8/properties/substring](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring) | {"type": "object", "required": ["substring_start", "substring_length", "value"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/8/properties/substring/properties/substring_start](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_start) | {"type": "integer", "minimum": -2147483648, "maximum": 2147483647} | existing-native |
+| [/$defs/expression/oneOf/8/properties/substring/properties/substring_length](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/8/properties/substring/properties/substring_length) | {"type": "integer", "minimum": -2147483648, "maximum": 2147483647} | existing-native |
+| [/$defs/expression/oneOf/9](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9) | {"type": "object", "required": ["arithmetic"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/9/properties/arithmetic](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic) | {"type": "object", "required": ["arithmetic_operation", "values"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/9/properties/arithmetic/properties/arithmetic_operation](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/arithmetic_operation) | {"enum": ["add", "multiply"]} | existing-native |
+| [/$defs/expression/oneOf/9/properties/arithmetic/properties/values](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/9/properties/arithmetic/properties/values) | {"type": "array", "minItems": 2} | existing-native |
+| [/$defs/expression/oneOf/10](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10) | {"type": "object", "required": ["begin"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/10/properties/begin](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin) | {"type": "object", "required": ["character", "value"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/10/properties/begin/properties/character](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/10/properties/begin/properties/character) | {"type": "string"} | existing-native |
+| [/$defs/expression/oneOf/11](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11) | {"type": "object", "required": ["end"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/11/properties/end](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end) | {"type": "object", "required": ["character", "value"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/11/properties/end/properties/character](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/11/properties/end/properties/character) | {"type": "string"} | existing-native |
+| [/$defs/expression/oneOf/12](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12) | {"type": "object", "required": ["merge"], "additionalProperties": false} | existing-native |
+| [/$defs/expression/oneOf/12/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge) | {"type": "object", "required": ["delimiter", "sort", "order", "values"], "additionalProperties": false} | semantic-hold |
 
-[/$defs/expression/oneOf/6/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge): Combine input values into one string using an explicit delimiter, sort mode, and order. `document` preserves input order; other modes sort before joining. Duplicates are preserved unless a separate `unique` expression removes them.
+[/$defs/expression/oneOf/12/properties/merge](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge): Combine one or more ordered input populations into one string using an explicit delimiter, sort mode, and order. document preserves flattened input order; other modes sort before joining. Duplicates are preserved unless a separate unique expression removes them.
 
 delimiter, sort, order and values are explicit required inputs; duplicates are not implicitly removed. Sorting edge cases, casting and unavailable/error behavior need semantic confirmation before unqualified publication.
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/expression/oneOf/6/properties/merge/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/delimiter) | {"type": "string"} | existing-native |
-| [/$defs/expression/oneOf/6/properties/merge/properties/sort](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/sort) | {"enum": ["document", "lexical", "numeric", "natural"]} | existing-native |
-| [/$defs/expression/oneOf/6/properties/merge/properties/order](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/6/properties/merge/properties/order) | {"enum": ["ascending", "descending"]} | existing-native |
+| [/$defs/expression/oneOf/12/properties/merge/properties/delimiter](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/delimiter) | {"type": "string"} | existing-native |
+| [/$defs/expression/oneOf/12/properties/merge/properties/sort](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/sort) | {"enum": ["document", "lexical", "numeric", "natural"]} | existing-native |
+| [/$defs/expression/oneOf/12/properties/merge/properties/order](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/order) | {"enum": ["ascending", "descending"]} | existing-native |
+| [/$defs/expression/oneOf/12/properties/merge/properties/values/oneOf/1](../../../proposed-schema/documentation/variable-expression.schema.json#/$defs/expression/oneOf/12/properties/merge/properties/values/oneOf/1) | {"type": "array", "minItems": 1} | existing-native |

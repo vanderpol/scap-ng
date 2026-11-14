@@ -1,4 +1,4 @@
-# SCAP-NG Assessment v0.4.0 draft — advanced constraints
+# SCAP-NG Assessment v0.4.1 draft — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 
@@ -100,7 +100,7 @@ Editorial receipt: editorial-batch-2.json case 28
 | --- | --- | --- |
 | [/properties/assessment/properties/specification](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/specification) | {"type": "object", "required": ["id", "version"], "additionalProperties": false} | existing-native |
 | [/properties/assessment/properties/specification/properties/id](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/specification/properties/id) | {"type": "string", "minLength": 1} | native-grammar-derived |
-| [/properties/assessment/properties/specification/properties/version](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/specification/properties/version) | {"type": "string", "minLength": 1} | native-grammar-derived |
+| [/properties/assessment/properties/specification/properties/version](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/specification/properties/version) | {"const": "0.4.1"} | native-grammar-derived |
 | [/properties/assessment/properties/dependencies](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/dependencies) | {"type": "object"} | existing-native |
 | [/properties/assessment/properties/dependencies/additionalProperties](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/dependencies/additionalProperties) | {"type": "object", "required": ["assessment", "expected_version"], "additionalProperties": false} | existing-native |
 | [/properties/assessment/properties/dependencies/additionalProperties/properties/assessment](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/dependencies/additionalProperties/properties/assessment) | {"type": "string", "minLength": 1} | existing-native |
@@ -124,7 +124,7 @@ Editorial receipt: editorial-batch-2.json case 28
 | [/properties/assessment/allOf/1/then](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then) | {"required": ["specification", "tests", "evaluate"]} | existing-native |
 | [/properties/assessment/allOf/1/then/properties/version](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/properties/version) | {"type": "integer", "minimum": 1} | existing-native |
 | [/properties/assessment/allOf/1/then/properties/specification/properties/id](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/properties/specification/properties/id) | {"const": "scap-ng.pre-alpha.assessment"} | existing-native |
-| [/properties/assessment/allOf/1/then/properties/specification/properties/version](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/properties/specification/properties/version) | {"const": "0.4.0"} | existing-native |
+| [/properties/assessment/allOf/1/then/properties/specification/properties/version](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/properties/specification/properties/version) | {"const": "0.4.1"} | existing-native |
 | [/properties/assessment/allOf/1/then/not/anyOf/0](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/not/anyOf/0) | {"required": ["procedure"]} | existing-native |
 | [/properties/assessment/allOf/1/then/not/anyOf/1](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/not/anyOf/1) | {"required": ["response"]} | existing-native |
 | [/properties/assessment/allOf/1/then/not/anyOf/2](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/allOf/1/then/not/anyOf/2) | {"required": ["references"]} | existing-native |

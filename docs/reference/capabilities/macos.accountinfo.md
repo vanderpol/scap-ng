@@ -1,6 +1,6 @@
 # macos.accountinfo
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 User account information (username, uid, gid, etc.) See netinfo(5) for field information, niutil(1) for retrieving it.
 

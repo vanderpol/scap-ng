@@ -40,18 +40,34 @@ def strip_annotations(node):
 class CoreDocumentationAudit(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.result = audit.audit()
-        cls.outputs = audit.artifacts(cls.result)
+        # The original Issue #40 review is a frozen 0.4.0 evidence set.
+        # Validate its actual schema snapshot instead of resolving its 0.4.0
+        # JSON pointers against the one active 0.4.1 family.
+        cls._archive = audit.historical_workspace(ROOT)
+        cls.historical_root = cls._archive.__enter__()
+        try:
+            shutil.copytree(ROOT / audit.HISTORICAL_DEST,
+                            cls.historical_root / audit.HISTORICAL_DEST,
+                            dirs_exist_ok=True)
+            cls.result = audit.audit(cls.historical_root, active=False)
+            cls.outputs = audit.artifacts(cls.result)
+        except BaseException:
+            cls._archive.__exit__(*sys.exc_info())
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._archive.__exit__(None, None, None)
 
     def fixture(self, root):
-        shutil.copytree(ROOT / 'schema', root / 'schema')
+        shutil.copytree(self.historical_root / 'schema', root / 'schema')
         notes = root / audit.DEST
         notes.mkdir(parents=True)
         shutil.copy(ROOT / audit.DEST / 'review-notes.json', notes / 'review-notes.json')
 
     def test_complete_discovery_pointer_accounting_and_explicit_exclusions(self):
-        paths = list((ROOT / 'schema').rglob('*.json'))
-        expected = {str(p.relative_to(ROOT)) for p in paths if '$schema' in json.loads(p.read_text()) and '$id' in json.loads(p.read_text())}
+        paths = list((self.historical_root / 'schema').rglob('*.json'))
+        expected = {str(p.relative_to(self.historical_root)) for p in paths if '$schema' in json.loads(p.read_text()) and '$id' in json.loads(p.read_text())}
         self.assertEqual(set(self.result['schemas']), expected)
         self.assertEqual(len(self.result['manifest']), len(paths))
         self.assertEqual(len(self.result['inventory']), len(self.result['nodes']))
@@ -154,7 +170,7 @@ class CoreDocumentationAudit(unittest.TestCase):
         for proposal in self.result['crosswalk']:
             current = self.result['nodes'][proposal['schema_uri'] + '#' + proposal['pointer']]['node']
             self.assertEqual(proposal['existing_description'], current.get('description'))
-            expected_hash = audit.sha256((ROOT / proposal['schema_file']).read_bytes()).hexdigest()
+            expected_hash = audit.sha256((self.historical_root / proposal['schema_file']).read_bytes()).hexdigest()
             self.assertEqual(proposal['precondition']['file_sha256'], expected_hash)
             for operation in proposal['operations']:
                 self.assertIn(operation['path'].rsplit('/', 1)[-1], {'description', 'title', 'examples'})
@@ -169,7 +185,7 @@ class CoreDocumentationAudit(unittest.TestCase):
 
     def test_active_language_reachability_and_inactive_candidates_are_distinct(self):
         language = audit.language_catalog(self.result)
-        self.assertEqual({r['name'] for r in language['active_variable_forms']}, {'literal', 'variable', 'values', 'concat', 'regex_capture', 'unique', 'merge'})
+        self.assertEqual({r['name'] for r in language['active_variable_forms']}, {'literal', 'variable', 'values', 'concat', 'regex_capture', 'unique', 'merge', 'count', 'split', 'substring', 'arithmetic', 'begin', 'end'})
         self.assertTrue(all(r['assessment_reachable'] for r in language['active_variable_forms']))
         self.assertTrue(language['spelling_notes']['else_if'])
         self.assertFalse(language['spelling_notes']['elseif'])
@@ -244,7 +260,7 @@ class CoreDocumentationAudit(unittest.TestCase):
         self.assertEqual(editor[0]['operations'], [])
 
     def test_exact_generation_links_baseline_and_frozen_bytes(self):
-        self.assertEqual(self.outputs, audit.artifacts(audit.audit()))
+        self.assertEqual(self.outputs, audit.artifacts(audit.audit(self.historical_root, active=False)))
         for name, text in self.outputs.items():
             self.assertEqual((ROOT / audit.DEST / name).read_bytes(), text.encode())
             if name.endswith('.md'):
@@ -255,7 +271,7 @@ class CoreDocumentationAudit(unittest.TestCase):
         baseline = json.loads((ROOT / audit.DEST / 'baseline.json').read_text())
         difference = audit.baseline_regressions(self.result, baseline)
         self.assertEqual(difference['new'], []); self.assertEqual(difference['changed'], [])
-        paths = sorted((ROOT / 'schema').rglob('*.json'))
+        paths = sorted((self.historical_root / 'schema').rglob('*.json'))
         before = {str(p): audit.sha256(p.read_bytes()).hexdigest() for p in paths}
         subprocess.run([sys.executable, 'tools/audit_schema_documentation.py', '--check'], cwd=ROOT, check=True, capture_output=True)
         self.assertEqual(before, {str(p): audit.sha256(p.read_bytes()).hexdigest() for p in paths})

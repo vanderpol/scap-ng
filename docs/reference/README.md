@@ -1,6 +1,6 @@
 # Proposed SCAP-NG reference
 
-Generated from proposed JSON Schemas; 0.4.0 remains frozen. Field-description coverage does not establish complete scanner contracts.
+Generated from proposed JSON Schemas; 0.4.1 remains current. Field-description coverage does not establish complete scanner contracts.
 
 Field-route totals count Object, Item and Require contexts, including reused meanings. Unique description owners are reported separately. Shared gaps count exact named-schema nodes, including repeated conditional constraints; they are not a count of distinct missing language features.
 
@@ -13,19 +13,19 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 | fields documented | 1858 |
 | missing capability descriptions | 8 |
 | unresolved native contracts | 104 |
-| shared description gaps | 148 |
+| shared description gaps | 152 |
 | capability pages | 104 |
 | shared pages | 35 |
 | advanced pages | 139 |
-| description owners | 2097 |
-| duplicate text groups | 165 |
+| description owners | 2122 |
+| duplicate text groups | 171 |
 | capability unique description owners | 794 |
-| preserved semantic holds | 9 |
+| preserved semantic holds | 8 |
 | preserved withheld definitions | 1 |
-| shared fields discovered | 3020 |
-| shared fields documented | 2872 |
-| shared basic fields discovered | 1449 |
-| shared basic fields documented | 1378 |
+| shared fields discovered | 3039 |
+| shared fields documented | 2887 |
+| shared basic fields discovered | 1468 |
+| shared basic fields documented | 1397 |
 
 ## [aix](platforms/aix.md)
 

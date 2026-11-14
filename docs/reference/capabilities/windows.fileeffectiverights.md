@@ -1,6 +1,6 @@
 # windows.fileeffectiverights
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The file effective rights test is used to check the effective rights associated with Windows files.
 

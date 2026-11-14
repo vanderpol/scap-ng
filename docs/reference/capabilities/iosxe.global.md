@@ -1,6 +1,6 @@
 # iosxe.global
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The global test is used to check for the existence of a particular line in the IOS-XE config file under the global context.
 
