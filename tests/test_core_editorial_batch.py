@@ -16,14 +16,29 @@ import audit_schema_documentation as audit
 class CoreEditorialBatch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.result = audit.audit()
-        cls.batch, cls.checked = audit.editorial_batch(cls.result)
+        # Editorial Issue #40 is immutable 0.4.0 history; its review notes
+        # intentionally do not point into the active 0.4.1 schema family.
+        cls._archive = audit.historical_workspace(ROOT)
+        cls.historical_root = cls._archive.__enter__()
+        try:
+            shutil.copytree(ROOT / audit.HISTORICAL_DEST,
+                            cls.historical_root / audit.HISTORICAL_DEST,
+                            dirs_exist_ok=True)
+            cls.result = audit.audit(cls.historical_root, active=False)
+            cls.batch, cls.checked = audit.editorial_batch(cls.result)
+        except BaseException:
+            cls._archive.__exit__(*sys.exc_info())
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._archive.__exit__(None, None, None)
 
     def temporary_batch(self, root, batch):
-        shutil.copytree(ROOT / 'schema', root / 'schema')
+        shutil.copytree(self.historical_root / 'schema', root / 'schema')
         (root / audit.DEST).mkdir(parents=True)
         (root / audit.DEST / 'editorial-batch.json').write_text(json.dumps(batch))
-        shutil.copytree(ROOT / 'examples', root / 'examples')
+        shutil.copytree(self.historical_root / 'examples', root / 'examples')
 
     def test_bounded_diverse_sheet_has_separate_author_and_engineering_fields(self):
         rows = self.batch['proposals']
