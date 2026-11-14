@@ -40,6 +40,12 @@ class CoreEditorialBatch(unittest.TestCase):
         (root / audit.DEST / 'editorial-batch.json').write_text(json.dumps(batch))
         shutil.copytree(self.historical_root / 'examples', root / 'examples')
 
+    def test_archived_040_worksheet_rejects_active_041_schema_files(self):
+        # Preserve the historical evidence gate: a batch pinned to 0.4.0
+        # must not silently inherit the current 0.4.1 capabilities/URIs.
+        with self.assertRaisesRegex(ValueError, 'precondition drifted'):
+            audit.editorial_batch(self.result, root=ROOT)
+
     def test_bounded_diverse_sheet_has_separate_author_and_engineering_fields(self):
         rows = self.batch['proposals']
         self.assertEqual(len(rows), 28)
