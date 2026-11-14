@@ -67,7 +67,7 @@ class CoreDocumentationAudit(unittest.TestCase):
 
     def test_complete_discovery_pointer_accounting_and_explicit_exclusions(self):
         paths = list((self.historical_root / 'schema').rglob('*.json'))
-        expected = {str(p.relative_to(ROOT)) for p in paths if '$schema' in json.loads(p.read_text()) and '$id' in json.loads(p.read_text())}
+        expected = {str(p.relative_to(self.historical_root)) for p in paths if '$schema' in json.loads(p.read_text()) and '$id' in json.loads(p.read_text())}
         self.assertEqual(set(self.result['schemas']), expected)
         self.assertEqual(len(self.result['manifest']), len(paths))
         self.assertEqual(len(self.result['inventory']), len(self.result['nodes']))
@@ -260,7 +260,7 @@ class CoreDocumentationAudit(unittest.TestCase):
         self.assertEqual(editor[0]['operations'], [])
 
     def test_exact_generation_links_baseline_and_frozen_bytes(self):
-        self.assertEqual(self.outputs, audit.artifacts(audit.audit()))
+        self.assertEqual(self.outputs, audit.artifacts(audit.audit(self.historical_root, active=False)))
         for name, text in self.outputs.items():
             self.assertEqual((ROOT / audit.DEST / name).read_bytes(), text.encode())
             if name.endswith('.md'):
