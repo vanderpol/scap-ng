@@ -110,7 +110,7 @@ class CoreEditorialBatch(unittest.TestCase):
         for row in self.batch['proposals']:
             node = self.result['store'].node(row['schema_uri'] + '#' + row['pointer'])
             self.assertEqual(row['existing_wording'], node.get('description'))
-            self.assertEqual(row['source_sha256'], audit.sha256((ROOT / row['schema_file']).read_bytes()).hexdigest())
+            self.assertEqual(row['source_sha256'], audit.sha256((self.historical_root / row['schema_file']).read_bytes()).hexdigest())
             origin = row['codex_proposal_source']
             if origin['kind'] == 'phase1_crosswalk':
                 self.assertEqual(row['codex_proposal'], prior[origin['proposal_id']]['proposed_description'])
@@ -174,7 +174,7 @@ class CoreEditorialBatch(unittest.TestCase):
                 self.assertIn(row['author_description'], sheet)
             self.assertIn(row['engineering_note'], sheet)
         before = {p.name: audit.sha256(p.read_bytes()).hexdigest() for p in (ROOT / audit.DEST).glob('*') if p.is_file()}
-        output = audit.artifacts(audit.audit())
+        output = audit.artifacts(audit.audit(self.historical_root, active=False))
         self.assertIn('EDITORIAL-REVIEW.md', output)
         for name in ['inventory.jsonl', 'gaps.jsonl', 'crosswalk.jsonl', 'proposed-annotations.patch.json', 'PILOTS.md']:
             self.assertEqual(before[name], audit.sha256(output[name].encode()).hexdigest())
