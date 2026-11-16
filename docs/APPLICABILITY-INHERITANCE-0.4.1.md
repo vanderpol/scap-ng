@@ -80,3 +80,25 @@ is qualification of each CPE fact/OVAL platform Assessment mapping (including
 platform facts whose source is a CPE URI). Until those mappings are pinned and
 independently qualified, such conditions must produce ERROR/hold rather than
 not_applicable.
+
+## P0 coordinated qualification handoff (2026-11-16)
+
+The focused integration receipts are published by the coordinated draft
+consumers, without changing this schema contract or regenerating the corpus:
+
+* Tools #68: `vanderpol/scap-ng-tools@851fbe4080031b3464a9607b84697284cdb21ebc`
+  (converter implementation under test: `0da62742953cccb1e909cb7cad95c0d71694caf0`).
+* RI #101: `vanderpol/scap-ng-ri@302c502170e4be2bb6ef78461ec409e6ee27eeee`
+  (applicability implementation under test: `57d028433767037ca19ff9ed65b192037e9461f0`).
+* Machine-readable receipt: `docs/evidence/issue59/p0-focused-qualification.json`
+  in each consumer draft.
+
+The receipt records real pinned OVAL source conversion for `def:580` and
+SSHD `def:963`, the synthetic hierarchy probe, exact source/native hashes,
+TRUE/FALSE/UNKNOWN/ERROR results, and profile-disabled separation. The
+embedded RI evaluator pack still advertises its older `326f8266…` family
+until the coordinated schema-pack repin is explicitly approved; this is a
+release hold, not a schema change in this PR. Tools #67 is not cherry-picked:
+its `time_difference` implementation is already present on the active #68
+line and is covered by the focused source-to-RI receipt. RI #90 remains
+independent and was not rebased or overwritten.
