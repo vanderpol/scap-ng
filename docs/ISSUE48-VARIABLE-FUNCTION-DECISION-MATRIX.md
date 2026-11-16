@@ -26,6 +26,7 @@ never emitted.
 | `arithmetic` | `{arithmetic: {arithmetic_operation, values: [...]}}` | At least two numeric inputs; ordered Cartesian product; add/multiply; integer/float widening | Restored; source datatype blockers remain |
 | `begin` / `end` | `{begin/end: {character, value}}` | One string input; prepend/append the complete character/string only when absent | Restored from pinned OVAL contract; source use is limited |
 | `unique` | `{unique: expression}` or `{unique: [expression, ...]}` | Flatten ordered populations then remove later duplicates, preserving first occurrence and status | Multi-component widening is explicit |
+| `time_difference` | `{time_difference: {values: [expression, ...], format_1?, format_2?}}` | OVAL 5.12.3 UTC parsing; one operand is current UTC minus the operand, two operands are first minus second; result is integer seconds | Owner-approved active Issue #59; RI/converter qualification receipt is separate |
 | `merge` | `{merge: {delimiter, sort, order, values: expression|[...]}}` | Flatten ordered populations, preserve duplicates, then explicit join/sort | Multi-component widening is explicit |
 
 The array forms are the smallest explicit collection composition that preserves
@@ -34,9 +35,12 @@ Existing one-expression forms remain valid.
 
 ## Deferred functions
 
-`escape_regex`, `glob_to_regex`, and `time_difference` have no active source
-uses in the 65-benchmark inventory and remain deferred. They are not silently
-claimed equivalent or emitted by the converter.
+`escape_regex` and `glob_to_regex` remain deferred. `time_difference` is no
+longer deferred: the owner approved full OVAL 5.12.3 support in
+[Tools Issue #59](https://github.com/vanderpol/scap-ng-tools/issues/59). The
+active schema, converter, RI evaluator, negative vectors, and 30-Test
+Self-Assertion receipt must move together; this document does not claim
+independent source-interpreter equivalence.
 
 ## Rejected alternatives
 
