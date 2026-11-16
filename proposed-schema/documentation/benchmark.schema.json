@@ -223,8 +223,7 @@
           "type": "object",
           "required": [
             "id",
-            "title",
-            "applicability"
+            "title"
           ],
           "properties": {
             "id": {
@@ -239,7 +238,7 @@
               "x-doc-status": "native-structure-derived"
             },
             "applicability": {
-              "type": "object",
+              "$ref": "applicability.schema.json#/$defs/expression",
               "description": "Applicability information associated with the declared platform.",
               "x-doc-status": "native-structure-derived"
             }
@@ -272,7 +271,7 @@
         "groups": {
           "type": "array",
           "items": {
-            "type": "object"
+            "$ref": "#/$defs/group"
           },
           "description": "Group declarations organizing the Benchmark content.",
           "x-doc-status": "native-structure-derived"
@@ -375,6 +374,59 @@
     }
   },
   "additionalProperties": false,
+  "$defs": {
+    "group": {
+      "type": "object",
+      "required": [
+        "id",
+        "groups",
+        "rules"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable Group identity."
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional human-readable Group title."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional Group description."
+        },
+        "applicability": {
+          "$ref": "applicability.schema.json#/$defs/expression",
+          "description": "Optional Group-local applicability restriction."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/group"
+          },
+          "description": "Nested child Groups in source order."
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Rule IDs directly contained by this Group."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Nested XCCDF Group projection. Group-local applicability is independent and combines with every ancestor restriction."
+    }
+  },
   "x-doc-review": {
     "status": "semantic-hold",
     "source": "editorial-batch.json",

@@ -27,7 +27,7 @@
     {
       "file": "schema/variable-expression.schema.json",
       "pointer": "/$defs/declaration/allOf/0/then/properties/expression/properties/literal",
-      "sha256": "af49aca16306bc6e6382c35ad35641647dc344042055beb830aceb967b6bb5e9",
+      "sha256": "3eed84e2142ef548c36cc0a9c381bfc1d7d38ad381e145fd8833d0d47f69fc39",
       "source_annotation": {
         "oneOf": [
           {
@@ -135,7 +135,7 @@
     {
       "file": "schema/variable-expression.schema.json",
       "pointer": "/$defs/expression/oneOf/1",
-      "sha256": "af49aca16306bc6e6382c35ad35641647dc344042055beb830aceb967b6bb5e9",
+      "sha256": "3eed84e2142ef548c36cc0a9c381bfc1d7d38ad381e145fd8833d0d47f69fc39",
       "source_annotation": {
         "type": "object",
         "required": [
@@ -452,7 +452,7 @@
     {
       "file": "schema/variable-expression.schema.json",
       "pointer": "/$defs/expression",
-      "sha256": "af49aca16306bc6e6382c35ad35641647dc344042055beb830aceb967b6bb5e9",
+      "sha256": "3eed84e2142ef548c36cc0a9c381bfc1d7d38ad381e145fd8833d0d47f69fc39",
       "source_annotation": {
         "oneOf": [
           {
@@ -630,6 +630,60 @@
             "additionalProperties": false,
             "title": "Collected values expression",
             "description": "Produce values from a collected Object field."
+          },
+          {
+            "type": "object",
+            "required": [
+              "time_difference"
+            ],
+            "properties": {
+              "time_difference": {
+                "type": "object",
+                "required": [
+                  "values"
+                ],
+                "properties": {
+                  "values": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "items": {
+                      "$ref": "#/$defs/expression"
+                    },
+                    "title": "Time operands",
+                    "description": "One operand computes current UTC minus that value; two operands compute first minus second. Multiple values form a bounded Cartesian product."
+                  },
+                  "format_1": {
+                    "enum": [
+                      "year_month_day",
+                      "month_day_year",
+                      "day_month_year",
+                      "seconds_since_epoch",
+                      "win_filetime"
+                    ],
+                    "default": "year_month_day",
+                    "title": "First time format"
+                  },
+                  "format_2": {
+                    "enum": [
+                      "year_month_day",
+                      "month_day_year",
+                      "day_month_year",
+                      "seconds_since_epoch",
+                      "win_filetime"
+                    ],
+                    "default": "year_month_day",
+                    "title": "Second time format"
+                  }
+                },
+                "additionalProperties": false,
+                "title": "Time difference expression",
+                "description": "Parse OVAL 5.12.3 time formats in UTC and return integer seconds. Formats default to year_month_day; format_1 is omitted for current UTC in the one-operand form. Invalid lexical values and source evidence statuses are errors/unknown, never silently coerced."
+              }
+            },
+            "additionalProperties": false,
+            "title": "Time difference expression",
+            "description": "Compute an OVAL 5.12.3 time difference as integer seconds using the active typed expression."
           },
           {
             "type": "object",

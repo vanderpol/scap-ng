@@ -7,6 +7,7 @@ Proposed documentation. Defaults are schema annotations, not inferred scanner fa
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `benchmark` | object | 1..1 (required) | **Unresolved description** | [/properties/benchmark](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark) |
+| `group` | object | Definition | Nested XCCDF Group projection. | [/$defs/group](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group) |
 
 ## `/properties/benchmark`
 
@@ -70,7 +71,7 @@ Proposed documentation. Defaults are schema annotations, not inferred scanner fa
 | --- | --- | --- | --- | --- |
 | `id` | string | 1..1 (required) | Identifier of the declared platform. | [/properties/benchmark/properties/platform/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/id) |
 | `title` | string | 1..1 (required) | Human-readable title of the declared platform. | [/properties/benchmark/properties/platform/properties/title](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/title) |
-| `applicability` | object | 1..1 (required) | Applicability information associated with the declared platform. | [/properties/benchmark/properties/platform/properties/applicability](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/applicability) |
+| `applicability` | object | 0..1 | Applicability information associated with the declared platform. | [/properties/benchmark/properties/platform/properties/applicability](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/applicability) |
 
 ## `/properties/benchmark/properties/profiles/items`
 
@@ -89,6 +90,17 @@ Proposed documentation. Defaults are schema annotations, not inferred scanner fa
 | --- | --- | --- | --- | --- |
 | `id` | string | 1..1 (required) | Identifier of the referenced Assessment specification. | [/properties/benchmark/properties/assessment_specifications/items/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/assessment_specifications/items/properties/id) |
 | `version` | string | 1..1 (required) | Version of the referenced Assessment specification. | [/properties/benchmark/properties/assessment_specifications/items/properties/version](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/assessment_specifications/items/properties/version) |
+
+## `/$defs/group`
+
+| Field | Schema type | Occurrences | Description | Details |
+| --- | --- | --- | --- | --- |
+| `id` | string | 1..1 (required) | Stable Group identity. | [/$defs/group/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/id) |
+| `title` | null, string | 0..1 | Optional human-readable Group title. | [/$defs/group/properties/title](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/title) |
+| `description` | null, string | 0..1 | Optional Group description. | [/$defs/group/properties/description](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/description) |
+| `applicability` | object | 0..1 | Optional Group-local applicability restriction. | [/$defs/group/properties/applicability](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/applicability) |
+| `groups` | array | 1..1 (required) | Nested child Groups in source order. | [/$defs/group/properties/groups](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/groups) |
+| `rules` | array | 1..1 (required) | Rule IDs directly contained by this Group. | [/$defs/group/properties/rules](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/rules) |
 
 ## Advanced constraints
 

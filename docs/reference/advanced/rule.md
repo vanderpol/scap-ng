@@ -5,7 +5,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
 | [schema](../../../proposed-schema/documentation/rule.schema.json#) | {"type": "object", "required": ["rule"], "additionalProperties": false} | existing-native |
-| [/properties/rule](../../../proposed-schema/documentation/rule.schema.json#/properties/rule) | {"type": "object", "required": ["id", "version", "title", "severity", "role", "weight", "requires", "conflicts", "applicability", "parameters", "assessment_choices", "default_assessment_choice"], "additionalProperties": false} | native-structure-derived |
+| [/properties/rule](../../../proposed-schema/documentation/rule.schema.json#/properties/rule) | {"type": "object", "required": ["id", "version", "title", "severity", "role", "weight", "requires", "conflicts", "parameters", "assessment_choices", "default_assessment_choice"], "additionalProperties": false} | native-structure-derived |
 | [/properties/rule/properties/id](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/rule/properties/version](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/version) | {"type": "string"} | native-structure-derived |
 | [/properties/rule/properties/title](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/title) | {"type": "string"} | native-structure-derived |
@@ -27,7 +27,7 @@ Constraints below are local to the exact pointer. Alternatives and parent condit
 | [/properties/rule/properties/requires/items/oneOf/1/properties/any_of/items](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/requires/items/oneOf/1/properties/any_of/items) | {"type": "string", "minLength": 1} | existing-native |
 | [/properties/rule/properties/conflicts](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/conflicts) | {"type": "array"} | native-structure-derived |
 | [/properties/rule/properties/conflicts/items](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/conflicts/items) | {"type": "string"} | existing-native |
-| [/properties/rule/properties/applicability](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/applicability) | {"type": "array"} | native-structure-derived |
+| [/properties/rule/properties/applicability](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/applicability) | {} | native-structure-derived |
 | [/properties/rule/properties/parameters](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/parameters) | {"type": "object"} | native-structure-derived |
 | [/properties/rule/properties/remediation](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/remediation) | {"type": "object"} | native-structure-derived |
 | [/properties/rule/properties/assessment_choices](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/assessment_choices) | {"type": "object", "minProperties": 1} | existing-native |
