@@ -179,8 +179,7 @@
           "type": "object",
           "required": [
             "id",
-            "title",
-            "applicability"
+            "title"
           ],
           "properties": {
             "id": {
@@ -191,7 +190,8 @@
               "type": "string"
             },
             "applicability": {
-              "type": "object"
+              "$ref": "applicability.schema.json#/$defs/expression",
+              "description": "Optional Benchmark-level applicability restriction. Omission means unrestricted; no synthetic condition is implied."
             }
           },
           "additionalProperties": false
@@ -212,7 +212,7 @@
         "groups": {
           "type": "array",
           "items": {
-            "type": "object"
+            "$ref": "#/$defs/group"
           }
         },
         "profiles": {
@@ -292,5 +292,52 @@
       "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "group": {
+      "type": "object",
+      "required": [
+        "id",
+        "groups",
+        "rules"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "applicability": {
+          "$ref": "applicability.schema.json#/$defs/expression",
+          "description": "Optional Group-local restriction. It is evaluated with every applicable ancestor restriction."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/group"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  }
 }
