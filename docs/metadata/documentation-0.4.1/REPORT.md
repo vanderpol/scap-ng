@@ -4,11 +4,11 @@
 
 Pin: `d707aad6a916bb4e2e61767d836c681fc9d0084b`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
 
-Discovered **35 schema documents** among 145 JSON inputs. Audited 7902 schema nodes, including 1959 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
+Discovered **35 schema documents** among 145 JSON inputs. Audited 7937 schema nodes, including 1979 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
 
 Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.
 
-Found **1564 deduplicated findings** at 1562 canonical proposal locations. Presence is not useful-quality approval. Structural-only/provisional proposals remain open for review; generic filler cannot close a gap.
+Found **1562 deduplicated findings** at 1560 canonical proposal locations. Presence is not useful-quality approval. Structural-only/provisional proposals remain open for review; generic filler cannot close a gap.
 
 [Batch 1 editorial receipt](EDITORIAL-REVIEW.md) · [Batch 2 pending review](EDITORIAL-REVIEW-2.md) · [Phase 1 wording inventory](CROSSWALK.md) · [two bounded previews](PILOTS.md) · [machine inventory](inventory.jsonl) · [gap register](gaps.jsonl) · [full crosswalk](crosswalk.jsonl) · [annotation patch](proposed-annotations.patch.json).
 
@@ -16,16 +16,16 @@ Found **1564 deduplicated findings** at 1562 canonical proposal locations. Prese
 
 | Value | Count |
 | --- | ---: |
-| inherited | 53 |
-| missing | 1586 |
-| own | 320 |
+| inherited | 54 |
+| missing | 1584 |
+| own | 341 |
 
 ### Useful-quality review state
 
 | Value | Count |
 | --- | ---: |
-| missing | 1586 |
-| present_not_semantically_reviewed | 373 |
+| missing | 1584 |
+| present_not_semantically_reviewed | 395 |
 
 ### Review decision kind
 
@@ -33,7 +33,7 @@ Found **1564 deduplicated findings** at 1562 canonical proposal locations. Prese
 | --- | ---: |
 | annotation_wording | 208 |
 | editor_integration | 1 |
-| native_basis_required_for_wording | 1137 |
+| native_basis_required_for_wording | 1135 |
 | shared_annotation_binding | 216 |
 
 ### Proposal approval category
@@ -42,14 +42,14 @@ Found **1564 deduplicated findings** at 1562 canonical proposal locations. Prese
 | --- | ---: |
 | clarification_no_validation_change | 209 |
 | editorial_only | 0 |
-| normative_contract_decision_required | 1353 |
+| normative_contract_decision_required | 1351 |
 
 ### Gap category
 
 | Value | Count |
 | --- | ---: |
 | missing_constraint_meaning | 8 |
-| missing_description | 1555 |
+| missing_description | 1553 |
 | missing_editor_help_binding | 1 |
 
 ### Severity
@@ -57,7 +57,7 @@ Found **1564 deduplicated findings** at 1562 canonical proposal locations. Prese
 | Value | Count |
 | --- | ---: |
 | high | 1 |
-| medium | 1563 |
+| medium | 1561 |
 
 ### Role
 
@@ -65,7 +65,7 @@ Found **1564 deduplicated findings** at 1562 canonical proposal locations. Prese
 | --- | ---: |
 | conditional_field | 83 |
 | document_root | 7 |
-| field | 1437 |
+| field | 1435 |
 | shared_definition | 37 |
 
 ### Document family
@@ -75,7 +75,7 @@ Found **1564 deduplicated findings** at 1562 canonical proposal locations. Prese
 | assessment_core | 973 |
 | expressions_variables | 13 |
 | packaging | 21 |
-| policy_applicability | 93 |
+| policy_applicability | 91 |
 | results_evidence | 313 |
 | shared_language | 151 |
 

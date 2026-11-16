@@ -46,30 +46,36 @@
                       "cpe_platform",
                       "cpe_logical_test",
                       "converter_derived"
-                    ]
+                    ],
+                    "description": "Source provenance kind, not an evaluation operator."
                   },
                   "id": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 1,
+                    "description": "Source platform or CPE identity."
                   },
                   "href": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Optional original component href."
                   },
                   "sha256": {
                     "type": "string",
-                    "pattern": "^[0-9a-f]{64}$"
+                    "pattern": "^[0-9a-f]{64}$",
+                    "description": "SHA-256 of the source platform element identity."
                   },
                   "idref": {
                     "type": "string",
-                    "minLength": 1
+                    "minLength": 1,
+                    "description": "Original XCCDF platform idref, including its leading fragment marker when present."
                   },
                   "expression_sha256": {
                     "type": "string",
-                    "pattern": "^[0-9a-f]{64}$"
+                    "pattern": "^[0-9a-f]{64}$",
+                    "description": "SHA-256 of the normalized CPE Boolean tree when one is available."
                   },
                   "cpe_expression": {
                     "type": "object",
-                    "description": "Normalized CPE logical-test tree; operator and negate are source semantics.",
+                    "description": "Normalized CPE logical-test tree retaining operator and negation semantics.",
                     "additionalProperties": true
                   }
                 },
@@ -97,7 +103,8 @@
           "properties": {
             "condition": {
               "type": "string",
-              "minLength": 1
+              "minLength": 1,
+              "description": "Catalog condition identifier. The condition is evaluated through the referenced applicability Assessment."
             }
           },
           "additionalProperties": false
@@ -113,7 +120,8 @@
               "minItems": 1,
               "items": {
                 "$ref": "#/$defs/expression"
-              }
+              },
+              "description": "All child expressions must be TRUE; ancestor levels use this operator to preserve inherited restrictions."
             }
           },
           "additionalProperties": false
@@ -129,7 +137,8 @@
               "minItems": 1,
               "items": {
                 "$ref": "#/$defs/expression"
-              }
+              },
+              "description": "At least one child expression must be TRUE; same-item source platform alternatives use this operator."
             }
           },
           "additionalProperties": false
