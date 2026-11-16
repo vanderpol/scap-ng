@@ -5,16 +5,7 @@
 its unit is seconds.
 
 ```json
-{
-  "time_difference": {
-    "values": [
-      {"literal": "2009-02-04"},
-      {"literal": "2004-02-04"}
-    ],
-    "format_1": "year_month_day",
-    "format_2": "year_month_day"
-  }
-}
+{"time_difference":{"values":[{"literal":"2009-02-04"},{"literal":"2004-02-04"}],"format_1":"year_month_day","format_2":"year_month_day"}}
 ```
 
 `values` has one or two expressions. With two, the result is first minus
@@ -28,11 +19,11 @@ incomplete collected evidence, and acquisition errors remain errors/unknown;
 they are never coerced into a value.
 
 The active schema contract is in
-[`schema/variable-expression.schema.json`](../../../schema/variable-expression.schema.json).
+[`schema/variable-expression.schema.json`](../../schema/variable-expression.schema.json).
 The inactive generic call schema remains intentionally unreferenced.
 
 Qualification uses the pinned OVAL 5.12.3 Self-Assertion
-`oval:org.mitre.oval.test:def:580` and is recorded in the RI repository's
-`docs/qualification/issue59/time-difference-20261115/` receipt. The receipt
-proves converted RI execution, not independent equivalence to an OVAL
-interpreter.
+`oval:org.mitre.oval.test:def:580`; the RI execution receipt is in the RI
+repository under `docs/qualification/issue59/time-difference-20261115/`.
+That receipt proves converted RI execution, not independent equivalence to an
+OVAL interpreter.

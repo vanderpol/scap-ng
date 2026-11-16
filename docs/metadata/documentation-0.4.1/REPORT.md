@@ -2,13 +2,13 @@
 
 **Inventory and wording proposals only. No schema edits or new runtime semantics are accepted.**
 
-Pin: `0683bbf6fdcbba65c5ffb79f2bf8d41d920e43d9`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
+Pin: `d707aad6a916bb4e2e61767d836c681fc9d0084b`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
 
-Discovered **35 schema documents** among 145 JSON inputs. Audited 7894 schema nodes, including 1955 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
+Discovered **35 schema documents** among 145 JSON inputs. Audited 7902 schema nodes, including 1959 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
 
 Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.
 
-Found **1560 deduplicated findings** at 1560 canonical proposal locations. Presence is not useful-quality approval. Structural-only/provisional proposals remain open for review; generic filler cannot close a gap.
+Found **1564 deduplicated findings** at 1562 canonical proposal locations. Presence is not useful-quality approval. Structural-only/provisional proposals remain open for review; generic filler cannot close a gap.
 
 [Batch 1 editorial receipt](EDITORIAL-REVIEW.md) · [Batch 2 pending review](EDITORIAL-REVIEW-2.md) · [Phase 1 wording inventory](CROSSWALK.md) · [two bounded previews](PILOTS.md) · [machine inventory](inventory.jsonl) · [gap register](gaps.jsonl) · [full crosswalk](crosswalk.jsonl) · [annotation patch](proposed-annotations.patch.json).
 
@@ -17,21 +17,21 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 | Value | Count |
 | --- | ---: |
 | inherited | 53 |
-| missing | 1584 |
-| own | 318 |
+| missing | 1586 |
+| own | 320 |
 
 ### Useful-quality review state
 
 | Value | Count |
 | --- | ---: |
-| missing | 1584 |
-| present_not_semantically_reviewed | 371 |
+| missing | 1586 |
+| present_not_semantically_reviewed | 373 |
 
 ### Review decision kind
 
 | Value | Count |
 | --- | ---: |
-| annotation_wording | 206 |
+| annotation_wording | 208 |
 | editor_integration | 1 |
 | native_basis_required_for_wording | 1137 |
 | shared_annotation_binding | 216 |
@@ -40,7 +40,7 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 
 | Value | Count |
 | --- | ---: |
-| clarification_no_validation_change | 207 |
+| clarification_no_validation_change | 209 |
 | editorial_only | 0 |
 | normative_contract_decision_required | 1353 |
 
@@ -48,8 +48,8 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 
 | Value | Count |
 | --- | ---: |
-| missing_constraint_meaning | 6 |
-| missing_description | 1553 |
+| missing_constraint_meaning | 8 |
+| missing_description | 1555 |
 | missing_editor_help_binding | 1 |
 
 ### Severity
@@ -57,7 +57,7 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 | Value | Count |
 | --- | ---: |
 | high | 1 |
-| medium | 1559 |
+| medium | 1563 |
 
 ### Role
 
@@ -65,7 +65,7 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 | --- | ---: |
 | conditional_field | 83 |
 | document_root | 7 |
-| field | 1433 |
+| field | 1437 |
 | shared_definition | 37 |
 
 ### Document family
@@ -73,7 +73,7 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 | Value | Count |
 | --- | ---: |
 | assessment_core | 973 |
-| expressions_variables | 9 |
+| expressions_variables | 13 |
 | packaging | 21 |
 | policy_applicability | 93 |
 | results_evidence | 313 |
@@ -81,7 +81,7 @@ Found **1560 deduplicated findings** at 1560 canonical proposal locations. Prese
 
 ## Actual language boundary
 
-Active Variable forms: `literal`, `variable`, `values`, `concat`, `regex_capture`, `unique`, `count`, `split`, `substring`, `arithmetic`, `begin`, `end`, `merge`.
+Active Variable forms: `literal`, `variable`, `values`, `time_difference`, `concat`, `regex_capture`, `unique`, `count`, `split`, `substring`, `arithmetic`, `begin`, `end`, `merge`.
 
 The broader canonical function-call migration document is inactive; its names are not active authoring/runtime support. The actual branch spelling is `else_if`, not `elseif`. Shared foreach helper definitions exist but have no Assessment reference path; they are not a demonstrated authored placement.
 

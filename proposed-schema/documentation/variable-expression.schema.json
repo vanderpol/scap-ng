@@ -372,6 +372,62 @@
         {
           "type": "object",
           "required": [
+            "time_difference"
+          ],
+          "properties": {
+            "time_difference": {
+              "type": "object",
+              "required": [
+                "values"
+              ],
+              "properties": {
+                "values": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "items": {
+                    "$ref": "#/$defs/expression"
+                  },
+                  "title": "Time operands",
+                  "description": "One operand computes current UTC minus that value; two operands compute first minus second. Multiple values form a bounded Cartesian product."
+                },
+                "format_1": {
+                  "enum": [
+                    "year_month_day",
+                    "month_day_year",
+                    "day_month_year",
+                    "seconds_since_epoch",
+                    "win_filetime"
+                  ],
+                  "default": "year_month_day",
+                  "title": "First time format",
+                  "description": "Format of the first explicit operand; omitted for the one-operand current-UTC form."
+                },
+                "format_2": {
+                  "enum": [
+                    "year_month_day",
+                    "month_day_year",
+                    "day_month_year",
+                    "seconds_since_epoch",
+                    "win_filetime"
+                  ],
+                  "default": "year_month_day",
+                  "title": "Second time format",
+                  "description": "Format of the second explicit operand, or the one explicit operand."
+                }
+              },
+              "additionalProperties": false,
+              "title": "Time difference expression",
+              "description": "Parse OVAL 5.12.3 time formats in UTC and return integer seconds. Formats default to year_month_day; format_1 is omitted for current UTC in the one-operand form. Invalid lexical values and source evidence statuses are errors/unknown, never silently coerced."
+            }
+          },
+          "additionalProperties": false,
+          "title": "Time difference expression",
+          "description": "Compute an OVAL 5.12.3 time difference as integer seconds using the active typed expression."
+        },
+        {
+          "type": "object",
+          "required": [
             "concat"
           ],
           "properties": {
