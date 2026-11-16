@@ -197,7 +197,7 @@ class CoreDocumentationAudit(unittest.TestCase):
         self.assertTrue(any(r['language_status'] == 'inactive_migration_candidate' for r in self.result['inventory']))
 
     def test_core_and_concat_preview_examples_keep_positive_negative_acceptance(self):
-        targets = [p for p in self.result['crosswalk'] if p['pointer'] in {'/$defs/canonical_all_items_requirement', '/$defs/expression/oneOf/3/properties/concat'}]
+        targets = [p for p in self.result['crosswalk'] if p['pointer'] in {'/$defs/canonical_all_items_requirement', '/$defs/expression/oneOf/4/properties/concat'}]
         self.assertEqual(len(targets), 2)
         preview = audit.apply_preview(self.result, targets)
         after = shared.SchemaStore(preview)
