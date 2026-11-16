@@ -17,15 +17,15 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 | capability pages | 104 |
 | shared pages | 35 |
 | advanced pages | 139 |
-| description owners | 2097 |
+| description owners | 2099 |
 | duplicate text groups | 165 |
 | capability unique description owners | 794 |
 | preserved semantic holds | 9 |
 | preserved withheld definitions | 1 |
-| shared fields discovered | 3020 |
-| shared fields documented | 2872 |
-| shared basic fields discovered | 1449 |
-| shared basic fields documented | 1378 |
+| shared fields discovered | 3021 |
+| shared fields documented | 2873 |
+| shared basic fields discovered | 1450 |
+| shared basic fields documented | 1379 |
 
 ## [aix](platforms/aix.md)
 
