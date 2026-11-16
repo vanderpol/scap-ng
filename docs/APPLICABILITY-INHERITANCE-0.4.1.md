@@ -86,7 +86,7 @@ not_applicable.
 The focused integration receipts are published by the coordinated draft
 consumers, without changing this schema contract or regenerating the corpus:
 
-* Tools #68: `vanderpol/scap-ng-tools@851fbe4080031b3464a9607b84697284cdb21ebc`
+* Tools #68: `vanderpol/scap-ng-tools@1db72b5a2fd16cd4d15fa5a9bd27bb4eefc593b0`
   (converter implementation under test: `0da62742953cccb1e909cb7cad95c0d71694caf0`).
 * RI #101: `vanderpol/scap-ng-ri@302c502170e4be2bb6ef78461ec409e6ee27eeee`
   (applicability implementation under test: `57d028433767037ca19ff9ed65b192037e9461f0`).
