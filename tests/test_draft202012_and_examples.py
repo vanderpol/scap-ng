@@ -1,4 +1,4 @@
-"""Resolve all frozen references locally and validate curated 0.4 examples."""
+"""Resolve one active 0.4.1 schema family and validate curated authoring examples."""
 from hashlib import sha256
 from pathlib import Path
 import unittest
@@ -13,13 +13,13 @@ from test_schema_integrity import ROOT, PREFIX, load, refs, frozen_paths
 PROJECT = ROOT.parent
 EXAMPLES = {
     'windows-server-2025-lock-screen.assessment.yaml':
-        '8501a018cd98fe1d041e2fd0a4438da3bc4cb031a9087506fcbf1d538bb33b2b',
+        'ed166e8da4209d0b08e9f9a6891e1aba844f7aa5e2349899a8d5830968f02e21',
     'windows-server-2025-sysvol-permissions.assessment.yaml':
-        '3fdb03b50b2506cbaf99bd300e0667f5056bd93be7e3e5f0cd3aee68515acba4',
+        'c2ae580ce346911a7ab1921b9cf9760d38885da33741e8bd25105270e9e863a0',
     'linux-home-nosuid.assessment.yaml':
-        '52b5e412f5b3c473e9a974d9d7ce9494e6d6afe10a9ae32e8c59db429ee8ebe6',
+        '9522416a793f1db62e1530ccfbcdd5cc14ddc0e35e5788c215443423e398ac6d',
     'windows-optional-organizational-input.assessment.yaml':
-        'c2056c9cc3d594cf78ac8fbc3bb1e2e03e880f74da1477d5e435cb0a00bc2b76',
+        '87a43b33c38e96edfc03d7926c53c2a94820d761d8c7db9c9e956a358c49e96a',
 }
 
 
@@ -90,7 +90,7 @@ class Draft202012AndExamples(unittest.TestCase):
                 validator.validate(document)
                 body = document['assessment']
                 self.assertNotIn('purpose', body)
-                self.assertEqual(body['specification']['version'], '0.4.0')
+                self.assertEqual(body['specification']['version'], '0.4.1')
                 for test in body['tests'].values():
                     requirement = test['require']
                     self.assertNotIn('items_found', requirement)

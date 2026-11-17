@@ -1,6 +1,6 @@
 # ios.snmpcommunity
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The snmpcommunity test is used to check the properties of specific output lines from an SNMP configuration.
 

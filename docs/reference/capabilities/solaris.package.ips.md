@@ -1,6 +1,6 @@
 # solaris.package.ips
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `solaris.package.ips` provides support for checking the metadata of packages installed using the Solaris Image Packaging System.
 

@@ -1,6 +1,6 @@
 # aix.fix
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The fix test is used to check information associated with different fixes installed on the system.
 

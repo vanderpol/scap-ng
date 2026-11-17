@@ -1,6 +1,6 @@
 # unix.password
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The password test is used to check metadata associated with the UNIX password file, of the sort returned by the passwd command.
 

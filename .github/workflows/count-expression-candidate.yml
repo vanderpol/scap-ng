@@ -1,0 +1,27 @@
+name: Candidate 0.4.1 count expression qualification
+on:
+  pull_request:
+    paths:
+      - 'schema/variable-expression.schema.json'
+      - 'tests/test_active_count_expression.py'
+      - 'tests/test_authoring_documentation.py'
+      - 'tests/test_variable_function_documentation.py'
+      - '.github/workflows/count-expression-candidate.yml'
+  workflow_dispatch:
+jobs:
+  count-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Parse active 0.4 JSON Schema
+        run: python3 -m json.tool schema/variable-expression.schema.json > /dev/null
+      - name: Verify active count and author-facing documentation
+        run: |
+          python3 -m unittest discover -s tests -p test_active_count_expression.py -v
+          python3 -m unittest discover -s tests -p test_variable_function_documentation.py -v
+          python3 -m unittest discover -s tests -p test_authoring_documentation.py -v

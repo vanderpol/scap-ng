@@ -1,6 +1,6 @@
 # file.hash
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The file hash test is used to check a specific hash type associated with a specified file.
 

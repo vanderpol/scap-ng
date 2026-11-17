@@ -1,4 +1,4 @@
-# SCAP-NG Organizational Input Set v0.4.0 draft
+# SCAP-NG Organizational Input Set v0.4.1 draft
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

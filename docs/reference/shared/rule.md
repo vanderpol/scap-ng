@@ -1,4 +1,4 @@
-# SCAP-NG Rule v0.4.0
+# SCAP-NG Rule v0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 
@@ -26,7 +26,7 @@ Proposed documentation. Defaults are schema annotations, not inferred scanner fa
 | `references` | array | 0..1 | External references supporting the Rule. | [/properties/rule/properties/references](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/references) |
 | `requires` | array | 1..1 (required) | Selection prerequisites. | [/properties/rule/properties/requires](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/requires) |
 | `conflicts` | array | 1..1 (required) | Rule identifiers declared as selection conflicts. | [/properties/rule/properties/conflicts](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/conflicts) |
-| `applicability` | array | 1..1 (required) | Applicability declarations associated with the Rule. | [/properties/rule/properties/applicability](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/applicability) |
+| `applicability` | object | 0..1 | Applicability declarations associated with the Rule. | [/properties/rule/properties/applicability](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/applicability) |
 | `parameters` | object | 1..1 (required) | Parameter declarations or bindings associated with the Rule. | [/properties/rule/properties/parameters](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/parameters) |
 | `remediation` | object | 0..1 | Remediation information associated with the Rule. | [/properties/rule/properties/remediation](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/remediation) |
 | `assessment_choices` | object | 1..1 (required) | Publisher-defined Assessment choices. | [/properties/rule/properties/assessment_choices](../../../proposed-schema/documentation/rule.schema.json#/properties/rule/properties/assessment_choices) |

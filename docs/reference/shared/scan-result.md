@@ -1,4 +1,4 @@
-# SCAP-NG Scan Result pre-release v0.4.0
+# SCAP-NG Scan Result pre-release v0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 
@@ -23,6 +23,13 @@ Run-level index for one scanner execution. Detailed Benchmark and Assessment res
 | `benchmark_results` | array | 1..1 (required) | Benchmark-result entries associated with the scan. | [/properties/scan_result/properties/benchmark_results](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/benchmark_results) |
 | `assessment_result_refs` | array | 0..1 | Assessment-result references associated with the scan. | [/properties/scan_result/properties/assessment_result_refs](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/assessment_result_refs) |
 | `signature_status` | null, string | 0..1 | Signature status recorded for the scan result. | [/properties/scan_result/properties/signature_status](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/signature_status) |
+| `scan_session_guid` | string | 0..1 | Globally unique scan/session correlation identifier, newly generated once per scan session and shared by all result events belonging to that session. | [/properties/scan_result/properties/scan_session_guid](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/scan_session_guid) |
+
+## `/properties/scan_result/properties/scanner`
+
+| Field | Schema type | Occurrences | Description | Details |
+| --- | --- | --- | --- | --- |
+| `app_guid` | string | 0..1 | Stable scanner application/agent installation GUID for enterprise SIEM correlation; sourced from scanner/enterprise inventory, not inferred from hostname or content. | [/properties/scan_result/properties/scanner/properties/app_guid](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/scanner/properties/app_guid) |
 
 ## `/properties/scan_result/properties/targets/items`
 
@@ -32,6 +39,7 @@ Run-level index for one scanner execution. Detailed Benchmark and Assessment res
 | `identifiers` | array | 0..1 | Additional identifiers recorded for the scan target. | [/properties/scan_result/properties/targets/items/properties/identifiers](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/identifiers) |
 | `hostname` | null, string | 0..1 | Hostname recorded for the target. | [/properties/scan_result/properties/targets/items/properties/hostname](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/hostname) |
 | `addresses` | array | 0..1 | Network addresses recorded for the target. | [/properties/scan_result/properties/targets/items/properties/addresses](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/addresses) |
+| `machine_guid` | string | 0..1 | Stable target-machine GUID supplied by authoritative system or enterprise asset inventory. | [/properties/scan_result/properties/targets/items/properties/machine_guid](../../../proposed-schema/documentation/scan-result.schema.json#/properties/scan_result/properties/targets/items/properties/machine_guid) |
 
 ## `/properties/scan_result/properties/benchmark_results/items`
 

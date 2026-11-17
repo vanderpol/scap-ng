@@ -1,6 +1,6 @@
 # windows.appcmdlistconfig
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `windows.appcmdlistconfig` is one of two tests used to gather Microsoft Internet Information Server (IIS) configuration settings.
 

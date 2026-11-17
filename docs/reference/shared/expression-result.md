@@ -1,4 +1,4 @@
-# Draft Assessment expression execution result 0.4.0
+# Draft Assessment expression execution result 0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

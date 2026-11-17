@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://scap-ng.dev/schema/v0.4.0/benchmark.schema.json",
-  "x-scap-ng-version": "0.4.0",
+  "$id": "https://scap-ng.dev/schema/v0.4.1/benchmark.schema.json",
+  "x-scap-ng-version": "0.4.1",
   "x-last-modified": "2026-10-06",
-  "title": "SCAP-NG Benchmark v0.4.0",
+  "title": "SCAP-NG Benchmark v0.4.1",
   "type": "object",
   "required": [
     "benchmark"
@@ -179,8 +179,7 @@
           "type": "object",
           "required": [
             "id",
-            "title",
-            "applicability"
+            "title"
           ],
           "properties": {
             "id": {
@@ -191,7 +190,8 @@
               "type": "string"
             },
             "applicability": {
-              "type": "object"
+              "$ref": "applicability.schema.json#/$defs/expression",
+              "description": "Optional Benchmark-level applicability restriction. Omission means unrestricted; no synthetic condition is implied."
             }
           },
           "additionalProperties": false
@@ -212,7 +212,7 @@
         "groups": {
           "type": "array",
           "items": {
-            "type": "object"
+            "$ref": "#/$defs/group"
           }
         },
         "profiles": {
@@ -239,10 +239,6 @@
                   "string",
                   "null"
                 ]
-              },
-              "extends": {
-                "type": "string",
-                "minLength": 1
               },
               "disabled_rules": {
                 "type": "array",
@@ -292,5 +288,58 @@
       "additionalProperties": false
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "group": {
+      "type": "object",
+      "required": [
+        "id",
+        "groups",
+        "rules"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Stable Group identity."
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional human-readable Group title."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Optional Group description."
+        },
+        "applicability": {
+          "$ref": "applicability.schema.json#/$defs/expression",
+          "description": "Optional Group-local applicability restriction."
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/group"
+          },
+          "description": "Nested child Groups in source order."
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "description": "Rule IDs directly contained by this Group."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Nested XCCDF Group projection. Group-local applicability is independent and combines with every ancestor restriction."
+    }
+  }
 }

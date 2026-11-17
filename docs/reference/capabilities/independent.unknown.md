@@ -1,6 +1,6 @@
 # independent.unknown
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 An `independent.unknown` acts as a placeholder for tests whose implementation is unknown.
 

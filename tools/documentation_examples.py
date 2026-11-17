@@ -55,7 +55,7 @@ class Examples:
         return raw
 
     def validate(self, name, instance):
-        uri = 'https://scap-ng.dev/schema/v0.4.0/' + name + '.schema.json'
+        uri = 'https://scap-ng.dev/schema/v0.4.1/' + name + '.schema.json'
         Draft202012Validator(self.documents[uri], registry=self.registry).validate(instance)
 
     def load(self, doc):
@@ -63,7 +63,7 @@ class Examples:
         if not annotation:
             return []
         pin = json.loads(self.read(annotation['pin']))
-        if pin['version'] != '0.4.0' or pin['namespace'] != 'https://scap-ng.dev/schema/v0.4.0/':
+        if pin['version'] != '0.4.1' or pin['namespace'] != 'https://scap-ng.dev/schema/v0.4.1/':
             raise ValueError('Unsupported example schema pin')
         digest = sha256()
         for path in sorted((self.root / 'schema').rglob('*.json')):

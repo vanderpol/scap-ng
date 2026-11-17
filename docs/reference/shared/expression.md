@@ -1,8 +1,8 @@
-# Draft SCAP-NG 0.4.0 automated expression
+# Draft SCAP-NG 0.4.1 automated expression
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 
-SCAP-NG 0.4.0 Test-result expression grammar. Logical and/or/one/xor are canonical; legacy all/any/odd are invalid. Item cardinalities are separate.
+SCAP-NG 0.4.1 Test-result expression grammar. Logical and/or/one/xor are canonical; legacy all/any/odd are invalid. Item cardinalities are separate.
 
 ## `/`
 

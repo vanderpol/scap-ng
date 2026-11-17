@@ -85,7 +85,7 @@ class DocumentationDriftTests(unittest.TestCase):
                                   'open_question': 'unknown'}
         }
         with self.assertRaisesRegex(ValueError, 'not_a_field'):
-            render_developer_pilot('0.4.0', mappings, proposal)
+            render_developer_pilot('0.4.1', mappings, proposal)
 
 
 if __name__ == '__main__':

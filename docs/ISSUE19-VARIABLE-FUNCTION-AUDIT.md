@@ -1,65 +1,42 @@
-# Issue #19 variable-function audit and authoring documentation
+# SCAP-NG 0.4 Variable-function audit and Issue #48 restoration
 
-This audit uses the pinned OVAL 5.12.3 `oval-definitions-schema.xsd` as the
-semantic baseline. The source is the `v5.12.3` tag at commit
-`2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`; its SHA-256 is
-`06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc`.
-The repository keeps source identity and paraphrased findings, not copied XSD
-prose.
+The active SCAP-NG 0.4 grammar uses explicit recursive expression objects. It
+inherits the pinned OVAL 5.12.3 operand order, collection, multiplicity, empty
+value, and diagnostic-status boundaries unless an owner decision says
+otherwise. JSON Schema validates authoring shape; it does not execute values or
+prove scanner equivalence.
 
-## Retained native forms
+## Active forms
 
-The active `schema/variable-expression.schema.json` vocabulary contains seven
-forms:
-
-| Form | Source relationship | Native authoring and parity boundary |
+| Form | Native authoring shape | Contract |
 |---|---|---|
-| `literal` | Typed literal/component data | Preserves scalar/list/record shape, datatype, order, and duplicates. |
-| `variable` | OVAL `VariableComponentType` | References another Variable; cycle/type/status checks are semantic. |
-| `values` | Native collected-field composition | Reads one field from a selected Object; no one-to-one OVAL function. |
-| `concat` | `ConcatFunctionType` (XSD 770–823) | Requires 2+ ordered components; multi-values form Cartesian products; missing/status outcomes are inherited. |
-| `regex_capture` | `RegexCaptureFunctionType` (931–953) | Applies to each input value and returns the first capture under the inherited regex contract. |
-| `unique` | `UniqueFunctionType` (954–962) | Removes duplicate scalar values; records are outside the retained domain. |
-| `merge` | Native composition | Explicit delimiter, sort mode, and order; it does not implicitly deduplicate. |
+| `literal` | `{literal: scalar|list|{datatype,value}}` | Preserve datatype, order, duplicates, and records. |
+| `variable` | `{variable: name-variable}` | Preserve referenced population and status; semantic validation handles cycles/types. |
+| `values` | `{values: {object, field}}` | Read a collected field without inventing values for missing/status outcomes. |
+| `concat` | `{concat: [expression, ...]}` | Two or more ordered components; Cartesian product; no status-to-string coercion. |
+| `regex_capture` | `{regex_capture: {pattern, value}}` | Process each input value under the inherited capture contract. |
+| `unique` | `{unique: expression|[expression, ...]}` | Flatten ordered components and retain first occurrences; record data is not a transformation operand. |
+| `count` | `{count: expression}` | Count values including duplicates; successful empty input is zero; statuses remain statuses. |
+| `split` | `{split: {delimiter, value}}` | Literal delimiter; retain leading/trailing/adjacent empty values and duplicates. |
+| `substring` | `{substring: {substring_start, substring_length, value}}` | Signed 32-bit explicit options; OVAL one-based boundary behavior. |
+| `arithmetic` | `{arithmetic: {arithmetic_operation, values}}` | Numeric Cartesian product; add/multiply; integer/float widening. |
+| `begin` / `end` | `{begin/end: {character, value}}` | Add the complete boundary string only when it is absent. |
+| `merge` | `{merge: {delimiter, sort, order, values: expression|[...]}}` | Flatten ordered populations, preserve duplicates, explicit sorting and joining. |
 
-`concat` authoring example:
-
-```yaml
-concat:
-  - literal: "https://"
-  - variable: host-name-variable
-  - literal: "/policy"
-```
-
-If the variable produces `edge-a` and `edge-b`, the result population is
-`https://edge-a/policy` and `https://edge-b/policy`. With multiple-valued
-components, every component combination is evaluated. A missing or nonexistent
-component is not converted into text; Error, Incomplete, Does Not Exist, Not
-Collected, and Not Applicable outcomes remain status outcomes. The schema
-cannot execute or prove those outcomes.
+The exact owner rationale and alternatives are recorded in
+`docs/ISSUE48-VARIABLE-FUNCTION-DECISION-MATRIX.md`.
 
 ## Broader OVAL disposition
 
-The pinned OVAL `FunctionGroup` includes `arithmetic`, `begin`, `concat`,
-`end`, `escape_regex`, `split`, `substring`, `time_difference`,
-`regex_capture`, `unique`, `count`, and `glob_to_regex`. Only `concat`,
-`regex_capture`, and `unique` are retained as direct native forms. The active
-schema's `values` and `merge` are native compositions, not claims that OVAL
-has identically named functions. The remaining functions are deferred, not declared unsupported without an owner decision; no unsupported function disposition is asserted. The
-inactive `variable-function-expression.schema.json` is a migration candidate,
-not active editor or runtime support.
+The pinned OVAL FunctionGroup also contains `escape_regex`, `time_difference`,
+and `glob_to_regex`. They have no active source uses in this corpus and remain
+deferred. The inactive generic function schema is a migration artifact and is
+not an active editor or converter contract.
 
-## Verification status
+## Qualification boundary
 
-The repository has no compiler, interpreter, scanner, or independent function
-proof implementation to execute. The automated suite therefore verifies schema
-shape, nested authoring help, `concat` minimum cardinality, examples, and
-explicitly documented boundaries. It does **not** claim runtime parity.
-
-Before qualification, a runnable evaluator must provide vectors for casting,
-Cartesian products, duplicate/order behavior, regex capture edge cases, and
-all Error/Incomplete/Does Not Exist/Not Collected/Not Applicable propagation.
-Those are documented compatibility gaps, not guessed semantics.
-
-The machine-readable inventory is
-`docs/metadata/variable-function-audit.json`.
+The converter and structural tests preserve source AST shape and reject
+invalid forms. Independent vectors cover collection order, multiplicity,
+empty values, arithmetic Cartesian products, substring boundaries, and status
+propagation. A scanner/runtime implementation and independent execution proof
+are not present here; no runtime equivalence claim is made.

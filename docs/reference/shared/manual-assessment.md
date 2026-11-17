@@ -1,4 +1,4 @@
-# SCAP-NG Manual Assessment v0.4.0 high-level draft
+# SCAP-NG Manual Assessment v0.4.1 high-level draft
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

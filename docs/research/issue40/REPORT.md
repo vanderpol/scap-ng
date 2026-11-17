@@ -2,9 +2,9 @@
 
 **Inventory and wording proposals only. No schema edits or new runtime semantics are accepted.**
 
-Pin: `7354a24cdbfe18321153ccaef5d772801a10cd71`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
+Pin: `63110e7762f4963d3e4d407e90b9fcfd9cfe86ad`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
 
-Discovered **35 schema documents** among 145 JSON inputs. Audited 7850 schema nodes, including 1936 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
+Discovered **35 schema documents** among 145 JSON inputs. Audited 7941 schema nodes, including 1953 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
 
 Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.
 
@@ -18,14 +18,14 @@ Found **1580 deduplicated findings** at 1573 canonical proposal locations. Prese
 | --- | ---: |
 | inherited | 53 |
 | missing | 1587 |
-| own | 296 |
+| own | 313 |
 
 ### Useful-quality review state
 
 | Value | Count |
 | --- | ---: |
 | missing | 1587 |
-| present_not_semantically_reviewed | 341 |
+| present_not_semantically_reviewed | 358 |
 | reviewed_deficient | 3 |
 | reviewed_useful_with_specific_gap | 5 |
 
@@ -91,7 +91,7 @@ Found **1580 deduplicated findings** at 1573 canonical proposal locations. Prese
 
 ## Actual language boundary
 
-Active Variable forms: `literal`, `variable`, `values`, `concat`, `regex_capture`, `unique`, `merge`.
+Active Variable forms: `literal`, `variable`, `values`, `concat`, `regex_capture`, `unique`, `count`, `split`, `substring`, `arithmetic`, `begin`, `end`, `merge`.
 
 The broader canonical function-call migration document is inactive; its names are not active authoring/runtime support. The actual branch spelling is `else_if`, not `elseif`. Shared foreach helper definitions exist but have no Assessment reference path; they are not a demonstrated authored placement.
 

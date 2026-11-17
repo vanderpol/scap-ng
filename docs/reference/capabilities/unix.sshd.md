@@ -1,6 +1,6 @@
 # unix.sshd
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `unix.sshd` is used to check the values associated with sshd parameters that are used by the local system.
 

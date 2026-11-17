@@ -2,7 +2,7 @@
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 
-SCAP-NG 0.4.0 Assessment predicates: structured Item requirements and explicit field_requirement scopes. Legacy State arrays and scalar Test.require are invalid. Schema acceptance does not establish scanner conformance.
+SCAP-NG 0.4.1 Assessment predicates: structured Item requirements and explicit field_requirement scopes. Legacy State arrays and scalar Test.require are invalid. Schema acceptance does not establish scanner conformance.
 
 ## `/`
 

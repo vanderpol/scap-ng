@@ -1,4 +1,4 @@
-# SCAP-NG Benchmark v0.4.0 — advanced constraints
+# SCAP-NG Benchmark v0.4.1 — advanced constraints
 
 Constraints below are local to the exact pointer. Alternatives and parent conditions still apply; literal alternatives are not an unconditional acceptance promise. Defaults are annotations. Array member bounds do not count mapping properties.
 
@@ -43,16 +43,15 @@ These named sections are required, but their internal policy objects are partly 
 | [/properties/benchmark/properties/references/items](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/references/items) | {"type": "object"} | existing-native |
 | [/properties/benchmark/properties/text_blocks](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/text_blocks) | {"type": "array"} | native-structure-derived |
 | [/properties/benchmark/properties/text_blocks/items](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/text_blocks/items) | {"type": "object"} | existing-native |
-| [/properties/benchmark/properties/platform](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform) | {"type": "object", "required": ["id", "title", "applicability"], "additionalProperties": false} | native-structure-derived |
+| [/properties/benchmark/properties/platform](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform) | {"type": "object", "required": ["id", "title"], "additionalProperties": false} | native-structure-derived |
 | [/properties/benchmark/properties/platform/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/benchmark/properties/platform/properties/title](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/title) | {"type": "string"} | native-structure-derived |
-| [/properties/benchmark/properties/platform/properties/applicability](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/applicability) | {"type": "object"} | native-structure-derived |
+| [/properties/benchmark/properties/platform/properties/applicability](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/applicability) | {} | native-structure-derived |
 | [/properties/benchmark/properties/applicability_catalog](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/applicability_catalog) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/benchmark/properties/scoring](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/scoring) | {"type": "array"} | native-structure-derived |
 | [/properties/benchmark/properties/parameters](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/parameters) | {"type": "array"} | native-structure-derived |
 | [/properties/benchmark/properties/default_selection](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/default_selection) | {"type": "boolean"} | native-structure-derived |
 | [/properties/benchmark/properties/groups](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/groups) | {"type": "array"} | native-structure-derived |
-| [/properties/benchmark/properties/groups/items](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/groups/items) | {"type": "object"} | existing-native |
 | [/properties/benchmark/properties/profiles](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/profiles) | {"type": "array"} | native-structure-derived |
 | [/properties/benchmark/properties/profiles/items](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/profiles/items) | {"type": "object", "required": ["id", "disabled_rules"], "additionalProperties": false} | existing-native |
 | [/properties/benchmark/properties/profiles/items/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/profiles/items/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
@@ -68,3 +67,10 @@ These named sections are required, but their internal policy objects are partly 
 | [/properties/benchmark/properties/assessment_specifications/items](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/assessment_specifications/items) | {"type": "object", "required": ["id", "version"], "additionalProperties": false} | existing-native |
 | [/properties/benchmark/properties/assessment_specifications/items/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/assessment_specifications/items/properties/id) | {"type": "string", "minLength": 1} | native-structure-derived |
 | [/properties/benchmark/properties/assessment_specifications/items/properties/version](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/assessment_specifications/items/properties/version) | {"type": "string", "minLength": 1} | native-structure-derived |
+| [/$defs/group](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group) | {"type": "object", "required": ["id", "groups", "rules"], "additionalProperties": false} | existing-native |
+| [/$defs/group/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/id) | {"type": "string", "minLength": 1} | existing-native |
+| [/$defs/group/properties/title](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/title) | {"type": ["string", "null"]} | existing-native |
+| [/$defs/group/properties/description](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/description) | {"type": ["string", "null"]} | existing-native |
+| [/$defs/group/properties/groups](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/groups) | {"type": "array"} | existing-native |
+| [/$defs/group/properties/rules](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/rules) | {"type": "array"} | existing-native |
+| [/$defs/group/properties/rules/items](../../../proposed-schema/documentation/benchmark.schema.json#/$defs/group/properties/rules/items) | {"type": "string", "minLength": 1} | existing-native |

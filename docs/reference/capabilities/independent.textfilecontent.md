@@ -1,6 +1,6 @@
 # independent.textfilecontent
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `independent.textfilecontent` element is used to check the contents of a text file (aka a configuration file) by looking at individual blocks of text.
 

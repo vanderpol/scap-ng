@@ -56,7 +56,7 @@ Object reference versus inline Object is a separate `oneOf` from selector pairin
 | `other_execute` | `boolean` | boolean | 1..1 or 0..n |
 | `has_extended_acl` | `boolean` | boolean | 1..1 or 0..n |
 
-These next-version assertions intentionally reject datatype/value inconsistencies accepted structurally by frozen 0.4.0. [Before/after vectors and integration limits](CANONICAL-INTEGRATION.md). No new bound or selector-pairing assertion is added by rendering.
+These next-version assertions intentionally reject datatype/value inconsistencies accepted structurally by active 0.4.1. [Before/after vectors and integration limits](CANONICAL-INTEGRATION.md). No new bound or selector-pairing assertion is added by rendering.
 
 ## Defaults and unresolved behavior
 

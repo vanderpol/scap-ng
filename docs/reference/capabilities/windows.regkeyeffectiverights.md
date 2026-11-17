@@ -1,6 +1,6 @@
 # windows.regkeyeffectiverights
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 Inspects effective access-right fields for a Windows registry key and trustee.
 

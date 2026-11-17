@@ -1,6 +1,6 @@
 # windows.registry
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The registry test is used to check metadata associated with Windows registry key.
 
@@ -113,7 +113,7 @@ collected_items:
   provenance: {kind: synthetic-documentation-fixture}
 ```
 
-[Complete version-pinned fixture](../../../examples/paired/v0.4.0/windows.registry.pass.yaml).
+[Complete version-pinned fixture](../../../examples/paired/v0.4.1/windows.registry.pass.yaml).
 
 ### Fail — expected `false` (unverified)
 
@@ -140,6 +140,6 @@ collected_items:
   provenance: {kind: synthetic-documentation-fixture}
 ```
 
-[Complete version-pinned fixture](../../../examples/paired/v0.4.0/windows.registry.fail.yaml).
+[Complete version-pinned fixture](../../../examples/paired/v0.4.1/windows.registry.fail.yaml).
 
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `windows-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

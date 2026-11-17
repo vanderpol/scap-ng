@@ -63,7 +63,7 @@ class ReviewDocumentationPack(unittest.TestCase):
         for path in (ROOT / 'schema').glob('*.schema.json'):
             doc = json.loads(path.read_text()); native[doc['$id']] = doc
         proposed = SchemaStore(dict(native, **{candidate['$id']: candidate}))
-        before = Draft202012Validator({'$ref': pack.audit.PREFIX + 'collected-item.schema.json'}, registry=SchemaStore(native).registry)
+        before = Draft202012Validator({'$ref': 'https://scap-ng.dev/schema/v0.4.1/collected-item.schema.json'}, registry=SchemaStore(native).registry)
         prior = Draft202012Validator({'$ref': candidate['$id'] + '#/$defs/item'}, registry=proposed.registry)
         review = Draft202012Validator({'$ref': pack.PREFIX + 'collected-item.schema.json'}, registry=self.store.registry)
         for payload in ['not-an-integer', 1.5, True]:
@@ -102,10 +102,10 @@ class ReviewDocumentationPack(unittest.TestCase):
             for row in batch['proposals']:
                 if row['id'] in ids:
                     self.assertEqual(row['semantic_status'], 'pending_semantic_review')
-                    original = json.loads((ROOT / row['schema_file']).read_text())
-                    old = pack.pointer(original, row['pointer']).get('description')
-                    new = self.store.node(pack.PREFIX + row['schema_file'].split('/')[-1] + '#' + row['pointer']).get('description')
-                    self.assertEqual(old, new)
+                    # The held rows are retained only in the historical
+                    # worksheet; no row may enter the generated help routes.
+                    self.assertFalse(any(e.get('source_pointer', '').endswith('/' + row['id'])
+                                         for e in self.provenance['annotations']))
         self.assertFalse(any('foreach' in r['field'] for r in self.metadata['entries']))
 
     def test_schema_mutation_drives_all_generated_help_without_sidecar_prose(self):

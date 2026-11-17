@@ -1,6 +1,6 @@
 # linux.dpkginfo
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The dpkginfo test is used to check information for a given DPKG package.
 

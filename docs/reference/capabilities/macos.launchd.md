@@ -1,6 +1,6 @@
 # macos.launchd
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `macos.launchd` is used to check the status of daemons/agents loaded via the launchd service.
 

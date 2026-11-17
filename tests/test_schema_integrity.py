@@ -1,4 +1,4 @@
-"""Frozen 0.4 schema-family byte and reference integrity, without network."""
+"""Active 0.4.1 schema-family byte and reference integrity, without network."""
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -6,13 +6,13 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1] / 'schema'
-PREFIX = 'https://scap-ng.dev/schema/v0.4.0/'
+PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
 EXPECTED_JSON = 145
 EXPECTED_SCHEMAS = 35
-EXPECTED_REFS = 673
+EXPECTED_REFS = 689
 # Owner-approved pre-release 0.4 amendment; prior freeze digest remains in
 # docs/PROVENANCE.md and the previous immutable Git commit.
-EXPECTED_DIGEST = '63a61b3eb0ca95790721699f5e63b6f5a16b146660b9545a437519b508351db5'
+EXPECTED_DIGEST = '65ad62d207e39488eba670d0ab9cad740e66bbec1f4fc19737582363e2165a54'
 
 
 def strict_object(pairs):
@@ -71,7 +71,7 @@ class FrozenSchemaIntegrity(unittest.TestCase):
                 self.assertEqual(document['$schema'],
                                  'https://json-schema.org/draft/2020-12/schema')
                 self.assertEqual(document['$id'], PREFIX + path.name)
-                self.assertEqual(document['x-scap-ng-version'], '0.4.0')
+                self.assertEqual(document['x-scap-ng-version'], '0.4.1')
                 self.assertNotIn(document['$id'], identifiers)
                 identifiers.add(document['$id'])
 

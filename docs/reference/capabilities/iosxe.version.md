@@ -1,6 +1,6 @@
 # iosxe.version
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `iosxe.version` is used to check the version of the IOS-XE operating system.
 

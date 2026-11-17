@@ -1,6 +1,6 @@
 # independent.sql
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The sql512 test is used to check information stored in a database.
 

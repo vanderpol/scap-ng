@@ -1,6 +1,6 @@
 # windows.wuaupdatesearcher
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `windows.wuaupdatesearcher` is used to evaluate patch level in a Windows environment utilizing the WUA (Windows Update Agent) interface.
 

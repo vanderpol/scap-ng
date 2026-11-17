@@ -313,7 +313,7 @@ def generate(root=ROOT):
         if 'x-doc-capability' not in doc:
             continue
         cap = doc['x-doc-capability']
-        page = f'# {cap}\n\nProposed documentation; frozen 0.4.0 validation is unchanged.\n\n'
+        page = f'# {cap}\n\nProposed documentation; frozen 0.4.1 validation is unchanged.\n\n'
         if doc.get('description'):
             page += doc['description']+'\n\n'
         page += '**Contract status: unresolved.** ' + doc['x-doc-contract']['note'] + '\n\n'
@@ -501,7 +501,7 @@ def generate(root=ROOT):
     outputs[DEST / 'qualification.json'] = encode({'initial_ten': list(QUALIFICATION), 'initial_ten_present': all(c in {x['capability'] for x in coverage} for c in QUALIFICATION),
         'all_capabilities_processed': len(coverage), 'checks': ['local references resolve', 'exact capability associations', 'one mapping key per named field', 'nested properties retain parent', 'shared description owners resolve'],
         'runtime_equivalence': 'not tested or claimed'})
-    index = '# Proposed SCAP-NG reference\n\nGenerated from proposed JSON Schemas; 0.4.0 remains frozen. Field-description coverage does not establish complete scanner contracts.\n\n'
+    index = '# Proposed SCAP-NG reference\n\nGenerated from proposed JSON Schemas; 0.4.1 remains current. Field-description coverage does not establish complete scanner contracts.\n\n'
     index += 'Field-route totals count Object, Item and Require contexts, including reused meanings. Unique description owners are reported separately. Shared gaps count exact named-schema nodes, including repeated conditional constraints; they are not a count of distinct missing language features.\n\n'
     index += '| Measure | Count |\n| --- | ---: |\n' + ''.join(f'| {k.replace("_", " ")} | {v} |\n' for k,v in totals.items()) + '\n'
     platforms = defaultdict(list)

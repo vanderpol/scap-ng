@@ -2,7 +2,7 @@
 
 <!-- Generated: python tools/generate_unix_file_reference.py -->
 
-**Proposed next-version schema reference; not the frozen 0.4.0 validation contract.**
+**Review-only proposed overlay; not an accepted replacement for active SCAP-NG 0.4.1.**
 
 Select filesystem entries and collect their metadata for comparison.
 

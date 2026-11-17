@@ -1,6 +1,6 @@
 # linux.rpminfo
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `linux.rpminfo` is used to check the RPM header information for a given RPM package.
 
@@ -103,7 +103,7 @@ collected_items:
   provenance: {kind: synthetic-documentation-fixture}
 ```
 
-[Complete version-pinned fixture](../../../examples/paired/v0.4.0/linux.rpminfo.pass.yaml).
+[Complete version-pinned fixture](../../../examples/paired/v0.4.1/linux.rpminfo.pass.yaml).
 
 ### Fail — expected `false` (unverified)
 
@@ -127,6 +127,6 @@ collected_items:
   provenance: {kind: synthetic-documentation-fixture}
 ```
 
-[Complete version-pinned fixture](../../../examples/paired/v0.4.0/linux.rpminfo.fail.yaml).
+[Complete version-pinned fixture](../../../examples/paired/v0.4.1/linux.rpminfo.fail.yaml).
 
 Historical source: OVAL 5.12.3, commit `2f140ee5c5dd1ed9606fcd5afc301f6baeb48706`, `linux-definitions-schema.xsd`; native field mapping and source pointers are recorded in the schema. Legacy runtime behavior is not adopted. Support classification: **supported**.

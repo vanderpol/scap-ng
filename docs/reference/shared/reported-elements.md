@@ -1,4 +1,4 @@
-# Draft Test reported elements 0.4.0
+# Draft Test reported elements 0.4.1
 
 Proposed documentation. Defaults are schema annotations, not inferred scanner fallbacks. Conditional requirements and alternatives remain linked in the schema.
 

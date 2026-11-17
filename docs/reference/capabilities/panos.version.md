@@ -1,6 +1,6 @@
 # panos.version
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 Inspects version information represented by a PAN-OS XML API response. The XML response payload is rooted with a `response` element and includes device-specific information.
 

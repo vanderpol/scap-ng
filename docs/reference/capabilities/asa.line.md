@@ -1,6 +1,6 @@
 # asa.line
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The `asa.line` is used to check the properties of specific output lines from a SHOW command, such as SHOW RUNNING-CONFIG.
 

@@ -16,14 +16,35 @@ import audit_schema_documentation as audit
 class CoreEditorialBatch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.result = audit.audit()
-        cls.batch, cls.checked = audit.editorial_batch(cls.result)
+        # Editorial Issue #40 is immutable 0.4.0 history; its review notes
+        # intentionally do not point into the active 0.4.1 schema family.
+        cls._archive = audit.historical_workspace(ROOT)
+        cls.historical_root = cls._archive.__enter__()
+        try:
+            shutil.copytree(ROOT / audit.HISTORICAL_DEST,
+                            cls.historical_root / audit.HISTORICAL_DEST,
+                            dirs_exist_ok=True)
+            cls.result = audit.audit(cls.historical_root, active=False)
+            cls.batch, cls.checked = audit.editorial_batch(cls.result)
+        except BaseException:
+            cls._archive.__exit__(*sys.exc_info())
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._archive.__exit__(None, None, None)
 
     def temporary_batch(self, root, batch):
-        shutil.copytree(ROOT / 'schema', root / 'schema')
+        shutil.copytree(self.historical_root / 'schema', root / 'schema')
         (root / audit.DEST).mkdir(parents=True)
         (root / audit.DEST / 'editorial-batch.json').write_text(json.dumps(batch))
-        shutil.copytree(ROOT / 'examples', root / 'examples')
+        shutil.copytree(self.historical_root / 'examples', root / 'examples')
+
+    def test_archived_040_worksheet_rejects_active_041_schema_files(self):
+        # Preserve the historical evidence gate: a batch pinned to 0.4.0
+        # must not silently inherit the current 0.4.1 capabilities/URIs.
+        with self.assertRaisesRegex(ValueError, 'precondition drifted'):
+            audit.editorial_batch(self.result, root=ROOT)
 
     def test_bounded_diverse_sheet_has_separate_author_and_engineering_fields(self):
         rows = self.batch['proposals']
@@ -95,7 +116,7 @@ class CoreEditorialBatch(unittest.TestCase):
         for row in self.batch['proposals']:
             node = self.result['store'].node(row['schema_uri'] + '#' + row['pointer'])
             self.assertEqual(row['existing_wording'], node.get('description'))
-            self.assertEqual(row['source_sha256'], audit.sha256((ROOT / row['schema_file']).read_bytes()).hexdigest())
+            self.assertEqual(row['source_sha256'], audit.sha256((self.historical_root / row['schema_file']).read_bytes()).hexdigest())
             origin = row['codex_proposal_source']
             if origin['kind'] == 'phase1_crosswalk':
                 self.assertEqual(row['codex_proposal'], prior[origin['proposal_id']]['proposed_description'])
@@ -159,7 +180,7 @@ class CoreEditorialBatch(unittest.TestCase):
                 self.assertIn(row['author_description'], sheet)
             self.assertIn(row['engineering_note'], sheet)
         before = {p.name: audit.sha256(p.read_bytes()).hexdigest() for p in (ROOT / audit.DEST).glob('*') if p.is_file()}
-        output = audit.artifacts(audit.audit())
+        output = audit.artifacts(audit.audit(self.historical_root, active=False))
         self.assertIn('EDITORIAL-REVIEW.md', output)
         for name in ['inventory.jsonl', 'gaps.jsonl', 'crosswalk.jsonl', 'proposed-annotations.patch.json', 'PILOTS.md']:
             self.assertEqual(before[name], audit.sha256(output[name].encode()).hexdigest())

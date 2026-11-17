@@ -1,6 +1,6 @@
 # windows.passwordpolicy
 
-Proposed documentation; frozen 0.4.0 validation is unchanged.
+Proposed documentation; frozen 0.4.1 validation is unchanged.
 
 The password policy test is used to check specific policy associated with passwords.
 

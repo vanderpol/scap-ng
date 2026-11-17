@@ -10,6 +10,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 import sys
+import subprocess
 from urllib.parse import urljoin, urldefrag
 
 from jsonschema import Draft202012Validator
@@ -56,14 +57,59 @@ def refs(node):
             yield from refs(v)
 
 
+def _historical_overlay(root, workspace, pins):
+    """Overlay non-native historical helper files by exact Git blob receipt."""
+    for path, expected in pins['files'].items():
+        candidates = list(pins['source_commits'].values())
+        candidates += subprocess.check_output(
+            ['git', '-C', str(root), 'log', '--all', '--format=%H', '--', path], text=True).split()
+        for commit in dict.fromkeys(candidates):
+            try:
+                raw = subprocess.check_output(['git', '-C', str(root), 'show', f'{commit}:{path}'], stderr=subprocess.DEVNULL)
+            except subprocess.CalledProcessError:
+                continue
+            if digest(raw) == expected:
+                target = workspace / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(raw)
+                break
+        else:
+            raise ValueError('Unable to materialize historical input: ' + path)
+
+
 def build(root=ROOT):
+    if root == ROOT:
+        with audit.historical_workspace(root) as workspace:
+            pins = json.loads((root / DEST / 'input-pins.json').read_text())
+            pinned_file = workspace / DEST / 'input-pins.json'
+            pinned_file.parent.mkdir(parents=True, exist_ok=True)
+            pinned_file.write_text((root / DEST / 'input-pins.json').read_text())
+            _historical_overlay(root, workspace, pins)
+            # The worksheet/review-note records were amended after the native
+            # schema commit; materialize their exact recorded Git blobs too.
+            for path in ('docs/research/issue40/review-notes.json',
+                         'docs/research/issue40/editorial-batch.json',
+                         'docs/research/issue40/editorial-batch-2.json',
+                         'docs/research/issue40/schema-manifest.json'):
+                expected = digest((root / path).read_bytes())
+                candidates = subprocess.check_output(['git', '-C', str(root), 'log', '--all', '--format=%H', '--', path], text=True).split()
+                for commit in candidates:
+                    try:
+                        raw = subprocess.check_output(['git', '-C', str(root), 'show', f'{commit}:{path}'], stderr=subprocess.DEVNULL)
+                    except subprocess.CalledProcessError:
+                        continue
+                    if digest(raw) == expected:
+                        target = workspace / path; target.parent.mkdir(parents=True, exist_ok=True); target.write_bytes(raw); break
+            return _build(workspace)
+
+def _build(root=ROOT):
     pins = json.loads((root / DEST / 'input-pins.json').read_text())
     if pins['source_commits'] != COMMITS or pins['review_only'] is not True:
         raise ValueError('Unexpected historical source commit or release identity')
     for name, expected in pins['files'].items():
         if digest((root / name).read_bytes()) != expected:
             raise ValueError('Pinned source input drifted: ' + name)
-    result = audit.audit(root)
+    result = audit.audit(root, active=False)
     routes = {uri: PREFIX + uri.rsplit('/', 1)[-1] for uri in sorted(result['documents'])}
     docs = {routes[uri]: remap(doc, uri, routes) for uri, doc in result['documents'].items()}
     # Known authoring-condition pointers are metadata routing, not new assertions.
