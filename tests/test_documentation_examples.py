@@ -104,6 +104,16 @@ class PairedDocumentationExamples(unittest.TestCase):
         case = yaml.safe_load((root / doc['x-doc-examples']['cases'][0]['path']).read_text())
         examples.Examples(root).validate('collected-item', case['collected_items'][0])
 
+    def test_archived_examples_validate_only_against_reviewed_active_family(self):
+        # Archived example bytes remain pinned to their original authoring
+        # snapshot; the current 0.4.1 family is separately allowlisted and
+        # checked for arbitrary schema drift, including whitespace-only edits.
+        root, doc = self.mutate('unix.file', lambda c: None)
+        path = root / 'schema/native-selector.schema.json'
+        path.write_bytes(path.read_bytes() + b' ')
+        with self.assertRaisesRegex(ValueError, 'Example schema family differs'):
+            examples.Examples(root).load(doc)
+
     def test_missing_stale_pins_and_fabricated_proof_are_rejected(self):
         root, doc = self.mutate('unix.file', lambda c: None)
         (root / doc['x-doc-examples']['pin']['path']).unlink()
