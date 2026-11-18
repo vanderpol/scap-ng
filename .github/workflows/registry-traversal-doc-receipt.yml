@@ -35,24 +35,24 @@ jobs:
               print('GENERATED_END::' + name)
           PY
 
-      - name: Render all active 0.4.1 documentation derivatives and return exact changed bytes
+      - name: Render exact active schema documentation inventory and log changed outputs
         run: |
           python -m pip install -r requirements-dev.txt
           python tools/audit_schema_documentation.py
-          python tools/generate_documentation.py
-          python tools/audit_documentation_fidelity.py
-          python tools/check_documentation_examples.py
           python - <<'PY'
           import base64
           from pathlib import Path
           import subprocess
           changed = subprocess.check_output(
-              ['git', 'diff', '--name-only', '--', 'docs/metadata', 'docs/reference', 'docs/examples'],
+              ['git', 'diff', '--name-only', '--', 'docs/metadata/documentation-0.4.1'],
               text=True).splitlines()
-          print('GENERATED_CHANGED_FILES::' + repr(changed))
+          print('INVENTORY_CHANGED::' + repr(changed))
           for name in changed:
               data = Path(name).read_bytes()
               print('GENERATED_START::' + name + '::' + str(len(data)))
-              print(base64.b64encode(data).decode('ascii'))
+              if len(data) > 150000:
+                  print('GENERATED_TOO_LARGE::' + name)
+              else:
+                  print(base64.b64encode(data).decode('ascii'))
               print('GENERATED_END::' + name)
           PY
