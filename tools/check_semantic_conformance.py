@@ -15,8 +15,24 @@ PACK = ROOT / 'conformance/0.4/model-a'
 
 def check(binary=None, supplied_evidence=False):
     freeze = json.loads((ROOT / 'conformance/0.4/frozen-schema-sha256.json').read_text())
+    # These are historical, immutable 0.4.1 conformance bytes. The single
+    # active 0.4.1 family is permitted to evolve through reviewed pre-alpha
+    # amendments, and must be checked separately by test_schema_integrity.
+    # Validate the ORIGINAL bytes from the pinned Git commit, not unrelated
+    # newer files in the working tree. No network is accessed; CI fetches full
+    # history and shallow checkouts fail closed with a useful diagnostic.
     for path, expected in freeze['files'].items():
-        assert sha256((ROOT / path).read_bytes()).hexdigest() == expected, path
+        try:
+            original = subprocess.run(
+                ['git', 'show', freeze['commit'] + ':' + path],
+                cwd=ROOT, check=True, capture_output=True, timeout=15).stdout
+        except (FileNotFoundError, subprocess.CalledProcessError,
+                subprocess.TimeoutExpired) as error:
+            raise ValueError(
+                'historical conformance commit unavailable; fetch full Git history: '
+                + freeze['commit']) from error
+        if sha256(original).hexdigest() != expected:
+            raise ValueError('historical conformance source digest mismatch: ' + path)
     schemas = [json.loads(p.read_text()) for p in (ROOT / 'schema').glob('*.schema.json')]
     registry = Registry().with_resources((s['$id'], Resource.from_contents(s)) for s in schemas)
     validator = Draft202012Validator(next(s for s in schemas if s['$id'].endswith('/assessment.schema.json')), registry=registry)
