@@ -136,7 +136,7 @@ class ProductionDocumentationTests(unittest.TestCase):
                          self.outputs[gen.DEST/'capabilities/windows.registry.md'])
         child=artifacts.capability_help(self.help,'windows.registry','Object',['traversal','max_depth'])
         self.assertIsNotNone(child)
-        self.assertIn('Runtime',row['availability'])
+        self.assertIn('Runtime collection',self.outputs[gen.DEST/'capabilities/windows.registry.md'])
 
     def test_require_alternatives_keep_comparison_and_existence_separate(self):
         uri=PREFIX+'assessment-language.schema.json#/$defs/test/properties/require'
