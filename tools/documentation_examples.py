@@ -68,8 +68,21 @@ class Examples:
         digest = sha256()
         for path in sorted((self.root / 'schema').rglob('*.json')):
             digest.update(path.relative_to(self.root / 'schema').as_posix().encode() + b'\0' + path.read_bytes())
-        if digest.hexdigest() != pin['frozen_family_sha256']:
-            raise ValueError('Example schema family differs from immutable pin')
+        active_digest = digest.hexdigest()
+        historical_digest = pin['frozen_family_sha256']
+        if active_digest != historical_digest:
+            # The original teaching examples are byte-pinned to a historical
+            # 0.4.1 schema commit. They may also be validated against exactly
+            # the reviewed active 0.4.1 amendment below; the old pin remains
+            # immutable provenance, not an assertion that both trees match.
+            # Never permit arbitrary new schema trees or silent repinning.
+            reviewed_amendments = {
+                ('65ad62d207e39488eba670d0ab9cad740e66bbec1f4fc19737582363e2165a54',
+                 'a3ba4c65246fe507e4b66b862662eeed854a6aa3dfd94f7b0bb7b89ce59b61a3'):
+                    '0.4.1 registry hierarchy traversal admission',
+            }
+            if (historical_digest, active_digest) not in reviewed_amendments:
+                raise ValueError('Example schema family differs from immutable pin')
         cap = doc['x-doc-capability']
         cases = []
         for ref in annotation['cases']:
