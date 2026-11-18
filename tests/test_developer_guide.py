@@ -125,12 +125,19 @@ class DeveloperGuideTests(unittest.TestCase):
         directory['assessment']['tests']['sample-test']['object'] = {'path': {'equals': '/etc'}, 'filename': None}
         self.validator.validate(directory)
 
-    def test_registry_enum_and_traversal_rejection_are_preserved(self):
+    def test_registry_enum_and_bounded_hierarchy_traversal(self):
         for change in [dict(hive={'equals': 'HKEY_LOCAL_MACHINE'}),
-                       dict(traversal={'max_depth': 0})]:
+                       dict(traversal={'max_depth': -1}),
+                       dict(traversal={'max_depth': True}),
+                       dict(traversal={'max_depth': 'up'}),
+                       dict(traversal={'max_depth': 1, 'recurse_direction': 'up'})]:
             example = deepcopy(self.examples['windows.registry'])
             self.object_for(example).update(change)
             self.assertFalse(self.validator.is_valid(example))
+        for depth in (0, 3, 'unlimited'):
+            example = deepcopy(self.examples['windows.registry'])
+            self.object_for(example)['traversal'] = {'max_depth': depth}
+            self.validator.validate(example)
         example = deepcopy(self.examples['windows.registry'])
         self.object_for(example).update(key=None, name=None)
         self.validator.validate(example)
@@ -199,7 +206,7 @@ class DeveloperGuideTests(unittest.TestCase):
         self.assertIsNone(shell['variables']['parameter_allow_variable']['error_if_stderr_exists'])
         unix = records['unix.file']['contracts']['authoring_contract']
         self.assertIn('traversal', unix['collection_controls'])
-        self.assertNotIn('traversal', records['windows.registry']['contracts']['authoring_contract']['collection_controls'])
+        self.assertIn('traversal', records['windows.registry']['contracts']['authoring_contract']['collection_controls'])
 
 
 if __name__ == '__main__':
