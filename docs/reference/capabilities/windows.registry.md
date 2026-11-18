@@ -18,11 +18,9 @@ Occurrences indicate how many times a field may appear within its parent object;
 | `hive` | string | 0..1 | Registry hive containing the key. | [/$defs/object/properties/hive](../../../proposed-schema/documentation/capabilities/windows.registry.schema.json#/$defs/object/properties/hive) |
 | `key` | string | 0..1 | Key path relative to the hive. | [/$defs/object/properties/key](../../../proposed-schema/documentation/capabilities/windows.registry.schema.json#/$defs/object/properties/key) |
 | `name` | string | 0..1 | Registry value name. | [/$defs/object/properties/name](../../../proposed-schema/documentation/capabilities/windows.registry.schema.json#/$defs/object/properties/name) |
-| `traversal` | not accepted | 0..1 | **Not accepted in this inline form.** Controls downward traversal from the selected hierarchy entry. | [/$defs/object/properties/traversal](../../../proposed-schema/documentation/capabilities/windows.registry.schema.json#/$defs/object/properties/traversal) |
+| `traversal` | object | 0..1 | Native 0.4.1 supports downward Registry key hierarchy traversal. max_depth 0 selects the starting key; a finite integer bounds subkey depth, and unlimited means unbounded depth. | [/$defs/object/properties/traversal](../../../proposed-schema/documentation/capabilities/windows.registry.schema.json#/$defs/object/properties/traversal) |
 
 ### traversal
-
-**Semantic hold inherited from the parent field; these children do not make the parent accepted.**
 
 | Field | Value datatype | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
