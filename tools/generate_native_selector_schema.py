@@ -91,6 +91,11 @@ def object_schema(capability, selectors, mapping):
     traversal = mapping.get('native', {}).get('traversal_definition')
     if traversal in ('file_traversal', 'windows_file_traversal'):
         props['filesystem'] = {'$ref': 'capability-common.schema.json#/$defs/filesystem_scope'}
+    # Registry recursion already has a reviewed downward-only shared contract.
+    # Do not treat hierarchy traversal as filesystem traversal, and do not
+    # enable it for capabilities that have not reviewed the source semantics.
+    if (traversal in ('file_traversal', 'windows_file_traversal')
+            or (capability == 'windows.registry' and traversal == 'hierarchy_traversal')):
         props['traversal'] = {
             '$ref': f'capability-common.schema.json#/$defs/{traversal}'
         }
