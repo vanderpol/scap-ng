@@ -1,0 +1,36 @@
+name: PR 0.4.1 generated-document byte receipt
+
+on:
+  pull_request:
+    paths:
+      - schema/native-selector.schema.json
+      - tools/generate_native_selector_schema.py
+      - .github/workflows/registry-traversal-doc-receipt.yml
+
+permissions:
+  contents: read
+
+jobs:
+  generated-content-receipt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reproduce generated documentation from source
+        run: |
+          python tools/generate_native_selector_schema.py --check
+          python tools/generate_docs.py
+      - name: Export reviewed changed files as exact-byte base64 receipts
+        run: |
+          python - <<'PY'
+          import base64
+          from pathlib import Path
+          for name in ('docs/generated/developer-guide-windows-pilot.md',
+                       'docs/generated/documentation-audit.json'):
+              data = Path(name).read_bytes()
+              print('GENERATED_START::' + name + '::' + str(len(data)))
+              print(base64.b64encode(data).decode('ascii'))
+              print('GENERATED_END::' + name)
+          PY
