@@ -56,6 +56,41 @@ class NativeSelectorContractTests(unittest.TestCase):
         obj['mount_point'] = {'case_insensitive_not_equal': '/tmp'}
         self.assert_valid(linux)
 
+    def test_registry_hierarchy_traversal_is_generated_and_depth_bounded(self):
+        # Valid source downward recursion must not be rejected by the
+        # capability-specific additionalProperties gate. This does not claim
+        # runtime or unsupported upward recursion equivalence.
+        from tools.generate_native_selector_schema import build
+
+        generated = load(SCHEMA / 'native-selector.schema.json')
+        generated_from_contracts, _, _ = build()
+        props = generated['$defs']['windows_registry_object']['oneOf'][1]['properties']
+        self.assertEqual(props['traversal'], {
+            '$ref': 'capability-common.schema.json#/$defs/hierarchy_traversal'})
+        self.assertEqual(
+            generated_from_contracts['$defs']['windows_registry_object'],
+            generated['$defs']['windows_registry_object'])
+
+        test_id = 'verifies-prevent-enabling-screen-slide-show-is-set-enabled-test'
+        for depth in (0, 2, 'unlimited'):
+            with self.subTest(valid_depth=depth):
+                document = deepcopy(self.windows)
+                self.object_for(document, test_id)['traversal'] = {'max_depth': depth}
+                self.assert_valid(document)
+
+        for traversal in (
+                {}, {'max_depth': -1}, {'max_depth': True},
+                {'max_depth': '1'}, {'max_depth': None},
+                {'max_depth': 'up'}, {'max_depth': 1, 'recurse_direction': 'up'}):
+            with self.subTest(invalid_traversal=traversal):
+                document = deepcopy(self.windows)
+                self.object_for(document, test_id)['traversal'] = traversal
+                self.assert_invalid(document)
+
+        # The capability mapping must not add unreviewed hierarchy behavior
+        # to an unrelated Object overlay.
+        self.assertNotIn('traversal', generated['$defs']['windows_service_object']['oneOf'][1]['properties'])
+
     def test_registry_hive_rejects_generic_operator_leak(self):
         for predicate in (
             {'float_greater_than': 'local_machine'},
