@@ -104,11 +104,6 @@ class Grammar:
                     })
                 elif kind == 'enumeration' and part.get('value') is not None:
                     enums.append(part.get('value'))
-                elif part.tag == OVAL+'deprecated_info':
-                    deprecated.append({
-                        'version':part.findtext(OVAL+'version'),
-                        'reason':' '.join((part.findtext(OVAL+'reason') or '').split())
-                    })
                 for attr in ('type','base','ref','memberTypes'):
                     for token in part.get(attr,'').split():
                         resolved = self.resolve(current_file, token)
@@ -119,6 +114,14 @@ class Grammar:
                             found = self.globals.get((*resolved[:1], candidate, resolved[1]))
                             if found and (found[0],id(found[1])) not in seen:
                                 pending.append(found)
+        # A field or inherited shared type may be deprecated without the
+        # enclosing Test/Object/State itself being deprecated. Record ONLY
+        # annotations attached directly to the primary source declaration.
+        for item in node.findall(X+'annotation/'+X+'appinfo/'+OVAL+'deprecated_info'):
+            deprecated.append({
+                'version':item.findtext(OVAL+'version'),
+                'reason':' '.join((item.findtext(OVAL+'reason') or '').split())
+            })
         return {'elements':distinct(elements), 'attributes':distinct(attributes),
                 'choices':distinct(choices), 'enumerations':sorted(set(enums)),
                 'deprecations':distinct(deprecated), 'resolved_declarations':len(seen)}
