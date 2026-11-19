@@ -62,3 +62,41 @@ jobs:
             base64 -w 800 "$f" | awk -v file="$f" '{printf "GENCHUNK::%s::%06d::%s\n", file, NR, $0}'
             printf 'GENEND::%s\n' "$f"
           done
+
+      - name: Emit exact proposed-doc regeneration deltas (read-only; temporary)
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/generate_documentation.py
+          python tools/audit_schema_documentation.py
+          python tools/audit_documentation_fidelity.py
+          python tools/check_documentation_examples.py
+          python - <<'PY'
+          from pathlib import Path
+          import base64, difflib, hashlib, json, subprocess
+          def sha(raw): return hashlib.sha256(raw).hexdigest()
+          paths = subprocess.check_output([
+              'git', 'diff', '--name-only', '--',
+              'docs/reference/', 'docs/metadata/documentation-0.4.1/',
+              'docs/fidelity/', 'docs/examples/'
+          ], text=True).splitlines()
+          print('DOCPATCHCOUNT::' + str(len(paths)))
+          for path in sorted(paths):
+              old = subprocess.check_output(['git','show','HEAD:'+path])
+              new = Path(path).read_bytes()
+              a = old.decode('utf-8').splitlines(keepends=True)
+              b = new.decode('utf-8').splitlines(keepends=True)
+              ops = difflib.SequenceMatcher(None,a,b,autojunk=False).get_opcodes()
+              changes = [[i1,i2,''.join(b[j1:j2])] for tag,i1,i2,j1,j2 in ops if tag != 'equal']
+              patch = json.dumps({'path':path,'before':sha(old),'after':sha(new),
+                                  'changes':changes},ensure_ascii=False,separators=(',',':')).encode()
+              print('DOCPATCHINFO::%s::%d::%d::%d::%d' % (path,len(old),len(new),len(changes),len(patch)))
+              if len(patch) > 1800000:
+                  print('DOCPATCHSKIP::' + path)
+                  continue
+              print('DOCPATCHBEGIN::'+path)
+              b64 = base64.b64encode(patch).decode()
+              for n in range(0,len(b64),800):
+                  print('DOCPATCHCHUNK::%s::%06d::%s' %(path,n//800+1,b64[n:n+800]))
+              print('DOCPATCHEND::'+path)
+          PY
