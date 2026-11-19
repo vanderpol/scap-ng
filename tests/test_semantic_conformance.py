@@ -35,6 +35,30 @@ class SemanticConformance(unittest.TestCase):
         self.assertEqual(result['schema_validated'], 23)
         self.assertEqual(result['actually_executed'], 0)
 
+    def test_archived_receipt_and_original_source_mutations_fail_closed(self):
+        """An immutable Git receipt or original schema mutation must be rejected."""
+        import subprocess
+        from unittest.mock import patch
+        import check_semantic_conformance as checker
+
+        real_run = subprocess.run
+        for suffix, expected in (
+                (':conformance/0.4/frozen-schema-sha256.json',
+                 'historical conformance receipt digest mismatch'),
+                (':schema/applicability.schema.json',
+                 'historical conformance source digest mismatch')):
+            with self.subTest(suffix=suffix):
+                def mutate(argv, *args, **kwargs):
+                    result = real_run(argv, *args, **kwargs)
+                    if len(argv) >= 3 and argv[1] == 'show' and argv[2].endswith(suffix):
+                        return subprocess.CompletedProcess(
+                            argv, result.returncode, result.stdout + b' ', result.stderr)
+                    return result
+
+                with patch.object(checker.subprocess, 'run', side_effect=mutate):
+                    with self.assertRaisesRegex(ValueError, expected):
+                        checker.check()
+
     def test_case_sensitive_evidence_members(self):
         from copy import deepcopy
         import yaml
