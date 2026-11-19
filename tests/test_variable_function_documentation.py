@@ -18,7 +18,7 @@ class VariableFunctionDocumentationTests(unittest.TestCase):
         }
 
     def test_retained_expression_inventory_is_complete_and_documented(self):
-        expected = {'literal', 'variable', 'values', 'concat',
+        expected = {'literal', 'variable', 'input', 'values', 'to_integer', 'concat',
                     'regex_capture', 'unique', 'merge', 'count', 'split', 'substring', 'arithmetic', 'begin', 'end', 'time_difference'}
         self.assertEqual(set(self.branches), expected)
         for name, branch in self.branches.items():
