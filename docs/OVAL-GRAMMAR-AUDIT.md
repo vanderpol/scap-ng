@@ -14,7 +14,7 @@ python3 tools/audit_oval_language.py --oval-dir /path/to/OVAL/oval-schemas \
   --mapping-root schema/capability-mappings --output /tmp/oval-grammar-5123.json
 ```
 
-Or run the **OVAL 5.12.3 normative grammar inventory** GitHub Actions workflow to create a pinned, read-only, downloadable inventory artifact. The authoritative CLI enforces the upstream commit SHA and 54 XSD count. `--skip-pin-check` is reserved for synthetic fixtures.
+Or run the **OVAL 5.12.3 normative grammar inventory** GitHub Actions workflow to check all pinned XSDs and print a summary in the job log. The complete JSON report is generated locally by the command above; GitHub Actions does not publish artifacts because the canonical publication-boundary policy forbids unreviewed workflow publication sinks. The authoritative CLI enforces the upstream commit SHA and 54 XSD count. `--skip-pin-check` is reserved for synthetic fixtures.
 
 ## Scope and evidence interpretation
 
