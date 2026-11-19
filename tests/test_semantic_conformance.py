@@ -35,6 +35,21 @@ class SemanticConformance(unittest.TestCase):
         self.assertEqual(result['schema_validated'], 23)
         self.assertEqual(result['actually_executed'], 0)
 
+    def test_newer_historical_receipt_tracks_actual_git_bytes(self):
+        """Every later frozen hash must resolve at its stated source commit."""
+        import hashlib
+        import subprocess
+
+        receipt = json.loads((ROOT / 'conformance/0.4/frozen-schema-sha256.json').read_text())
+        self.assertEqual(len(receipt['files']), 145)
+        for path, expected in receipt['files'].items():
+            with self.subTest(path=path):
+                self.assertTrue(path.startswith('schema/'))
+                original = subprocess.run(
+                    ['git', 'show', receipt['commit'] + ':' + path],
+                    cwd=ROOT, check=True, capture_output=True, timeout=15).stdout
+                self.assertEqual(hashlib.sha256(original).hexdigest(), expected)
+
     def test_archived_receipt_and_original_source_mutations_fail_closed(self):
         """An immutable Git receipt or original schema mutation must be rejected."""
         import subprocess

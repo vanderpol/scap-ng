@@ -14,11 +14,10 @@ PACK = ROOT / 'conformance/0.4/model-a'
 
 
 def check(binary=None, supplied_evidence=False):
-    # The active frozen-schema-sha256.json was subsequently repinned during
-    # pre-alpha schema changes without updating its original commit field.
-    # It is therefore NOT a consistent immutable conformance receipt. Load
-    # the archived receipt from the exact Git commit that published the
-    # original 0.4.1 Model A schema snapshot, and pin its complete raw bytes.
+    # The working-tree frozen-schema-sha256.json pins a *later* historical
+    # schema snapshot. Model A was authored against an earlier snapshot.
+    # Load and byte-pin the archived Model A receipt as originally published;
+    # do not silently substitute the later schema receipt.
     #
     # Keep validating current authored documents against the active schema
     # below. Historical integrity and current schema admission are separate.
