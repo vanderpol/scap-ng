@@ -14,29 +14,42 @@ PACK = ROOT / 'conformance/0.4/model-a'
 
 
 def check(binary=None, supplied_evidence=False):
-    freeze = json.loads((ROOT / 'conformance/0.4/frozen-schema-sha256.json').read_text())
-    # These are historical, immutable 0.4.1 conformance bytes. The single
-    # active 0.4.1 family is permitted to evolve through reviewed pre-alpha
-    # amendments, and must be checked separately by test_schema_integrity.
-    # Validate the ORIGINAL bytes from the pinned Git commit, not unrelated
-    # newer files in the working tree. No network is accessed; CI fetches full
-    # history and shallow checkouts fail closed with a useful diagnostic.
-    for path, expected in freeze['files'].items():
+    # The active frozen-schema-sha256.json was subsequently repinned during
+    # pre-alpha schema changes without updating its original commit field.
+    # It is therefore NOT a consistent immutable conformance receipt. Load
+    # the archived receipt from the exact Git commit that published the
+    # original 0.4.1 Model A schema snapshot, and pin its complete raw bytes.
+    #
+    # Keep validating current authored documents against the active schema
+    # below. Historical integrity and current schema admission are separate.
+    receipt_commit = '0a2264afec660e0780d0b332810069e7e5894579'
+    receipt_path = 'conformance/0.4/frozen-schema-sha256.json'
+    receipt_sha256 = 'cac38053441e088c33da38aae444a8167ccbee5486ab3385adde4b5566b3c0c5'
+
+    def original_bytes(commit, path):
         try:
-            original = subprocess.run(
-                ['git', 'show', freeze['commit'] + ':' + path],
+            return subprocess.run(
+                ['git', 'show', commit + ':' + path],
                 cwd=ROOT, check=True, capture_output=True, timeout=15).stdout
         except (FileNotFoundError, subprocess.CalledProcessError,
                 subprocess.TimeoutExpired) as error:
             raise ValueError(
-                'historical conformance commit unavailable; fetch full Git history: '
-                + freeze['commit']) from error
-        if sha256(original).hexdigest() != expected:
+                'historical conformance Git object unavailable; fetch full Git history: '
+                + commit + ':' + path) from error
+
+    receipt_raw = original_bytes(receipt_commit, receipt_path)
+    if sha256(receipt_raw).hexdigest() != receipt_sha256:
+        raise ValueError('historical conformance receipt digest mismatch')
+    freeze = json.loads(receipt_raw)
+    manifest = json.loads((PACK / 'manifest.json').read_text())
+    if freeze['commit'] != manifest['schema_commit']:
+        raise ValueError('historical conformance receipt and Model A commit mismatch')
+    for path, expected in freeze['files'].items():
+        if sha256(original_bytes(freeze['commit'], path)).hexdigest() != expected:
             raise ValueError('historical conformance source digest mismatch: ' + path)
     schemas = [json.loads(p.read_text()) for p in (ROOT / 'schema').glob('*.schema.json')]
     registry = Registry().with_resources((s['$id'], Resource.from_contents(s)) for s in schemas)
     validator = Draft202012Validator(next(s for s in schemas if s['$id'].endswith('/assessment.schema.json')), registry=registry)
-    manifest = json.loads((PACK / 'manifest.json').read_text())
     cases = []
     for row in manifest['cases']:
         raw = (PACK / row['assessment']).read_bytes()
