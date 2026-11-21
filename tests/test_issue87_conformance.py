@@ -40,13 +40,48 @@ class Issue87Conformance(unittest.TestCase):
         cases = {row["capability"] for row in self.manifest["capabilities"]}
         self.assertEqual(cases, capabilities)
         self.assertEqual(self.inventory["counts"]["capability_mappings"], len(cases))
-        required = {"positive", "negative", "boundary", "empty", "permission-denied", "error", "not-applicable"}
+        required = {"positive", "negative", "boundary", "empty", "permission-denied", "error", "not-applicable", "multi-item"}
         for row in self.manifest["capabilities"]:
-            self.assertEqual(set(row["vectors"]), required, row["capability"])
+            self.assertTrue(required.issubset(row["vectors"]), row["capability"])
             for kind in ("assessment", "fixture", "expected"):
                 path = CONF / row[kind]
                 self.assertTrue(path.is_file(), path)
                 self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), row["sha256"][kind], path)
+
+    def test_negative_variants_are_distinct_and_preserve_selectors(self):
+        for row in self.manifest["capabilities"]:
+            fixture = read(CONF / row["fixture"])
+            positive = fixture["variants"]["positive"]
+            negative = fixture["variants"]["negative"]
+            self.assertFalse(
+                positive == negative,
+                f"{row['capability']} has identical positive/negative evidence",
+            )
+            contract = fixture["semantic_contract"]
+            if contract["negative_strategy"] == "field-mismatch":
+                self.assertEqual(len(positive["items"]), 1, row["capability"])
+                self.assertEqual(len(negative["items"]), 1, row["capability"])
+                for selector in contract["selector_fields"]:
+                    self.assertEqual(
+                        positive["items"][0]["fields"].get(selector),
+                        negative["items"][0]["fields"].get(selector),
+                        f"{row['capability']} negative changed selector {selector}",
+                    )
+                field = contract["negative_field"]
+                self.assertNotEqual(
+                    positive["items"][0]["fields"].get(field),
+                    negative["items"][0]["fields"].get(field),
+                    f"{row['capability']} negative did not change Require field",
+                )
+            else:
+                self.assertEqual(negative["items"], [], row["capability"])
+                self.assertEqual(negative["acquisition"], "collected", row["capability"])
+            expected = read(CONF / row["expected"])
+            self.assertNotEqual(
+                expected["variants"]["positive"]["assessment_outcome"],
+                expected["variants"]["negative"]["assessment_outcome"],
+                row["capability"],
+            )
 
     def test_core_semantics_keep_false_leaf_visible_and_only_not_negates(self):
         assessment = (CONF / "cases/core/evaluate-not.assessment.yaml").read_text(encoding="utf-8")
@@ -63,18 +98,36 @@ class Issue87Conformance(unittest.TestCase):
         audit = read(CONF / "coverage-audit.json")
         self.assertEqual(audit["schema_commit"], self.manifest["schema_commit"])
         self.assertEqual(audit["schema_family_sha256"], self.manifest["schema_family_sha256"])
-        self.assertEqual(audit["vectors"]["capability_vectors_total"], 728)
+        self.assertEqual(audit["vectors"]["base_capability_vectors_total"], 728)
+        self.assertEqual(audit["vectors"]["expanded_capability_vectors_total"], 832)
+        self.assertEqual(audit["vectors"]["multi_value_suite_cases"], 103)
         self.assertEqual(audit["fields"]["declared_mapping_fields"], 710)
         self.assertEqual(audit["fields"]["asserted_by_positive_assessments"], 710)
-        self.assertGreater(audit["selectors"]["uncovered_alternative_sets"], 0)
-        self.assertIn("exactly_one", audit["cardinalities"]["uncovered"])
-        self.assertIn("not_evaluated", audit["exceptional_outcomes"]["uncovered_defined_outcomes"])
+        self.assertEqual(audit["selectors"]["uncovered_alternative_sets"], 0)
+        self.assertEqual(audit["operators"]["uncovered_comparison"], [])
+        self.assertEqual(audit["cardinalities"]["uncovered"], [])
+        self.assertEqual(audit["exceptional_outcomes"]["uncovered_defined_outcomes"], [])
+        self.assertGreater(audit["enum_boundaries"]["schema_rejected_mutations"], 0)
         self.assertFalse(audit["schema_branches"]["direct_executable_branch_coverage"])
         self.assertTrue(audit["expected_results"]["independent_justification"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
                 self.assertTrue(assertion["reason"].strip())
+
+    def test_core_expansions_cover_operators_selectors_cardinalities_and_statuses(self):
+        operators = read(CONF / "expected/core-comparison-operators.json")
+        active = set(self.inventory["operator_inventory"]["field_predicate_properties"])
+        self.assertEqual(set(operators["operators"]), active)
+        selectors = read(CONF / "expected/core-selector-alternatives.json")
+        declared = sum(len(row["selector_alternatives"]) for row in self.inventory["capabilities"])
+        self.assertEqual(len(selectors["alternatives"]), declared)
+        multi_values = read(CONF / "expected/core-multi-values.json")
+        self.assertEqual(len(multi_values["capabilities"]), 103)
+        cardinalities = read(CONF / "expected/core-cardinalities.json")
+        self.assertEqual(set(cardinalities["cardinalities"]), {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"})
+        for row in self.manifest["status_cases"]:
+            self.assertTrue(read(CONF / row["expected"])["reason"].strip())
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]

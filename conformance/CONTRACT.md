@@ -20,7 +20,16 @@ Every ordinary capability case provides:
 * `empty`: no evidence, expected `unknown`;
 * `permission-denied`: acquisition denied, expected `unknown`;
 * `error`: collector error, expected `error`;
-* `not-applicable`: typed applicability result, expected `not_applicable`.
+* `not-applicable`: typed applicability result, expected `not_applicable`;
+* `multi-item`: two distinct matching Items;
+* selector-only capabilities use an empty collected population for the negative
+  vector, because no non-selector Require field exists to mutate.
+
+Dedicated core suites additionally provide all 67 active comparison operators,
+all 94 mapping-declared selector alternatives, all Item/field cardinality
+values, 103 applicable multi-value field witnesses, typed `not_evaluated`, and
+profile-disabled Rule witnesses. These are schema-valid semantic witnesses;
+collector execution remains outside this source oracle.
 
 `items_found` and `items_satisfying` remain separate cardinality observations.
 A status is not Booleanized. A scanner MUST NOT turn missing evidence or ERROR

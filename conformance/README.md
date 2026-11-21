@@ -32,13 +32,20 @@ regenerating the complete pack.
 
 The audit explicitly reports uncovered operators, selector alternatives,
 cardinalities, result statuses, and schema branches; it makes no semantic
-completeness claim. Every capability has a schema-valid Assessment plus deterministic positive,
-negative, boundary, empty, permission-denied, ERROR, and NOT_APPLICABLE fixture
-variants. The expected result files are an independent oracle and preserve
-UNKNOWN/ERROR/NOT_APPLICABLE instead of Booleanizing them. Core Evaluate content
-also covers FALSE, `not(false)`, double negation, AND/OR/ONE/XOR, and status
-propagation. `not` is the only canonical negation spelling; `negate` is an
-invalid-authoring regression.
+completeness claim. Each capability has seven base vectors plus deterministic
+multi-Item vectors; 103 capabilities also have a multi-value vector (935
+expanded capability vectors total). Negative fixtures are derived from each
+Assessment: selector fields remain unchanged when a Require field is mismatched,
+and selector-only capabilities use a collected empty population rather than
+inventing a field mismatch. The expected result files are an independent oracle
+and preserve UNKNOWN/ERROR/NOT_APPLICABLE instead of Booleanizing them.
+Dedicated suites cover all 67 active comparison operators, all 94 declared
+selector alternatives, every cardinality token, `not_evaluated`, and
+profile-disabled Rules. Enum boundary mutations, schema property/constraint
+combinations, collector execution, and scale remain explicitly incomplete.
+Core Evaluate content also covers FALSE, `not(false)`, double negation,
+AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
+spelling; `negate` is an invalid-authoring regression.
 
 ## Qualification boundary
 

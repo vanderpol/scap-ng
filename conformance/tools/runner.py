@@ -50,6 +50,11 @@ def validator() -> Draft202012Validator:
     return Draft202012Validator(schema, registry=registry())
 
 
+def schema_validator(name: str) -> Draft202012Validator:
+    schema = json.loads((SCHEMA / name).read_text(encoding="utf-8"))
+    return Draft202012Validator(schema, registry=registry())
+
+
 def check_fixture(path: Path) -> list[str]:
     errors: list[str] = []
     fixture = load(path)
@@ -61,6 +66,26 @@ def check_fixture(path: Path) -> list[str]:
     if clock != {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}:
         errors.append("fixture clock/timezone/locale/order is not deterministic")
     variants = fixture.get("variants", {})
+    contract = fixture.get("semantic_contract", {})
+    if "positive" in variants and "negative" in variants:
+        positive_items = variants["positive"].get("items", [])
+        negative_items = variants["negative"].get("items", [])
+        if positive_items == negative_items and variants["positive"].get("acquisition") == variants["negative"].get("acquisition"):
+            errors.append("positive and negative evidence are identical with the same acquisition status")
+        strategy = contract.get("negative_strategy")
+        if strategy == "field-mismatch":
+            field = contract.get("negative_field")
+            if len(positive_items) != 1 or len(negative_items) != 1 or not field:
+                errors.append("field-mismatch negative must retain exactly one Item")
+            else:
+                for selector in contract.get("selector_fields", []):
+                    if positive_items[0].get("fields", {}).get(selector) != negative_items[0].get("fields", {}).get(selector):
+                        errors.append(f"negative changed selector field {selector!r}")
+                if positive_items[0].get("fields", {}).get(field) == negative_items[0].get("fields", {}).get(field):
+                    errors.append(f"negative did not change comparison field {field!r}")
+        elif strategy == "empty-collected-population":
+            if positive_items == negative_items or negative_items:
+                errors.append("empty-population negative must remove Items while retaining collected acquisition")
     for name, variant in variants.items():
         if "items" in variant and not isinstance(variant["items"], list):
             errors.append(f"variant {name}: items must be an array")
@@ -116,17 +141,45 @@ def validate() -> int:
                 errors.append(f"{row['expected']}: wrong expected-result format")
             if set(expected.get("variants", {})) != set(row["vectors"]):
                 errors.append(f"{row['expected']}: expected vectors do not match manifest")
+            fixture = load(fixture_path)
             for vector, assertion in expected.get("variants", {}).items():
                 if assertion.get("assessment_outcome") not in {"true", "false", "unknown", "error", "not_applicable", "not_evaluated"}:
                     errors.append(f"{row['expected']}:{vector}: untyped outcome")
+                if vector in fixture.get("variants", {}):
+                    actual_items = len(fixture["variants"][vector].get("items", []))
+                    if assertion.get("items_found") != actual_items:
+                        errors.append(f"{row['expected']}:{vector}: items_found does not match fixture")
         except Exception as exc:
             errors.append(f"{row['fixture']} / {row['expected']}: {exc}")
+    inventory = load(CONFORMANCE / "schema-coverage.json")
     for row in manifest["core_cases"]:
         assessment = CONFORMANCE / row["assessment"]
         try:
             v.validate(load(assessment))
+            expected = load(CONFORMANCE / row["expected"])
+            if row["id"] == "core-comparison-operators":
+                expected_ops = set(expected.get("operators", {}))
+                active_ops = set(inventory["operator_inventory"]["field_predicate_properties"])
+                if expected_ops != active_ops:
+                    errors.append("comparison operator suite does not cover the active 67-operator surface")
+            if row["id"] == "core-selector-alternatives":
+                declared = sum(len(c.get("selector_alternatives", [])) for c in inventory["capabilities"])
+                if len(expected.get("alternatives", {})) != declared:
+                    errors.append("selector suite does not cover every declared selector alternative")
+            if row["id"] == "core-cardinalities":
+                required = {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"}
+                if set(expected.get("cardinalities", {})) != required:
+                    errors.append("cardinality suite is incomplete")
         except Exception as exc:
             errors.append(f"{row['assessment']}: {exc.message if hasattr(exc, 'message') else exc}")
+    for row in manifest.get("status_cases", []):
+        path = CONFORMANCE / row.get("assessment", row.get("case"))
+        try:
+            schema_validator(row["schema"]).validate(load(path))
+            if not (CONFORMANCE / row["expected"]).is_file():
+                errors.append(f"{row['id']}: missing expected status/profile oracle")
+        except Exception as exc:
+            errors.append(f"{row['id']}: {exc.message if hasattr(exc, 'message') else exc}")
     for invalid_case in manifest["invalid_cases"]:
         invalid = CONFORMANCE / invalid_case["assessment"]
         try:
@@ -150,7 +203,8 @@ def coverage() -> int:
     present = {r["capability"] for r in manifest["capabilities"]}
     expected = {r["capability"] for r in inventory["capabilities"]}
     missing = sorted(expected - present)
-    print(json.dumps({"schema_commit": inventory["schema_commit"], "capabilities": len(expected), "vectors_per_capability": 7, "missing_capabilities": missing, "schema_validated": not missing}, indent=2))
+    audit = load(CONFORMANCE / "coverage-audit.json")
+    print(json.dumps({"schema_commit": inventory["schema_commit"], "capabilities": len(expected), "base_vectors_per_capability": 7, "expanded_capability_vectors_total": audit["vectors"]["expanded_capability_vectors_total"], "missing_capabilities": missing, "schema_validated": not missing, "semantic_complete": audit["schema_branches"]["direct_executable_branch_coverage"]}, indent=2))
     return 1 if missing else 0
 
 
