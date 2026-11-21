@@ -22,8 +22,8 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 | capability unique description owners | 795 |
 | preserved semantic holds | 5 |
 | preserved withheld definitions | 1 |
-| shared fields discovered | 3067 |
-| shared fields documented | 2912 |
+| shared fields discovered | 3069 |
+| shared fields documented | 2914 |
 | shared basic fields discovered | 1496 |
 | shared basic fields documented | 1422 |
 

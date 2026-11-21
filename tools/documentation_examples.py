@@ -83,6 +83,12 @@ class Examples:
                 ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
                  '679519c0ecf2102ace79312f803ee03ba7057af6d86976e5d575055606b76a31'):
                     '0.4.1 NTUSER and effective-rights hierarchy traversal admission',
+                ('679519c0ecf2102ace79312f803ee03ba7057af6d86976e5d575055606b76a31',
+                 '33c0867870c04a411f769646a8f5c8c785134673d56a26b7a1cd3c8d213a7a91'):
+                    '0.4.1 hierarchy traversal pattern-key restriction',
+                ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
+                 '33c0867870c04a411f769646a8f5c8c785134673d56a26b7a1cd3c8d213a7a91'):
+                    '0.4.1 hierarchy traversal admission and pattern-key restriction',
             }
             if (historical_digest, active_digest) not in reviewed_amendments:
                 raise ValueError('Example schema family differs from immutable pin')
