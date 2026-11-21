@@ -188,6 +188,7 @@ Generated capability-specific selector overlay. Resolved entries close the opera
 | `hive` | object | 0..1 | Hive names are canonical enum values. | [/$defs/windows_registry_object/oneOf/1/properties/hive](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_registry_object/oneOf/1/properties/hive) |
 | `key` | null, object | 0..1 | Key path relative to the hive. | [/$defs/windows_registry_object/oneOf/1/properties/key](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_registry_object/oneOf/1/properties/key) |
 | `name` | null, object | 0..1 | Registry value name. | [/$defs/windows_registry_object/oneOf/1/properties/name](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_registry_object/oneOf/1/properties/name) |
+| `traversal` | object | 0..1 | Native 0.4.1 accepts downward Registry hierarchy traversal with max_depth 0, a finite nonnegative integer, or unlimited. | [/$defs/windows_registry_object/oneOf/1/properties/traversal](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_registry_object/oneOf/1/properties/traversal) |
 
 ## `/$defs/windows_regkeyeffectiverights_object/oneOf/1`
 

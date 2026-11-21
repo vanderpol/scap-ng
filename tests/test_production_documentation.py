@@ -128,12 +128,15 @@ class ProductionDocumentationTests(unittest.TestCase):
         self.assertIn('| Definition |',self.outputs[gen.DEST/'shared/variable-expression.md'])
         self.assertIn('"unlimited"',self.outputs[gen.DEST/'advanced/capability-common.md'])
 
-    def test_registry_traversal_discrepancy_is_not_hidden(self):
+    def test_registry_traversal_is_authorable_but_runtime_remains_unqualified(self):
         row=artifacts.capability_help(self.help,'windows.registry','Object',['traversal'])
-        self.assertEqual(row['status'],'semantic-hold')
-        self.assertIn('**Not accepted in this inline form.**',self.outputs[gen.DEST/'capabilities/windows.registry.md'])
+        self.assertEqual(row['status'],'native-mapping-reviewed')
+        self.assertIn('max_depth',self.outputs[gen.DEST/'capabilities/windows.registry.md'])
+        self.assertNotIn('**Not accepted in this inline form.**',
+                         self.outputs[gen.DEST/'capabilities/windows.registry.md'])
         child=artifacts.capability_help(self.help,'windows.registry','Object',['traversal','max_depth'])
-        self.assertEqual(child['status'],'semantic-hold')
+        self.assertIsNotNone(child)
+        self.assertIn('Runtime collection',row['description'])
 
     def test_require_alternatives_keep_comparison_and_existence_separate(self):
         uri=PREFIX+'assessment-language.schema.json#/$defs/test/properties/require'

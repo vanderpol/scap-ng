@@ -14,13 +14,41 @@ PACK = ROOT / 'conformance/0.4/model-a'
 
 
 def check(binary=None, supplied_evidence=False):
-    freeze = json.loads((ROOT / 'conformance/0.4/frozen-schema-sha256.json').read_text())
+    # The working-tree frozen-schema-sha256.json pins a *later* historical
+    # schema snapshot. Model A was authored against an earlier snapshot.
+    # Load and byte-pin the archived Model A receipt as originally published;
+    # do not silently substitute the later schema receipt.
+    #
+    # Keep validating current authored documents against the active schema
+    # below. Historical integrity and current schema admission are separate.
+    receipt_commit = '0a2264afec660e0780d0b332810069e7e5894579'
+    receipt_path = 'conformance/0.4/frozen-schema-sha256.json'
+    receipt_sha256 = 'cac38053441e088c33da38aae444a8167ccbee5486ab3385adde4b5566b3c0c5'
+
+    def original_bytes(commit, path):
+        try:
+            return subprocess.run(
+                ['git', 'show', commit + ':' + path],
+                cwd=ROOT, check=True, capture_output=True, timeout=15).stdout
+        except (FileNotFoundError, subprocess.CalledProcessError,
+                subprocess.TimeoutExpired) as error:
+            raise ValueError(
+                'historical conformance Git object unavailable; fetch full Git history: '
+                + commit + ':' + path) from error
+
+    receipt_raw = original_bytes(receipt_commit, receipt_path)
+    if sha256(receipt_raw).hexdigest() != receipt_sha256:
+        raise ValueError('historical conformance receipt digest mismatch')
+    freeze = json.loads(receipt_raw)
+    manifest = json.loads((PACK / 'manifest.json').read_text())
+    if freeze['commit'] != manifest['schema_commit']:
+        raise ValueError('historical conformance receipt and Model A commit mismatch')
     for path, expected in freeze['files'].items():
-        assert sha256((ROOT / path).read_bytes()).hexdigest() == expected, path
+        if sha256(original_bytes(freeze['commit'], path)).hexdigest() != expected:
+            raise ValueError('historical conformance source digest mismatch: ' + path)
     schemas = [json.loads(p.read_text()) for p in (ROOT / 'schema').glob('*.schema.json')]
     registry = Registry().with_resources((s['$id'], Resource.from_contents(s)) for s in schemas)
     validator = Draft202012Validator(next(s for s in schemas if s['$id'].endswith('/assessment.schema.json')), registry=registry)
-    manifest = json.loads((PACK / 'manifest.json').read_text())
     cases = []
     for row in manifest['cases']:
         raw = (PACK / row['assessment']).read_bytes()

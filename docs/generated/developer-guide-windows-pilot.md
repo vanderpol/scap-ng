@@ -537,7 +537,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `hive` + `key` + `name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
