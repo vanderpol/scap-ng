@@ -6,7 +6,7 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 Every known capability has a dedicated section, including capabilities with **documentation gaps**. These sections identify physical acquisition requirements separately from the Assessment authoring contract. Absence of scanner steps is an explicit gap, not permission for vendors to guess.
 
-**Coverage:** 104 capability sections; 0 qualified guidance records, 104 pending full implementation guidance. Qualification requires documented collection steps, vendor/source references where applicable, missing/error handling, conformance evidence and owner review.
+**Coverage:** 105 capability sections; 0 qualified guidance records, 105 pending full implementation guidance. Qualification requires documented collection steps, vendor/source references where applicable, missing/error handling, conformance evidence and owner review.
 
 | Capability section | Scope | Scanner guidance |
 | --- | --- | --- |
@@ -33,6 +33,7 @@ Every known capability has a dedicated section, including capabilities with **do
 | [`ios.snmpgroup`](#iossnmpgroup) | supported | `documentation_gap` |
 | [`ios.snmphost`](#iossnmphost) | supported | `documentation_gap` |
 | [`ios.snmpuser`](#iossnmpuser) | supported | `documentation_gap` |
+| [`ios.version55`](#iosversion55) | supported | `documentation_gap` |
 | [`iosxe.bgpneighbor`](#iosxebgpneighbor) | supported | `documentation_gap` |
 | [`iosxe.global`](#iosxeglobal) | supported | `documentation_gap` |
 | [`iosxe.interface`](#iosxeinterface) | supported | `documentation_gap` |
@@ -356,6 +357,16 @@ Every known capability has a dedicated section, including capabilities with **do
 - Authoring selectors: `name`.
 - Collection parameters: none declared.
 - Returned/state fields: `auth`, `group`, `ipv4_acl`, `ipv6_acl`, `name`, `priv`, `version`.
+- **Implementation steps:** Not yet reviewed/documented.
+- **Vendor/source references:** Not yet reviewed/documented.
+
+### ios.version55
+
+**Guidance status:** `documentation_gap`. **Contract:** [mapping](../../schema/capability-mappings/supported/ios.version55.json).
+
+- Authoring selectors: none declared.
+- Collection parameters: none declared.
+- Returned/state fields: `mainline_rebuild`, `major_version`, `minor_version`, `rebuild`, `release`, `subrebuild`, `train_identifier`, `version_string`.
 - **Implementation steps:** Not yet reviewed/documented.
 - **Vendor/source references:** Not yet reviewed/documented.
 

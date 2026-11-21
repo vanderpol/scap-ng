@@ -4,7 +4,7 @@
 
 This is a **generated reference** from the frozen schema and capability metadata, not a statement of scanner implementation conformance. Pin the entire repository commit (or release tag when available), including documentation, schemas, specification and examples.
 
-## 100 supported and 4 experimental mappings
+## 101 supported and 4 experimental mappings
 
 The frozen capability mapping metadata defines authoring selectors, collection parameters, result fields, datatypes and source lineage. **Supported** describes this specification catalog, not a qualified scanner provider. **Experimental** entries are not adopted as normative requirements.
 
@@ -33,6 +33,7 @@ The frozen capability mapping metadata defines authoring selectors, collection p
 | [`ios.snmpgroup`](../../schema/capability-mappings/supported/ios.snmpgroup.json) | supported | `name` | 8 | OVAL 5.12.3 |
 | [`ios.snmphost`](../../schema/capability-mappings/supported/ios.snmphost.json) | supported | `host` | 5 | OVAL 5.12.3 |
 | [`ios.snmpuser`](../../schema/capability-mappings/supported/ios.snmpuser.json) | supported | `name` | 7 | OVAL 5.12.3 |
+| [`ios.version55`](../../schema/capability-mappings/supported/ios.version55.json) | supported | — | 8 | OVAL 5.12.3 |
 | [`iosxe.bgpneighbor`](../../schema/capability-mappings/supported/iosxe.bgpneighbor.json) | supported | `neighbor` | 2 | OVAL 5.12.3 |
 | [`iosxe.global`](../../schema/capability-mappings/supported/iosxe.global.json) | supported | `global_command` | 1 | OVAL 5.12.3 |
 | [`iosxe.interface`](../../schema/capability-mappings/supported/iosxe.interface.json) | supported | `name` | 19 | OVAL 5.12.3 |

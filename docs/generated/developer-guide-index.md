@@ -13,7 +13,7 @@ Read the [common contracts](../developer-guide/README.md), then the namespace fa
 | [esx](developer-guide-esx.md) | 0 | 4 | 0 |
 | [file](developer-guide-file.md) | 1 | 0 | 0 |
 | [independent](developer-guide-independent-pilot.md) | 8 | 0 | 1 |
-| [ios](developer-guide-ios.md) | 10 | 0 | 0 |
+| [ios](developer-guide-ios.md) | 11 | 0 | 0 |
 | [iosxe](developer-guide-iosxe.md) | 11 | 0 | 0 |
 | [junos](developer-guide-junos.md) | 1 | 0 | 0 |
 | [linux](developer-guide-linux.md) | 13 | 0 | 0 |

@@ -35,7 +35,7 @@ class DocumentationDriftTests(unittest.TestCase):
         catalog = self.docs['scanner-implementation-catalog.md']
         capabilities = [path.stem for path in
                         (PROJECT / 'schema' / 'capability-mappings').rglob('*.json')]
-        self.assertEqual(len(capabilities), 104)
+        self.assertEqual(len(capabilities), 105)
         for name in capabilities:
             with self.subTest(capability=name):
                 self.assertEqual(catalog.count(f'### {name}\n'), 1)
