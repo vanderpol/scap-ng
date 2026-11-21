@@ -73,13 +73,6 @@ def check_fixture(path: Path) -> list[str]:
     return errors
 
 
-def canonical_commit() -> str:
-    try:
-        return subprocess.check_output(["git", "rev-parse", "origin/main"], cwd=ROOT, text=True).strip()
-    except subprocess.CalledProcessError:
-        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-
-
 def family_digest() -> str:
     paths = sorted((*SCHEMA.glob("*.json"), *(SCHEMA / "capability-mappings").rglob("*.json")))
     checksum = hashlib.sha256()
@@ -92,11 +85,15 @@ def family_digest() -> str:
 def validate() -> int:
     manifest = load(CONFORMANCE / "manifest.json")
     errors: list[str] = []
-    current_commit = canonical_commit()
     if manifest.get("schema_version") != "0.4.1":
         errors.append("manifest is not pinned to schema version 0.4.1")
-    if manifest.get("schema_commit") != current_commit:
-        errors.append(f"manifest schema commit {manifest.get('schema_commit')} != checked out {current_commit}")
+    source_commit = manifest.get("schema_commit", "")
+    if len(source_commit) != 40:
+        errors.append("manifest schema_commit is not an exact Git SHA")
+    else:
+        source_check = subprocess.run(["git", "cat-file", "-e", f"{source_commit}^{{commit}}"], cwd=ROOT, capture_output=True)
+        if source_check.returncode:
+            errors.append(f"manifest source commit is unavailable locally: {source_commit}")
     if manifest.get("schema_family_sha256") != family_digest():
         errors.append("manifest schema family digest does not match checked-out schema resources")
     v = validator()

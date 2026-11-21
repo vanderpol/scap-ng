@@ -24,8 +24,9 @@ class Issue87Conformance(unittest.TestCase):
         cls.inventory = read(CONF / "schema-coverage.json")
 
     def test_manifest_is_exactly_pinned_to_checked_out_schema(self):
-        commit = subprocess.check_output(["git", "rev-parse", "origin/main"], cwd=ROOT, text=True).strip()
-        self.assertEqual(self.manifest["schema_commit"], commit)
+        commit = self.manifest["schema_commit"]
+        self.assertRegex(commit, r"^[0-9a-f]{40}$")
+        self.assertEqual(subprocess.run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=ROOT).returncode, 0)
         paths = sorted((ROOT / "schema").glob("*.json")) + sorted((ROOT / "schema/capability-mappings").rglob("*.json"))
         digest = hashlib.sha256()
         for path in sorted(paths):

@@ -35,10 +35,17 @@ def digest(paths: list[Path]) -> str:
 
 
 def git_sha() -> str:
-    """Return the exact canonical schema source pin, not this implementation commit."""
+    """Return the canonical schema source pin, never this implementation commit."""
     requested = os.environ.get("SCAP_NG_SCHEMA_COMMIT")
     if requested:
         return requested
+    current = digest(sorted((*SCHEMA.glob("*.json"), *(SCHEMA / "capability-mappings").rglob("*.json"))))
+    existing = OUT / "manifest.json"
+    if existing.is_file():
+        prior = load(existing)
+        if prior.get("schema_family_sha256") == current and prior.get("schema_commit"):
+            return prior["schema_commit"]
+        raise SystemExit("schema resources changed; regenerate with SCAP_NG_SCHEMA_COMMIT=<reviewed exact source commit>")
     try:
         return subprocess.check_output(["git", "rev-parse", "origin/main"], cwd=ROOT, text=True).strip()
     except subprocess.CalledProcessError:
