@@ -493,7 +493,7 @@ def main() -> None:
     (OUT / "cases/invalid/negate.assessment.yaml").write_text(yaml.safe_dump(invalid, sort_keys=False), encoding="utf-8")
     manifest = {
         "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
-        "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "capability_case_count": len(rows), "capabilities": rows,
+        "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
         "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}],
         "invalid_cases": [
             {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},

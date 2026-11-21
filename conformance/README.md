@@ -8,7 +8,8 @@ Model-A evidence and is not an active 0.4.1 authoring corpus.
 
 ## Current inventory receipt
 
-The generated inventory records the source commit, whole-family digest, every
+The generated inventory (`schema-coverage.json`) and conservative audit
+(`coverage-audit.json`) record the source commit, whole-family digest, every
 schema JSON document, `$ref`, property group, enum and constraint, plus each
 supported/experimental capability mapping and its selectors, fields, datatypes,
 and semantic validator rules. Regenerate it after a canonical schema change:
@@ -29,7 +30,9 @@ family SHA-256 is
 SHA-256 is in both generated receipts; do not edit the version label without
 regenerating the complete pack.
 
-Every capability has a schema-valid Assessment plus deterministic positive,
+The audit explicitly reports uncovered operators, selector alternatives,
+cardinalities, result statuses, and schema branches; it makes no semantic
+completeness claim. Every capability has a schema-valid Assessment plus deterministic positive,
 negative, boundary, empty, permission-denied, ERROR, and NOT_APPLICABLE fixture
 variants. The expected result files are an independent oracle and preserve
 UNKNOWN/ERROR/NOT_APPLICABLE instead of Booleanizing them. Core Evaluate content

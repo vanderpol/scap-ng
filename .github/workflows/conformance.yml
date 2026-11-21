@@ -38,5 +38,9 @@ jobs:
         run: python conformance/tools/runner.py validate
       - name: Report inventory and vector coverage
         run: python conformance/tools/runner.py coverage
+      - name: Audit field/operator/cardinality/status branch coverage
+        run: |
+          python conformance/tools/audit.py
+          git diff --exit-code -- conformance/coverage-audit.json
       - name: Run independent corpus regression tests
         run: PYTHONPATH=tests python -m unittest test_issue87_conformance -v

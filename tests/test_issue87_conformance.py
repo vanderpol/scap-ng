@@ -59,6 +59,23 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["assertions"]["error"], "error")
         self.assertEqual(expected["assertions"]["not_applicable"], "not_applicable")
 
+    def test_audit_reports_scope_without_false_semantic_completeness(self):
+        audit = read(CONF / "coverage-audit.json")
+        self.assertEqual(audit["schema_commit"], self.manifest["schema_commit"])
+        self.assertEqual(audit["schema_family_sha256"], self.manifest["schema_family_sha256"])
+        self.assertEqual(audit["vectors"]["capability_vectors_total"], 728)
+        self.assertEqual(audit["fields"]["declared_mapping_fields"], 710)
+        self.assertEqual(audit["fields"]["asserted_by_positive_assessments"], 710)
+        self.assertGreater(audit["selectors"]["uncovered_alternative_sets"], 0)
+        self.assertIn("exactly_one", audit["cardinalities"]["uncovered"])
+        self.assertIn("not_evaluated", audit["exceptional_outcomes"]["uncovered_defined_outcomes"])
+        self.assertFalse(audit["schema_branches"]["direct_executable_branch_coverage"])
+        self.assertTrue(audit["expected_results"]["independent_justification"])
+        for row in self.manifest["capabilities"]:
+            expected = read(CONF / row["expected"])
+            for assertion in expected["variants"].values():
+                self.assertTrue(assertion["reason"].strip())
+
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
