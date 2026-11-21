@@ -156,7 +156,7 @@ class ProductionDocumentationTests(unittest.TestCase):
         legacy=artifacts.schema_help(self.help,PREFIX+'capability-common.schema.json#/$defs/authoring_type_resolution')
         self.assertEqual(legacy['scope'],'unreferenced-schema-helper')
         self.assertEqual(legacy['status'],'unresolved-legacy-helper')
-        active=artifacts.schema_help(self.help,PREFIX+'variable-expression.schema.json#/$defs/expression/oneOf/4/properties/concat')
+        active=artifacts.schema_help(self.help,PREFIX+'variable-expression.schema.json#/$defs/expression/oneOf/6/properties/concat')
         self.assertEqual(active['scope'],'declared-schema')
         self.assertEqual(active['status'],'semantic-hold')
 

@@ -9,11 +9,11 @@ ROOT = Path(__file__).resolve().parents[1] / 'schema'
 PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
 EXPECTED_JSON = 145
 EXPECTED_SCHEMAS = 35
-EXPECTED_REFS = 690
+EXPECTED_REFS = 691
 # Active single-version 0.4.1 family including reviewed registry traversal.
 # Historical frozen receipts remain in conformance/0.4 and prior Git commits.
 # The digest is independently checked by the generated documentation manifest.
-EXPECTED_DIGEST = 'a3ba4c65246fe507e4b66b862662eeed854a6aa3dfd94f7b0bb7b89ce59b61a3'
+EXPECTED_DIGEST = 'ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260'
 
 
 def strict_object(pairs):
