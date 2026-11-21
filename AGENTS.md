@@ -1,3 +1,9 @@
+## MANDATORY ALL-TASK CODEX SELF-AUDIT — OWNER POLICY 2026-11-21
+
+Before claiming ANY SCAP-NG engineering task complete, perform an adversarial semantic self-review and correct defects: verify normative sources and actual inputs/outputs, challenge expectations independently of generators, use negative and mutation/metamorphic tests, reconcile source pins and current-head CI, and report explicit unqualified holds. A green test suite alone is not sufficient. Read and follow the shared [standing quality gates](https://github.com/vanderpol/scap-ng/blob/main/docs/engineering/CODEX-QUALITY-GATES.md). Human independent review still follows. This adds a mandatory step without superseding existing security, single-version, or prompt-mainline merge policies.
+
+---
+
 ## OWNER-DIRECTED MAINLINE INTEGRATION POLICY — 2026-11-17 (takes precedence over older PR workflow)
 
 The owner prioritizes **preserving implemented pre-alpha work in `main`** over accumulating open draft PRs. `main` is the active **development** baseline, not a claim of product readiness. This overrides older instructions to keep all development draft-only; security, source/provenance checks, test honesty, canonical version coordination, and release gates still apply.
