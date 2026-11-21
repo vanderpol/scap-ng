@@ -80,6 +80,9 @@ class Examples:
                 ('65ad62d207e39488eba670d0ab9cad740e66bbec1f4fc19737582363e2165a54',
                  'a3ba4c65246fe507e4b66b862662eeed854a6aa3dfd94f7b0bb7b89ce59b61a3'):
                     '0.4.1 registry hierarchy traversal admission',
+                ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
+                 '679519c0ecf2102ace79312f803ee03ba7057af6d86976e5d575055606b76a31'):
+                    '0.4.1 NTUSER and effective-rights hierarchy traversal admission',
             }
             if (historical_digest, active_digest) not in reviewed_amendments:
                 raise ValueError('Example schema family differs from immutable pin')

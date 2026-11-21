@@ -94,8 +94,13 @@ def object_schema(capability, selectors, mapping):
     # Registry recursion already has a reviewed downward-only shared contract.
     # Do not treat hierarchy traversal as filesystem traversal, and do not
     # enable it for capabilities that have not reviewed the source semantics.
+    hierarchy_capabilities = {
+        'windows.registry',
+        'windows.ntuser',
+        'windows.regkeyeffectiverights',
+    }
     if (traversal in ('file_traversal', 'windows_file_traversal')
-            or (capability == 'windows.registry' and traversal == 'hierarchy_traversal')):
+            or (capability in hierarchy_capabilities and traversal == 'hierarchy_traversal')):
         props['traversal'] = {
             '$ref': f'capability-common.schema.json#/$defs/{traversal}'
         }
