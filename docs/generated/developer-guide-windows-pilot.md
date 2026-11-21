@@ -443,7 +443,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `key` + `name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`include_default`](../../schema/native-selector.schema.json), [`item_creation`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`include_default`](../../schema/native-selector.schema.json), [`item_creation`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
 
 ### Collection parameters
 
@@ -642,7 +642,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `hive` + `key` + `trustee_sid`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 

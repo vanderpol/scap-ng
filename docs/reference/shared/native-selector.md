@@ -177,6 +177,7 @@ Generated capability-specific selector overlay. Resolved entries close the opera
 | `name` | null, object | 0..1 | Name assigned to a value associated with a specific registry key. | [/$defs/windows_ntuser_object/oneOf/1/properties/name](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_ntuser_object/oneOf/1/properties/name) |
 | `include_default` | boolean | 0..1 | Whether the local Default user's ntuser.dat is included. | [/$defs/windows_ntuser_object/oneOf/1/properties/include_default](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_ntuser_object/oneOf/1/properties/include_default) |
 | `item_creation` | string | 0..1 | Controls whether Items are created only for matching key/name pairs or for every relevant ntuser.dat. | [/$defs/windows_ntuser_object/oneOf/1/properties/item_creation](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_ntuser_object/oneOf/1/properties/item_creation) |
+| `traversal` | object | 0..1 | Controls downward traversal from the selected hierarchy entry. | [/$defs/windows_ntuser_object/oneOf/1/properties/traversal](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_ntuser_object/oneOf/1/properties/traversal) |
 
 ## `/$defs/windows_registry_object/oneOf/1`
 
@@ -200,6 +201,7 @@ Generated capability-specific selector overlay. Resolved entries close the opera
 | `hive` | object | 0..1 | OVAL 5.12.3 regkeyeffectiverights53_object uses the canonical registry-hive enum with equals only; key and trustee_sid retain all five EntityObjectStringType operations. key null selects the higher-level hive. | [/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/hive](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/hive) |
 | `key` | null, object | 0..1 | Registry key to be collected. | [/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/key](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/key) |
 | `trustee_sid` | object | 0..1 | OVAL 5.12.3 regkeyeffectiverights53_object uses the canonical registry-hive enum with equals only; key and trustee_sid retain all five EntityObjectStringType operations. key null selects the higher-level hive. | [/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/trustee_sid](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/trustee_sid) |
+| `traversal` | object | 0..1 | Controls downward traversal from the selected hierarchy entry. | [/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/traversal](../../../proposed-schema/documentation/native-selector.schema.json#/$defs/windows_regkeyeffectiverights_object/oneOf/1/properties/traversal) |
 
 ## `/$defs/windows_service_object/oneOf/1`
 

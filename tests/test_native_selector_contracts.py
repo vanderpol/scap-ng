@@ -87,8 +87,13 @@ class NativeSelectorContractTests(unittest.TestCase):
                 self.object_for(document, test_id)['traversal'] = traversal
                 self.assert_invalid(document)
 
-        # The capability mapping must not add unreviewed hierarchy behavior
-        # to an unrelated Object overlay.
+        # Registry, NTUSER and effective-rights all use the same reviewed
+        # downward hierarchy contract; unrelated capabilities remain closed.
+        for capability in ('windows_ntuser', 'windows_regkeyeffectiverights'):
+            self.assertEqual(
+                generated['$defs'][capability + '_object']['oneOf'][1]['properties']['traversal'],
+                {'$ref': 'capability-common.schema.json#/$defs/hierarchy_traversal'},
+            )
         self.assertNotIn('traversal', generated['$defs']['windows_service_object']['oneOf'][1]['properties'])
 
     def test_registry_hive_rejects_generic_operator_leak(self):
