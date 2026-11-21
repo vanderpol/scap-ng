@@ -1,0 +1,40 @@
+assessment:
+  id: conformance-windows-wmi-query
+  version: 1
+  assessment_title: 'SCAP-NG 0.4.1 conformance: windows.wmi.query positive and status
+    vectors'
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  tests:
+    windows-wmi-query-test:
+      test_title: Collect and match every declared windows.wmi.query field
+      capability: windows.wmi.query
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          namespace:
+            equals: fixture-value
+          wql:
+            equals: fixture-value
+          result:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                fixture_field:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: fixture-value
+      reported_elements: all
+      object:
+        capability: windows.wmi.query
+  evaluate:
+    test: windows-wmi-query-test

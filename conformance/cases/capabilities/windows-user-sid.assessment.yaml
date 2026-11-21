@@ -1,0 +1,47 @@
+assessment:
+  id: conformance-windows-user-sid
+  version: 1
+  assessment_title: 'SCAP-NG 0.4.1 conformance: windows.user_sid positive and status
+    vectors'
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  tests:
+    windows-user-sid-test:
+      test_title: Collect and match every declared windows.user_sid field
+      capability: windows.user_sid
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          user_sid:
+            equals: fixture-value
+          enabled:
+            equals: true
+          group_sid:
+            equals: fixture-value
+          last_logon:
+            equals: 7
+          user:
+            equals: fixture-value
+          group:
+            equals: fixture-value
+          full_name:
+            equals: fixture-value
+          comment:
+            equals: fixture-value
+          password_age_days:
+            equals: 7
+      reported_elements: all
+      object:
+        capability: windows.user_sid
+        user_sid:
+          equals: fixture-value
+  evaluate:
+    test: windows-user-sid-test
