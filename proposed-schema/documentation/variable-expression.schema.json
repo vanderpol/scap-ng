@@ -2,9 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://scap-ng.dev/schema/proposed/documentation/variable-expression.schema.json",
   "x-scap-ng-version": "0.4.1",
-  "x-last-modified": "2026-11-13",
+  "x-last-modified": "2026-11-19",
   "title": "Native Variable declarations and retained OVAL transformations",
-  "description": "Declare typed local or constant Variables from literal data, other Variables, collected Object fields, or explicit recursive transformations. Active 0.4 forms preserve source operand order, collection multiplicity, empty values, and evaluation status; datatype compatibility and status propagation are checked separately by semantic validation or a qualified runtime.",
+  "description": "SCAP-NG 0.4.1 native Variable declarations. Value type, collection cardinality, and observation status are separate semantic dimensions.",
   "x-scap-ng-owner-decision": "https://github.com/vanderpol/scap-ng-tools/issues/48",
   "$ref": "#/$defs/declaration",
   "$defs": {
@@ -21,24 +21,12 @@
             "constant"
           ],
           "title": "Variable kind",
-          "description": "Selects a constant or locally derived Variable.",
-          "x-doc-review": {
-            "status": "editorially-approved",
-            "source": "editorial-batch-2.json",
-            "case": "06",
-            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
-          }
+          "description": "Use `local` for a derived value or `constant` for a literal declaration."
         },
         "expression": {
           "$ref": "#/$defs/expression",
           "title": "Variable expression",
-          "description": "Defines how this Variable's values are obtained.",
-          "x-doc-review": {
-            "status": "editorially-approved",
-            "source": "editorial-batch.json",
-            "case": "06",
-            "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721578815"
-          }
+          "description": "Expression that supplies this Variable’s values."
         },
         "title": {
           "type": [
@@ -176,8 +164,7 @@
           }
         }
       ],
-      "description": "Declares a constant or locally derived Variable.",
-      "x-doc-status": "native-grammar-derived"
+      "description": "Declare a native Variable with kind and expression. Result datatypes are inferred from typed literal values, canonical collected fields, referenced Variables, and defined operations. No declaration datatype is accepted; implicit lexical casts are forbidden."
     },
     "expression": {
       "oneOf": [
@@ -281,19 +268,13 @@
                 }
               ],
               "title": "Literal value",
-              "description": "Supplies a literal value, list of values, or explicitly typed value.",
+              "description": "A scalar, ordered list, or explicitly typed value. Use the typed form when the datatype matters; lists preserve their supplied order and duplicates.",
               "examples": [
                 {
                   "datatype": "string",
                   "value": "example"
                 }
-              ],
-              "x-doc-review": {
-                "status": "editorially-approved",
-                "source": "editorial-batch-2.json",
-                "case": "08",
-                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
-              }
+              ]
             }
           },
           "additionalProperties": false,
@@ -324,6 +305,27 @@
         {
           "type": "object",
           "required": [
+            "input"
+          ],
+          "properties": {
+            "input": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-input$",
+              "maxLength": 64,
+              "title": "Assessment Input reference",
+              "description": "Reference a typed Assessment Input from the invocation's policy binding. The declared Input supplies its datatype and cardinality; a missing or malformed Input must never be replaced by a literal or default.",
+              "examples": [
+                "var-accounts-user-umask-input"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "title": "Assessment Input expression",
+          "description": "Typed, dynamic Assessment Input operand for Variable and function composition."
+        },
+        {
+          "type": "object",
+          "required": [
             "values"
           ],
           "properties": {
@@ -348,7 +350,7 @@
               },
               "additionalProperties": false,
               "title": "Collected field values",
-              "description": "Reads a field from the Items collected by an Object.",
+              "description": "Read the selected field from the collected Object. Field availability, multiplicity, and collection status are semantic/runtime concerns.",
               "examples": [
                 {
                   "object": {
@@ -356,18 +358,28 @@
                   },
                   "field": "hostname"
                 }
-              ],
-              "x-doc-review": {
-                "status": "editorially-approved",
-                "source": "editorial-batch-2.json",
-                "case": "09",
-                "approval": "https://github.com/vanderpol/scap-ng/pull/41#issuecomment-6721712939"
-              }
+              ]
             }
           },
           "additionalProperties": false,
           "title": "Collected values expression",
           "description": "Produce values from a collected Object field."
+        },
+        {
+          "type": "object",
+          "required": [
+            "to_integer"
+          ],
+          "properties": {
+            "to_integer": {
+              "$ref": "#/$defs/expression",
+              "title": "String operand",
+              "description": "Explicit elementwise OVAL xsd:integer decimal conversion. Only string operands with signed decimal digits, including leading zeros, are accepted. Invalid lexical values, missing Inputs, and incomplete evidence fail closed. Values, order, duplicates, and source statuses remain significant."
+            }
+          },
+          "additionalProperties": false,
+          "title": "Explicit integer conversion",
+          "description": "Typed expression conversion, never a Variable declaration datatype or implicit arithmetic cast."
         },
         {
           "type": "object",
@@ -400,8 +412,7 @@
                     "win_filetime"
                   ],
                   "default": "year_month_day",
-                  "title": "First time format",
-                  "description": "Format of the first explicit operand; omitted for the one-operand current-UTC form."
+                  "title": "First time format"
                 },
                 "format_2": {
                   "enum": [
@@ -412,8 +423,7 @@
                     "win_filetime"
                   ],
                   "default": "year_month_day",
-                  "title": "Second time format",
-                  "description": "Format of the second explicit operand, or the one explicit operand."
+                  "title": "Second time format"
                 }
               },
               "additionalProperties": false,
@@ -509,13 +519,7 @@
                     "variable": "url-variable"
                   }
                 }
-              ],
-              "x-doc-review": {
-                "status": "semantic-hold",
-                "source": "editorial-batch.json",
-                "case": "16",
-                "note": "The current native annotation specifies the first group but delegates regex dialect, no-match/no-group behavior and statuses to inherited rules. The pattern member is only a string constraint; validating it does not prove capture semantics."
-              }
+              ]
             }
           },
           "additionalProperties": false,
@@ -568,13 +572,7 @@
                     "$ref": "#/$defs/expression"
                   }
                 }
-              ],
-              "x-doc-review": {
-                "status": "semantic-hold",
-                "source": "editorial-batch.json",
-                "case": "17",
-                "note": "The native description excludes record operands, although the expression reference does not by itself close every operand type. Equality, ordering and unavailable-value propagation remain pending; no deduplication runtime is executed."
-              }
+              ]
             }
           },
           "additionalProperties": false,
@@ -931,22 +929,14 @@
                     }
                   ]
                 }
-              ],
-              "x-doc-review": {
-                "status": "semantic-hold",
-                "source": "editorial-batch.json",
-                "case": "18",
-                "note": "delimiter, sort, order and values are explicit required inputs; duplicates are not implicitly removed. Sorting edge cases, casting and unavailable/error behavior need semantic confirmation before unqualified publication."
-              }
+              ]
             }
           },
           "additionalProperties": false,
           "title": "Merge expression",
           "description": "Sort and join values into one string."
         }
-      ],
-      "x-doc-status": "native-grammar-derived",
-      "description": "One retained expression form: literal, Variable reference, Object field values, concat, regex_capture, unique, or merge."
+      ]
     }
   },
   "x-doc-origin": "schema/variable-expression.schema.json",
