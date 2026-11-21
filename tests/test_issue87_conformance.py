@@ -10,6 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CONF = ROOT / "conformance"
+SCHEMA = ROOT / "schema"
 
 
 def read(path: Path):
@@ -28,7 +29,7 @@ class Issue87Conformance(unittest.TestCase):
         paths = sorted((ROOT / "schema").glob("*.json")) + sorted((ROOT / "schema/capability-mappings").rglob("*.json"))
         digest = hashlib.sha256()
         for path in sorted(paths):
-            digest.update(path.relative_to(ROOT).as_posix().encode() + b"\0")
+            digest.update(path.relative_to(SCHEMA).as_posix().encode() + b"\0")
             digest.update(path.read_bytes())
         self.assertEqual(self.inventory["schema_family_sha256"], digest.hexdigest())
         self.assertEqual(self.manifest["schema_family_sha256"], self.inventory["schema_family_sha256"])

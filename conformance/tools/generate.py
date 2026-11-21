@@ -29,7 +29,7 @@ def load(path: Path) -> Any:
 def digest(paths: list[Path]) -> str:
     h = hashlib.sha256()
     for path in sorted(paths):
-        h.update(path.relative_to(ROOT).as_posix().encode() + b"\0")
+        h.update(path.relative_to(SCHEMA).as_posix().encode() + b"\0")
         h.update(path.read_bytes())
     return h.hexdigest()
 

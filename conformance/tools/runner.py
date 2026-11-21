@@ -84,7 +84,7 @@ def family_digest() -> str:
     paths = sorted((*SCHEMA.glob("*.json"), *(SCHEMA / "capability-mappings").rglob("*.json")))
     checksum = hashlib.sha256()
     for path in paths:
-        checksum.update(path.relative_to(ROOT).as_posix().encode() + b"\0")
+        checksum.update(path.relative_to(SCHEMA).as_posix().encode() + b"\0")
         checksum.update(path.read_bytes())
     return checksum.hexdigest()
 
