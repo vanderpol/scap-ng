@@ -104,6 +104,35 @@ def object_schema(capability, selectors, mapping):
         props['traversal'] = {
             '$ref': f'capability-common.schema.json#/$defs/{traversal}'
         }
+    all_of = [
+        {'$ref': 'capability-common.schema.json#/$defs/inline_object'},
+    ]
+    # OVAL's NTUSER and effective-rights Schematron forbids max_depth and
+    # recurse_direction with pattern-key selectors.  Native hierarchy
+    # traversal is the typed representation of those two controls, so encode
+    # the same source-valid boundary in the canonical JSON Schema rather than
+    # leaving it as documentation-only mapping metadata.
+    if capability in {'windows.ntuser', 'windows.regkeyeffectiverights'}:
+        non_equality = ('not_equal', 'case_insensitive_equals',
+                        'case_insensitive_not_equal', 'matches_regex')
+        all_of.append({
+            'if': {'required': ['traversal']},
+            'then': {
+                'not': {
+                    'anyOf': [
+                        {
+                            'required': ['key'],
+                            'properties': {
+                                'key': {'anyOf': [
+                                    {'required': [operator]}
+                                    for operator in non_equality
+                                ]},
+                            },
+                        },
+                    ],
+                },
+            },
+        })
     return defs, {
         'oneOf': [
             {'$ref': 'capability-common.schema.json#/$defs/object_reference'},
@@ -111,9 +140,7 @@ def object_schema(capability, selectors, mapping):
                 'type': 'object',
                 'properties': props,
                 'additionalProperties': False,
-                'allOf': [
-                    {'$ref': 'capability-common.schema.json#/$defs/inline_object'},
-                ],
+                'allOf': all_of,
                 'description': f'{capability} inline Object with reviewed native selector constraints.',
             },
         ],

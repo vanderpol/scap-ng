@@ -96,6 +96,29 @@ class NativeSelectorContractTests(unittest.TestCase):
             )
         self.assertNotIn('traversal', generated['$defs']['windows_service_object']['oneOf'][1]['properties'])
 
+    def test_hierarchy_traversal_rejects_pattern_keys(self):
+        for capability, key in (
+                ('windows.ntuser', 'key'),
+                ('windows.regkeyeffectiverights', 'key')):
+            with self.subTest(capability=capability):
+                valid = self.batch_document(capability, {
+                    key: {'equals': 'Software\\Example'},
+                    'traversal': {'max_depth': 2},
+                })
+                self.assert_valid(valid)
+                no_traversal = deepcopy(valid)
+                no_traversal_object = no_traversal['assessment']['tests'][next(iter(no_traversal['assessment']['tests']))]['object']
+                no_traversal_object.pop('traversal')
+                no_traversal_object[key] = {'matches_regex': '^Software'}
+                self.assert_valid(no_traversal)
+                for operator in ('not_equal', 'case_insensitive_equals',
+                                 'case_insensitive_not_equal', 'matches_regex'):
+                    invalid = deepcopy(valid)
+                    invalid['assessment']['tests'][next(iter(invalid['assessment']['tests']))]['object'][key] = {
+                        operator: 'Software\\Example'
+                    }
+                    self.assert_invalid(invalid)
+
     def test_registry_hive_rejects_generic_operator_leak(self):
         for predicate in (
             {'float_greater_than': 'local_machine'},
