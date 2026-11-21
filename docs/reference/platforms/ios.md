@@ -14,5 +14,6 @@ Proposed schema-derived documentation for this capability family. Collection and
 | [ios.snmpgroup](../capabilities/ios.snmpgroup.md) | 19/19 | 0 |
 | [ios.snmphost](../capabilities/ios.snmphost.md) | 13/13 | 0 |
 | [ios.snmpuser](../capabilities/ios.snmpuser.md) | 17/17 | 0 |
+| [ios.version55](../capabilities/ios.version55.md) | 18/18 | 0 |
 
 Shared language: [Require and comparisons](../shared/assessment-language.md), [Variables and retained functions](../shared/variable-expression.md), [collection grammar](../shared/capability-common.md), [result values](../shared/result-types.md).

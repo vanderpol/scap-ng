@@ -32,7 +32,7 @@ class DeveloperGuideTests(unittest.TestCase):
 
     def test_platform_partition_and_gap_counts_reconcile(self):
         inventory = json.loads(self.docs['developer-guide-gaps.json'])
-        self.assertEqual(inventory['summary'], dict(capabilities=104, supported=100,
+        self.assertEqual(inventory['summary'], dict(capabilities=105, supported=101,
                          experimental=4, platform_families=15, reviewed_pilots=3,
                          qualified=0, selectors=145, unresolved_selectors=117,
                          missing_result_datatypes=38))

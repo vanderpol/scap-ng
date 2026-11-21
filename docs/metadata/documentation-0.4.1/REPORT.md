@@ -4,7 +4,7 @@
 
 Pin: `d707aad6a916bb4e2e61767d836c681fc9d0084b`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
 
-Discovered **35 schema documents** among 145 JSON inputs. Audited 7942 schema nodes, including 1980 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
+Discovered **35 schema documents** among 146 JSON inputs. Audited 7942 schema nodes, including 1980 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
 
 Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.
 

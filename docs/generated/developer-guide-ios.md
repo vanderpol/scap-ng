@@ -406,3 +406,38 @@ No dedicated selector overlay is recorded; consult the shared schema and mapping
 ### Recorded semantic rules
 
 - `ios.snmpuser.filter_state_capability`: Every Set filter State reference must resolve to capability ios.snmpuser.
+
+## ios.version55
+
+**Scope:** supported. **Authority:** [frozen mapping](../../schema/capability-mappings/supported/ios.version55.json).
+
+| Contract | Documentation status |
+| --- | --- |
+| authoring | partially_documented |
+| collection | partially_documented |
+| evaluation | partially_documented |
+| provenance | verified |
+
+[Shared variables, evaluation and status definitions](developer-guide-contract-model.md). Acquisition and complete missing/error mappings remain unresolved.
+
+
+No dedicated selector overlay is recorded; consult the shared schema and mapping separately.
+
+### Evidence and comparison fields
+
+| Native field | Source field(s) | Collected datatype(s) | Comparison datatype override | Enum |
+| --- | --- | --- | --- | --- |
+| mainline_rebuild | mainline_rebuild | string | none separately recorded | — |
+| major_version | major_version | integer | none separately recorded | — |
+| minor_version | minor_version | integer | none separately recorded | — |
+| rebuild | rebuild | integer | none separately recorded | — |
+| release | release | integer | none separately recorded | — |
+| subrebuild | subrebuild | string | none separately recorded | — |
+| train_identifier | train_identifier | string | none separately recorded | — |
+| version_string | version_string | string | none separately recorded | — |
+
+### Recorded semantic rules
+
+- `ios.version55.singleton_source`: The capability evaluates the current IOS software version directly; native content SHALL NOT introduce a meaningless singleton Object.
+- `ios.version55.version_string`: version_string preserves the source EntityStateIOSVersionType lexical string and comparison semantics.
+- `ios.version55.version_components`: major_version, minor_version, release and rebuild preserve source integer entities; subrebuild, mainline_rebuild and train_identifier preserve source string entities.

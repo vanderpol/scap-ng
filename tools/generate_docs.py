@@ -335,7 +335,7 @@ def generated_documents():
     for path in immutable:
         fingerprint.update(path.relative_to(SCHEMAS).as_posix().encode() + b'\0')
         fingerprint.update(path.read_bytes())
-    if len(immutable) != 145:
+    if len(immutable) != 146:
         raise ValueError('Active 0.4.1 schema file count changed; regenerate and qualify an updated release pin')
     manifest = {
         'format': 'scap-ng/schema-documentation-drift-audit/1',

@@ -45,7 +45,7 @@ class ProductionDocumentationTests(unittest.TestCase):
         caps = {d['x-doc-capability'] for d,p in self.docs.values() if 'x-doc-capability' in d}
         mappings = {json.loads(p.read_text())['capability'] for p in (ROOT/'schema/capability-mappings').glob('*/*.json')}
         self.assertEqual(caps, mappings)
-        self.assertEqual(len(caps),104)
+        self.assertEqual(len(caps),105)
         for cap in gen.QUALIFICATION:
             row = next(c for c in self.coverage['capabilities'] if c['capability'] == cap)
             self.assertEqual(row['missing_descriptions'],0, cap)
@@ -223,7 +223,7 @@ class ProductionDocumentationTests(unittest.TestCase):
             self.assertEqual(page.count('Historical source:'),1)
             self.assertNotIn('`traversal.max_depth`',page)
         self.assertEqual(self.coverage['totals']['missing_capability_descriptions'],8)
-        self.assertEqual(self.coverage['totals']['fully_field_documented'],102)
+        self.assertEqual(self.coverage['totals']['fully_field_documented'],103)
 
     def test_new_capability_and_field_require_no_generator_changes(self):
         docs=deepcopy(self.docs)

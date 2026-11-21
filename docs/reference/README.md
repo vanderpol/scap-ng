@@ -6,20 +6,20 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 
 | Measure | Count |
 | --- | ---: |
-| capabilities | 104 |
-| fully field documented | 102 |
+| capabilities | 105 |
+| fully field documented | 103 |
 | partial capabilities | 2 |
-| fields discovered | 1866 |
-| fields documented | 1858 |
+| fields discovered | 1884 |
+| fields documented | 1876 |
 | missing capability descriptions | 8 |
-| unresolved native contracts | 104 |
+| unresolved native contracts | 105 |
 | shared description gaps | 155 |
-| capability pages | 104 |
+| capability pages | 105 |
 | shared pages | 35 |
-| advanced pages | 139 |
-| description owners | 2148 |
-| duplicate text groups | 172 |
-| capability unique description owners | 795 |
+| advanced pages | 140 |
+| description owners | 2160 |
+| duplicate text groups | 176 |
+| capability unique description owners | 803 |
 | preserved semantic holds | 5 |
 | preserved withheld definitions | 1 |
 | shared fields discovered | 3069 |
@@ -71,6 +71,7 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 - [ios.snmpgroup](capabilities/ios.snmpgroup.md): 19/19 field routes; native contract unresolved.
 - [ios.snmphost](capabilities/ios.snmphost.md): 13/13 field routes; native contract unresolved.
 - [ios.snmpuser](capabilities/ios.snmpuser.md): 17/17 field routes; native contract unresolved.
+- [ios.version55](capabilities/ios.version55.md): 18/18 field routes; native contract unresolved.
 
 ## [iosxe](platforms/iosxe.md)
 
