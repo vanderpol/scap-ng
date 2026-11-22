@@ -237,6 +237,8 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic"])
         self.assertEqual(audit["variable_functions"]["witness_tests"], 9)
+        self.assertEqual(audit["variable_functions"]["expression_schema_branches"], ["arithmetic", "begin", "concat", "count", "end", "input", "literal", "merge", "regex_capture", "split", "substring", "time_difference", "to_integer", "unique", "values", "variable"])
+        self.assertEqual(audit["variable_functions"]["uncovered_expression_branches"], ["begin", "end", "input", "to_integer", "values"])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
         self.assertEqual(audit["applicability"]["variants"], ["applicable", "not-applicable", "deferred"])
         dimensions = {"schema", "semantic", "collection", "integration", "operational"}

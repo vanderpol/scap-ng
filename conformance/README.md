@@ -99,7 +99,7 @@ The canonical `core-variable-functions` Assessment covers nine functions —
 `unique`, `count`, `concat`, `merge`, `split`, `regex_capture`, `substring`,
 `time_difference`, and `arithmetic` — over deterministic ordered values with
 local Variable dependencies. Expected values are independently derived and do
-not claim status propagation, resource-limit behavior, or runtime equivalence.
+not claim status propagation, resource-limit behavior, or runtime equivalence. The schema expression branches `begin`, `end`, `input`, `to_integer`, and `values` remain explicitly uncovered.
 
 The canonical `core-input-guards` Assessment distinguishes supplied, absent,
 empty, over-cardinality, and out-of-range Input bindings behind an explicit
