@@ -1,0 +1,741 @@
+#!/usr/bin/env python3
+"""Generate the schema-derived 0.4.1 conformance inventory and portable vectors.
+
+This generator reads only the checked-out flat ``schema/`` tree.  It deliberately
+never copies a hand-maintained capability list: mappings, JSON-Schema properties,
+enums and constraints are extracted at generation time.
+"""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+from pathlib import Path
+from typing import Any
+
+import yaml
+
+HERE = Path(__file__).resolve()
+ROOT = HERE.parents[2]
+SCHEMA = ROOT / "schema"
+OUT = ROOT / "conformance"
+
+
+def load(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def digest(paths: list[Path]) -> str:
+    h = hashlib.sha256()
+    for path in sorted(paths):
+        h.update(path.relative_to(SCHEMA).as_posix().encode() + b"\0")
+        h.update(path.read_bytes())
+    return h.hexdigest()
+
+
+def git_sha() -> str:
+    """Return the canonical schema source pin, never this implementation commit."""
+    requested = os.environ.get("SCAP_NG_SCHEMA_COMMIT")
+    if requested:
+        return requested
+    current = digest(sorted((*SCHEMA.glob("*.json"), *(SCHEMA / "capability-mappings").rglob("*.json"))))
+    existing = OUT / "manifest.json"
+    if existing.is_file():
+        prior = load(existing)
+        if prior.get("schema_family_sha256") == current and prior.get("schema_commit"):
+            return prior["schema_commit"]
+        raise SystemExit("schema resources changed; regenerate with SCAP_NG_SCHEMA_COMMIT=<reviewed exact source commit>")
+    try:
+        return subprocess.check_output(["git", "rev-parse", "origin/main"], cwd=ROOT, text=True).strip()
+    except subprocess.CalledProcessError:
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+
+
+def pointer(path: str, key: str) -> str:
+    return path + "/" + key.replace("~", "~0").replace("/", "~1")
+
+
+def walk_schema(value: Any, path: str = ""):
+    if isinstance(value, dict):
+        yield path, value
+        for key, child in value.items():
+            yield from walk_schema(child, pointer(path, key))
+    elif isinstance(value, list):
+        for i, child in enumerate(value):
+            yield from walk_schema(child, f"{path}/{i}")
+
+
+def constraint_value(value: Any) -> Any:
+    """Keep the inventory reviewable while retaining an exact value digest.
+
+    Scalar constraints remain directly readable. Nested schema branches are
+    represented by shape, keys, and a canonical JSON digest; the source schema
+    and pointer remain the authoritative full value.
+    """
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
+    if isinstance(value, dict):
+        return {"kind": "object", "keys": list(value), "sha256": hashlib.sha256(encoded).hexdigest()}
+    return {"kind": "array", "length": len(value), "sha256": hashlib.sha256(encoded).hexdigest()}
+
+
+def enums_and_constraints(doc: Any, source: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    enums: list[dict[str, Any]] = []
+    constraints: list[dict[str, Any]] = []
+    properties: list[dict[str, Any]] = []
+    keywords = {
+        "type", "required", "additionalProperties", "minProperties", "maxProperties",
+        "minItems", "maxItems", "minLength", "maxLength", "pattern", "format",
+        "const", "oneOf", "anyOf", "allOf", "not", "if", "then", "else",
+        "dependentSchemas", "propertyNames", "uniqueItems", "contains",
+        "unevaluatedProperties", "dependentRequired", "multipleOf", "minimum", "maximum",
+        "exclusiveMinimum", "exclusiveMaximum",
+    }
+    for path, node in walk_schema(doc):
+        if not isinstance(node, dict):
+            continue
+        if "enum" in node:
+            enums.append({"pointer": path or "/", "values": node["enum"]})
+        for key in sorted(set(node) & keywords):
+            constraints.append({"pointer": path or "/", "keyword": key, "value": constraint_value(node[key])})
+        if isinstance(node.get("properties"), dict):
+            properties.append({
+                "pointer": path or "/",
+                "names": list(node["properties"]),
+                "required": list(node.get("required", [])),
+                "additional_properties": node.get("additionalProperties", True),
+            })
+    return enums, constraints, properties
+
+
+def all_enums(node: Any) -> list[Any]:
+    result: list[Any] = []
+    for _, child in walk_schema(node):
+        if isinstance(child, dict) and "enum" in child:
+            result.extend(child["enum"])
+    return result
+
+
+def sample_for(datatype: str | None, *, ordinal: int = 0) -> Any:
+    values = {
+        "string": "fixture-value",
+        "boolean": True,
+        "integer": 7,
+        "float": 7.5,
+        "binary": "ZmFjdHVyZQ==",
+        "version": "1.2.3",
+        "ipv4": "192.0.2.7",
+        "ipv6": "2001:db8::7",
+        "rpm_evr": "1:1.2.3-7",
+        "debian_evr": "1:1.2.3-7",
+        "fileset_revision": "1.2.3",
+        "ios_version": "1.2.3",
+        "record": {"fixture_field": "fixture-value"},
+    }
+    value = values.get(datatype or "string", "fixture-value")
+    if ordinal and isinstance(value, str):
+        return f"{value}-{ordinal}"
+    return value
+
+
+def slug(name: str) -> str:
+    return name.replace(".", "-").replace("_", "-")
+
+
+def selector_sample(capability: str, field: str, mapping: dict[str, Any], selector_contracts: dict[str, Any]) -> Any:
+    # Prefer canonical enum values exposed by the generated selector schema.
+    native_selector = selector_contracts.get("resolved", {}).get(capability, {}).get("selectors", {}).get(field, {})
+    source = native_selector.get("enum_source")
+    if source:
+        # enum_source is a vocabulary name, not necessarily a JSON pointer. The
+        # selector schema remains authoritative for actual values.
+        pass
+    defs = selector_contracts.get("_selector_defs", {})
+    for key in (f"{slug(capability)}_{field}_selector", f"{capability.replace('.', '_')}_{field}_selector"):
+        if key in defs:
+            definition = defs[key]
+            # propertyNames enums describe allowed keys; only the operation
+            # value enum is a selector vocabulary. Definitions use allOf, so
+            # search each subschema for the equals property.
+            for _, node in walk_schema(definition):
+                if not isinstance(node, dict) or "equals" not in node.get("properties", {}):
+                    continue
+                enums = [v for v in all_enums(node["properties"]["equals"])
+                         if isinstance(v, str) and v not in {"datatype", "equals"}]
+                if enums:
+                    return enums[0]
+    datatypes = mapping.get("native", {}).get("field_datatypes", {})
+    types = datatypes.get(field, ["string"])
+    return sample_for(types[0] if types else "string")
+
+
+def different_value(value: Any, datatype: str | None = None) -> Any:
+    """Create a deterministic mismatch without changing the declared datatype."""
+    if datatype == "boolean":
+        return not value
+    if datatype == "integer":
+        return value + 1
+    if datatype == "float":
+        return value + 1.0
+    if datatype == "record" and isinstance(value, dict):
+        return {**value, "fixture_field": "not-the-expected-value"}
+    if isinstance(value, list):
+        return value + ["not-the-expected-value"]
+    return "not-the-expected-value"
+
+
+def predicate(value: Any, datatype: str | None = None) -> dict[str, Any]:
+    if datatype == "record":
+        return {"record": {"records_found": "one_or_more", "records_matching": "every", "fields": {
+            "fixture_field": {"values_found": "one_or_more", "values_matching": "every", "equals": "fixture-value"}
+        }}}
+    return {"equals": value}
+
+
+def build_assessment(mapping: dict[str, Any], selector_contracts: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    capability = mapping["capability"]
+    s = slug(capability)
+    native = mapping.get("native", {})
+    datatypes = native.get("field_datatypes", {})
+    selector_names: list[str] = []
+    for alternative in native.get("object_selector_alternatives", []):
+        if alternative:
+            selector_names = list(alternative)
+            break
+    if not selector_names:
+        selector_names = list(native.get("selector_map", {}))
+    selector_values = {name: selector_sample(capability, name, mapping, selector_contracts) for name in selector_names}
+    object_fields = {name: predicate(selector_values[name]) for name in selector_names}
+    state_fields = list(native.get("state_field_map", {}))
+    field_types = {field: (datatypes.get(field) or ["string"])[0] for field in state_fields}
+    field_values = {field: selector_values[field] if field in selector_values else sample_for(field_types[field]) for field in state_fields}
+    test_name = f"{s}-test"[:64]
+    body: dict[str, Any] = {
+        "assessment": {
+            "id": f"conformance-{s}"[:64],
+            "version": 1,
+            "assessment_title": f"SCAP-NG 0.4.1 conformance: {capability} positive and status vectors",
+            "mode": "automated",
+            "class": "miscellaneous",
+            "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"},
+            "tests": {},
+            "evaluate": {"test": test_name},
+        }
+    }
+    test: dict[str, Any] = {
+        "test_title": f"Collect and match every declared {capability} field",
+        "capability": capability,
+        "require": {"item_requirement": {"items_found": "one_or_more"}},
+    }
+    if state_fields:
+        test["require"]["item_requirement"]["items_satisfying"] = "every"
+        test["require"]["field_requirement"] = {"values_found": "one_or_more", "values_matching": "every"}
+        test["require"]["fields"] = {field: predicate(value, field_types[field]) for field, value in field_values.items()}
+    if capability != "independent.unknown":
+        test["reported_elements"] = "all"
+    if native.get("test_source", {}).get("kind") == "none":
+        # Singleton sources intentionally have no Object.
+        pass
+    elif native.get("test_source", {}).get("kind") == "variable":
+        variable_name = f"{s}-variable"[:64]
+        body["assessment"]["variables"] = {
+            variable_name: {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": "fixture-value"}}}
+        }
+        test["variable"] = variable_name
+    else:
+        test["object"] = {"capability": capability, **object_fields}
+    body["assessment"]["tests"][test_name] = test
+    # The evidence fixture is intentionally separate from the source assessment.
+    fields = {
+        field: {"datatype": field_types[field], "value": value, "status": "collected"}
+        for field, value in field_values.items()
+    }
+    item = {"id": f"{s}-item", "capability": capability, "fields": fields, "status": "collected"}
+    comparison_fields = [field for field in state_fields if field not in selector_names]
+    if comparison_fields:
+        negative_field = comparison_fields[0]
+        negative_value = different_value(fields[negative_field]["value"], fields[negative_field]["datatype"])
+        negative_items = [{**item, "fields": {**fields, negative_field: {**fields[negative_field], "value": negative_value}}}]
+        negative_strategy = "field-mismatch"
+    else:
+        negative_field = None
+        negative_items = []
+        negative_value = None
+        negative_strategy = "empty-collected-population"
+    fixture = {
+        "format": "scap-ng-conformance-evidence-0.1",
+        "schema_version": "0.4.1",
+        "case_id": capability,
+        "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"},
+        "items": [item],
+        "semantic_contract": {"selector_fields": selector_names, "negative_strategy": negative_strategy, "negative_field": negative_field, "negative_value": negative_value},
+        "variants": {
+            "positive": {"items": [item], "acquisition": "collected"},
+            "negative": {"items": negative_items, "acquisition": "collected", "selector_fields_preserved": negative_strategy == "field-mismatch"},
+            "multi-item": {"items": [{**item, "id": f"{s}-item-1"}, {**item, "id": f"{s}-item-2"}], "acquisition": "collected", "population": "two matching Items"},
+            "boundary": {"items": [item], "acquisition": "collected", "boundary": "minimum one Item and one value per required field"},
+            "empty": {"items": [], "acquisition": "not_collected"},
+            "permission-denied": {"items": [], "acquisition": "denied"},
+            "error": {"items": [], "acquisition": "error"},
+            "not-applicable": {"items": [], "acquisition": "not_applicable"},
+        },
+    }
+    return body, fixture
+
+
+def operator_operand(operator: str) -> tuple[str, Any, Any, str]:
+    """Return datatype, observed value, comparison operand, and justification."""
+    if operator.startswith("float_"):
+        datatype, observed = "float", 2.5
+    elif operator.startswith("binary_"):
+        datatype, observed = "binary", "Zm9v"
+    elif operator.startswith("version_"):
+        datatype, observed = "version", "1.2.3"
+    elif operator.startswith("ipv4_"):
+        datatype, observed = "ipv4", "192.0.2.7"
+    elif operator.startswith("ipv6_"):
+        datatype, observed = "ipv6", "2001:db8::7"
+    elif operator.startswith("rpm_evr_"):
+        datatype, observed = "rpm_evr", "1:1.2.3-7"
+    elif operator.startswith("debian_evr_"):
+        datatype, observed = "debian_evr", "1:1.2.3-7"
+    elif operator.startswith("fileset_revision_"):
+        datatype, observed = "fileset_revision", "1.2.3"
+    elif operator.startswith("ios_version_"):
+        datatype, observed = "ios_version", "1.2.3"
+    elif operator in {"bitwise_and", "bitwise_or"}:
+        datatype, observed = "integer", 3
+    elif operator in {"subset_of", "superset_of"}:
+        datatype, observed = "string", ["alpha", "beta"]
+    else:
+        datatype, observed = "string", "fixture-value"
+    if operator in {"not_equal", "case_insensitive_not_equal", "float_not_equal", "binary_not_equal", "version_not_equal", "ipv4_not_equal", "ipv6_not_equal", "rpm_evr_not_equal", "debian_evr_not_equal", "fileset_revision_not_equal", "ios_version_not_equal"}:
+        operand = different_value(observed, datatype)
+        reason = "The operand is a deterministic different value, so not-equal is TRUE."
+    elif operator in {"greater_than", "greater_than_or_equal", "less_than", "less_than_or_equal"} or operator.endswith(("_greater_than", "_greater_than_or_equal", "_less_than", "_less_than_or_equal")):
+        if operator.endswith("greater_than"):
+            operand = "1.0" if datatype in {"version", "ios_version", "fileset_revision"} else (1 if datatype not in {"float"} else 1.5)
+            if datatype == "string": operand = "a"
+            if datatype in {"ipv4", "ipv6"}: operand = "192.0.2.1" if datatype == "ipv4" else "2001:db8::1"
+        elif operator.endswith("greater_than_or_equal"):
+            operand = observed
+        elif operator.endswith("less_than"):
+            operand = "9.9.9" if datatype in {"version", "ios_version", "fileset_revision"} else (9 if datatype not in {"float"} else 9.5)
+            if datatype == "string": operand = "zzzz"
+            if datatype in {"ipv4", "ipv6"}: operand = "192.0.2.9" if datatype == "ipv4" else "2001:db8::9"
+        else:
+            operand = observed
+        reason = "The typed observed value and operand satisfy the named ordering relation."
+    elif operator in {"bitwise_and", "bitwise_or"}:
+        operand = 1 if operator == "bitwise_and" else 3
+        reason = "The integer bit mask satisfies the named bitwise relation."
+    elif operator == "matches_regex":
+        operand = "^fixture-value$"
+        reason = "The deterministic lexical value matches the anchored regular expression."
+    elif operator in {"subset_of", "superset_of"}:
+        operand = ["alpha", "beta", "gamma"] if operator == "subset_of" else ["alpha"]
+        reason = "The ordered observed collection satisfies the named set relation."
+    elif operator in {"case_insensitive_equals"}:
+        operand = "FIXTURE-VALUE"
+        reason = "The operand differs only in case."
+    elif operator in {"ipv4_subset_of", "ipv4_superset_of", "ipv6_subset_of", "ipv6_superset_of"}:
+        operand = observed
+        reason = "The identical typed network value satisfies the reflexive set relation."
+    else:
+        operand = observed
+        reason = "The typed operand is equal to the observed value."
+    return datatype, observed, operand, reason
+
+
+def build_selector_alternative_suite(mappings: list[dict[str, Any]], selector_contracts: dict[str, Any]) -> dict[str, Any]:
+    tests: dict[str, Any] = {}
+    expected: dict[str, Any] = {}
+    test_outcomes: dict[str, str] = {}
+    witness: dict[str, Any] = {}
+    for mapping in mappings:
+        capability = mapping["capability"]
+        native = mapping.get("native", {})
+        alternatives = native.get("object_selector_alternatives", [])
+        for index, alternative in enumerate(alternatives, 1):
+            if native.get("test_source", {}).get("kind") in {"none", "variable"}:
+                continue
+            test_name = f"selector-{slug(capability)}-{index}-test"[:64]
+            values = {field: selector_sample(capability, field, mapping, selector_contracts) for field in alternative}
+            tests[test_name] = {"test_title": f"{capability} selector alternative {index}", "capability": capability, "reported_elements": "all", "object": {"capability": capability, **{field: predicate(value) for field, value in values.items()}}, "require": {"item_requirement": {"items_found": "one_or_more"}}}
+            test_outcomes[test_name] = "true"
+            expected[f"{capability}#{index}"] = {"outcome": "true", "selectors": values, "reason": "The complete declared selector alternative is present and independently witnessed."}
+            witness[test_name] = {"capability": capability, "selectors": values, "items": [{"id": f"{slug(capability)}-selector-{index}-item", "capability": capability, "fields": {}, "status": "collected"}]}
+    assessment = {"assessment": {"id": "conformance-core-selector-alternatives", "version": 1, "assessment_title": "SCAP-NG 0.4.1 selector alternatives", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-selector-alternatives", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": test_outcomes, "selector_witnesses": witness}
+    return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-selector-alternatives", "alternatives": expected, "reason": "Every mapping-declared selector alternative is represented; enum boundary and collector execution remain separate gates."}}
+
+
+def build_operator_suite(comparison_operators: list[str]) -> dict[str, Any]:
+    tests: dict[str, Any] = {}
+    variables: dict[str, Any] = {}
+    expected: dict[str, Any] = {}
+    outcomes = {}
+    for operator in comparison_operators:
+        name = f"operator-{slug(operator)}"
+        variable = f"{name}-variable"
+        datatype, observed, operand, reason = operator_operand(operator)
+        variables[variable] = {"kind": "constant", "expression": {"literal": {"datatype": datatype, "value": observed}}}
+        field_predicate = {operator: operand}
+        if isinstance(operand, list):
+            field_predicate = {"value_match": "every", **field_predicate}
+        tests[f"{name}-test"] = {
+            "test_title": f"Comparison operator {operator} has a TRUE witness",
+            "capability": "variable.value", "variable": variable, "reported_elements": "all",
+            "require": {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": {"value": field_predicate}},
+        }
+        outcomes[f"{name}-test"] = "true"
+        expected[operator] = {"outcome": "true", "datatype": datatype, "observed": observed, "operand": operand, "reason": reason}
+    test_names = list(outcomes)
+    assessment = {"assessment": {"id": "conformance-core-comparison-operators", "version": 1, "assessment_title": "SCAP-NG 0.4.1 comparison operator witnesses", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": name} for name in test_names]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-comparison-operators", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes}
+    return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-comparison-operators", "operators": expected, "reason": "Each operator has a typed operand chosen to make the named relation TRUE; this is a semantic witness, not RI execution proof."}}
+
+
+def build_multi_value_suite(mappings: list[dict[str, Any]], selector_contracts: dict[str, Any]) -> dict[str, Any]:
+    tests: dict[str, Any] = {}; variables: dict[str, Any] = {}; outcomes: dict[str, str] = {}; expected: dict[str, Any] = {}
+    for mapping in mappings:
+        capability = mapping["capability"]; native = mapping.get("native", {}); datatypes = native.get("field_datatypes", {})
+        state_fields = list(native.get("state_field_map", {})); field = next((f for f in state_fields if (datatypes.get(f) or ["string"])[0] != "record"), None)
+        if field is None: continue
+        datatype = (datatypes.get(field) or ["string"])[0]; value = selector_sample(capability, field, mapping, selector_contracts) if field in native.get("selector_map", {}) else sample_for(datatype)
+        test_name = f"multi-value-{slug(capability)}-test"[:64]
+        test = {"test_title": f"{capability} value_match every multi-value witness", "capability": capability, "require": {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": {field: {"value_match": "every", "equals": [value, value]}}}}
+        if capability != "independent.unknown": test["reported_elements"] = "all"
+        if native.get("test_source", {}).get("kind") == "variable":
+            var = f"multi-value-{slug(capability)}-variable"[:64]; variables[var] = {"kind": "constant", "expression": {"literal": {"datatype": datatype, "value": [value, value]}}}; test["variable"] = var
+        elif native.get("test_source", {}).get("kind") != "none":
+            selector_names = list(native.get("object_selector_alternatives", [[]])[0]) if native.get("object_selector_alternatives") else list(native.get("selector_map", {})); test["object"] = {"capability": capability, **{name: predicate(selector_sample(capability, name, mapping, selector_contracts)) for name in selector_names}}
+        tests[test_name] = test; outcomes[test_name] = "true"; expected[capability] = {"outcome": "true", "field": field, "datatype": datatype, "values": [value, value], "reason": "Both deterministic values satisfy value_match: every."}
+    assessment = {"assessment": {"id": "conformance-core-multi-values", "version": 1, "assessment_title": "SCAP-NG 0.4.1 multi-value field matching", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-multi-values", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes}
+    return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-multi-values", "capabilities": expected, "reason": "Each applicable scalar field has a schema-valid value_match: every witness; record-only and no-field capabilities are explicitly omitted."}}
+
+
+def build_cardinality_suite() -> dict[str, Any]:
+    cases = [
+        ("item-exactly-one", "independent.unknown", {"item_requirement": {"items_found": "exactly_one"}}, "Exactly one collected Item satisfies exactly_one."),
+        ("item-none", "independent.unknown", {"item_requirement": {"items_found": "none"}}, "A collected empty population satisfies none."),
+        ("item-zero-or-more", "independent.unknown", {"item_requirement": {"items_found": "zero_or_more"}}, "An empty collected population satisfies zero_or_more."),
+        ("field-exactly-one", "variable.value", {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": {"value": {"values_found": "exactly_one", "values_matching": "every", "equals": "fixture-value"}}}, "One observed value satisfies exactly_one."),
+        ("field-none", "variable.value", {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": {"value": {"values_found": "none"}}}, "Confirmed field absence satisfies none without a comparator."),
+        ("field-zero-or-more", "variable.value", {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": {"value": {"values_found": "zero_or_more", "values_matching": "every", "equals": "fixture-value"}}}, "Zero or more observed values is a valid independent cardinality."),
+    ]
+    tests = {}; variables = {}; outcomes = {}; expected = {}
+    for name, capability, require, reason in cases:
+        test_name = f"cardinality-{name}-test"
+        test = {"test_title": f"Cardinality witness: {name}", "capability": capability, "require": require}
+        if capability == "variable.value":
+            variable = f"{test_name}-variable"
+            variables[variable] = {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": "fixture-value"}}}
+            test["variable"] = variable; test["reported_elements"] = "all"
+        tests[test_name] = test; outcomes[test_name] = "true"; expected[name] = {"outcome": "true", "reason": reason}
+    assessment = {"assessment": {"id": "conformance-core-cardinalities", "version": 1, "assessment_title": "SCAP-NG 0.4.1 remaining Item and field cardinalities", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-cardinalities", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes}
+    return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-cardinalities", "cardinalities": expected, "reason": "Each remaining cardinality has a dedicated schema-valid witness; execution receipts remain separate."}}
+
+
+def build_status_and_policy_cases() -> dict[str, Any]:
+    base = {"version": 1, "assessment_title": "SCAP-NG 0.4.1 typed status witness", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"status-test": {"test_title": "Typed status propagation witness", "capability": "independent.unknown", "require": {"item_requirement": {"items_found": "one_or_more"}}}}}
+    status = []
+    for name, expression, outcome, reason in [
+        ("not-evaluated", {"not_evaluated": {"reason": "Evidence-backed authoring deferral", "follow_up": "Collect the required evidence."}}, "not_evaluated", "Author-declared deferral remains NOT_EVALUATED."),
+        ("not-applicable", {"not_applicable": {"reason": "Applicability predicate excludes this target."}}, "not_applicable", "Applicability remains NOT_APPLICABLE and is not Boolean false."),
+    ]:
+        document = {"assessment": {**base, "id": f"conformance-status-{name}", "evaluate": expression}}
+        status.append((name, document, {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": f"status-{name}", "assessment_outcome": outcome, "reason": reason}))
+    tailoring = {"tailoring": {"id": "conformance-disabled-profile-tailoring", "version": 1, "purpose": "Exercise profile disablement without changing Assessment truth.", "benchmark": {"id": "conformance-benchmark", "version": 1}, "profile": "baseline", "extends": None, "enabled_rules": ["rule-enabled"], "disabled_rules": ["rule-disabled"], "group_operations": [], "check_selectors": {}, "provenance": {"organization": "SCAP-NG", "created_by": "conformance", "created_at": None, "modified_by": "conformance", "modified_at": None, "authorized_by": "owner", "authorized_at": None, "authorization_reference": "issue-87", "authorization_status": "review"}}}
+    benchmark = {"benchmark": {"id": "conformance-benchmark", "ng_schema_version": "0.4.1", "use_case": "conformance", "assessment_specifications": [], "title": [{"text": "Conformance benchmark", "language": "en"}], "description": [{"text": "Deterministic profile witness", "language": "en"}], "language": "en", "status": [], "version": {}, "metadata": {}, "notices": [], "front_matter": [], "rear_matter": [], "references": [], "text_blocks": [], "platform": {"id": "all", "title": "All targets"}, "applicability_catalog": "catalog", "scoring": [], "parameters": [], "default_selection": True, "groups": [], "profiles": [{"id": "baseline", "title": "Baseline", "description": "Disables one rule", "disabled_rules": ["rule-disabled"]}], "rules": ["rule-enabled", "rule-disabled"]}}
+    policy_expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "disabled-profile", "profile": "baseline", "disabled_rules": ["rule-disabled"], "enabled_rules": ["rule-enabled"], "reason": "Profile resolution disables the named Rule; it does not fabricate a technical Assessment outcome."}
+    return {"status": status, "tailoring": tailoring, "benchmark": benchmark, "policy_expected": policy_expected}
+
+
+def build_core() -> dict[str, Any]:
+    tests = {}
+    for name, title in [
+        ("true-test", "A supplied TRUE leaf"), ("false-test", "A supplied FALSE leaf"),
+        ("unknown-test", "A supplied UNKNOWN leaf"), ("error-test", "A supplied ERROR leaf"),
+        ("na-test", "A supplied NOT_APPLICABLE leaf"),
+    ]:
+        tests[name] = {"test_title": title, "capability": "independent.unknown", "require": {"item_requirement": {"items_found": "one_or_more"}}}
+    assessment = {
+        "assessment": {
+            "id": "conformance-core-evaluate-not",
+            "version": 1,
+            "assessment_title": "SCAP-NG 0.4.1 core Evaluate, Require and not semantics",
+            "mode": "automated", "class": "miscellaneous",
+            "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"},
+            "tests": tests,
+            "evaluate": {"and": [
+                {"test": "true-test"}, {"not": {"test": "false-test"}},
+                {"not": {"not": {"test": "true-test"}}},
+                {"one": [{"test": "true-test"}, {"test": "false-test"}]},
+                {"xor": [{"test": "true-test"}, {"test": "false-test"}]},
+                {"or": [{"test": "false-test"}, {"test": "true-test"}]},
+            ]},
+        }
+    }
+    fixture = {
+        "format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1",
+        "case_id": "core-evaluate-not", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"},
+        "test_outcomes": {"true-test": "true", "false-test": "false", "unknown-test": "unknown", "error-test": "error", "na-test": "not_applicable"},
+        "variants": {"normal": {"test_outcomes": {"true-test": "true", "false-test": "false"}, "assessment_outcome": "true"},
+                     "unknown": {"test_outcomes": {"true-test": "true", "false-test": "unknown"}, "assessment_outcome": "unknown"},
+                     "error": {"test_outcomes": {"true-test": "true", "false-test": "error"}, "assessment_outcome": "error"},
+                     "not-applicable": {"test_outcomes": {"true-test": "true", "false-test": "not_applicable"}, "assessment_outcome": "not_applicable"}},
+    }
+    return {"assessment": assessment, "fixture": fixture}
+
+
+def write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+
+
+def inventory() -> dict[str, Any]:
+    paths = sorted(SCHEMA.glob("*.json")) + sorted((SCHEMA / "capability-mappings").rglob("*.json"))
+    schema_docs = []
+    enums = []
+    constraints = []
+    property_groups = []
+    refs = []
+    for path in paths:
+        doc = load(path)
+        rel = path.relative_to(ROOT).as_posix()
+        e, c, p = enums_and_constraints(doc, rel)
+        schema_docs.append({"path": rel, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "kind": "root" if path.parent == SCHEMA else "mapping"})
+        enums.extend(e); constraints.extend(c); property_groups.extend(p)
+        for pointer_path, node in walk_schema(doc):
+            if isinstance(node, dict) and "$ref" in node:
+                refs.append({"path": pointer_path or "/", "ref": node["$ref"], "source": rel})
+    selector_contracts = load(SCHEMA / "native-selector-contracts.json")
+    selector_contracts["_selector_defs"] = load(SCHEMA / "native-selector.schema.json").get("$defs", {})
+    mappings = []
+    for path in sorted((SCHEMA / "capability-mappings").rglob("*.json")):
+        if path.name == "README.json":
+            continue
+        m = load(path); n = m.get("native", {})
+        mappings.append({
+            "capability": m["capability"], "status": path.parent.name,
+            "source_path": path.relative_to(ROOT).as_posix(),
+            "object_selectors": list(n.get("selector_map", {})),
+            "selector_alternatives": n.get("object_selector_alternatives", []),
+            "fields": list(n.get("state_field_map", {})),
+            "field_datatypes": n.get("field_datatypes", {}),
+            "test_source": n.get("test_source", {"kind": "object"}),
+            "semantic_validator_rules": [r.get("id") for r in m.get("semantic_validator_rules", [])],
+            "vector_policy": {
+                "positive": "capability vector fixture",
+                "negative": "capability vector fixture",
+                "boundary": "capability vector fixture",
+                "unknown": "portable status vector; scanner must preserve status",
+                "error": "portable status vector; scanner must preserve status",
+                "not_applicable": "portable applicability vector; scanner must preserve status",
+                "invalid_authoring": "shared schema rejection vector",
+            },
+        })
+    ops = set()
+    for e in enums:
+        if "operator" in e["pointer"] or "operation" in e["pointer"]:
+            ops.update(v for v in e["values"] if isinstance(v, str))
+    # Include every canonical operation from the schema definition, even if the
+    # definition's pointer is not named operator.
+    common = load(SCHEMA / "capability-common.schema.json")
+    for _, node in walk_schema(common):
+        if isinstance(node, dict) and node.get("title") in {"Comparison operation", "Logical operator"}:
+            ops.update(node.get("enum", []))
+    # Keep categories separate so an editor or adapter cannot mistake a
+    # field-comparison token for a Boolean Evaluate operator.
+    operator_inventory = {"comparison": [], "logical": [], "set": [], "functions": [], "field_predicate_properties": []}
+    for file_name, definition_name, category in [
+        ("capability-common.schema.json", "comparison_operation", "comparison"),
+        ("capability-common.schema.json", "logical_operator", "logical"),
+        ("capability-common.schema.json", "set_expression", "set"),
+        ("variable-function-expression.schema.json", "function_call", "functions"),
+    ]:
+        doc = load(SCHEMA / file_name)
+        definition = doc.get("$defs", {}).get(definition_name, {})
+        values = []
+        for _, node in walk_schema(definition):
+            if isinstance(node, dict) and isinstance(node.get("enum"), list):
+                values.extend(node["enum"])
+        if category == "functions":
+            operator_inventory[category] = sorted(set(values))
+        else:
+            operator_inventory[category] = sorted(set(values))
+    language = load(SCHEMA / "assessment-language.schema.json")
+    for name in ("scalar_field_predicate", "record_field_predicate", "object_selector_predicate"):
+        operator_inventory["field_predicate_properties"].extend(
+            k for k in language.get("$defs", {}).get(name, {}).get("properties", {})
+            if k not in {"values_found", "values_matching", "datatype", "value_match", "redact_result", "selection_match"}
+        )
+    operator_inventory["field_predicate_properties"] = sorted(set(operator_inventory["field_predicate_properties"]))
+    fields = []
+    for row in mappings:
+        for field in row["fields"]:
+            fields.append({"capability": row["capability"], "field": field, "datatypes": row["field_datatypes"].get(field, []), "role": "selector" if field in row["object_selectors"] else "state"})
+    definitions = []
+    for path in sorted(SCHEMA.glob("*.json")):
+        doc = load(path)
+        for name, value in doc.get("$defs", {}).items():
+            definitions.append({"schema": path.relative_to(ROOT).as_posix(), "name": name, "title": value.get("title"), "description": value.get("description")})
+    return {
+        "format": "scap-ng-schema-feature-inventory-0.1",
+        "schema_version": "0.4.1",
+        "schema_commit": git_sha(),
+        "schema_family_sha256": digest(paths),
+        "source": "vanderpol/scap-ng flat schema/ at exact Git commit",
+        "generated_by": "conformance/tools/generate.py",
+        "counts": {
+            "schema_documents": len(schema_docs), "root_schemas": sum(d["kind"] == "root" and d["path"].endswith(".schema.json") for d in schema_docs),
+            "capability_mappings": len(mappings), "supported_capabilities": sum(m["status"] == "supported" for m in mappings),
+            "experimental_capabilities": sum(m["status"] == "experimental" for m in mappings),
+            "schema_property_groups": len(property_groups), "schema_enums": len(enums),
+            "schema_constraints": len(constraints), "schema_references": len(refs),
+            "comparison_operations": len(ops),
+        },
+        "schema_documents": schema_docs,
+        "capabilities": mappings,
+        "operations": sorted(ops),
+        "operator_inventory": operator_inventory,
+        "fields": fields,
+        "definitions": definitions,
+        "enums": enums,
+        "constraints": constraints,
+        "property_groups": property_groups,
+        "references": refs,
+        "coverage_policy": {
+            "required_vectors": ["positive", "negative", "boundary", "unknown", "error", "not_applicable", "invalid_authoring"],
+            "status_semantics": "Expected statuses are typed oracle values, not Booleanized PASS/FAIL. Negation is only the canonical not expression.",
+            "unsupported": "A capability without an independently qualified collector remains schema-covered but execution-unqualified.",
+        },
+        "schema_branch_tracking": {
+            "capability_mappings": "vector-covered by one independent Assessment per mapping",
+            "evaluate_require_variable_core": "vector-covered by cases/core/evaluate-not.assessment.yaml",
+            "schema_properties_enums_constraints": "exhaustively inventoried; occurrence-specific executable vectors are not claimed by this increment",
+            "untested_branches": [
+                "All schema property/enum/constraint occurrences not reachable through the portable Assessment vectors; see properties, enums, and constraints arrays.",
+                "Platform collector acquisition and native selector execution; requires an adapter receipt and is not inferred from schema validity.",
+                "Scale/concurrency (100K/1M Items), real-host permissions, and cross-scanner equivalence; tracked outside this source oracle.",
+            ],
+        },
+    }
+
+
+def main() -> None:
+    inv = inventory()
+    write_json(OUT / "schema-coverage.json", inv)
+    selector_contracts = load(SCHEMA / "native-selector-contracts.json")
+    selector_contracts["_selector_defs"] = load(SCHEMA / "native-selector.schema.json").get("$defs", {})
+    rows = []
+    selector_mappings = []
+    for path in sorted((SCHEMA / "capability-mappings").rglob("*.json")):
+        if path.name != "README.json":
+            selector_mappings.append(load(path))
+    for path in sorted((SCHEMA / "capability-mappings").rglob("*.json")):
+        if path.name == "README.json": continue
+        mapping = load(path)
+        body, fixture = build_assessment(mapping, selector_contracts)
+        capability = mapping["capability"]; s = slug(capability)
+        assessment_path = OUT / "cases" / "capabilities" / f"{s}.assessment.yaml"
+        fixture_path = OUT / "fixtures" / f"{s}.json"
+        expected_path = OUT / "expected" / f"{s}.json"
+        assessment_path.parent.mkdir(parents=True, exist_ok=True)
+        assessment_path.write_text(yaml.safe_dump(body, sort_keys=False, allow_unicode=False), encoding="utf-8")
+        write_json(fixture_path, fixture)
+        field_count = len(mapping.get("native", {}).get("state_field_map", {}))
+        state_field_names = list(mapping.get("native", {}).get("state_field_map", {}))
+        has_fields = bool(state_field_names)
+        negative_strategy = fixture["semantic_contract"]["negative_strategy"]
+        negative_field = fixture["semantic_contract"]["negative_field"]
+        positive_assertion = {"assessment_outcome": "true", "test_outcome": "true", "items_found": 1, "reason": "All declared fields match the collected Item."}
+        negative_assertion = {"assessment_outcome": "false", "test_outcome": "false", "items_found": 0 if negative_strategy == "empty-collected-population" else 1, "reason": (f"Collected field {negative_field} is changed while selector fields remain identical; the mismatch is decisive." if negative_strategy == "field-mismatch" else "A collected empty population violates items_found: one_or_more; no selector is changed.")}
+        if has_fields:
+            positive_assertion["items_satisfying"] = 1
+            negative_assertion["items_satisfying"] = 0
+        expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": capability, "variants": {
+            "positive": positive_assertion,
+            "negative": negative_assertion,
+            "multi-item": {"assessment_outcome": "true", "test_outcome": "true", "items_found": 2, **({"items_satisfying": 2} if has_fields else {}), "reason": "Two distinct matching Items both satisfy the complete Require condition."},
+            "boundary": {"assessment_outcome": "true", "test_outcome": "true", "items_found": 1, **({"items_satisfying": 1} if has_fields else {}), "reason": "Minimum permitted non-empty Item and field cardinality."},
+            "empty": {"assessment_outcome": "unknown", "test_outcome": "unknown", "items_found": 0, "items_satisfying": 0, "reason": "No evidence was collected; absence is not a passing result."},
+            "permission-denied": {"assessment_outcome": "unknown", "test_outcome": "unknown", "items_found": 0, "items_satisfying": 0, "reason": "Permission denied is preserved as UNKNOWN."},
+            "error": {"assessment_outcome": "error", "test_outcome": "error", "items_found": 0, "items_satisfying": 0, "reason": "Collector ERROR is not converted to FALSE or TRUE."},
+            "not-applicable": {"assessment_outcome": "not_applicable", "test_outcome": "not_applicable", "items_found": 0, "items_satisfying": 0, "reason": "Applicability is a typed outcome, not a Boolean false."},
+        }}
+        write_json(expected_path, expected)
+        def file_sha256(file_path: Path) -> str:
+            return hashlib.sha256(file_path.read_bytes()).hexdigest()
+        rows.append({"capability": capability, "status": path.parent.name,
+                     "assessment": assessment_path.relative_to(OUT).as_posix(),
+                     "fixture": fixture_path.relative_to(OUT).as_posix(),
+                     "expected": expected_path.relative_to(OUT).as_posix(),
+                     "sha256": {"assessment": file_sha256(assessment_path),
+                                "fixture": file_sha256(fixture_path),
+                                "expected": file_sha256(expected_path)},
+                     "field_count": field_count, "vectors": list(expected["variants"])})
+    core = build_core()
+    core_assessment = OUT / "cases/core/evaluate-not.assessment.yaml"
+    core_assessment.write_text(yaml.safe_dump(core["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-evaluate-not.json", core["fixture"])
+    write_json(OUT / "expected/core-evaluate-not.json", {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-evaluate-not", "underlying": {"true-test": "true", "false-test": "false"}, "assertions": {"not(false)": "true", "not(not(true))": "true", "one(true,false)": "true", "xor(true,false)": "true", "and": "true", "unknown": "unknown", "error": "error", "not_applicable": "not_applicable"}, "reason": "The FALSE leaf remains explicitly FALSE; not is tested only as an enclosing expression."})
+    operators = build_operator_suite(sorted(inv["operator_inventory"]["field_predicate_properties"]))
+    op_assessment = OUT / "cases/core/comparison-operators.assessment.yaml"
+    op_assessment.write_text(yaml.safe_dump(operators["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-comparison-operators.json", operators["fixture"])
+    write_json(OUT / "expected/core-comparison-operators.json", operators["expected"])
+    selectors = build_selector_alternative_suite(selector_mappings, selector_contracts)
+    selector_assessment = OUT / "cases/core/selector-alternatives.assessment.yaml"
+    selector_assessment.write_text(yaml.safe_dump(selectors["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-selector-alternatives.json", selectors["fixture"])
+    write_json(OUT / "expected/core-selector-alternatives.json", selectors["expected"])
+    multi_values = build_multi_value_suite(selector_mappings, selector_contracts)
+    multi_value_assessment = OUT / "cases/core/multi-values.assessment.yaml"
+    multi_value_assessment.write_text(yaml.safe_dump(multi_values["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-multi-values.json", multi_values["fixture"])
+    write_json(OUT / "expected/core-multi-values.json", multi_values["expected"])
+    cardinalities = build_cardinality_suite()
+    cardinality_assessment = OUT / "cases/core/cardinalities.assessment.yaml"
+    cardinality_assessment.write_text(yaml.safe_dump(cardinalities["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-cardinalities.json", cardinalities["fixture"])
+    write_json(OUT / "expected/core-cardinalities.json", cardinalities["expected"])
+    status_cases = build_status_and_policy_cases()
+    status_rows = []
+    for name, document, expected in status_cases["status"]:
+        assessment_path = OUT / f"cases/core/status-{name}.assessment.yaml"
+        assessment_path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+        fixture_path = OUT / f"fixtures/status-{name}.json"
+        write_json(fixture_path, {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": f"status-{name}", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": {"status-test": expected["assessment_outcome"]}})
+        expected_path = OUT / f"expected/status-{name}.json"; write_json(expected_path, expected)
+        status_rows.append({"id": f"status-{name}", "schema": "assessment.schema.json", "assessment": assessment_path.relative_to(OUT).as_posix(), "fixture": fixture_path.relative_to(OUT).as_posix(), "expected": expected_path.relative_to(OUT).as_posix()})
+    tailoring_path = OUT / "cases/policy/disabled-profile-tailoring.json"; write_json(tailoring_path, status_cases["tailoring"])
+    benchmark_path = OUT / "cases/policy/disabled-profile-benchmark.json"; write_json(benchmark_path, status_cases["benchmark"])
+    policy_expected_path = OUT / "expected/disabled-profile.json"; write_json(policy_expected_path, status_cases["policy_expected"])
+    invalid = {
+        "assessment": {"id": "invalid-negate", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"invalid-test": {"capability": "independent.unknown", "require": {"item_requirement": {"items_found": "one_or_more"}}, "negate": True}}}
+    }
+    (OUT / "cases/invalid/negate.assessment.yaml").write_text(yaml.safe_dump(invalid, sort_keys=False), encoding="utf-8")
+    manifest = {
+        "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
+        "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
+        "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
+        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
+        "invalid_cases": [
+            {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},
+            {"id": "invalid-variable-datatype", "assessment": "cases/invalid/variable-datatype.assessment.yaml", "expected": "schema-invalid", "reason": "Variables infer datatype from typed expressions; declaration datatype is not canonical."},
+            {"id": "invalid-legacy-states", "assessment": "cases/invalid/legacy-states.assessment.yaml", "expected": "schema-invalid", "reason": "Legacy State wrappers are not part of the 0.4.1 language."},
+        ],
+        "execution_boundary": "Schema validation and oracle comparison are independent of RI execution. RI adapter coordination is RI issue #196.",
+        "coverage_claim": "Inventory and vector presence are exhaustive for the pinned mappings; scanner execution remains unqualified until an independent adapter supplies receipts.",
+    }
+    write_json(OUT / "manifest.json", manifest)
+
+
+if __name__ == "__main__":
+    main()

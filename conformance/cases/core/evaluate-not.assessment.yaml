@@ -1,0 +1,57 @@
+assessment:
+  id: conformance-core-evaluate-not
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 core Evaluate, Require and not semantics
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  tests:
+    true-test:
+      test_title: A supplied TRUE leaf
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+    false-test:
+      test_title: A supplied FALSE leaf
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+    unknown-test:
+      test_title: A supplied UNKNOWN leaf
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+    error-test:
+      test_title: A supplied ERROR leaf
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+    na-test:
+      test_title: A supplied NOT_APPLICABLE leaf
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+  evaluate:
+    and:
+    - test: true-test
+    - not:
+        test: false-test
+    - not:
+        not:
+          test: true-test
+    - one:
+      - test: true-test
+      - test: false-test
+    - xor:
+      - test: true-test
+      - test: false-test
+    - or:
+      - test: false-test
+      - test: true-test

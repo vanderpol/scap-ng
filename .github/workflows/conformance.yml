@@ -1,0 +1,47 @@
+name: Native 0.4.1 conformance corpus
+
+on:
+  pull_request:
+    paths:
+      - 'conformance/**'
+      - 'schema/**'
+      - 'tests/test_issue87_conformance.py'
+      - 'requirements-dev.txt'
+      - '.github/workflows/conformance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'conformance/**'
+      - 'schema/**'
+      - 'tests/test_issue87_conformance.py'
+      - 'requirements-dev.txt'
+      - '.github/workflows/conformance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable-corpus:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Validate exact source pin, schema-valid Assessments and receipts
+        run: python conformance/tools/runner.py validate
+      - name: Report inventory and vector coverage
+        run: python conformance/tools/runner.py coverage
+      - name: Audit field/operator/cardinality/status branch coverage
+        run: |
+          python conformance/tools/audit.py
+          git diff --exit-code -- conformance/coverage-audit.json
+      - name: Run independent corpus regression tests
+        run: PYTHONPATH=tests python -m unittest test_issue87_conformance -v

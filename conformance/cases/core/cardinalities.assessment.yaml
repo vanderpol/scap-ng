@@ -1,0 +1,104 @@
+assessment:
+  id: conformance-core-cardinalities
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 remaining Item and field cardinalities
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  variables:
+    cardinality-field-exactly-one-test-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: fixture-value
+    cardinality-field-none-test-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: fixture-value
+    cardinality-field-zero-or-more-test-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: fixture-value
+  tests:
+    cardinality-item-exactly-one-test:
+      test_title: 'Cardinality witness: item-exactly-one'
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: exactly_one
+    cardinality-item-none-test:
+      test_title: 'Cardinality witness: item-none'
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: none
+    cardinality-item-zero-or-more-test:
+      test_title: 'Cardinality witness: item-zero-or-more'
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: zero_or_more
+    cardinality-field-exactly-one-test:
+      test_title: 'Cardinality witness: field-exactly-one'
+      capability: variable.value
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            values_found: exactly_one
+            values_matching: every
+            equals: fixture-value
+      variable: cardinality-field-exactly-one-test-variable
+      reported_elements: all
+    cardinality-field-none-test:
+      test_title: 'Cardinality witness: field-none'
+      capability: variable.value
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            values_found: none
+      variable: cardinality-field-none-test-variable
+      reported_elements: all
+    cardinality-field-zero-or-more-test:
+      test_title: 'Cardinality witness: field-zero-or-more'
+      capability: variable.value
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            values_found: zero_or_more
+            values_matching: every
+            equals: fixture-value
+      variable: cardinality-field-zero-or-more-test-variable
+      reported_elements: all
+  evaluate:
+    and:
+    - test: cardinality-item-exactly-one-test
+    - test: cardinality-item-none-test
+    - test: cardinality-item-zero-or-more-test
+    - test: cardinality-field-exactly-one-test
+    - test: cardinality-field-none-test
+    - test: cardinality-field-zero-or-more-test
