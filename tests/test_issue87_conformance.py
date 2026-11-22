@@ -158,6 +158,30 @@ class Issue87Conformance(unittest.TestCase):
         mutated["variants"]["negative"]["assessment_outcome"] = "false"
         self.assertTrue(check_semantic_witnesses(fixture, mutated))
 
+    def test_ri_handoff_is_exactly_derived_for_not_run_rules(self):
+        handoff = read(CONF / "0.4/execution-boundaries/RI-196-HANDOFF.json")
+        audit = read(CONF / "coverage-audit.json")
+        expected_rules = {row["id"] for row in audit["capability_constraints"]["semantic_rules_unresolved"] if row["status"] == "not_run"}
+        self.assertEqual({row["rule_id"] for row in handoff["cases"]}, expected_rules)
+        self.assertEqual(len(handoff["cases"]), 16)
+        self.assertEqual(handoff["schema_commit"], self.manifest["schema_commit"])
+        self.assertEqual(handoff["schema_family_sha256"], self.manifest["schema_family_sha256"])
+        for row in handoff["cases"]:
+            for key in ("assessment", "fixture", "expected"):
+                self.assertTrue((CONF / row[key]).is_file(), row[key])
+            self.assertIn(row["portable_expected_outcome"], {"true", "false", "unknown", "error", "not_applicable", "not_evaluated"})
+            self.assertIn("unchanged Assessment", row["adapter_required"])
+
+    def test_remaining_normative_holds_are_minimal_and_explicit(self):
+        audit = read(CONF / "coverage-audit.json")
+        holds = {row["id"]: row for row in audit["normative_holds"]}
+        self.assertEqual(set(holds), {"variable.value.state_var_ref_guard", "windows.cmdlet.select_no_wildcard"})
+        for row in holds.values():
+            self.assertEqual(row["current_status"], "blocked")
+            self.assertEqual(len(row["outcomes"]), 2)
+            self.assertTrue(row["execution_independent"])
+            self.assertIn("#/semantic_validator_rules", row["source"])
+
     def test_core_semantics_keep_false_leaf_visible_and_only_not_negates(self):
         assessment = (CONF / "cases/core/evaluate-not.assessment.yaml").read_text(encoding="utf-8")
         self.assertIn("not:", assessment)
@@ -206,9 +230,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         dispositions = audit["capability_constraints"]["semantic_rule_disposition_counts"]
         self.assertEqual(sum(dispositions.values()), 180)
-        self.assertEqual(dispositions, {"blocked": 2, "not_run": 16, "semantic-witness": 57, "structural-witness": 19, "unsupported": 86})
-        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 104)
-        self.assertIn("104 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
+        self.assertEqual(dispositions, {"blocked": 2, "not_run": 16, "semantic-witness": 57, "source-only-native-equivalence": 81, "structural-witness": 19, "unsupported": 5})
+        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 23)
+        self.assertIn("23 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
@@ -344,6 +368,18 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(len(observed), 2)
         self.assertEqual(observed, assessment["assessment"]["variables"]["expected-values-variable"]["expression"]["literal"]["value"])
         self.assertEqual(expected["assertions"]["variable-alias-exactly-one-test"]["values_found"], len(observed))
+
+    def test_source_state_reference_filter_is_not_silently_claimed_native(self):
+        assessment = yaml.safe_load((CONF / "cases/core/set-filters.assessment.yaml").read_text(encoding="utf-8"))
+        mutated = deepcopy(assessment)
+        filter_node = mutated["assessment"]["tests"]["set-union-test"]["object"]["set"]["operands"][0]["filters"][0]
+        filter_node["include"] = {"state": "legacy-state-reference"}
+        with self.assertRaises(ValidationError):
+            validator().validate(mutated)
+        audit = read(CONF / "coverage-audit.json")
+        self.assertEqual(audit["capability_constraints"]["semantic_rules_source_only_count"], 81)
+        self.assertEqual(audit["set_filter_semantics"]["shared_witness"], "core-set-filters")
+        self.assertEqual(audit["set_filter_semantics"]["source_rule_schema_pointer"], "schema/capability-common.schema.json#/$defs/state_filter")
 
     def test_set_filter_mutations_fail_closed_at_schema_boundary(self):
         assessment = yaml.safe_load((CONF / "cases/core/set-filters.assessment.yaml").read_text(encoding="utf-8"))
