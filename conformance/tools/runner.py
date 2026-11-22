@@ -19,6 +19,10 @@ from typing import Any
 import yaml
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
+try:
+    from .semantic import validate as semantic_validate
+except ImportError:  # direct script execution
+    from semantic import validate as semantic_validate
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = ROOT / "schema"
@@ -198,6 +202,15 @@ def validate() -> int:
                 required = {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"}
                 if set(expected.get("cardinalities", {})) != required:
                     errors.append("cardinality suite is incomplete")
+            if row["id"] == "core-approved-decisions":
+                fixture = load(CONFORMANCE / row["fixture"])
+                expected = load(CONFORMANCE / row["expected"])
+                if fixture.get("decision_witnesses") != expected.get("decision_witnesses"):
+                    errors.append("approved decision fixture and expected proof differ")
+                if not any(w.get("rule") == "variable.value.state_var_ref_guard" and w.get("identity_entailed") is False and w.get("expected") == "not_losslessly_representable" for w in fixture.get("decision_witnesses", [])):
+                    errors.append("Variable State-reference decision lacks a concrete nonredundant counterexample")
+                if not any(w.get("rule") == "windows.cmdlet.select_no_wildcard" and w.get("wildcard_selection") == "rejected-before-collection" for w in fixture.get("decision_witnesses", [])):
+                    errors.append("cmdlet wildcard decision lacks a pre-collection rejection witness")
             if row["id"] == "core-semantic-boundaries":
                 fixture = load(CONFORMANCE / row["fixture"])
                 witness_rules = {rule for witness in fixture.get("semantic_witnesses", []) for rule in witness.get("rules", [])}
@@ -208,6 +221,15 @@ def validate() -> int:
                     errors.append("semantic boundary contains unknown mapping rule IDs")
                 tests = load(assessment).get("assessment", {}).get("tests", {})
                 assertions = expected.get("assertions", {})
+                declared_rejections = fixture.get("semantic_rejections", {})
+                actual_rejections = {
+                    error["test"]: error["rule"]
+                    for error in semantic_validate(load(assessment))
+                }
+                if actual_rejections != declared_rejections:
+                    errors.append("semantic boundary semantic-validator rejections do not match the independent witness")
+                if actual_rejections != expected.get("semantic_rejections", {}):
+                    errors.append("semantic boundary expected semantic-validator rejections do not match the fixture")
                 for test_name, assertion in assertions.items():
                     evidence = fixture.get("evidence", {}).get(test_name, {})
                     if evidence.get("items_found") != assertion.get("items_found") or evidence.get("items_satisfying") != assertion.get("items_satisfying"):

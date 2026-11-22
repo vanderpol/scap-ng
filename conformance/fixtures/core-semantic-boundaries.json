@@ -46,6 +46,10 @@
     "lockout-time-invalid-test": "error",
     "listening-protocol-safe-test": "true",
     "listening-protocol-invalid-test": "error",
+    "registry-pattern-key-traversal-test": "error",
+    "cmdlet-explicit-select-safe-test": "true",
+    "cmdlet-null-select-safe-test": "true",
+    "cmdlet-wildcard-select-invalid-test": "error",
     "registry-key-null-safe-test": "true",
     "registry-key-null-invalid-test": "error",
     "registry-value-type-safe-test": "true",
@@ -554,6 +558,44 @@
       ]
     },
     "listening-protocol-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "registry-pattern-key-traversal-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "cmdlet-explicit-select-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "cmdlet-explicit-select-safe-test-item",
+          "capability": "windows.cmdlet",
+          "fields": {}
+        }
+      ]
+    },
+    "cmdlet-null-select-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "cmdlet-null-select-safe-test-item",
+          "capability": "windows.cmdlet",
+          "fields": {}
+        }
+      ]
+    },
+    "cmdlet-wildcard-select-invalid-test": {
       "status": "not_run",
       "items_found": 0,
       "items_satisfying": 0,
@@ -1756,6 +1798,38 @@
       "reason": "Upper-case TCP is not the canonical lower-case collected protocol form."
     },
     {
+      "test": "registry-pattern-key-traversal-test",
+      "rules": [
+        "windows.registry.pattern_key_no_traversal"
+      ],
+      "expected": "error",
+      "reason": "A registry key pattern cannot be combined with hierarchy traversal; the schema-valid shape is rejected before collection."
+    },
+    {
+      "test": "cmdlet-explicit-select-safe-test",
+      "rules": [
+        "windows.cmdlet.select_no_wildcard"
+      ],
+      "expected": "true",
+      "reason": "An explicit unique cmdlet output property is a valid selection."
+    },
+    {
+      "test": "cmdlet-null-select-safe-test",
+      "rules": [
+        "windows.cmdlet.select_no_wildcard"
+      ],
+      "expected": "true",
+      "reason": "A null cmdlet selection explicitly disables Select-Object and remains valid."
+    },
+    {
+      "test": "cmdlet-wildcard-select-invalid-test",
+      "rules": [
+        "windows.cmdlet.select_no_wildcard"
+      ],
+      "expected": "error",
+      "reason": "The wildcard cmdlet selection is rejected before collection; it is not converted into a technical collector ERROR."
+    },
+    {
       "test": "registry-key-null-safe-test",
       "rules": [
         "windows.registry.key_null_requires_name_null"
@@ -2245,5 +2319,9 @@
       "expected": "error",
       "reason": "An NT-user Object omitting materialized include_default and item_creation is semantically incomplete."
     }
-  ]
+  ],
+  "semantic_rejections": {
+    "registry-pattern-key-traversal-test": "windows.registry.pattern_key_no_traversal",
+    "cmdlet-wildcard-select-invalid-test": "windows.cmdlet.select_no_wildcard"
+  }
 }

@@ -1,0 +1,55 @@
+{
+  "format": "scap-ng-conformance-evidence-0.1",
+  "schema_version": "0.4.1",
+  "case_id": "core-approved-decisions",
+  "clock": {
+    "now_utc": "2026-01-01T00:00:00Z",
+    "timezone": "UTC",
+    "locale": "C",
+    "ordering": "document"
+  },
+  "test_outcomes": {
+    "variable-identity-redundant-test": "true",
+    "variable-identity-counterexample-test": "false",
+    "cmdlet-explicit-select-decision-test": "true",
+    "cmdlet-null-select-decision-test": "true"
+  },
+  "decision_witnesses": [
+    {
+      "rule": "variable.value.state_var_ref_guard",
+      "case": "redundant",
+      "source_state_var_ref": "source-variable",
+      "native_test_variable": "source-variable",
+      "compared_items": [
+        "variable-identity-item"
+      ],
+      "identity_entailed": true,
+      "action": "omit source var_ref with proof",
+      "expected": "losslessly_representable",
+      "reason": "The selected Test Variable and State variable are the same for the sole compared Item; the native Test.variable preserves identity without a legacy State reference."
+    },
+    {
+      "rule": "variable.value.state_var_ref_guard",
+      "case": "nonredundant-counterexample",
+      "source_state_var_ref": "different-variable",
+      "native_test_variable": "source-variable",
+      "compared_items": [
+        "variable-identity-item"
+      ],
+      "identity_entailed": false,
+      "action": "fail closed and retain conversion hold",
+      "expected": "not_losslessly_representable",
+      "reason": "A different State variable can disagree for the same Item; omitting it would change the source predicate, so no native rewrite is emitted."
+    },
+    {
+      "rule": "windows.cmdlet.select_no_wildcard",
+      "case": "explicit-and-null",
+      "explicit_selection": [
+        "Name"
+      ],
+      "null_selection": true,
+      "wildcard_selection": "rejected-before-collection",
+      "expected": "valid"
+    }
+  ]
+}

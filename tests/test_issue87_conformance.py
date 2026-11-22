@@ -172,15 +172,17 @@ class Issue87Conformance(unittest.TestCase):
             self.assertIn(row["portable_expected_outcome"], {"true", "false", "unknown", "error", "not_applicable", "not_evaluated"})
             self.assertIn("unchanged Assessment", row["adapter_required"])
 
-    def test_remaining_normative_holds_are_minimal_and_explicit(self):
+    def test_approved_normative_decisions_are_proved_and_no_hold_remains(self):
         audit = read(CONF / "coverage-audit.json")
-        holds = {row["id"]: row for row in audit["normative_holds"]}
-        self.assertEqual(set(holds), {"variable.value.state_var_ref_guard", "windows.cmdlet.select_no_wildcard"})
-        for row in holds.values():
-            self.assertEqual(row["current_status"], "blocked")
-            self.assertEqual(len(row["outcomes"]), 2)
-            self.assertTrue(row["execution_independent"])
-            self.assertIn("#/semantic_validator_rules", row["source"])
+        self.assertEqual(audit["normative_holds"], [])
+        decisions = {row["id"]: row for row in audit["approved_normative_decisions"]}
+        self.assertEqual(set(decisions), {"variable.value.state_var_ref_guard", "windows.cmdlet.select_no_wildcard"})
+        self.assertTrue(all(row["status"] == "resolved" for row in decisions.values()))
+        fixture = read(CONF / "fixtures/core-approved-decisions.json")
+        expected = read(CONF / "expected/core-approved-decisions.json")
+        self.assertEqual(fixture["decision_witnesses"], expected["decision_witnesses"])
+        self.assertTrue(any(w["identity_entailed"] is False and w["expected"] == "not_losslessly_representable" for w in fixture["decision_witnesses"] if w["rule"] == "variable.value.state_var_ref_guard"))
+        self.assertEqual(expected["assertions"]["variable-identity-counterexample-test"]["outcome"], "false")
 
     def test_core_semantics_keep_false_leaf_visible_and_only_not_negates(self):
         assessment = (CONF / "cases/core/evaluate-not.assessment.yaml").read_text(encoding="utf-8")
@@ -230,9 +232,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         dispositions = audit["capability_constraints"]["semantic_rule_disposition_counts"]
         self.assertEqual(sum(dispositions.values()), 180)
-        self.assertEqual(dispositions, {"blocked": 2, "not_run": 16, "semantic-witness": 57, "source-only-native-equivalence": 81, "structural-witness": 19, "unsupported": 5})
-        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 23)
-        self.assertIn("23 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
+        self.assertEqual(dispositions, {"authoring-rejected": 4, "not_run": 16, "semantic-witness": 60, "source-only-native-equivalence": 81, "structural-witness": 19})
+        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 16)
+        self.assertIn("16 unresolved capability semantic-validator rules (not_run/blocked)", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer", "begin", "end", "input", "values"])
@@ -312,7 +314,7 @@ class Issue87Conformance(unittest.TestCase):
         validator().validate(assessment)
         rule_ids = {rule for witness in fixture["semantic_witnesses"] for rule in witness["rules"]}
         self.assertEqual(rule_ids, set(expected["rules"]))
-        self.assertEqual(len(rule_ids), 56)
+        self.assertEqual(len(rule_ids), 58)
         audit = read(CONF / "coverage-audit.json")
         self.assertEqual(audit["capability_constraints"]["semantic_boundary_unknown_rules"], [])
         self.assertEqual(set(audit["semantic_boundaries"]["rules"]), rule_ids)
@@ -349,6 +351,8 @@ class Issue87Conformance(unittest.TestCase):
                     self.assertEqual(test["object"]["filename"].get("matches_regex"), "^bad:name$")
             elif any("key_null_requires_name_null" in rule for rule in witness["rules"]):
                 self.assertNotIn("fields", test["require"])
+            elif any(rule in {"windows.cmdlet.select_no_wildcard", "windows.registry.pattern_key_no_traversal"} for rule in witness["rules"]):
+                self.assertTrue(test.get("object"))
             else:
                 self.assertTrue(test["require"].get("fields"))
         # A boundary mutation removing traversal from each traversal error leaves
@@ -362,6 +366,17 @@ class Issue87Conformance(unittest.TestCase):
             del mutated["assessment"]["tests"][witness["test"]]["object"]["traversal"]
             validator().validate(mutated)
             self.assertNotIn("traversal", mutated["assessment"]["tests"][witness["test"]]["object"])
+
+    def test_approved_cmdlet_wildcard_is_schema_valid_but_semantically_rejected(self):
+        assessment = yaml.safe_load((CONF / "cases/core/semantic-boundaries.assessment.yaml").read_text(encoding="utf-8"))
+        from conformance.tools.semantic import validate as semantic_validate
+        wildcard = assessment["assessment"]["tests"]["cmdlet-wildcard-select-invalid-test"]
+        self.assertEqual(validator().is_valid(assessment), True)
+        errors = semantic_validate(assessment)
+        self.assertIn({"test": "cmdlet-wildcard-select-invalid-test", "rule": "windows.cmdlet.select_no_wildcard", "reason": "object.select contains the wildcard member '*'"}, errors)
+        mutated = deepcopy(assessment)
+        mutated["assessment"]["tests"]["cmdlet-wildcard-select-invalid-test"]["object"]["select"]["fields"] = {"Name": {"selection_match": "one_or_more", "equals": "Name"}}
+        self.assertNotIn("windows.cmdlet.select_no_wildcard", {e["rule"] for e in semantic_validate(mutated) if e["test"] == "cmdlet-wildcard-select-invalid-test"})
 
     def test_variable_require_evaluate_interaction_keeps_false_leaf_visible(self):
         assessment = yaml.safe_load((CONF / "cases/core/variable-interactions.assessment.yaml").read_text(encoding="utf-8"))
