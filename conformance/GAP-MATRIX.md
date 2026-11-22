@@ -6,7 +6,7 @@ do not imply scanner equivalence.
 
 | Issue #87 requirement | Current evidence | Status / remaining gap |
 | --- | --- | --- |
-| Exact canonical 0.4.1 pin and closure | `manifest.json`, 146-resource digest, source `d1ab028...` | **Proved after explicit mainline repin**; family SHA-256 is `1755c893...`; no parallel active schema is introduced. |
+| Exact canonical 0.4.1 pin and closure | `manifest.json`, 147-resource digest, source `d1ab028...` | **Proved after explicit mainline repin**; family SHA-256 is `1755c893...`; no parallel active schema is introduced. |
 | Issue #95 YAML presentation order | Generated Assessments and core suites; actual YAML-order regression | **Proved for newly generated corpus**: every Test containing both keys serializes `object` before `require`; key order remains non-semantic. |
 | Exhaustive schema/mapping inventory | `schema-coverage.json`, 105 mappings, 718 fields, 142 enums, 11,327 constraints, 700 refs | **Proved as inventory**; occurrence-level executable semantic coverage is not claimed. |
 | Schema-valid Assessment per active capability | 105 generated Assessments; offline Draft 2020-12 validation | **Proved structurally**; collector support/runtime semantics unproved. |

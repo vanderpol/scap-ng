@@ -27,11 +27,11 @@ python -m unittest tests/test_issue87_conformance.py -v
 ```
 
 The current mainline-rebased inventory is pinned to schema commit
-`d1ab0283e09369c2c734d3b8f93b65007441cf07` and contains 105 capability
-mappings (101 supported, 4 experimental), 35 root schemas, 146 JSON resources,
+`cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876` and contains 105 capability
+mappings (101 supported, 4 experimental), 36 root schemas, 147 JSON resources,
 700 schema references, 142 enum nodes and 11,327 constraint nodes. The schema
 family SHA-256 is
-`1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4`. The exact
+`dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24`. The exact
 SHA-256 is in both generated receipts; do not edit the version label without
 regenerating the complete pack.
 

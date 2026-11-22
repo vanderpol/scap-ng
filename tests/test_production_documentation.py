@@ -72,7 +72,7 @@ class ProductionDocumentationTests(unittest.TestCase):
             original=json.loads((ROOT/'schema'/path.name).read_text())
             self.assertEqual(assertions(proposed),assertions(original),path.name)
             checked+=1
-        self.assertEqual(checked,35)
+        self.assertEqual(checked,36)
 
     def test_all_proposed_resources_are_valid_schemas_and_refs_are_local(self):
         gen.check_links(self.docs)
