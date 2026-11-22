@@ -169,6 +169,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertIn("160 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
+        self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
@@ -246,6 +247,17 @@ class Issue87Conformance(unittest.TestCase):
         del missing_quantifier["assessment"]["tests"]["set-union-test"]["object"]["set"]["operands"][0]["filters"][0]["include"]["arch"]["values_matching"]
         with self.assertRaises(ValidationError):
             validator().validate(missing_quantifier)
+
+    def test_variable_function_expected_values_are_derived_from_source_population(self):
+        assessment = yaml.safe_load((CONF / "cases/core/variable-functions.assessment.yaml").read_text(encoding="utf-8"))
+        expected = read(CONF / "expected/core-variable-functions.json")
+        source = assessment["assessment"]["variables"]["source-values-variable"]["expression"]["literal"]["value"]
+        unique = list(dict.fromkeys(source))
+        self.assertEqual(source, ["a", "a", "b"])
+        self.assertEqual(expected["functions"]["unique"]["values"], unique)
+        self.assertEqual(expected["functions"]["count"]["values"], [len(source)])
+        self.assertEqual(expected["functions"]["concat"]["values"], [f"prefix-{value}" for value in unique])
+        self.assertEqual(expected["functions"]["merge"]["values"], [",".join(sorted(unique))])
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]

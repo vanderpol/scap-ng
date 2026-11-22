@@ -78,6 +78,11 @@ The canonical `core-set-filters` Assessment covers shared Set operators
 abstract populations. It is an independent schema/oracle witness, not proof of
 collector-side Set or capability filter execution.
 
+The canonical `core-variable-functions` Assessment covers `unique`, `count`,
+`concat`, and `merge` over ordered duplicate values with local Variable
+dependencies. Its expected values are independently derived and do not claim
+status propagation or runtime function equivalence.
+
 The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
 independent-oracle, and runtime proof and records the exact RI #196 handoff.
 
