@@ -235,10 +235,10 @@ class Issue87Conformance(unittest.TestCase):
         self.assertIn("23 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
-        self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer"])
-        self.assertEqual(audit["variable_functions"]["witness_tests"], 10)
+        self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer", "begin", "end", "input", "values"])
+        self.assertEqual(audit["variable_functions"]["witness_tests"], 14)
         self.assertEqual(audit["variable_functions"]["expression_schema_branches"], ["arithmetic", "begin", "concat", "count", "end", "input", "literal", "merge", "regex_capture", "split", "substring", "time_difference", "to_integer", "unique", "values", "variable"])
-        self.assertEqual(audit["variable_functions"]["uncovered_expression_branches"], ["begin", "end", "input", "values"])
+        self.assertEqual(audit["variable_functions"]["uncovered_expression_branches"], [])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
         self.assertEqual(audit["applicability"]["variants"], ["applicable", "not-applicable", "deferred"])
         dimensions = {"schema", "semantic", "collection", "integration", "operational"}
@@ -427,6 +427,7 @@ class Issue87Conformance(unittest.TestCase):
     def test_variable_function_expected_values_are_derived_from_source_population(self):
         assessment = yaml.safe_load((CONF / "cases/core/variable-functions.assessment.yaml").read_text(encoding="utf-8"))
         expected = read(CONF / "expected/core-variable-functions.json")
+        fixture = read(CONF / "fixtures/core-variable-functions.json")
         source = assessment["assessment"]["variables"]["source-values-variable"]["expression"]["literal"]["value"]
         unique = list(dict.fromkeys(source))
         self.assertEqual(source, ["a", "a", "b"])
@@ -440,6 +441,34 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["functions"]["time_difference"]["values"], [86400])
         self.assertEqual(expected["functions"]["arithmetic"]["values"], [5, 6])
         self.assertEqual(expected["functions"]["to_integer"]["values"], [7, -12])
+
+        # The four previously uncovered expression branches are independently
+        # tied to their authored source and deterministic evidence.  This is a
+        # small source oracle, not scanner execution: begin/end are the pinned
+        # boundary transforms, input is the exact supplied binding, and values
+        # is the ordered projection of the two collected Items.
+        self.assertEqual(expected["functions"]["begin"]["values"], ["/etc", "/var"])
+        self.assertEqual(expected["functions"]["end"]["values"], ["etc/", "var/"])
+        self.assertEqual(expected["functions"]["input"]["values"], [7])
+        self.assertEqual(expected["functions"]["values"]["values"], ["unix", "windows"])
+        self.assertEqual(assessment["assessment"]["variables"]["begin-values-variable"]["expression"]["begin"]["character"], "/")
+        self.assertEqual(assessment["assessment"]["variables"]["end-values-variable"]["expression"]["end"]["character"], "/")
+        self.assertEqual(assessment["assessment"]["variables"]["input-values-variable"]["expression"], {"input": "function-value-input"})
+        values_expr = assessment["assessment"]["variables"]["collected-values-variable"]["expression"]["values"]
+        self.assertEqual(values_expr, {"object": {"object_ref": "function-family-object"}, "field": "family"})
+        self.assertEqual(fixture["bindings"]["function-value-input"], [7])
+        self.assertEqual([item["family"] for item in fixture["populations"]["function-family-object"]], ["unix", "windows"])
+        for name in ("function-begin-test", "function-end-test", "function-input-test", "function-values-test"):
+            self.assertEqual(fixture["test_outcomes"][name], "true")
+            self.assertEqual(expected["functions"][name.removeprefix("function-").removesuffix("-test")]["outcome"], "true")
+
+    def test_variable_function_branch_mutations_fail_independent_expected_values(self):
+        expected = read(CONF / "expected/core-variable-functions.json")
+        mutated = deepcopy(expected)
+        mutated["functions"]["begin"]["values"][0] = "etc"
+        mutated["functions"]["values"]["values"].reverse()
+        self.assertNotEqual(mutated["functions"]["begin"]["values"], expected["functions"]["begin"]["values"])
+        self.assertNotEqual(mutated["functions"]["values"]["values"], expected["functions"]["values"]["values"])
 
     def test_input_guard_keeps_absent_and_empty_bindings_distinct(self):
         assessment = yaml.safe_load((CONF / "cases/core/input-guards.assessment.yaml").read_text(encoding="utf-8"))

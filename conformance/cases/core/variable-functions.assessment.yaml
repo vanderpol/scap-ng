@@ -7,6 +7,16 @@ assessment:
   specification:
     id: scap-ng.pre-alpha.assessment
     version: 0.4.1
+  inputs:
+    function-value-input:
+      datatype: integer
+      cardinality: exactly_one
+      required: true
+      description: Deterministic supplied value for the native input expression witness.
+  shared_objects:
+    function-family-object:
+      object_title: Deterministic family source
+      capability: independent.family
   variables:
     source-values-variable:
       kind: constant
@@ -94,6 +104,35 @@ assessment:
           literal:
           - '007'
           - '-12'
+    begin-values-variable:
+      kind: local
+      expression:
+        begin:
+          character: /
+          value:
+            literal:
+            - etc
+            - /var
+    end-values-variable:
+      kind: local
+      expression:
+        end:
+          character: /
+          value:
+            literal:
+            - etc
+            - var/
+    input-values-variable:
+      kind: local
+      expression:
+        input: function-value-input
+    collected-values-variable:
+      kind: local
+      expression:
+        values:
+          object:
+            object_ref: function-family-object
+          field: family
     expected-unique-variable:
       kind: constant
       expression:
@@ -169,6 +208,36 @@ assessment:
           value:
           - 7
           - -12
+    expected-begin-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - /etc
+          - /var
+    expected-end-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - etc/
+          - var/
+    expected-input-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value: 7
+    expected-collected-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - unix
+          - windows
   tests:
     function-unique-test:
       test_title: Unique removes duplicate values preserving first occurrence
@@ -360,6 +429,83 @@ assessment:
             values_matching: every
             equals:
               variable: expected-to-integer-variable
+    function-begin-test:
+      test_title: Begin adds a missing leading boundary and preserves an existing
+        one
+      capability: variable.value
+      reported_elements: all
+      variable: begin-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-begin-variable
+    function-end-test:
+      test_title: End adds a missing trailing boundary and preserves an existing one
+      capability: variable.value
+      reported_elements: all
+      variable: end-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-end-variable
+    function-input-test:
+      test_title: Input expression retains the supplied typed binding
+      capability: variable.value
+      reported_elements: all
+      variable: input-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-input-variable
+    function-values-test:
+      test_title: Values projects the selected field from collected Items
+      capability: variable.value
+      reported_elements: all
+      variable: collected-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-collected-variable
   evaluate:
     and:
     - test: function-unique-test
@@ -372,3 +518,7 @@ assessment:
     - test: function-time-difference-test
     - test: function-arithmetic-test
     - test: function-to-integer-test
+    - test: function-begin-test
+    - test: function-end-test
+    - test: function-input-test
+    - test: function-values-test
