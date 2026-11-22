@@ -1715,6 +1715,145 @@ assessment:
         fields:
           trustee_sid:
             equals: S-1-5-32-544
+    ios-version-typed-safe-test:
+      test_title: 'Semantic boundary witness: ios-version-typed-safe'
+      capability: ios.version55
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          version_string:
+            equals: 17.9(4)
+          major_version:
+            equals: 17
+          minor_version:
+            equals: 9
+          release:
+            equals: 4
+          rebuild:
+            equals: 0
+          subrebuild:
+            equals: '0'
+          mainline_rebuild:
+            equals: '0'
+          train_identifier:
+            equals: mainline
+      reported_elements: all
+    yaml-record-keys-safe-test:
+      test_title: 'Semantic boundary witness: yaml-record-keys-safe'
+      capability: independent.yamlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.yamlfilecontent
+        full_path:
+          equals: /etc/config.yaml
+        yamlpath:
+          equals: $.metadata
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                OriginalKey:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: fixture-value
+    wmi-structured-result-safe-test:
+      test_title: 'Semantic boundary witness: wmi-structured-result-safe'
+      capability: windows.wmi.query
+      reported_elements: all
+      object:
+        capability: windows.wmi.query
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          result:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                SelectedProperty:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: fixture-value
+    cmdlet-structured-record-safe-test:
+      test_title: 'Semantic boundary witness: cmdlet-structured-record-safe'
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          parameters:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                ParameterName:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: fixture-value
+          select:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                Name:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: fixture-value
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                Name:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: fixture-value
+    userright-case-safe-test:
+      test_title: 'Semantic boundary witness: userright-case-safe'
+      capability: windows.userright
+      reported_elements: all
+      object:
+        capability: windows.userright
+        privilege:
+          equals: SeBackupPrivilege
+        trustee_name:
+          case_insensitive_equals: Administrators
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          trustee_name:
+            case_insensitive_equals: Administrators
     wu-defaults-safe-test:
       test_title: 'Semantic boundary witness: wu-defaults-safe'
       capability: windows.wuaupdatesearcher
@@ -1889,6 +2028,11 @@ assessment:
     - test: file-rights-literal-safe-test
     - test: file-rights-literal-invalid-test
     - test: file-rights-trustee-sid-safe-test
+    - test: ios-version-typed-safe-test
+    - test: yaml-record-keys-safe-test
+    - test: wmi-structured-result-safe-test
+    - test: cmdlet-structured-record-safe-test
+    - test: userright-case-safe-test
     - test: wu-defaults-safe-test
     - test: wu-defaults-invalid-test
     - test: ntuser-defaults-safe-test
