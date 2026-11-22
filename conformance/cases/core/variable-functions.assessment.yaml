@@ -87,6 +87,13 @@ assessment:
           - literal:
             - 3
             - 4
+    to-integer-values-variable:
+      kind: local
+      expression:
+        to_integer:
+          literal:
+          - '007'
+          - '-12'
     expected-unique-variable:
       kind: constant
       expression:
@@ -154,6 +161,14 @@ assessment:
           value:
           - 5
           - 6
+    expected-to-integer-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value:
+          - 7
+          - -12
   tests:
     function-unique-test:
       test_title: Unique removes duplicate values preserving first occurrence
@@ -326,6 +341,25 @@ assessment:
             values_matching: every
             equals:
               variable: expected-arithmetic-variable
+    function-to-integer-test:
+      test_title: To-integer converts signed decimal strings elementwise
+      capability: variable.value
+      reported_elements: all
+      variable: to-integer-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-to-integer-variable
   evaluate:
     and:
     - test: function-unique-test
@@ -337,3 +371,4 @@ assessment:
     - test: function-substring-test
     - test: function-time-difference-test
     - test: function-arithmetic-test
+    - test: function-to-integer-test
