@@ -293,6 +293,12 @@ class Issue87Conformance(unittest.TestCase):
         set_filters = read(CONF / "expected/core-set-filters.json")
         self.assertEqual(set(set_filters["set_operators"]), {"union", "intersection", "difference"})
         self.assertEqual(set(set_filters["filter_actions"]), {"include", "exclude"})
+        self.assertEqual(set(set_filters["operand_branches"]), {"object", "nested-set"})
+        self.assertEqual(set(set_filters["filter_predicates"]), {"field", "and"})
+        self.assertEqual(set(set_filters["cardinality_boundaries"]), {"one-or-more", "none", "single-operand"})
+        self.assertEqual(len(set_filters["operations"]), 8)
+        fixture = read(CONF / "fixtures/core-set-filters.json")
+        self.assertEqual(len(fixture["test_outcomes"]), 8)
         for row in self.manifest["status_cases"]:
             self.assertTrue(read(CONF / row["expected"])["reason"].strip())
 
@@ -380,6 +386,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["capability_constraints"]["semantic_rules_source_only_count"], 81)
         self.assertEqual(audit["set_filter_semantics"]["shared_witness"], "core-set-filters")
         self.assertEqual(audit["set_filter_semantics"]["source_rule_schema_pointer"], "schema/capability-common.schema.json#/$defs/state_filter")
+        self.assertEqual(audit["set_filter_semantics"]["witness_tests"], 8)
+        self.assertEqual(audit["set_filter_semantics"]["operand_branches"], ["object", "nested-set"])
+        self.assertEqual(audit["set_filter_semantics"]["filter_predicates"], ["field", "and"])
 
     def test_set_filter_mutations_fail_closed_at_schema_boundary(self):
         assessment = yaml.safe_load((CONF / "cases/core/set-filters.assessment.yaml").read_text(encoding="utf-8"))
@@ -394,6 +403,23 @@ class Issue87Conformance(unittest.TestCase):
         del missing_quantifier["assessment"]["tests"]["set-union-test"]["object"]["set"]["operands"][0]["filters"][0]["include"]["arch"]["values_matching"]
         with self.assertRaises(ValidationError):
             validator().validate(missing_quantifier)
+
+    def test_set_filter_expected_values_are_derived_from_fixed_populations(self):
+        fixture = read(CONF / "fixtures/core-set-filters.json")
+        expected = read(CONF / "expected/core-set-filters.json")
+        left = {item["id"] for item in fixture["populations"]["left"] if item["arch"] == "amd64"}
+        right = {item["id"] for item in fixture["populations"]["right"] if item["arch"] != "arm64"}
+        union = sorted(left | right, key=[item["id"] for item in fixture["populations"]["left"] + fixture["populations"]["right"]].index)
+        intersection = sorted(left & right, key=union.index)
+        difference = sorted(left - right, key=union.index)
+        for operation, values in (("union", union), ("intersection", intersection), ("difference", difference)):
+            self.assertEqual(expected["operations"][operation]["values"], values)
+            self.assertEqual(expected["operations"][operation]["items_found"], len(values))
+        self.assertEqual(expected["operations"]["empty-filter"]["items_found"], 0)
+        # A filter-action mutation must change the abstract population; it may
+        # not be accepted while retaining the original expected result.
+        mutated = [item for item in fixture["populations"]["left"] if item["arch"] != "amd64"]
+        self.assertNotEqual({item["id"] for item in mutated}, left)
 
     def test_variable_function_expected_values_are_derived_from_source_population(self):
         assessment = yaml.safe_load((CONF / "cases/core/variable-functions.assessment.yaml").read_text(encoding="utf-8"))

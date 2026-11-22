@@ -87,10 +87,13 @@ cardinality. Its decisive FALSE leaf is visible and enclosed only by canonical
 `not`; the expected counts are independently derived from the two ordered
 values.
 
-The canonical `core-set-filters` Assessment covers shared Set operators
-(`union`, `intersection`, `difference`) and both filter actions over deterministic
-abstract populations. It is an independent schema/oracle witness, not proof of
-collector-side Set or capability filter execution.
+The canonical `core-set-filters` Assessment contains eight independent witnesses
+over shared deterministic populations: all three Set operators and both filter
+actions, one operand per operator, a nested Set operand, a logical AND filter
+predicate, and an empty collected population checked with `items_found: none`.
+Expected values are independently derived from fixture populations. This is a
+schema/oracle witness, not proof of collector-side Set/filter execution or status
+propagation.
 
 The canonical `core-variable-functions` Assessment covers `unique`, `count`,
 `concat`, and `merge` over ordered duplicate values with local Variable

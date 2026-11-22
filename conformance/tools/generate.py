@@ -504,7 +504,14 @@ def build_variable_interaction_suite() -> dict[str, Any]:
 
 
 def build_set_filter_suite() -> dict[str, Any]:
-    """Schema-valid witnesses for shared Set composition and filter actions."""
+    """Schema-valid witnesses for shared Set composition and filter actions.
+
+    The suite intentionally exercises every Set operand branch (object and
+    nested Set), all three operators at their minimum cardinality, both filter
+    actions, a logical filter predicate, and an empty filtered population.
+    Expected values are computed from the fixed abstract populations below;
+    collector/runtime status propagation remains an RI boundary.
+    """
     shared_objects = {
         "left-object": {"object_title": "Left package population", "capability": "linux.dpkginfo", "name": {"equals": "left"}},
         "right-object": {"object_title": "Right package population", "capability": "linux.dpkginfo", "name": {"equals": "right"}},
@@ -513,6 +520,9 @@ def build_set_filter_suite() -> dict[str, Any]:
     def filter_entry(action: str, value: str) -> dict[str, Any]:
         return {action: {"arch": {"values_found": "one_or_more", "values_matching": "every", "equals": value}}}
 
+    def filtered_operand(action: str = "include", value: str = "amd64") -> dict[str, Any]:
+        return {"object": "left-object", "filters": [filter_entry(action, value)]}
+
     def set_expression(operator: str) -> dict[str, Any]:
         operands = [
             {"object": "left-object", "filters": [filter_entry("include", "amd64")]},
@@ -520,7 +530,7 @@ def build_set_filter_suite() -> dict[str, Any]:
         ]
         return {"operator": operator, "operands": operands}
 
-    tests = {}
+    tests: dict[str, Any] = {}
     for name, operator, title in [
         ("union", "union", "Union applies include/exclude filters to both operands"),
         ("intersection", "intersection", "Intersection retains only shared Items"),
@@ -533,11 +543,62 @@ def build_set_filter_suite() -> dict[str, Any]:
             "object": {"capability": "linux.dpkginfo", "set": set_expression(operator)},
             "require": {"item_requirement": {"items_found": "one_or_more"}},
         }
-    assessment = {"assessment": {"id": "conformance-core-set-filters", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Set and Filter semantics", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "shared_objects": shared_objects, "tests": tests, "evaluate": {"and": [{"test": "set-union-test"}, {"test": "set-intersection-test"}, {"test": "set-difference-test"}]}}}
-    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-set-filters", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "populations": {"left": [{"id": "left-a", "arch": "amd64", "status": "collected"}, {"id": "shared", "arch": "amd64", "status": "collected"}], "right": [{"id": "shared", "arch": "amd64", "status": "collected"}, {"id": "right-b", "arch": "amd64", "status": "collected"}]}, "test_outcomes": {"set-union-test": "true", "set-intersection-test": "true", "set-difference-test": "true"}}
-    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-set-filters", "operations": {"union": {"outcome": "true", "items_found": 3, "items_satisfying": 3, "values": ["left-a", "shared", "right-b"], "reason": "Include/exclude filters are applied before union; the duplicate shared Item is retained once."}, "intersection": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values": ["shared"], "reason": "Both filtered operand populations contain the shared Item."}, "difference": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values": ["left-a"], "reason": "The right filtered population is removed from the left population."}}, "filter_actions": ["include", "exclude"], "set_operators": ["union", "intersection", "difference"], "reason": "The abstract deterministic populations independently justify Set cardinalities; collector execution and capability-specific filter semantics remain separate."}
-    return {"assessment": assessment, "fixture": fixture, "expected": expected}
 
+    # A single operand is explicitly valid for every Set operator. Keep one
+    # representative per operator so the minimum cardinality is executable.
+    for operator in ("union", "intersection", "difference"):
+        name = f"set-single-{operator}-test"
+        tests[name] = {
+            "test_title": f"Single-operand {operator} preserves the filtered population",
+            "capability": "linux.dpkginfo", "reported_elements": "all",
+            "object": {"capability": "linux.dpkginfo", "set": {"operator": operator, "operands": [filtered_operand()]}},
+            "require": {"item_requirement": {"items_found": "one_or_more"}},
+        }
+
+    # Exercise the nested Set operand branch and a logical (AND) filter
+    # predicate. The filter remains one state_entry, not an OVAL State ID.
+    tests["set-nested-predicate-test"] = {
+        "test_title": "Nested Set and logical filter predicate preserve membership",
+        "capability": "linux.dpkginfo", "reported_elements": "all",
+        "object": {"capability": "linux.dpkginfo", "set": {"operator": "union", "operands": [
+            {"set": {"operator": "difference", "operands": [
+                {"object": "left-object", "filters": [{"include": {"and": [
+                    {"arch": {"values_found": "one_or_more", "values_matching": "every", "equals": "amd64"}},
+                    {"name": {"values_found": "one_or_more", "values_matching": "every", "equals": "left-a"}},
+                ]}}]},
+                {"object": "right-object", "filters": [filter_entry("exclude", "arm64")]},
+            ]}},
+            {"object": "right-object", "filters": [filter_entry("exclude", "arm64")]},
+        ]}},
+        "require": {"item_requirement": {"items_found": "one_or_more"}},
+    }
+
+    # An include predicate that matches no Item is a valid empty population;
+    # the explicit NONE requirement is TRUE and proves empty != absent.
+    tests["set-empty-filter-test"] = {
+        "test_title": "Nonmatching include filter produces an empty collected Set",
+        "capability": "linux.dpkginfo", "reported_elements": "all",
+        "object": {"capability": "linux.dpkginfo", "set": {"operator": "union", "operands": [filtered_operand("include", "arm64")]}},
+        "require": {"item_requirement": {"items_found": "none"}},
+    }
+
+    names = list(tests)
+    assessment = {"assessment": {"id": "conformance-core-set-filters", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Set and Filter semantics", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "shared_objects": shared_objects, "tests": tests, "evaluate": {"and": [{"test": name} for name in names]}}}
+    populations = {"left": [{"id": "left-a", "name": "left-a", "arch": "amd64", "status": "collected"}, {"id": "shared", "name": "shared", "arch": "amd64", "status": "collected"}], "right": [{"id": "shared", "name": "shared", "arch": "amd64", "status": "collected"}, {"id": "right-b", "name": "right-b", "arch": "amd64", "status": "collected"}]}
+    outcomes = {name: "true" for name in names}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-set-filters", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "populations": populations, "test_outcomes": outcomes}
+    operations = {
+        "union": {"outcome": "true", "items_found": 3, "items_satisfying": 3, "values": ["left-a", "shared", "right-b"], "reason": "Include/exclude filters are applied before union; the duplicate shared Item is retained once."},
+        "intersection": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values": ["shared"], "reason": "Both filtered operand populations contain the shared Item."},
+        "difference": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values": ["left-a"], "reason": "The right filtered population is removed from the left population."},
+        "single-union": {"outcome": "true", "items_found": 2, "items_satisfying": 2, "values": ["left-a", "shared"], "reason": "A single union operand is valid and returns that operand after its include filter."},
+        "single-intersection": {"outcome": "true", "items_found": 2, "items_satisfying": 2, "values": ["left-a", "shared"], "reason": "A single intersection operand is valid and returns that operand after its include filter."},
+        "single-difference": {"outcome": "true", "items_found": 2, "items_satisfying": 2, "values": ["left-a", "shared"], "reason": "A single difference operand is valid and returns that operand after its include filter."},
+        "nested-predicate": {"outcome": "true", "items_found": 3, "items_satisfying": 3, "values": ["left-a", "shared", "right-b"], "reason": "The nested difference removes the right population after the AND filter selects left-a; the outer union restores the right population."},
+        "empty-filter": {"outcome": "true", "items_found": 0, "items_satisfying": 0, "values": [], "reason": "A collected population with no matching Item satisfies items_found: none; it is distinct from absent acquisition."},
+    }
+    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-set-filters", "operations": operations, "filter_actions": ["include", "exclude"], "set_operators": ["union", "intersection", "difference"], "operand_branches": ["object", "nested-set"], "filter_predicates": ["field", "and"], "cardinality_boundaries": ["one-or-more", "none", "single-operand"], "reason": "The abstract deterministic populations independently justify Set cardinalities, nested operand membership, logical filter predicates, and empty collected results; collector status propagation and capability-specific filter semantics remain separate."}
+    return {"assessment": assessment, "fixture": fixture, "expected": expected}
 
 def build_semantic_boundary_suite() -> dict[str, Any]:
     """Witness shared file-selection semantic boundaries with paired cases.
@@ -1189,7 +1250,7 @@ def main() -> None:
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
         "authoring_cases": authoring_rows,
         "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
-        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference"]}, {"id": "core-semantic-boundaries", "assessment": "cases/core/semantic-boundaries.assessment.yaml", "fixture": "fixtures/core-semantic-boundaries.json", "expected": "expected/core-semantic-boundaries.json", "vectors": ["file-selection-traversal", "windows-literal-name"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": ["unique", "count", "concat", "merge"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
+        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference", "single-operand", "nested-set", "logical-filter-predicate", "empty-collected-population"]}, {"id": "core-semantic-boundaries", "assessment": "cases/core/semantic-boundaries.assessment.yaml", "fixture": "fixtures/core-semantic-boundaries.json", "expected": "expected/core-semantic-boundaries.json", "vectors": ["file-selection-traversal", "windows-literal-name"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": ["unique", "count", "concat", "merge"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
         "invalid_cases": [
             {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},
             {"id": "invalid-variable-datatype", "assessment": "cases/invalid/variable-datatype.assessment.yaml", "expected": "schema-invalid", "reason": "Variables infer datatype from typed expressions; declaration datatype is not canonical."},

@@ -31,6 +31,54 @@
         "left-a"
       ],
       "reason": "The right filtered population is removed from the left population."
+    },
+    "single-union": {
+      "outcome": "true",
+      "items_found": 2,
+      "items_satisfying": 2,
+      "values": [
+        "left-a",
+        "shared"
+      ],
+      "reason": "A single union operand is valid and returns that operand after its include filter."
+    },
+    "single-intersection": {
+      "outcome": "true",
+      "items_found": 2,
+      "items_satisfying": 2,
+      "values": [
+        "left-a",
+        "shared"
+      ],
+      "reason": "A single intersection operand is valid and returns that operand after its include filter."
+    },
+    "single-difference": {
+      "outcome": "true",
+      "items_found": 2,
+      "items_satisfying": 2,
+      "values": [
+        "left-a",
+        "shared"
+      ],
+      "reason": "A single difference operand is valid and returns that operand after its include filter."
+    },
+    "nested-predicate": {
+      "outcome": "true",
+      "items_found": 3,
+      "items_satisfying": 3,
+      "values": [
+        "left-a",
+        "shared",
+        "right-b"
+      ],
+      "reason": "The nested difference removes the right population after the AND filter selects left-a; the outer union restores the right population."
+    },
+    "empty-filter": {
+      "outcome": "true",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "values": [],
+      "reason": "A collected population with no matching Item satisfies items_found: none; it is distinct from absent acquisition."
     }
   },
   "filter_actions": [
@@ -42,5 +90,18 @@
     "intersection",
     "difference"
   ],
-  "reason": "The abstract deterministic populations independently justify Set cardinalities; collector execution and capability-specific filter semantics remain separate."
+  "operand_branches": [
+    "object",
+    "nested-set"
+  ],
+  "filter_predicates": [
+    "field",
+    "and"
+  ],
+  "cardinality_boundaries": [
+    "one-or-more",
+    "none",
+    "single-operand"
+  ],
+  "reason": "The abstract deterministic populations independently justify Set cardinalities, nested operand membership, logical filter predicates, and empty collected results; collector status propagation and capability-specific filter semantics remain separate."
 }

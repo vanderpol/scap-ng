@@ -97,8 +97,130 @@ assessment:
       require:
         item_requirement:
           items_found: one_or_more
+    set-single-union-test:
+      test_title: Single-operand union preserves the filtered population
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: union
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+      require:
+        item_requirement:
+          items_found: one_or_more
+    set-single-intersection-test:
+      test_title: Single-operand intersection preserves the filtered population
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: intersection
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+      require:
+        item_requirement:
+          items_found: one_or_more
+    set-single-difference-test:
+      test_title: Single-operand difference preserves the filtered population
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: difference
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+      require:
+        item_requirement:
+          items_found: one_or_more
+    set-nested-predicate-test:
+      test_title: Nested Set and logical filter predicate preserve membership
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: union
+          operands:
+          - set:
+              operator: difference
+              operands:
+              - object: left-object
+                filters:
+                - include:
+                    and:
+                    - arch:
+                        values_found: one_or_more
+                        values_matching: every
+                        equals: amd64
+                    - name:
+                        values_found: one_or_more
+                        values_matching: every
+                        equals: left-a
+              - object: right-object
+                filters:
+                - exclude:
+                    arch:
+                      values_found: one_or_more
+                      values_matching: every
+                      equals: arm64
+          - object: right-object
+            filters:
+            - exclude:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: arm64
+      require:
+        item_requirement:
+          items_found: one_or_more
+    set-empty-filter-test:
+      test_title: Nonmatching include filter produces an empty collected Set
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: union
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: arm64
+      require:
+        item_requirement:
+          items_found: none
   evaluate:
     and:
     - test: set-union-test
     - test: set-intersection-test
     - test: set-difference-test
+    - test: set-single-union-test
+    - test: set-single-intersection-test
+    - test: set-single-difference-test
+    - test: set-nested-predicate-test
+    - test: set-empty-filter-test
