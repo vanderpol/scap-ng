@@ -161,6 +161,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["operators"]["non_exercising_witnesses"], [])
         self.assertEqual(audit["authoring_enums"]["cases"], 20)
         self.assertEqual(len(audit["authoring_enums"]["negative_boundary_cases"]), 10)
+        self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 177)
+        self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
+        self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():

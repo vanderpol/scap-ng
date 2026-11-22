@@ -52,6 +52,12 @@ both modes, all five Assessment classes, all three `reported_elements` branches
 Ten invalid-authoring vectors reject out-of-domain enums and representative
 identifier, procedure, duplicate-list, cardinality, Variable-kind, and
 specification-version constraints.
+
+The audit also derives all 177 mapping semantic-validator rules. It marks only
+explicit source-shape checks (for example singleton/no-Object and resolved
+Variable source) as structural witnesses; collector/filter and capability
+specific rules remain listed as untested rather than promoted to semantic
+coverage.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
 spelling; `negate` is an invalid-authoring regression.

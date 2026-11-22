@@ -67,6 +67,7 @@ def main() -> int:
     datatypes = Counter(); mapping_rows = []
     source_mapping_paths = sorted((SCHEMA / "capability-mappings").rglob("*.json"))
     source_mappings = [load(path) for path in source_mapping_paths]
+    semantic_rule_audit: list[dict[str, Any]] = []
     for mapping in source_mappings:
         native = mapping.get("native", {})
         fields = set(native.get("state_field_map", {})); selectors = set(native.get("selector_map", {}))
@@ -101,6 +102,19 @@ def main() -> int:
             observed = positive_item.get("fields", {}).get(field, {}).get("value") if positive_item else None
             if not positive_item or field not in positive_item.get("fields", {}) or not predicate_matches(observed, predicates[field]):
                 non_exercising_field_witnesses.append({"capability": capability, "field": field, "reason": "positive fixture value does not satisfy authored Require predicate"})
+        tests = list(document["assessment"].get("tests", {}).values())
+        for rule in mapping.get("semantic_validator_rules", []):
+            rule_id = rule.get("id", "")
+            suffix = rule_id.rsplit(".", 1)[-1]
+            has_object = any(isinstance(test.get("object"), dict) for test in tests)
+            has_variable = any(isinstance(test.get("variable"), str) and test["variable"] in document["assessment"].get("variables", {}) for test in tests)
+            if suffix in {"singleton_source", "implicit_source", "implicit_population", "fixed_result"} and not has_object:
+                status = "structural-witness"
+            elif suffix == "source_exists" and has_variable:
+                status = "structural-witness"
+            else:
+                status = "untested"
+            semantic_rule_audit.append({"capability": capability, "id": rule_id, "status": status})
         mapping_rows.append({"capability": mapping["capability"], "fields": len(fields), "selectors": len(selectors), "alternatives": len(alternatives), "selected_alternative": 1 if alternatives else 0})
 
     selector_document = load(CONF / "cases/core/selector-alternatives.assessment.yaml")
@@ -192,7 +206,7 @@ def main() -> int:
         "schema_family_sha256": manifest["schema_family_sha256"],
         "vectors": {"capabilities": len(manifest["capabilities"]), "base_vectors_per_capability": 7, "base_capability_vectors_total": len(manifest["capabilities"]) * 7, "additional_multi_item": len(manifest["capabilities"]), "expanded_capability_vectors_total": sum(len(row["vectors"]) for row in manifest["capabilities"]), "multi_value_suite_cases": len(load(CONF / "expected/core-multi-values.json").get("capabilities", {})), "normal_true_vectors_total": len(manifest["capabilities"]) * 2},
         "fields": {"declared_mapping_fields": len(all_fields), "authored_assessment_fields": len(authored_field_witnesses), "positive_fixture_fields": len(fixture_field_witnesses), "missing_from_assessments": sorted(set(all_fields) - authored_field_witnesses), "missing_from_fixtures": sorted(set(all_fields) - fixture_field_witnesses), "extra_authored_fields": sorted(authored_field_witnesses - set(all_fields)), "coverage_percent": round(100 * len(authored_field_witnesses & set(all_fields)) / len(all_fields), 2), "non_exercising_witnesses": non_exercising_field_witnesses, "datatypes": dict(sorted(datatypes.items()))},
-        "capability_constraints": {"mapping_count": len(mapping_rows), "semantic_validator_rule_count": sum(len(m.get("semantic_validator_rules", [])) for m in source_mappings), "mappings_with_semantic_rules": sum(bool(m.get("semantic_validator_rules")) for m in source_mappings), "schema_positive_validation": "all 104 capability Assessments", "execution_coverage": False, "note": "Mapping rules are inventoried and source Assessments are schema-validated; collector/filter semantic execution remains separate."},
+        "capability_constraints": {"mapping_count": len(mapping_rows), "semantic_validator_rule_count": len(semantic_rule_audit), "mappings_with_semantic_rules": sum(bool(m.get("semantic_validator_rules")) for m in source_mappings), "semantic_rules_structural_witnesses": sum(row["status"] == "structural-witness" for row in semantic_rule_audit), "semantic_rules_untested": [row for row in semantic_rule_audit if row["status"] == "untested"], "schema_positive_validation": "all 104 capability Assessments", "execution_coverage": False, "note": "Mapping rules are inventoried and only explicit source-shape witnesses are marked structural; collector/filter and capability-specific semantic execution remain separate."},
         "selectors": {"declared_selector_fields": len(all_selectors), "selected_in_positive_assessments": len(chosen_selectors), "field_coverage_percent": round(100 * len(chosen_selectors) / len(all_selectors), 2), "selector_alternative_sets": selector_alternatives, "positive_first_alternative_sets": selected_alternatives, "alternative_sets_exercised_by_selector_suite": selector_suite_alternatives, "uncovered_alternative_sets": selector_alternatives - selector_suite_alternatives, "duplicate_selector_witnesses": duplicate_selector_witnesses, "missing_selector_witnesses": sorted(set(source_alternatives) - set(authored_selector_keys)), "non_exercising_witnesses": non_exercising_selector_witnesses, "note": "The selector suite exercises every declared alternative; native selector enum/pattern boundary values and collector execution remain separate gates."},
         "enum_boundaries": {"selector_mutation_attempts": enum_boundary_attempts, "schema_rejected_mutations": enum_boundary_rejections, "unconstrained_selector_values": enum_boundary_attempts - enum_boundary_rejections, "native_selector_enum_values": len(native_enum_values), "authored_native_selector_enum_values": len(authored_enum_values & native_enum_values), "uncovered_native_selector_enum_values": sorted(native_enum_values - authored_enum_values), "note": "Only schema-backed enum selectors reject the sentinel; unconstrained selector strings are not falsely called enum coverage."},
         "operators": {"canonical_comparison_count": len(comparison), "authored_comparison": sorted(comparison & authored_ops), "uncovered_comparison": sorted(comparison - authored_ops), "canonical_field_operator_count": len(field_ops), "authored_field_operators": sorted(field_ops & authored_ops), "uncovered_field_operators": sorted(field_ops - authored_ops), "canonical_logical": sorted(logical), "authored_logical": sorted(logical & authored_ops), "uncovered_logical": sorted(logical - authored_ops), "witnesses": operator_witnesses, "duplicate_witnesses": sorted(set(duplicate_operator_witnesses)), "non_exercising_witnesses": non_exercising_operator_witnesses},
