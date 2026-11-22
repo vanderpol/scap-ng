@@ -79,7 +79,7 @@ Editorial receipt: editorial-batch-2.json case 04
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
 | [/properties/assessment/properties/inputs/additionalProperties/properties/description](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/description) | {"type": ["string", "null"]} | existing-native |
-| [/properties/assessment/properties/inputs/additionalProperties/properties/constraints](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/constraints) | {"type": "object", "additionalProperties": false} | existing-native |
+| [/properties/assessment/properties/inputs/additionalProperties/properties/constraints](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/constraints) | {"type": "object", "additionalProperties": false, "maxProperties": 2} | existing-native |
 | [/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/allowed](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/allowed) | {"type": "array"} | editorially-approved |
 
 [/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/allowed](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/allowed): Lists the permitted values for this Input.

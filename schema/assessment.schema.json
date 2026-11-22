@@ -242,7 +242,7 @@
               },
               "constraints": {
                 "type": "object",
-                "description": "Explicit constraints on supplied values. They do not supply a missing Input or change its cardinality.",
+                "description": "Explicit constraints on supplied values. They do not supply a missing Input or change its cardinality. allowed values and predicate alternatives are ORed.",
                 "properties": {
                   "allowed": {
                     "type": "array",
@@ -255,9 +255,14 @@
                       ]
                     },
                     "description": "Explicit allowed values in the declared domain; no casts or defaults."
+                  },
+                  "predicate": {
+                    "$ref": "assessment-language.schema.json#/$defs/value_constraint_expression",
+                    "description": "Optional generic typed value constraint expression. It is ORed with allowed values. Every supplied Input value must satisfy at least one alternative. Bounds (64 branches, 4096-character string literals) are authoring resource limits; cardinality is independent."
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "maxProperties": 2
               }
             },
             "additionalProperties": false
