@@ -1,0 +1,64 @@
+# PROPOSED SCAP-NG 0.5.0 design content; not active 0.4.1.
+assessment:
+  id: proposed-esx-host-service
+  version: 1
+  assessment_title: Proposed ESX host service checks
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.proposed.assessment
+    version: 0.5.0
+  provenance:
+    oval_release: v6.0
+    oval_test: host_service_test
+    source_status: proposed
+    stig_examples:
+      - ESXI-65-000046 / V-94039: NTP service policy on and running
+      - ESXI-65-000004 / representative service-hardening requirement
+  tests:
+    ntpd-service-test:
+      test_title: NTP daemon is configured and running
+      capability: esx.host_service
+      object:
+        service_name:
+          equals: ntpd
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          service_name:
+            equals: ntpd
+          service_policy:
+            equals: on
+          service_running:
+            equals: true
+      reported_elements: all
+    tsm-ssh-service-test:
+      test_title: TSM-SSH service is disabled and stopped
+      capability: esx.host_service
+      object:
+        service_name:
+          equals: TSM-SSH
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          service_name:
+            equals: TSM-SSH
+          service_policy:
+            equals: off
+          service_running:
+            equals: false
+      reported_elements: all
+  evaluate:
+    and:
+      - test: ntpd-service-test
+      - test: tsm-ssh-service-test

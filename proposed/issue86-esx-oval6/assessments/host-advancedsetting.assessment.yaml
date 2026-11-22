@@ -1,0 +1,60 @@
+# PROPOSED SCAP-NG 0.5.0 design content; not active 0.4.1.
+assessment:
+  id: proposed-esx-host-advancedsetting
+  version: 1
+  assessment_title: Proposed ESX host advanced setting checks
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.proposed.assessment
+    version: 0.5.0
+  provenance:
+    oval_release: v6.0
+    oval_test: host_advancedsetting_test
+    source_status: proposed
+    stig_examples:
+      - ESXI-65-000002 / V-93951: restrict DCUI.Access to root
+      - ESXI-65-100043 / V-94517: set UserVars.DcuiTimeOut to 600
+  tests:
+    dcui-access-test:
+      test_title: DCUI.Access contains only root
+      capability: esx.host_advancedsetting
+      object:
+        advanced_setting_name:
+          equals: DCUI.Access
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          advanced_setting_name:
+            equals: DCUI.Access
+          advanced_setting_value:
+            equals: root
+      reported_elements: all
+    dcui-timeout-test:
+      test_title: UserVars.DcuiTimeOut is 600 seconds
+      capability: esx.host_advancedsetting
+      object:
+        advanced_setting_name:
+          equals: UserVars.DcuiTimeOut
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          advanced_setting_name:
+            equals: UserVars.DcuiTimeOut
+          advanced_setting_value:
+            equals: '600'
+      reported_elements: all
+  evaluate:
+    and:
+      - test: dcui-access-test
+      - test: dcui-timeout-test
