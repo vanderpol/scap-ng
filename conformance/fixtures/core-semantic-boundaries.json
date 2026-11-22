@@ -98,6 +98,11 @@
     "file-rights-literal-safe-test": "true",
     "file-rights-literal-invalid-test": "error",
     "file-rights-trustee-sid-safe-test": "true",
+    "ios-version-typed-safe-test": "true",
+    "yaml-record-keys-safe-test": "true",
+    "wmi-structured-result-safe-test": "true",
+    "cmdlet-structured-record-safe-test": "true",
+    "userright-case-safe-test": "true",
     "wu-defaults-safe-test": "true",
     "wu-defaults-invalid-test": "error",
     "ntuser-defaults-safe-test": "true",
@@ -1220,6 +1225,191 @@
         }
       ]
     },
+    "ios-version-typed-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "ios-version-typed-safe-test-item",
+          "capability": "ios.version55",
+          "fields": {
+            "version_string": {
+              "datatype": "string",
+              "value": "17.9(4)",
+              "status": "collected"
+            },
+            "major_version": {
+              "datatype": "integer",
+              "value": 17,
+              "status": "collected"
+            },
+            "minor_version": {
+              "datatype": "integer",
+              "value": 9,
+              "status": "collected"
+            },
+            "release": {
+              "datatype": "integer",
+              "value": 4,
+              "status": "collected"
+            },
+            "rebuild": {
+              "datatype": "integer",
+              "value": 0,
+              "status": "collected"
+            },
+            "subrebuild": {
+              "datatype": "string",
+              "value": "0",
+              "status": "collected"
+            },
+            "mainline_rebuild": {
+              "datatype": "string",
+              "value": "0",
+              "status": "collected"
+            },
+            "train_identifier": {
+              "datatype": "string",
+              "value": "mainline",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "yaml-record-keys-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "yaml-record-keys-safe-test-item",
+          "capability": "independent.yamlfilecontent",
+          "fields": {
+            "value": {
+              "datatype": "string",
+              "value": {
+                "records_found": "one_or_more",
+                "records_matching": "every",
+                "fields": {
+                  "OriginalKey": {
+                    "values_found": "one_or_more",
+                    "values_matching": "every",
+                    "equals": "fixture-value"
+                  }
+                }
+              },
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "wmi-structured-result-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "wmi-structured-result-safe-test-item",
+          "capability": "windows.wmi.query",
+          "fields": {
+            "result": {
+              "datatype": "string",
+              "value": {
+                "records_found": "one_or_more",
+                "records_matching": "every",
+                "fields": {
+                  "SelectedProperty": {
+                    "values_found": "one_or_more",
+                    "values_matching": "every",
+                    "equals": "fixture-value"
+                  }
+                }
+              },
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "cmdlet-structured-record-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "cmdlet-structured-record-safe-test-item",
+          "capability": "windows.cmdlet",
+          "fields": {
+            "parameters": {
+              "datatype": "string",
+              "value": {
+                "records_found": "one_or_more",
+                "records_matching": "every",
+                "fields": {
+                  "ParameterName": {
+                    "values_found": "one_or_more",
+                    "values_matching": "every",
+                    "equals": "fixture-value"
+                  }
+                }
+              },
+              "status": "collected"
+            },
+            "select": {
+              "datatype": "string",
+              "value": {
+                "records_found": "one_or_more",
+                "records_matching": "every",
+                "fields": {
+                  "Name": {
+                    "values_found": "one_or_more",
+                    "values_matching": "every",
+                    "equals": "fixture-value"
+                  }
+                }
+              },
+              "status": "collected"
+            },
+            "value": {
+              "datatype": "string",
+              "value": {
+                "records_found": "one_or_more",
+                "records_matching": "every",
+                "fields": {
+                  "Name": {
+                    "values_found": "one_or_more",
+                    "values_matching": "every",
+                    "equals": "fixture-value"
+                  }
+                }
+              },
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "userright-case-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "userright-case-safe-test-item",
+          "capability": "windows.userright",
+          "fields": {
+            "trustee_name": {
+              "datatype": "string",
+              "value": "Administrators",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
     "wu-defaults-safe-test": {
       "status": "collected",
       "items_found": 1,
@@ -1980,6 +2170,48 @@
       ],
       "expected": "true",
       "reason": "File effective-rights identifies the trustee by SID."
+    },
+    {
+      "test": "ios-version-typed-safe-test",
+      "rules": [
+        "ios.version55.version_string",
+        "ios.version55.version_components"
+      ],
+      "expected": "true",
+      "reason": "IOS version fields preserve the source lexical version string and the distinct integer/string component datatypes."
+    },
+    {
+      "test": "yaml-record-keys-safe-test",
+      "rules": [
+        "independent.yamlfilecontent.record_keys"
+      ],
+      "expected": "true",
+      "reason": "Native YAML record field identity preserves the authored key spelling."
+    },
+    {
+      "test": "wmi-structured-result-safe-test",
+      "rules": [
+        "windows.wmi.query.source_fields",
+        "windows.wmi.query.structured_results"
+      ],
+      "expected": "true",
+      "reason": "WMI query results remain structured records whose selected field identity is observable."
+    },
+    {
+      "test": "cmdlet-structured-record-safe-test",
+      "rules": [
+        "windows.cmdlet.record_fields"
+      ],
+      "expected": "true",
+      "reason": "PowerShell cmdlet parameters, selected fields, and values retain structured record semantics."
+    },
+    {
+      "test": "userright-case-safe-test",
+      "rules": [
+        "windows.userright.trustee_name_case"
+      ],
+      "expected": "true",
+      "reason": "Trustee names use an explicit case-insensitive comparison as recommended by the Windows identity rule."
     },
     {
       "test": "wu-defaults-safe-test",

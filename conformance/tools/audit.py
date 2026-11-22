@@ -134,6 +134,12 @@ def main() -> int:
             elif suffix == "filter_state_capability":
                 status = "unsupported"
                 reason = "Native 0.4.1 Set filters are inline predicates; they do not expose an OVAL State-reference form for this rule. A scanner-specific State graph cannot be represented by this schema-neutral corpus."
+            elif suffix in {"pattern_key_no_traversal", "deprecated_group_behaviors", "supported_fields"}:
+                status = "unsupported"
+                reason = "The legacy/invalid branch is rejected or omitted by the canonical native authoring surface before a schema-valid semantic ERROR witness can be authored; it is retained as an explicit unsupported branch rather than fabricated."
+            elif suffix in {"pattern_semantics", "result_record", "engine_filterability"}:
+                status = "not_run"
+                reason = "The condition is representable in a native Assessment but its decisive structured collection/execution behavior requires a scanner receipt; no portable source oracle is substituted."
             elif any(token in rule.get("rule", "").lower() for token in ("collector", "collection", "current system", "execution", "process", "protocol", "algorithm", "xpath evaluation", "mount-option", "skipped", "canonical destination", "source_path", "date lexical", "complete reused")):
                 status = "not_run"
                 reason = "The condition is representable in a native Assessment but its decisive behavior depends on platform collection or scanner execution; RI #196 must supply the receipt."
