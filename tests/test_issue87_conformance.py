@@ -160,6 +160,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["selectors"]["non_exercising_witnesses"], [])
         self.assertEqual(audit["operators"]["non_exercising_witnesses"], [])
         self.assertEqual(audit["authoring_enums"]["cases"], 20)
+        self.assertEqual(len(audit["authoring_enums"]["negative_boundary_cases"]), 10)
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
@@ -182,9 +183,9 @@ class Issue87Conformance(unittest.TestCase):
 
     def test_authoring_enum_negative_boundaries_are_rejected(self):
         invalid = {row["id"] for row in self.manifest["invalid_cases"]}
-        self.assertTrue({"invalid-class", "invalid-reported-elements", "invalid-manual-outcome"}.issubset(invalid))
+        self.assertTrue({"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern"}.issubset(invalid))
         for case in self.manifest["invalid_cases"]:
-            if case["id"] not in {"invalid-class", "invalid-reported-elements", "invalid-manual-outcome"}:
+            if case["id"] not in {"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern"}:
                 continue
             path = CONF / case["assessment"]
             self.assertTrue(path.is_file(), path)

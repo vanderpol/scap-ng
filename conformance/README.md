@@ -49,8 +49,9 @@ explicitly incomplete.
 Authoring branches are separately witnessed: 20 schema-valid Assessments cover
 both modes, all five Assessment classes, all three `reported_elements` branches
 (including an explicit list), and all six manual technical-outcome choices.
-Three invalid-authoring vectors reject out-of-domain class, reporting, and
-manual-outcome enum values.
+Ten invalid-authoring vectors reject out-of-domain enums and representative
+identifier, procedure, duplicate-list, cardinality, Variable-kind, and
+specification-version constraints.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
 spelling; `negate` is an invalid-authoring regression.
