@@ -9,8 +9,10 @@ import unittest
 from pathlib import Path
 from copy import deepcopy
 import yaml
+from jsonschema import ValidationError
 
 from conformance.tools.oracle import compare
+from conformance.tools.runner import validator
 
 ROOT = Path(__file__).resolve().parents[1]
 CONF = ROOT / "conformance"
@@ -230,6 +232,20 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(len(observed), 2)
         self.assertEqual(observed, assessment["assessment"]["variables"]["expected-values-variable"]["expression"]["literal"]["value"])
         self.assertEqual(expected["assertions"]["variable-alias-exactly-one-test"]["values_found"], len(observed))
+
+    def test_set_filter_mutations_fail_closed_at_schema_boundary(self):
+        assessment = yaml.safe_load((CONF / "cases/core/set-filters.assessment.yaml").read_text(encoding="utf-8"))
+        difference = assessment["assessment"]["tests"]["set-difference-test"]["object"]["set"]["operands"]
+        mutated = deepcopy(assessment)
+        mutated_difference = mutated["assessment"]["tests"]["set-difference-test"]["object"]["set"]["operands"]
+        mutated_difference.append(deepcopy(mutated_difference[0]))
+        with self.assertRaises(ValidationError):
+            validator().validate(mutated)
+        self.assertEqual(len(difference), 2)
+        missing_quantifier = deepcopy(assessment)
+        del missing_quantifier["assessment"]["tests"]["set-union-test"]["object"]["set"]["operands"][0]["filters"][0]["include"]["arch"]["values_matching"]
+        with self.assertRaises(ValidationError):
+            validator().validate(missing_quantifier)
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]
