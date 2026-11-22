@@ -1,0 +1,212 @@
+{
+  "format": "scap-ng-ri-196-handoff-0.1",
+  "schema_version": "0.4.1",
+  "schema_commit": "d1ab0283e09369c2c734d3b8f93b65007441cf07",
+  "schema_family_sha256": "1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4",
+  "issue": 196,
+  "execution_boundary": "RI adapter execution only; this handoff does not alter normative expected results or implement an evaluator.",
+  "invocation": {
+    "command_template": "adapter qualify --manifest conformance/manifest.json --case {capability} --variant {fixture_variant} --assessment {assessment} --fixture {fixture} --expected {expected} --receipt-out {receipt}",
+    "requirements": [
+      "bind exact manifest/schema pin and hashes",
+      "execute authored Assessment unchanged",
+      "use only selected deterministic fixture variant",
+      "emit receipt accepted by conformance/receipt.schema.json and conformance/tools/oracle.py",
+      "preserve unsupported, unknown, error, permission, cancellation, and resource-limit statuses"
+    ]
+  },
+  "cases": [
+    {
+      "rule_id": "file.hash.algorithm_collection_domain",
+      "capability": "file.hash",
+      "rule": "The algorithm selector determines acquisition over the complete six-algorithm domain md5, sha1, sha224, sha256, sha384, sha512. A literal collection or Variable reference is evaluated with its explicit value_match; value_match none selects the complement within that domain, not an arbitrary default algorithm. Each selected algorithm produces an Item with its algorithm and digest, and source collection errors or incomplete evidence must not be treated as a complete empty selection.",
+      "assessment": "cases/capabilities/file-hash.assessment.yaml",
+      "fixture": "fixtures/file-hash.json",
+      "expected": "expected/file-hash.json",
+      "fixture_variant": "boundary",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "Minimum permitted non-empty Item and field cardinality.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.environmentvariable.null_pid",
+      "capability": "independent.environmentvariable",
+      "rule": "A null pid preserves source xsi:nil semantics selecting the assessment tool's running process; if the scanner has no process identity, no matching item exists.",
+      "assessment": "cases/capabilities/independent-environmentvariable.assessment.yaml",
+      "fixture": "fixtures/independent-environmentvariable.json",
+      "expected": "expected/independent-environmentvariable.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.shellcommand.pattern_semantics",
+      "capability": "independent.shellcommand",
+      "rule": "When object.pattern is present it is a regular expression applied to stdout lines; matching output lines and capture subexpressions remain separately observable.",
+      "assessment": "cases/capabilities/independent-shellcommand.assessment.yaml",
+      "fixture": "fixtures/independent-shellcommand.json",
+      "expected": "expected/independent-shellcommand.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.shellcommand.trusted_content",
+      "capability": "independent.shellcommand",
+      "rule": "Execution of publisher-supplied commands is trust-sensitive. Package/signature verification policy SHALL be enforced outside the command string itself and scanners SHOULD avoid executing unsigned or untrusted content according to deployment policy.",
+      "assessment": "cases/capabilities/independent-shellcommand.assessment.yaml",
+      "fixture": "fixtures/independent-shellcommand.json",
+      "expected": "expected/independent-shellcommand.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.shellcommand.not_generic_escape_hatch",
+      "capability": "independent.shellcommand",
+      "rule": "This capability represents command-oriented assessment. It SHALL NOT replace native scanner capabilities when doing so would discard meaningful native collection semantics such as controlled filesystem traversal, structured evidence, or bounded collection.",
+      "assessment": "cases/capabilities/independent-shellcommand.assessment.yaml",
+      "fixture": "fixtures/independent-shellcommand.json",
+      "expected": "expected/independent-shellcommand.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.sql.result_record",
+      "capability": "independent.sql",
+      "rule": "SQL result rows remain structured record values and SHALL NOT be flattened to strings.",
+      "assessment": "cases/capabilities/independent-sql.assessment.yaml",
+      "fixture": "fixtures/independent-sql.json",
+      "expected": "expected/independent-sql.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.sql.engine_filterability",
+      "capability": "independent.sql",
+      "rule": "The native engine vocabulary follows the collected Item vocabulary so every collected engine value is representable in State predicates.",
+      "assessment": "cases/capabilities/independent-sql.assessment.yaml",
+      "fixture": "fixtures/independent-sql.json",
+      "expected": "expected/independent-sql.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "independent.xmlfilecontent.xpath_text_values",
+      "capability": "independent.xmlfilecontent",
+      "rule": "XPath evaluation must produce zero or more text values; non-text result shapes are collection errors.",
+      "assessment": "cases/capabilities/independent-xmlfilecontent.assessment.yaml",
+      "fixture": "fixtures/independent-xmlfilecontent.json",
+      "expected": "expected/independent-xmlfilecontent.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "linux.partition.mount_options_complete",
+      "capability": "linux.partition",
+      "rule": "Collectors SHALL report the effective mount-option set, including options not visible only through /etc/mtab or /proc/mounts; /etc/fstab alone is not sufficient evidence.",
+      "assessment": "cases/capabilities/linux-partition.assessment.yaml",
+      "fixture": "fixtures/linux-partition.json",
+      "expected": "expected/linux-partition.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "linux.rpminfo.filepaths_collection",
+      "capability": "linux.rpminfo",
+      "rule": "A full_path State can only be evaluated from an Object collection that requested package file paths, or from equivalent complete reused collection evidence.",
+      "assessment": "cases/capabilities/linux-rpminfo.assessment.yaml",
+      "fixture": "fixtures/linux-rpminfo.json",
+      "expected": "expected/linux-rpminfo.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "linux.rpmverifypackage.skipped_results",
+      "capability": "linux.rpmverifypackage",
+      "rule": "dependency_check_passed is absent when dependency verification is skipped; verification_script_successful is absent when verification scripts are skipped.",
+      "assessment": "cases/capabilities/linux-rpmverifypackage.assessment.yaml",
+      "fixture": "fixtures/linux-rpmverifypackage.json",
+      "expected": "expected/linux-rpmverifypackage.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "linux.selinuxsecuritycontext.pid_no_file_traversal",
+      "capability": "linux.selinuxsecuritycontext",
+      "rule": "Traversal is not applicable when selecting a process by pid.",
+      "assessment": "cases/capabilities/linux-selinuxsecuritycontext.assessment.yaml",
+      "fixture": "fixtures/linux-selinuxsecuritycontext.json",
+      "expected": "expected/linux-selinuxsecuritycontext.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "linux.selinuxsecuritycontext.null_pid",
+      "capability": "linux.selinuxsecuritycontext",
+      "rule": "A null pid preserves source xsi:nil semantics selecting the assessment tool's running process.",
+      "assessment": "cases/capabilities/linux-selinuxsecuritycontext.assessment.yaml",
+      "fixture": "fixtures/linux-selinuxsecuritycontext.json",
+      "expected": "expected/linux-selinuxsecuritycontext.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "unix.symlink.canonical_resolution",
+      "capability": "unix.symlink",
+      "rule": "Collection resolves the symbolic-link target to its final canonical destination; missing targets and circular links retain error/nonexistence semantics rather than being silently normalized.",
+      "assessment": "cases/capabilities/unix-symlink.assessment.yaml",
+      "fixture": "fixtures/unix-symlink.json",
+      "expected": "expected/unix-symlink.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "windows.wuaupdatesearcher.date_lexical_form",
+      "capability": "windows.wuaupdatesearcher",
+      "rule": "last_deployment_change_time preserves the source XML-date lexical semantics even though OVAL exposes its comparison datatype as string.",
+      "assessment": "cases/capabilities/windows-wuaupdatesearcher.assessment.yaml",
+      "fixture": "fixtures/windows-wuaupdatesearcher.json",
+      "expected": "expected/windows-wuaupdatesearcher.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    },
+    {
+      "rule_id": "windows.wuaupdatesearcher.source_path_repair",
+      "capability": "windows.wuaupdatesearcher",
+      "rule": "source_path is a native State predicate as well as a collected Item field; this intentionally repairs the OVAL 5.12.3 State omission.",
+      "assessment": "cases/capabilities/windows-wuaupdatesearcher.assessment.yaml",
+      "fixture": "fixtures/windows-wuaupdatesearcher.json",
+      "expected": "expected/windows-wuaupdatesearcher.json",
+      "fixture_variant": "positive",
+      "portable_expected_outcome": "true",
+      "portable_expected_reason": "All declared fields match the collected Item.",
+      "adapter_required": "Execute unchanged Assessment against the selected deterministic fixture variant, then emit receipt with collection/integration/operational status; this rule remains not_run until the receipt independently demonstrates the rule."
+    }
+  ]
+}

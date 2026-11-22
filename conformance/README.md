@@ -65,10 +65,12 @@ Assessment plus the fixed-result case records fifty-seven independently justifie
 schema-valid semantic rule witnesses (file traversal, inline YAML content,
 Windows literal-name, protocol, interface-type, family-vocabulary,
 non-negative-time, materialized-default, selector equality, type compatibility,
-and null-selector boundaries), with 19 structural witnesses. The remaining 104
-rules are explicitly dispositioned unresolved: 86 are unsupported by the native
-State-free Set/filter authoring surface, 16 are not-run pending collector/RI
-receipts, and 2 are blocked on a documented semantic or normative decision.
+and null-selector boundaries), with 19 structural witnesses. The 81 repeated `filter_state_capability` rules
+are preserved as source-only native-equivalence dispositions, all sharing the
+`core-set-filters` witness and the native `state_filter` schema pointer. The
+remaining 23 rules are explicitly unresolved: 5 unsupported native branches,
+16 not-run pending collector/RI receipts, and 2 blocked documented semantic or
+normative holds.
 No unresolved rule is silently counted as semantic coverage.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
