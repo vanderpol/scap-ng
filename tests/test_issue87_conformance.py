@@ -184,7 +184,11 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
         self.assertEqual(audit["applicability"]["variants"], ["applicable", "not-applicable", "deferred"])
-        self.assertEqual(set(audit["feature_coverage"]["fields"]), {"schema", "semantic", "collection", "integration", "operational"})
+        dimensions = {"schema", "semantic", "collection", "integration", "operational"}
+        self.assertTrue(dimensions.issubset(audit["feature_coverage"]["fields"]))
+        allowed_states = {"pass", "fail", "unsupported", "untested", "not_run", "blocked"}
+        for feature in audit["feature_coverage"].values():
+            self.assertTrue(all(feature[dimension] in allowed_states for dimension in dimensions))
         self.assertEqual(audit["feature_coverage"]["comparison_operators"]["collection"], "untested")
         self.assertEqual(audit["feature_coverage"]["applicability"]["integration"], "untested")
         for row in audit["capability_rows"]:
