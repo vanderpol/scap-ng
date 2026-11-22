@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 from copy import deepcopy
 import yaml
-from jsonschema import ValidationError
+from jsonschema import Draft202012Validator, ValidationError
 
 from conformance.tools.oracle import compare
 from conformance.tools.runner import validator
@@ -95,12 +95,23 @@ class Issue87Conformance(unittest.TestCase):
         fixture = read(CONF / row["fixture"])
         item = fixture["variants"]["positive"]["items"][0]
         evidence = [{"item_id": item["id"], "field": field, "datatype": value["datatype"], "status": value["status"], "value": value["value"]} for field, value in item["fields"].items()]
-        receipt = {"format": "scap-ng-conformance-receipt-0.1", "schema_version": self.manifest["schema_version"], "schema_commit": self.manifest["schema_commit"], "case_id": "windows.registry", "variant": "positive", "fixture_sha256": row["sha256"]["fixture"], "expected_sha256": row["sha256"]["expected"], "assessment_outcome": "true", "test_outcomes": {"windows-registry-test": "true"}, "items_found": 1, "items_satisfying": 1, "decisive_reason": expected["variants"]["positive"]["reason"], "evidence": evidence, "provenance": {"source": "deterministic-fixture", "fixture_variant": "positive", "fixture_sha256": row["sha256"]["fixture"], "expected_sha256": row["sha256"]["expected"], "schema_commit": self.manifest["schema_commit"]}}
+        receipt = {"format": "scap-ng-conformance-receipt-0.1", "schema_version": self.manifest["schema_version"], "schema_commit": self.manifest["schema_commit"], "case_id": "windows.registry", "variant": "positive", "fixture_sha256": row["sha256"]["fixture"], "expected_sha256": row["sha256"]["expected"], "assessment_outcome": "true", "test_outcomes": {"windows-registry-test": "true"}, "items_found": 1, "items_satisfying": 1, "decisive_reason": expected["variants"]["positive"]["reason"], "evidence": evidence, "provenance": {"source": "deterministic-fixture", "fixture_variant": "positive", "fixture_sha256": row["sha256"]["fixture"], "expected_sha256": row["sha256"]["expected"], "schema_commit": self.manifest["schema_commit"]}, "qualification": {"schema": "pass", "semantic": "pass", "collection": "pass", "integration": "not_run", "operational": "not_run"}}
         return expected, fixture, receipt, row
 
     def test_oracle_accepts_complete_receipt(self):
         expected, fixture, receipt, row = self._valid_receipt()
         self.assertEqual(compare(expected, receipt, manifest=self.manifest, fixture=fixture, fixture_sha256=row["sha256"]["fixture"], expected_sha256=row["sha256"]["expected"], test_names=["windows-registry-test"]), [])
+
+    def test_portable_receipt_schema_accepts_valid_and_rejects_bad_qualification(self):
+        _, _, receipt, _ = self._valid_receipt()
+        schema = read(CONF / "receipt.schema.json")
+        Draft202012Validator(schema).validate(receipt)
+        invalid = deepcopy(receipt)
+        invalid["qualification"].pop("collection")
+        self.assertTrue(list(Draft202012Validator(schema).iter_errors(invalid)))
+        invalid = deepcopy(receipt)
+        invalid["qualification"]["semantic"] = "scanner-specific-pass"
+        self.assertTrue(list(Draft202012Validator(schema).iter_errors(invalid)))
 
     def test_oracle_rejects_missing_or_mismatched_identity_and_proof(self):
         expected, fixture, receipt, row = self._valid_receipt()
@@ -112,6 +123,7 @@ class Issue87Conformance(unittest.TestCase):
             "decisive reason": ("decisive_reason", "wrong"),
             "provenance": ("provenance", {"source": "deterministic-fixture"}),
             "typed evidence": ("evidence", [{"item_id": "windows-registry-item", "field": "hive", "datatype": "string", "status": "collected"}]),
+            "qualification": ("qualification", {"schema": "pass"}),
         }
         for name, (key, value) in mutations.items():
             with self.subTest(name=name):
@@ -172,6 +184,11 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
         self.assertEqual(audit["applicability"]["variants"], ["applicable", "not-applicable", "deferred"])
+        self.assertEqual(set(audit["feature_coverage"]["fields"]), {"schema", "semantic", "collection", "integration", "operational"})
+        self.assertEqual(audit["feature_coverage"]["comparison_operators"]["collection"], "untested")
+        self.assertEqual(audit["feature_coverage"]["applicability"]["integration"], "untested")
+        for row in audit["capability_rows"]:
+            self.assertEqual(set(row["coverage"]), {"schema", "semantic", "collection", "integration", "operational"})
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():

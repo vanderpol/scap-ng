@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/conformance/receipt-0.1.schema.json",
+  "title": "SCAP-NG scanner-neutral conformance receipt 0.1",
+  "description": "Implementation-independent adapter receipt. It is not the SCAP-NG result schema and does not define evaluator semantics.",
+  "type": "object",
+  "required": ["format", "schema_version", "schema_commit", "case_id", "variant", "fixture_sha256", "expected_sha256", "assessment_outcome", "test_outcomes", "decisive_reason", "evidence", "provenance", "qualification"],
+  "properties": {
+    "format": {"const": "scap-ng-conformance-receipt-0.1"},
+    "schema_version": {"const": "0.4.1"},
+    "schema_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "case_id": {"type": "string", "minLength": 1},
+    "variant": {"type": "string", "minLength": 1},
+    "fixture_sha256": {"$ref": "#/$defs/sha256"},
+    "expected_sha256": {"$ref": "#/$defs/sha256"},
+    "assessment_outcome": {"$ref": "#/$defs/outcome"},
+    "test_outcome": {"$ref": "#/$defs/outcome"},
+    "test_outcomes": {"type": "object", "additionalProperties": {"$ref": "#/$defs/outcome"}},
+    "items_found": {"type": "integer", "minimum": 0},
+    "items_satisfying": {"type": "integer", "minimum": 0},
+    "decisive_reason": {"type": "string", "minLength": 1, "pattern": "\\S"},
+    "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+    "provenance": {"type": "object", "required": ["source", "fixture_variant", "fixture_sha256", "expected_sha256", "schema_commit"], "properties": {"source": {"const": "deterministic-fixture"}, "fixture_variant": {"type": "string", "minLength": 1}, "fixture_sha256": {"$ref": "#/$defs/sha256"}, "expected_sha256": {"$ref": "#/$defs/sha256"}, "schema_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"}}, "additionalProperties": false},
+    "qualification": {"type": "object", "required": ["schema", "semantic", "collection", "integration", "operational"], "properties": {"schema": {"$ref": "#/$defs/qualification_state"}, "semantic": {"$ref": "#/$defs/qualification_state"}, "collection": {"$ref": "#/$defs/qualification_state"}, "integration": {"$ref": "#/$defs/qualification_state"}, "operational": {"$ref": "#/$defs/qualification_state"}}, "additionalProperties": false},
+    "extensions": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "outcome": {"enum": ["true", "false", "unknown", "error", "not_applicable", "not_evaluated"]},
+    "qualification_state": {"enum": ["pass", "fail", "unsupported", "untested", "not_run", "blocked"]},
+    "evidence": {"type": "object", "required": ["item_id", "field", "datatype", "status", "value"], "properties": {"item_id": {"type": "string", "minLength": 1}, "field": {"type": ["string", "null"]}, "datatype": {"type": "string", "minLength": 1}, "status": {"type": "string", "minLength": 1}, "value": {}}, "additionalProperties": false}
+  }
+}
