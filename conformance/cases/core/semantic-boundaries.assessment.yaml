@@ -959,6 +959,211 @@ assessment:
         fields:
           xpath:
             equals: /config/devices
+    pwpolicy-auth-pair-safe-test:
+      test_title: 'Semantic boundary witness: pwpolicy-auth-pair-safe'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        username:
+          equals: fixture-user
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          username:
+            equals: fixture-user
+    pwpolicy-auth-pair-invalid-test:
+      test_title: 'Semantic boundary witness: pwpolicy-auth-pair-invalid'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        username:
+          equals: fixture-user
+        authenticator_password:
+          equals: secret
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          username:
+            equals: fixture-user
+    pwpolicy-password-equal-safe-test:
+      test_title: 'Semantic boundary witness: pwpolicy-password-equal-safe'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        authenticator:
+          equals: Directory
+        authenticator_password:
+          equals: secret
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          authenticator_password:
+            equals: secret
+    pwpolicy-password-equal-invalid-test:
+      test_title: 'Semantic boundary witness: pwpolicy-password-equal-invalid'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        authenticator:
+          equals: Directory
+        authenticator_password:
+          matches_regex: sec.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          authenticator_password:
+            equals: secret
+    pwpolicy-directory-equal-safe-test:
+      test_title: 'Semantic boundary witness: pwpolicy-directory-equal-safe'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        directory_node:
+          equals: /Local/Default
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          directory_node:
+            equals: /Local/Default
+    pwpolicy-directory-equal-invalid-test:
+      test_title: 'Semantic boundary witness: pwpolicy-directory-equal-invalid'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        directory_node:
+          matches_regex: /Local/.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          directory_node:
+            equals: /Local/Default
+    pwpolicy-xpath-equal-safe-test:
+      test_title: 'Semantic boundary witness: pwpolicy-xpath-equal-safe'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        xpath:
+          equals: /policy/value
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /policy/value
+    pwpolicy-xpath-equal-invalid-test:
+      test_title: 'Semantic boundary witness: pwpolicy-xpath-equal-invalid'
+      capability: macos.pwpolicy
+      reported_elements: all
+      object:
+        capability: macos.pwpolicy
+        xpath:
+          matches_regex: /policy/.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /policy/value
+    cmdlet-module-guid-safe-test:
+      test_title: 'Semantic boundary witness: cmdlet-module-guid-safe'
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        module_id:
+          equals: 12345678-1234-1234-1234-1234567890ab
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          module_id:
+            equals: 12345678-1234-1234-1234-1234567890ab
+    cmdlet-module-guid-invalid-test:
+      test_title: 'Semantic boundary witness: cmdlet-module-guid-invalid'
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        module_id:
+          equals: not-a-guid
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          module_id:
+            equals: not-a-guid
+    dpkg-debian-evr-safe-test:
+      test_title: 'Semantic boundary witness: dpkg-debian-evr-safe'
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        name:
+          equals: fixture-package
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          evr:
+            datatype: debian_evr
+            equals: 1:2.3-4
     wu-defaults-safe-test:
       test_title: 'Semantic boundary witness: wu-defaults-safe'
       capability: windows.wuaupdatesearcher
@@ -1095,6 +1300,17 @@ assessment:
     - test: plist-path-operation-invalid-test
     - test: panos-xpath-operation-safe-test
     - test: panos-xpath-operation-invalid-test
+    - test: pwpolicy-auth-pair-safe-test
+    - test: pwpolicy-auth-pair-invalid-test
+    - test: pwpolicy-password-equal-safe-test
+    - test: pwpolicy-password-equal-invalid-test
+    - test: pwpolicy-directory-equal-safe-test
+    - test: pwpolicy-directory-equal-invalid-test
+    - test: pwpolicy-xpath-equal-safe-test
+    - test: pwpolicy-xpath-equal-invalid-test
+    - test: cmdlet-module-guid-safe-test
+    - test: cmdlet-module-guid-invalid-test
+    - test: dpkg-debian-evr-safe-test
     - test: wu-defaults-safe-test
     - test: wu-defaults-invalid-test
     - test: ntuser-defaults-safe-test
