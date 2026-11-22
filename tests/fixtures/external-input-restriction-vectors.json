@@ -1,0 +1,34 @@
+{
+  "format": "scap-ng/0.4.1/external-input-restriction-vectors/1",
+  "contract": {
+    "constraint_alternatives": "allowed values OR predicate expression",
+    "predicate_boolean_operators": ["and", "or", "one", "xor"],
+    "multivalue": "validate every supplied value against the same expression; validate cardinality independently",
+    "missing_required": "not_evaluated",
+    "optional_unguarded": "error",
+    "input_constraint_violation": "error",
+    "resource_limits": {"max_boolean_branches": 64, "max_pattern_length": 4096}
+  },
+  "schema_valid": [
+    {"id": "equals", "predicate": {"equals": 1}},
+    {"id": "typed-and", "predicate": {"and": [{"greater_than_or_equal": 10}, {"less_than_or_equal": 20}]}},
+    {"id": "typed-or", "predicate": {"or": [{"equals": 1}, {"equals": 2}]}},
+    {"id": "typed-one", "predicate": {"one": [{"equals": 1}, {"equals": 2}, {"equals": 3}]}},
+    {"id": "typed-xor", "predicate": {"xor": [{"equals": 1}, {"equals": 2}, {"equals": 3}]}},
+    {"id": "regex-bounded", "predicate": {"matches_regex": "^ok$"}}
+  ],
+  "schema_invalid": [
+    {"id": "empty-and", "predicate": {"and": []}},
+    {"id": "unknown-boolean", "predicate": {"nand": [{"equals": 1}, {"equals": 2}]}},
+    {"id": "too-many-branches", "predicate": {"or": {"branch_count": 65}}},
+    {"id": "overlong-pattern", "predicate": {"matches_regex": {"length": 4097}}}
+  ],
+  "binding_semantics": [
+    {"id": "missing-required", "required": true, "cardinality": "exactly_one", "supplied": null, "outcome": "not_evaluated"},
+    {"id": "optional-guarded", "required": false, "cardinality": "zero_or_one", "supplied": null, "guard": "input_provided", "outcome": "not_evaluated"},
+    {"id": "optional-unguarded", "required": false, "cardinality": "zero_or_one", "supplied": null, "guard": null, "outcome": "error"},
+    {"id": "explicit-empty-valid", "required": false, "cardinality": "zero_or_more", "supplied": [], "outcome": "accepted"},
+    {"id": "empty-cardinality-invalid", "required": true, "cardinality": "exactly_one", "supplied": [], "outcome": "error"},
+    {"id": "multivalue-cardinality-invalid", "required": true, "cardinality": "exactly_one", "supplied": [1, 2], "outcome": "error"}
+  ]
+}
