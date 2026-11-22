@@ -164,6 +164,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 177)
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
+        self.assertIn("158 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
