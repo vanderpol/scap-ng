@@ -60,6 +60,17 @@
     "plist-path-operation-invalid-test": "error",
     "panos-xpath-operation-safe-test": "true",
     "panos-xpath-operation-invalid-test": "error",
+    "pwpolicy-auth-pair-safe-test": "true",
+    "pwpolicy-auth-pair-invalid-test": "error",
+    "pwpolicy-password-equal-safe-test": "true",
+    "pwpolicy-password-equal-invalid-test": "error",
+    "pwpolicy-directory-equal-safe-test": "true",
+    "pwpolicy-directory-equal-invalid-test": "error",
+    "pwpolicy-xpath-equal-safe-test": "true",
+    "pwpolicy-xpath-equal-invalid-test": "error",
+    "cmdlet-module-guid-safe-test": "true",
+    "cmdlet-module-guid-invalid-test": "error",
+    "dpkg-debian-evr-safe-test": "true",
     "wu-defaults-safe-test": "true",
     "wu-defaults-invalid-test": "error",
     "ntuser-defaults-safe-test": "true",
@@ -691,6 +702,149 @@
       "items": [],
       "reason": "Semantic validation fails before collection."
     },
+    "pwpolicy-auth-pair-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "pwpolicy-auth-pair-safe-test-item",
+          "capability": "macos.pwpolicy",
+          "fields": {
+            "username": {
+              "datatype": "string",
+              "value": "fixture-user",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "pwpolicy-auth-pair-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "pwpolicy-password-equal-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "pwpolicy-password-equal-safe-test-item",
+          "capability": "macos.pwpolicy",
+          "fields": {
+            "authenticator_password": {
+              "datatype": "string",
+              "value": "secret",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "pwpolicy-password-equal-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "pwpolicy-directory-equal-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "pwpolicy-directory-equal-safe-test-item",
+          "capability": "macos.pwpolicy",
+          "fields": {
+            "directory_node": {
+              "datatype": "string",
+              "value": "/Local/Default",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "pwpolicy-directory-equal-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "pwpolicy-xpath-equal-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "pwpolicy-xpath-equal-safe-test-item",
+          "capability": "macos.pwpolicy",
+          "fields": {
+            "xpath": {
+              "datatype": "string",
+              "value": "/policy/value",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "pwpolicy-xpath-equal-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "cmdlet-module-guid-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "cmdlet-module-guid-safe-test-item",
+          "capability": "windows.cmdlet",
+          "fields": {
+            "module_id": {
+              "datatype": "string",
+              "value": "12345678-1234-1234-1234-1234567890ab",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "cmdlet-module-guid-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "dpkg-debian-evr-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "dpkg-debian-evr-safe-test-item",
+          "capability": "linux.dpkginfo",
+          "fields": {
+            "evr": {
+              "datatype": "string",
+              "value": "debian_evr",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
     "wu-defaults-safe-test": {
       "status": "collected",
       "items_found": 1,
@@ -1147,6 +1301,94 @@
       ],
       "expected": "error",
       "reason": "A pattern selector is not the canonical equality operation for PAN-OS XPath."
+    },
+    {
+      "test": "pwpolicy-auth-pair-safe-test",
+      "rules": [
+        "macos.pwpolicy.auth_pair"
+      ],
+      "expected": "true",
+      "reason": "Omitting both optional authenticator members preserves the unauthenticated policy form."
+    },
+    {
+      "test": "pwpolicy-auth-pair-invalid-test",
+      "rules": [
+        "macos.pwpolicy.auth_pair"
+      ],
+      "expected": "error",
+      "reason": "An authenticator password without its paired authenticator violates the native pair constraint."
+    },
+    {
+      "test": "pwpolicy-password-equal-safe-test",
+      "rules": [
+        "macos.pwpolicy.password_equal"
+      ],
+      "expected": "true",
+      "reason": "The authenticator password selector uses equality semantics."
+    },
+    {
+      "test": "pwpolicy-password-equal-invalid-test",
+      "rules": [
+        "macos.pwpolicy.password_equal"
+      ],
+      "expected": "error",
+      "reason": "A pattern operation is not the native equality operation for authenticator_password."
+    },
+    {
+      "test": "pwpolicy-directory-equal-safe-test",
+      "rules": [
+        "macos.pwpolicy.directory_node_equal"
+      ],
+      "expected": "true",
+      "reason": "The directory_node selector uses equality semantics."
+    },
+    {
+      "test": "pwpolicy-directory-equal-invalid-test",
+      "rules": [
+        "macos.pwpolicy.directory_node_equal"
+      ],
+      "expected": "error",
+      "reason": "A pattern operation is not the native equality operation for directory_node."
+    },
+    {
+      "test": "pwpolicy-xpath-equal-safe-test",
+      "rules": [
+        "macos.pwpolicy.xpath_equal"
+      ],
+      "expected": "true",
+      "reason": "The policy XPath selector uses equality semantics."
+    },
+    {
+      "test": "pwpolicy-xpath-equal-invalid-test",
+      "rules": [
+        "macos.pwpolicy.xpath_equal"
+      ],
+      "expected": "error",
+      "reason": "A pattern operation is not the native equality operation for policy XPath."
+    },
+    {
+      "test": "cmdlet-module-guid-safe-test",
+      "rules": [
+        "windows.cmdlet.module_guid"
+      ],
+      "expected": "true",
+      "reason": "The literal module_id is a canonical Windows GUID."
+    },
+    {
+      "test": "cmdlet-module-guid-invalid-test",
+      "rules": [
+        "windows.cmdlet.module_guid"
+      ],
+      "expected": "error",
+      "reason": "A non-null literal module_id that is not a GUID is a semantic error."
+    },
+    {
+      "test": "dpkg-debian-evr-safe-test",
+      "rules": [
+        "linux.dpkginfo.debian_evr"
+      ],
+      "expected": "true",
+      "reason": "A Debian package EVR is compared with the preferred debian_evr datatype."
     },
     {
       "test": "wu-defaults-safe-test",

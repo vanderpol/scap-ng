@@ -206,9 +206,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         dispositions = audit["capability_constraints"]["semantic_rule_disposition_counts"]
         self.assertEqual(sum(dispositions.values()), 180)
-        self.assertEqual(dispositions, {"blocked": 37, "not_run": 13, "semantic-witness": 30, "structural-witness": 19, "unsupported": 81})
-        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 131)
-        self.assertIn("131 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
+        self.assertEqual(dispositions, {"blocked": 31, "not_run": 13, "semantic-witness": 36, "structural-witness": 19, "unsupported": 81})
+        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 125)
+        self.assertIn("125 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
@@ -279,7 +279,7 @@ class Issue87Conformance(unittest.TestCase):
         validator().validate(assessment)
         rule_ids = {rule for witness in fixture["semantic_witnesses"] for rule in witness["rules"]}
         self.assertEqual(rule_ids, set(expected["rules"]))
-        self.assertEqual(len(rule_ids), 29)
+        self.assertEqual(len(rule_ids), 35)
         audit = read(CONF / "coverage-audit.json")
         self.assertEqual(audit["capability_constraints"]["semantic_boundary_unknown_rules"], [])
         self.assertEqual(set(audit["semantic_boundaries"]["rules"]), rule_ids)
