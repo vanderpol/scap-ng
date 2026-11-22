@@ -1314,6 +1314,197 @@ assessment:
           min_passwd_age:
             equals: -1
       reported_elements: all
+    plist-xpath-operation-safe-test:
+      test_title: 'Semantic boundary witness: plist-xpath-operation-safe'
+      capability: macos.plist
+      reported_elements: all
+      object:
+        capability: macos.plist
+        app_id:
+          equals: com.example
+        xpath:
+          equals: /dict/key
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /dict/key
+    plist-xpath-operation-invalid-test:
+      test_title: 'Semantic boundary witness: plist-xpath-operation-invalid'
+      capability: macos.plist
+      reported_elements: all
+      object:
+        capability: macos.plist
+        app_id:
+          equals: com.example
+        xpath:
+          matches_regex: /dict/.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /dict/key
+    systemprofiler-xpath-operation-safe-test:
+      test_title: 'Semantic boundary witness: systemprofiler-xpath-operation-safe'
+      capability: macos.systemprofiler
+      reported_elements: all
+      object:
+        capability: macos.systemprofiler
+        data_type:
+          equals: SPHardwareDataType
+        xpath:
+          equals: /hardware
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /hardware
+    systemprofiler-xpath-operation-invalid-test:
+      test_title: 'Semantic boundary witness: systemprofiler-xpath-operation-invalid'
+      capability: macos.systemprofiler
+      reported_elements: all
+      object:
+        capability: macos.systemprofiler
+        data_type:
+          equals: SPHardwareDataType
+        xpath:
+          matches_regex: /hardware/.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /hardware
+    shadow-encrypt-safe-test:
+      test_title: 'Semantic boundary witness: shadow-encrypt-safe'
+      capability: unix.shadow
+      reported_elements: all
+      object:
+        capability: unix.shadow
+        username:
+          equals: fixture-user
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          encrypt_method:
+            equals: SHA-512
+    shadow-encrypt-invalid-test:
+      test_title: 'Semantic boundary witness: shadow-encrypt-invalid'
+      capability: unix.shadow
+      reported_elements: all
+      object:
+        capability: unix.shadow
+        username:
+          equals: fixture-user
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          encrypt_method:
+            equals: ''
+    yaml-yamlpath-safe-test:
+      test_title: 'Semantic boundary witness: yaml-yamlpath-safe'
+      capability: independent.yamlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.yamlfilecontent
+        yamlpath:
+          equals: $.metadata.name
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          yamlpath:
+            equals: $.metadata.name
+    yaml-yamlpath-invalid-test:
+      test_title: 'Semantic boundary witness: yaml-yamlpath-invalid'
+      capability: independent.yamlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.yamlfilecontent
+        yamlpath:
+          matches_regex: \$\..*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          yamlpath:
+            equals: $.metadata.name
+    yaml-full-path-traversal-test:
+      test_title: 'Semantic boundary witness: yaml-full-path-traversal'
+      capability: independent.yamlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.yamlfilecontent
+        full_path:
+          matches_regex: ^/etc/.*
+        traversal:
+          max_depth: unlimited
+          recurse: directories
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filepath:
+            matches_regex: ^/etc/.*
+    shadow-encrypt-boundary-test:
+      test_title: 'Semantic boundary witness: shadow-encrypt-boundary'
+      capability: unix.shadow
+      reported_elements: all
+      object:
+        capability: unix.shadow
+        username:
+          equals: fixture-user
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          encrypt_method:
+            equals: DES
     wu-defaults-safe-test:
       test_title: 'Semantic boundary witness: wu-defaults-safe'
       capability: windows.wuaupdatesearcher
@@ -1469,6 +1660,16 @@ assessment:
     - test: ntuser-value-type-invalid-test
     - test: password-range-safe-test
     - test: password-range-invalid-test
+    - test: plist-xpath-operation-safe-test
+    - test: plist-xpath-operation-invalid-test
+    - test: systemprofiler-xpath-operation-safe-test
+    - test: systemprofiler-xpath-operation-invalid-test
+    - test: shadow-encrypt-safe-test
+    - test: shadow-encrypt-invalid-test
+    - test: yaml-yamlpath-safe-test
+    - test: yaml-yamlpath-invalid-test
+    - test: yaml-full-path-traversal-test
+    - test: shadow-encrypt-boundary-test
     - test: wu-defaults-safe-test
     - test: wu-defaults-invalid-test
     - test: ntuser-defaults-safe-test

@@ -79,6 +79,16 @@
     "ntuser-value-type-invalid-test": "error",
     "password-range-safe-test": "true",
     "password-range-invalid-test": "error",
+    "plist-xpath-operation-safe-test": "true",
+    "plist-xpath-operation-invalid-test": "error",
+    "systemprofiler-xpath-operation-safe-test": "true",
+    "systemprofiler-xpath-operation-invalid-test": "error",
+    "shadow-encrypt-safe-test": "true",
+    "shadow-encrypt-invalid-test": "error",
+    "yaml-yamlpath-safe-test": "true",
+    "yaml-yamlpath-invalid-test": "error",
+    "yaml-full-path-traversal-test": "error",
+    "shadow-encrypt-boundary-test": "true",
     "wu-defaults-safe-test": "true",
     "wu-defaults-invalid-test": "error",
     "ntuser-defaults-safe-test": "true",
@@ -958,6 +968,131 @@
       "items": [],
       "reason": "Semantic validation fails before collection."
     },
+    "plist-xpath-operation-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "plist-xpath-operation-safe-test-item",
+          "capability": "macos.plist",
+          "fields": {
+            "xpath": {
+              "datatype": "string",
+              "value": "/dict/key",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "plist-xpath-operation-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "systemprofiler-xpath-operation-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "systemprofiler-xpath-operation-safe-test-item",
+          "capability": "macos.systemprofiler",
+          "fields": {
+            "xpath": {
+              "datatype": "string",
+              "value": "/hardware",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "systemprofiler-xpath-operation-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "shadow-encrypt-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "shadow-encrypt-safe-test-item",
+          "capability": "unix.shadow",
+          "fields": {
+            "encrypt_method": {
+              "datatype": "string",
+              "value": "SHA-512",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "shadow-encrypt-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "yaml-yamlpath-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "yaml-yamlpath-safe-test-item",
+          "capability": "independent.yamlfilecontent",
+          "fields": {
+            "yamlpath": {
+              "datatype": "string",
+              "value": "$.metadata.name",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "yaml-yamlpath-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "yaml-full-path-traversal-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "shadow-encrypt-boundary-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "shadow-encrypt-boundary-test-item",
+          "capability": "unix.shadow",
+          "fields": {
+            "encrypt_method": {
+              "datatype": "string",
+              "value": "DES",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
     "wu-defaults-safe-test": {
       "status": "collected",
       "items_found": 1,
@@ -1566,6 +1701,86 @@
       ],
       "expected": "error",
       "reason": "A negative literal password-policy age violates the source range constraint."
+    },
+    {
+      "test": "plist-xpath-operation-safe-test",
+      "rules": [
+        "macos.plist.xpath_equal"
+      ],
+      "expected": "true",
+      "reason": "The plist XPath selector uses equality semantics."
+    },
+    {
+      "test": "plist-xpath-operation-invalid-test",
+      "rules": [
+        "macos.plist.xpath_equal"
+      ],
+      "expected": "error",
+      "reason": "A pattern selector is not the canonical equality operation for plist XPath."
+    },
+    {
+      "test": "systemprofiler-xpath-operation-safe-test",
+      "rules": [
+        "macos.systemprofiler.xpath_equal"
+      ],
+      "expected": "true",
+      "reason": "The system_profiler XPath selector uses equality semantics."
+    },
+    {
+      "test": "systemprofiler-xpath-operation-invalid-test",
+      "rules": [
+        "macos.systemprofiler.xpath_equal"
+      ],
+      "expected": "error",
+      "reason": "A pattern selector is not the canonical equality operation for system_profiler XPath."
+    },
+    {
+      "test": "shadow-encrypt-safe-test",
+      "rules": [
+        "unix.shadow.encrypt_method_literal"
+      ],
+      "expected": "true",
+      "reason": "SHA-512 is an admitted OVAL encryption-method literal."
+    },
+    {
+      "test": "shadow-encrypt-invalid-test",
+      "rules": [
+        "unix.shadow.encrypt_method_literal"
+      ],
+      "expected": "error",
+      "reason": "An empty encryption method is reserved for variable serialization and is not a native literal."
+    },
+    {
+      "test": "yaml-yamlpath-safe-test",
+      "rules": [
+        "independent.yamlfilecontent.yamlpath_equal"
+      ],
+      "expected": "true",
+      "reason": "The YAMLPath selector uses equality semantics."
+    },
+    {
+      "test": "yaml-yamlpath-invalid-test",
+      "rules": [
+        "independent.yamlfilecontent.yamlpath_equal"
+      ],
+      "expected": "error",
+      "reason": "A pattern selector is not the canonical equality operation for YAMLPath."
+    },
+    {
+      "test": "yaml-full-path-traversal-test",
+      "rules": [
+        "independent.yamlfilecontent.full_path_no_traversal"
+      ],
+      "expected": "error",
+      "reason": "Traversal is rejected when YAML content selects full_path."
+    },
+    {
+      "test": "shadow-encrypt-boundary-test",
+      "rules": [
+        "unix.shadow.encrypt_method_literal"
+      ],
+      "expected": "true",
+      "reason": "DES is the lower lexical boundary of the admitted encryption-method vocabulary."
     },
     {
       "test": "wu-defaults-safe-test",
