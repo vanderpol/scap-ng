@@ -307,7 +307,7 @@ def render_ntuser(version, mapping, notes, audit):
 
 def generated_documents():
     roots = [(path, load(path)) for path in sorted(SCHEMAS.glob('*.schema.json'))]
-    if len(roots) != 35:
+    if len(roots) != 36:
         raise ValueError('Frozen root schema count changed')
     version = load(SCHEMAS / 'assessment.schema.json')['x-scap-ng-version']
     scope = load(SCHEMAS / 'capability-scope.json')
@@ -335,7 +335,7 @@ def generated_documents():
     for path in immutable:
         fingerprint.update(path.relative_to(SCHEMAS).as_posix().encode() + b'\0')
         fingerprint.update(path.read_bytes())
-    if len(immutable) != 146:
+    if len(immutable) != 147:
         raise ValueError('Active 0.4.1 schema file count changed; regenerate and qualify an updated release pin')
     manifest = {
         'format': 'scap-ng/schema-documentation-drift-audit/1',

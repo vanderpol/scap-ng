@@ -10,8 +10,8 @@ RI #196 execution boundary.
 | Artifact | Value |
 |---|---|
 | Schema version | `0.4.1` |
-| Canonical schema commit | `d1ab0283e09369c2c734d3b8f93b65007441cf07` |
-| Schema-family SHA-256 | `1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4` |
+| Canonical schema commit | `cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876` |
+| Schema-family SHA-256 | `dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24` |
 | `conformance/manifest.json` SHA-256 | `a72fb77f2dcf3c932e84676acb97bc84d34cce9fbc5f0333d2ecf57c481a9a3b` |
 | `conformance/schema-coverage.json` SHA-256 | `3580316a790d2e87a6df2e5a30f544091ec5a9deb4db55f24c6a36207599a2a7` |
 | `conformance/coverage-audit.json` SHA-256 | `f948448ed597a30b72abeeb247deb6cc87a8207b860414a5788b17a763800621` |

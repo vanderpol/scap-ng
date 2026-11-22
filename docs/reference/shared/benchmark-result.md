@@ -31,6 +31,7 @@ Benchmark-scoped policy result for one Benchmark evaluation against one scan-lev
 | `id` | string | 1..1 (required) | Identifier of the Benchmark being reported. | [/properties/benchmark_result/properties/benchmark/properties/id](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/benchmark/properties/id) |
 | `version` | integer, string | 1..1 (required) | Version of the Benchmark being reported. | [/properties/benchmark_result/properties/benchmark/properties/version](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/benchmark/properties/version) |
 | `package_digest` | null, string | 0..1 | Digest recorded for the Benchmark package. | [/properties/benchmark_result/properties/benchmark/properties/package_digest](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/benchmark/properties/package_digest) |
+| `expected_cpe_identities` | array | 0..1 | Exact bounded echo of the Benchmark declared expected CPE identities. | [/properties/benchmark_result/properties/benchmark/properties/expected_cpe_identities](../../../proposed-schema/documentation/benchmark-result.schema.json#/properties/benchmark_result/properties/benchmark/properties/expected_cpe_identities) |
 
 ## `/properties/benchmark_result/properties/effective_policy`
 

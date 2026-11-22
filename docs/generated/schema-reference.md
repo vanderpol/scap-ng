@@ -6,7 +6,7 @@ This is a **generated reference** from the frozen schema and capability metadata
 
 The JSON Schema `$id` URIs retain their versioned `v0.4.1` identity. The physical repository layout is flat under `schema/`; resolvers should use the pinned release snapshot rather than fetching unversioned files over the network.
 
-## Root schemas (35)
+## Root schemas (36)
 
 | Schema | Title | Schema description |
 | --- | --- | --- |
@@ -20,6 +20,7 @@ The JSON Schema `$id` URIs retain their versioned `v0.4.1` identity. The physica
 | [`capability-common.schema.json`](../../schema/capability-common.schema.json) | SCAP-NG shared capability schema primitives v0.4.1 | Pre-alpha reusable authored-Assessment primitives shared by generated capability schemas. Capability-specific schemas SHOULD reference these definitions instead of copying them. Base entity definitions intentionally leave closure to the capability schema via unevaluatedProperties so capability-specific fields can be composed without duplicating common properties. Generic OVAL mask is intentionally absent from native authored predicates; sensitive evidence redaction is a separate results concern. Native 0.4 authoring may omit an inferred literal comparison datatype or use a self-describing typed operation; published compiled Assessments retain fully explicit canonical datatypes. compare_as is not supported. |
 | [`collected-item.schema.json`](../../schema/collected-item.schema.json) | Draft canonical collected Item 0.4.1 | Reusable runtime Item shape. Missing Items are absent from the collection, not represented as synthetic does_not_exist Items. Collection-level absence and field-level statuses remain separate. |
 | [`collection-result.schema.json`](../../schema/collection-result.schema.json) | SCAP-NG Object Collection Result pre-release v0.4.1 | Runtime result of evaluating an authored Object and producing Items. Collection status is intentionally not Boolean. |
+| [`cpe-identity.schema.json`](../../schema/cpe-identity.schema.json) | SCAP-NG declared CPE identity v0.4.1 | A lossless source CPE identity declared by a Benchmark platform. This metadata is not an applicability decision or a CPE matching result. |
 | [`entity-result.schema.json`](../../schema/entity-result.schema.json) | Compatibility resource name for native field-result.schema.json | Resource URI retained for local reference continuity; only the current native wire is accepted. Legacy payloads are preserved under tests/fixtures/v04-native-results/pre-migration-schemas and immutable history, never silently migrated. |
 | [`expression-invocation.schema.json`](../../schema/expression-invocation.schema.json) |  |  |
 | [`expression-result.schema.json`](../../schema/expression-result.schema.json) | Draft Assessment expression execution result 0.4.1 | Expression-stage result, not a complete Assessment Result or scanner result package. |

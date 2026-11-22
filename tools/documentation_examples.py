@@ -101,6 +101,12 @@ class Examples:
                 ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
                  '1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4'):
                     '0.4.1 IOS version55 and bounded typed Input predicate contract',
+                ('1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4',
+                 'dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24'):
+                    '0.4.1 declarative Benchmark CPE identity metadata and Result passthrough',
+                ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
+                 'dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24'):
+                    '0.4.1 declarative Benchmark CPE identity metadata and Result passthrough',
             }
             if (historical_digest, active_digest) not in reviewed_amendments:
                 raise ValueError('Example schema family differs from immutable pin')
