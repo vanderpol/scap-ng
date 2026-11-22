@@ -398,6 +398,23 @@ def build_operator_suite(comparison_operators: list[str]) -> dict[str, Any]:
     return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-comparison-operators", "operators": expected, "reason": "Each operator has a typed operand chosen to make the named relation TRUE; this is a semantic witness, not RI execution proof."}}
 
 
+def build_enum_boundary_suite(mappings: list[dict[str, Any]]) -> dict[str, Any]:
+    enum_values = ["classes_root", "current_config", "current_user", "current_user_local_settings", "local_machine", "users"]
+    tests: dict[str, Any] = {}; outcomes: dict[str, str] = {}; expected: dict[str, Any] = {}
+    for mapping in mappings:
+        capability = mapping["capability"]
+        if capability not in {"windows.registry", "windows.regkeyeffectiverights"}: continue
+        native = mapping.get("native", {}); selectors = list(native.get("object_selector_alternatives", [[]])[0])
+        for index, value in enumerate(enum_values, 1):
+            name = f"enum-{slug(capability)}-{index}-test"[:64]
+            obj = {"capability": capability, **{selector: {"equals": value if selector == "hive" else "fixture-value"} for selector in selectors}}
+            tests[name] = {"test_title": f"{capability} hive enum boundary {value}", "capability": capability, "reported_elements": "all", "object": obj, "require": {"item_requirement": {"items_found": "one_or_more"}}}
+            outcomes[name] = "true"; expected[f"{capability}#{value}"] = {"outcome": "true", "reason": "Every schema-admitted hive enum value has a distinct selector witness."}
+    assessment = {"assessment": {"id": "conformance-core-enum-boundaries", "version": 1, "assessment_title": "SCAP-NG 0.4.1 native selector enum boundaries", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-enum-boundaries", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes}
+    return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-enum-boundaries", "enum_values": expected, "reason": "Native selector enum values are schema-valid witnesses; invalid sentinel rejection remains a separate negative gate."}}
+
+
 def build_multi_value_suite(mappings: list[dict[str, Any]], selector_contracts: dict[str, Any]) -> dict[str, Any]:
     tests: dict[str, Any] = {}; variables: dict[str, Any] = {}; outcomes: dict[str, str] = {}; expected: dict[str, Any] = {}
     for mapping in mappings:
@@ -700,6 +717,11 @@ def main() -> None:
     multi_value_assessment.write_text(yaml.safe_dump(multi_values["assessment"], sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-multi-values.json", multi_values["fixture"])
     write_json(OUT / "expected/core-multi-values.json", multi_values["expected"])
+    enum_boundaries = build_enum_boundary_suite(selector_mappings)
+    enum_assessment = OUT / "cases/core/enum-boundaries.assessment.yaml"
+    enum_assessment.write_text(yaml.safe_dump(enum_boundaries["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-enum-boundaries.json", enum_boundaries["fixture"])
+    write_json(OUT / "expected/core-enum-boundaries.json", enum_boundaries["expected"])
     cardinalities = build_cardinality_suite()
     cardinality_assessment = OUT / "cases/core/cardinalities.assessment.yaml"
     cardinality_assessment.write_text(yaml.safe_dump(cardinalities["assessment"], sort_keys=False), encoding="utf-8")
@@ -725,7 +747,7 @@ def main() -> None:
         "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
         "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
-        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
+        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
         "invalid_cases": [
             {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},
             {"id": "invalid-variable-datatype", "assessment": "cases/invalid/variable-datatype.assessment.yaml", "expected": "schema-invalid", "reason": "Variables infer datatype from typed expressions; declaration datatype is not canonical."},

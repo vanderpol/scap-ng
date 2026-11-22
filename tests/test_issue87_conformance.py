@@ -169,6 +169,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(len(selectors["alternatives"]), declared)
         multi_values = read(CONF / "expected/core-multi-values.json")
         self.assertEqual(len(multi_values["capabilities"]), 103)
+        enum_boundaries = read(CONF / "expected/core-enum-boundaries.json")
+        self.assertEqual(len(enum_boundaries["enum_values"]), 12)
+        self.assertEqual(read(CONF / "coverage-audit.json")["enum_boundaries"]["uncovered_native_selector_enum_values"], [])
         cardinalities = read(CONF / "expected/core-cardinalities.json")
         self.assertEqual(set(cardinalities["cardinalities"]), {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"})
         for row in self.manifest["status_cases"]:
