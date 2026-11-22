@@ -171,6 +171,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
+        self.assertEqual(audit["applicability"]["variants"], ["applicable", "not-applicable", "deferred"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
@@ -267,6 +268,17 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["variants"]["absent"]["assessment_outcome"], "not_evaluated")
         self.assertEqual(expected["variants"]["explicit-empty"]["assessment_outcome"], "error")
         self.assertNotEqual(expected["variants"]["absent"]["assessment_outcome"], expected["variants"]["explicit-empty"]["assessment_outcome"])
+
+    def test_applicability_dependency_identity_and_status_handoffs_are_explicit(self):
+        assessment = yaml.safe_load((CONF / "cases/core/applicability.assessment.yaml").read_text(encoding="utf-8"))
+        expected = read(CONF / "expected/core-applicability.json")
+        dependency = assessment["assessment"]["dependencies"]["shared-applicability"]
+        self.assertEqual(dependency["assessment"], expected["dependency"])
+        self.assertEqual(dependency["purpose"], expected["purpose"])
+        expression = assessment["assessment"]["applicability"]["and"][0]
+        self.assertEqual(expression["assessment"], dependency["assessment"])
+        self.assertEqual(expected["variants"]["not-applicable"]["assessment_outcome"], "not_applicable")
+        self.assertEqual(expected["variants"]["deferred"]["assessment_outcome"], "not_evaluated")
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]

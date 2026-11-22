@@ -1,0 +1,29 @@
+assessment:
+  id: conformance-core-applicability
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 shared Assessment applicability
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  dependencies:
+    shared-applicability:
+      assessment: shared-applicability-assessment
+      expected_version: 1
+      purpose: applicability
+  applicability:
+    and:
+    - assessment: shared-applicability-assessment
+    - not:
+        not_applicable:
+          reason: Target is excluded by the shared applicability Assessment.
+  tests:
+    applicable-test:
+      test_title: Applicable shared Assessment branch
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+  evaluate:
+    test: applicable-test
