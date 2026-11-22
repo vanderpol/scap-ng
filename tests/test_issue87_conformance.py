@@ -257,6 +257,22 @@ class Issue87Conformance(unittest.TestCase):
             for assertion in expected["variants"].values():
                 self.assertTrue(assertion["reason"].strip())
 
+    def test_freeze_receipt_matches_current_derived_inventory(self):
+        freeze = (ROOT / "conformance/TEST-CONTENT-0.4.1-FREEZE.md").read_text(encoding="utf-8")
+        audit = read(CONF / "coverage-audit.json")
+        self.assertIn(audit["schema_commit"], freeze)
+        self.assertIn(audit["schema_family_sha256"], freeze)
+        self.assertIn("718/718", freeze)
+        self.assertIn("67/67", freeze)
+        self.assertIn("94/94", freeze)
+        self.assertIn("180 total: 60 semantic, 19 structural, 4 authoring-rejected, 81 source-only/native-equivalence, 16 RI not-run", freeze)
+        self.assertIn("begin", freeze)
+        self.assertIn("end", freeze)
+        self.assertIn("input", freeze)
+        self.assertIn("values", freeze)
+        self.assertIn("RI #196", freeze)
+        self.assertNotIn("scanner execution is claimed", freeze)
+
     def test_authoring_enum_cases_cover_all_assessment_branches(self):
         rows = self.manifest.get("authoring_cases", [])
         self.assertEqual(len(rows), 20)
