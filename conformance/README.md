@@ -61,10 +61,10 @@ specification-version constraints.
 The audit also derives all 180 mapping semantic-validator rules. It marks only
 explicit source-shape checks (for example singleton/no-Object and resolved
 Variable source) as structural witnesses. The generated
-`core-semantic-boundaries` Assessment adds sixteen independently justified
-schema-valid file-selection rule witnesses (full-path/pattern traversal, inline
-YAML content, and Windows literal-name boundaries), leaving 144 rules
-explicitly untested;
+`core-semantic-boundaries` Assessment adds twenty independently justified
+schema-valid semantic rule witnesses (file traversal, inline YAML content,
+Windows literal-name, protocol, interface-type, family-vocabulary, and
+non-negative-time boundaries), leaving 140 rules explicitly untested;
 collector/filter and capability-specific runtime rules remain unqualified.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation

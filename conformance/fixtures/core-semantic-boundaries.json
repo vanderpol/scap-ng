@@ -37,7 +37,15 @@
     "semantic-4-pattern-safe-test": "true",
     "semantic-4-pattern-traversal-test": "error",
     "yaml-inline-content-safe-test": "true",
-    "yaml-inline-content-traversal-test": "error"
+    "yaml-inline-content-traversal-test": "error",
+    "family-vocabulary-safe-test": "true",
+    "family-vocabulary-invalid-test": "error",
+    "interface-type-safe-test": "true",
+    "interface-type-invalid-test": "error",
+    "lockout-time-safe-test": "true",
+    "lockout-time-invalid-test": "error",
+    "listening-protocol-safe-test": "true",
+    "listening-protocol-invalid-test": "error"
   },
   "evidence": {
     "unix-full-path-safe-test": {
@@ -390,6 +398,106 @@
       "items_satisfying": 0,
       "items": [],
       "reason": "Semantic validation fails before collection."
+    },
+    "family-vocabulary-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "family-vocabulary-safe-test-item",
+          "capability": "independent.family",
+          "fields": {
+            "family": {
+              "datatype": "string",
+              "value": "unix",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "family-vocabulary-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "interface-type-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "interface-type-safe-test-item",
+          "capability": "unix.interface",
+          "fields": {
+            "type": {
+              "datatype": "string",
+              "value": "ARPHRD_ETHER",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "interface-type-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "lockout-time-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "lockout-time-safe-test-item",
+          "capability": "windows.lockoutpolicy",
+          "fields": {
+            "force_logoff": {
+              "datatype": "integer",
+              "value": 0,
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "lockout-time-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "listening-protocol-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "listening-protocol-safe-test-item",
+          "capability": "linux.inetlisteningservers",
+          "fields": {
+            "protocol": {
+              "datatype": "string",
+              "value": "tcp",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "listening-protocol-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
     }
   },
   "semantic_witnesses": [
@@ -616,6 +724,70 @@
       ],
       "expected": "error",
       "reason": "Traversal is not applicable when inline YAML content is supplied."
+    },
+    {
+      "test": "family-vocabulary-safe-test",
+      "rules": [
+        "independent.family.literal_vocabulary"
+      ],
+      "expected": "true",
+      "reason": "The literal family value unix is in the source vocabulary."
+    },
+    {
+      "test": "family-vocabulary-invalid-test",
+      "rules": [
+        "independent.family.literal_vocabulary"
+      ],
+      "expected": "error",
+      "reason": "An empty literal family is reserved for variable serialization and is semantically invalid."
+    },
+    {
+      "test": "interface-type-safe-test",
+      "rules": [
+        "unix.interface.type_literal"
+      ],
+      "expected": "true",
+      "reason": "ARPHRD_ETHER is a source OVAL interface-type literal."
+    },
+    {
+      "test": "interface-type-invalid-test",
+      "rules": [
+        "unix.interface.type_literal"
+      ],
+      "expected": "error",
+      "reason": "The empty interface type is not a native literal; it is reserved for variable serialization."
+    },
+    {
+      "test": "lockout-time-safe-test",
+      "rules": [
+        "windows.lockoutpolicy.nonnegative_time_values"
+      ],
+      "expected": "true",
+      "reason": "Zero is the inclusive lower bound for a non-negative lockout time."
+    },
+    {
+      "test": "lockout-time-invalid-test",
+      "rules": [
+        "windows.lockoutpolicy.nonnegative_time_values"
+      ],
+      "expected": "error",
+      "reason": "A negative literal lockout time violates the non-negative source constraint."
+    },
+    {
+      "test": "listening-protocol-safe-test",
+      "rules": [
+        "linux.inetlisteningservers.protocol"
+      ],
+      "expected": "true",
+      "reason": "Collected transport protocol tcp uses the required lower-case form."
+    },
+    {
+      "test": "listening-protocol-invalid-test",
+      "rules": [
+        "linux.inetlisteningservers.protocol"
+      ],
+      "expected": "error",
+      "reason": "Upper-case TCP is not the canonical lower-case collected protocol form."
     }
   ]
 }

@@ -623,14 +623,25 @@ def build_semantic_boundary_suite() -> dict[str, Any]:
         ("yaml-inline-content-safe-test", "independent.yamlfilecontent", {"capability": "independent.yamlfilecontent", "content": {"equals": "fixture-content"}}, {"content": {"equals": "fixture-content"}}, "true", ["independent.yamlfilecontent.inline_content_no_traversal"], "Inline content selection is valid without file traversal."),
         ("yaml-inline-content-traversal-test", "independent.yamlfilecontent", {"capability": "independent.yamlfilecontent", "content": {"equals": "fixture-content"}, "traversal": {"max_depth": "unlimited", "recurse": "directories"}}, {"content": {"equals": "fixture-content"}}, "error", ["independent.yamlfilecontent.inline_content_no_traversal"], "Traversal is not applicable when inline YAML content is supplied."),
     ])
+    cases.extend([
+        ("family-vocabulary-safe-test", "independent.family", None, {"family": {"equals": "unix"}}, "true", ["independent.family.literal_vocabulary"], "The literal family value unix is in the source vocabulary."),
+        ("family-vocabulary-invalid-test", "independent.family", None, {"family": {"equals": ""}}, "error", ["independent.family.literal_vocabulary"], "An empty literal family is reserved for variable serialization and is semantically invalid."),
+        ("interface-type-safe-test", "unix.interface", {"capability": "unix.interface", "name": {"equals": "eth0"}}, {"type": {"equals": "ARPHRD_ETHER"}}, "true", ["unix.interface.type_literal"], "ARPHRD_ETHER is a source OVAL interface-type literal."),
+        ("interface-type-invalid-test", "unix.interface", {"capability": "unix.interface", "name": {"equals": "eth0"}}, {"type": {"equals": ""}}, "error", ["unix.interface.type_literal"], "The empty interface type is not a native literal; it is reserved for variable serialization."),
+        ("lockout-time-safe-test", "windows.lockoutpolicy", None, {"force_logoff": {"equals": 0}}, "true", ["windows.lockoutpolicy.nonnegative_time_values"], "Zero is the inclusive lower bound for a non-negative lockout time."),
+        ("lockout-time-invalid-test", "windows.lockoutpolicy", None, {"force_logoff": {"equals": -1}}, "error", ["windows.lockoutpolicy.nonnegative_time_values"], "A negative literal lockout time violates the non-negative source constraint."),
+        ("listening-protocol-safe-test", "linux.inetlisteningservers", {"capability": "linux.inetlisteningservers", "protocol": {"equals": "tcp"}}, {"protocol": {"equals": "tcp"}}, "true", ["linux.inetlisteningservers.protocol"], "Collected transport protocol tcp uses the required lower-case form."),
+        ("listening-protocol-invalid-test", "linux.inetlisteningservers", {"capability": "linux.inetlisteningservers", "protocol": {"equals": "TCP"}}, {"protocol": {"equals": "TCP"}}, "error", ["linux.inetlisteningservers.protocol"], "Upper-case TCP is not the canonical lower-case collected protocol form."),
+    ])
     for name, capability, obj, fields, outcome, rule_ids, reason in cases:
         tests[name] = {
             "test_title": f"Semantic boundary witness: {name.removesuffix('-test')}",
             "capability": capability,
-            "object": obj,
             "require": {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": fields},
             "reported_elements": "all",
         }
+        if obj is not None:
+            tests[name]["object"] = obj
         outcomes[name] = outcome
         item_count = 1 if outcome == "true" else 0
         assertion = {"outcome": outcome, "items_found": item_count, "items_satisfying": item_count, "reason": reason}
@@ -647,7 +658,8 @@ def build_semantic_boundary_suite() -> dict[str, Any]:
                         "^C:[\\]Logs[\\].*": "C:\\Logs\\fixture.txt",
                         "^bad:name$": "bad:name",
                     }.get(value, value)
-                typed_fields[field] = {"datatype": "string", "value": value, "status": "collected"}
+                datatype = "boolean" if isinstance(value, bool) else "integer" if isinstance(value, int) and not isinstance(value, bool) else "string"
+                typed_fields[field] = {"datatype": datatype, "value": value, "status": "collected"}
             evidence[name] = {"status": "collected", "items_found": 1, "items_satisfying": 1, "items": [{"id": f"{name}-item", "capability": capability, "fields": typed_fields}]}
         else:
             evidence[name] = {"status": "not_run", "items_found": 0, "items_satisfying": 0, "items": [], "reason": "Semantic validation fails before collection."}
