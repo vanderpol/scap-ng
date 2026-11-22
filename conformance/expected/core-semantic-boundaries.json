@@ -176,25 +176,77 @@
       "items_found": 0,
       "items_satisfying": 0,
       "reason": "Traversal is not applicable when inline YAML content is supplied."
+    },
+    "family-vocabulary-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "The literal family value unix is in the source vocabulary."
+    },
+    "family-vocabulary-invalid-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "An empty literal family is reserved for variable serialization and is semantically invalid."
+    },
+    "interface-type-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "ARPHRD_ETHER is a source OVAL interface-type literal."
+    },
+    "interface-type-invalid-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "The empty interface type is not a native literal; it is reserved for variable serialization."
+    },
+    "lockout-time-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "Zero is the inclusive lower bound for a non-negative lockout time."
+    },
+    "lockout-time-invalid-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "A negative literal lockout time violates the non-negative source constraint."
+    },
+    "listening-protocol-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "Collected transport protocol tcp uses the required lower-case form."
+    },
+    "listening-protocol-invalid-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "Upper-case TCP is not the canonical lower-case collected protocol form."
     }
   },
   "rules": [
     "file.hash.full_path_no_traversal",
     "file.hash.pattern_directory_no_traversal",
+    "independent.family.literal_vocabulary",
     "independent.textfilecontent.full_path_no_traversal",
     "independent.textfilecontent.pattern_directory_no_traversal",
     "independent.xmlfilecontent.full_path_no_traversal",
     "independent.xmlfilecontent.pattern_directory_no_traversal",
     "independent.yamlfilecontent.inline_content_no_traversal",
+    "linux.inetlisteningservers.protocol",
     "linux.selinuxsecuritycontext.full_path_no_traversal",
     "linux.selinuxsecuritycontext.pattern_directory_no_traversal",
     "unix.file.full_path_no_traversal",
     "unix.file.pattern_directory_no_traversal",
+    "unix.interface.type_literal",
     "windows.file.full_path_no_traversal",
     "windows.file.literal_name_characters",
     "windows.file.pattern_directory_no_traversal",
     "windows.fileeffectiverights.full_path_no_traversal",
-    "windows.fileeffectiverights.pattern_directory_no_traversal"
+    "windows.fileeffectiverights.pattern_directory_no_traversal",
+    "windows.lockoutpolicy.nonnegative_time_values"
   ],
   "reason": "Each invalid combination remains schema-valid but has an independently justified semantic ERROR; positive cases demonstrate the allowed boundary and regex exemption. Scanner execution is not claimed."
 }
