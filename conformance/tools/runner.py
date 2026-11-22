@@ -175,6 +175,9 @@ def validate() -> int:
                 witness_rules = {rule for witness in fixture.get("semantic_witnesses", []) for rule in witness.get("rules", [])}
                 if witness_rules != set(expected.get("rules", [])):
                     errors.append("semantic boundary expected rules do not match fixture witnesses")
+                declared_rules = {rule for mapping in inventory.get("capabilities", []) for rule in mapping.get("semantic_validator_rules", [])}
+                if witness_rules - declared_rules:
+                    errors.append("semantic boundary contains unknown mapping rule IDs")
                 tests = load(assessment).get("assessment", {}).get("tests", {})
                 assertions = expected.get("assertions", {})
                 for test_name, assertion in assertions.items():
