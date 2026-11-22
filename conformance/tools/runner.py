@@ -98,6 +98,33 @@ def check_fixture(path: Path) -> list[str]:
     return errors
 
 
+
+def check_semantic_witnesses(fixture: dict[str, Any], expected: dict[str, Any], label: str = "fixture") -> list[str]:
+    """Ensure a declared semantic witness has a distinct, typed expected result.
+
+    This is deliberately independent of vector labels: the witness names the
+    variants and the result that its mapping rule justifies.
+    """
+    errors: list[str] = []
+    semantic_witnesses = fixture.get("semantic_witnesses", [])
+    if not semantic_witnesses:
+        return errors
+    fixture_rules = {w.get("rule") for w in semantic_witnesses}
+    expected_rules = {w.get("id") for w in expected.get("semantic_rules", [])}
+    if None in fixture_rules or fixture_rules != expected_rules:
+        errors.append(f"{label}: semantic witness rules do not match independent expected rules")
+    valid_outcomes = {"true", "false", "unknown", "error", "not_applicable", "not_evaluated"}
+    for witness in semantic_witnesses:
+        if witness.get("expected") not in valid_outcomes:
+            errors.append(f"{label}: semantic witness has untyped expected outcome")
+        for variant_key in ("positive_variant", "negative_variant"):
+            variant_name = witness.get(variant_key)
+            if variant_name not in fixture.get("variants", {}):
+                errors.append(f"{label}: semantic witness references missing {variant_key}")
+            elif expected.get("variants", {}).get(variant_name, {}).get("assessment_outcome") != witness.get("expected"):
+                errors.append(f"{label}: semantic witness outcome disagrees with expected {variant_name} result")
+    return errors
+
 def family_digest() -> str:
     paths = sorted((*SCHEMA.glob("*.json"), *(SCHEMA / "capability-mappings").rglob("*.json")))
     checksum = hashlib.sha256()
@@ -136,12 +163,13 @@ def validate() -> int:
                 actual_sha = hashlib.sha256(path.read_bytes()).hexdigest()
                 if actual_sha != row["sha256"][kind]:
                     errors.append(f"{row[kind]}: SHA-256 differs from manifest")
+            fixture = load(fixture_path)
             expected = load(expected_path)
+            errors.extend(check_semantic_witnesses(fixture, expected, row["fixture"]))
             if expected.get("format") != "scap-ng-conformance-expected-0.1":
                 errors.append(f"{row['expected']}: wrong expected-result format")
             if set(expected.get("variants", {})) != set(row["vectors"]):
                 errors.append(f"{row['expected']}: expected vectors do not match manifest")
-            fixture = load(fixture_path)
             for vector, assertion in expected.get("variants", {}).items():
                 if assertion.get("assessment_outcome") not in {"true", "false", "unknown", "error", "not_applicable", "not_evaluated"}:
                     errors.append(f"{row['expected']}:{vector}: untyped outcome")
