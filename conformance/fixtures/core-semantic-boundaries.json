@@ -89,6 +89,15 @@
     "yaml-yamlpath-invalid-test": "error",
     "yaml-full-path-traversal-test": "error",
     "shadow-encrypt-boundary-test": "true",
+    "xml-item-creation-safe-test": "true",
+    "xml-item-creation-invalid-test": "error",
+    "rpm-package-defaults-safe-test": "true",
+    "rpm-package-defaults-invalid-test": "error",
+    "rpm-file-defaults-safe-test": "true",
+    "rpm-file-defaults-invalid-test": "error",
+    "file-rights-literal-safe-test": "true",
+    "file-rights-literal-invalid-test": "error",
+    "file-rights-trustee-sid-safe-test": "true",
     "wu-defaults-safe-test": "true",
     "wu-defaults-invalid-test": "error",
     "ntuser-defaults-safe-test": "true",
@@ -1093,6 +1102,124 @@
         }
       ]
     },
+    "xml-item-creation-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "xml-item-creation-safe-test-item",
+          "capability": "independent.xmlfilecontent",
+          "fields": {
+            "xpath": {
+              "datatype": "string",
+              "value": "/config/value",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "xml-item-creation-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "rpm-package-defaults-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "rpm-package-defaults-safe-test-item",
+          "capability": "linux.rpmverifypackage",
+          "fields": {
+            "name": {
+              "datatype": "string",
+              "value": "fixture-package",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "rpm-package-defaults-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "rpm-file-defaults-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "rpm-file-defaults-safe-test-item",
+          "capability": "linux.rpmverifyfile",
+          "fields": {
+            "name": {
+              "datatype": "string",
+              "value": "fixture-file",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "rpm-file-defaults-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "file-rights-literal-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "file-rights-literal-safe-test-item",
+          "capability": "windows.fileeffectiverights",
+          "fields": {
+            "filename": {
+              "datatype": "string",
+              "value": "bad:name",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "file-rights-literal-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "file-rights-trustee-sid-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "file-rights-trustee-sid-safe-test-item",
+          "capability": "windows.fileeffectiverights",
+          "fields": {
+            "trustee_sid": {
+              "datatype": "string",
+              "value": "S-1-5-32-544",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
     "wu-defaults-safe-test": {
       "status": "collected",
       "items_found": 1,
@@ -1781,6 +1908,78 @@
       ],
       "expected": "true",
       "reason": "DES is the lower lexical boundary of the admitted encryption-method vocabulary."
+    },
+    {
+      "test": "xml-item-creation-safe-test",
+      "rules": [
+        "independent.xmlfilecontent.materialized_item_creation"
+      ],
+      "expected": "true",
+      "reason": "The XML Object explicitly materializes the imported all-object-elements item-creation default."
+    },
+    {
+      "test": "xml-item-creation-invalid-test",
+      "rules": [
+        "independent.xmlfilecontent.materialized_item_creation"
+      ],
+      "expected": "error",
+      "reason": "A direct XML Object omitting the materialized item-creation behavior is semantically incomplete."
+    },
+    {
+      "test": "rpm-package-defaults-safe-test",
+      "rules": [
+        "linux.rpmverifypackage.materialized_behaviors"
+      ],
+      "expected": "true",
+      "reason": "The RPM package Object explicitly materializes both verification switches."
+    },
+    {
+      "test": "rpm-package-defaults-invalid-test",
+      "rules": [
+        "linux.rpmverifypackage.materialized_behaviors"
+      ],
+      "expected": "error",
+      "reason": "A direct RPM package Object omitting imported verification switches is semantically incomplete."
+    },
+    {
+      "test": "rpm-file-defaults-safe-test",
+      "rules": [
+        "linux.rpmverifyfile.materialized_behaviors"
+      ],
+      "expected": "true",
+      "reason": "The RPM file Object explicitly materializes every non-deprecated verification switch."
+    },
+    {
+      "test": "rpm-file-defaults-invalid-test",
+      "rules": [
+        "linux.rpmverifyfile.materialized_behaviors"
+      ],
+      "expected": "error",
+      "reason": "A direct RPM file Object omitting imported verification switches is semantically incomplete."
+    },
+    {
+      "test": "file-rights-literal-safe-test",
+      "rules": [
+        "windows.fileeffectiverights.literal_name_characters"
+      ],
+      "expected": "true",
+      "reason": "Reserved characters are permitted inside a filename match expression."
+    },
+    {
+      "test": "file-rights-literal-invalid-test",
+      "rules": [
+        "windows.fileeffectiverights.literal_name_characters"
+      ],
+      "expected": "error",
+      "reason": "A literal Windows filename cannot contain reserved characters."
+    },
+    {
+      "test": "file-rights-trustee-sid-safe-test",
+      "rules": [
+        "windows.fileeffectiverights.trustee_sid"
+      ],
+      "expected": "true",
+      "reason": "File effective-rights identifies the trustee by SID."
     },
     {
       "test": "wu-defaults-safe-test",

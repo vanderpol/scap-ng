@@ -61,14 +61,14 @@ specification-version constraints.
 The audit also derives all 180 mapping semantic-validator rules. It marks explicit
 source-shape checks (for example singleton/no-Object and resolved Variable
 source) as structural witnesses. The generated `core-semantic-boundaries`
-Assessment plus the fixed-result case records forty-five independently justified
+Assessment plus the fixed-result case records fifty independently justified
 schema-valid semantic rule witnesses (file traversal, inline YAML content,
 Windows literal-name, protocol, interface-type, family-vocabulary,
 non-negative-time, materialized-default, selector equality, type compatibility,
-and null-selector boundaries), with 19 structural witnesses. The remaining 116
+and null-selector boundaries), with 19 structural witnesses. The remaining 111
 rules are explicitly dispositioned unresolved: 81 are unsupported by the native
 State-free Set/filter authoring surface, 13 are not-run pending collector/RI
-receipts, and 22 are blocked on a documented semantic or normative decision.
+receipts, and 17 are blocked on a documented semantic or normative decision.
 No unresolved rule is silently counted as semantic coverage.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
