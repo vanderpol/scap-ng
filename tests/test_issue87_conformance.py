@@ -54,6 +54,19 @@ class Issue87Conformance(unittest.TestCase):
                 self.assertTrue(path.is_file(), path)
                 self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), row["sha256"][kind], path)
 
+    def test_issue95_generated_yaml_orders_object_before_require(self):
+        rows = self.manifest["capabilities"] + self.manifest["core_cases"]
+        checked = 0
+        for row in rows:
+            path = CONF / row["assessment"]
+            document = yaml.safe_load(path.read_text(encoding="utf-8"))
+            for test in document.get("assessment", {}).get("tests", {}).values():
+                keys = list(test)
+                if "object" in test and "require" in test:
+                    checked += 1
+                    self.assertLess(keys.index("object"), keys.index("require"), path)
+        self.assertGreater(checked, 100)
+
     def test_negative_variants_are_distinct_and_preserve_selectors(self):
         for row in self.manifest["capabilities"]:
             fixture = read(CONF / row["fixture"])

@@ -26,6 +26,26 @@ def load(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def order_assessment_tests(document: dict[str, Any]) -> dict[str, Any]:
+    """Apply Issue #95 presentation order without changing schema semantics."""
+    assessment = document.get("assessment")
+    tests = assessment.get("tests") if isinstance(assessment, dict) else None
+    if not isinstance(tests, dict):
+        return document
+    for name, test in list(tests.items()):
+        if not isinstance(test, dict) or "object" not in test or "require" not in test:
+            continue
+        ordered: dict[str, Any] = {}
+        for key, value in test.items():
+            if key == "require":
+                continue
+            ordered[key] = value
+            if key == "object":
+                ordered["require"] = test["require"]
+        tests[name] = ordered
+    return document
+
+
 def digest(paths: list[Path]) -> str:
     h = hashlib.sha256()
     for path in sorted(paths):
@@ -227,25 +247,23 @@ def build_assessment(mapping: dict[str, Any], selector_contracts: dict[str, Any]
     test: dict[str, Any] = {
         "test_title": f"Collect and match every declared {capability} field",
         "capability": capability,
-        "require": {"item_requirement": {"items_found": "one_or_more"}},
     }
+    source_kind = native.get("test_source", {}).get("kind")
+    if source_kind == "variable":
+        variable_name = f"{s}-variable"
+        body["assessment"]["variables"] = {
+            variable_name: {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": "fixture-value"}}}
+        }
+        test["variable"] = variable_name
+    elif source_kind != "none":
+        test["object"] = {"capability": capability, **object_fields}
+    test["require"] = {"item_requirement": {"items_found": "one_or_more"}}
     if state_fields:
         test["require"]["item_requirement"]["items_satisfying"] = "every"
         test["require"]["field_requirement"] = {"values_found": "one_or_more", "values_matching": "every"}
         test["require"]["fields"] = {field: predicate(value, field_types[field]) for field, value in field_values.items()}
     if capability != "independent.unknown":
         test["reported_elements"] = "all"
-    if native.get("test_source", {}).get("kind") == "none":
-        # Singleton sources intentionally have no Object.
-        pass
-    elif native.get("test_source", {}).get("kind") == "variable":
-        variable_name = f"{s}-variable"[:64]
-        body["assessment"]["variables"] = {
-            variable_name: {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": "fixture-value"}}}
-        }
-        test["variable"] = variable_name
-    else:
-        test["object"] = {"capability": capability, **object_fields}
     body["assessment"]["tests"][test_name] = test
     # The evidence fixture is intentionally separate from the source assessment.
     fields = {
@@ -792,7 +810,7 @@ def main() -> None:
         fixture_path = OUT / "fixtures" / f"{s}.json"
         expected_path = OUT / "expected" / f"{s}.json"
         assessment_path.parent.mkdir(parents=True, exist_ok=True)
-        assessment_path.write_text(yaml.safe_dump(body, sort_keys=False, allow_unicode=False), encoding="utf-8")
+        assessment_path.write_text(yaml.safe_dump(order_assessment_tests(body), sort_keys=False, allow_unicode=False), encoding="utf-8")
         write_json(fixture_path, fixture)
         field_count = len(mapping.get("native", {}).get("state_field_map", {}))
         state_field_names = list(mapping.get("native", {}).get("state_field_map", {}))
@@ -827,64 +845,64 @@ def main() -> None:
                      "field_count": field_count, "vectors": list(expected["variants"])})
     core = build_core()
     core_assessment = OUT / "cases/core/evaluate-not.assessment.yaml"
-    core_assessment.write_text(yaml.safe_dump(core["assessment"], sort_keys=False), encoding="utf-8")
+    core_assessment.write_text(yaml.safe_dump(order_assessment_tests(core["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-evaluate-not.json", core["fixture"])
     write_json(OUT / "expected/core-evaluate-not.json", {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-evaluate-not", "underlying": {"true-test": "true", "false-test": "false"}, "assertions": {"not(false)": "true", "not(not(true))": "true", "one(true,false)": "true", "xor(true,false)": "true", "and": "true", "unknown": "unknown", "error": "error", "not_applicable": "not_applicable"}, "reason": "The FALSE leaf remains explicitly FALSE; not is tested only as an enclosing expression."})
     operators = build_operator_suite(sorted(inv["operator_inventory"]["field_predicate_properties"]))
     op_assessment = OUT / "cases/core/comparison-operators.assessment.yaml"
-    op_assessment.write_text(yaml.safe_dump(operators["assessment"], sort_keys=False), encoding="utf-8")
+    op_assessment.write_text(yaml.safe_dump(order_assessment_tests(operators["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-comparison-operators.json", operators["fixture"])
     write_json(OUT / "expected/core-comparison-operators.json", operators["expected"])
     selectors = build_selector_alternative_suite(selector_mappings, selector_contracts)
     selector_assessment = OUT / "cases/core/selector-alternatives.assessment.yaml"
-    selector_assessment.write_text(yaml.safe_dump(selectors["assessment"], sort_keys=False), encoding="utf-8")
+    selector_assessment.write_text(yaml.safe_dump(order_assessment_tests(selectors["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-selector-alternatives.json", selectors["fixture"])
     write_json(OUT / "expected/core-selector-alternatives.json", selectors["expected"])
     multi_values = build_multi_value_suite(selector_mappings, selector_contracts)
     multi_value_assessment = OUT / "cases/core/multi-values.assessment.yaml"
-    multi_value_assessment.write_text(yaml.safe_dump(multi_values["assessment"], sort_keys=False), encoding="utf-8")
+    multi_value_assessment.write_text(yaml.safe_dump(order_assessment_tests(multi_values["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-multi-values.json", multi_values["fixture"])
     write_json(OUT / "expected/core-multi-values.json", multi_values["expected"])
     enum_boundaries = build_enum_boundary_suite(selector_mappings)
     enum_assessment = OUT / "cases/core/enum-boundaries.assessment.yaml"
-    enum_assessment.write_text(yaml.safe_dump(enum_boundaries["assessment"], sort_keys=False), encoding="utf-8")
+    enum_assessment.write_text(yaml.safe_dump(order_assessment_tests(enum_boundaries["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-enum-boundaries.json", enum_boundaries["fixture"])
     write_json(OUT / "expected/core-enum-boundaries.json", enum_boundaries["expected"])
     cardinalities = build_cardinality_suite()
     cardinality_assessment = OUT / "cases/core/cardinalities.assessment.yaml"
-    cardinality_assessment.write_text(yaml.safe_dump(cardinalities["assessment"], sort_keys=False), encoding="utf-8")
+    cardinality_assessment.write_text(yaml.safe_dump(order_assessment_tests(cardinalities["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-cardinalities.json", cardinalities["fixture"])
     write_json(OUT / "expected/core-cardinalities.json", cardinalities["expected"])
     variable_interactions = build_variable_interaction_suite()
     variable_assessment = OUT / "cases/core/variable-interactions.assessment.yaml"
-    variable_assessment.write_text(yaml.safe_dump(variable_interactions["assessment"], sort_keys=False), encoding="utf-8")
+    variable_assessment.write_text(yaml.safe_dump(order_assessment_tests(variable_interactions["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-variable-interactions.json", variable_interactions["fixture"])
     write_json(OUT / "expected/core-variable-interactions.json", variable_interactions["expected"])
     set_filters = build_set_filter_suite()
     set_assessment = OUT / "cases/core/set-filters.assessment.yaml"
-    set_assessment.write_text(yaml.safe_dump(set_filters["assessment"], sort_keys=False), encoding="utf-8")
+    set_assessment.write_text(yaml.safe_dump(order_assessment_tests(set_filters["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-set-filters.json", set_filters["fixture"])
     write_json(OUT / "expected/core-set-filters.json", set_filters["expected"])
     variable_functions = build_variable_function_suite()
     function_assessment = OUT / "cases/core/variable-functions.assessment.yaml"
-    function_assessment.write_text(yaml.safe_dump(variable_functions["assessment"], sort_keys=False), encoding="utf-8")
+    function_assessment.write_text(yaml.safe_dump(order_assessment_tests(variable_functions["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-variable-functions.json", variable_functions["fixture"])
     write_json(OUT / "expected/core-variable-functions.json", variable_functions["expected"])
     input_guards = build_input_guard_suite()
     input_assessment = OUT / "cases/core/input-guards.assessment.yaml"
-    input_assessment.write_text(yaml.safe_dump(input_guards["assessment"], sort_keys=False), encoding="utf-8")
+    input_assessment.write_text(yaml.safe_dump(order_assessment_tests(input_guards["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-input-guards.json", input_guards["fixture"])
     write_json(OUT / "expected/core-input-guards.json", input_guards["expected"])
     applicability = build_applicability_suite()
     applicability_assessment = OUT / "cases/core/applicability.assessment.yaml"
-    applicability_assessment.write_text(yaml.safe_dump(applicability["assessment"], sort_keys=False), encoding="utf-8")
+    applicability_assessment.write_text(yaml.safe_dump(order_assessment_tests(applicability["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-applicability.json", applicability["fixture"])
     write_json(OUT / "expected/core-applicability.json", applicability["expected"])
     status_cases = build_status_and_policy_cases()
     status_rows = []
     for name, document, expected in status_cases["status"]:
         assessment_path = OUT / f"cases/core/status-{name}.assessment.yaml"
-        assessment_path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+        assessment_path.write_text(yaml.safe_dump(order_assessment_tests(document), sort_keys=False), encoding="utf-8")
         fixture_path = OUT / f"fixtures/status-{name}.json"
         write_json(fixture_path, {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": f"status-{name}", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": {"status-test": expected["assessment_outcome"]}})
         expected_path = OUT / f"expected/status-{name}.json"; write_json(expected_path, expected)
@@ -894,7 +912,7 @@ def main() -> None:
     policy_expected_path = OUT / "expected/disabled-profile.json"; write_json(policy_expected_path, status_cases["policy_expected"])
     authoring_rows = []
     for case_id, document, expected in build_authoring_enum_cases():
-        assessment_path = OUT / f"cases/core/{case_id}.assessment.yaml"; assessment_path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+        assessment_path = OUT / f"cases/core/{case_id}.assessment.yaml"; assessment_path.write_text(yaml.safe_dump(order_assessment_tests(document), sort_keys=False), encoding="utf-8")
         expected_path = OUT / f"expected/{case_id}.json"; write_json(expected_path, expected)
         authoring_rows.append({"id": case_id, "schema": "assessment.schema.json", "assessment": assessment_path.relative_to(OUT).as_posix(), "expected": expected_path.relative_to(OUT).as_posix()})
     invalid = {
@@ -931,7 +949,7 @@ def main() -> None:
         }
     }
     for name, document in invalid_enum_cases.items():
-        (OUT / f"cases/invalid/{name}.assessment.yaml").write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+        (OUT / f"cases/invalid/{name}.assessment.yaml").write_text(yaml.safe_dump(order_assessment_tests(document), sort_keys=False), encoding="utf-8")
     manifest = {
         "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,

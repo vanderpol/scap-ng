@@ -153,6 +153,16 @@ def main() -> int:
             authored_ops.update(k for k in node if k in set(inventory["operator_inventory"]["field_predicate_properties"]) | expression_keys)
             for key in ("items_found", "items_satisfying", "values_found", "values_matching"):
                 if key in node: authored_cardinalities.add(node[key])
+    presentation_order_violations: list[str] = []
+    presentation_order_witnesses = 0
+    for document in authored_documents:
+        for test_name, test in document.get("assessment", {}).get("tests", {}).items():
+            if not isinstance(test, dict) or "object" not in test or "require" not in test:
+                continue
+            presentation_order_witnesses += 1
+            keys = list(test)
+            if keys.index("object") > keys.index("require"):
+                presentation_order_violations.append(test_name)
 
     # Native field predicate operators are the active comparison surface;
     # source-only pattern_match is deliberately not treated as native.
@@ -224,6 +234,7 @@ def main() -> int:
         "authoring_enums": {"cases": len(manifest.get("authoring_cases", [])), "automated_reported_elements_branches": ["scalar-all", "scalar-compared", "explicit-list"], "manual_outcomes": ["true", "false", "error", "unknown", "not_evaluated", "not_applicable"], "negative_boundary_cases": ["invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern"]},
         "expected_results": {"independent_justification": True, "basis": "Separate expected JSON files cite deterministic fixture variants, item/field cardinality observations, decisive mismatch/status reasons, and core not(FALSE) assertions. They are not derived from RI output.", "ri_execution": False, "ri_issue": 196},
         "feature_coverage": {"fields": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "not_run", "operational": "untested", "scope": "authored fields and deterministic fixture witness"}, "comparison_operators": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "not_run", "operational": "untested", "scope": "schema-valid typed witnesses; runtime unqualified"}, "selector_alternatives": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "not_run", "operational": "untested", "scope": "mapping-declared alternatives; acquisition unqualified"}, "cardinalities": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "not_run", "operational": "untested", "scope": "Model A and schema witnesses; empty/status precedence unqualified"}, "variable_functions": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "not_run", "operational": "untested", "scope": "known ordered values only"}, "input_guards": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "untested", "operational": "untested", "scope": "authoring binding distinctions; Rule packaging unqualified"}, "applicability": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "untested", "operational": "untested", "scope": "dependency identity and typed handoff; graph resolution unqualified"}, "set_filters": {"schema": "pass", "semantic": "pass", "collection": "untested", "integration": "untested", "operational": "untested", "scope": "abstract deterministic populations; collector filter execution unqualified"}},
+        "presentation_order": {"issue": 95, "tests_with_object_and_require": presentation_order_witnesses, "violations": presentation_order_violations, "deterministic": True},
         "capability_rows": mapping_rows,
     }
     (CONF / "coverage-audit.json").write_text(json.dumps(report, indent=2) + "\n")
