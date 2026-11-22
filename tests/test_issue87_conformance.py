@@ -143,6 +143,8 @@ class Issue87Conformance(unittest.TestCase):
         self.assertGreater(audit["enum_boundaries"]["schema_rejected_mutations"], 0)
         self.assertFalse(audit["schema_branches"]["direct_executable_branch_coverage"])
         self.assertTrue(audit["expected_results"]["independent_justification"])
+        self.assertEqual(audit["independent_oracle"]["source_cases"], 15)
+        self.assertFalse(audit["independent_oracle"]["runtime_qualification"])
         derived = audit["derived_integrity"]
         self.assertEqual(derived["fields_from_source_mappings"], 710)
         self.assertEqual(derived["fields_from_authored_assessments"], 710)
