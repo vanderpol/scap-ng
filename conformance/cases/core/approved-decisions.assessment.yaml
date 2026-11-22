@@ -1,0 +1,88 @@
+assessment:
+  id: conformance-core-approved-decisions
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 approved normative decision witnesses
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  variables:
+    source-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: stable
+    different-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: other
+  tests:
+    variable-identity-redundant-test:
+      test_title: Entailed variable State identity can be omitted
+      capability: variable.value
+      variable: source-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            equals:
+              variable: source-variable
+    variable-identity-counterexample-test:
+      test_title: A nonmatching State identity remains a visible FALSE leaf
+      capability: variable.value
+      variable: source-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            equals:
+              variable: different-variable
+    cmdlet-explicit-select-decision-test:
+      test_title: Explicit cmdlet selection remains allowed
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        select:
+          fields:
+            Name:
+              selection_match: one_or_more
+              equals: Name
+      require:
+        item_requirement:
+          items_found: one_or_more
+    cmdlet-null-select-decision-test:
+      test_title: Null cmdlet selection remains allowed
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        select: null
+      require:
+        item_requirement:
+          items_found: one_or_more
+  evaluate:
+    and:
+    - test: variable-identity-redundant-test
+    - not:
+        test: variable-identity-counterexample-test
+    - test: cmdlet-explicit-select-decision-test
+    - test: cmdlet-null-select-decision-test

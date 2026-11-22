@@ -225,6 +225,30 @@
       "items_satisfying": 0,
       "reason": "Upper-case TCP is not the canonical lower-case collected protocol form."
     },
+    "registry-pattern-key-traversal-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "A registry key pattern cannot be combined with hierarchy traversal; the schema-valid shape is rejected before collection."
+    },
+    "cmdlet-explicit-select-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "An explicit unique cmdlet output property is a valid selection."
+    },
+    "cmdlet-null-select-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "A null cmdlet selection explicitly disables Select-Object and remains valid."
+    },
+    "cmdlet-wildcard-select-invalid-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "The wildcard cmdlet selection is rejected before collection; it is not converted into a technical collector ERROR."
+    },
     "registry-key-null-safe-test": {
       "outcome": "true",
       "items_found": 1,
@@ -630,6 +654,7 @@
     "unix.shadow.encrypt_method_literal",
     "windows.cmdlet.module_guid",
     "windows.cmdlet.record_fields",
+    "windows.cmdlet.select_no_wildcard",
     "windows.file.full_path_no_traversal",
     "windows.file.literal_name_characters",
     "windows.file.pattern_directory_no_traversal",
@@ -642,6 +667,7 @@
     "windows.ntuser.value_type_datatype",
     "windows.passwordpolicy.source_ranges",
     "windows.registry.key_null_requires_name_null",
+    "windows.registry.pattern_key_no_traversal",
     "windows.registry.value_type_datatype",
     "windows.sid.materialized_behaviors",
     "windows.sid_sid.materialized_behaviors",
@@ -650,5 +676,9 @@
     "windows.wmi.query.structured_results",
     "windows.wuaupdatesearcher.materialized_superseded_default"
   ],
+  "semantic_rejections": {
+    "registry-pattern-key-traversal-test": "windows.registry.pattern_key_no_traversal",
+    "cmdlet-wildcard-select-invalid-test": "windows.cmdlet.select_no_wildcard"
+  },
   "reason": "Each invalid combination remains schema-valid but has an independently justified semantic ERROR; positive cases demonstrate the allowed boundary and regex exemption. Scanner execution is not claimed."
 }

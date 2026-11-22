@@ -701,6 +701,61 @@ assessment:
         fields:
           protocol:
             equals: TCP
+    registry-pattern-key-traversal-test:
+      test_title: 'Semantic boundary witness: registry-pattern-key-traversal'
+      capability: windows.registry
+      reported_elements: all
+      object:
+        capability: windows.registry
+        hive:
+          equals: classes_root
+        key:
+          matches_regex: ^Software.*
+        name:
+          equals: Count
+        traversal:
+          max_depth: unlimited
+      require:
+        item_requirement:
+          items_found: one_or_more
+    cmdlet-explicit-select-safe-test:
+      test_title: 'Semantic boundary witness: cmdlet-explicit-select-safe'
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        select:
+          fields:
+            Name:
+              selection_match: one_or_more
+              equals: Name
+      require:
+        item_requirement:
+          items_found: one_or_more
+    cmdlet-null-select-safe-test:
+      test_title: 'Semantic boundary witness: cmdlet-null-select-safe'
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        select: null
+      require:
+        item_requirement:
+          items_found: one_or_more
+    cmdlet-wildcard-select-invalid-test:
+      test_title: 'Semantic boundary witness: cmdlet-wildcard-select-invalid'
+      capability: windows.cmdlet
+      reported_elements: all
+      object:
+        capability: windows.cmdlet
+        select:
+          fields:
+            '*':
+              selection_match: one_or_more
+              equals: '*'
+      require:
+        item_requirement:
+          items_found: one_or_more
     registry-key-null-safe-test:
       test_title: 'Semantic boundary witness: registry-key-null-safe'
       capability: windows.registry
@@ -1976,6 +2031,10 @@ assessment:
     - test: lockout-time-invalid-test
     - test: listening-protocol-safe-test
     - test: listening-protocol-invalid-test
+    - test: registry-pattern-key-traversal-test
+    - test: cmdlet-explicit-select-safe-test
+    - test: cmdlet-null-select-safe-test
+    - test: cmdlet-wildcard-select-invalid-test
     - test: registry-key-null-safe-test
     - test: registry-key-null-invalid-test
     - test: registry-value-type-safe-test

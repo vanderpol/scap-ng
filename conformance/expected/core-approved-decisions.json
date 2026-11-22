@@ -1,0 +1,62 @@
+{
+  "format": "scap-ng-conformance-expected-0.1",
+  "schema_version": "0.4.1",
+  "case_id": "core-approved-decisions",
+  "assertions": {
+    "variable-identity-redundant-test": {
+      "outcome": "true",
+      "reason": "The source State identity is entailed and can be omitted with proof."
+    },
+    "variable-identity-counterexample-test": {
+      "outcome": "false",
+      "reason": "The differing State identity is decisive; the FALSE leaf is enclosed only by canonical not."
+    },
+    "cmdlet-explicit-select-decision-test": {
+      "outcome": "true",
+      "reason": "Explicit unique selection is permitted."
+    },
+    "cmdlet-null-select-decision-test": {
+      "outcome": "true",
+      "reason": "Null selection disables Select-Object and is permitted."
+    }
+  },
+  "decision_witnesses": [
+    {
+      "rule": "variable.value.state_var_ref_guard",
+      "case": "redundant",
+      "source_state_var_ref": "source-variable",
+      "native_test_variable": "source-variable",
+      "compared_items": [
+        "variable-identity-item"
+      ],
+      "identity_entailed": true,
+      "action": "omit source var_ref with proof",
+      "expected": "losslessly_representable",
+      "reason": "The selected Test Variable and State variable are the same for the sole compared Item; the native Test.variable preserves identity without a legacy State reference."
+    },
+    {
+      "rule": "variable.value.state_var_ref_guard",
+      "case": "nonredundant-counterexample",
+      "source_state_var_ref": "different-variable",
+      "native_test_variable": "source-variable",
+      "compared_items": [
+        "variable-identity-item"
+      ],
+      "identity_entailed": false,
+      "action": "fail closed and retain conversion hold",
+      "expected": "not_losslessly_representable",
+      "reason": "A different State variable can disagree for the same Item; omitting it would change the source predicate, so no native rewrite is emitted."
+    },
+    {
+      "rule": "windows.cmdlet.select_no_wildcard",
+      "case": "explicit-and-null",
+      "explicit_selection": [
+        "Name"
+      ],
+      "null_selection": true,
+      "wildcard_selection": "rejected-before-collection",
+      "expected": "valid"
+    }
+  ],
+  "reason": "Approved decisions are tested with a positive entailed rewrite, a concrete nonredundant counterexample that fails closed, and valid explicit/null cmdlet selections. Wildcard rejection is separately exercised as a schema-valid semantic rejection in core-semantic-boundaries."
+}
