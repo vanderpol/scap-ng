@@ -30,19 +30,21 @@ family SHA-256 is
 SHA-256 is in both generated receipts; do not edit the version label without
 regenerating the complete pack.
 
-The audit explicitly reports uncovered operators, selector alternatives,
-cardinalities, result statuses, and schema branches; it makes no semantic
-completeness claim. Each capability has seven base vectors plus deterministic
-multi-Item vectors; 103 capabilities also have a multi-value vector (935
-expanded capability vectors total). Negative fixtures are derived from each
-Assessment: selector fields remain unchanged when a Require field is mismatched,
-and selector-only capabilities use a collected empty population rather than
-inventing a field mismatch. The expected result files are an independent oracle
-and preserve UNKNOWN/ERROR/NOT_APPLICABLE instead of Booleanizing them.
+The audit derives coverage from source mappings, authored Assessment YAML, and
+corresponding fixture JSON—not from declared inventory counts or expected keys.
+It finds 710/710 fields in both authored positive Assessments and positive
+fixtures. Each capability has seven base vectors plus a deterministic
+multi-Item vector (832 expanded capability vectors total); a dedicated suite
+adds 103 applicable multi-value witnesses. Negative fixtures are derived from
+each Assessment: selector fields remain unchanged when a Require field is
+mismatched, and selector-only capabilities use a collected empty population.
+The strict receipt oracle verifies identity, exact schema pin, fixture/expected
+hashes, Test outcomes, decisive reasons, typed evidence, and provenance.
 Dedicated suites cover all 67 active comparison operators, all 94 declared
 selector alternatives, every cardinality token, `not_evaluated`, and
-profile-disabled Rules. Enum boundary mutations, schema property/constraint
-combinations, collector execution, and scale remain explicitly incomplete.
+profile-disabled Rules. Native enum boundary values beyond the sentinel audit,
+schema property/constraint combinations, collector execution, and scale remain
+explicitly incomplete.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
 spelling; `negate` is an invalid-authoring regression.

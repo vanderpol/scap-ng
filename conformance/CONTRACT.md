@@ -46,14 +46,30 @@ An adapter (RI issue #196) consumes `manifest.json` and emits a JSON receipt:
   "schema_commit": "<exact manifest commit>",
   "case_id": "windows.registry",
   "variant": "positive",
+  "fixture_sha256": "<fixture bytes>",
+  "expected_sha256": "<expected bytes>",
   "assessment_outcome": "true",
   "test_outcomes": {"windows-registry-test": "true"},
   "items_found": 1,
   "items_satisfying": 1,
-  "decisive_reason": "...",
-  "evidence": [{"item_id": "...", "field": "...", "status": "collected", "value": "..."}]
+  "decisive_reason": "All declared fields match the collected Item.",
+  "evidence": [{"item_id": "...", "field": "...", "datatype": "string", "status": "collected", "value": "..."}],
+  "provenance": {
+    "source": "deterministic-fixture",
+    "fixture_variant": "positive",
+    "fixture_sha256": "<fixture bytes>",
+    "expected_sha256": "<expected bytes>",
+    "schema_commit": "<exact manifest commit>"
+  }
 }
 ```
+
+The oracle rejects missing identity, hash, outcome, decisive-reason, typed
+evidence, or provenance fields; it verifies every witness against the selected
+fixture Item/field and requires Test outcome keys to exactly match the authored
+Assessment. Item-level evidence uses `field: null`, `datatype: record`, and the
+Item field map as its value. Adapters must not report a receipt whose evidence
+or provenance is merely asserted rather than byte-linked.
 
 Allowed typed outcomes are `true`, `false`, `unknown`, `error`,
 `not_applicable`, `not_evaluated`, and any additional status explicitly admitted

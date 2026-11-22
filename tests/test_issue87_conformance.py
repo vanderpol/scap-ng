@@ -7,6 +7,9 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from copy import deepcopy
+
+from conformance.tools.oracle import compare
 
 ROOT = Path(__file__).resolve().parents[1]
 CONF = ROOT / "conformance"
@@ -83,6 +86,36 @@ class Issue87Conformance(unittest.TestCase):
                 row["capability"],
             )
 
+    def _valid_receipt(self):
+        row = next(row for row in self.manifest["capabilities"] if row["capability"] == "windows.registry")
+        expected = read(CONF / row["expected"])
+        fixture = read(CONF / row["fixture"])
+        item = fixture["variants"]["positive"]["items"][0]
+        evidence = [{"item_id": item["id"], "field": field, "datatype": value["datatype"], "status": value["status"], "value": value["value"]} for field, value in item["fields"].items()]
+        receipt = {"format": "scap-ng-conformance-receipt-0.1", "schema_version": self.manifest["schema_version"], "schema_commit": self.manifest["schema_commit"], "case_id": "windows.registry", "variant": "positive", "fixture_sha256": row["sha256"]["fixture"], "expected_sha256": row["sha256"]["expected"], "assessment_outcome": "true", "test_outcomes": {"windows-registry-test": "true"}, "items_found": 1, "items_satisfying": 1, "decisive_reason": expected["variants"]["positive"]["reason"], "evidence": evidence, "provenance": {"source": "deterministic-fixture", "fixture_variant": "positive", "fixture_sha256": row["sha256"]["fixture"], "expected_sha256": row["sha256"]["expected"], "schema_commit": self.manifest["schema_commit"]}}
+        return expected, fixture, receipt, row
+
+    def test_oracle_accepts_complete_receipt(self):
+        expected, fixture, receipt, row = self._valid_receipt()
+        self.assertEqual(compare(expected, receipt, manifest=self.manifest, fixture=fixture, fixture_sha256=row["sha256"]["fixture"], expected_sha256=row["sha256"]["expected"], test_names=["windows-registry-test"]), [])
+
+    def test_oracle_rejects_missing_or_mismatched_identity_and_proof(self):
+        expected, fixture, receipt, row = self._valid_receipt()
+        mutations = {
+            "schema pin": ("schema_commit", "0" * 40),
+            "fixture hash": ("fixture_sha256", "bad"),
+            "expected hash": ("expected_sha256", "bad"),
+            "test outcomes": ("test_outcomes", {}),
+            "decisive reason": ("decisive_reason", "wrong"),
+            "provenance": ("provenance", {"source": "deterministic-fixture"}),
+            "typed evidence": ("evidence", [{"item_id": "windows-registry-item", "field": "hive", "datatype": "string", "status": "collected"}]),
+        }
+        for name, (key, value) in mutations.items():
+            with self.subTest(name=name):
+                mutant = deepcopy(receipt); mutant[key] = value
+                errors = compare(expected, mutant, manifest=self.manifest, fixture=fixture, fixture_sha256=row["sha256"]["fixture"], expected_sha256=row["sha256"]["expected"], test_names=["windows-registry-test"])
+                self.assertTrue(errors, name)
+
     def test_core_semantics_keep_false_leaf_visible_and_only_not_negates(self):
         assessment = (CONF / "cases/core/evaluate-not.assessment.yaml").read_text(encoding="utf-8")
         self.assertIn("not:", assessment)
@@ -102,7 +135,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["vectors"]["expanded_capability_vectors_total"], 832)
         self.assertEqual(audit["vectors"]["multi_value_suite_cases"], 103)
         self.assertEqual(audit["fields"]["declared_mapping_fields"], 710)
-        self.assertEqual(audit["fields"]["asserted_by_positive_assessments"], 710)
+        self.assertEqual(audit["fields"]["authored_assessment_fields"], 710)
         self.assertEqual(audit["selectors"]["uncovered_alternative_sets"], 0)
         self.assertEqual(audit["operators"]["uncovered_comparison"], [])
         self.assertEqual(audit["cardinalities"]["uncovered"], [])
@@ -110,6 +143,16 @@ class Issue87Conformance(unittest.TestCase):
         self.assertGreater(audit["enum_boundaries"]["schema_rejected_mutations"], 0)
         self.assertFalse(audit["schema_branches"]["direct_executable_branch_coverage"])
         self.assertTrue(audit["expected_results"]["independent_justification"])
+        derived = audit["derived_integrity"]
+        self.assertEqual(derived["fields_from_source_mappings"], 710)
+        self.assertEqual(derived["fields_from_authored_assessments"], 710)
+        self.assertEqual(derived["fields_from_positive_fixtures"], 710)
+        self.assertEqual(derived["operators_from_source_schema"], 67)
+        self.assertEqual(derived["operators_from_authored_assessments"], 67)
+        self.assertEqual(derived["selector_alternatives_from_source_mappings"], 94)
+        self.assertEqual(derived["selector_alternatives_from_authored_assessments"], 94)
+        self.assertEqual(derived["missing_witnesses"], {"fields": [], "selectors": [], "operators": [], "cardinalities": []})
+        self.assertEqual(derived["non_exercising_witnesses"], [])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():

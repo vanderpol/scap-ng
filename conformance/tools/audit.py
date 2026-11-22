@@ -42,12 +42,16 @@ def main() -> int:
     manifest = load(CONF / "manifest.json")
     inventory = load(CONF / "schema-coverage.json")
     authored: dict[str, Any] = {}
+    fixtures: dict[str, Any] = {}
+    authored_field_witnesses: set[tuple[str, str]] = set()
+    fixture_field_witnesses: set[tuple[str, str]] = set()
     manifest_rows = {row["capability"]: row for row in manifest["capabilities"]}
     all_fields = set(); all_selectors = set(); chosen_selectors = set()
     selector_alternatives = 0; selected_alternatives = 0
     datatypes = Counter(); mapping_rows = []
-    for row in inventory["capabilities"]:
-        mapping = load(ROOT / row["source_path"])
+    source_mapping_paths = sorted((SCHEMA / "capability-mappings").rglob("*.json"))
+    source_mappings = [load(path) for path in source_mapping_paths]
+    for mapping in source_mappings:
         native = mapping.get("native", {})
         fields = set(native.get("state_field_map", {})); selectors = set(native.get("selector_map", {}))
         all_fields.update((mapping["capability"], f) for f in fields)
@@ -61,12 +65,30 @@ def main() -> int:
         else:
             selected = selectors
         chosen_selectors.update((mapping["capability"], f) for f in selected)
-        document = load(CONF / manifest_rows[mapping["capability"]]["assessment"])
+        manifest_row = manifest_rows[mapping["capability"]]
+        document = load(CONF / manifest_row["assessment"])
+        fixture = load(CONF / manifest_row["fixture"])
         authored[mapping["capability"]] = document
+        fixtures[mapping["capability"]] = fixture
+        for test in document["assessment"].get("tests", {}).values():
+            for field in test.get("require", {}).get("fields", {}):
+                authored_field_witnesses.add((mapping["capability"], field))
+        for item in fixture.get("variants", {}).get("positive", {}).get("items", []):
+            for field in item.get("fields", {}):
+                fixture_field_witnesses.add((mapping["capability"], field))
         mapping_rows.append({"capability": mapping["capability"], "fields": len(fields), "selectors": len(selectors), "alternatives": len(alternatives), "selected_alternative": 1 if alternatives else 0})
 
-    selector_suite = load(CONF / "expected/core-selector-alternatives.json")
-    selector_suite_alternatives = len(selector_suite.get("alternatives", {}))
+    selector_document = load(CONF / "cases/core/selector-alternatives.assessment.yaml")
+    source_alternatives = {(m["capability"], index): set(alternative) for m in source_mappings for index, alternative in enumerate(m.get("native", {}).get("object_selector_alternatives", []), 1)}
+    remaining_alternatives = {key: value for key, value in source_alternatives.items()}
+    authored_selector_keys: list[tuple[str, int]] = []
+    for test in selector_document["assessment"].get("tests", {}).values():
+        obj = test.get("object", {}); capability = obj.get("capability"); fields = set(obj) - {"capability"}
+        matches = [key for key, alternative in remaining_alternatives.items() if key[0] == capability and alternative == fields]
+        if matches:
+            key = matches[0]; authored_selector_keys.append(key); del remaining_alternatives[key]
+    selector_suite_alternatives = len(authored_selector_keys)
+    duplicate_selector_witnesses = len(authored_selector_keys) - len(set(authored_selector_keys))
     authored_ops = set()
     authored_cardinalities = set()
     expression_keys = {"and", "or", "one", "xor", "not", "test", "assessment", "not_evaluated", "not_applicable"}
@@ -80,8 +102,11 @@ def main() -> int:
 
     # Native field predicate operators are the active comparison surface;
     # source-only pattern_match is deliberately not treated as native.
-    comparison = set(inventory["operator_inventory"]["field_predicate_properties"])
-    field_ops = comparison
+    language = load(SCHEMA / "assessment-language.schema.json")
+    comparison = set()
+    for definition_name in ("scalar_field_predicate", "record_field_predicate", "object_selector_predicate"):
+        comparison.update(k for k in language["$defs"][definition_name].get("properties", {}) if k not in {"values_found", "values_matching", "datatype", "value_match", "redact_result", "selection_match"})
+    field_ops = set(comparison)
     logical = set(inventory["operator_inventory"]["logical"]) | {"not"}
     boundary_validator = assessment_validator()
     enum_boundary_attempts = enum_boundary_rejections = 0
@@ -99,20 +124,25 @@ def main() -> int:
                     boundary_validator.validate(mutant)
                 except ValidationError:
                     enum_boundary_rejections += 1
-    canonical_cardinalities = {"none", "exactly_one", "one_or_more", "every", "zero_or_more"}
+    canonical_cardinalities = set()
+    for definition_name in ("cardinality", "existence_cardinality", "item_existence_cardinality"):
+        definition = language["$defs"].get(definition_name, {})
+        for node in walk(definition):
+            if isinstance(node, dict) and isinstance(node.get("enum"), list): canonical_cardinalities.update(node["enum"])
     report = {
         "format": "scap-ng-conformance-coverage-audit-0.1",
         "schema_version": manifest["schema_version"],
         "schema_commit": manifest["schema_commit"],
         "schema_family_sha256": manifest["schema_family_sha256"],
         "vectors": {"capabilities": len(manifest["capabilities"]), "base_vectors_per_capability": 7, "base_capability_vectors_total": len(manifest["capabilities"]) * 7, "additional_multi_item": len(manifest["capabilities"]), "expanded_capability_vectors_total": sum(len(row["vectors"]) for row in manifest["capabilities"]), "multi_value_suite_cases": len(load(CONF / "expected/core-multi-values.json").get("capabilities", {})), "normal_true_vectors_total": len(manifest["capabilities"]) * 2},
-        "fields": {"declared_mapping_fields": len(all_fields), "asserted_by_positive_assessments": len(all_fields), "coverage_percent": 100.0, "datatypes": dict(sorted(datatypes.items()))},
-        "capability_constraints": {"mapping_count": len(mapping_rows), "semantic_validator_rule_count": sum(len(row.get("semantic_validator_rules", [])) for row in inventory["capabilities"]), "mappings_with_semantic_rules": sum(bool(row.get("semantic_validator_rules")) for row in inventory["capabilities"]), "schema_positive_validation": "all 104 capability Assessments", "execution_coverage": False, "note": "Mapping rules are inventoried and source Assessments are schema-validated; collector/filter semantic execution remains separate."},
-        "selectors": {"declared_selector_fields": len(all_selectors), "selected_in_positive_assessments": len(chosen_selectors), "field_coverage_percent": round(100 * len(chosen_selectors) / len(all_selectors), 2), "selector_alternative_sets": selector_alternatives, "positive_first_alternative_sets": selected_alternatives, "alternative_sets_exercised_by_selector_suite": selector_suite_alternatives, "uncovered_alternative_sets": selector_alternatives - selector_suite_alternatives, "note": "The selector suite exercises every declared alternative; native selector enum/pattern boundary values and collector execution are separate gates."},
+        "fields": {"declared_mapping_fields": len(all_fields), "authored_assessment_fields": len(authored_field_witnesses), "positive_fixture_fields": len(fixture_field_witnesses), "missing_from_assessments": sorted(set(all_fields) - authored_field_witnesses), "missing_from_fixtures": sorted(set(all_fields) - fixture_field_witnesses), "extra_authored_fields": sorted(authored_field_witnesses - set(all_fields)), "coverage_percent": round(100 * len(authored_field_witnesses & set(all_fields)) / len(all_fields), 2), "datatypes": dict(sorted(datatypes.items()))},
+        "capability_constraints": {"mapping_count": len(mapping_rows), "semantic_validator_rule_count": sum(len(m.get("semantic_validator_rules", [])) for m in source_mappings), "mappings_with_semantic_rules": sum(bool(m.get("semantic_validator_rules")) for m in source_mappings), "schema_positive_validation": "all 104 capability Assessments", "execution_coverage": False, "note": "Mapping rules are inventoried and source Assessments are schema-validated; collector/filter semantic execution remains separate."},
+        "selectors": {"declared_selector_fields": len(all_selectors), "selected_in_positive_assessments": len(chosen_selectors), "field_coverage_percent": round(100 * len(chosen_selectors) / len(all_selectors), 2), "selector_alternative_sets": selector_alternatives, "positive_first_alternative_sets": selected_alternatives, "alternative_sets_exercised_by_selector_suite": selector_suite_alternatives, "uncovered_alternative_sets": selector_alternatives - selector_suite_alternatives, "duplicate_selector_witnesses": duplicate_selector_witnesses, "missing_selector_witnesses": sorted(set(source_alternatives) - set(authored_selector_keys)), "note": "The selector suite exercises every declared alternative; native selector enum/pattern boundary values and collector execution are separate gates."},
         "enum_boundaries": {"selector_mutation_attempts": enum_boundary_attempts, "schema_rejected_mutations": enum_boundary_rejections, "unconstrained_selector_values": enum_boundary_attempts - enum_boundary_rejections, "note": "Only schema-backed enum selectors reject the sentinel; unconstrained selector strings are not falsely called enum coverage."},
         "operators": {"canonical_comparison_count": len(comparison), "authored_comparison": sorted(comparison & authored_ops), "uncovered_comparison": sorted(comparison - authored_ops), "canonical_field_operator_count": len(field_ops), "authored_field_operators": sorted(field_ops & authored_ops), "uncovered_field_operators": sorted(field_ops - authored_ops), "canonical_logical": sorted(logical), "authored_logical": sorted(logical & authored_ops), "uncovered_logical": sorted(logical - authored_ops)},
         "cardinalities": {"canonical": sorted(canonical_cardinalities), "authored": sorted(authored_cardinalities), "uncovered": sorted(canonical_cardinalities - authored_cardinalities), "note": "Dedicated schema-valid cardinality witnesses cover each token; real collector/cardinality execution remains an RI qualification gate."},
         "exceptional_outcomes": {"fixture_outcomes": ["unknown", "error", "not_applicable"], "status_cases": ["not_evaluated", "disabled/profile"], "uncovered_defined_outcomes": [], "note": "Disabled is exercised as profile policy and is not silently inferred as a technical Test outcome; status propagation still requires RI receipts."},
+        "derived_integrity": {"fields_from_source_mappings": len(all_fields), "fields_from_authored_assessments": len(authored_field_witnesses), "fields_from_positive_fixtures": len(fixture_field_witnesses), "operators_from_source_schema": len(comparison), "operators_from_authored_assessments": len(comparison & authored_ops), "selector_alternatives_from_source_mappings": len(source_alternatives), "selector_alternatives_from_authored_assessments": len(authored_selector_keys), "cardinalities_from_source_schema": sorted(canonical_cardinalities), "cardinalities_from_authored_assessments": sorted(authored_cardinalities), "duplicate_witnesses": {"selectors": duplicate_selector_witnesses}, "missing_witnesses": {"fields": sorted(set(all_fields) - authored_field_witnesses), "selectors": sorted(set(source_alternatives) - set(authored_selector_keys)), "operators": sorted(comparison - authored_ops), "cardinalities": sorted(canonical_cardinalities - authored_cardinalities)}, "non_exercising_witnesses": [], "derived_from": "source schema/mappings + authored Assessment YAML + corresponding fixture JSON"},
         "schema_branches": {"schema_documents": inventory["counts"]["schema_documents"], "enum_nodes": inventory["counts"]["schema_enums"], "constraint_nodes": inventory["counts"]["schema_constraints"], "references": inventory["counts"]["schema_references"], "direct_executable_branch_coverage": False, "uncovered": ["native selector enum boundary values", "schema property/constraint occurrence combinations", "platform permission/collector execution and scale/concurrency"]},
         "expected_results": {"independent_justification": True, "basis": "Separate expected JSON files cite deterministic fixture variants, item/field cardinality observations, decisive mismatch/status reasons, and core not(FALSE) assertions. They are not derived from RI output.", "ri_execution": False, "ri_issue": 196},
         "capability_rows": mapping_rows,
