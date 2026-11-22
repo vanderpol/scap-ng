@@ -7,13 +7,13 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1] / 'schema'
 PREFIX = 'https://scap-ng.dev/schema/v0.4.1/'
-EXPECTED_JSON = 146
-EXPECTED_SCHEMAS = 35
-EXPECTED_REFS = 700
+EXPECTED_JSON = 147
+EXPECTED_SCHEMAS = 36
+EXPECTED_REFS = 702
 # Active single-version 0.4.1 family including reviewed registry traversal.
 # Historical frozen receipts remain in conformance/0.4 and prior Git commits.
 # The digest is independently checked by the generated documentation manifest.
-EXPECTED_DIGEST = '1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4'
+EXPECTED_DIGEST = 'dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24'
 
 
 def strict_object(pairs):

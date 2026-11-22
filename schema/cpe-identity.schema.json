@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scap-ng.dev/schema/v0.4.1/cpe-identity.schema.json",
+  "x-scap-ng-version": "0.4.1",
+  "x-last-modified": "2026-11-22",
+  "title": "SCAP-NG declared CPE identity v0.4.1",
+  "description": "A lossless source CPE identity declared by a Benchmark platform. This metadata is not an applicability decision or a CPE matching result.",
+  "type": "object",
+  "required": [
+    "value",
+    "binding",
+    "source"
+  ],
+  "properties": {
+    "value": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exact source CPE spelling, including escaping and packed-edition syntax; no normalization or matching is implied."
+    },
+    "binding": {
+      "type": "string",
+      "enum": [
+        "cpe_uri_2_2",
+        "cpe_formatted_string_2_3"
+      ],
+      "description": "CPE naming binding used by the source value."
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "kind",
+        "id",
+        "sha256"
+      ],
+      "properties": {
+        "kind": {
+          "const": "cpe_platform",
+          "description": "Source provenance kind; it does not authorize executable matching."
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Source CPE/platform identity associated with this declaration."
+        },
+        "idref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Original source identifier or reference, when present."
+        },
+        "href": {
+          "type": "string",
+          "description": "Original source component location, when present."
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "SHA-256 of the source identity element or preserved source provenance record."
+        }
+      },
+      "additionalProperties": false,
+      "description": "Immutable source provenance for the declared identity."
+    }
+  },
+  "additionalProperties": false
+}

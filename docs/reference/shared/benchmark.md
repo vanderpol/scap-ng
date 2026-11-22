@@ -72,6 +72,7 @@ Proposed documentation. Defaults are schema annotations, not inferred scanner fa
 | `id` | string | 1..1 (required) | Identifier of the declared platform. | [/properties/benchmark/properties/platform/properties/id](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/id) |
 | `title` | string | 1..1 (required) | Human-readable title of the declared platform. | [/properties/benchmark/properties/platform/properties/title](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/title) |
 | `applicability` | object | 0..1 | Applicability information associated with the declared platform. | [/properties/benchmark/properties/platform/properties/applicability](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/applicability) |
+| `expected_cpe_identities` | array | 0..1 | Optional declared Benchmark target CPE identities. | [/properties/benchmark/properties/platform/properties/expected_cpe_identities](../../../proposed-schema/documentation/benchmark.schema.json#/properties/benchmark/properties/platform/properties/expected_cpe_identities) |
 
 ## `/properties/benchmark/properties/profiles/items`
 

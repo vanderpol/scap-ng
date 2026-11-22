@@ -60,7 +60,7 @@ class ProductionDocumentationTests(unittest.TestCase):
             self.assertEqual(set(native.get('state_field_map',{}).values()),set(doc['$defs']['meanings']['properties']),cap)
             self.assertTrue(set(gen.properties(self.docs,obj['x-doc-validation-ref'])) <= set(fields),cap)
 
-    def test_validation_assertions_equal_frozen_for_all_35_roots(self):
+    def test_validation_assertions_equal_frozen_for_all_36_roots(self):
         checked=0
         for base,(doc,path) in self.docs.items():
             if 'x-doc-capability' in doc: continue

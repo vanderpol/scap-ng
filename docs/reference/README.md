@@ -15,17 +15,17 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 | unresolved native contracts | 105 |
 | shared description gaps | 155 |
 | capability pages | 105 |
-| shared pages | 35 |
-| advanced pages | 140 |
-| description owners | 2235 |
+| shared pages | 36 |
+| advanced pages | 141 |
+| description owners | 2246 |
 | duplicate text groups | 176 |
 | capability unique description owners | 803 |
 | preserved semantic holds | 5 |
 | preserved withheld definitions | 1 |
-| shared fields discovered | 3144 |
-| shared fields documented | 2989 |
-| shared basic fields discovered | 1571 |
-| shared basic fields documented | 1497 |
+| shared fields discovered | 3154 |
+| shared fields documented | 2999 |
+| shared basic fields discovered | 1581 |
+| shared basic fields documented | 1507 |
 
 ## [aix](platforms/aix.md)
 
@@ -189,6 +189,7 @@ Field-route totals count Object, Item and Require contexts, including reused mea
 - [capability-common.schema](shared/capability-common.md)
 - [collected-item.schema](shared/collected-item.md)
 - [collection-result.schema](shared/collection-result.md)
+- [cpe-identity.schema](shared/cpe-identity.md)
 - [entity-result.schema](shared/entity-result.md)
 - [expression-invocation.schema](shared/expression-invocation.md)
 - [expression-result.schema](shared/expression-result.md)

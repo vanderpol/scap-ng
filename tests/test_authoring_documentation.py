@@ -78,7 +78,7 @@ class AuthoringDocumentationTests(unittest.TestCase):
 
     def test_documentation_audit_covers_every_schema_root(self):
         roots = sorted(ROOT.glob('*.schema.json'))
-        self.assertEqual(len(roots), 35)
+        self.assertEqual(len(roots), 36)
         for path in roots:
             document = json.loads(path.read_text())
 
