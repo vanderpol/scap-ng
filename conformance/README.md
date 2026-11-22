@@ -6,6 +6,11 @@ active corpus is **only** the root `manifest.json`, `schema-coverage.json`,
 0.4.1 schema family. The older `0.4/` material is retained as historical
 Model-A evidence and is not an active 0.4.1 authoring corpus.
 
+Generated Assessment YAML follows Issue #95: each Test serializes `object`
+before `require` when both are present. This is deterministic presentation
+order, not a language or JSON Schema rule; Issue #96's 0.5.0 `requirements`
+rename is explicitly out of scope.
+
 ## Current inventory receipt
 
 The generated inventory (`schema-coverage.json`) and conservative audit

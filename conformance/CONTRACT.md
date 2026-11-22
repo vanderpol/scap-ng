@@ -12,6 +12,12 @@ and an expected-result document. A vector is identified by
 `(case_id, fixture_variant)`. The fixture is a replay input, not an evaluator
 output. Expected results are independent oracle assertions.
 
+Newly generated 0.4.1 Assessment YAML follows Issue #95 presentation order in
+each Test: identification/metadata, `capability`, `object` when present,
+`require`, then `reported_elements`. This is serialization guidance only; JSON
+object order is not schema semantics and existing historical evidence is not
+rewritten solely for formatting.
+
 Every ordinary capability case provides:
 
 * `positive`: one collected Item and every declared field matching;
