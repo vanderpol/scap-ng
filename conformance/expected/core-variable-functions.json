@@ -90,6 +90,41 @@
         -12
       ],
       "reason": "Signed decimal strings, including leading zeros, convert elementwise without changing order."
+    },
+    "begin": {
+      "outcome": "true",
+      "values_found": 2,
+      "values": [
+        "/etc",
+        "/var"
+      ],
+      "reason": "The source begin transformation prepends / only when absent, so etc becomes /etc while /var remains unchanged."
+    },
+    "end": {
+      "outcome": "true",
+      "values_found": 2,
+      "values": [
+        "etc/",
+        "var/"
+      ],
+      "reason": "The source end transformation appends / only when absent, so etc becomes etc/ while var/ remains unchanged."
+    },
+    "input": {
+      "outcome": "true",
+      "values_found": 1,
+      "values": [
+        7
+      ],
+      "reason": "The required exactly-one integer binding is supplied as [7] and is not replaced by a literal or default."
+    },
+    "values": {
+      "outcome": "true",
+      "values_found": 2,
+      "values": [
+        "unix",
+        "windows"
+      ],
+      "reason": "The values projection reads family from two collected Items in document order; no field or status is synthesized."
     }
   },
   "function_names": [
@@ -102,7 +137,11 @@
     "substring",
     "time_difference",
     "arithmetic",
-    "to_integer"
+    "to_integer",
+    "begin",
+    "end",
+    "input",
+    "values"
   ],
-  "reason": "Expected values are independently derived from ordered literal populations; status/error propagation and runtime execution remain separate."
+  "reason": "Expected values are independently derived from deterministic literals, a required Input binding, and two typed collected Items. Collector/runtime status propagation remains separate and scanner execution is not claimed."
 }
