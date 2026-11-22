@@ -96,6 +96,13 @@ remain outside this portable corpus.
 The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
 independent-oracle, and runtime proof and records the exact RI #196 handoff.
 
+For RI and third-party vendor reuse, see
+[`ADAPTER-CONTRACT.md`](ADAPTER-CONTRACT.md) and the versioned
+[`receipt.schema.json`](receipt.schema.json). They define a public adapter
+workflow, five independent qualification dimensions, receipt states, and the
+regression process for normative ambiguities without making any scanner the
+semantic authority.
+
 ## Qualification boundary
 
 The offline runner checks schema validity, deterministic fixture structure,

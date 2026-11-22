@@ -111,3 +111,20 @@ execution equivalence, or compliance. An RI receipt and independent source
 oracle comparison are separate gates. Platform/collector qualification and
 scale evidence are intentionally tracked as adapter increments rather than
 invented by this portable corpus.
+
+## Portable vendor qualification
+
+`receipt.schema.json` is the versioned, implementation-independent receipt
+contract. `ADAPTER-CONTRACT.md` defines the public adapter workflow and
+qualification dimensions. A vendor or RI adapter consumes only public manifest,
+Assessment, fixture, expected, and pinned-schema bytes and emits one receipt
+per `(case_id, variant)`. It must not import or rewrite scanner-specific corpus
+logic. `tools/oracle.py` remains the independent comparison authority.
+
+Receipts classify `schema`, `semantic`, `collection`, `integration`, and
+`operational` evidence independently as `pass`, `fail`, `unsupported`,
+`untested`, `not_run`, or `blocked`. Missing receipts and unsupported behavior
+are not success. Expected results never come from an implementation under test.
+Normative ambiguities require a minimal paired witness, independent expected
+result, and adversarial mutation regression recorded in `GAP-MATRIX.md` before
+an outcome or schema contract is changed.

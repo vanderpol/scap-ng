@@ -14,6 +14,8 @@ from typing import Any, Iterable
 ALLOWED = {"true", "false", "unknown", "error", "not_applicable", "not_evaluated"}
 RECEIPT_FORMAT = "scap-ng-conformance-receipt-0.1"
 EXPECTED_FORMAT = "scap-ng-conformance-expected-0.1"
+QUALIFICATION_STATES = {"pass", "fail", "unsupported", "untested", "not_run", "blocked"}
+QUALIFICATION_DIMENSIONS = {"schema", "semantic", "collection", "integration", "operational"}
 
 
 def _sha256(path: Path) -> str:
@@ -110,7 +112,7 @@ def compare(
         return errors
     assert manifest is not None and fixture is not None and fixture_sha256 is not None and expected_sha256 is not None and test_names is not None
     test_names = list(test_names)
-    required_receipt = {"format", "schema_version", "schema_commit", "case_id", "variant", "fixture_sha256", "expected_sha256", "assessment_outcome", "test_outcomes", "decisive_reason", "evidence", "provenance"}
+    required_receipt = {"format", "schema_version", "schema_commit", "case_id", "variant", "fixture_sha256", "expected_sha256", "assessment_outcome", "test_outcomes", "decisive_reason", "evidence", "provenance", "qualification"}
     missing = required_receipt - set(receipt)
     if missing:
         errors.append(f"receipt missing required fields: {sorted(missing)}")
@@ -126,6 +128,15 @@ def compare(
         errors.append("receipt fixture_sha256 does not match fixture bytes")
     if receipt.get("expected_sha256") != expected_sha256:
         errors.append("receipt expected_sha256 does not match expected bytes")
+    qualification = receipt.get("qualification")
+    if not isinstance(qualification, dict) or set(qualification) != QUALIFICATION_DIMENSIONS:
+        errors.append("qualification must contain exactly schema, semantic, collection, integration, and operational states")
+    else:
+        for dimension, state in qualification.items():
+            if state not in QUALIFICATION_STATES:
+                errors.append(f"qualification[{dimension!r}] is not a recognized qualification state")
+        if qualification.get("schema") != "pass":
+            errors.append("qualification.schema must be pass for an adapter receipt")
     variant = receipt.get("variant")
     assertion = expected.get("variants", {}).get(variant)
     if assertion is None:
