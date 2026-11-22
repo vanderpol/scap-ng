@@ -21,21 +21,21 @@ python conformance/tools/runner.py coverage
 python -m unittest tests/test_issue87_conformance.py -v
 ```
 
-At the initial issue #87 increment the inventory is pinned to commit
-`860d63e84d5aba12daa6d5037bdb83d78a95088a` and contains 104 capability
-mappings (100 supported, 4 experimental), 35 root schemas, 145 JSON resources,
-693 schema references, 141 enum nodes and 10,960 constraint nodes. The schema
+The current mainline-rebased inventory is pinned to schema commit
+`d1ab0283e09369c2c734d3b8f93b65007441cf07` and contains 105 capability
+mappings (101 supported, 4 experimental), 35 root schemas, 146 JSON resources,
+700 schema references, 142 enum nodes and 11,327 constraint nodes. The schema
 family SHA-256 is
-`33c0867870c04a411f769646a8f5c8c785134673d56a26b7a1cd3c8d213a7a91`. The exact
+`1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4`. The exact
 SHA-256 is in both generated receipts; do not edit the version label without
 regenerating the complete pack.
 
 The audit derives coverage from source mappings, authored Assessment YAML, and
 corresponding fixture JSON—not from declared inventory counts or expected keys.
-It finds 710/710 fields in both authored positive Assessments and positive
+It finds 718/718 fields in both authored positive Assessments and positive
 fixtures. Each capability has seven base vectors plus a deterministic
-multi-Item vector (832 expanded capability vectors total); a dedicated suite
-adds 103 applicable multi-value witnesses. Negative fixtures are derived from
+multi-Item vector (840 expanded capability vectors total); a dedicated suite
+adds 104 applicable multi-value witnesses. Negative fixtures are derived from
 each Assessment: selector fields remain unchanged when a Require field is
 mismatched, and selector-only capabilities use a collected empty population.
 The strict receipt oracle verifies identity, exact schema pin, fixture/expected
@@ -45,9 +45,41 @@ selector alternatives, every cardinality token, `not_evaluated`, and
 profile-disabled Rules. Native enum boundary values beyond the sentinel audit,
 schema property/constraint combinations, collector execution, and scale remain
 explicitly incomplete.
+
+Authoring branches are separately witnessed: 20 schema-valid Assessments cover
+both modes, all five Assessment classes, all three `reported_elements` branches
+(including an explicit list), and all six manual technical-outcome choices.
+Ten invalid-authoring vectors reject out-of-domain enums and representative
+identifier, procedure, duplicate-list, cardinality, Variable-kind, and
+specification-version constraints.
+
+The audit also derives all 180 mapping semantic-validator rules. It marks only
+explicit source-shape checks (for example singleton/no-Object and resolved
+Variable source) as structural witnesses; collector/filter and capability
+specific rules remain listed as untested rather than promoted to semantic
+coverage.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
 spelling; `negate` is an invalid-authoring regression.
+
+The independent Model A oracle executes all 15 frozen complete-known-nonempty
+integer/string cases, including aliases, duplicate preservation, expected-value
+matching, and the three cardinality layers. It intentionally rejects empty,
+unknown, error, and unsupported datatype cases rather than assigning outcomes.
+
+The canonical `core-variable-interactions` Assessment separately connects a
+local Variable alias to a multi-value `variable.value` Test and Require field
+cardinality. Its decisive FALSE leaf is visible and enclosed only by canonical
+`not`; the expected counts are independently derived from the two ordered
+values.
+
+The canonical `core-set-filters` Assessment covers shared Set operators
+(`union`, `intersection`, `difference`) and both filter actions over deterministic
+abstract populations. It is an independent schema/oracle witness, not proof of
+collector-side Set or capability filter execution.
+
+The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
+independent-oracle, and runtime proof and records the exact RI #196 handoff.
 
 ## Qualification boundary
 

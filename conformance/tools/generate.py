@@ -398,6 +398,23 @@ def build_operator_suite(comparison_operators: list[str]) -> dict[str, Any]:
     return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-comparison-operators", "operators": expected, "reason": "Each operator has a typed operand chosen to make the named relation TRUE; this is a semantic witness, not RI execution proof."}}
 
 
+def build_enum_boundary_suite(mappings: list[dict[str, Any]]) -> dict[str, Any]:
+    enum_values = ["classes_root", "current_config", "current_user", "current_user_local_settings", "local_machine", "users"]
+    tests: dict[str, Any] = {}; outcomes: dict[str, str] = {}; expected: dict[str, Any] = {}
+    for mapping in mappings:
+        capability = mapping["capability"]
+        if capability not in {"windows.registry", "windows.regkeyeffectiverights"}: continue
+        native = mapping.get("native", {}); selectors = list(native.get("object_selector_alternatives", [[]])[0])
+        for index, value in enumerate(enum_values, 1):
+            name = f"enum-{slug(capability)}-{index}-test"[:64]
+            obj = {"capability": capability, **{selector: {"equals": value if selector == "hive" else "fixture-value"} for selector in selectors}}
+            tests[name] = {"test_title": f"{capability} hive enum boundary {value}", "capability": capability, "reported_elements": "all", "object": obj, "require": {"item_requirement": {"items_found": "one_or_more"}}}
+            outcomes[name] = "true"; expected[f"{capability}#{value}"] = {"outcome": "true", "reason": "Every schema-admitted hive enum value has a distinct selector witness."}
+    assessment = {"assessment": {"id": "conformance-core-enum-boundaries", "version": 1, "assessment_title": "SCAP-NG 0.4.1 native selector enum boundaries", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-enum-boundaries", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes}
+    return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-enum-boundaries", "enum_values": expected, "reason": "Native selector enum values are schema-valid witnesses; invalid sentinel rejection remains a separate negative gate."}}
+
+
 def build_multi_value_suite(mappings: list[dict[str, Any]], selector_contracts: dict[str, Any]) -> dict[str, Any]:
     tests: dict[str, Any] = {}; variables: dict[str, Any] = {}; outcomes: dict[str, str] = {}; expected: dict[str, Any] = {}
     for mapping in mappings:
@@ -439,6 +456,91 @@ def build_cardinality_suite() -> dict[str, Any]:
     assessment = {"assessment": {"id": "conformance-core-cardinalities", "version": 1, "assessment_title": "SCAP-NG 0.4.1 remaining Item and field cardinalities", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
     fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-cardinalities", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes}
     return {"assessment": assessment, "fixture": fixture, "expected": {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-cardinalities", "cardinalities": expected, "reason": "Each remaining cardinality has a dedicated schema-valid witness; execution receipts remain separate."}}
+
+
+def build_variable_interaction_suite() -> dict[str, Any]:
+    """Exercise a canonical Variable -> Require -> Evaluate chain.
+
+    The second Test is deliberately FALSE because two observed values cannot
+    satisfy ``values_found: exactly_one``.  ``not`` keeps the enclosing
+    Assessment TRUE without hiding the decisive FALSE leaf.
+    """
+    variables = {
+        "source-values-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["alpha", "beta"]}}},
+        "alias-values-variable": {"kind": "local", "expression": {"variable": "source-values-variable"}},
+        "expected-values-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["alpha", "beta"]}}},
+    }
+    common = {"item_requirement": {"items_found": "exactly_one", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}}
+    every_require = {**common, "fields": {"value": {"value_match": "every", "values_found": "one_or_more", "values_matching": "every", "equals": {"variable": "expected-values-variable"}}}}
+    exact_require = {**common, "fields": {"value": {"value_match": "every", "values_found": "exactly_one", "values_matching": "every", "equals": {"variable": "expected-values-variable"}}}}
+    tests = {
+        "variable-alias-every-test": {"test_title": "Variable alias preserves ordered values", "capability": "variable.value", "reported_elements": "all", "variable": "alias-values-variable", "require": every_require},
+        "variable-alias-exactly-one-test": {"test_title": "Variable alias exposes field cardinality failure", "capability": "variable.value", "reported_elements": "all", "variable": "alias-values-variable", "require": exact_require},
+    }
+    assessment = {"assessment": {"id": "conformance-core-variable-interactions", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Variable, Require and Evaluate interactions", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": "variable-alias-every-test"}, {"not": {"test": "variable-alias-exactly-one-test"}}]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-variable-interactions", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "variables": {"source-values-variable": ["alpha", "beta"], "alias-values-variable": ["alpha", "beta"], "expected-values-variable": ["alpha", "beta"]}, "test_outcomes": {"variable-alias-every-test": "true", "variable-alias-exactly-one-test": "false"}}
+    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-variable-interactions", "assertions": {"variable-alias-every-test": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values_found": 2, "values_matching": 2, "reason": "The local alias preserves the two ordered source values; every observed value matches the expected Variable."}, "variable-alias-exactly-one-test": {"outcome": "false", "items_found": 1, "items_satisfying": 0, "values_found": 2, "values_matching": 2, "reason": "The same two-value alias fails values_found: exactly_one; the FALSE leaf remains visible."}}, "enclosing_outcome": "true", "reason": "Variable alias resolution, field cardinality, and canonical not are independently asserted; the enclosing AND is TRUE without negating the FALSE leaf."}
+    return {"assessment": assessment, "fixture": fixture, "expected": expected}
+
+
+def build_set_filter_suite() -> dict[str, Any]:
+    """Schema-valid witnesses for shared Set composition and filter actions."""
+    shared_objects = {
+        "left-object": {"object_title": "Left package population", "capability": "linux.dpkginfo", "name": {"equals": "left"}},
+        "right-object": {"object_title": "Right package population", "capability": "linux.dpkginfo", "name": {"equals": "right"}},
+    }
+
+    def filter_entry(action: str, value: str) -> dict[str, Any]:
+        return {action: {"arch": {"values_found": "one_or_more", "values_matching": "every", "equals": value}}}
+
+    def set_expression(operator: str) -> dict[str, Any]:
+        operands = [
+            {"object": "left-object", "filters": [filter_entry("include", "amd64")]},
+            {"object": "right-object", "filters": [filter_entry("exclude", "arm64")]},
+        ]
+        return {"operator": operator, "operands": operands}
+
+    tests = {}
+    for name, operator, title in [
+        ("union", "union", "Union applies include/exclude filters to both operands"),
+        ("intersection", "intersection", "Intersection retains only shared Items"),
+        ("difference", "difference", "Difference removes right-operand Items"),
+    ]:
+        tests[f"set-{name}-test"] = {
+            "test_title": title,
+            "capability": "linux.dpkginfo",
+            "reported_elements": "all",
+            "object": {"capability": "linux.dpkginfo", "set": set_expression(operator)},
+            "require": {"item_requirement": {"items_found": "one_or_more"}},
+        }
+    assessment = {"assessment": {"id": "conformance-core-set-filters", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Set and Filter semantics", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "shared_objects": shared_objects, "tests": tests, "evaluate": {"and": [{"test": "set-union-test"}, {"test": "set-intersection-test"}, {"test": "set-difference-test"}]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-set-filters", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "populations": {"left": [{"id": "left-a", "arch": "amd64", "status": "collected"}, {"id": "shared", "arch": "amd64", "status": "collected"}], "right": [{"id": "shared", "arch": "amd64", "status": "collected"}, {"id": "right-b", "arch": "amd64", "status": "collected"}]}, "test_outcomes": {"set-union-test": "true", "set-intersection-test": "true", "set-difference-test": "true"}}
+    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-set-filters", "operations": {"union": {"outcome": "true", "items_found": 3, "items_satisfying": 3, "values": ["left-a", "shared", "right-b"], "reason": "Include/exclude filters are applied before union; the duplicate shared Item is retained once."}, "intersection": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values": ["shared"], "reason": "Both filtered operand populations contain the shared Item."}, "difference": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values": ["left-a"], "reason": "The right filtered population is removed from the left population."}}, "filter_actions": ["include", "exclude"], "set_operators": ["union", "intersection", "difference"], "reason": "The abstract deterministic populations independently justify Set cardinalities; collector execution and capability-specific filter semantics remain separate."}
+    return {"assessment": assessment, "fixture": fixture, "expected": expected}
+
+
+def build_authoring_enum_cases() -> list[tuple[str, dict[str, Any], dict[str, Any]]]:
+    """Generate witnesses for every active Assessment authoring enum branch.
+
+    These are authoring/schema cases, not runtime outcomes.  In particular the
+    explicit reported-elements array is included because it is a distinct
+    oneOf branch from the two scalar enum values.
+    """
+    classes = ["compliance", "vulnerability", "patch", "inventory", "miscellaneous"]
+    outcomes = ["true", "false", "error", "unknown", "not_evaluated", "not_applicable"]
+    reported_elements = [("all", "scalar-all"), ("compared", "scalar-compared"), (["value"], "explicit-list")]
+    cases = []
+    for assessment_class in classes:
+        for reported, label in reported_elements:
+            case_id = f"authoring-automated-{assessment_class}-{label}"
+            body = {"assessment": {"id": case_id, "version": 1, "assessment_title": f"Authoring enum witness automated/{assessment_class}/{label}", "mode": "automated", "class": assessment_class, "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"enum-test": {"test_title": "reported-elements enum/oneOf witness", "capability": "independent.unknown", "reported_elements": reported, "require": {"item_requirement": {"items_found": "one_or_more"}}}}, "evaluate": {"test": "enum-test"}}}
+            expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": case_id, "mode": "automated", "class": assessment_class, "reported_elements": label, "reason": "Schema-admitted automated class and reported_elements branch; no scanner outcome is inferred."}
+            cases.append((case_id, body, expected))
+        case_id = f"authoring-manual-{assessment_class}"
+        body = {"assessment": {"id": case_id, "version": 1, "assessment_title": f"Authoring enum witness manual/{assessment_class}", "mode": "manual", "class": assessment_class, "procedure": "Review the deterministic authoring enum witness.", "response": {"type": "technical-outcome", "choices": [{"value": outcome, "outcome": outcome} for outcome in outcomes], "allow_comment": True, "allow_evidence": True}}}
+        expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": case_id, "mode": "manual", "class": assessment_class, "response_outcomes": outcomes, "reason": "Schema-admitted manual class and every technical outcome enum value; no response is selected."}
+        cases.append((case_id, body, expected))
+    return cases
 
 
 def build_status_and_policy_cases() -> dict[str, Any]:
@@ -700,11 +802,26 @@ def main() -> None:
     multi_value_assessment.write_text(yaml.safe_dump(multi_values["assessment"], sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-multi-values.json", multi_values["fixture"])
     write_json(OUT / "expected/core-multi-values.json", multi_values["expected"])
+    enum_boundaries = build_enum_boundary_suite(selector_mappings)
+    enum_assessment = OUT / "cases/core/enum-boundaries.assessment.yaml"
+    enum_assessment.write_text(yaml.safe_dump(enum_boundaries["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-enum-boundaries.json", enum_boundaries["fixture"])
+    write_json(OUT / "expected/core-enum-boundaries.json", enum_boundaries["expected"])
     cardinalities = build_cardinality_suite()
     cardinality_assessment = OUT / "cases/core/cardinalities.assessment.yaml"
     cardinality_assessment.write_text(yaml.safe_dump(cardinalities["assessment"], sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-cardinalities.json", cardinalities["fixture"])
     write_json(OUT / "expected/core-cardinalities.json", cardinalities["expected"])
+    variable_interactions = build_variable_interaction_suite()
+    variable_assessment = OUT / "cases/core/variable-interactions.assessment.yaml"
+    variable_assessment.write_text(yaml.safe_dump(variable_interactions["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-variable-interactions.json", variable_interactions["fixture"])
+    write_json(OUT / "expected/core-variable-interactions.json", variable_interactions["expected"])
+    set_filters = build_set_filter_suite()
+    set_assessment = OUT / "cases/core/set-filters.assessment.yaml"
+    set_assessment.write_text(yaml.safe_dump(set_filters["assessment"], sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-set-filters.json", set_filters["fixture"])
+    write_json(OUT / "expected/core-set-filters.json", set_filters["expected"])
     status_cases = build_status_and_policy_cases()
     status_rows = []
     for name, document, expected in status_cases["status"]:
@@ -717,19 +834,67 @@ def main() -> None:
     tailoring_path = OUT / "cases/policy/disabled-profile-tailoring.json"; write_json(tailoring_path, status_cases["tailoring"])
     benchmark_path = OUT / "cases/policy/disabled-profile-benchmark.json"; write_json(benchmark_path, status_cases["benchmark"])
     policy_expected_path = OUT / "expected/disabled-profile.json"; write_json(policy_expected_path, status_cases["policy_expected"])
+    authoring_rows = []
+    for case_id, document, expected in build_authoring_enum_cases():
+        assessment_path = OUT / f"cases/core/{case_id}.assessment.yaml"; assessment_path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+        expected_path = OUT / f"expected/{case_id}.json"; write_json(expected_path, expected)
+        authoring_rows.append({"id": case_id, "schema": "assessment.schema.json", "assessment": assessment_path.relative_to(OUT).as_posix(), "expected": expected_path.relative_to(OUT).as_posix()})
     invalid = {
         "assessment": {"id": "invalid-negate", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"invalid-test": {"capability": "independent.unknown", "require": {"item_requirement": {"items_found": "one_or_more"}}, "negate": True}}}
     }
     (OUT / "cases/invalid/negate.assessment.yaml").write_text(yaml.safe_dump(invalid, sort_keys=False), encoding="utf-8")
+    invalid_enum_cases = {
+        "invalid-class": {"assessment": {"id": "invalid-class", "version": 1, "assessment_title": "invalid", "mode": "manual", "class": "not-a-class", "procedure": "invalid", "response": {"type": "technical-outcome", "choices": [{"value": "x", "outcome": "true"}], "allow_comment": False, "allow_evidence": False}}},
+        "invalid-reported-elements": {"assessment": {"id": "invalid-reported-elements", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"invalid-test": {"capability": "independent.unknown", "reported_elements": "not-an-option", "require": {"item_requirement": {"items_found": "one_or_more"}}}}, "evaluate": {"test": "invalid-test"}}},
+        "invalid-manual-outcome": {"assessment": {"id": "invalid-manual-outcome", "version": 1, "assessment_title": "invalid", "mode": "manual", "class": "miscellaneous", "procedure": "invalid", "response": {"type": "technical-outcome", "choices": [{"value": "x", "outcome": "not-a-status"}], "allow_comment": False, "allow_evidence": False}}},
+        "invalid-mode": {"assessment": {"id": "invalid-mode", "version": 1, "assessment_title": "invalid", "mode": "semi", "class": "miscellaneous"}},
+        "invalid-variable-kind": {"assessment": {"id": "invalid-variable-kind", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": {"bad-variable": {"kind": "external", "expression": {"literal": "x"}}}, "tests": {"invalid-test": {"capability": "independent.unknown", "require": {"item_requirement": {"items_found": "one_or_more"}}}}, "evaluate": {"test": "invalid-test"}}},
+        "invalid-cardinality": {"assessment": {"id": "invalid-cardinality", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"invalid-test": {"capability": "independent.unknown", "require": {"item_requirement": {"items_found": "sometimes"}}}}, "evaluate": {"test": "invalid-test"}}},
+        "invalid-specification-version": {"assessment": {"id": "invalid-specification-version", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.0"}, "tests": {"invalid-test": {"capability": "independent.unknown", "require": {"item_requirement": {"items_found": "one_or_more"}}}}, "evaluate": {"test": "invalid-test"}}},
+        "invalid-reported-elements-duplicate": {"assessment": {"id": "invalid-reported-elements-duplicate", "version": 1, "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": {"invalid-test": {"capability": "independent.unknown", "reported_elements": ["value", "value"], "require": {"item_requirement": {"items_found": "one_or_more"}}}}, "evaluate": {"test": "invalid-test"}}},
+        "invalid-empty-procedure": {"assessment": {"id": "invalid-empty-procedure", "version": 1, "assessment_title": "invalid", "mode": "manual", "class": "miscellaneous", "procedure": "", "response": {"type": "technical-outcome", "choices": [{"value": "x", "outcome": "true"}], "allow_comment": False, "allow_evidence": False}}},
+        "invalid-id-pattern": {"assessment": {"id": "INVALID_ID", "version": 1, "assessment_title": "invalid", "mode": "manual", "class": "miscellaneous", "procedure": "invalid", "response": {"type": "technical-outcome", "choices": [{"value": "x", "outcome": "true"}], "allow_comment": False, "allow_evidence": False}}},
+    }
+    invalid_enum_cases["invalid-set-difference-cardinality"] = {
+        "assessment": {
+            "id": "invalid-set-difference-cardinality", "version": 1,
+            "assessment_title": "invalid", "mode": "automated", "class": "miscellaneous",
+            "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"},
+            "tests": {"invalid-test": {
+                "test_title": "invalid Set difference", "capability": "linux.dpkginfo", "reported_elements": "all",
+                "object": {"capability": "linux.dpkginfo", "set": {"operator": "difference", "operands": [
+                    {"object": "left-object", "filters": [{"include": {"arch": {"values_found": "one_or_more", "values_matching": "every", "equals": "amd64"}}}]},
+                    {"object": "right-object", "filters": [{"exclude": {"arch": {"values_found": "one_or_more", "values_matching": "every", "equals": "arm64"}}}]},
+                    {"object": "third-object", "filters": [{"include": {"arch": {"values_found": "one_or_more", "values_matching": "every", "equals": "amd64"}}}]}
+                ]}},
+                "require": {"item_requirement": {"items_found": "one_or_more"}}
+            }},
+            "evaluate": {"test": "invalid-test"}
+        }
+    }
+    for name, document in invalid_enum_cases.items():
+        (OUT / f"cases/invalid/{name}.assessment.yaml").write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
     manifest = {
         "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
+        "authoring_cases": authoring_rows,
         "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
-        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
+        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
         "invalid_cases": [
             {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},
             {"id": "invalid-variable-datatype", "assessment": "cases/invalid/variable-datatype.assessment.yaml", "expected": "schema-invalid", "reason": "Variables infer datatype from typed expressions; declaration datatype is not canonical."},
             {"id": "invalid-legacy-states", "assessment": "cases/invalid/legacy-states.assessment.yaml", "expected": "schema-invalid", "reason": "Legacy State wrappers are not part of the 0.4.1 language."},
+            {"id": "invalid-class", "assessment": "cases/invalid/invalid-class.assessment.yaml", "expected": "schema-invalid", "reason": "Assessment class is a closed canonical enum."},
+            {"id": "invalid-reported-elements", "assessment": "cases/invalid/invalid-reported-elements.assessment.yaml", "expected": "schema-invalid", "reason": "reported_elements admits only all, compared, or a valid explicit field list."},
+            {"id": "invalid-manual-outcome", "assessment": "cases/invalid/invalid-manual-outcome.assessment.yaml", "expected": "schema-invalid", "reason": "Manual response outcomes are the six canonical technical statuses."},
+            {"id": "invalid-mode", "assessment": "cases/invalid/invalid-mode.assessment.yaml", "expected": "schema-invalid", "reason": "Assessment mode is a closed manual/automated enum."},
+            {"id": "invalid-variable-kind", "assessment": "cases/invalid/invalid-variable-kind.assessment.yaml", "expected": "schema-invalid", "reason": "Variable kind is limited to local and constant; no external declaration kind is canonical."},
+            {"id": "invalid-cardinality", "assessment": "cases/invalid/invalid-cardinality.assessment.yaml", "expected": "schema-invalid", "reason": "Require cardinality is a closed canonical enum."},
+            {"id": "invalid-specification-version", "assessment": "cases/invalid/invalid-specification-version.assessment.yaml", "expected": "schema-invalid", "reason": "Active Assessment authoring is pinned to specification version 0.4.1."},
+            {"id": "invalid-reported-elements-duplicate", "assessment": "cases/invalid/invalid-reported-elements-duplicate.assessment.yaml", "expected": "schema-invalid", "reason": "Explicit reported element lists require unique field names."},
+            {"id": "invalid-empty-procedure", "assessment": "cases/invalid/invalid-empty-procedure.assessment.yaml", "expected": "schema-invalid", "reason": "Manual procedure is required and cannot be empty."},
+            {"id": "invalid-id-pattern", "assessment": "cases/invalid/invalid-id-pattern.assessment.yaml", "expected": "schema-invalid", "reason": "Native identifiers use the canonical lower-kebab pattern."},
+            {"id": "invalid-set-difference-cardinality", "assessment": "cases/invalid/invalid-set-difference-cardinality.assessment.yaml", "expected": "schema-invalid", "reason": "Set difference admits at most two operands."},
         ],
         "execution_boundary": "Schema validation and oracle comparison are independent of RI execution. RI adapter coordination is RI issue #196.",
         "coverage_claim": "Inventory and vector presence are exhaustive for the pinned mappings; scanner execution remains unqualified until an independent adapter supplies receipts.",

@@ -1,0 +1,45 @@
+assessment:
+  id: invalid-set-difference-cardinality
+  version: 1
+  assessment_title: invalid
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  tests:
+    invalid-test:
+      test_title: invalid Set difference
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: difference
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+          - object: right-object
+            filters:
+            - exclude:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: arm64
+          - object: third-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+      require:
+        item_requirement:
+          items_found: one_or_more
+  evaluate:
+    test: invalid-test

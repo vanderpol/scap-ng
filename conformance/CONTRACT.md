@@ -27,9 +27,15 @@ Every ordinary capability case provides:
 
 Dedicated core suites additionally provide all 67 active comparison operators,
 all 94 mapping-declared selector alternatives, all Item/field cardinality
-values, 103 applicable multi-value field witnesses, typed `not_evaluated`, and
+values, 104 applicable multi-value field witnesses, typed `not_evaluated`, and
 profile-disabled Rule witnesses. These are schema-valid semantic witnesses;
 collector execution remains outside this source oracle.
+
+Authoring/schema branches are tracked separately from executable semantics:
+20 cases cover both automated/manual modes, all five Assessment classes, all
+three `reported_elements` branches, and all six manual technical outcomes.
+Invalid enum vectors are required to fail schema validation. These cases do not
+select a manual response or assert a scanner result.
 
 `items_found` and `items_satisfying` remain separate cardinality observations.
 A status is not Booleanized. A scanner MUST NOT turn missing evidence or ERROR
@@ -76,6 +82,17 @@ Allowed typed outcomes are `true`, `false`, `unknown`, `error`,
 by the pinned result contract. Adapters must preserve source statuses and report
 unsupported collector capabilities separately from schema validity. Receipts
 must include fixture and expected-file SHA-256 values in a production run.
+
+## Independent Model A oracle
+
+`conformance/tools/model_a_oracle.py` is a separate truth oracle for the owner-approved
+complete-known-nonempty integer/string Model A domain. It preserves one logical
+Variable source group, ordered duplicate values, and independently folds
+`value_match`, `values_found`, `values_matching`, `items_found`, and
+`items_satisfying`. `tests/test_model_a_oracle.py` executes all 15 frozen Model A
+cases with hard-coded normative outcomes and rejects empty/out-of-domain inputs.
+It does not implement unknown/error/empty status precedence or scanner
+collection; those remain explicitly outside this oracle and RI #196.
 
 ## Evaluate and `not`
 

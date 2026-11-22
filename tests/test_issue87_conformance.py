@@ -8,8 +8,11 @@ import sys
 import unittest
 from pathlib import Path
 from copy import deepcopy
+import yaml
+from jsonschema import ValidationError
 
 from conformance.tools.oracle import compare
+from conformance.tools.runner import validator
 
 ROOT = Path(__file__).resolve().parents[1]
 CONF = ROOT / "conformance"
@@ -131,11 +134,11 @@ class Issue87Conformance(unittest.TestCase):
         audit = read(CONF / "coverage-audit.json")
         self.assertEqual(audit["schema_commit"], self.manifest["schema_commit"])
         self.assertEqual(audit["schema_family_sha256"], self.manifest["schema_family_sha256"])
-        self.assertEqual(audit["vectors"]["base_capability_vectors_total"], 728)
-        self.assertEqual(audit["vectors"]["expanded_capability_vectors_total"], 832)
-        self.assertEqual(audit["vectors"]["multi_value_suite_cases"], 103)
-        self.assertEqual(audit["fields"]["declared_mapping_fields"], 710)
-        self.assertEqual(audit["fields"]["authored_assessment_fields"], 710)
+        self.assertEqual(audit["vectors"]["base_capability_vectors_total"], 735)
+        self.assertEqual(audit["vectors"]["expanded_capability_vectors_total"], 840)
+        self.assertEqual(audit["vectors"]["multi_value_suite_cases"], 104)
+        self.assertEqual(audit["fields"]["declared_mapping_fields"], 718)
+        self.assertEqual(audit["fields"]["authored_assessment_fields"], 718)
         self.assertEqual(audit["selectors"]["uncovered_alternative_sets"], 0)
         self.assertEqual(audit["operators"]["uncovered_comparison"], [])
         self.assertEqual(audit["cardinalities"]["uncovered"], [])
@@ -143,20 +146,57 @@ class Issue87Conformance(unittest.TestCase):
         self.assertGreater(audit["enum_boundaries"]["schema_rejected_mutations"], 0)
         self.assertFalse(audit["schema_branches"]["direct_executable_branch_coverage"])
         self.assertTrue(audit["expected_results"]["independent_justification"])
+        self.assertEqual(audit["independent_oracle"]["source_cases"], 15)
+        self.assertFalse(audit["independent_oracle"]["runtime_qualification"])
         derived = audit["derived_integrity"]
-        self.assertEqual(derived["fields_from_source_mappings"], 710)
-        self.assertEqual(derived["fields_from_authored_assessments"], 710)
-        self.assertEqual(derived["fields_from_positive_fixtures"], 710)
+        self.assertEqual(derived["fields_from_source_mappings"], 718)
+        self.assertEqual(derived["fields_from_authored_assessments"], 718)
+        self.assertEqual(derived["fields_from_positive_fixtures"], 718)
         self.assertEqual(derived["operators_from_source_schema"], 67)
         self.assertEqual(derived["operators_from_authored_assessments"], 67)
         self.assertEqual(derived["selector_alternatives_from_source_mappings"], 94)
         self.assertEqual(derived["selector_alternatives_from_authored_assessments"], 94)
         self.assertEqual(derived["missing_witnesses"], {"fields": [], "selectors": [], "operators": [], "cardinalities": []})
-        self.assertEqual(derived["non_exercising_witnesses"], [])
+        self.assertEqual(derived["non_exercising_witnesses"], {"fields": [], "selectors": [], "operators": []})
+        self.assertEqual(audit["fields"]["non_exercising_witnesses"], [])
+        self.assertEqual(audit["selectors"]["non_exercising_witnesses"], [])
+        self.assertEqual(audit["operators"]["non_exercising_witnesses"], [])
+        self.assertEqual(audit["authoring_enums"]["cases"], 20)
+        self.assertEqual(len(audit["authoring_enums"]["negative_boundary_cases"]), 10)
+        self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 180)
+        self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
+        self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
+        self.assertIn("160 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
+        self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
                 self.assertTrue(assertion["reason"].strip())
+
+    def test_authoring_enum_cases_cover_all_assessment_branches(self):
+        rows = self.manifest.get("authoring_cases", [])
+        self.assertEqual(len(rows), 20)
+        modes = {read(CONF / row["expected"])["mode"] for row in rows}
+        self.assertEqual(modes, {"automated", "manual"})
+        classes = {read(CONF / row["expected"])["class"] for row in rows}
+        self.assertEqual(classes, {"compliance", "vulnerability", "patch", "inventory", "miscellaneous"})
+        automated = [read(CONF / row["expected"]) for row in rows if read(CONF / row["expected"])["mode"] == "automated"]
+        self.assertEqual({case["reported_elements"] for case in automated}, {"scalar-all", "scalar-compared", "explicit-list"})
+        manual = [read(CONF / row["expected"]) for row in rows if read(CONF / row["expected"])["mode"] == "manual"]
+        self.assertEqual({tuple(case["response_outcomes"]) for case in manual}, {("true", "false", "error", "unknown", "not_evaluated", "not_applicable")})
+        for row in rows:
+            self.assertTrue((CONF / row["assessment"]).is_file())
+            self.assertTrue(read(CONF / row["expected"])["reason"].strip())
+
+    def test_authoring_enum_negative_boundaries_are_rejected(self):
+        invalid = {row["id"] for row in self.manifest["invalid_cases"]}
+        self.assertTrue({"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern", "invalid-set-difference-cardinality"}.issubset(invalid))
+        for case in self.manifest["invalid_cases"]:
+            if case["id"] not in {"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern", "invalid-set-difference-cardinality"}:
+                continue
+            path = CONF / case["assessment"]
+            self.assertTrue(path.is_file(), path)
 
     def test_core_expansions_cover_operators_selectors_cardinalities_and_statuses(self):
         operators = read(CONF / "expected/core-comparison-operators.json")
@@ -166,11 +206,46 @@ class Issue87Conformance(unittest.TestCase):
         declared = sum(len(row["selector_alternatives"]) for row in self.inventory["capabilities"])
         self.assertEqual(len(selectors["alternatives"]), declared)
         multi_values = read(CONF / "expected/core-multi-values.json")
-        self.assertEqual(len(multi_values["capabilities"]), 103)
+        self.assertEqual(len(multi_values["capabilities"]), 104)
+        enum_boundaries = read(CONF / "expected/core-enum-boundaries.json")
+        self.assertEqual(len(enum_boundaries["enum_values"]), 12)
+        self.assertEqual(read(CONF / "coverage-audit.json")["enum_boundaries"]["uncovered_native_selector_enum_values"], [])
         cardinalities = read(CONF / "expected/core-cardinalities.json")
         self.assertEqual(set(cardinalities["cardinalities"]), {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"})
+        set_filters = read(CONF / "expected/core-set-filters.json")
+        self.assertEqual(set(set_filters["set_operators"]), {"union", "intersection", "difference"})
+        self.assertEqual(set(set_filters["filter_actions"]), {"include", "exclude"})
         for row in self.manifest["status_cases"]:
             self.assertTrue(read(CONF / row["expected"])["reason"].strip())
+
+    def test_variable_require_evaluate_interaction_keeps_false_leaf_visible(self):
+        assessment = yaml.safe_load((CONF / "cases/core/variable-interactions.assessment.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(set(assessment["assessment"]["variables"]), {"source-values-variable", "alias-values-variable", "expected-values-variable"})
+        self.assertEqual(assessment["assessment"]["variables"]["alias-values-variable"]["kind"], "local")
+        self.assertEqual(assessment["assessment"]["evaluate"]["and"][1]["not"]["test"], "variable-alias-exactly-one-test")
+        expected = read(CONF / "expected/core-variable-interactions.json")
+        self.assertEqual(expected["assertions"]["variable-alias-exactly-one-test"]["outcome"], "false")
+        self.assertEqual(expected["enclosing_outcome"], "true")
+        observed = assessment["assessment"]["variables"]["source-values-variable"]["expression"]["literal"]["value"]
+        alias = assessment["assessment"]["variables"]["alias-values-variable"]["expression"]["variable"]
+        self.assertEqual(alias, "source-values-variable")
+        self.assertEqual(len(observed), 2)
+        self.assertEqual(observed, assessment["assessment"]["variables"]["expected-values-variable"]["expression"]["literal"]["value"])
+        self.assertEqual(expected["assertions"]["variable-alias-exactly-one-test"]["values_found"], len(observed))
+
+    def test_set_filter_mutations_fail_closed_at_schema_boundary(self):
+        assessment = yaml.safe_load((CONF / "cases/core/set-filters.assessment.yaml").read_text(encoding="utf-8"))
+        difference = assessment["assessment"]["tests"]["set-difference-test"]["object"]["set"]["operands"]
+        mutated = deepcopy(assessment)
+        mutated_difference = mutated["assessment"]["tests"]["set-difference-test"]["object"]["set"]["operands"]
+        mutated_difference.append(deepcopy(mutated_difference[0]))
+        with self.assertRaises(ValidationError):
+            validator().validate(mutated)
+        self.assertEqual(len(difference), 2)
+        missing_quantifier = deepcopy(assessment)
+        del missing_quantifier["assessment"]["tests"]["set-union-test"]["object"]["set"]["operands"][0]["filters"][0]["include"]["arch"]["values_matching"]
+        with self.assertRaises(ValidationError):
+            validator().validate(missing_quantifier)
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]
