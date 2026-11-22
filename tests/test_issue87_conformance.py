@@ -191,7 +191,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 180)
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
-        self.assertIn("155 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        self.assertIn("144 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
@@ -262,7 +262,10 @@ class Issue87Conformance(unittest.TestCase):
         validator().validate(assessment)
         rule_ids = {rule for witness in fixture["semantic_witnesses"] for rule in witness["rules"]}
         self.assertEqual(rule_ids, set(expected["rules"]))
-        self.assertEqual(len(rule_ids), 5)
+        self.assertEqual(len(rule_ids), 16)
+        audit = read(CONF / "coverage-audit.json")
+        self.assertEqual(audit["capability_constraints"]["semantic_boundary_unknown_rules"], [])
+        self.assertEqual(set(audit["semantic_boundaries"]["rules"]), rule_ids)
         for test_name, assertion in expected["assertions"].items():
             evidence = fixture["evidence"][test_name]
             self.assertEqual(evidence["items_found"], assertion["items_found"])
@@ -279,12 +282,21 @@ class Issue87Conformance(unittest.TestCase):
             test = assessment["assessment"]["tests"][witness["test"]]
             outcome = expected["assertions"][witness["test"]]["outcome"]
             self.assertEqual(outcome, witness["expected"])
-            self.assertTrue(test["object"].get("traversal") or test["object"].get("filename"))
-            if outcome == "error":
-                if any("no_traversal" in rule for rule in witness["rules"]):
+            if any("inline_content_no_traversal" in rule for rule in witness["rules"]):
+                self.assertIn("content", test["object"])
+                if outcome == "error":
+                    self.assertIn("traversal", test["object"])
+            elif any("no_traversal" in rule for rule in witness["rules"]):
+                if outcome == "error":
                     self.assertIn("traversal", test["object"])
                 else:
+                    self.assertNotIn("traversal", test["object"])
+                    self.assertTrue(test["object"].get("filepath") or test["object"].get("path"))
+            else:
+                if outcome == "error":
                     self.assertEqual(test["object"]["filename"].get("equals"), "bad:name")
+                else:
+                    self.assertEqual(test["object"]["filename"].get("matches_regex"), "^bad:name$")
         # A boundary mutation removing traversal from each traversal error leaves
         # a schema-valid positive shape; it must not be silently treated as the
         # same semantic witness.

@@ -596,6 +596,33 @@ def build_semantic_boundary_suite() -> dict[str, Any]:
             "Reserved characters in a match expression are allowed; the literal-name rule is not applied to regex syntax.",
         ),
     ]
+    # The same constraints recur on other file-content/resource capabilities.
+    # Keep paired witnesses per occurrence rather than claiming transitive
+    # coverage from the Unix and Windows examples.
+    family_specs = [
+        ("file.hash", "file.hash.full_path_no_traversal", "file.hash.pattern_directory_no_traversal", "unix", "directories"),
+        ("independent.textfilecontent", "independent.textfilecontent.full_path_no_traversal", "independent.textfilecontent.pattern_directory_no_traversal", "unix", "directories"),
+        ("independent.xmlfilecontent", "independent.xmlfilecontent.full_path_no_traversal", "independent.xmlfilecontent.pattern_directory_no_traversal", "unix", "directories"),
+        ("windows.fileeffectiverights", "windows.fileeffectiverights.full_path_no_traversal", "windows.fileeffectiverights.pattern_directory_no_traversal", "windows", "directories"),
+        ("linux.selinuxsecuritycontext", "linux.selinuxsecuritycontext.full_path_no_traversal", "linux.selinuxsecuritycontext.pattern_directory_no_traversal", "unix", "directories"),
+    ]
+    for index, (capability, full_rule, pattern_rule, platform, recurse) in enumerate(family_specs):
+        prefix = "C:\\Windows" if platform == "windows" else "/etc"
+        log_prefix = "C:\\Logs" if platform == "windows" else "/var/log"
+        full_path = f"{prefix}/fixture" if platform == "unix" else f"{prefix}\\fixture.txt"
+        full_pattern = f"^{prefix.replace('\\', '[\\\\]')}/.*"
+        directory_pattern = f"^{log_prefix.replace('\\', '[\\\\]')}/.*"
+        traversal = {"max_depth": "unlimited", "recurse": recurse}
+        cases.extend([
+            (f"semantic-{index}-full-safe-test", capability, {"capability": capability, "filepath": {"equals": full_path}}, {"filepath": {"equals": full_path}}, "true", [full_rule], "Equality full_path selection is valid without traversal."),
+            (f"semantic-{index}-full-traversal-test", capability, {"capability": capability, "filepath": {"matches_regex": full_pattern}, "traversal": traversal}, {"filepath": {"matches_regex": full_pattern}}, "error", [full_rule], "Traversal is rejected when this capability selects full_path."),
+            (f"semantic-{index}-pattern-safe-test", capability, {"capability": capability, "path": {"equals": log_prefix}}, {"path": {"equals": log_prefix}}, "true", [pattern_rule], "Equality directory selection is valid without traversal."),
+            (f"semantic-{index}-pattern-traversal-test", capability, {"capability": capability, "path": {"matches_regex": directory_pattern}, "traversal": traversal}, {"path": {"matches_regex": directory_pattern}}, "error", [pattern_rule], "Traversal is rejected when this capability selects a patterned directory."),
+        ])
+    cases.extend([
+        ("yaml-inline-content-safe-test", "independent.yamlfilecontent", {"capability": "independent.yamlfilecontent", "content": {"equals": "fixture-content"}}, {"content": {"equals": "fixture-content"}}, "true", ["independent.yamlfilecontent.inline_content_no_traversal"], "Inline content selection is valid without file traversal."),
+        ("yaml-inline-content-traversal-test", "independent.yamlfilecontent", {"capability": "independent.yamlfilecontent", "content": {"equals": "fixture-content"}, "traversal": {"max_depth": "unlimited", "recurse": "directories"}}, {"content": {"equals": "fixture-content"}}, "error", ["independent.yamlfilecontent.inline_content_no_traversal"], "Traversal is not applicable when inline YAML content is supplied."),
+    ])
     for name, capability, obj, fields, outcome, rule_ids, reason in cases:
         tests[name] = {
             "test_title": f"Semantic boundary witness: {name.removesuffix('-test')}",
