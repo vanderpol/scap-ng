@@ -633,6 +633,12 @@ def build_semantic_boundary_suite() -> dict[str, Any]:
         ("listening-protocol-safe-test", "linux.inetlisteningservers", {"capability": "linux.inetlisteningservers", "protocol": {"equals": "tcp"}}, {"protocol": {"equals": "tcp"}}, "true", ["linux.inetlisteningservers.protocol"], "Collected transport protocol tcp uses the required lower-case form."),
         ("listening-protocol-invalid-test", "linux.inetlisteningservers", {"capability": "linux.inetlisteningservers", "protocol": {"equals": "TCP"}}, {"protocol": {"equals": "TCP"}}, "error", ["linux.inetlisteningservers.protocol"], "Upper-case TCP is not the canonical lower-case collected protocol form."),
     ])
+    cases.extend([
+        ("wu-defaults-safe-test", "windows.wuaupdatesearcher", {"capability": "windows.wuaupdatesearcher", "search_criteria": {"equals": "IsInstalled=1"}, "include_superseded_updates": True}, {"search_criteria": {"equals": "IsInstalled=1"}}, "true", ["windows.wuaupdatesearcher.materialized_superseded_default"], "The direct Object explicitly materializes include_superseded_updates."),
+        ("wu-defaults-invalid-test", "windows.wuaupdatesearcher", {"capability": "windows.wuaupdatesearcher", "search_criteria": {"equals": "IsInstalled=1"}}, {"search_criteria": {"equals": "IsInstalled=1"}}, "error", ["windows.wuaupdatesearcher.materialized_superseded_default"], "A direct Object omitting the required materialized superseded-update default is semantically incomplete."),
+        ("ntuser-defaults-safe-test", "windows.ntuser", {"capability": "windows.ntuser", "key": {"equals": "Software"}, "name": {"equals": "Example"}, "include_default": False, "item_creation": "key_and_name_exist"}, {"key": {"equals": "Software"}, "name": {"equals": "Example"}}, "true", ["windows.ntuser.materialized_collection_defaults"], "The direct NT-user Object explicitly carries both imported collection defaults."),
+        ("ntuser-defaults-invalid-test", "windows.ntuser", {"capability": "windows.ntuser", "key": {"equals": "Software"}, "name": {"equals": "Example"}}, {"key": {"equals": "Software"}, "name": {"equals": "Example"}}, "error", ["windows.ntuser.materialized_collection_defaults"], "An NT-user Object omitting materialized include_default and item_creation is semantically incomplete."),
+    ])
     for name, capability, obj, fields, outcome, rule_ids, reason in cases:
         tests[name] = {
             "test_title": f"Semantic boundary witness: {name.removesuffix('-test')}",

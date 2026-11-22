@@ -701,6 +701,89 @@ assessment:
         fields:
           protocol:
             equals: TCP
+    wu-defaults-safe-test:
+      test_title: 'Semantic boundary witness: wu-defaults-safe'
+      capability: windows.wuaupdatesearcher
+      reported_elements: all
+      object:
+        capability: windows.wuaupdatesearcher
+        search_criteria:
+          equals: IsInstalled=1
+        include_superseded_updates: true
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          search_criteria:
+            equals: IsInstalled=1
+    wu-defaults-invalid-test:
+      test_title: 'Semantic boundary witness: wu-defaults-invalid'
+      capability: windows.wuaupdatesearcher
+      reported_elements: all
+      object:
+        capability: windows.wuaupdatesearcher
+        search_criteria:
+          equals: IsInstalled=1
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          search_criteria:
+            equals: IsInstalled=1
+    ntuser-defaults-safe-test:
+      test_title: 'Semantic boundary witness: ntuser-defaults-safe'
+      capability: windows.ntuser
+      reported_elements: all
+      object:
+        capability: windows.ntuser
+        key:
+          equals: Software
+        name:
+          equals: Example
+        include_default: false
+        item_creation: key_and_name_exist
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          key:
+            equals: Software
+          name:
+            equals: Example
+    ntuser-defaults-invalid-test:
+      test_title: 'Semantic boundary witness: ntuser-defaults-invalid'
+      capability: windows.ntuser
+      reported_elements: all
+      object:
+        capability: windows.ntuser
+        key:
+          equals: Software
+        name:
+          equals: Example
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          key:
+            equals: Software
+          name:
+            equals: Example
   evaluate:
     and:
     - test: unix-full-path-safe-test
@@ -740,3 +823,7 @@ assessment:
     - test: lockout-time-invalid-test
     - test: listening-protocol-safe-test
     - test: listening-protocol-invalid-test
+    - test: wu-defaults-safe-test
+    - test: wu-defaults-invalid-test
+    - test: ntuser-defaults-safe-test
+    - test: ntuser-defaults-invalid-test
