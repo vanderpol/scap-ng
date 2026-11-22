@@ -88,6 +88,11 @@ empty, over-cardinality, and out-of-range Input bindings behind an explicit
 `input_provided` guard. It proves authoring and independent binding semantics,
 not Rule packaging or scanner invocation.
 
+The canonical `core-applicability` Assessment binds a shared Assessment for
+`purpose: applicability` and records applicable, NOT_APPLICABLE, and
+NOT_EVALUATED handoff expectations. Graph resolution and runtime precedence
+remain outside this portable corpus.
+
 The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
 independent-oracle, and runtime proof and records the exact RI #196 handoff.
 
