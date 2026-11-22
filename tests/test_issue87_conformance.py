@@ -12,7 +12,7 @@ import yaml
 from jsonschema import Draft202012Validator, ValidationError
 
 from conformance.tools.oracle import compare
-from conformance.tools.runner import validator
+from conformance.tools.runner import validator, check_semantic_witnesses
 
 ROOT = Path(__file__).resolve().parents[1]
 CONF = ROOT / "conformance"
@@ -96,11 +96,16 @@ class Issue87Conformance(unittest.TestCase):
                 self.assertEqual(negative["items"], [], row["capability"])
                 self.assertEqual(negative["acquisition"], "collected", row["capability"])
             expected = read(CONF / row["expected"])
-            self.assertNotEqual(
-                expected["variants"]["positive"]["assessment_outcome"],
-                expected["variants"]["negative"]["assessment_outcome"],
-                row["capability"],
-            )
+            if row["capability"] == "independent.unknown":
+                self.assertEqual(expected["variants"]["positive"]["assessment_outcome"], "unknown")
+                self.assertEqual(expected["variants"]["negative"]["assessment_outcome"], "unknown")
+                self.assertTrue(read(CONF / row["fixture"]).get("semantic_witnesses"))
+            else:
+                self.assertNotEqual(
+                    expected["variants"]["positive"]["assessment_outcome"],
+                    expected["variants"]["negative"]["assessment_outcome"],
+                    row["capability"],
+                )
 
     def _valid_receipt(self):
         row = next(row for row in self.manifest["capabilities"] if row["capability"] == "windows.registry")
@@ -143,6 +148,15 @@ class Issue87Conformance(unittest.TestCase):
                 mutant = deepcopy(receipt); mutant[key] = value
                 errors = compare(expected, mutant, manifest=self.manifest, fixture=fixture, fixture_sha256=row["sha256"]["fixture"], expected_sha256=row["sha256"]["expected"], test_names=["windows-registry-test"])
                 self.assertTrue(errors, name)
+
+    def test_fixed_result_witness_rejects_contradictory_expected_mutation(self):
+        row = next(row for row in self.manifest["capabilities"] if row["capability"] == "independent.unknown")
+        fixture = read(CONF / row["fixture"])
+        expected = read(CONF / row["expected"])
+        self.assertEqual(check_semantic_witnesses(fixture, expected), [])
+        mutated = deepcopy(expected)
+        mutated["variants"]["negative"]["assessment_outcome"] = "false"
+        self.assertTrue(check_semantic_witnesses(fixture, mutated))
 
     def test_core_semantics_keep_false_leaf_visible_and_only_not_negates(self):
         assessment = (CONF / "cases/core/evaluate-not.assessment.yaml").read_text(encoding="utf-8")
@@ -190,8 +204,11 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(len(audit["authoring_enums"]["negative_boundary_cases"]), 10)
         self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 180)
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
-        self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
-        self.assertIn("138 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        dispositions = audit["capability_constraints"]["semantic_rule_disposition_counts"]
+        self.assertEqual(sum(dispositions.values()), 180)
+        self.assertEqual(dispositions, {"blocked": 44, "not_run": 13, "semantic-witness": 23, "structural-witness": 19, "unsupported": 81})
+        self.assertEqual(len(audit["capability_constraints"]["semantic_rules_unresolved"]), 138)
+        self.assertIn("138 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])

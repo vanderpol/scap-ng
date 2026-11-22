@@ -300,6 +300,8 @@ def build_assessment(mapping: dict[str, Any], selector_contracts: dict[str, Any]
             "not-applicable": {"items": [], "acquisition": "not_applicable"},
         },
     }
+    if capability == "independent.unknown":
+        fixture["semantic_witnesses"] = [{"rule": "independent.unknown.fixed_result", "positive_variant": "positive", "negative_variant": "negative", "expected": "unknown", "reason": "The mapping declares a fixed UNKNOWN source with no Object, State, existence, or runtime result control; distinct collected and empty evidence cannot turn that source into TRUE or FALSE."}]
     return body, fixture
 
 
@@ -958,7 +960,14 @@ def main() -> None:
         negative_field = fixture["semantic_contract"]["negative_field"]
         positive_assertion = {"assessment_outcome": "true", "test_outcome": "true", "items_found": 1, "reason": "All declared fields match the collected Item."}
         negative_assertion = {"assessment_outcome": "false", "test_outcome": "false", "items_found": 0 if negative_strategy == "empty-collected-population" else 1, "reason": (f"Collected field {negative_field} is changed while selector fields remain identical; the mismatch is decisive." if negative_strategy == "field-mismatch" else "A collected empty population violates items_found: one_or_more; no selector is changed.")}
-        if has_fields:
+        if capability == "independent.unknown":
+            # This capability is a fixed-result semantic source.  Collection
+            # evidence is intentionally varied, but neither populated nor
+            # empty evidence may manufacture TRUE/FALSE for a Test whose
+            # canonical result is UNKNOWN.
+            positive_assertion = {"assessment_outcome": "unknown", "test_outcome": "unknown", "items_found": 1, "reason": "The fixed-result capability is UNKNOWN regardless of collected evidence; the positive Item does not override its source contract."}
+            negative_assertion = {"assessment_outcome": "unknown", "test_outcome": "unknown", "items_found": 0, "reason": "The fixed-result capability remains UNKNOWN with a distinct collected-empty evidence variant; this is not a FALSE Require witness."}
+        elif has_fields:
             positive_assertion["items_satisfying"] = 1
             negative_assertion["items_satisfying"] = 0
         expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": capability, "variants": {
@@ -971,6 +980,12 @@ def main() -> None:
             "error": {"assessment_outcome": "error", "test_outcome": "error", "items_found": 0, "items_satisfying": 0, "reason": "Collector ERROR is not converted to FALSE or TRUE."},
             "not-applicable": {"assessment_outcome": "not_applicable", "test_outcome": "not_applicable", "items_found": 0, "items_satisfying": 0, "reason": "Applicability is a typed outcome, not a Boolean false."},
         }}
+        if capability == "independent.unknown":
+            for variant_name, assertion in expected["variants"].items():
+                assertion["assessment_outcome"] = "unknown"
+                assertion["test_outcome"] = "unknown"
+                assertion["reason"] = "The fixed-result capability is UNKNOWN for the distinct evidence variant; collection status does not manufacture a Boolean result."
+            expected["semantic_rules"] = [{"id": "independent.unknown.fixed_result", "expected": "unknown", "reason": "Fixed-result source semantics dominate every distinct evidence variant; this is explicitly not a FALSE negative."}]
         write_json(expected_path, expected)
         def file_sha256(file_path: Path) -> str:
             return hashlib.sha256(file_path.read_bytes()).hexdigest()
