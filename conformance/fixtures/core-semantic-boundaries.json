@@ -71,6 +71,14 @@
     "cmdlet-module-guid-safe-test": "true",
     "cmdlet-module-guid-invalid-test": "error",
     "dpkg-debian-evr-safe-test": "true",
+    "sid-defaults-safe-test": "true",
+    "sid-defaults-invalid-test": "error",
+    "sid-sid-defaults-safe-test": "true",
+    "sid-sid-defaults-invalid-test": "error",
+    "ntuser-value-type-safe-test": "true",
+    "ntuser-value-type-invalid-test": "error",
+    "password-range-safe-test": "true",
+    "password-range-invalid-test": "error",
     "wu-defaults-safe-test": "true",
     "wu-defaults-invalid-test": "error",
     "ntuser-defaults-safe-test": "true",
@@ -845,6 +853,111 @@
         }
       ]
     },
+    "sid-defaults-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "sid-defaults-safe-test-item",
+          "capability": "windows.sid",
+          "fields": {
+            "trustee_name": {
+              "datatype": "string",
+              "value": "Administrators",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "sid-defaults-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "sid-sid-defaults-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "sid-sid-defaults-safe-test-item",
+          "capability": "windows.sid_sid",
+          "fields": {
+            "trustee_sid": {
+              "datatype": "string",
+              "value": "S-1-5-32-544",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "sid-sid-defaults-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "ntuser-value-type-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "ntuser-value-type-safe-test-item",
+          "capability": "windows.ntuser",
+          "fields": {
+            "type": {
+              "datatype": "string",
+              "value": "dword",
+              "status": "collected"
+            },
+            "value": {
+              "datatype": "string",
+              "value": "integer",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "ntuser-value-type-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "password-range-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "password-range-safe-test-item",
+          "capability": "windows.passwordpolicy",
+          "fields": {
+            "min_passwd_age": {
+              "datatype": "integer",
+              "value": 0,
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "password-range-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
     "wu-defaults-safe-test": {
       "status": "collected",
       "items_found": 1,
@@ -1389,6 +1502,70 @@
       ],
       "expected": "true",
       "reason": "A Debian package EVR is compared with the preferred debian_evr datatype."
+    },
+    {
+      "test": "sid-defaults-safe-test",
+      "rules": [
+        "windows.sid.materialized_behaviors"
+      ],
+      "expected": "true",
+      "reason": "The direct SID Object materializes both group behavior parameters."
+    },
+    {
+      "test": "sid-defaults-invalid-test",
+      "rules": [
+        "windows.sid.materialized_behaviors"
+      ],
+      "expected": "error",
+      "reason": "A direct SID Object omitting imported group behavior defaults is semantically incomplete."
+    },
+    {
+      "test": "sid-sid-defaults-safe-test",
+      "rules": [
+        "windows.sid_sid.materialized_behaviors"
+      ],
+      "expected": "true",
+      "reason": "The SID-targeted Object materializes both group behavior parameters."
+    },
+    {
+      "test": "sid-sid-defaults-invalid-test",
+      "rules": [
+        "windows.sid_sid.materialized_behaviors"
+      ],
+      "expected": "error",
+      "reason": "A direct SID-targeted Object omitting imported group behavior defaults is semantically incomplete."
+    },
+    {
+      "test": "ntuser-value-type-safe-test",
+      "rules": [
+        "windows.ntuser.value_type_datatype"
+      ],
+      "expected": "true",
+      "reason": "A registry dword type and integer NT-user value predicate use compatible datatypes."
+    },
+    {
+      "test": "ntuser-value-type-invalid-test",
+      "rules": [
+        "windows.ntuser.value_type_datatype"
+      ],
+      "expected": "error",
+      "reason": "A registry dword type cannot be compared as a string when both type and value datatype are asserted."
+    },
+    {
+      "test": "password-range-safe-test",
+      "rules": [
+        "windows.passwordpolicy.source_ranges"
+      ],
+      "expected": "true",
+      "reason": "Zero is the inclusive lower bound for a non-negative password-policy age."
+    },
+    {
+      "test": "password-range-invalid-test",
+      "rules": [
+        "windows.passwordpolicy.source_ranges"
+      ],
+      "expected": "error",
+      "reason": "A negative literal password-policy age violates the source range constraint."
     },
     {
       "test": "wu-defaults-safe-test",

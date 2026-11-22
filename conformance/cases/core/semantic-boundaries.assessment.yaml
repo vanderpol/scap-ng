@@ -1164,6 +1164,156 @@ assessment:
           evr:
             datatype: debian_evr
             equals: 1:2.3-4
+    sid-defaults-safe-test:
+      test_title: 'Semantic boundary witness: sid-defaults-safe'
+      capability: windows.sid
+      reported_elements: all
+      object:
+        capability: windows.sid
+        trustee_name:
+          equals: Administrators
+        include_group: true
+        resolve_group: false
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          trustee_name:
+            equals: Administrators
+    sid-defaults-invalid-test:
+      test_title: 'Semantic boundary witness: sid-defaults-invalid'
+      capability: windows.sid
+      reported_elements: all
+      object:
+        capability: windows.sid
+        trustee_name:
+          equals: Administrators
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          trustee_name:
+            equals: Administrators
+    sid-sid-defaults-safe-test:
+      test_title: 'Semantic boundary witness: sid-sid-defaults-safe'
+      capability: windows.sid_sid
+      reported_elements: all
+      object:
+        capability: windows.sid_sid
+        trustee_sid:
+          equals: S-1-5-32-544
+        include_group: true
+        resolve_group: false
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          trustee_sid:
+            equals: S-1-5-32-544
+    sid-sid-defaults-invalid-test:
+      test_title: 'Semantic boundary witness: sid-sid-defaults-invalid'
+      capability: windows.sid_sid
+      reported_elements: all
+      object:
+        capability: windows.sid_sid
+        trustee_sid:
+          equals: S-1-5-32-544
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          trustee_sid:
+            equals: S-1-5-32-544
+    ntuser-value-type-safe-test:
+      test_title: 'Semantic boundary witness: ntuser-value-type-safe'
+      capability: windows.ntuser
+      reported_elements: all
+      object:
+        capability: windows.ntuser
+        key:
+          equals: Software
+        name:
+          equals: Count
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          type:
+            equals: dword
+          value:
+            datatype: integer
+            equals: 7
+    ntuser-value-type-invalid-test:
+      test_title: 'Semantic boundary witness: ntuser-value-type-invalid'
+      capability: windows.ntuser
+      reported_elements: all
+      object:
+        capability: windows.ntuser
+        key:
+          equals: Software
+        name:
+          equals: Count
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          type:
+            equals: dword
+          value:
+            datatype: string
+            equals: '7'
+    password-range-safe-test:
+      test_title: 'Semantic boundary witness: password-range-safe'
+      capability: windows.passwordpolicy
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          min_passwd_age:
+            equals: 0
+      reported_elements: all
+    password-range-invalid-test:
+      test_title: 'Semantic boundary witness: password-range-invalid'
+      capability: windows.passwordpolicy
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          min_passwd_age:
+            equals: -1
+      reported_elements: all
     wu-defaults-safe-test:
       test_title: 'Semantic boundary witness: wu-defaults-safe'
       capability: windows.wuaupdatesearcher
@@ -1311,6 +1461,14 @@ assessment:
     - test: cmdlet-module-guid-safe-test
     - test: cmdlet-module-guid-invalid-test
     - test: dpkg-debian-evr-safe-test
+    - test: sid-defaults-safe-test
+    - test: sid-defaults-invalid-test
+    - test: sid-sid-defaults-safe-test
+    - test: sid-sid-defaults-invalid-test
+    - test: ntuser-value-type-safe-test
+    - test: ntuser-value-type-invalid-test
+    - test: password-range-safe-test
+    - test: password-range-invalid-test
     - test: wu-defaults-safe-test
     - test: wu-defaults-invalid-test
     - test: ntuser-defaults-safe-test
