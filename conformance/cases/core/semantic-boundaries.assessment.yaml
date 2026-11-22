@@ -1505,6 +1505,216 @@ assessment:
         fields:
           encrypt_method:
             equals: DES
+    xml-item-creation-safe-test:
+      test_title: 'Semantic boundary witness: xml-item-creation-safe'
+      capability: independent.xmlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.xmlfilecontent
+        full_path:
+          equals: /etc/config.xml
+        xpath:
+          equals: /config/value
+        item_creation: all_object_elements_fullfilled
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /config/value
+    xml-item-creation-invalid-test:
+      test_title: 'Semantic boundary witness: xml-item-creation-invalid'
+      capability: independent.xmlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.xmlfilecontent
+        full_path:
+          equals: /etc/config.xml
+        xpath:
+          equals: /config/value
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /config/value
+    rpm-package-defaults-safe-test:
+      test_title: 'Semantic boundary witness: rpm-package-defaults-safe'
+      capability: linux.rpmverifypackage
+      reported_elements: all
+      object:
+        capability: linux.rpmverifypackage
+        name:
+          equals: fixture-package
+        skip_dependencies: false
+        skip_scripts: false
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          name:
+            equals: fixture-package
+    rpm-package-defaults-invalid-test:
+      test_title: 'Semantic boundary witness: rpm-package-defaults-invalid'
+      capability: linux.rpmverifypackage
+      reported_elements: all
+      object:
+        capability: linux.rpmverifypackage
+        name:
+          equals: fixture-package
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          name:
+            equals: fixture-package
+    rpm-file-defaults-safe-test:
+      test_title: 'Semantic boundary witness: rpm-file-defaults-safe'
+      capability: linux.rpmverifyfile
+      reported_elements: all
+      object:
+        capability: linux.rpmverifyfile
+        name:
+          equals: fixture-file
+        epoch:
+          equals: '0'
+        version:
+          equals: '1.0'
+        release:
+          equals: '1'
+        arch:
+          equals: x86_64
+        filepath:
+          equals: /usr/bin/fixture
+        skip_link_target: false
+        skip_size: false
+        skip_owner: false
+        skip_group: false
+        skip_mtime: false
+        skip_mode: false
+        skip_rdev: false
+        skip_config_files: false
+        skip_ghost_files: false
+        skip_file_digest: false
+        skip_capabilities: false
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          name:
+            equals: fixture-file
+    rpm-file-defaults-invalid-test:
+      test_title: 'Semantic boundary witness: rpm-file-defaults-invalid'
+      capability: linux.rpmverifyfile
+      reported_elements: all
+      object:
+        capability: linux.rpmverifyfile
+        name:
+          equals: fixture-file
+        epoch:
+          equals: '0'
+        version:
+          equals: '1.0'
+        release:
+          equals: '1'
+        arch:
+          equals: x86_64
+        filepath:
+          equals: /usr/bin/fixture
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          name:
+            equals: fixture-file
+    file-rights-literal-safe-test:
+      test_title: 'Semantic boundary witness: file-rights-literal-safe'
+      capability: windows.fileeffectiverights
+      reported_elements: all
+      object:
+        capability: windows.fileeffectiverights
+        path:
+          equals: C:\Windows
+        filename:
+          matches_regex: ^bad:name$
+        trustee_sid:
+          equals: S-1-5-32-544
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filename:
+            matches_regex: ^bad:name$
+    file-rights-literal-invalid-test:
+      test_title: 'Semantic boundary witness: file-rights-literal-invalid'
+      capability: windows.fileeffectiverights
+      reported_elements: all
+      object:
+        capability: windows.fileeffectiverights
+        path:
+          equals: C:\Windows
+        filename:
+          equals: bad:name
+        trustee_sid:
+          equals: S-1-5-32-544
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filename:
+            equals: bad:name
+    file-rights-trustee-sid-safe-test:
+      test_title: 'Semantic boundary witness: file-rights-trustee-sid-safe'
+      capability: windows.fileeffectiverights
+      reported_elements: all
+      object:
+        capability: windows.fileeffectiverights
+        filepath:
+          equals: C:\Windows\fixture.txt
+        trustee_sid:
+          equals: S-1-5-32-544
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          trustee_sid:
+            equals: S-1-5-32-544
     wu-defaults-safe-test:
       test_title: 'Semantic boundary witness: wu-defaults-safe'
       capability: windows.wuaupdatesearcher
@@ -1670,6 +1880,15 @@ assessment:
     - test: yaml-yamlpath-invalid-test
     - test: yaml-full-path-traversal-test
     - test: shadow-encrypt-boundary-test
+    - test: xml-item-creation-safe-test
+    - test: xml-item-creation-invalid-test
+    - test: rpm-package-defaults-safe-test
+    - test: rpm-package-defaults-invalid-test
+    - test: rpm-file-defaults-safe-test
+    - test: rpm-file-defaults-invalid-test
+    - test: file-rights-literal-safe-test
+    - test: file-rights-literal-invalid-test
+    - test: file-rights-trustee-sid-safe-test
     - test: wu-defaults-safe-test
     - test: wu-defaults-invalid-test
     - test: ntuser-defaults-safe-test
