@@ -42,6 +42,51 @@ assessment:
           order: ascending
           values:
             variable: unique-values-variable
+    split-values-variable:
+      kind: local
+      expression:
+        split:
+          delimiter: ','
+          value:
+            literal: a,,b
+    regex-capture-values-variable:
+      kind: local
+      expression:
+        regex_capture:
+          pattern: ^https://([^/]+)/
+          value:
+            literal:
+            - https://one.example/path
+            - https://two.example/
+    substring-values-variable:
+      kind: local
+      expression:
+        substring:
+          substring_start: 1
+          substring_length: 3
+          value:
+            literal:
+            - abcdef
+            - xyz
+    time-difference-values-variable:
+      kind: local
+      expression:
+        time_difference:
+          values:
+          - literal: '2026-01-02'
+          - literal: '2026-01-01'
+          format_1: year_month_day
+          format_2: year_month_day
+    arithmetic-values-variable:
+      kind: local
+      expression:
+        arithmetic:
+          arithmetic_operation: add
+          values:
+          - literal: 2
+          - literal:
+            - 3
+            - 4
     expected-unique-variable:
       kind: constant
       expression:
@@ -70,6 +115,45 @@ assessment:
         literal:
           datatype: string
           value: a,b
+    expected-split-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - a
+          - ''
+          - b
+    expected-regex-capture-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - one.example
+          - two.example
+    expected-substring-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - abc
+          - xyz
+    expected-time-difference-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value: 86400
+    expected-arithmetic-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value:
+          - 5
+          - 6
   tests:
     function-unique-test:
       test_title: Unique removes duplicate values preserving first occurrence
@@ -147,9 +231,109 @@ assessment:
             values_matching: every
             equals:
               variable: expected-merge-variable
+    function-split-test:
+      test_title: Split preserves adjacent empty parts
+      capability: variable.value
+      reported_elements: all
+      variable: split-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-split-variable
+    function-regex-capture-test:
+      test_title: Regex capture returns the first group per value
+      capability: variable.value
+      reported_elements: all
+      variable: regex-capture-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-regex-capture-variable
+    function-substring-test:
+      test_title: Substring uses the explicit one-based source boundary
+      capability: variable.value
+      reported_elements: all
+      variable: substring-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-substring-variable
+    function-time-difference-test:
+      test_title: Time difference returns UTC seconds
+      capability: variable.value
+      reported_elements: all
+      variable: time-difference-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-time-difference-variable
+    function-arithmetic-test:
+      test_title: Arithmetic preserves Cartesian multiplicity
+      capability: variable.value
+      reported_elements: all
+      variable: arithmetic-values-variable
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: one_or_more
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-arithmetic-variable
   evaluate:
     and:
     - test: function-unique-test
     - test: function-count-test
     - test: function-concat-test
     - test: function-merge-test
+    - test: function-split-test
+    - test: function-regex-capture-test
+    - test: function-substring-test
+    - test: function-time-difference-test
+    - test: function-arithmetic-test

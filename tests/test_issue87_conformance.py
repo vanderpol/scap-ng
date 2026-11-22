@@ -235,7 +235,10 @@ class Issue87Conformance(unittest.TestCase):
         self.assertIn("23 unresolved capability semantic-validator rules (not_run/unsupported/blocked)", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
-        self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
+        self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic"])
+        self.assertEqual(audit["variable_functions"]["witness_tests"], 9)
+        self.assertEqual(audit["variable_functions"]["expression_schema_branches"], ["arithmetic", "begin", "concat", "count", "end", "input", "literal", "merge", "regex_capture", "split", "substring", "time_difference", "to_integer", "unique", "values", "variable"])
+        self.assertEqual(audit["variable_functions"]["uncovered_expression_branches"], ["begin", "end", "input", "to_integer", "values"])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
         self.assertEqual(audit["applicability"]["variants"], ["applicable", "not-applicable", "deferred"])
         dimensions = {"schema", "semantic", "collection", "integration", "operational"}
@@ -431,6 +434,11 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["functions"]["count"]["values"], [len(source)])
         self.assertEqual(expected["functions"]["concat"]["values"], [f"prefix-{value}" for value in unique])
         self.assertEqual(expected["functions"]["merge"]["values"], [",".join(sorted(unique))])
+        self.assertEqual(expected["functions"]["split"]["values"], ["a", "", "b"])
+        self.assertEqual(expected["functions"]["regex_capture"]["values"], ["one.example", "two.example"])
+        self.assertEqual(expected["functions"]["substring"]["values"], ["abc", "xyz"])
+        self.assertEqual(expected["functions"]["time_difference"]["values"], [86400])
+        self.assertEqual(expected["functions"]["arithmetic"]["values"], [5, 6])
 
     def test_input_guard_keeps_absent_and_empty_bindings_distinct(self):
         assessment = yaml.safe_load((CONF / "cases/core/input-guards.assessment.yaml").read_text(encoding="utf-8"))
