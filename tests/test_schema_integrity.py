@@ -13,7 +13,7 @@ EXPECTED_REFS = 700
 # Active single-version 0.4.1 family including reviewed registry traversal.
 # Historical frozen receipts remain in conformance/0.4 and prior Git commits.
 # The digest is independently checked by the generated documentation manifest.
-EXPECTED_DIGEST = '56067e9ad0cbfe27b6ff733852df6d81a2c0deb1d42de1db673c625b3a322deb'
+EXPECTED_DIGEST = '1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4'
 
 
 def strict_object(pairs):

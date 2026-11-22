@@ -59,6 +59,7 @@ Defines an Assessment's metadata and its manual procedure or automated checks.
 | Field | Schema type | Occurrences | Description | Details |
 | --- | --- | --- | --- | --- |
 | `allowed` | array | 0..1 | Lists the permitted values for this Input. | [/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/allowed](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/allowed) |
+| `predicate` | object | 0..1 | Optional generic typed value constraint expression. | [/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/predicate](../../../proposed-schema/documentation/assessment.schema.json#/properties/assessment/properties/inputs/additionalProperties/properties/constraints/properties/predicate) |
 
 ## `/properties/assessment/properties/specification`
 

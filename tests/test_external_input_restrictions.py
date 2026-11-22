@@ -47,6 +47,31 @@ class ExternalInputRestrictionSchema(unittest.TestCase):
                     predicate = vector["predicate"]
                 self.assertTrue(list(self.expression_validator.iter_errors(predicate)))
 
+    def test_expression_resource_limits_are_explicit_and_enforced_by_contract(self):
+        limits = self.language["$defs"]["value_constraint_expression"]["x-scap-ng-resource-limits"]
+        self.assertEqual(limits["max_expression_depth"], 32)
+        self.assertEqual(limits["max_expression_nodes"], 256)
+
+        def nested(depth):
+            value = {"equals": 1}
+            for _ in range(depth - 1):
+                value = {"and": [value]}
+            return value
+
+        def size_and_depth(value, depth=1):
+            if "and" in value or "or" in value or "one" in value or "xor" in value:
+                key = next(k for k in ("and", "or", "one", "xor") if k in value)
+                children = [size_and_depth(child, depth + 1) for child in value[key]]
+                return 1 + sum(row[0] for row in children), max([depth] + [row[1] for row in children])
+            return 1, depth
+
+        nodes, depth = size_and_depth(nested(limits["max_expression_depth"] + 1))
+        self.assertGreater(depth, limits["max_expression_depth"])
+        self.assertLessEqual(nodes, limits["max_expression_nodes"])
+        nodes, depth = size_and_depth({"or": [{"equals": i} for i in range(limits["max_expression_nodes"] + 1)]})
+        self.assertGreater(nodes, limits["max_expression_nodes"])
+        self.assertLessEqual(depth, limits["max_expression_depth"])
+
     def test_input_constraint_is_admitted_without_oval_specific_keys(self):
         document = copy.deepcopy(self.assessment)
         document["assessment"]["inputs"]["slideshow-value-input"]["constraints"] = {

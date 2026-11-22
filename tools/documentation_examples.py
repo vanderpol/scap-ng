@@ -93,13 +93,13 @@ class Examples:
                  '11b5ae735dd0a7a1db496b421e0d12f757c027f734da688c2b1d96940f4c47dc'):
                     '0.4.1 IOS version55 capability admission',
                 ('11b5ae735dd0a7a1db496b421e0d12f757c027f734da688c2b1d96940f4c47dc',
-                 '56067e9ad0cbfe27b6ff733852df6d81a2c0deb1d42de1db673c625b3a322deb'):
+                 '1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4'):
                     '0.4.1 bounded typed Input predicate contract',
                 ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
                  '11b5ae735dd0a7a1db496b421e0d12f757c027f734da688c2b1d96940f4c47dc'):
                     '0.4.1 IOS version55 capability admission',
                 ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
-                 '56067e9ad0cbfe27b6ff733852df6d81a2c0deb1d42de1db673c625b3a322deb'):
+                 '1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4'):
                     '0.4.1 IOS version55 and bounded typed Input predicate contract',
             }
             if (historical_digest, active_digest) not in reviewed_amendments:
