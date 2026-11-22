@@ -1,0 +1,54 @@
+assessment:
+  id: conformance-core-input-guards
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 Input presence and cardinality guards
+  mode: automated
+  class: compliance
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  inputs:
+    expected-value-input:
+      datatype: integer
+      cardinality: exactly_one
+      required: false
+      constraints:
+        predicate:
+          and:
+          - greater_than_or_equal: 1
+          - less_than_or_equal: 10
+  tests:
+    input-guarded-test:
+      test_title: Input-bound registry comparison
+      capability: windows.registry
+      reported_elements: all
+      object:
+        hive:
+          equals: local_machine
+        key:
+          equals: SOFTWARE\Policies\Example
+        name:
+          equals: ExampleValue
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          type:
+            equals: dword
+          value:
+            equals:
+              input: expected-value-input
+            value_match: every
+  evaluate:
+    if:
+      input_provided: expected-value-input
+    then:
+      test: input-guarded-test
+    else:
+      not_evaluated:
+        reason: Expected organization input was not supplied
+        follow_up: Obtain an authorized value before evaluation

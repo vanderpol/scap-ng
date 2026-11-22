@@ -83,6 +83,11 @@ The canonical `core-variable-functions` Assessment covers `unique`, `count`,
 dependencies. Its expected values are independently derived and do not claim
 status propagation or runtime function equivalence.
 
+The canonical `core-input-guards` Assessment distinguishes supplied, absent,
+empty, over-cardinality, and out-of-range Input bindings behind an explicit
+`input_provided` guard. It proves authoring and independent binding semantics,
+not Rule packaging or scanner invocation.
+
 The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
 independent-oracle, and runtime proof and records the exact RI #196 handoff.
 

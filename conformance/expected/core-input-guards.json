@@ -1,0 +1,31 @@
+{
+  "format": "scap-ng-conformance-expected-0.1",
+  "schema_version": "0.4.1",
+  "case_id": "core-input-guards",
+  "variants": {
+    "provided": {
+      "assessment_outcome": "true",
+      "reason": "Presence guard takes the then branch; one supplied integer satisfies the bounded Input predicate."
+    },
+    "absent": {
+      "assessment_outcome": "not_evaluated",
+      "reason": "Absent optional Input takes the explicit else branch; it is not treated as an empty or default value."
+    },
+    "explicit-empty": {
+      "assessment_outcome": "error",
+      "reason": "A supplied empty population is distinct from absence and violates exactly_one."
+    },
+    "too-many": {
+      "assessment_outcome": "error",
+      "reason": "Two supplied values violate exactly_one; cardinality is not silently truncated."
+    },
+    "out-of-range": {
+      "assessment_outcome": "error",
+      "reason": "The supplied value violates the explicit 1..10 predicate; it is not coerced or defaulted."
+    }
+  },
+  "guard": "input_provided",
+  "input_cardinality": "exactly_one",
+  "independently_justified": true,
+  "reason": "Input presence, supplied population cardinality, and value constraints are separate dimensions; runtime binding receipts remain RI-owned."
+}

@@ -170,6 +170,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
+        self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
@@ -258,6 +259,14 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["functions"]["count"]["values"], [len(source)])
         self.assertEqual(expected["functions"]["concat"]["values"], [f"prefix-{value}" for value in unique])
         self.assertEqual(expected["functions"]["merge"]["values"], [",".join(sorted(unique))])
+
+    def test_input_guard_keeps_absent_and_empty_bindings_distinct(self):
+        assessment = yaml.safe_load((CONF / "cases/core/input-guards.assessment.yaml").read_text(encoding="utf-8"))
+        expected = read(CONF / "expected/core-input-guards.json")
+        self.assertEqual(assessment["assessment"]["evaluate"]["if"]["input_provided"], "expected-value-input")
+        self.assertEqual(expected["variants"]["absent"]["assessment_outcome"], "not_evaluated")
+        self.assertEqual(expected["variants"]["explicit-empty"]["assessment_outcome"], "error")
+        self.assertNotEqual(expected["variants"]["absent"]["assessment_outcome"], expected["variants"]["explicit-empty"]["assessment_outcome"])
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]
