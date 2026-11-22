@@ -132,11 +132,11 @@ class Issue87Conformance(unittest.TestCase):
         audit = read(CONF / "coverage-audit.json")
         self.assertEqual(audit["schema_commit"], self.manifest["schema_commit"])
         self.assertEqual(audit["schema_family_sha256"], self.manifest["schema_family_sha256"])
-        self.assertEqual(audit["vectors"]["base_capability_vectors_total"], 728)
-        self.assertEqual(audit["vectors"]["expanded_capability_vectors_total"], 832)
-        self.assertEqual(audit["vectors"]["multi_value_suite_cases"], 103)
-        self.assertEqual(audit["fields"]["declared_mapping_fields"], 710)
-        self.assertEqual(audit["fields"]["authored_assessment_fields"], 710)
+        self.assertEqual(audit["vectors"]["base_capability_vectors_total"], 735)
+        self.assertEqual(audit["vectors"]["expanded_capability_vectors_total"], 840)
+        self.assertEqual(audit["vectors"]["multi_value_suite_cases"], 104)
+        self.assertEqual(audit["fields"]["declared_mapping_fields"], 718)
+        self.assertEqual(audit["fields"]["authored_assessment_fields"], 718)
         self.assertEqual(audit["selectors"]["uncovered_alternative_sets"], 0)
         self.assertEqual(audit["operators"]["uncovered_comparison"], [])
         self.assertEqual(audit["cardinalities"]["uncovered"], [])
@@ -147,9 +147,9 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["independent_oracle"]["source_cases"], 15)
         self.assertFalse(audit["independent_oracle"]["runtime_qualification"])
         derived = audit["derived_integrity"]
-        self.assertEqual(derived["fields_from_source_mappings"], 710)
-        self.assertEqual(derived["fields_from_authored_assessments"], 710)
-        self.assertEqual(derived["fields_from_positive_fixtures"], 710)
+        self.assertEqual(derived["fields_from_source_mappings"], 718)
+        self.assertEqual(derived["fields_from_authored_assessments"], 718)
+        self.assertEqual(derived["fields_from_positive_fixtures"], 718)
         self.assertEqual(derived["operators_from_source_schema"], 67)
         self.assertEqual(derived["operators_from_authored_assessments"], 67)
         self.assertEqual(derived["selector_alternatives_from_source_mappings"], 94)
@@ -161,10 +161,12 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["operators"]["non_exercising_witnesses"], [])
         self.assertEqual(audit["authoring_enums"]["cases"], 20)
         self.assertEqual(len(audit["authoring_enums"]["negative_boundary_cases"]), 10)
-        self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 177)
+        self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 180)
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
-        self.assertIn("158 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        self.assertIn("160 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
+        self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
@@ -187,9 +189,9 @@ class Issue87Conformance(unittest.TestCase):
 
     def test_authoring_enum_negative_boundaries_are_rejected(self):
         invalid = {row["id"] for row in self.manifest["invalid_cases"]}
-        self.assertTrue({"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern"}.issubset(invalid))
+        self.assertTrue({"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern", "invalid-set-difference-cardinality"}.issubset(invalid))
         for case in self.manifest["invalid_cases"]:
-            if case["id"] not in {"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern"}:
+            if case["id"] not in {"invalid-class", "invalid-reported-elements", "invalid-manual-outcome", "invalid-mode", "invalid-variable-kind", "invalid-cardinality", "invalid-specification-version", "invalid-reported-elements-duplicate", "invalid-empty-procedure", "invalid-id-pattern", "invalid-set-difference-cardinality"}:
                 continue
             path = CONF / case["assessment"]
             self.assertTrue(path.is_file(), path)
@@ -202,12 +204,15 @@ class Issue87Conformance(unittest.TestCase):
         declared = sum(len(row["selector_alternatives"]) for row in self.inventory["capabilities"])
         self.assertEqual(len(selectors["alternatives"]), declared)
         multi_values = read(CONF / "expected/core-multi-values.json")
-        self.assertEqual(len(multi_values["capabilities"]), 103)
+        self.assertEqual(len(multi_values["capabilities"]), 104)
         enum_boundaries = read(CONF / "expected/core-enum-boundaries.json")
         self.assertEqual(len(enum_boundaries["enum_values"]), 12)
         self.assertEqual(read(CONF / "coverage-audit.json")["enum_boundaries"]["uncovered_native_selector_enum_values"], [])
         cardinalities = read(CONF / "expected/core-cardinalities.json")
         self.assertEqual(set(cardinalities["cardinalities"]), {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"})
+        set_filters = read(CONF / "expected/core-set-filters.json")
+        self.assertEqual(set(set_filters["set_operators"]), {"union", "intersection", "difference"})
+        self.assertEqual(set(set_filters["filter_actions"]), {"include", "exclude"})
         for row in self.manifest["status_cases"]:
             self.assertTrue(read(CONF / row["expected"])["reason"].strip())
 

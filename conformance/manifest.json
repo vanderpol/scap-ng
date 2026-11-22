@@ -1,14 +1,14 @@
 {
   "format": "scap-ng-native-conformance-manifest-0.1",
   "schema_version": "0.4.1",
-  "schema_commit": "860d63e84d5aba12daa6d5037bdb83d78a95088a",
-  "schema_family_sha256": "33c0867870c04a411f769646a8f5c8c785134673d56a26b7a1cd3c8d213a7a91",
+  "schema_commit": "d1ab0283e09369c2c734d3b8f93b65007441cf07",
+  "schema_family_sha256": "1755c893712ef30334dc7ecadc88e5abf387c2d60a75211bc2445b7cefa2e7d4",
   "source": "vanderpol/scap-ng",
   "issue": 87,
   "runner_contract": "conformance/CONTRACT.md",
   "schema_inventory": "conformance/schema-coverage.json",
   "coverage_audit": "conformance/coverage-audit.json",
-  "capability_case_count": 104,
+  "capability_case_count": 105,
   "capabilities": [
     {
       "capability": "esx.host_account",
@@ -620,6 +620,29 @@
         "expected": "dfe5b62609cecf1d52ae1a8554c7b25db818071f3987a3c00f8848f48a6dff64"
       },
       "field_count": 7,
+      "vectors": [
+        "positive",
+        "negative",
+        "multi-item",
+        "boundary",
+        "empty",
+        "permission-denied",
+        "error",
+        "not-applicable"
+      ]
+    },
+    {
+      "capability": "ios.version55",
+      "status": "supported",
+      "assessment": "cases/capabilities/ios-version55.assessment.yaml",
+      "fixture": "fixtures/ios-version55.json",
+      "expected": "expected/ios-version55.json",
+      "sha256": {
+        "assessment": "fb23ea8af113203f39b312f55407302d03148de4a69c3298e6a18ebdeb7636b2",
+        "fixture": "4856322ebadf71a636a71d23ec120196fafb72b1ea0db25bd6cb730da5340414",
+        "expected": "681bd5fb2892b8e0e743e7f5526d050f14cbac2f5123e08379b575eba643ffc9"
+      },
+      "field_count": 8,
       "vectors": [
         "positive",
         "negative",
@@ -2585,6 +2608,19 @@
       ]
     },
     {
+      "id": "core-set-filters",
+      "assessment": "cases/core/set-filters.assessment.yaml",
+      "fixture": "fixtures/core-set-filters.json",
+      "expected": "expected/core-set-filters.json",
+      "vectors": [
+        "include",
+        "exclude",
+        "union",
+        "intersection",
+        "difference"
+      ]
+    },
+    {
       "id": "core-comparison-operators",
       "assessment": "cases/core/comparison-operators.assessment.yaml",
       "fixture": "fixtures/core-comparison-operators.json",
@@ -2774,6 +2810,12 @@
       "assessment": "cases/invalid/invalid-id-pattern.assessment.yaml",
       "expected": "schema-invalid",
       "reason": "Native identifiers use the canonical lower-kebab pattern."
+    },
+    {
+      "id": "invalid-set-difference-cardinality",
+      "assessment": "cases/invalid/invalid-set-difference-cardinality.assessment.yaml",
+      "expected": "schema-invalid",
+      "reason": "Set difference admits at most two operands."
     }
   ],
   "execution_boundary": "Schema validation and oracle comparison are independent of RI execution. RI adapter coordination is RI issue #196.",

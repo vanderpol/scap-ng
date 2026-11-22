@@ -27,7 +27,7 @@ Every ordinary capability case provides:
 
 Dedicated core suites additionally provide all 67 active comparison operators,
 all 94 mapping-declared selector alternatives, all Item/field cardinality
-values, 103 applicable multi-value field witnesses, typed `not_evaluated`, and
+values, 104 applicable multi-value field witnesses, typed `not_evaluated`, and
 profile-disabled Rule witnesses. These are schema-valid semantic witnesses;
 collector execution remains outside this source oracle.
 

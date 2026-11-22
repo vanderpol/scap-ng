@@ -1,0 +1,104 @@
+assessment:
+  id: conformance-core-set-filters
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 Set and Filter semantics
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  shared_objects:
+    left-object:
+      object_title: Left package population
+      capability: linux.dpkginfo
+      name:
+        equals: left
+    right-object:
+      object_title: Right package population
+      capability: linux.dpkginfo
+      name:
+        equals: right
+  tests:
+    set-union-test:
+      test_title: Union applies include/exclude filters to both operands
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: union
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+          - object: right-object
+            filters:
+            - exclude:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: arm64
+      require:
+        item_requirement:
+          items_found: one_or_more
+    set-intersection-test:
+      test_title: Intersection retains only shared Items
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: intersection
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+          - object: right-object
+            filters:
+            - exclude:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: arm64
+      require:
+        item_requirement:
+          items_found: one_or_more
+    set-difference-test:
+      test_title: Difference removes right-operand Items
+      capability: linux.dpkginfo
+      reported_elements: all
+      object:
+        capability: linux.dpkginfo
+        set:
+          operator: difference
+          operands:
+          - object: left-object
+            filters:
+            - include:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: amd64
+          - object: right-object
+            filters:
+            - exclude:
+                arch:
+                  values_found: one_or_more
+                  values_matching: every
+                  equals: arm64
+      require:
+        item_requirement:
+          items_found: one_or_more
+  evaluate:
+    and:
+    - test: set-union-test
+    - test: set-intersection-test
+    - test: set-difference-test
