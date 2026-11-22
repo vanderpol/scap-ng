@@ -1,0 +1,70 @@
+assessment:
+  id: conformance-core-variable-interactions
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 Variable, Require and Evaluate interactions
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  variables:
+    source-values-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - alpha
+          - beta
+    alias-values-variable:
+      kind: local
+      expression:
+        variable: source-values-variable
+    expected-values-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value:
+          - alpha
+          - beta
+  tests:
+    variable-alias-every-test:
+      test_title: Variable alias preserves ordered values
+      capability: variable.value
+      reported_elements: all
+      variable: alias-values-variable
+      require:
+        item_requirement: &id001
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement: &id002
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            value_match: every
+            values_found: one_or_more
+            values_matching: every
+            equals:
+              variable: expected-values-variable
+    variable-alias-exactly-one-test:
+      test_title: Variable alias exposes field cardinality failure
+      capability: variable.value
+      reported_elements: all
+      variable: alias-values-variable
+      require:
+        item_requirement: *id001
+        field_requirement: *id002
+        fields:
+          value:
+            value_match: every
+            values_found: exactly_one
+            values_matching: every
+            equals:
+              variable: expected-values-variable
+  evaluate:
+    and:
+    - test: variable-alias-every-test
+    - not:
+        test: variable-alias-exactly-one-test

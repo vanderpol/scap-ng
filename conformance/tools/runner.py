@@ -180,6 +180,20 @@ def validate() -> int:
                 errors.append(f"{row['id']}: missing expected status/profile oracle")
         except Exception as exc:
             errors.append(f"{row['id']}: {exc.message if hasattr(exc, 'message') else exc}")
+    for row in manifest.get("authoring_cases", []):
+        try:
+            document = load(CONFORMANCE / row["assessment"])
+            schema_validator(row["schema"]).validate(document)
+            expected = load(CONFORMANCE / row["expected"])
+            if expected.get("case_id") != row["id"]:
+                errors.append(f"{row['id']}: expected case_id does not match manifest")
+            if document.get("assessment", {}).get("id") != row["id"]:
+                errors.append(f"{row['id']}: Assessment id does not match manifest")
+            if expected.get("mode") != document.get("assessment", {}).get("mode") or expected.get("class") != document.get("assessment", {}).get("class"):
+                errors.append(f"{row['id']}: expected authoring enum metadata disagrees with Assessment")
+            if not expected.get("reason", "").strip(): errors.append(f"{row['id']}: expected enum reason is empty")
+        except Exception as exc:
+            errors.append(f"{row['id']}: {exc.message if hasattr(exc, 'message') else exc}")
     for invalid_case in manifest["invalid_cases"]:
         invalid = CONFORMANCE / invalid_case["assessment"]
         try:

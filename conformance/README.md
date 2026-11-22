@@ -45,6 +45,12 @@ selector alternatives, every cardinality token, `not_evaluated`, and
 profile-disabled Rules. Native enum boundary values beyond the sentinel audit,
 schema property/constraint combinations, collector execution, and scale remain
 explicitly incomplete.
+
+Authoring branches are separately witnessed: 20 schema-valid Assessments cover
+both modes, all five Assessment classes, all three `reported_elements` branches
+(including an explicit list), and all six manual technical-outcome choices.
+Three invalid-authoring vectors reject out-of-domain class, reporting, and
+manual-outcome enum values.
 Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
 spelling; `negate` is an invalid-authoring regression.
@@ -53,6 +59,12 @@ The independent Model A oracle executes all 15 frozen complete-known-nonempty
 integer/string cases, including aliases, duplicate preservation, expected-value
 matching, and the three cardinality layers. It intentionally rejects empty,
 unknown, error, and unsupported datatype cases rather than assigning outcomes.
+
+The canonical `core-variable-interactions` Assessment separately connects a
+local Variable alias to a multi-value `variable.value` Test and Require field
+cardinality. Its decisive FALSE leaf is visible and enclosed only by canonical
+`not`; the expected counts are independently derived from the two ordered
+values.
 
 The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
 independent-oracle, and runtime proof and records the exact RI #196 handoff.

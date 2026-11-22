@@ -8,6 +8,7 @@ import sys
 import unittest
 from pathlib import Path
 from copy import deepcopy
+import yaml
 
 from conformance.tools.oracle import compare
 
@@ -154,11 +155,39 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(derived["selector_alternatives_from_source_mappings"], 94)
         self.assertEqual(derived["selector_alternatives_from_authored_assessments"], 94)
         self.assertEqual(derived["missing_witnesses"], {"fields": [], "selectors": [], "operators": [], "cardinalities": []})
-        self.assertEqual(derived["non_exercising_witnesses"], [])
+        self.assertEqual(derived["non_exercising_witnesses"], {"fields": [], "selectors": [], "operators": []})
+        self.assertEqual(audit["fields"]["non_exercising_witnesses"], [])
+        self.assertEqual(audit["selectors"]["non_exercising_witnesses"], [])
+        self.assertEqual(audit["operators"]["non_exercising_witnesses"], [])
+        self.assertEqual(audit["authoring_enums"]["cases"], 20)
         for row in self.manifest["capabilities"]:
             expected = read(CONF / row["expected"])
             for assertion in expected["variants"].values():
                 self.assertTrue(assertion["reason"].strip())
+
+    def test_authoring_enum_cases_cover_all_assessment_branches(self):
+        rows = self.manifest.get("authoring_cases", [])
+        self.assertEqual(len(rows), 20)
+        modes = {read(CONF / row["expected"])["mode"] for row in rows}
+        self.assertEqual(modes, {"automated", "manual"})
+        classes = {read(CONF / row["expected"])["class"] for row in rows}
+        self.assertEqual(classes, {"compliance", "vulnerability", "patch", "inventory", "miscellaneous"})
+        automated = [read(CONF / row["expected"]) for row in rows if read(CONF / row["expected"])["mode"] == "automated"]
+        self.assertEqual({case["reported_elements"] for case in automated}, {"scalar-all", "scalar-compared", "explicit-list"})
+        manual = [read(CONF / row["expected"]) for row in rows if read(CONF / row["expected"])["mode"] == "manual"]
+        self.assertEqual({tuple(case["response_outcomes"]) for case in manual}, {("true", "false", "error", "unknown", "not_evaluated", "not_applicable")})
+        for row in rows:
+            self.assertTrue((CONF / row["assessment"]).is_file())
+            self.assertTrue(read(CONF / row["expected"])["reason"].strip())
+
+    def test_authoring_enum_negative_boundaries_are_rejected(self):
+        invalid = {row["id"] for row in self.manifest["invalid_cases"]}
+        self.assertTrue({"invalid-class", "invalid-reported-elements", "invalid-manual-outcome"}.issubset(invalid))
+        for case in self.manifest["invalid_cases"]:
+            if case["id"] not in {"invalid-class", "invalid-reported-elements", "invalid-manual-outcome"}:
+                continue
+            path = CONF / case["assessment"]
+            self.assertTrue(path.is_file(), path)
 
     def test_core_expansions_cover_operators_selectors_cardinalities_and_statuses(self):
         operators = read(CONF / "expected/core-comparison-operators.json")
@@ -176,6 +205,21 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(set(cardinalities["cardinalities"]), {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"})
         for row in self.manifest["status_cases"]:
             self.assertTrue(read(CONF / row["expected"])["reason"].strip())
+
+    def test_variable_require_evaluate_interaction_keeps_false_leaf_visible(self):
+        assessment = yaml.safe_load((CONF / "cases/core/variable-interactions.assessment.yaml").read_text(encoding="utf-8"))
+        self.assertEqual(set(assessment["assessment"]["variables"]), {"source-values-variable", "alias-values-variable", "expected-values-variable"})
+        self.assertEqual(assessment["assessment"]["variables"]["alias-values-variable"]["kind"], "local")
+        self.assertEqual(assessment["assessment"]["evaluate"]["and"][1]["not"]["test"], "variable-alias-exactly-one-test")
+        expected = read(CONF / "expected/core-variable-interactions.json")
+        self.assertEqual(expected["assertions"]["variable-alias-exactly-one-test"]["outcome"], "false")
+        self.assertEqual(expected["enclosing_outcome"], "true")
+        observed = assessment["assessment"]["variables"]["source-values-variable"]["expression"]["literal"]["value"]
+        alias = assessment["assessment"]["variables"]["alias-values-variable"]["expression"]["variable"]
+        self.assertEqual(alias, "source-values-variable")
+        self.assertEqual(len(observed), 2)
+        self.assertEqual(observed, assessment["assessment"]["variables"]["expected-values-variable"]["expression"]["literal"]["value"])
+        self.assertEqual(expected["assertions"]["variable-alias-exactly-one-test"]["values_found"], len(observed))
 
     def test_offline_schema_runner_and_invalid_negate_gate(self):
         command = [sys.executable, str(CONF / "tools/runner.py"), "validate"]

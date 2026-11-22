@@ -31,6 +31,12 @@ values, 103 applicable multi-value field witnesses, typed `not_evaluated`, and
 profile-disabled Rule witnesses. These are schema-valid semantic witnesses;
 collector execution remains outside this source oracle.
 
+Authoring/schema branches are tracked separately from executable semantics:
+20 cases cover both automated/manual modes, all five Assessment classes, all
+three `reported_elements` branches, and all six manual technical outcomes.
+Invalid enum vectors are required to fail schema validation. These cases do not
+select a manual response or assert a scanner result.
+
 `items_found` and `items_satisfying` remain separate cardinality observations.
 A status is not Booleanized. A scanner MUST NOT turn missing evidence or ERROR
 into success by applying `not`.

@@ -38,6 +38,21 @@ def walk(value: Any):
             yield from walk(child)
 
 
+def predicate_matches(observed: Any, predicate: Any) -> bool:
+    """Verify the positive comparison is witnessed by the fixture value."""
+    if not isinstance(predicate, dict):
+        return False
+    if "equals" in predicate:
+        expected = predicate["equals"]
+        if isinstance(expected, list):
+            return isinstance(observed, list) and all(value in expected for value in observed)
+        return observed == expected
+    if "record" in predicate and isinstance(observed, dict):
+        return all(predicate_matches(observed.get(field), child)
+                   for field, child in predicate["record"].get("fields", {}).items())
+    return False
+
+
 def main() -> int:
     manifest = load(CONF / "manifest.json")
     inventory = load(CONF / "schema-coverage.json")
@@ -45,6 +60,7 @@ def main() -> int:
     fixtures: dict[str, Any] = {}
     authored_field_witnesses: set[tuple[str, str]] = set()
     fixture_field_witnesses: set[tuple[str, str]] = set()
+    non_exercising_field_witnesses: list[dict[str, Any]] = []
     manifest_rows = {row["capability"]: row for row in manifest["capabilities"]}
     all_fields = set(); all_selectors = set(); chosen_selectors = set()
     selector_alternatives = 0; selected_alternatives = 0
@@ -68,14 +84,23 @@ def main() -> int:
         manifest_row = manifest_rows[mapping["capability"]]
         document = load(CONF / manifest_row["assessment"])
         fixture = load(CONF / manifest_row["fixture"])
-        authored[mapping["capability"]] = document
-        fixtures[mapping["capability"]] = fixture
+        capability = mapping["capability"]
+        authored[capability] = document
+        fixtures[capability] = fixture
+        positive_items = fixture.get("variants", {}).get("positive", {}).get("items", [])
+        positive_item = positive_items[0] if len(positive_items) == 1 else None
+        predicates: dict[str, Any] = {}
         for test in document["assessment"].get("tests", {}).values():
-            for field in test.get("require", {}).get("fields", {}):
-                authored_field_witnesses.add((mapping["capability"], field))
-        for item in fixture.get("variants", {}).get("positive", {}).get("items", []):
+            for field, predicate in test.get("require", {}).get("fields", {}).items():
+                authored_field_witnesses.add((capability, field))
+                predicates[field] = predicate
+        for item in positive_items:
             for field in item.get("fields", {}):
-                fixture_field_witnesses.add((mapping["capability"], field))
+                fixture_field_witnesses.add((capability, field))
+        for field in sorted(set(predicates) & set(native.get("state_field_map", {}))):
+            observed = positive_item.get("fields", {}).get(field, {}).get("value") if positive_item else None
+            if not positive_item or field not in positive_item.get("fields", {}) or not predicate_matches(observed, predicates[field]):
+                non_exercising_field_witnesses.append({"capability": capability, "field": field, "reason": "positive fixture value does not satisfy authored Require predicate"})
         mapping_rows.append({"capability": mapping["capability"], "fields": len(fields), "selectors": len(selectors), "alternatives": len(alternatives), "selected_alternative": 1 if alternatives else 0})
 
     selector_document = load(CONF / "cases/core/selector-alternatives.assessment.yaml")
@@ -89,14 +114,25 @@ def main() -> int:
             key = matches[0]; authored_selector_keys.append(key); del remaining_alternatives[key]
     selector_suite_alternatives = len(authored_selector_keys)
     duplicate_selector_witnesses = len(authored_selector_keys) - len(set(authored_selector_keys))
+    non_exercising_selector_witnesses: list[dict[str, Any]] = []
+    selector_fixture = load(CONF / "fixtures/core-selector-alternatives.json")
+    selector_witnesses = selector_fixture.get("selector_witnesses", {})
+    for test_name, test in selector_document["assessment"].get("tests", {}).items():
+        object_fields = set(test.get("object", {})) - {"capability"}
+        witness = selector_witnesses.get(test_name, {})
+        if object_fields != set(witness.get("selectors", {})) or not witness.get("items"):
+            non_exercising_selector_witnesses.append({"test": test_name, "reason": "selector Object and corresponding fixture witness differ"})
     enum_suite_document = load(CONF / "cases/core/enum-boundaries.assessment.yaml")
     enum_suite_values = {test.get("object", {}).get("hive", {}).get("equals") for test in enum_suite_document["assessment"].get("tests", {}).values()}
     native_enum_values = {"classes_root", "current_config", "current_user", "current_user_local_settings", "local_machine", "users"}
     authored_enum_values = {value for value in enum_suite_values if isinstance(value, str)}
     authored_ops = set()
+    operator_witnesses: dict[str, dict[str, Any]] = {}
+    duplicate_operator_witnesses: list[str] = []
+    non_exercising_operator_witnesses: list[dict[str, Any]] = []
     authored_cardinalities = set()
     expression_keys = {"and", "or", "one", "xor", "not", "test", "assessment", "not_evaluated", "not_applicable"}
-    authored_documents = list(authored.values()) + [load(CONF / "cases/core/evaluate-not.assessment.yaml"), load(CONF / "cases/core/comparison-operators.assessment.yaml"), load(CONF / "cases/core/selector-alternatives.assessment.yaml"), load(CONF / "cases/core/cardinalities.assessment.yaml"), load(CONF / "cases/core/status-not-evaluated.assessment.yaml"), load(CONF / "cases/core/status-not-applicable.assessment.yaml")]
+    authored_documents = list(authored.values()) + [load(CONF / "cases/core/evaluate-not.assessment.yaml"), load(CONF / "cases/core/variable-interactions.assessment.yaml"), load(CONF / "cases/core/comparison-operators.assessment.yaml"), load(CONF / "cases/core/selector-alternatives.assessment.yaml"), load(CONF / "cases/core/cardinalities.assessment.yaml"), load(CONF / "cases/core/status-not-evaluated.assessment.yaml"), load(CONF / "cases/core/status-not-applicable.assessment.yaml")]
     for document in authored_documents:
         for node in walk(document):
             if not isinstance(node, dict): continue
@@ -111,6 +147,22 @@ def main() -> int:
     for definition_name in ("scalar_field_predicate", "record_field_predicate", "object_selector_predicate"):
         comparison.update(k for k in language["$defs"][definition_name].get("properties", {}) if k not in {"values_found", "values_matching", "datatype", "value_match", "redact_result", "selection_match"})
     field_ops = set(comparison)
+    operator_document = load(CONF / "cases/core/comparison-operators.assessment.yaml")
+    operator_expected = load(CONF / "expected/core-comparison-operators.json").get("operators", {})
+    for test_name, test in operator_document["assessment"].get("tests", {}).items():
+        value_predicate = test.get("require", {}).get("fields", {}).get("value", {})
+        operators = [key for key in value_predicate if key in comparison]
+        if len(operators) != 1:
+            non_exercising_operator_witnesses.append({"test": test_name, "reason": "operator test does not contain exactly one comparison operator"})
+            continue
+        operator = operators[0]
+        if operator in operator_witnesses:
+            duplicate_operator_witnesses.append(operator)
+        operand = value_predicate[operator]
+        expected = operator_expected.get(operator, {})
+        operator_witnesses[operator] = {"test": test_name, "datatype": expected.get("datatype"), "operand": operand, "variable": test.get("variable")}
+        if expected.get("operand") != operand or not test.get("variable"):
+            non_exercising_operator_witnesses.append({"test": test_name, "operator": operator, "reason": "authored operand or Variable source differs from expected witness"})
     logical = set(inventory["operator_inventory"]["logical"]) | {"not"}
     boundary_validator = assessment_validator()
     enum_boundary_attempts = enum_boundary_rejections = 0
@@ -139,16 +191,18 @@ def main() -> int:
         "schema_commit": manifest["schema_commit"],
         "schema_family_sha256": manifest["schema_family_sha256"],
         "vectors": {"capabilities": len(manifest["capabilities"]), "base_vectors_per_capability": 7, "base_capability_vectors_total": len(manifest["capabilities"]) * 7, "additional_multi_item": len(manifest["capabilities"]), "expanded_capability_vectors_total": sum(len(row["vectors"]) for row in manifest["capabilities"]), "multi_value_suite_cases": len(load(CONF / "expected/core-multi-values.json").get("capabilities", {})), "normal_true_vectors_total": len(manifest["capabilities"]) * 2},
-        "fields": {"declared_mapping_fields": len(all_fields), "authored_assessment_fields": len(authored_field_witnesses), "positive_fixture_fields": len(fixture_field_witnesses), "missing_from_assessments": sorted(set(all_fields) - authored_field_witnesses), "missing_from_fixtures": sorted(set(all_fields) - fixture_field_witnesses), "extra_authored_fields": sorted(authored_field_witnesses - set(all_fields)), "coverage_percent": round(100 * len(authored_field_witnesses & set(all_fields)) / len(all_fields), 2), "datatypes": dict(sorted(datatypes.items()))},
+        "fields": {"declared_mapping_fields": len(all_fields), "authored_assessment_fields": len(authored_field_witnesses), "positive_fixture_fields": len(fixture_field_witnesses), "missing_from_assessments": sorted(set(all_fields) - authored_field_witnesses), "missing_from_fixtures": sorted(set(all_fields) - fixture_field_witnesses), "extra_authored_fields": sorted(authored_field_witnesses - set(all_fields)), "coverage_percent": round(100 * len(authored_field_witnesses & set(all_fields)) / len(all_fields), 2), "non_exercising_witnesses": non_exercising_field_witnesses, "datatypes": dict(sorted(datatypes.items()))},
         "capability_constraints": {"mapping_count": len(mapping_rows), "semantic_validator_rule_count": sum(len(m.get("semantic_validator_rules", [])) for m in source_mappings), "mappings_with_semantic_rules": sum(bool(m.get("semantic_validator_rules")) for m in source_mappings), "schema_positive_validation": "all 104 capability Assessments", "execution_coverage": False, "note": "Mapping rules are inventoried and source Assessments are schema-validated; collector/filter semantic execution remains separate."},
-        "selectors": {"declared_selector_fields": len(all_selectors), "selected_in_positive_assessments": len(chosen_selectors), "field_coverage_percent": round(100 * len(chosen_selectors) / len(all_selectors), 2), "selector_alternative_sets": selector_alternatives, "positive_first_alternative_sets": selected_alternatives, "alternative_sets_exercised_by_selector_suite": selector_suite_alternatives, "uncovered_alternative_sets": selector_alternatives - selector_suite_alternatives, "duplicate_selector_witnesses": duplicate_selector_witnesses, "missing_selector_witnesses": sorted(set(source_alternatives) - set(authored_selector_keys)), "note": "The selector suite exercises every declared alternative; native selector enum/pattern boundary values and collector execution are separate gates."},
+        "selectors": {"declared_selector_fields": len(all_selectors), "selected_in_positive_assessments": len(chosen_selectors), "field_coverage_percent": round(100 * len(chosen_selectors) / len(all_selectors), 2), "selector_alternative_sets": selector_alternatives, "positive_first_alternative_sets": selected_alternatives, "alternative_sets_exercised_by_selector_suite": selector_suite_alternatives, "uncovered_alternative_sets": selector_alternatives - selector_suite_alternatives, "duplicate_selector_witnesses": duplicate_selector_witnesses, "missing_selector_witnesses": sorted(set(source_alternatives) - set(authored_selector_keys)), "non_exercising_witnesses": non_exercising_selector_witnesses, "note": "The selector suite exercises every declared alternative; native selector enum/pattern boundary values and collector execution remain separate gates."},
         "enum_boundaries": {"selector_mutation_attempts": enum_boundary_attempts, "schema_rejected_mutations": enum_boundary_rejections, "unconstrained_selector_values": enum_boundary_attempts - enum_boundary_rejections, "native_selector_enum_values": len(native_enum_values), "authored_native_selector_enum_values": len(authored_enum_values & native_enum_values), "uncovered_native_selector_enum_values": sorted(native_enum_values - authored_enum_values), "note": "Only schema-backed enum selectors reject the sentinel; unconstrained selector strings are not falsely called enum coverage."},
-        "operators": {"canonical_comparison_count": len(comparison), "authored_comparison": sorted(comparison & authored_ops), "uncovered_comparison": sorted(comparison - authored_ops), "canonical_field_operator_count": len(field_ops), "authored_field_operators": sorted(field_ops & authored_ops), "uncovered_field_operators": sorted(field_ops - authored_ops), "canonical_logical": sorted(logical), "authored_logical": sorted(logical & authored_ops), "uncovered_logical": sorted(logical - authored_ops)},
+        "operators": {"canonical_comparison_count": len(comparison), "authored_comparison": sorted(comparison & authored_ops), "uncovered_comparison": sorted(comparison - authored_ops), "canonical_field_operator_count": len(field_ops), "authored_field_operators": sorted(field_ops & authored_ops), "uncovered_field_operators": sorted(field_ops - authored_ops), "canonical_logical": sorted(logical), "authored_logical": sorted(logical & authored_ops), "uncovered_logical": sorted(logical - authored_ops), "witnesses": operator_witnesses, "duplicate_witnesses": sorted(set(duplicate_operator_witnesses)), "non_exercising_witnesses": non_exercising_operator_witnesses},
         "cardinalities": {"canonical": sorted(canonical_cardinalities), "authored": sorted(authored_cardinalities), "uncovered": sorted(canonical_cardinalities - authored_cardinalities), "note": "Dedicated schema-valid cardinality witnesses cover each token; real collector/cardinality execution remains an RI qualification gate."},
         "exceptional_outcomes": {"fixture_outcomes": ["unknown", "error", "not_applicable"], "status_cases": ["not_evaluated", "disabled/profile"], "uncovered_defined_outcomes": [], "note": "Disabled is exercised as profile policy and is not silently inferred as a technical Test outcome; status propagation still requires RI receipts."},
-        "derived_integrity": {"fields_from_source_mappings": len(all_fields), "fields_from_authored_assessments": len(authored_field_witnesses), "fields_from_positive_fixtures": len(fixture_field_witnesses), "operators_from_source_schema": len(comparison), "operators_from_authored_assessments": len(comparison & authored_ops), "selector_alternatives_from_source_mappings": len(source_alternatives), "selector_alternatives_from_authored_assessments": len(authored_selector_keys), "cardinalities_from_source_schema": sorted(canonical_cardinalities), "cardinalities_from_authored_assessments": sorted(authored_cardinalities), "duplicate_witnesses": {"selectors": duplicate_selector_witnesses}, "missing_witnesses": {"fields": sorted(set(all_fields) - authored_field_witnesses), "selectors": sorted(set(source_alternatives) - set(authored_selector_keys)), "operators": sorted(comparison - authored_ops), "cardinalities": sorted(canonical_cardinalities - authored_cardinalities)}, "non_exercising_witnesses": [], "derived_from": "source schema/mappings + authored Assessment YAML + corresponding fixture JSON"},
+        "derived_integrity": {"fields_from_source_mappings": len(all_fields), "fields_from_authored_assessments": len(authored_field_witnesses), "fields_from_positive_fixtures": len(fixture_field_witnesses), "operators_from_source_schema": len(comparison), "operators_from_authored_assessments": len(comparison & authored_ops), "selector_alternatives_from_source_mappings": len(source_alternatives), "selector_alternatives_from_authored_assessments": len(authored_selector_keys), "cardinalities_from_source_schema": sorted(canonical_cardinalities), "cardinalities_from_authored_assessments": sorted(authored_cardinalities), "duplicate_witnesses": {"selectors": duplicate_selector_witnesses, "operators": sorted(set(duplicate_operator_witnesses))}, "missing_witnesses": {"fields": sorted(set(all_fields) - authored_field_witnesses), "selectors": sorted(set(source_alternatives) - set(authored_selector_keys)), "operators": sorted(comparison - authored_ops), "cardinalities": sorted(canonical_cardinalities - authored_cardinalities)}, "non_exercising_witnesses": {"fields": non_exercising_field_witnesses, "selectors": non_exercising_selector_witnesses, "operators": non_exercising_operator_witnesses}, "derived_from": "source schema/mappings + authored Assessment YAML + corresponding fixture JSON"},
         "schema_branches": {"schema_documents": inventory["counts"]["schema_documents"], "enum_nodes": inventory["counts"]["schema_enums"], "constraint_nodes": inventory["counts"]["schema_constraints"], "references": inventory["counts"]["schema_references"], "direct_executable_branch_coverage": False, "uncovered": ["non-selector enum boundary values", "schema property/constraint occurrence combinations", "platform permission/collector execution and scale/concurrency"]},
         "independent_oracle": {"model_a_scope": "complete known nonempty integer/string Model A", "source_cases": 15, "source_manifest": "conformance/0.4/model-a/manifest.json", "implementation": "conformance/tools/model_a_oracle.py", "executed_by": "tests/test_model_a_oracle.py", "runtime_qualification": False},
+        "variable_interactions": {"case": "core-variable-interactions", "canonical_assessment": True, "local_alias": True, "multi_value_observation": 2, "false_leaf_visible": True, "enclosing_not_result": "true", "independently_justified": True, "runtime_qualification": False},
+        "authoring_enums": {"cases": len(manifest.get("authoring_cases", [])), "automated_reported_elements_branches": ["scalar-all", "scalar-compared", "explicit-list"], "manual_outcomes": ["true", "false", "error", "unknown", "not_evaluated", "not_applicable"], "negative_boundary_cases": ["invalid-class", "invalid-reported-elements", "invalid-manual-outcome"]},
         "expected_results": {"independent_justification": True, "basis": "Separate expected JSON files cite deterministic fixture variants, item/field cardinality observations, decisive mismatch/status reasons, and core not(FALSE) assertions. They are not derived from RI output.", "ri_execution": False, "ri_issue": 196},
         "capability_rows": mapping_rows,
     }
