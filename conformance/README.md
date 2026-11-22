@@ -54,6 +54,9 @@ integer/string cases, including aliases, duplicate preservation, expected-value
 matching, and the three cardinality layers. It intentionally rejects empty,
 unknown, error, and unsupported datatype cases rather than assigning outcomes.
 
+The falsifiable [Issue #87 gap matrix](GAP-MATRIX.md) separates structural,
+independent-oracle, and runtime proof and records the exact RI #196 handoff.
+
 ## Qualification boundary
 
 The offline runner checks schema validity, deterministic fixture structure,
