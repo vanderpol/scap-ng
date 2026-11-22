@@ -45,7 +45,11 @@
     "lockout-time-safe-test": "true",
     "lockout-time-invalid-test": "error",
     "listening-protocol-safe-test": "true",
-    "listening-protocol-invalid-test": "error"
+    "listening-protocol-invalid-test": "error",
+    "wu-defaults-safe-test": "true",
+    "wu-defaults-invalid-test": "error",
+    "ntuser-defaults-safe-test": "true",
+    "ntuser-defaults-invalid-test": "error"
   },
   "evidence": {
     "unix-full-path-safe-test": {
@@ -498,6 +502,61 @@
       "items_satisfying": 0,
       "items": [],
       "reason": "Semantic validation fails before collection."
+    },
+    "wu-defaults-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "wu-defaults-safe-test-item",
+          "capability": "windows.wuaupdatesearcher",
+          "fields": {
+            "search_criteria": {
+              "datatype": "string",
+              "value": "IsInstalled=1",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "wu-defaults-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "ntuser-defaults-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "ntuser-defaults-safe-test-item",
+          "capability": "windows.ntuser",
+          "fields": {
+            "key": {
+              "datatype": "string",
+              "value": "Software",
+              "status": "collected"
+            },
+            "name": {
+              "datatype": "string",
+              "value": "Example",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "ntuser-defaults-invalid-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
     }
   },
   "semantic_witnesses": [
@@ -788,6 +847,38 @@
       ],
       "expected": "error",
       "reason": "Upper-case TCP is not the canonical lower-case collected protocol form."
+    },
+    {
+      "test": "wu-defaults-safe-test",
+      "rules": [
+        "windows.wuaupdatesearcher.materialized_superseded_default"
+      ],
+      "expected": "true",
+      "reason": "The direct Object explicitly materializes include_superseded_updates."
+    },
+    {
+      "test": "wu-defaults-invalid-test",
+      "rules": [
+        "windows.wuaupdatesearcher.materialized_superseded_default"
+      ],
+      "expected": "error",
+      "reason": "A direct Object omitting the required materialized superseded-update default is semantically incomplete."
+    },
+    {
+      "test": "ntuser-defaults-safe-test",
+      "rules": [
+        "windows.ntuser.materialized_collection_defaults"
+      ],
+      "expected": "true",
+      "reason": "The direct NT-user Object explicitly carries both imported collection defaults."
+    },
+    {
+      "test": "ntuser-defaults-invalid-test",
+      "rules": [
+        "windows.ntuser.materialized_collection_defaults"
+      ],
+      "expected": "error",
+      "reason": "An NT-user Object omitting materialized include_default and item_creation is semantically incomplete."
     }
   ]
 }

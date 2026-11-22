@@ -191,7 +191,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 180)
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
-        self.assertIn("140 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        self.assertIn("138 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
@@ -262,7 +262,7 @@ class Issue87Conformance(unittest.TestCase):
         validator().validate(assessment)
         rule_ids = {rule for witness in fixture["semantic_witnesses"] for rule in witness["rules"]}
         self.assertEqual(rule_ids, set(expected["rules"]))
-        self.assertEqual(len(rule_ids), 20)
+        self.assertEqual(len(rule_ids), 22)
         audit = read(CONF / "coverage-audit.json")
         self.assertEqual(audit["capability_constraints"]["semantic_boundary_unknown_rules"], [])
         self.assertEqual(set(audit["semantic_boundaries"]["rules"]), rule_ids)
