@@ -170,6 +170,34 @@ def validate() -> int:
                 required = {"item-exactly-one", "item-none", "item-zero-or-more", "field-exactly-one", "field-none", "field-zero-or-more"}
                 if set(expected.get("cardinalities", {})) != required:
                     errors.append("cardinality suite is incomplete")
+            if row["id"] == "core-semantic-boundaries":
+                fixture = load(CONFORMANCE / row["fixture"])
+                witness_rules = {rule for witness in fixture.get("semantic_witnesses", []) for rule in witness.get("rules", [])}
+                if witness_rules != set(expected.get("rules", [])):
+                    errors.append("semantic boundary expected rules do not match fixture witnesses")
+                tests = load(assessment).get("assessment", {}).get("tests", {})
+                assertions = expected.get("assertions", {})
+                for test_name, assertion in assertions.items():
+                    evidence = fixture.get("evidence", {}).get(test_name, {})
+                    if evidence.get("items_found") != assertion.get("items_found") or evidence.get("items_satisfying") != assertion.get("items_satisfying"):
+                        errors.append(f"semantic boundary evidence cardinality disagrees: {test_name}")
+                    if assertion.get("outcome") == "true":
+                        items = evidence.get("items", [])
+                        if len(items) != 1 or evidence.get("status") != "collected":
+                            errors.append(f"semantic boundary positive lacks collected Item evidence: {test_name}")
+                        for field_value in items[0].get("fields", {}).values() if items else []:
+                            if not {"datatype", "value", "status"}.issubset(field_value) or field_value["status"] != "collected":
+                                errors.append(f"semantic boundary evidence is not typed: {test_name}")
+                    elif evidence.get("status") != "not_run" or evidence.get("items"):
+                        errors.append(f"semantic boundary rejected case fabricated collection evidence: {test_name}")
+                for witness in fixture.get("semantic_witnesses", []):
+                    test_name = witness.get("test")
+                    if test_name not in tests:
+                        errors.append(f"semantic boundary witness references missing Test: {test_name}")
+                    if test_name not in assertions or assertions[test_name].get("outcome") != witness.get("expected"):
+                        errors.append(f"semantic boundary witness outcome is not independently recorded: {test_name}")
+                if any(assertion.get("outcome") == "error" for assertion in assertions.values()) and not witness_rules:
+                    errors.append("semantic boundary suite has ERROR without a rule witness")
         except Exception as exc:
             errors.append(f"{row['assessment']}: {exc.message if hasattr(exc, 'message') else exc}")
     for row in manifest.get("status_cases", []):

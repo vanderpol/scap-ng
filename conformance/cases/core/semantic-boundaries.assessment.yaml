@@ -1,0 +1,165 @@
+assessment:
+  id: conformance-core-semantic-boundaries
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 shared file-selection semantic boundaries
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  tests:
+    unix-full-path-safe-test:
+      test_title: 'Semantic boundary witness: unix-full-path-safe'
+      capability: unix.file
+      object:
+        capability: unix.file
+        filepath:
+          equals: /etc/hosts
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filepath:
+            equals: /etc/hosts
+      reported_elements: all
+    unix-full-path-traversal-test:
+      test_title: 'Semantic boundary witness: unix-full-path-traversal'
+      capability: unix.file
+      object:
+        capability: unix.file
+        filepath:
+          matches_regex: ^/etc/.*
+        traversal:
+          max_depth: unlimited
+          recurse: directories
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filepath:
+            matches_regex: ^/etc/.*
+      reported_elements: all
+    unix-pattern-directory-traversal-test:
+      test_title: 'Semantic boundary witness: unix-pattern-directory-traversal'
+      capability: unix.file
+      object:
+        capability: unix.file
+        path:
+          matches_regex: ^/var/log/.*
+        traversal:
+          max_depth: unlimited
+          recurse: directories
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          path:
+            matches_regex: ^/var/log/.*
+      reported_elements: all
+    windows-full-path-traversal-test:
+      test_title: 'Semantic boundary witness: windows-full-path-traversal'
+      capability: windows.file
+      object:
+        capability: windows.file
+        filepath:
+          matches_regex: ^C:[\\]Windows[\\].*
+        traversal:
+          max_depth: unlimited
+          recurse: directories
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filepath:
+            matches_regex: ^C:[\\]Windows[\\].*
+      reported_elements: all
+    windows-pattern-directory-traversal-test:
+      test_title: 'Semantic boundary witness: windows-pattern-directory-traversal'
+      capability: windows.file
+      object:
+        capability: windows.file
+        path:
+          matches_regex: ^C:[\\]Logs[\\].*
+        traversal:
+          max_depth: unlimited
+          recurse: directories
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          path:
+            matches_regex: ^C:[\\]Logs[\\].*
+      reported_elements: all
+    windows-literal-reserved-name-test:
+      test_title: 'Semantic boundary witness: windows-literal-reserved-name'
+      capability: windows.file
+      object:
+        capability: windows.file
+        path:
+          equals: C:\Windows
+        filename:
+          equals: bad:name
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          path:
+            equals: C:\Windows
+          filename:
+            equals: bad:name
+      reported_elements: all
+    windows-pattern-reserved-name-test:
+      test_title: 'Semantic boundary witness: windows-pattern-reserved-name'
+      capability: windows.file
+      object:
+        capability: windows.file
+        path:
+          equals: C:\Windows
+        filename:
+          matches_regex: ^bad:name$
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          path:
+            equals: C:\Windows
+          filename:
+            matches_regex: ^bad:name$
+      reported_elements: all
+  evaluate:
+    and:
+    - test: unix-full-path-safe-test
+    - test: unix-full-path-traversal-test
+    - test: unix-pattern-directory-traversal-test
+    - test: windows-full-path-traversal-test
+    - test: windows-pattern-directory-traversal-test
+    - test: windows-literal-reserved-name-test
+    - test: windows-pattern-reserved-name-test
