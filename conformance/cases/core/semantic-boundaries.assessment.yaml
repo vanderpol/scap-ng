@@ -701,6 +701,264 @@ assessment:
         fields:
           protocol:
             equals: TCP
+    registry-key-null-safe-test:
+      test_title: 'Semantic boundary witness: registry-key-null-safe'
+      capability: windows.registry
+      reported_elements: all
+      object:
+        capability: windows.registry
+        hive:
+          equals: classes_root
+      require:
+        item_requirement:
+          items_found: one_or_more
+    registry-key-null-invalid-test:
+      test_title: 'Semantic boundary witness: registry-key-null-invalid'
+      capability: windows.registry
+      reported_elements: all
+      object:
+        capability: windows.registry
+        hive:
+          equals: classes_root
+        name:
+          equals: fixture-value
+      require:
+        item_requirement:
+          items_found: one_or_more
+    registry-value-type-safe-test:
+      test_title: 'Semantic boundary witness: registry-value-type-safe'
+      capability: windows.registry
+      reported_elements: all
+      object:
+        capability: windows.registry
+        hive:
+          equals: classes_root
+        key:
+          equals: Software
+        name:
+          equals: Count
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          type:
+            equals: dword
+          value:
+            datatype: integer
+            equals: 7
+    registry-value-type-invalid-test:
+      test_title: 'Semantic boundary witness: registry-value-type-invalid'
+      capability: windows.registry
+      reported_elements: all
+      object:
+        capability: windows.registry
+        hive:
+          equals: classes_root
+        key:
+          equals: Software
+        name:
+          equals: Count
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          type:
+            equals: dword
+          value:
+            datatype: string
+            equals: '7'
+    text-pattern-operation-safe-test:
+      test_title: 'Semantic boundary witness: text-pattern-operation-safe'
+      capability: independent.textfilecontent
+      reported_elements: all
+      object:
+        capability: independent.textfilecontent
+        pattern:
+          matches_regex: ^needle$
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          pattern:
+            equals: ^needle$
+    text-pattern-operation-invalid-test:
+      test_title: 'Semantic boundary witness: text-pattern-operation-invalid'
+      capability: independent.textfilecontent
+      reported_elements: all
+      object:
+        capability: independent.textfilecontent
+        pattern:
+          equals: ^needle$
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          pattern:
+            equals: ^needle$
+    xml-xpath-operation-safe-test:
+      test_title: 'Semantic boundary witness: xml-xpath-operation-safe'
+      capability: independent.xmlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.xmlfilecontent
+        full_path:
+          equals: /etc/config.xml
+        xpath:
+          equals: /config/value
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /config/value
+    xml-xpath-operation-invalid-test:
+      test_title: 'Semantic boundary witness: xml-xpath-operation-invalid'
+      capability: independent.xmlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.xmlfilecontent
+        full_path:
+          equals: /etc/config.xml
+        xpath:
+          matches_regex: /config/.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /config/.*
+    yaml-content-operation-safe-test:
+      test_title: 'Semantic boundary witness: yaml-content-operation-safe'
+      capability: independent.yamlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.yamlfilecontent
+        content:
+          equals: fixture-content
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          content:
+            equals: fixture-content
+    yaml-content-operation-invalid-test:
+      test_title: 'Semantic boundary witness: yaml-content-operation-invalid'
+      capability: independent.yamlfilecontent
+      reported_elements: all
+      object:
+        capability: independent.yamlfilecontent
+        content:
+          matches_regex: fixture-.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          content:
+            equals: fixture-content
+    plist-path-operation-safe-test:
+      test_title: 'Semantic boundary witness: plist-path-operation-safe'
+      capability: macos.plist
+      reported_elements: all
+      object:
+        capability: macos.plist
+        filepath:
+          equals: /Library/Preferences/example.plist
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filepath:
+            equals: /Library/Preferences/example.plist
+    plist-path-operation-invalid-test:
+      test_title: 'Semantic boundary witness: plist-path-operation-invalid'
+      capability: macos.plist
+      reported_elements: all
+      object:
+        capability: macos.plist
+        filepath:
+          matches_regex: /Library/Preferences/.*\.plist
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          filepath:
+            equals: /Library/Preferences/example.plist
+    panos-xpath-operation-safe-test:
+      test_title: 'Semantic boundary witness: panos-xpath-operation-safe'
+      capability: panos.config
+      reported_elements: all
+      object:
+        capability: panos.config
+        xpath:
+          equals: /config/devices
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /config/devices
+    panos-xpath-operation-invalid-test:
+      test_title: 'Semantic boundary witness: panos-xpath-operation-invalid'
+      capability: panos.config
+      reported_elements: all
+      object:
+        capability: panos.config
+        xpath:
+          matches_regex: /config/.*
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          xpath:
+            equals: /config/devices
     wu-defaults-safe-test:
       test_title: 'Semantic boundary witness: wu-defaults-safe'
       capability: windows.wuaupdatesearcher
@@ -823,6 +1081,20 @@ assessment:
     - test: lockout-time-invalid-test
     - test: listening-protocol-safe-test
     - test: listening-protocol-invalid-test
+    - test: registry-key-null-safe-test
+    - test: registry-key-null-invalid-test
+    - test: registry-value-type-safe-test
+    - test: registry-value-type-invalid-test
+    - test: text-pattern-operation-safe-test
+    - test: text-pattern-operation-invalid-test
+    - test: xml-xpath-operation-safe-test
+    - test: xml-xpath-operation-invalid-test
+    - test: yaml-content-operation-safe-test
+    - test: yaml-content-operation-invalid-test
+    - test: plist-path-operation-safe-test
+    - test: plist-path-operation-invalid-test
+    - test: panos-xpath-operation-safe-test
+    - test: panos-xpath-operation-invalid-test
     - test: wu-defaults-safe-test
     - test: wu-defaults-invalid-test
     - test: ntuser-defaults-safe-test
