@@ -34,8 +34,13 @@ Every ordinary capability case provides:
 Dedicated core suites additionally provide all 67 active comparison operators,
 all 94 mapping-declared selector alternatives, all Item/field cardinality
 values, 104 applicable multi-value field witnesses, typed `not_evaluated`, and
-profile-disabled Rule witnesses. These are schema-valid semantic witnesses;
-collector execution remains outside this source oracle.
+profile-disabled Rule witnesses. `core-semantic-boundaries` adds paired,
+schema-valid file-selection cases for five mapping semantic rules. Its
+semantic `error` assertions mean the authored combination must be rejected by
+a semantic validator before collection; they are not scanner execution
+receipts. Positive cases carry deterministic typed Item evidence, while
+rejected cases explicitly carry `not_run` and zero evidence. Collector execution
+remains outside this source oracle.
 
 Authoring/schema branches are tracked separately from executable semantics:
 20 cases cover both automated/manual modes, all five Assessment classes, all

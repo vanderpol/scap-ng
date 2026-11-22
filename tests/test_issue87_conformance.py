@@ -191,7 +191,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["capability_constraints"]["semantic_validator_rule_count"], 180)
         self.assertGreater(audit["capability_constraints"]["semantic_rules_structural_witnesses"], 0)
         self.assertGreater(len(audit["capability_constraints"]["semantic_rules_untested"]), 0)
-        self.assertIn("160 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
+        self.assertIn("155 untested capability semantic-validator rules", audit["schema_branches"]["uncovered"])
         self.assertEqual(audit["set_filter_semantics"]["operations"], 3)
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge"])
@@ -254,6 +254,47 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(set(set_filters["filter_actions"]), {"include", "exclude"})
         for row in self.manifest["status_cases"]:
             self.assertTrue(read(CONF / row["expected"])["reason"].strip())
+
+    def test_semantic_boundary_witnesses_are_schema_valid_and_targeted(self):
+        assessment = yaml.safe_load((CONF / "cases/core/semantic-boundaries.assessment.yaml").read_text(encoding="utf-8"))
+        fixture = read(CONF / "fixtures/core-semantic-boundaries.json")
+        expected = read(CONF / "expected/core-semantic-boundaries.json")
+        validator().validate(assessment)
+        rule_ids = {rule for witness in fixture["semantic_witnesses"] for rule in witness["rules"]}
+        self.assertEqual(rule_ids, set(expected["rules"]))
+        self.assertEqual(len(rule_ids), 5)
+        for test_name, assertion in expected["assertions"].items():
+            evidence = fixture["evidence"][test_name]
+            self.assertEqual(evidence["items_found"], assertion["items_found"])
+            self.assertEqual(evidence["items_satisfying"], assertion["items_satisfying"])
+            if assertion["outcome"] == "true":
+                self.assertEqual(evidence["status"], "collected")
+                for field_value in evidence["items"][0]["fields"].values():
+                    self.assertTrue({"datatype", "value", "status"}.issubset(field_value))
+                    self.assertEqual(field_value["status"], "collected")
+            else:
+                self.assertEqual(evidence["status"], "not_run")
+                self.assertEqual(evidence["items"], [])
+        for witness in fixture["semantic_witnesses"]:
+            test = assessment["assessment"]["tests"][witness["test"]]
+            outcome = expected["assertions"][witness["test"]]["outcome"]
+            self.assertEqual(outcome, witness["expected"])
+            self.assertTrue(test["object"].get("traversal") or test["object"].get("filename"))
+            if outcome == "error":
+                if any("no_traversal" in rule for rule in witness["rules"]):
+                    self.assertIn("traversal", test["object"])
+                else:
+                    self.assertEqual(test["object"]["filename"].get("equals"), "bad:name")
+        # A boundary mutation removing traversal from each traversal error leaves
+        # a schema-valid positive shape; it must not be silently treated as the
+        # same semantic witness.
+        for witness in fixture["semantic_witnesses"]:
+            if witness["expected"] != "error" or "traversal" not in assessment["assessment"]["tests"][witness["test"]]["object"]:
+                continue
+            mutated = deepcopy(assessment)
+            del mutated["assessment"]["tests"][witness["test"]]["object"]["traversal"]
+            validator().validate(mutated)
+            self.assertNotIn("traversal", mutated["assessment"]["tests"][witness["test"]]["object"])
 
     def test_variable_require_evaluate_interaction_keeps_false_leaf_visible(self):
         assessment = yaml.safe_load((CONF / "cases/core/variable-interactions.assessment.yaml").read_text(encoding="utf-8"))

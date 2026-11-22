@@ -1,0 +1,57 @@
+{
+  "format": "scap-ng-conformance-expected-0.1",
+  "schema_version": "0.4.1",
+  "case_id": "core-semantic-boundaries",
+  "assertions": {
+    "unix-full-path-safe-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "An equality full_path selection has no traversal and is semantically valid."
+    },
+    "unix-full-path-traversal-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "The schema admits the shape, but the semantic rule rejects traversal with full_path selection."
+    },
+    "unix-pattern-directory-traversal-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "The schema admits the shape, but a patterned directory selection cannot request traversal."
+    },
+    "windows-full-path-traversal-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "The Windows full_path traversal combination is schema-valid but semantically rejected."
+    },
+    "windows-pattern-directory-traversal-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "The Windows patterned directory traversal combination is semantically rejected."
+    },
+    "windows-literal-reserved-name-test": {
+      "outcome": "error",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "reason": "A literal Windows filename cannot contain a reserved character; this is a semantic error, not a schema error."
+    },
+    "windows-pattern-reserved-name-test": {
+      "outcome": "true",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "reason": "Reserved characters in a match expression are allowed; the literal-name rule is not applied to regex syntax."
+    }
+  },
+  "rules": [
+    "unix.file.full_path_no_traversal",
+    "unix.file.pattern_directory_no_traversal",
+    "windows.file.full_path_no_traversal",
+    "windows.file.literal_name_characters",
+    "windows.file.pattern_directory_no_traversal"
+  ],
+  "reason": "Each invalid combination remains schema-valid but has an independently justified semantic ERROR; positive cases demonstrate the allowed boundary and regex exemption. Scanner execution is not claimed."
+}

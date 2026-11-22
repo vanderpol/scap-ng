@@ -1,0 +1,148 @@
+{
+  "format": "scap-ng-conformance-evidence-0.1",
+  "schema_version": "0.4.1",
+  "case_id": "core-semantic-boundaries",
+  "clock": {
+    "now_utc": "2026-01-01T00:00:00Z",
+    "timezone": "UTC",
+    "locale": "C",
+    "ordering": "document"
+  },
+  "test_outcomes": {
+    "unix-full-path-safe-test": "true",
+    "unix-full-path-traversal-test": "error",
+    "unix-pattern-directory-traversal-test": "error",
+    "windows-full-path-traversal-test": "error",
+    "windows-pattern-directory-traversal-test": "error",
+    "windows-literal-reserved-name-test": "error",
+    "windows-pattern-reserved-name-test": "true"
+  },
+  "evidence": {
+    "unix-full-path-safe-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "unix-full-path-safe-test-item",
+          "capability": "unix.file",
+          "fields": {
+            "filepath": {
+              "datatype": "string",
+              "value": "/etc/hosts",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    },
+    "unix-full-path-traversal-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "unix-pattern-directory-traversal-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "windows-full-path-traversal-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "windows-pattern-directory-traversal-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "windows-literal-reserved-name-test": {
+      "status": "not_run",
+      "items_found": 0,
+      "items_satisfying": 0,
+      "items": [],
+      "reason": "Semantic validation fails before collection."
+    },
+    "windows-pattern-reserved-name-test": {
+      "status": "collected",
+      "items_found": 1,
+      "items_satisfying": 1,
+      "items": [
+        {
+          "id": "windows-pattern-reserved-name-test-item",
+          "capability": "windows.file",
+          "fields": {
+            "path": {
+              "datatype": "string",
+              "value": "C:\\Windows",
+              "status": "collected"
+            },
+            "filename": {
+              "datatype": "string",
+              "value": "bad:name",
+              "status": "collected"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "semantic_witnesses": [
+    {
+      "test": "unix-full-path-traversal-test",
+      "rules": [
+        "unix.file.full_path_no_traversal"
+      ],
+      "expected": "error",
+      "reason": "The schema admits the shape, but the semantic rule rejects traversal with full_path selection."
+    },
+    {
+      "test": "unix-pattern-directory-traversal-test",
+      "rules": [
+        "unix.file.pattern_directory_no_traversal"
+      ],
+      "expected": "error",
+      "reason": "The schema admits the shape, but a patterned directory selection cannot request traversal."
+    },
+    {
+      "test": "windows-full-path-traversal-test",
+      "rules": [
+        "windows.file.full_path_no_traversal"
+      ],
+      "expected": "error",
+      "reason": "The Windows full_path traversal combination is schema-valid but semantically rejected."
+    },
+    {
+      "test": "windows-pattern-directory-traversal-test",
+      "rules": [
+        "windows.file.pattern_directory_no_traversal"
+      ],
+      "expected": "error",
+      "reason": "The Windows patterned directory traversal combination is semantically rejected."
+    },
+    {
+      "test": "windows-literal-reserved-name-test",
+      "rules": [
+        "windows.file.literal_name_characters"
+      ],
+      "expected": "error",
+      "reason": "A literal Windows filename cannot contain a reserved character; this is a semantic error, not a schema error."
+    },
+    {
+      "test": "windows-pattern-reserved-name-test",
+      "rules": [
+        "windows.file.literal_name_characters"
+      ],
+      "expected": "true",
+      "reason": "Reserved characters in a match expression are allowed; the literal-name rule is not applied to regex syntax."
+    }
+  ]
+}

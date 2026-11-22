@@ -537,6 +537,100 @@ def build_set_filter_suite() -> dict[str, Any]:
     return {"assessment": assessment, "fixture": fixture, "expected": expected}
 
 
+def build_semantic_boundary_suite() -> dict[str, Any]:
+    """Witness shared file-selection semantic boundaries with paired cases.
+
+    These combinations are deliberately schema-valid but semantically distinct:
+    traversal is valid for an ordinary selector, while full-path or patterned
+    directory selection with traversal is rejected by the mapping rule.  A
+    literal Windows filename with a reserved character is rejected; the same
+    character in a match expression is explicitly permitted.
+    """
+    tests: dict[str, Any] = {}
+    outcomes: dict[str, str] = {}
+    assertions: dict[str, Any] = {}
+    witnesses: list[dict[str, Any]] = []
+    evidence: dict[str, Any] = {}
+
+    cases = [
+        (
+            "unix-full-path-safe-test", "unix.file", {
+                "capability": "unix.file", "filepath": {"equals": "/etc/hosts"},
+            }, {"filepath": {"equals": "/etc/hosts"}}, "true", [],
+            "An equality full_path selection has no traversal and is semantically valid.",
+        ),
+        (
+            "unix-full-path-traversal-test", "unix.file", {
+                "capability": "unix.file", "filepath": {"matches_regex": "^/etc/.*"}, "traversal": {"max_depth": "unlimited", "recurse": "directories"},
+            }, {"filepath": {"matches_regex": "^/etc/.*"}}, "error", ["unix.file.full_path_no_traversal"],
+            "The schema admits the shape, but the semantic rule rejects traversal with full_path selection.",
+        ),
+        (
+            "unix-pattern-directory-traversal-test", "unix.file", {
+                "capability": "unix.file", "path": {"matches_regex": "^/var/log/.*"}, "traversal": {"max_depth": "unlimited", "recurse": "directories"},
+            }, {"path": {"matches_regex": "^/var/log/.*"}}, "error", ["unix.file.pattern_directory_no_traversal"],
+            "The schema admits the shape, but a patterned directory selection cannot request traversal.",
+        ),
+        (
+            "windows-full-path-traversal-test", "windows.file", {
+                "capability": "windows.file", "filepath": {"matches_regex": "^C:[\\\\]Windows[\\\\].*"}, "traversal": {"max_depth": "unlimited", "recurse": "directories"},
+            }, {"filepath": {"matches_regex": "^C:[\\\\]Windows[\\\\].*"}}, "error", ["windows.file.full_path_no_traversal"],
+            "The Windows full_path traversal combination is schema-valid but semantically rejected.",
+        ),
+        (
+            "windows-pattern-directory-traversal-test", "windows.file", {
+                "capability": "windows.file", "path": {"matches_regex": "^C:[\\\\]Logs[\\\\].*"}, "traversal": {"max_depth": "unlimited", "recurse": "directories"},
+            }, {"path": {"matches_regex": "^C:[\\\\]Logs[\\\\].*"}}, "error", ["windows.file.pattern_directory_no_traversal"],
+            "The Windows patterned directory traversal combination is semantically rejected.",
+        ),
+        (
+            "windows-literal-reserved-name-test", "windows.file", {
+                "capability": "windows.file", "path": {"equals": "C:\\Windows"}, "filename": {"equals": "bad:name"},
+            }, {"path": {"equals": "C:\\Windows"}, "filename": {"equals": "bad:name"}}, "error", ["windows.file.literal_name_characters"],
+            "A literal Windows filename cannot contain a reserved character; this is a semantic error, not a schema error.",
+        ),
+        (
+            "windows-pattern-reserved-name-test", "windows.file", {
+                "capability": "windows.file", "path": {"equals": "C:\\Windows"}, "filename": {"matches_regex": "^bad:name$"},
+            }, {"path": {"equals": "C:\\Windows"}, "filename": {"matches_regex": "^bad:name$"}}, "true", ["windows.file.literal_name_characters"],
+            "Reserved characters in a match expression are allowed; the literal-name rule is not applied to regex syntax.",
+        ),
+    ]
+    for name, capability, obj, fields, outcome, rule_ids, reason in cases:
+        tests[name] = {
+            "test_title": f"Semantic boundary witness: {name.removesuffix('-test')}",
+            "capability": capability,
+            "object": obj,
+            "require": {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": fields},
+            "reported_elements": "all",
+        }
+        outcomes[name] = outcome
+        item_count = 1 if outcome == "true" else 0
+        assertion = {"outcome": outcome, "items_found": item_count, "items_satisfying": item_count, "reason": reason}
+        assertions[name] = assertion
+        if outcome == "true":
+            typed_fields = {}
+            for field, predicate in fields.items():
+                operator, value = next(iter(predicate.items()))
+                if operator == "matches_regex":
+                    value = {
+                        "^/etc/.*": "/etc/hosts",
+                        "^/var/log/.*": "/var/log/app.log",
+                        "^C:[\\]Windows[\\].*": "C:\\Windows\\fixture.txt",
+                        "^C:[\\]Logs[\\].*": "C:\\Logs\\fixture.txt",
+                        "^bad:name$": "bad:name",
+                    }.get(value, value)
+                typed_fields[field] = {"datatype": "string", "value": value, "status": "collected"}
+            evidence[name] = {"status": "collected", "items_found": 1, "items_satisfying": 1, "items": [{"id": f"{name}-item", "capability": capability, "fields": typed_fields}]}
+        else:
+            evidence[name] = {"status": "not_run", "items_found": 0, "items_satisfying": 0, "items": [], "reason": "Semantic validation fails before collection."}
+        if rule_ids:
+            witnesses.append({"test": name, "rules": rule_ids, "expected": outcome, "reason": reason})
+    assessment = {"assessment": {"id": "conformance-core-semantic-boundaries", "version": 1, "assessment_title": "SCAP-NG 0.4.1 shared file-selection semantic boundaries", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-semantic-boundaries", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "test_outcomes": outcomes, "evidence": evidence, "semantic_witnesses": witnesses}
+    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-semantic-boundaries", "assertions": assertions, "rules": sorted({rule for witness in witnesses for rule in witness["rules"]}), "reason": "Each invalid combination remains schema-valid but has an independently justified semantic ERROR; positive cases demonstrate the allowed boundary and regex exemption. Scanner execution is not claimed."}
+    return {"assessment": assessment, "fixture": fixture, "expected": expected}
+
 def build_variable_function_suite() -> dict[str, Any]:
     """Schema-valid witnesses for ordered Variable functions and aliases."""
     variables = {
@@ -883,6 +977,11 @@ def main() -> None:
     set_assessment.write_text(yaml.safe_dump(order_assessment_tests(set_filters["assessment"]), sort_keys=False), encoding="utf-8")
     write_json(OUT / "fixtures/core-set-filters.json", set_filters["fixture"])
     write_json(OUT / "expected/core-set-filters.json", set_filters["expected"])
+    semantic_boundaries = build_semantic_boundary_suite()
+    semantic_assessment = OUT / "cases/core/semantic-boundaries.assessment.yaml"
+    semantic_assessment.write_text(yaml.safe_dump(order_assessment_tests(semantic_boundaries["assessment"]), sort_keys=False), encoding="utf-8")
+    write_json(OUT / "fixtures/core-semantic-boundaries.json", semantic_boundaries["fixture"])
+    write_json(OUT / "expected/core-semantic-boundaries.json", semantic_boundaries["expected"])
     variable_functions = build_variable_function_suite()
     function_assessment = OUT / "cases/core/variable-functions.assessment.yaml"
     function_assessment.write_text(yaml.safe_dump(order_assessment_tests(variable_functions["assessment"]), sort_keys=False), encoding="utf-8")
@@ -955,7 +1054,7 @@ def main() -> None:
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
         "authoring_cases": authoring_rows,
         "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
-        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": ["unique", "count", "concat", "merge"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
+        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference"]}, {"id": "core-semantic-boundaries", "assessment": "cases/core/semantic-boundaries.assessment.yaml", "fixture": "fixtures/core-semantic-boundaries.json", "expected": "expected/core-semantic-boundaries.json", "vectors": ["file-selection-traversal", "windows-literal-name"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": ["unique", "count", "concat", "merge"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
         "invalid_cases": [
             {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},
             {"id": "invalid-variable-datatype", "assessment": "cases/invalid/variable-datatype.assessment.yaml", "expected": "schema-invalid", "reason": "Variables infer datatype from typed expressions; declaration datatype is not canonical."},
