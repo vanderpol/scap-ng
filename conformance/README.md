@@ -49,6 +49,11 @@ Core Evaluate content also covers FALSE, `not(false)`, double negation,
 AND/OR/ONE/XOR, and status propagation. `not` is the only canonical negation
 spelling; `negate` is an invalid-authoring regression.
 
+The independent Model A oracle executes all 15 frozen complete-known-nonempty
+integer/string cases, including aliases, duplicate preservation, expected-value
+matching, and the three cardinality layers. It intentionally rejects empty,
+unknown, error, and unsupported datatype cases rather than assigning outcomes.
+
 ## Qualification boundary
 
 The offline runner checks schema validity, deterministic fixture structure,

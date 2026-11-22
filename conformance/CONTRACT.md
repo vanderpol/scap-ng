@@ -77,6 +77,17 @@ by the pinned result contract. Adapters must preserve source statuses and report
 unsupported collector capabilities separately from schema validity. Receipts
 must include fixture and expected-file SHA-256 values in a production run.
 
+## Independent Model A oracle
+
+`conformance/tools/model_a_oracle.py` is a separate truth oracle for the owner-approved
+complete-known-nonempty integer/string Model A domain. It preserves one logical
+Variable source group, ordered duplicate values, and independently folds
+`value_match`, `values_found`, `values_matching`, `items_found`, and
+`items_satisfying`. `tests/test_model_a_oracle.py` executes all 15 frozen Model A
+cases with hard-coded normative outcomes and rejects empty/out-of-domain inputs.
+It does not implement unknown/error/empty status precedence or scanner
+collection; those remain explicitly outside this oracle and RI #196.
+
 ## Evaluate and `not`
 
 `not` is the sole canonical negation syntax. `negate: true` is invalid. The core
