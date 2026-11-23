@@ -1,0 +1,783 @@
+{
+  "format": "scap-ng-regex-conformance-vectors/1",
+  "status": "owner-review-proposal",
+  "profile_id": "scap-ng-pcre2-oval-compatible/0.1",
+  "normative": false,
+  "purpose": "Engine-neutral Phase 1 vectors for a proposed PCRE2 compatibility profile. No vector is scanner or RI proof.",
+  "source_pins": {
+    "scap_ng_schema_commit": "354c9c962c77488a3d939cab56f6ceecfd495d27",
+    "oval_schema_version": "5.12.3",
+    "vscode_reference_commit": "6f5a2bc38261586ea3e7badb95592a039b72e5da",
+    "vscode_test_file": "test/source.test.mjs",
+    "pcre2_reference_release": "pcre2-10.49 (tag 6f9d7c1373262c541324a16a358785b33ef116cf)",
+    "pcre2_unicode_data": "17.0.0 (src/pcre2_ucd.c at pcre2-10.49)"
+  },
+  "result_statuses": [
+    "match",
+    "nonmatch",
+    "capture",
+    "compile_error",
+    "unsupported_feature",
+    "invalid_utf8",
+    "input_limit",
+    "resource_limit",
+    "cancelled",
+    "engine_unavailable",
+    "owner_decision"
+  ],
+  "vectors": [
+    {
+      "id": "native-linux-home-unanchored-search",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "canonical-converted-yaml",
+        "path": "examples/linux-home-nosuid.assessment.yaml",
+        "line": 15
+      },
+      "pattern": ".*\\/home",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "/dev/mapper/root on /home type ext4",
+          "status": "match"
+        },
+        {
+          "subject": "/dev/mapper/root on /var type ext4",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "native-windows-inline-case-insensitive",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "canonical-converted-yaml",
+        "path": "examples/windows-server-2025-sysvol-permissions.assessment.yaml",
+        "line": 47
+      },
+      "pattern": "(?i)NT AUTHORITY\\\\SYSTEM:\\(F\\)",
+      "flags": "",
+      "subject_framing": "shellcommand-stdout-line",
+      "cases": [
+        {
+          "subject": "nt authority\\system:(F)",
+          "status": "match"
+        },
+        {
+          "subject": "BUILTIN\\SYSTEM:(RX)",
+          "status": "nonmatch"
+        }
+      ],
+      "compatibility_class": "source-preserved-pcre2-hold",
+      "owner_decision": "OVAL general policy disables inline Perl modifiers; decide whether this existing source-preserved construct is admitted only in a later native extension profile."
+    },
+    {
+      "id": "native-windows-regex-capture-path",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "canonical-converted-yaml",
+        "path": "examples/windows-server-2025-sysvol-permissions.assessment.yaml",
+        "lines": "17-21"
+      },
+      "pattern": "(^[a-zA-Z]:\\\\.+)\\\\sysvol",
+      "flags": "",
+      "subject_framing": "variable-input-scalar",
+      "cases": [
+        {
+          "subject": "C:\\Windows\\sysvol",
+          "status": "capture",
+          "captures": [
+            "C:\\Windows"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "oval-negative-lookahead-comment-exclusion",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "converted-content-audit-witness",
+        "path": "docs/generated/developer-contract-research-independent.md",
+        "line": 112,
+        "note": "The pattern is also represented in the generated converted-content audit; qualify against the pinned OVAL subset before runtime use."
+      },
+      "pattern": "^(?!#).*\\s+NOPASSWD[\\s]*\\:.*$",
+      "flags": "",
+      "subject_framing": "text-line",
+      "cases": [
+        {
+          "subject": "alice ALL=(ALL) NOPASSWD: /bin/id",
+          "status": "match"
+        },
+        {
+          "subject": "# alice ALL=(ALL) NOPASSWD: /bin/id",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "oval-positive-lookahead-presence",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "converted-content-audit-witness",
+        "path": "docs/metadata/developer-guide-content-audit.json",
+        "line": 359,
+        "note": "Positive lookahead occurs in the pinned converted-content audit; profile qualification remains required."
+      },
+      "pattern": "^(?=.*\\bDNSOverHTTPS\\b).*$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "policy DNSOverHTTPS Enabled",
+          "status": "match"
+        },
+        {
+          "subject": "policy DNSOverHTTP Enabled",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "oval-single-digit-numbered-backreference",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "oval-regex-policy",
+        "source": "OVAL Version 8 regular expressions"
+      },
+      "pattern": "^(a|b)\\1$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "compatibility_class": "oval-candidate",
+      "cases": [
+        {
+          "subject": "aa",
+          "status": "match"
+        },
+        {
+          "subject": "ab",
+          "status": "nonmatch"
+        }
+      ],
+      "owner_decision": "Qualify the OVAL single-digit backreference with match/depth limits; do not generalize this to named, recursive, or arbitrary PCRE2 backreferences."
+    },
+    {
+      "id": "oval-behavior-flags-to-effective-options",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "oval-5.12.3-behavior-contract",
+        "source": "Textfilecontent54Behaviors/@ignore_case,@multiline,@singleline"
+      },
+      "pattern": "^user=(.+)$",
+      "source_behavior": {
+        "ignore_case": false,
+        "multiline": true,
+        "singleline": false
+      },
+      "flags": "m",
+      "subject_framing": "text-block",
+      "cases": [
+        {
+          "subject": "header\nuser=alice\nfooter",
+          "status": "match"
+        },
+        {
+          "subject": "header\nUSER=alice\nfooter",
+          "status": "nonmatch"
+        }
+      ],
+      "compatibility_class": "oval-evidence-backed"
+    },
+    {
+      "id": "inline-modifier-and-explicit-flag-composition",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "151-156"
+      },
+      "pattern": "^user=(.+)$",
+      "flags": "i",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "USER=alice",
+          "status": "match"
+        },
+        {
+          "subject": "user=",
+          "status": "nonmatch"
+        }
+      ],
+      "owner_decision": "OVAL general policy disables inline modifiers; explicit text behavior flags remain the only OVAL-backed i/m/s mapping in this profile.",
+      "compatibility_class": "source-preserved-pcre2-hold"
+    },
+    {
+      "id": "editor-flag-allowlist-boundary",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "src/extension.ts",
+        "note": "The preview UI currently advertises i,m,s,x,u,U,A,D and g; this vector prevents that UI list from becoming an unreviewed native contract."
+      },
+      "pattern": "^ user = [A-Za-z]+ $",
+      "flags": "x",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "user = alice",
+          "status": "owner_decision"
+        }
+      ],
+      "owner_decision": "Decide whether extended/UTF/ungreedy/anchored/end-only flags are admitted in a later profile; g is editor-only unless a native global-match cardinality contract is defined."
+    },
+    {
+      "id": "dotall-newline-flag",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "src/playground.ts"
+      },
+      "pattern": "^BEGIN.*END$",
+      "flags": "s",
+      "subject_framing": "multiline-scalar",
+      "cases": [
+        {
+          "subject": "BEGIN\nEND",
+          "status": "match"
+        },
+        {
+          "subject": "BEGIN\nMIDDLE",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "crlf-multiline-anchor-policy",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "newline policy"
+      },
+      "pattern": "^user=(.+)$",
+      "flags": "m",
+      "newline_mode": "ANYCRLF",
+      "subject_framing": "multiline-scalar",
+      "cases": [
+        {
+          "subject": "user=alice\nuser=bob",
+          "status": "match"
+        },
+        {
+          "subject": "user=alice\r\nuser=bob",
+          "status": "match"
+        },
+        {
+          "subject": "user=alice\ruser=bob",
+          "status": "match"
+        },
+        {
+          "subject": "header\r\nUSER=alice",
+          "status": "nonmatch"
+        }
+      ],
+      "owner_decision": "Approve ANYCRLF for multiline text-block matching; source framing remains caller-owned and no line-ending normalization is performed."
+    },
+    {
+      "id": "anchor-search-versus-full-match",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "OVAL pattern-match search semantics"
+      },
+      "pattern": "user",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "prefix user suffix",
+          "status": "match"
+        }
+      ],
+      "assertions": [
+        "No implicit full-match anchoring"
+      ]
+    },
+    {
+      "id": "absolute-and-line-anchors",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "anchor distinction"
+      },
+      "pattern": "\\Auser=alice\\z",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "user=alice",
+          "status": "match"
+        },
+        {
+          "subject": "prefix user=alice",
+          "status": "nonmatch"
+        }
+      ],
+      "compatibility_class": "pcre2-extension-hold",
+      "owner_decision": "\\A and \\z are not listed by the OVAL common-subset policy; retain this as a PCRE2 behavior vector without admitting it to the OVAL-compatible profile."
+    },
+    {
+      "id": "unicode-literal-no-normalization",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "UTF-8/no-normalization baseline"
+      },
+      "pattern": "café",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "café",
+          "status": "match"
+        },
+        {
+          "subject": "café",
+          "status": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "unicode-ucp-word-class-policy",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "oval-regex-policy-and-pcre2-documentation",
+        "source": "Unicode character matching plus PCRE2_UCP behavior"
+      },
+      "pattern": "\\w+",
+      "flags": "",
+      "unicode_mode": "UTF-8+UCP",
+      "subject_framing": "scalar",
+      "compatibility_class": "proposed-unicode-policy",
+      "cases": [
+        {
+          "subject": "café",
+          "status": "match"
+        },
+        {
+          "subject": "!!!",
+          "status": "nonmatch"
+        }
+      ],
+      "owner_decision": "Pin the PCRE2 Unicode data version; do not enable pattern-controlled UCP changes."
+    },
+    {
+      "id": "unicode-casefold-and-ucp-hold",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "Unicode policy"
+      },
+      "pattern": "(?i)Ångström",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "ångström",
+          "status": "owner_decision"
+        }
+      ],
+      "owner_decision": "Select Unicode case-fold/UCP and Unicode-data policy before assigning match/nonmatch."
+    },
+    {
+      "id": "named-and-numbered-captures",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "192-197"
+      },
+      "pattern": "^(?<user>[^:]+):(.+)$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "alice:secret",
+          "status": "capture",
+          "captures": [
+            "alice",
+            "secret"
+          ],
+          "named_captures": {
+            "user": "alice"
+          }
+        }
+      ],
+      "owner_decision": "Named captures are preview data until native wire semantics are approved."
+    },
+    {
+      "id": "oval-repeated-capture-last-participation",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "oval-self-assertion-witness",
+        "source": "OVAL-Community/SCAP-Self-Assertion oval-def_regex_capture_function.xml",
+        "note": "The source comment expects ipp for (i..)+ over mississippi; this remains source evidence, not runtime proof."
+      },
+      "pattern": "(i..)+",
+      "flags": "",
+      "subject_framing": "variable-input-scalar",
+      "cases": [
+        {
+          "subject": "mississippi",
+          "status": "capture",
+          "captures": [
+            "ipp"
+          ],
+          "source_expected_capture": "ipp"
+        }
+      ],
+      "owner_decision": "The OVAL 5.12.3 XSD resolves this value rule; native wire/status mapping remains separate.",
+      "compatibility_class": "oval-evidence-backed"
+    },
+    {
+      "id": "optional-unmatched-versus-empty-capture",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "capture absence distinction"
+      },
+      "pattern": "^(a)?b$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "b",
+          "status": "capture",
+          "captures": [
+            ""
+          ],
+          "capture_state": "unmatched",
+          "source_value": ""
+        },
+        {
+          "subject": "ab",
+          "status": "capture",
+          "captures": [
+            "a"
+          ],
+          "capture_state": "participating",
+          "source_value": "a"
+        }
+      ],
+      "owner_decision": "OVAL value is the empty string for an unmatched optional group. Implementations may retain an internal diagnostic distinction from a participating empty group, but native value output must not expose a different source value.",
+      "compatibility_class": "oval-evidence-backed"
+    },
+    {
+      "id": "empty-participating-versus-unmatched-capture",
+      "operation": "regex_capture",
+      "provenance": {
+        "kind": "oval-schema-value-rule",
+        "source": "oval-definitions-schema.xsd lines 910-915"
+      },
+      "pattern": "^()b$",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "b",
+          "status": "capture",
+          "captures": [
+            ""
+          ],
+          "capture_state": "participating",
+          "source_value": ""
+        }
+      ],
+      "owner_decision": "Both this case and an unmatched optional group serialize as the OVAL empty-string value; internal provenance may distinguish participation.",
+      "compatibility_class": "oval-evidence-backed"
+    },
+    {
+      "id": "engine-unavailable-is-not-nonmatch",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "failure mapping decision"
+      },
+      "pattern": "x",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "engine_unavailable",
+          "must_not_report": "match_or_nonmatch"
+        }
+      ],
+      "owner_decision": "Unavailable engine is a diagnostic/indeterminate result. It must not be converted to match or nonmatch.",
+      "compatibility_class": "profile-error-contract"
+    },
+    {
+      "id": "invalid-pattern",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "line": 156
+      },
+      "pattern": "(",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "x",
+          "status": "compile_error",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "invalid-flag",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "flag allow-list"
+      },
+      "pattern": "x",
+      "flags": "z",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "x",
+          "status": "compile_error",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "invalid-utf8-subject",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "UTF-8 boundary"
+      },
+      "pattern": "x",
+      "subject_encoding": "hex",
+      "subject": "ff",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "invalid_utf8",
+          "must_not_report": "nonmatch"
+        }
+      ]
+    },
+    {
+      "id": "unsupported-lookbehind",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "profile-proposal",
+        "source": "PCRE2 extension boundary"
+      },
+      "pattern": "(?<=a)b",
+      "flags": "",
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "subject": "ab",
+          "status": "unsupported_feature",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "editor-input-limit",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "line": 157
+      },
+      "pattern": "x",
+      "flags": "",
+      "subject_framing": "scalar",
+      "limits": {
+        "subject_characters": 100000
+      },
+      "subject_generator": {
+        "repeat": "a",
+        "count": 100001
+      },
+      "cases": [
+        {
+          "status": "input_limit",
+          "must_not_report": "match"
+        }
+      ]
+    },
+    {
+      "id": "editor-pathological-match-limit",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "171-174"
+      },
+      "pattern": "(a+)+$",
+      "flags": "",
+      "limits": {
+        "subject_characters": 100000,
+        "match_limit": 1000000,
+        "depth_limit": 1000,
+        "timeout_ms": 100
+      },
+      "subject_generator": {
+        "prefix": "a",
+        "count": 10000,
+        "suffix": "!"
+      },
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "resource_limit",
+          "must_not_report": "match"
+        }
+      ],
+      "owner_decision": "Map match/depth/heap exhaustion to diagnostics without a technical nonmatch."
+    },
+    {
+      "id": "editor-worker-cancellation",
+      "operation": "matches_regex",
+      "provenance": {
+        "kind": "vscode-preview-test-derived",
+        "path": "test/source.test.mjs",
+        "lines": "171-176"
+      },
+      "pattern": "^(a|aa)+$",
+      "flags": "",
+      "limits": {
+        "timeout_ms": 25
+      },
+      "subject_generator": {
+        "prefix": "a",
+        "count": 50000,
+        "suffix": "!"
+      },
+      "subject_framing": "scalar",
+      "cases": [
+        {
+          "status": "cancelled",
+          "must_not_report": "match",
+          "acceptable_statuses": [
+            "cancelled",
+            "resource_limit"
+          ]
+        }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "oval-regex-policy",
+      "url": "https://ovalproject.github.io/documentation/policy/regex/",
+      "retrieved_body_sha256": "8607d1cd11c44bc82f42a38d05405cc3e33f2e42f87b305551bb874c5b57b683",
+      "claims": [
+        "lookahead",
+        "single_digit_backreference",
+        "unicode_character_matching",
+        "modifiers_off_unless_construct_allows"
+      ]
+    },
+    {
+      "id": "oval-5.12.3-capture-xsd",
+      "repository_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+      "path": "oval-schemas/oval-definitions-schema.xsd",
+      "sha256": "06b79e8683d6b9dcaad3ab074a456588ed82c4edd2e8fff209def10aa0a366cc",
+      "lines": "910-915",
+      "claims": [
+        "first_match_first_capture",
+        "empty_no_capture_or_no_match",
+        "last_quantified_capture"
+      ]
+    },
+    {
+      "id": "oval-5.12.3-text-behaviors",
+      "repository_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+      "path": "oval-schemas/independent-definitions-schema.xsd",
+      "lines": "1940-1952",
+      "claims": [
+        "ignore_case_maps_to_i",
+        "multiline_maps_to_m",
+        "singleline_maps_to_s",
+        "defaults_false_true_false"
+      ]
+    },
+    {
+      "id": "pcre2-resource-and-unicode-policy",
+      "url": "https://www.pcre.org/current/doc/html/pcre2pattern.html",
+      "retrieved_body_sha256": "e1ae7a7a415031293d774f2b9ee94075f258c2eba1695b40d412dbff957e6681",
+      "claims": [
+        "UCP_changes_character_classes",
+        "newline_affects_anchors_and_dot",
+        "JIT_depth_and_heap_limit_difference"
+      ]
+    },
+    {
+      "id": "pcre2-wasm-vector-smoke",
+      "repository_commit": "6f5a2bc38261586ea3e7badb95592a039b72e5da",
+      "package": "pcre2-wasm@10.49.2",
+      "package_lock_integrity": "sha512-KT/xILUIPAgxAFA9ZbwMUBrRbt06B31DlS88dt7DsaHbLTfvfx+thRtnhLyZ9kX+JvzOqwStHDzzg9szDjQLWg==",
+      "claims": [
+        "numbered_backreference_aa_match_ab_nonmatch",
+        "quantified_capture_ipp",
+        "UTF_UCP_word_class_cafe"
+      ],
+      "qualification": "local smoke only; not cross-platform or RI qualification"
+    },
+    {
+      "id": "pcre2-10.49-release-and-ucd",
+      "repository_tag": "pcre2-10.49",
+      "repository_commit": "6f9d7c1373262c541324a16a358785b33ef116cf",
+      "source_tar_sha256": "53c156e1ba416a20da8e65395daa132da0d80e76910424caca3fcdae7831d384",
+      "ucd_path": "src/pcre2_ucd.c",
+      "ucd_sha256": "cfa8bcb3ad316e09ebfdf3e4b07d708a9d4e53795cc7c0bf04ce5156d7695adc",
+      "unicode_version": "17.0.0",
+      "claims": [
+        "candidate_engine_baseline",
+        "pinned_unicode_data"
+      ],
+      "url": "https://github.com/PCRE2Project/pcre2/releases/tag/pcre2-10.49"
+    },
+    {
+      "id": "pcre2-wasm-wrapper-error-and-utf-policy",
+      "package": "pcre2-wasm@10.49.2",
+      "package_lock_integrity": "sha512-KT/xILUIPAgxAFA9ZbwMUBrRbt06B31DlS88dt7DsaHbLTfvfx+thRtnhLyZ9kX+JvzOqwStHDzzg9szDjQLWg==",
+      "readme_sha256": "2d01a6401390401cca6403471cb0cb19a08e7591471b33bf7f59eac725a8bf0d",
+      "claims": [
+        "byte_mode_default",
+        "UTF_or_UCP_for_non_ascii",
+        "match_limit_error_code_minus_47",
+        "global_flag_noop"
+      ],
+      "qualification": "package documentation only; not RI qualification"
+    }
+  ],
+  "error_contract": {
+    "successful_statuses": [
+      "match",
+      "nonmatch",
+      "capture"
+    ],
+    "diagnostic_statuses": [
+      "compile_error",
+      "unsupported_feature",
+      "invalid_utf8",
+      "engine_unavailable",
+      "input_limit",
+      "resource_limit",
+      "cancelled"
+    ],
+    "rule": "Only successful engine operations may report match/nonmatch/capture; diagnostics never become a genuine nonmatch.",
+    "owner_approval_required": true
+  }
+}
