@@ -37,7 +37,8 @@ conditional mutation distinguishes a missing fallback from valid authoring,
 and the SQLite tests run queries against the disposable database independently
 of the converter and RI.
 
-For the independent source checks, use the OVAL XSD pin and Self-Assertion pin
+For the converter replay, set `CANONICAL_SCHEMA_CHECKOUT` to a worktree at the
+exact schema commit above. For the independent source checks, use the OVAL XSD pin and Self-Assertion pin
 declared in [the source inventory](../oval-source-coverage.json). Use the OVAL
 6.0 tag at `5afcf590fb5d334687bfdc47f98716424cdb7f3d`. Install `lxml` and
 `saxonche` for the XML validation command. Use the ISO Schematron skeleton at
@@ -48,7 +49,8 @@ python conformance/tools/oval_source_audit.py --check --oval "$OVAL_5123" \
   --self-assertion "$SELF_ASSERTION" --oval6 "$OVAL_60"
 python conformance/tools/validate_oval_supplement.py --oval "$OVAL_5123" \
   --schematron "$SCHEMATRON"
-python conformance/tools/qualify_oval_conversion.py --converter "$CONVERTER"
+python conformance/tools/qualify_oval_conversion.py --check --converter "$CONVERTER" \
+  --schema-root "$CANONICAL_SCHEMA_CHECKOUT/schema"
 python proposed/issue86-esx-oval6/tools/validate.py
 ```
 
@@ -67,7 +69,7 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
   Canonical replay remains open under [RI #196](https://github.com/vanderpol/scap-ng-ri/issues/196).
 - Studio's current main passed 212 tests with its published metadata pack.
   A separately built candidate pack with the exact current schema exercised
-  canonical Assessment model open/save/reopen/undo. Five new Assessment
+  canonical Assessment model open/save/reopen/undo. Six new Assessment
   documents and 132 baseline active-only documents passed. Two additional
   baseline documents mix active and experimental Tests and were excluded
   from the active Studio qualification count. Graphical CRUD and extension

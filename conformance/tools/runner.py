@@ -297,9 +297,13 @@ def validate() -> int:
             actual = schema_validator(row["schema"]).is_valid(document)
             if actual != row["valid"]:
                 errors.append(f"{row['id']}: expected schema validity {row['valid']}, got {actual}")
-            for key in ("fixture", "expected"):
-                if row.get(key) and not (CONFORMANCE / row[key]).is_file():
-                    errors.append(f"{row['id']}: missing {key}")
+            receipt_paths = row["artifact_sha256"]
+            required_paths = {row[key] for key in ("source", "fixture", "expected") if key in row}
+            if required_paths - receipt_paths.keys():
+                errors.append(f"{row['id']}: supplemental inputs are missing digests")
+            for name, expected_sha in receipt_paths.items():
+                if hashlib.sha256((CONFORMANCE / name).read_bytes()).hexdigest() != expected_sha:
+                    errors.append(f"{row['id']}: stale supplemental artifact digest for {name}")
         except (ValueError, KeyError, OSError, yaml.YAMLError) as exc:
             errors.append(f"{row['id']}: {exc}")
     if errors:

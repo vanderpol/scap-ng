@@ -72,7 +72,7 @@ class SupplementalConformance(unittest.TestCase):
         self.assertEqual(evaluate_presence_tree(document["evaluate"], unchanged, []), {"test": "nested-test"})
         self.assertEqual(evaluate_presence_tree(document["evaluate"], decisive, []), {"test": "secondary-test"})
 
-    def test_organizational_and_publisher_routes_resolve_without_shared_cache_aliasing(self):
+    def test_organizational_and_publisher_routes_select_distinct_invocations(self):
         root = CONFORMANCE / "cases/policy/organizational-binding"
         benchmark = load(root / "route.benchmark.yaml")["benchmark"]
         tailoring = load(root / "route.tailoring.yaml")["tailoring"]
@@ -178,6 +178,7 @@ class SupplementalConformance(unittest.TestCase):
         counts = matrix["coverage_counts"]
         validation = load(qualification / "oval-supplement-validation.json")
         conversion = load(qualification / "oval-supplement-conversion.json")
+        self.assertEqual(conversion["schema_pin"], manifest["schema_commit"])
         self.assertEqual(conversion["converter"]["flat_schema_family_sha256"], manifest["schema_family_sha256"])
         declarations = {}
         for path in sorted(CORPUS.glob("*/*.xml")):

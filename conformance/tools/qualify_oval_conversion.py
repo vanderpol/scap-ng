@@ -12,16 +12,16 @@ from tempfile import TemporaryDirectory
 
 from jsonschema.exceptions import ValidationError
 
-from oval_source_audit import scan_xml
-from runner import CONFORMANCE, ROOT, SCHEMA, load, validator
+from oval_source_audit import require_pin, scan_xml
+from runner import CONFORMANCE, ROOT, load, validator
 
 SOURCE_PIN = "4f116d86ac1218586aa0a1294c696947121a1ccc"
 CORPUS = CONFORMANCE / "oval-self-assertion"
 
 
-def convert(converter, path, checksum, definition, test, output):
+def convert(converter, schema, schema_commit, path, checksum, definition, test, output):
     command = [
-        converter, "--schema-root", str(SCHEMA), "--sha256", checksum,
+        converter, "--schema-root", str(schema), "--sha256", checksum,
         "--source-commit", SOURCE_PIN, "--source-path", path.relative_to(ROOT).as_posix(),
         "--oval-definition", definition, "--output", str(output), str(path),
     ]
@@ -40,6 +40,8 @@ def convert(converter, path, checksum, definition, test, output):
     trace = load(trace_path)
     if (trace["definition_id"], trace["source_commit"], trace["source_sha256"]) != (definition, SOURCE_PIN, checksum):
         raise ValueError(f"{definition}: incorrect source identity in trace")
+    if trace["schema_commit"] != schema_commit:
+        raise ValueError(f"{definition}: converter trace scanned a different schema commit")
     test_bindings = {
         node["native_id"]: node["source_id"] for node in trace["native_identities"]
         if node["kind"] == "test"
@@ -57,10 +59,16 @@ def convert(converter, path, checksum, definition, test, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--converter", default="scapng-convert-v04")
+    parser.add_argument("--schema-root", type=Path, required=True,
+                        help="flat schema/ directory checked out at the exact conformance schema commit")
     parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     version = json.loads(subprocess.check_output([args.converter, "--version"], text=True))
     manifest = load(CONFORMANCE / "manifest.json")
+    schema = args.schema_root.resolve(strict=True)
+    schema_commit = manifest["schema_commit"]
+    require_pin(schema.parent, schema_commit)
     if version["flat_schema_family_sha256"] != manifest["schema_family_sha256"]:
         raise SystemExit("production converter schema family differs from canonical corpus")
 
@@ -79,14 +87,23 @@ def main():
             checksum = sha256(raw).hexdigest()
             for definition in doc["ids"]["definitions"]:
                 suffix = definition.rsplit(":", 1)[-1]
-                jobs.append((args.converter, path, checksum, definition, by_suffix[suffix], output_root / suffix))
+                jobs.append((
+                    args.converter, schema, schema_commit, path, checksum, definition,
+                    by_suffix[suffix], output_root / suffix,
+                ))
         try:
             with ThreadPoolExecutor(max_workers=args.jobs) as pool:
                 records = list(pool.map(lambda job: convert(*job), jobs))
         except (ValueError, ValidationError) as error:
             raise SystemExit(str(error)) from error
-    print(json.dumps({"source_pin": SOURCE_PIN, "converter": version, "definitions": records},
-                     indent=2, sort_keys=True))
+    report = {"source_pin": SOURCE_PIN, "schema_pin": schema_commit,
+              "converter": version, "definitions": records}
+    rendered = json.dumps(report, indent=2, sort_keys=True) + "\n"
+    if args.check:
+        receipt = CONFORMANCE / "qualification/oval-supplement-conversion.json"
+        if receipt.read_text(encoding="utf-8") != rendered:
+            raise SystemExit(f"stale conversion receipt: {receipt}")
+    print(rendered, end="")
 
 
 if __name__ == "__main__":
