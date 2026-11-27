@@ -1,0 +1,94 @@
+{
+  "format": "scap-ng-oval-self-assertion-expected-1",
+  "oval_schema_pin": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+  "id_prefix": "oval:org.scapng.conformance",
+  "yaml_file_layout": {
+    "unix": "/tmp/scap-ng-issue87",
+    "windows": "C:\\scap-ng-issue87",
+    "fixture_directory": "fixtures/yaml"
+  },
+  "yaml_cases": [
+    {
+      "definitions_and_tests": [101, 201],
+      "selected_document": "settings.yaml",
+      "selected_value": {"myCamelCase^Key": "amber", "Limit": 7, "Enabled": true, "ratio": 1.25},
+      "outcome": "true",
+      "reason": "All four typed fields equal their operands. OVAL escapes uppercase letters and the caret in State record names. Native NG must preserve the target keys."
+    },
+    {
+      "definitions_and_tests": [102, 202],
+      "selected_document": "settings.yaml",
+      "selected_value": {"myCamelCase^Key": "amber"},
+      "outcome": "false",
+      "reason": "The same document and mapping are selected as in the positive case. The observed amber differs from the expected blue."
+    },
+    {
+      "definitions_and_tests": [103, 203],
+      "selected_document": "settings.yaml",
+      "selected_value": ["amber", "amber", "blue"],
+      "outcome": "true",
+      "reason": "The unkeyed field has three observed values. Two match amber, which satisfies at least one."
+    },
+    {
+      "definitions_and_tests": [104, 204],
+      "selected_document": "literal inline content",
+      "selected_value": {"myCamelCase^Key": "amber"},
+      "outcome": "true",
+      "reason": "The YAML literal supplies the entire document and the chosen field equals amber."
+    },
+    {
+      "definitions_and_tests": [105, 205],
+      "selected_document": "constant Variable inline content",
+      "selected_value": {"myCamelCase^Key": "amber"},
+      "outcome": "true",
+      "reason": "The Variable supplies exactly the same document bytes as the literal case. Resolution does not require a file."
+    },
+    {
+      "definitions_and_tests": [106, 206],
+      "selected_document": "does-not-exist.yaml",
+      "outcome": "false",
+      "reason": "The fixture has no such file and the evaluator has authoritative access to the fixture directory. The at-least-one existence requirement fails."
+    },
+    {
+      "definitions_and_tests": [107, 207],
+      "selected_document": "depth-one/recursive.yaml",
+      "selected_value": {"myCamelCase^Key": "amber"},
+      "outcome": "true",
+      "reason": "The selected name matches once within depth one. The nested blue file is deliberately outside the traversal depth."
+    },
+    {
+      "definitions_and_tests": [108, 208],
+      "selected_document": "settings.yaml",
+      "selected_value": "amber",
+      "outcome": "true",
+      "reason": "The selected scalar uses the unkeyed record field, which equals amber."
+    },
+    {
+      "definitions_and_tests": [109, 209],
+      "selected_document": "settings.yaml",
+      "selected_value": {"myCamelCase^Key": "amber"},
+      "outcome": "true",
+      "reason": "The union considers two distinct source files. The include filter drops the blue record before the Test checks the remaining amber Item."
+    }
+  ],
+  "sql512_cases": [
+    {
+      "definitions_and_tests": [301],
+      "rows": [{"measurement": 7, "label": "amber"}],
+      "outcome": "true",
+      "reason": "The memory database has measurement 7 and label amber for id 1. The State requires those typed values."
+    },
+    {
+      "definitions_and_tests": [302],
+      "rows": [{"measurement": 7, "label": "amber"}],
+      "outcome": "false",
+      "reason": "The query and selected row are unchanged. State measurement 3 disagrees with observed integer 7."
+    },
+    {
+      "definitions_and_tests": [303],
+      "rows": [],
+      "outcome": null,
+      "reason": "The query returns zero rows. The XSD permits an Item with no result records. Qualification must determine whether the collector emits that Item or supplies an empty Object population before asserting the Test existence outcome."
+    }
+  ]
+}
