@@ -11,6 +11,7 @@ from copy import deepcopy
 import yaml
 from jsonschema import Draft202012Validator, ValidationError
 
+from conformance.tools.generate import inventory as derive_inventory
 from conformance.tools.oracle import compare
 from conformance.tools.runner import validator, check_semantic_witnesses
 
@@ -40,6 +41,19 @@ class Issue87Conformance(unittest.TestCase):
             digest.update(path.read_bytes())
         self.assertEqual(self.inventory["schema_family_sha256"], digest.hexdigest())
         self.assertEqual(self.manifest["schema_family_sha256"], self.inventory["schema_family_sha256"])
+
+    def test_inventory_matches_current_normative_sources_and_reachable_surface(self):
+        self.assertTrue(self.inventory == derive_inventory(),
+                        "Regenerate schema-coverage.json from current canonical inputs")
+        specification = self.inventory["specification"]
+        reachable = specification["resources"]
+        self.assertIn("assessment", reachable["schema/expression.schema.json"]["entry_points"])
+        self.assertIn("benchmark", reachable["schema/cpe-identity.schema.json"]["entry_points"])
+        self.assertIn("benchmark-result", reachable["schema/rule-result.schema.json"]["entry_points"])
+        self.assertEqual(reachable["schema/variable-function-expression.schema.json"]["entry_points"], {})
+        unreachable = specification["unreachable_schema_nodes"]
+        self.assertIn("/$defs/foreach_binding", unreachable["schema/capability-common.schema.json"])
+        self.assertIn("/$defs/foreach_selector_binding", unreachable["schema/capability-common.schema.json"])
 
     def test_inventory_and_vectors_are_exhaustive_for_mappings(self):
         capabilities = {row["capability"] for row in self.inventory["capabilities"]}

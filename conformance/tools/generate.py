@@ -16,6 +16,11 @@ from typing import Any
 
 import yaml
 
+try:
+    from .specification import inventory as specification_inventory
+except ImportError:  # direct script execution
+    from specification import inventory as specification_inventory
+
 HERE = Path(__file__).resolve()
 ROOT = HERE.parents[2]
 SCHEMA = ROOT / "schema"
@@ -1023,6 +1028,7 @@ def write_json(path: Path, value: Any) -> None:
 def inventory() -> dict[str, Any]:
     paths = sorted(SCHEMA.glob("*.json")) + sorted((SCHEMA / "capability-mappings").rglob("*.json"))
     schema_docs = []
+    schemas = {}
     enums = []
     constraints = []
     property_groups = []
@@ -1030,7 +1036,11 @@ def inventory() -> dict[str, Any]:
     for path in paths:
         doc = load(path)
         rel = path.relative_to(ROOT).as_posix()
+        if path.name.endswith(".schema.json"):
+            schemas[rel] = doc
         e, c, p = enums_and_constraints(doc, rel)
+        for row in (*e, *c, *p):
+            row["source"] = rel
         schema_docs.append({"path": rel, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "kind": "root" if path.parent == SCHEMA else "mapping"})
         enums.extend(e); constraints.extend(c); property_groups.extend(p)
         for pointer_path, node in walk_schema(doc):
@@ -1122,6 +1132,7 @@ def inventory() -> dict[str, Any]:
             "schema_constraints": len(constraints), "schema_references": len(refs),
             "comparison_operations": len(ops),
         },
+        "specification": specification_inventory(ROOT, schemas),
         "schema_documents": schema_docs,
         "capabilities": mappings,
         "operations": sorted(ops),
