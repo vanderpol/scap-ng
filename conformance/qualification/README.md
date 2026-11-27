@@ -142,3 +142,10 @@ evidence for one of the five upstream parity holds. It checks exact
 XSD-derived options, source and native Variable identities, and all four
 RI Test leaves. Both order mutations produced the independently expected
 results. The general Tools parity check remains open.
+
+The [pinned time_difference witness](../variable-time-difference/README.md)
+independently recalculates 29 source State values and passes each in direct
+RI Test evaluation. The original clock-dependent Test also returns false,
+false and true at one second below, exactly at and one second above its
+threshold. The Object-backed case returned all 16 matching product
+values. Assessment rollup and the general Tools parity hold remain open.

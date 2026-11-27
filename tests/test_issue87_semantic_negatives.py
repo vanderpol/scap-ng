@@ -1,5 +1,6 @@
 """Check semantic-invalid native fixtures and their single-change controls."""
 import copy
+from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from hashlib import sha256
@@ -184,6 +185,39 @@ class SourceAccountingCases(unittest.TestCase):
             self.assertIn(f'"{independent}"', witness["leaves"][name]["explanation"])
             self.assertEqual(witness["leaves"][name]["outcome"], "true")
         self.assertEqual(witness["reordered_integers"], expected["reordered_integers"]["outcomes"])
+
+
+    def test_time_difference_receipt_matches_source_native_and_clock_expectations(self):
+        root = CONFORMANCE / "variable-time-difference"
+        expected = load(root / "expected.json")
+        witness = load(root / "ri-receipt.json")
+        full = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        hold, = [row for row in full["holds"] if row["definition_id"] == expected["definition"]]
+        self.assertEqual(witness["source_sha256"], hold["source_sha256"])
+        self.assertEqual(witness["source_sha256"], expected["source_sha256"])
+        self.assertEqual(witness["native_assessment_sha256"], hold["assessment_json_sha256"])
+        self.assertEqual(witness["schema_commit"], full["schema_pin"])
+        self.assertEqual(witness["converter_revision"], full["tools_revision"])
+        self.assertEqual(witness["leaves"].keys(), expected["static_expected_seconds"].keys())
+        product = expected["cartesian_case"]
+        for source_id, seconds in expected["static_expected_seconds"].items():
+            observation = witness["leaves"][source_id]
+            counts = product["values"] if source_id == product["test"] else 1
+            self.assertEqual(observation["outcome"], "true")
+            self.assertEqual((observation["values_found"], observation["values_matching"]), (counts, counts))
+            if counts == 1:
+                self.assertRegex(observation["explanation"], rf"\bvalue {seconds}\b")
+
+        clock = expected["clock_case"]
+        self.assertEqual(witness["fixed_clock"].keys(), clock["variants"].keys())
+        for instant, expectation in clock["variants"].items():
+            observed = witness["fixed_clock"][instant]
+            delta = int(datetime.fromisoformat(instant).timestamp()) - clock["operand_seconds_since_epoch"]
+            outcome = str(delta > clock["strictly_greater_than"]).lower()
+            self.assertEqual(expectation, {"seconds": delta, "outcome": outcome})
+            self.assertEqual(observed["outcome"], outcome)
+            self.assertEqual(observed["values_matching"], int(outcome == "true"))
+            self.assertRegex(observed["explanation"], rf"\bvalue {delta}\b")
 
 
 if __name__ == "__main__":
