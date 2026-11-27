@@ -122,3 +122,12 @@ collected-field datatype resolutions. The companion
 [upstream receipt](upstream-converter-audit.json) preserves source and native
 hashes, exact identities, family counts and each diagnostic.
 [Tools #128](https://github.com/vanderpol/scap-ng-tools/issues/128).
+
+## Result package fixture
+
+The [unsigned Result package fixture](../result-package/README.md) connects
+two targets, two Benchmark Results and two Assessment invocations. Local
+checks distinguish byte integrity and same-target execution identity from
+schema admission. Studio's exact-pin metadata pack admitted all six
+documents. Existing RI Result assembly tests passed independently of the
+fixture. Scanner generation and package verification remain unqualified.
