@@ -1,5 +1,6 @@
 """Check semantic-invalid native fixtures and their single-change controls."""
 import copy
+from hashlib import sha256
 import unittest
 
 from conformance.tools.runner import CONFORMANCE, load, validator
@@ -85,6 +86,13 @@ class LogicalCardinalityCases(unittest.TestCase):
         fixture = load(root / "fixture.json")
         self.assertEqual(fixture["assessment"], source["assessment"]["id"])
         self.assertEqual(fixture["literal_mutations"].keys(), expected.keys())
+        receipt = load(root / "ri-leaf-receipt.json")
+        for name, digest in receipt["sha256"].items():
+            self.assertEqual(sha256((root / name).read_bytes()).hexdigest(), digest)
+        self.assertEqual(
+            receipt["observed_test_outcomes"],
+            {name: outcome["test_outcomes"] for name, outcome in expected.items()},
+        )
         schema = validator()
         for variant, changes in fixture["literal_mutations"].items():
             with self.subTest(variant=variant):
