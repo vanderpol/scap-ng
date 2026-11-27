@@ -134,3 +134,9 @@ being fabricated by this source corpus.
 The [Issue #87 qualification checkpoint](qualification/README.md) records the
 current source census, supplemental native and OVAL cases, local checks and
 separate consumer qualifications.
+
+The [supplemental suite index](suite-index.json) gives downstream consumers
+one pinned entry point for the native witnesses, package fixtures, OVAL
+source additions and experimental ESXi cases. Each row identifies the
+suite's adoption status and exact published artifact digests. The main
+manifest retains the built-in capability and core case entries.

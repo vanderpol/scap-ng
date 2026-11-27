@@ -11,7 +11,7 @@ from copy import deepcopy
 import yaml
 from jsonschema import Draft202012Validator, ValidationError
 
-from conformance.tools.generate import inventory as derive_inventory
+from conformance.tools.generate import inventory as derive_inventory, suite_index
 from conformance.tools.oracle import compare
 from conformance.tools.runner import validator, check_semantic_witnesses
 
@@ -54,6 +54,17 @@ class Issue87Conformance(unittest.TestCase):
         unreachable = specification["unreachable_schema_nodes"]
         self.assertIn("/$defs/foreach_binding", unreachable["schema/capability-common.schema.json"])
         self.assertIn("/$defs/foreach_selector_binding", unreachable["schema/capability-common.schema.json"])
+
+    def test_supplemental_suite_index_matches_published_artifacts(self):
+        commit = self.manifest["schema_commit"]
+        published = read(CONF / self.manifest["suite_index"])
+        self.assertEqual(published, suite_index(commit))
+        suites = {row["id"]: row for row in published["suites"]}
+        self.assertEqual(len(suites), len(published["suites"]))
+        self.assertEqual(suites["esxi"]["adoption"], "experimental")
+        self.assertEqual(suites["result-package"]["adoption"], "draft-transport")
+        for row in suites.values():
+            self.assertIn(row["entrypoint"], row["artifact_sha256"])
 
     def test_inventory_and_vectors_are_exhaustive_for_mappings(self):
         capabilities = {row["capability"] for row in self.inventory["capabilities"]}
