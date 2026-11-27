@@ -207,6 +207,38 @@ class SupplementalConformance(unittest.TestCase):
                 self.assertNotEqual(row["exit_code"], 0)
                 self.assertTrue(row["diagnostic"])
 
+    def test_observed_scanner_outcomes_remain_separate_from_the_oracle(self):
+        qualification = CONFORMANCE / "qualification"
+        receipt = load(qualification / "openscap-unix-yaml.json")
+        source = CONFORMANCE / receipt["source"]
+        self.assertEqual(receipt["source_sha256"], sha256(source.read_bytes()).hexdigest())
+        oracle = load(CORPUS / "expected.json")["yaml_cases"]
+        expected = {case["definitions_and_tests"][0]: case["outcome"] for case in oracle}
+        actual = {int(case["definition"].rsplit(":", 1)[-1]): case
+                  for case in receipt["definition_results"]}
+        self.assertEqual(actual.keys(), expected.keys())
+        disagreements = []
+        for number, outcome in expected.items():
+            self.assertEqual(actual[number]["expected"], outcome)
+            equal = actual[number]["observed"] == outcome
+            self.assertEqual(actual[number]["matched"], equal)
+            if not equal:
+                disagreements.append(number)
+        self.assertEqual(disagreements, [109])
+        self.assertEqual(receipt["set_filter"]["isolated_run"]["definition_outcome"], "false")
+        for probe in receipt["boundary_observations"].values():
+            self.assertEqual(sha256(probe["fixture_text"].encode()).hexdigest(), probe["fixture_sha256"])
+
+        diagnostic = load(qualification / "ri-conditional-diagnostics.json")
+        source = CONFORMANCE / diagnostic["source"]
+        self.assertEqual(diagnostic["source_sha256"], sha256(source.read_bytes()).hexdigest())
+        authored = load(source)["assessment"]["tests"]
+        leaf_diagnostics = diagnostic["leaf_replay"]["tests"]
+        self.assertEqual(leaf_diagnostics.keys(), authored.keys())
+        for name, details in leaf_diagnostics.items():
+            self.assertEqual(authored[name]["reported_elements"], "compared")
+            self.assertEqual(details["as_authored"]["code"], "unsupported_test_profile")
+
     def test_yaml_selected_records_and_controlled_file_boundaries(self):
         settings = load(CORPUS / "fixtures/yaml/settings.yaml")
         other = load(CORPUS / "fixtures/yaml/other.yaml")

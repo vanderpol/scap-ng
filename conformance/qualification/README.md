@@ -63,10 +63,22 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
 
 ## Consumer status
 
+- Real UNIX OpenSCAP 1.4.2 collection matched eight of nine YAML-file-content
+  Definitions. The Set/Filter discrepancy reproduced in isolation. The scanner
+  advertises OVAL 5.11.1, so the replay uses the separately pinned 5.12.3 XSD
+  and Schematron check. See [the normalized receipt](openscap-unix-yaml.json)
+  and [canonical #132](https://github.com/vanderpol/scap-ng/issues/132).
+  Four additional UNIX probes record observed empty-map, missing-path,
+  malformed and unreadable behavior. They leave native collector expectations
+  open until their status and authority rules are qualified.
 - The RI evaluator unit suite and focused existing Profile, Tailoring and
   manual Result unit tests passed. The two guard-status Benchmark test cases
   stopped at VM filesystem admission, before evaluator execution.
-  Canonical replay remains open under [RI #196](https://github.com/vanderpol/scap-ng-ri/issues/196).
+  The same limit stopped direct canonical scheduler replay. The standalone RI
+  evaluator rejects the valid `reported_elements: compared` setting. Changing
+  only that setting in a diagnostic copy produced all four intended leaf
+  results. See [the RI diagnostic receipt](ri-conditional-diagnostics.json)
+  and [RI #196](https://github.com/vanderpol/scap-ng-ri/issues/196).
 - Studio's current main passed 212 tests with its published metadata pack.
   A separately built candidate pack with the exact current schema exercised
   canonical Assessment model open/save/reopen/undo. Six new Assessment
