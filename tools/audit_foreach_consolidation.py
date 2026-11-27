@@ -18,11 +18,56 @@ def primary_expression(expr):
         if key in expr: return key
     return 'other'
 
+def normalize_duplicate_test(value):
+    """Normalize only authoring noise for the duplicate-template census.
+
+    The census is deliberately narrower than semantic equivalence.  It is
+    performed within one Assessment, removes presentation titles, and hides
+    source/reference names so that repeated Test shapes can be counted without
+    claiming that their Objects, Variables, or source lineage are interchangeable.
+    """
+    if isinstance(value, dict):
+        return {
+            key: normalize_duplicate_test(child)
+            for key, child in sorted(value.items())
+            if key not in {"test_title", "object_title", "state_title"}
+        }
+    if isinstance(value, list):
+        return [normalize_duplicate_test(child) for child in value]
+    if isinstance(value, str) and ("variable" in value or value.startswith("oval:")):
+        return "<REFERENCE>"
+    return value
+
+
+def duplicate_test_census(assessment, path):
+    groups = defaultdict(list)
+    for test_id, test in assessment.get("tests", {}).items():
+        normalized = normalize_duplicate_test(test)
+        digest = hashlib.sha256(
+            json.dumps(normalized, sort_keys=True, separators=(",", ":")).encode()
+        ).hexdigest()
+        groups[digest].append(test_id)
+    duplicate_groups = []
+    for digest, test_ids in sorted(groups.items()):
+        if len(test_ids) < 2:
+            continue
+        duplicate_groups.append({
+            "assessment": assessment["id"],
+            "file": str(path),
+            "normalized_sha256": digest,
+            "test_ids": sorted(test_ids),
+            "test_count": len(test_ids),
+            "syntactic_reduction_upper_bound": len(test_ids) - 1,
+        })
+    return duplicate_groups
+
+
 def classify(root):
     files=sorted(root.glob('*/native-automated-subset/authoring/direct-slice/assessments/*.json'))
-    c=Counter(); rows=[]; reductions=[]
+    c=Counter(); rows=[]; reductions=[]; duplicate_groups=[]
     for p in files:
         d=json.loads(p.read_text())['assessment']; uses=defaultdict(list)
+        duplicate_groups.extend(duplicate_test_census(d, p.relative_to(root)))
         for v,path in walk(d): uses[v].append(path)
         for v,decl in d.get('variables',{}).items():
             expr=decl.get('expression',{})
@@ -111,11 +156,11 @@ def classify(root):
         original=json.loads(dpath.read_text()); before=yaml.safe_dump(original,sort_keys=False).splitlines()
         after=yaml.safe_dump(doc,sort_keys=False).splitlines()
         reductions.append({'assessment':row['assessment'],'variable':v,'before_yaml_lines':len(before),'after_yaml_lines':len(after),'delta_lines':len(after)-len(before)})
-    return files,c,rows,reductions
+    return files,c,rows,reductions,duplicate_groups
 
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('root',type=Path); ap.add_argument('--stage-manifest',type=Path,required=True); ap.add_argument('--source-pins',type=Path); ap.add_argument('--output',type=Path,required=True); args=ap.parse_args()
-    files,c,rows,reds=classify(args.root)
+    files,c,rows,reds,duplicate_groups=classify(args.root)
     m=json.loads(args.stage_manifest.read_text())
     if len(m.get('streams',[])) not in (0,65): raise SystemExit('expected 65 benchmark streams')
     result={'format':'scap-ng-foreach-consolidation-audit/0.1','status':'design-analysis-only','source':{
@@ -124,6 +169,14 @@ def main():
       'source_repository': json.loads(args.source_pins.read_text()).get('repository') if args.source_pins else None, 'source_revision': json.loads(args.source_pins.read_text()).get('revision') if args.source_pins else None, 'source_pins_sha256': hashlib.sha256(args.source_pins.read_bytes()).hexdigest() if args.source_pins else None, 'scope':m.get('limitations',[])} ,'counts':dict(c),
       'replacement_decision': {'current_for_each_replacements_verified': 0, 'semantic_candidates_requiring_review': c['sole_transfer_variable_definitions'], 'upper_bound_transfer_variables_removable': c['sole_transfer_variable_definitions'], 'reason': 'All sole-transfer candidates use selector value_match or nested/shared placement; current binding shape is scalar {from} and cannot be declared equivalent without an approved cardinality/lineage mapping.'},
       'yaml_estimate':{'strict_candidates':len(reds),'before_lines':sum(x['before_yaml_lines'] for x in reds),'after_lines':sum(x['after_yaml_lines'] for x in reds),'delta_lines':sum(x['delta_lines'] for x in reds),'method':'PyYAML normalized representation; estimate only'},
+      'duplicate_test_analysis': {
+        'method': 'Within each Assessment, remove presentation title fields and replace variable/OVAL reference names with a marker; hash the normalized Test. This is a syntactic template census, not semantic equivalence.',
+        'duplicate_template_groups': len(duplicate_groups),
+        'tests_in_duplicate_groups': sum(row['test_count'] for row in duplicate_groups),
+        'syntactic_test_reduction_upper_bound': sum(row['syntactic_reduction_upper_bound'] for row in duplicate_groups),
+        'proven_same_source_transfer_groups': 0,
+        'groups': duplicate_groups,
+      },
       'candidates':rows}
     args.output.write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps({'source':result['source'],'counts':result['counts'],'yaml_estimate':result['yaml_estimate']},indent=2))

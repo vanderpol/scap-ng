@@ -5,6 +5,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 RECEIPT = ROOT / "docs/contracts/evidence/foreach-consolidation-65.json"
+RECOMMENDATION = ROOT / "docs/contracts/0.4.1-foreach-architectural-recommendation.md"
 
 
 class ForeachConsolidationAuditTests(unittest.TestCase):
@@ -35,6 +36,28 @@ class ForeachConsolidationAuditTests(unittest.TestCase):
         self.assertEqual(decision["current_for_each_replacements_verified"], 0)
         self.assertEqual(decision["upper_bound_transfer_variables_removable"], 121)
         self.assertEqual(self.receipt["yaml_estimate"]["strict_candidates"], 0)
+
+    def test_architectural_recommendation_defers_removal(self):
+        text = RECOMMENDATION.read_text()
+        self.assertIn("MODIFY / DEFER ADOPTION", text)
+        self.assertIn("Proven lossless `for_each` replacements | **0**", text)
+        self.assertIn("63 groups / 148 Tests", text)
+        self.assertIn("Issue #76", text)
+        self.assertIn("Windows", text)
+        self.assertIn("OVAL 6.0", text)
+        self.assertIn("home_dir +", text)
+
+    def test_duplicate_template_census_is_not_mistaken_for_equivalence(self):
+        census = self.receipt["duplicate_test_analysis"]
+        self.assertEqual(census["duplicate_template_groups"], 63)
+        self.assertEqual(census["tests_in_duplicate_groups"], 148)
+        self.assertEqual(census["syntactic_test_reduction_upper_bound"], 85)
+        self.assertEqual(census["proven_same_source_transfer_groups"], 0)
+        self.assertIn("not semantic equivalence", census["method"])
+        self.assertEqual(
+            sum(row["test_count"] for row in census["groups"]),
+            census["tests_in_duplicate_groups"],
+        )
 
     def test_legitimate_computation_remains_in_inventory(self):
         counts = self.receipt["counts"]

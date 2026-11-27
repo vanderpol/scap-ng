@@ -18,6 +18,8 @@ The first conformance command checks syntax only and reports zero executions. Th
 
 [Actual combined conformance execution](evidence/combined-conformance.json) and [qualification/pins](evidence/qualification.json) bind the 23 cases to compiled RI runtime producer `3e05fb8cdd2765d0d0a94f197795ad0513a97911`, independently of subsequent SQLite work. The canonical 129-test suite passed locally. Separate RI backend parity/100,001-Item evidence must be reviewed in the linked SQLite draft; it is not inferred from this syntax/equality receipt.
 
+The `for_each` architectural recommendation (`0.4.1-foreach-architectural-recommendation.md`) concludes modify/defer: correlation is new, but no existing construct is retired before Issue #76 approval and independent equivalence proof.
+
 The `for_each` semantic packet (`0.4.1-foreach-semantics.md`) is accompanied by
 source-backed examples and the [65-benchmark language-consolidation review](0.4.1-foreach-consolidation.md).
 The consolidation receipt records zero proven replacements; existing Variables,
