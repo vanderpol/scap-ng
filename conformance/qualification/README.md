@@ -158,6 +158,14 @@ five documents. All five passed open/save, scalar edit, reopen and undo.
 The [pinned external Variable witness](../variable-external-input/README.md)
 checks Definition 562 with its companion OVAL bindings. All 18 direct RI
 Test evaluations matched the independent source expectations. The missing,
-empty, wrong-type and nonmatching binding controls preserve distinct
-failure or comparison dispositions. Full policy enforcement and rollup
+empty, wrong-type and nonmatching binding controls distinguish missing
+evidence, invalid evidence and a valid false comparison. Full policy enforcement and rollup
 remain open.
+
+The [collected datatype receipt](collected-datatype-holds.json) identifies
+the exact macOS HOME and Solaris package-version projections. Both OVAL
+System Characteristics fields and both native mappings permit multiple
+datatypes. The current converter trace retains the original Variable
+declaration tokens. Choosing a native type requires typed collector
+evidence and may require an approved compatibility rule. The production
+parity holds remain in place.

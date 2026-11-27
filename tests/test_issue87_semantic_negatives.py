@@ -266,5 +266,39 @@ class SourceAccountingCases(unittest.TestCase):
         self.assertEqual(witness["controls"], controls)
 
 
+    def test_collected_type_holds_remain_explicit_for_polymorphic_fields(self):
+        root = CONFORMANCE / "qualification"
+        full = load(root / "upstream-converter-audit.json")
+        receipt = load(root / "collected-datatype-holds.json")
+        census = load(CONFORMANCE / "oval-source-coverage.json")
+        self.assertEqual(receipt["status"], "unqualified")
+        self.assertEqual(receipt["schema_commit"], full["schema_pin"])
+        self.assertEqual(receipt["converter_revision"], full["tools_revision"])
+        self.assertEqual(receipt["oval_schema_commit"], census["pins"]["oval_5_12_3"])
+        expected = {
+            row["definition_id"]: (row["source_sha256"], row["assessment_json_sha256"])
+            for row in full["holds"] if row["parity_diagnostic"] == "native collected-field datatype is unresolved"
+        }
+        self.assertEqual(
+            {row["definition_id"]: (row["source_sha256"], row["native_assessment_sha256"]) for row in receipt["holds"]},
+            expected,
+        )
+        schema = CONFORMANCE.parent / "schema/capability-mappings/supported"
+        source_types = {}
+        for row in receipt["holds"]:
+            for record in row["projections"]:
+                capability = record["native_capability"]
+                field = record["native_field"]
+                datatypes = load(schema / f"{capability}.json")["native"]["field_datatypes"][field]
+                self.assertEqual(record["native_datatypes"], datatypes)
+                self.assertGreater(len(datatypes), 1)
+                self.assertEqual(record["xsd_item_field_type"], "oval-sc:EntityItemAnySimpleType")
+                source_types.setdefault((capability, field), []).append(record["source_datatype"])
+        self.assertEqual(source_types, {
+            ("independent.environmentvariable", "value"): ["string"],
+            ("independent.shellcommand", "subexpression"): ["version", "version"],
+        })
+
+
 if __name__ == "__main__":
     unittest.main()

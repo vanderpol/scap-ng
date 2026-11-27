@@ -34,7 +34,7 @@ conformance workflow uses the same gate.
 The current mainline-rebased inventory is pinned to schema commit
 `cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876` and contains 105 capability
 mappings (101 supported, 4 experimental), 36 root schemas, 147 JSON resources,
-700 schema references, 142 enum nodes and 11,327 constraint nodes. The schema
+702 schema references, 143 enum nodes and 11,346 constraint nodes. The schema
 family SHA-256 is
 `dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24`. The exact
 SHA-256 is in both generated receipts; do not edit the version label without
