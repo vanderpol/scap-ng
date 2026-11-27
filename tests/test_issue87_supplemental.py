@@ -1,6 +1,5 @@
 """Independent checks of the supplemental 0.4.1 fixture and oracle pairs."""
 import copy
-from pathlib import Path
 import sqlite3
 import unittest
 import xml.etree.ElementTree as ET
@@ -162,6 +161,27 @@ class SupplementalConformance(unittest.TestCase):
             field = state.find(f"{INDEPENDENT}result/{OVAL}field[@name='measurement']")
             matches = observed[0]["measurement"] == int(field.text)
             self.assertEqual("true" if matches else "false", row["outcome"])
+
+    def test_native_sql_uses_same_observed_row_for_both_comparisons(self):
+        assessment = load(CONFORMANCE / "cases/collector/sqlite-row.assessment.yaml")["assessment"]
+        expected = load(CONFORMANCE / "expected/sqlite-row.json")
+        db = sqlite3.connect(":memory:")
+        self.addCleanup(db.close)
+        db.row_factory = sqlite3.Row
+        db.executescript((CORPUS / "fixtures/sqlite.sql").read_text(encoding="utf-8"))
+        db.execute("PRAGMA query_only = ON")
+        outcomes = {}
+        for name, test in assessment["tests"].items():
+            obj = assessment["shared_objects"][test["object"]["object_ref"]]
+            rows = [dict(item) for item in db.execute(obj["sql"]["equals"])]
+            self.assertEqual(rows, [expected["observed_record"]])
+            comparisons = test["require"]["fields"]["result"]["record"]["fields"]
+            matches = all(rows[0][key] == predicate["equals"] for key, predicate in comparisons.items())
+            outcomes[name] = "true" if matches else "false"
+        self.assertEqual(outcomes, expected["test_outcomes"])
+        for expression in assessment["evaluate"]["and"]:
+            test = expression.get("not", expression)["test"]
+            self.assertEqual("not" in expression, outcomes[test] == "false")
 
 
 if __name__ == "__main__":

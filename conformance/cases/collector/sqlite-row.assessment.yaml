@@ -1,0 +1,53 @@
+assessment:
+  id: conformance-sqlite-row
+  version: 1
+  assessment_title: Compare typed SQLite query results
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  evaluate:
+    and:
+      - test: row-matches-test
+      - not: {test: row-mismatch-test}
+  shared_objects:
+    observation-object:
+      object_title: Observation with ID 1
+      capability: independent.sql
+      engine: {equals: sqlite}
+      version: {matches_regex: '^3\.'}
+      instance: {equals: scap-ng-issue87}
+      database: {equals: main}
+      sql: {equals: 'SELECT measurement, label FROM observations WHERE id = 1'}
+  tests:
+    row-matches-test:
+      test_title: Compare the measurement and label in the selected row
+      capability: independent.sql
+      object: {object_ref: observation-object}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          result:
+            record:
+              records_found: exactly_one
+              records_matching: every
+              fields:
+                measurement: {datatype: integer, equals: 7}
+                label: {datatype: string, equals: amber}
+      reported_elements: compared
+    row-mismatch-test:
+      test_title: Keep acquisition fixed and compare against the wrong measurement
+      capability: independent.sql
+      object: {object_ref: observation-object}
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          result:
+            record:
+              records_found: exactly_one
+              records_matching: every
+              fields:
+                measurement: {datatype: integer, equals: 3}
+                label: {datatype: string, equals: amber}
+      reported_elements: compared
