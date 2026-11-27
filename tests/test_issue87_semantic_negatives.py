@@ -1,9 +1,12 @@
 """Check semantic-invalid native fixtures and their single-change controls."""
 import copy
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from hashlib import sha256
 import unittest
 
 from conformance.tools.runner import CONFORMANCE, load, validator
+from conformance.tools.build_content_fixture import build
 
 
 class SemanticAuthoringCases(unittest.TestCase):
@@ -76,6 +79,22 @@ class SemanticAuthoringCases(unittest.TestCase):
         corrected["assessment"]["dependencies"][alias]["expected_version"] = target["version"]
         self.schema.validate(corrected)
         self.assertEqual(corrected["assessment"]["dependencies"][alias]["expected_version"], target["version"])
+
+
+    def test_dependency_version_has_exact_ri_resolution_receipt(self):
+        receipt = load(self.root / "ri-resolver-receipt.json")
+        premises = receipt["premise"]
+        authored = CONFORMANCE / premises["case"]
+        self.assertEqual(sha256(authored.read_bytes()).hexdigest(), premises["case_sha256"])
+        with TemporaryDirectory() as directory:
+            package = Path(directory) / "package"
+            build(package)
+            resolved = package / premises["target_member"]
+            proof = receipt["results"]
+            self.assertEqual(sha256(resolved.read_bytes()).hexdigest(),
+                             proof["matching_version_member_sha256"])
+            self.assertEqual(proof["version_mismatch"], "Assessment expected version mismatch")
+            self.assertEqual(proof["identity_mismatch"], "Assessment expected ID mismatch")
 
 
 class LogicalCardinalityCases(unittest.TestCase):

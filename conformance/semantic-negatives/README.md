@@ -8,3 +8,7 @@ The regression checks exercise a one-change control for each source defect.
 They keep local graph reasoning and scanner execution separate. The standalone
 RI evaluator reported the dangling reference and held the two other cases
 without a specific authoring diagnosis.
+
+The [direct package resolver receipt](ri-resolver-receipt.json) separately
+qualifies the dependency case. RI rejects the mismatched version or
+identity and returns the exact packaged member for the matching version.
