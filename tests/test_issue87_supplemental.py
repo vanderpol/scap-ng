@@ -303,8 +303,13 @@ class SupplementalConformance(unittest.TestCase):
         oracle = load(root / "expected.json")
         evidence = load(root / "evidence.json")["tests"]
         inventory = load(CONFORMANCE / "oval-source-coverage.json")["oval_6_0_esxi_tests"]
-        experimental = {row["capability"] for row in inventory.values() if row["status"] == "experimental"}
-        self.assertEqual({test["capability"] for test in tests.values()}, experimental)
+        experimental = {
+            row["capability"]: load(
+                CONFORMANCE.parent / row["mappings"][0]["path"],
+            )["native"]["object_selector_alternatives"]
+            for row in inventory.values() if row["status"] == "experimental"
+        }
+        self.assertEqual({test["capability"] for test in tests.values()}, experimental.keys())
         self.assertEqual(tests.keys(), oracle["tests"].keys())
         self.assertEqual(tests.keys(), evidence.keys())
         self.assertEqual(assessment["assessment"]["id"], oracle["assessment"])
@@ -319,6 +324,7 @@ class SupplementalConformance(unittest.TestCase):
                 observed = case["complete_observation"]
                 changed = observed | case["decisive_change"]
                 selector, = test["object"]
+                self.assertIn([selector], experimental[test["capability"]])
                 self.assertEqual(observed[selector], test["object"][selector]["equals"])
                 self.assertEqual(changed[selector], observed[selector])
                 predicates = test["require"]["fields"]
@@ -335,7 +341,10 @@ class SupplementalConformance(unittest.TestCase):
                     self.assertEqual(result, oracle["tests"][name][variant])
         invalid = copy.deepcopy(assessment)
         invalid["assessment"]["tests"]["vib-test"]["object"] = {"account_name": {"equals": "fixture-package"}}
-        self.assertFalse(schema.is_valid(invalid))
+        wrong = invalid["assessment"]["tests"]["vib-test"]
+        # The experimental schema is permissive here (canonical #133).
+        # The mapped selector alternatives still reject a cross-family field.
+        self.assertNotIn(list(wrong["object"]), experimental[wrong["capability"]])
 
     def test_native_sql_uses_same_observed_row_for_both_comparisons(self):
         assessment = load(CONFORMANCE / "cases/collector/sqlite-row.assessment.yaml")["assessment"]

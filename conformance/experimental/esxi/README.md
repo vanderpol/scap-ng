@@ -11,3 +11,8 @@ The local gate validates authoring and compares the specified known evidence.
 Live ESXi and cross-implementation results remain open. The sixteen
 proposal-only Test families and their source inventory remain in
 [the separate Issue #86 proposal](../../../proposed/issue86-esx-oval6/README.md).
+
+The local test checks selector identity against the exact mapping. A
+cross-capability selector can pass the experimental JSON Schema shape.
+[Canonical #133](https://github.com/vanderpol/scap-ng/issues/133) tracks the
+capability-specific admission gap.
