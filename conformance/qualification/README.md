@@ -7,7 +7,7 @@ with family SHA-256 `dc650646a24e727e68de242027cca3058683accc531f07bf6ace2176097
 | Metric | Baseline | With canonical supplement |
 | --- | ---: | ---: |
 | Active native capabilities with a structural capability Assessment | 101/101 | 101/101 |
-| Supported OVAL 5.12.3 Test families with source content | 97/99 | 99/99 |
+| Nondeprecated mapped OVAL 5.12.3 Test families with source content | 97/99 | 99/99 |
 | Native capabilities linked to a source Test | 99/101 | 101/101 |
 | Source Definitions | 167 | 188 |
 | Source Tests | 799 | 820 |
@@ -15,9 +15,12 @@ with family SHA-256 `dc650646a24e727e68de242027cca3058683accc531f07bf6ace2176097
 | Additional policy documents | 0 | 6 |
 | Additional invalid Assessment and manual Result documents | 0 | 2 |
 
-Two source Test families map to more than one native capability. The after
-counts include only the three canonical XML additions plus the pinned upstream
-corpus. [Coverage and qualification matrix](coverage.json) records the exact
+Two additional active native mappings retain deprecated OVAL Solaris source
+Tests, `package_test` and `package511_test`. Both are already present in
+Self-Assertion. Twelve nondeprecated OVAL Test declarations have no
+canonical 0.4.1 mapping and remain outside the active native denominator.
+The after counts combine the three canonical XML additions with the pinned
+upstream corpus. [Coverage and qualification matrix](coverage.json) records the exact
 consumer revisions, source pins and remaining gaps.
 
 ## Local regression commands
