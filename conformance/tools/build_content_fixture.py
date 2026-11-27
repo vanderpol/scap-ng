@@ -17,8 +17,8 @@ def json_bytes(document):
     return (json.dumps(document, indent=2, sort_keys=True) + "\n").encode()
 
 
-def build(output):
-    sources = load(CONFORMANCE / "content-package/sources.json")
+def build(output, sources_path=CONFORMANCE / "content-package/sources.json"):
+    sources = load(sources_path)
     if sources["schema_pin"] != load(CONFORMANCE / "manifest.json")["schema_commit"]:
         raise ValueError("content fixture sources use a different schema pin")
 

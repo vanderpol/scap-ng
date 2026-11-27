@@ -1032,6 +1032,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("native-semantic-negatives", "active", "semantic-negatives/expected.json"),
         ("logical-cardinality", "active", "logical-cardinality/expected.json"),
         ("content-package", "active", "content-package/sources.json"),
+        ("manual-lifecycle", "active", "manual-lifecycle/expected.json"),
         ("result-package", "draft-transport", "result-package/manifest.json"),
         ("oval-self-assertion", "oval-5.12.3", "oval-self-assertion/expected.json"),
         ("oval-merge", "oval-5.12.3", "variable-merge/expected.json"),

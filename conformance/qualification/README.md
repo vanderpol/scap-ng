@@ -28,8 +28,7 @@ consumer revisions, source pins and remaining gaps.
 From the canonical repository root with `requirements-dev.txt` installed:
 
 ```sh
-python conformance/tools/runner.py validate
-python -m unittest discover -s tests -p 'test_issue87*.py'
+bash conformance/check.sh
 python tools/audit_documentation_fidelity.py --check
 ```
 
@@ -169,3 +168,10 @@ datatypes. The current converter trace retains the original Variable
 declaration tokens. Choosing a native type requires typed collector
 evidence and may require an approved compatibility rule. The production
 parity holds remain in place.
+
+The [manual response lifecycle](../manual-lifecycle/README.md) adds a
+canonical Benchmark and Rule for the existing manual Assessment. All six
+choices appear in the RI workbook. Import admits four completed outcomes,
+preserves an answer across a revision with the same question and marks
+the answer stale when the procedure changes. Actual Benchmark policy and
+Result emission remain held on this VM.
