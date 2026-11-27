@@ -294,6 +294,49 @@ class SupplementalConformance(unittest.TestCase):
             matches = observed[0]["measurement"] == int(field.text)
             self.assertEqual("true" if matches else "false", row["outcome"])
 
+    def test_experimental_esxi_receipt_has_only_new_oval6_mappings(self):
+        root = CONFORMANCE / "experimental/esxi"
+        assessment = load(root / "host-evidence.assessment.yaml")
+        schema = schema_validator("assessment.schema.json")
+        schema.validate(assessment)
+        tests = assessment["assessment"]["tests"]
+        oracle = load(root / "expected.json")
+        evidence = load(root / "evidence.json")["tests"]
+        inventory = load(CONFORMANCE / "oval-source-coverage.json")["oval_6_0_esxi_tests"]
+        experimental = {row["capability"] for row in inventory.values() if row["status"] == "experimental"}
+        self.assertEqual({test["capability"] for test in tests.values()}, experimental)
+        self.assertEqual(tests.keys(), oracle["tests"].keys())
+        self.assertEqual(tests.keys(), evidence.keys())
+        self.assertEqual(assessment["assessment"]["id"], oracle["assessment"])
+        self.assertEqual(
+            {branch["test"] for branch in assessment["assessment"]["evaluate"]["and"]},
+            tests.keys(),
+        )
+
+        for name, test in tests.items():
+            with self.subTest(test=name):
+                case = evidence[name]
+                observed = case["complete_observation"]
+                changed = observed | case["decisive_change"]
+                selector, = test["object"]
+                self.assertEqual(observed[selector], test["object"][selector]["equals"])
+                self.assertEqual(changed[selector], observed[selector])
+                predicates = test["require"]["fields"]
+                for variant, values in (("complete", observed), ("changed", changed)):
+                    conditions = []
+                    for field, predicate in predicates.items():
+                        operand_type = {"boolean": bool, "integer": int, "string": str}[predicate["datatype"]]
+                        self.assertIs(type(values[field]), operand_type)
+                        if "equals" in predicate:
+                            conditions.append(values[field] == predicate["equals"])
+                        else:
+                            conditions.append(values[field] >= predicate["greater_than_or_equal"])
+                    result = "true" if all(conditions) else "false"
+                    self.assertEqual(result, oracle["tests"][name][variant])
+        invalid = copy.deepcopy(assessment)
+        invalid["assessment"]["tests"]["vib-test"]["object"] = {"account_name": {"equals": "fixture-package"}}
+        self.assertFalse(schema.is_valid(invalid))
+
     def test_native_sql_uses_same_observed_row_for_both_comparisons(self):
         assessment = load(CONFORMANCE / "cases/collector/sqlite-row.assessment.yaml")["assessment"]
         expected = load(CONFORMANCE / "expected/sqlite-row.json")

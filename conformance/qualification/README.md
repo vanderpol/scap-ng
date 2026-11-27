@@ -92,7 +92,8 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
   current source manifest live in the canonical repository.
 - Four OVAL 6.0 ESXi mappings are experimental. Sixteen additional XSD Test
   families remain proposal-only. Case qualification stays separate from
-  active 0.4.1 coverage. [Canonical #86](https://github.com/vanderpol/scap-ng/issues/86).
+  active 0.4.1 coverage. The [experimental fixture](../experimental/esxi/README.md)
+  covers four typed comparisons. [Canonical #86](https://github.com/vanderpol/scap-ng/issues/86).
 
 Full canonical discovery passed all 244 baseline tests. The standalone
 documentation-fidelity check failed on a stale CPE-era manifest and passed

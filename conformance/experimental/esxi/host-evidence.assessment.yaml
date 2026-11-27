@@ -1,0 +1,59 @@
+assessment:
+  id: conformance-experimental-esxi-host-evidence
+  version: 1
+  assessment_title: Experimental ESXi typed host evidence
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  evaluate:
+    and:
+      - test: account-test
+      - test: setting-test
+      - test: service-test
+      - test: vib-test
+  tests:
+    account-test:
+      test_title: Shell access is explicitly disabled
+      capability: esx.host_account
+      object:
+        account_name: {equals: fixture-account}
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          shell_access_enabled: {datatype: boolean, equals: false}
+      reported_elements: compared
+    setting-test:
+      test_title: The observed setting reaches the inclusive threshold
+      capability: esx.host_advancedsetting
+      object:
+        advanced_setting_name: {equals: Security.PasswordHistory}
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          advanced_setting_value: {datatype: integer, greater_than_or_equal: 5}
+      reported_elements: compared
+    service-test:
+      test_title: The service is enabled and running
+      capability: esx.host_service
+      object:
+        service_name: {equals: ntpd}
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          service_policy: {datatype: string, equals: 'on'}
+          service_running: {datatype: boolean, equals: true}
+      reported_elements: compared
+    vib-test:
+      test_title: The VIB acceptance category equals VMwareCertified
+      capability: esx.host_vib
+      object:
+        vib_name: {equals: fixture-package}
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          acceptance_level: {datatype: string, equals: VMwareCertified}
+      reported_elements: compared
