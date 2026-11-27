@@ -1,5 +1,6 @@
 """Independent checks of the supplemental 0.4.1 fixture and oracle pairs."""
 import copy
+from hashlib import sha256
 import sqlite3
 import unittest
 import xml.etree.ElementTree as ET
@@ -106,6 +107,44 @@ class SupplementalConformance(unittest.TestCase):
                 definition = document.find(f".//{OVAL}definition[@id='{expected['id_prefix']}:def:{number}']")
                 criterion = definition.find(f"{OVAL}criteria/{OVAL}criterion")
                 self.assertEqual(criterion.attrib["test_ref"], f"{expected['id_prefix']}:tst:{number}")
+
+    def test_qualification_receipts_match_the_pinned_source_and_coverage_counts(self):
+        qualification = CONFORMANCE / "qualification"
+        matrix = load(qualification / "coverage.json")
+        manifest = load(CONFORMANCE / "manifest.json")
+        for key in ("schema_commit", "schema_family_sha256"):
+            self.assertEqual(matrix["baseline"][key], manifest[key])
+
+        counts = matrix["coverage_counts"]
+        validation = load(qualification / "oval-supplement-validation.json")
+        conversion = load(qualification / "oval-supplement-conversion.json")
+        self.assertEqual(conversion["converter"]["flat_schema_family_sha256"], manifest["schema_family_sha256"])
+        declarations = {}
+        for path in sorted(CORPUS.glob("*/*.xml")):
+            raw = path.read_bytes()
+            entry = validation[path.relative_to(CONFORMANCE.parent).as_posix()]
+            self.assertEqual(entry["sha256"], sha256(raw).hexdigest())
+            self.assertEqual((entry["xsd"], entry["schematron"]), ("pass", "pass"))
+            self.assertGreater(entry["schematron_fired_rules"], 0)
+            _, tests = scan_xml(raw)
+            declarations.update({test_id: xml_type for xml_type, test_id in tests})
+        self.assertEqual(len(validation), counts["source_xml_files_added"])
+        self.assertEqual(
+            counts["source_tests_after_canonical_supplement"] - counts["source_tests_before"],
+            len(declarations),
+        )
+        self.assertEqual(
+            sorted(declarations),
+            sorted(row["source_test"] for row in conversion["definitions"]),
+        )
+        for row in conversion["definitions"]:
+            if row["structural"] == "schema-valid":
+                self.assertEqual(set(row["native_tests"].values()), {row["source_test"]})
+                self.assertEqual(row["exit_code"], 0)
+            else:
+                self.assertEqual(row["structural"], "rejected")
+                self.assertNotEqual(row["exit_code"], 0)
+                self.assertTrue(row["diagnostic"])
 
     def test_yaml_selected_records_and_controlled_file_boundaries(self):
         settings = load(CORPUS / "fixtures/yaml/settings.yaml")

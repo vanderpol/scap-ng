@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 from referencing import Registry, Resource
 try:
     from .semantic import validate as semantic_validate
@@ -279,8 +279,10 @@ def validate() -> int:
         invalid = CONFORMANCE / invalid_case["assessment"]
         try:
             v.validate(load(invalid))
-        except Exception:
+        except ValidationError:
             pass
+        except (ValueError, OSError, yaml.YAMLError) as exc:
+            errors.append(f"{invalid_case['id']}: could not load invalid-authoring witness: {exc}")
         else:
             errors.append(f"{invalid_case['id']} unexpectedly passed schema validation")
     supplemental = load(CONFORMANCE / manifest["supplemental_manifest"])

@@ -1,0 +1,105 @@
+{
+  "format": "scap-ng-conformance-qualification-1",
+  "issue": "https://github.com/vanderpol/scap-ng/issues/87",
+  "baseline": {
+    "canonical_main": "58918a32bfa241dcafb16eecfed5931dad076100",
+    "schema_commit": "cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876",
+    "schema_family_sha256": "dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24"
+  },
+  "inventories": {
+    "native_schema_locations": "../schema-coverage.json",
+    "canonical_fixture_audit": "../coverage-audit.json",
+    "oval_source_test_qnames": "../oval-source-coverage.json",
+    "supplemental_cases": "../supplemental-manifest.json"
+  },
+  "coverage_counts": {
+    "active_native_capability_baseline": 101,
+    "native_supported_capabilities_with_authored_vector_before": 101,
+    "native_supported_capabilities_with_authored_vector_after": 101,
+    "oval_mapped_capabilities_with_source_test_before": 99,
+    "oval_mapped_capabilities_with_source_test_after_canonical_supplement": 101,
+    "oval_test_families_with_source_test_before": 97,
+    "oval_test_families_with_source_test_after_canonical_supplement": 99,
+    "source_definitions_before": 167,
+    "source_definitions_after_canonical_supplement": 188,
+    "source_tests_before": 799,
+    "source_tests_after_canonical_supplement": 820,
+    "source_xml_files_added": 3,
+    "native_positive_assessment_documents_added": 5,
+    "native_invalid_assessment_documents_added": 1,
+    "native_result_documents_added": 1,
+    "new_platform_specific_yaml_leaf_tests": 18,
+    "new_sql_leaf_tests": 2
+  },
+  "qualification": {
+    "yaml_file_content": {
+      "scope": ["UNIX", "Windows"],
+      "structure": "18 source Definitions pass pinned XSD and embedded Schematron. Both native Assessments pass the canonical 0.4.1 structural gate.",
+      "semantics": "Independent fixture and expectation checks cover typed key identity, decisive mismatch, duplicates, inline and Variable input, missing file, depth and filters. YAMLPath parser, permission, empty and malformed evidence behavior await runtime coverage.",
+      "converter": "18 of 18 Definitions schema-admitted with exact source and native Test IDs. Behavioral equivalence remains unqualified.",
+      "ri_execution": "No collector receipt for either platform.",
+      "studio": "Both native Assessments passed the exact-pin Studio model open/save/reopen/undo smoke.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/305"]
+    },
+    "sql512": {
+      "scope": ["SQLite"],
+      "structure": "Three source Definitions pass the XSD and embedded Schematron. The native Assessment passes the 0.4.1 structural gate.",
+      "semantics": "SQLite produced the independent typed row results. Zero rows versus absent Items is an open collector question. Other engines are unqualified.",
+      "converter": "All three Definitions are explicitly rejected as unsupported at current Tools main.",
+      "ri_execution": "No RI collector receipt. SQLite runs the queries separately.",
+      "studio": "Pending exact-pin smoke for the SQLite Assessment.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-tools/issues/127", "https://github.com/vanderpol/scap-ng-ri/issues/196"]
+    },
+    "conditional_input_and_variables": {
+      "structure": "The nested ordered Assessment passes. A separate missing-else document is rejected and the exact repair restores validity.",
+      "semantics": "Independent tests verify provided-empty versus absent inputs, guard order, active branch outcomes and fallback. Branch collection suppression and indeterminate guard precedence still need canonical runner receipts.",
+      "converter": "Native authoring feature.",
+      "ri_execution": "The RI evaluate package passed its local unit suite. RI guard-status Benchmark unit tests were blocked by unknown_mount_not_authorized in the VM before branch evaluation.",
+      "studio": "Ordered conditional Assessment passed exact-pin model open/save/reopen/undo smoke.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "manual_assessment_and_result": {
+      "structure": "Manual Assessment and signed response Result pass. The validator admits all six declared technical outcomes.",
+      "semantics": "Independent authored response mapping covers six outcomes and the signed response binds the expected identity, version, evaluator, comment and evidence.",
+      "converter": "Native authoring witness. OCIL migration remains unqualified.",
+      "ri_execution": "Runner unit test passed for the existing completed true response. Pending and error completed responses, stale revision and unanswered handling still need a canonical replay receipt.",
+      "studio": "Manual Assessment passed the exact-pin model open/save/reopen/undo smoke. Manual Result and full UI lifecycle remain unqualified.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/10", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "policy_and_results": {
+      "structure": "Canonical existing disabled Profile/Tailoring, applicability, Organizational Input examples, Result schemas and new manual Result are inventoried. Coverage varies by schema occurrence.",
+      "semantics": "Existing scenarios exercise separate pieces of the contract. Combined policy resolution, source and package integrity, reporting, scoring, timing, stale provenance and per-occurrence Result fields need more portable vectors.",
+      "converter": "Existing integration receipts cover separate cases. No complete current crosswalk.",
+      "ri_execution": "Local Profile/Tailoring unit tests passed. No comprehensive canonical package or Result receipt.",
+      "studio": "Model-only Assessment smoke. Policy and Result authoring behavior is unqualified.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "oval_6_esxi": {
+      "structure": "Four experimental capability mappings have canonical schema-valid vectors. The 20 OVAL 6.0 Test QNames have checked XSD crosswalk entries. Sixteen of these are proposal-only.",
+      "semantics": "Two separate OVAL 6.0 proposal Assessments pass the proposal fixture validator. Real VMware acquisition, current DISA STIG requirements and authority remain unqualified.",
+      "converter": "Unqualified.",
+      "ri_execution": "No new ESXi runtime receipt.",
+      "studio": "Four experimental capabilities are absent from the active pack. Two baseline mixed-purpose docs contain experimental Tests and remain outside the active Studio claim.",
+      "gaps": ["https://github.com/vanderpol/scap-ng/issues/86", "https://github.com/vanderpol/scap-ng-ri/issues/202"]
+    },
+    "other_active_features": {
+      "structure": "See the per-source mapping, operator, cardinality, field, constraint and reachability inventories.",
+      "semantics": "The earlier synthetic fixtures include canned vectors and some non-exercising status cases. Full occurrence-level and feature-interaction review remains open.",
+      "converter": "Conversion receipts exist for selected production content. Cross-corpus status and semantic qualification remain open.",
+      "ri_execution": "The gate retains the 16 canonical collector-dependent rules with not_run dispositions. No new platform, scale or independent scanner claim.",
+      "studio": "132 of 134 baseline Assessment model-smoke documents used only active capabilities and passed the exact-pin check. Two documents with experimental Tests are excluded.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75", "https://github.com/vanderpol/scap-ng-evidence/issues/3"]
+    }
+  },
+  "scope_exclusions": {
+    "for_each": {"status": "deferred to 0.5.0 consideration", "issue": "https://github.com/vanderpol/scap-ng/issues/76"},
+    "deprecated_oval_5_12_3_esx": {"status": "excluded", "issue": "https://github.com/vanderpol/scap-ng/issues/86"}
+  },
+  "consumer_revisions": {
+    "tools": "8e33b955fd5304a72e75663fc5429cdf3701fb3e",
+    "ri": "f39ac725b820353e6f6b8fc71af673c08857d895",
+    "studio": "b5de2514e534cc21146e891fa114611951d1dc8f",
+    "studio_sample_data": "990a1bff999f4f82c603bca1de36353c1cb08f01",
+    "studio_main_schema_pin": "d1ab0283e09369c2c734d3b8f93b65007441cf07"
+  }
+}

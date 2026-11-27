@@ -34,7 +34,7 @@ python conformance/tools/runner.py validate
 python conformance/tools/runner.py coverage
 python conformance/tools/audit.py
 git diff --exit-code -- conformance/coverage-audit.json
-PYTHONPATH=tests python -m unittest test_issue87_conformance test_model_a_oracle -v
+PYTHONPATH=tests python -m unittest test_issue87_conformance test_issue87_supplemental test_model_a_oracle -v
 ```
 
 For the OVAL 5.12.3 inventory, check out the pinned OVAL commit
