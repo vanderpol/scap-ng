@@ -164,5 +164,27 @@ class SourceAccountingCases(unittest.TestCase):
             self.assertTrue(hold["schema_validated"] and hold["parity_diagnostic"])
 
 
+    def test_merge_receipt_matches_source_and_native_hashes(self):
+        root = CONFORMANCE / "variable-merge"
+        expected = load(root / "expected.json")
+        witness = load(root / "ri-receipt.json")
+        full = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        hold, = [row for row in full["holds"] if row["definition_id"] == expected["definition"]]
+        self.assertEqual(witness["source_sha256"], hold["source_sha256"])
+        self.assertEqual(witness["native_assessment_sha256"], hold["assessment_json_sha256"])
+        self.assertEqual(witness["source_sha256"], expected["source_sha256"])
+        self.assertEqual(witness["schema_commit"], full["schema_pin"])
+        self.assertEqual(witness["converter_revision"], full["tools_revision"])
+        self.assertEqual(witness["leaves"].keys(), expected["tests"].keys())
+        for name, row in expected["tests"].items():
+            raw = row["values"]
+            ordered = sorted(raw) if row["sort"] == "natural" else raw
+            independent = row["delimiter"].join(map(str, ordered))
+            self.assertEqual(independent, row["joined"])
+            self.assertIn(f'"{independent}"', witness["leaves"][name]["explanation"])
+            self.assertEqual(witness["leaves"][name]["outcome"], "true")
+        self.assertEqual(witness["reordered_integers"], expected["reordered_integers"]["outcomes"])
+
+
 if __name__ == "__main__":
     unittest.main()

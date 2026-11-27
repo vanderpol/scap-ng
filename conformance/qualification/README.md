@@ -136,3 +136,9 @@ The [canonical content package replay](../content-package/README.md) builds
 from the same YAML sources. RI accepted the exact package and rejected
 four separately controlled integrity, reference and signature-policy
 mutations. This evidence concerns content admission.
+
+The [pinned merge witness](../variable-merge/README.md) adds independent
+evidence for one of the five upstream parity holds. It checks exact
+XSD-derived options, source and native Variable identities, and all four
+RI Test leaves. Both order mutations produced the independently expected
+results. The general Tools parity check remains open.
