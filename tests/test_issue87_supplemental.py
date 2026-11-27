@@ -72,6 +72,66 @@ class SupplementalConformance(unittest.TestCase):
         self.assertEqual(evaluate_presence_tree(document["evaluate"], unchanged, []), {"test": "nested-test"})
         self.assertEqual(evaluate_presence_tree(document["evaluate"], decisive, []), {"test": "secondary-test"})
 
+    def test_organizational_and_publisher_routes_resolve_without_shared_cache_aliasing(self):
+        root = CONFORMANCE / "cases/policy/organizational-binding"
+        benchmark = load(root / "route.benchmark.yaml")["benchmark"]
+        tailoring = load(root / "route.tailoring.yaml")["tailoring"]
+        input_set = load(root / "route.organizational-input.yaml")["organizational_input"]
+        catalog = load(root / "catalog.applicability.yaml")["applicability"]
+        scope = load(root / "scope.assessment.yaml")["assessment"]
+        rules = {route + "-rule": load(root / f"{route}.rule.yaml")["rule"]
+                 for route in ("primary", "secondary")}
+        expected = load(CONFORMANCE / "expected/organizational-policy.json")
+        assessment = load(CONFORMANCE / "cases/supplemental/conditional-ordered.assessment.yaml")["assessment"]
+        identity = {"id": benchmark["id"], "version": benchmark["version"]["value"]}
+        self.assertEqual(identity, input_set["benchmark"])
+        self.assertEqual(identity, tailoring["benchmark"])
+        self.assertEqual(identity, expected["benchmark"])
+
+        condition = expected["applicability"]["condition"]
+        self.assertEqual(benchmark["applicability_catalog"], catalog["id"])
+        self.assertEqual(catalog["conditions"][condition]["assessment"], scope["id"])
+        self.assertEqual(scope["id"], expected["applicability"]["assessment"])
+        for context in [benchmark["platform"], benchmark["groups"][0], *rules.values()]:
+            self.assertEqual(context["applicability"], {"condition": condition})
+        scope_test = scope["tests"][scope["evaluate"]["test"]]
+        scope_value = scope["variables"][scope_test["variable"]]["expression"]["literal"]
+        scope_result = scope_value == scope_test["require"]["fields"]["value"]["equals"]
+        self.assertTrue(scope_result)
+
+        profiles = {profile["id"]: set(profile["disabled_rules"]) for profile in benchmark["profiles"]}
+        parameters = {parameter["id"]: parameter for parameter in benchmark["parameters"]}
+        for name, oracle in expected["variants"].items():
+            with self.subTest(variant=name):
+                disabled = profiles[oracle["profile"]].copy()
+                if "tailoring" in oracle:
+                    self.assertEqual(oracle["tailoring"], tailoring["id"])
+                    self.assertEqual(oracle["profile"], tailoring["profile"])
+                    disabled.difference_update(tailoring["enabled_rules"])
+                    disabled.update(tailoring["disabled_rules"])
+                self.assertEqual(sorted(disabled), oracle["disabled_rules"])
+                enabled = set(benchmark["rules"]) - disabled
+                self.assertEqual(sorted(enabled), oracle["enabled_rules"])
+                rule = rules[oracle["enabled_rules"][0]]
+                choice = rule["assessment_choices"][rule["default_assessment_choice"]]
+                self.assertEqual(choice["assessment"], oracle["assessment"])
+                self.assertEqual(choice["expected_version"], assessment["version"])
+                bindings = {}
+                for target, reference in choice["inputs"].items():
+                    parameter = parameters[reference["parameter"]]
+                    self.assertEqual(parameter["datatype"], assessment["inputs"][target]["datatype"])
+                    self.assertEqual(parameter["cardinality"], assessment["inputs"][target]["cardinality"])
+                    if parameter["resolution"] == "organization":
+                        bindings[target] = input_set["values"][parameter["id"]]
+                    else:
+                        bindings[target] = parameter["values"]
+                terminal = evaluate_presence_tree(assessment["evaluate"], bindings, [])
+                self.assertEqual(terminal, {"test": oracle["expected_test"]})
+                test = assessment["tests"][terminal["test"]]
+                actual = assessment["variables"][test["variable"]]["expression"]["literal"]
+                operand = test["require"]["fields"]["value"]["equals"]
+                self.assertEqual("true" if actual == operand else "false", oracle["assessment_outcome"])
+
     def test_manual_result_representation_and_independent_mappings(self):
         assessment = load(CONFORMANCE / "cases/supplemental/manual-response.assessment.yaml")["assessment"]
         result = load(CONFORMANCE / "cases/supplemental/manual-response.result.yaml")

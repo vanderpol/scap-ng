@@ -11,7 +11,8 @@ with family SHA-256 `dc650646a24e727e68de242027cca3058683accc531f07bf6ace2176097
 | Native capabilities linked to a source Test | 99/101 | 101/101 |
 | Source Definitions | 167 | 188 |
 | Source Tests | 799 | 820 |
-| Additional native Assessments | 0 | 5 |
+| Additional native Assessments | 0 | 6 |
+| Additional policy documents | 0 | 6 |
 | Additional invalid Assessment and manual Result documents | 0 | 2 |
 
 Two source Test families map to more than one native capability. The after
@@ -66,7 +67,7 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
   Canonical replay remains open under [RI #196](https://github.com/vanderpol/scap-ng-ri/issues/196).
 - Studio's current main passed 212 tests with its published metadata pack.
   A separately built candidate pack with the exact current schema exercised
-  canonical Assessment model open/save/reopen/undo. Four new Assessment
+  canonical Assessment model open/save/reopen/undo. Five new Assessment
   documents and 132 baseline active-only documents passed. Two additional
   baseline documents mix active and experimental Tests and were excluded
   from the active Studio qualification count. Graphical CRUD and extension

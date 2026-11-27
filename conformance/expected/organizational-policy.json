@@ -1,0 +1,44 @@
+{
+  "benchmark": {"id": "conformance-organization-benchmark", "version": "1"},
+  "applicability": {
+    "condition": "fixture-in-scope",
+    "assessment": "conformance-organization-scope",
+    "technical_outcome": "true",
+    "scopes": ["benchmark", "group", "rule"],
+    "reason": "The shared scope Assessment compares the literal selected to selected. All three policy levels reference this same condition."
+  },
+  "variants": {
+    "baseline": {
+      "profile": "baseline",
+      "enabled_rules": ["primary-rule"],
+      "disabled_rules": ["secondary-rule"],
+      "assessment": "conformance-conditional-ordered",
+      "expected_test": "primary-test",
+      "assessment_outcome": "true",
+      "reason": "The baseline disables the secondary Rule. The organization's explicit empty list is a provided primary Input and selects the primary branch."
+    },
+    "secondary-profile": {
+      "profile": "secondary-only",
+      "enabled_rules": ["secondary-rule"],
+      "disabled_rules": ["primary-rule"],
+      "assessment": "conformance-conditional-ordered",
+      "expected_test": "secondary-test",
+      "assessment_outcome": "false",
+      "reason": "The independent Profile disables only the primary Rule. The published secondary Parameter selects the shared Assessment's second route without a detail Input."
+    },
+    "tailoring-switch": {
+      "profile": "baseline",
+      "tailoring": "conformance-route-tailoring",
+      "enabled_rules": ["secondary-rule"],
+      "disabled_rules": ["primary-rule"],
+      "assessment": "conformance-conditional-ordered",
+      "expected_test": "secondary-test",
+      "assessment_outcome": "false",
+      "reason": "Tailoring re-enables the secondary Rule after the baseline Profile and disables the primary Rule. The publisher's value and the shared Assessment remain effective for the selected secondary Rule."
+    }
+  },
+  "review_boundaries": {
+    "wrong_benchmark_version": "A well-shaped Organizational Input Set bound to a different Benchmark version must be rejected by policy binding.",
+    "package_qualification": "Compiler-derived organizational_input_requirements, packaged provenance and scanner outcomes still require an RI receipt."
+  }
+}
