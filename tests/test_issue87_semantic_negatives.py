@@ -120,5 +120,30 @@ class LogicalCardinalityCases(unittest.TestCase):
                 self.assertEqual(str(odd and not exactly_one).lower(), expected[variant]["assessment_outcome"])
 
 
+class SourceAccountingCases(unittest.TestCase):
+    def test_production_and_parity_receipts_cover_the_independent_source_census(self):
+        receipt = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        source = load(CONFORMANCE / "oval-source-coverage.json")
+        manifest = load(CONFORMANCE / "manifest.json")
+        parity = receipt["independent_parity_audit"]
+        self.assertEqual(receipt["schema_pin"], manifest["schema_commit"])
+        self.assertEqual(parity["schema_family_sha256"], manifest["schema_family_sha256"])
+        self.assertEqual(parity["source_commit"], source["pins"]["self_assertion"])
+        self.assertTrue(receipt["source_accounted"])
+        self.assertFalse(receipt["runtime_equivalence_proved"])
+        for key in ("definitions", "tests"):
+            count = source["self_assertion_counts"][key]
+            self.assertEqual(receipt["original"][key], count)
+            self.assertEqual(receipt["production_conversion"][key], count)
+        self.assertEqual(parity["source_tests_without_disposition"], 0)
+        self.assertEqual(parity["source_definitions_without_disposition"], 0)
+        self.assertEqual(
+            parity["parity_checked_definitions"] + len(receipt["holds"]),
+            parity["converted_definitions"],
+        )
+        for hold in receipt["holds"]:
+            self.assertTrue(hold["schema_validated"] and hold["parity_diagnostic"])
+
+
 if __name__ == "__main__":
     unittest.main()

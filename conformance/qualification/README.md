@@ -110,3 +110,15 @@ failures do not reproduce as a set on this baseline.
 Issue #87 remains open. Continue with YAMLFileContent empty/malformed and
 permission/status oracles, shared dependency and policy/Result interactions,
 per-occurrence coverage and consumer replay receipts.
+
+## Upstream Self-Assertion replay
+
+The production converter replayed the complete pinned upstream census with
+the current schema. It emitted 167 schema-valid Definition Assessments and
+accounted for 799 Tests. The independent source parity checker ran its
+defined comparison checks successfully on 162 Definitions and retained
+five explicit holds for `merge`, `time_difference`, Input typing and two
+collected-field datatype resolutions. The companion
+[upstream receipt](upstream-converter-audit.json) preserves source and native
+hashes, exact identities, family counts and each diagnostic.
+[Tools #128](https://github.com/vanderpol/scap-ng-tools/issues/128).
