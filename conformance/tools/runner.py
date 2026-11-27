@@ -283,6 +283,23 @@ def validate() -> int:
             pass
         else:
             errors.append(f"{invalid_case['id']} unexpectedly passed schema validation")
+    supplemental = load(CONFORMANCE / manifest["supplemental_manifest"])
+    if supplemental["schema_commit"] != manifest["schema_commit"]:
+        errors.append("supplemental corpus schema pin differs from the canonical corpus")
+    for row in supplemental["cases"]:
+        try:
+            document = load(CONFORMANCE / row["source"])
+            value = next(iter(document.values()))
+            if value.get("id", value.get("execution_id")) != row["id"]:
+                errors.append(f"{row['id']}: document identity differs from the supplemental manifest")
+            actual = schema_validator(row["schema"]).is_valid(document)
+            if actual != row["valid"]:
+                errors.append(f"{row['id']}: expected schema validity {row['valid']}, got {actual}")
+            for key in ("fixture", "expected"):
+                if row.get(key) and not (CONFORMANCE / row[key]).is_file():
+                    errors.append(f"{row['id']}: missing {key}")
+        except (ValueError, KeyError, OSError, yaml.YAMLError) as exc:
+            errors.append(f"{row['id']}: {exc}")
     if errors:
         for error in errors:
             print("ERROR", error, file=sys.stderr)

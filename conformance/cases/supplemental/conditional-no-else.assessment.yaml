@@ -1,0 +1,24 @@
+assessment:
+  id: conformance-conditional-no-else
+  version: 1
+  assessment_title: A conditional with no fallback is invalid
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  evaluate:
+    if: {input_provided: example-input}
+    then: {test: example-test}
+  inputs:
+    example-input: {datatype: string, cardinality: zero_or_more, required: false}
+  tests:
+    example-test:
+      test_title: Compare a constant
+      capability: variable.value
+      variable: example-variable
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: example}}
+      reported_elements: compared
+  variables:
+    example-variable: {kind: constant, expression: {literal: example}}
