@@ -264,6 +264,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer", "begin", "end", "input", "values"])
         self.assertEqual(audit["variable_functions"]["witness_tests"], 14)
+        self.assertEqual(audit["variable_functions"]["ordered_population_tests"], 10)
         self.assertEqual(audit["variable_functions"]["expression_schema_branches"], ["arithmetic", "begin", "concat", "count", "end", "input", "literal", "merge", "regex_capture", "split", "substring", "time_difference", "to_integer", "unique", "values", "variable"])
         self.assertEqual(audit["variable_functions"]["uncovered_expression_branches"], [])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])

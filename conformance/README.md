@@ -100,11 +100,11 @@ Expected values are independently derived from fixture populations. This is a
 schema/oracle witness, not proof of collector-side Set/filter execution or status
 propagation.
 
-The canonical `core-variable-functions` Assessment covers ten functions —
-`unique`, `count`, `concat`, `merge`, `split`, `regex_capture`, `substring`,
-`time_difference`, `arithmetic`, and `to_integer` — over deterministic ordered values with
-local Variable dependencies. Expected values are independently derived and do
-not claim status propagation, resource-limit behavior, or runtime equivalence. The schema expression branches `begin`, `end`, `input`, and `values` remain explicitly uncovered.
+The canonical `core-variable-functions` Assessment covers all 14 Variable
+operations with deterministic inputs. Ten companion Tests verify multivalue
+populations in exact document order. The [RI replay](variable-function-replay/README.md)
+covers the direct Test leaves and projection controls with supplied Items.
+Host collection, whole-Assessment rollup and resource limits remain open.
 
 The canonical `core-input-guards` Assessment distinguishes supplied, absent,
 empty, over-cardinality, and out-of-range Input bindings behind an explicit

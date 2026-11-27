@@ -104,7 +104,10 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
 Full canonical discovery passed all 244 baseline tests. The standalone
 documentation-fidelity check failed on a stale CPE-era manifest and passed
 after regeneration from the existing generator. The reported six canonical
-failures do not reproduce as a set on this baseline.
+failures do not reproduce as a set on this baseline. The recent hosted
+failures occur at generated-documentation checks. Replaying all nine
+standalone checks locally passed after the fidelity refresh. The inspected
+hosted records contain no list matching the reported six unittest failures.
 
 Issue #87 remains open. Continue with YAMLFileContent empty/malformed and
 permission/status oracles, shared dependency and policy/Result interactions,
@@ -175,3 +178,12 @@ choices appear in the RI workbook. Import admits four completed outcomes,
 preserves an answer across a revision with the same question and marks
 the answer stale when the procedure changes. Actual Benchmark policy and
 Result emission remain held on this VM.
+
+The [native Variable function replay](../variable-function-replay/README.md)
+separates nine reproducible authoring contradictions from the earlier
+report of six unidentified failures. The baseline Tests used `value_match:
+every` against distinct expected operands. The corrected suite retains the
+independent expected values, adds exact sequence comparisons and passes
+all 24 direct RI function Tests plus 20 projection controls. A matching
+repair to the two alias interaction Tests preserves the intended false
+cardinality leaf and restores the expected two matching values.
