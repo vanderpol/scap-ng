@@ -1,0 +1,21 @@
+{
+  "format": "scap-ng-foreach-truth-tables/0.1",
+  "status": "owner-review-draft",
+  "schema_version": "0.4.1",
+  "symbols": {"true": "T", "false": "F", "unknown": "U", "error": "E", "not_evaluated": "N"},
+  "source_states": ["complete_empty", "complete_nonempty", "partial", "cancelled", "error", "not_applicable"],
+  "reducers": {
+    "every": {"empty": "unknown", "decisive_false": "false", "partial_without_false": "unknown", "cancelled_without_false": "not_evaluated"},
+    "one_or_more": {"empty": "false", "decisive_true": "true", "partial_without_true": "unknown", "cancelled_without_true": "not_evaluated"},
+    "exactly_one": {"empty": "false", "two_true": "false", "partial_without_two_true": "unknown", "cancelled_without_two_true": "not_evaluated"},
+    "none": {"empty": "true", "decisive_true": "false", "partial_without_true": "unknown", "cancelled_without_true": "not_evaluated"}
+  },
+  "status_precedence": ["false_if_reducer_decisive", "true_if_reducer_decisive", "error", "unknown", "not_evaluated"],
+  "invariants": [
+    "one_iteration_record_per_source_item",
+    "zero_dependent_items_are_explicit",
+    "incomplete_never_becomes_complete_empty",
+    "duplicate_source_items_are_not_deduplicated",
+    "suppressed_branches_do_not_collect"
+  ]
+}

@@ -52,7 +52,7 @@ def assessment_object(**overrides):
                     "test_title": "Check each selected path",
                     "capability": "unix.file",
                     "object": {
-                        "for_each": {"item": "user", "in": "users-object"},
+                        "for_each": {"item": "user", "in": "users-object", "reduce": "every"},
                         "filepath": {"from": "user.full_path"},
                     },
                     "require": {
@@ -95,6 +95,7 @@ class ForEachSchemaTests(unittest.TestCase):
         document["assessment"]["shared_objects"]["users-object"]["for_each"] = {
             "item": "parent",
             "in": "root-object",
+            "reduce": "every",
         }
         self.assert_valid(document)
 
@@ -109,6 +110,47 @@ class ForEachSchemaTests(unittest.TestCase):
         document = assessment_object()
         document["assessment"]["tests"]["home-test"]["object"]["for_each"]["in"] = "users"
         self.assertTrue(list(self.validator.iter_errors(document)))
+
+    def test_reduction_is_explicit(self):
+        document = assessment_object()
+        del document["assessment"]["tests"]["home-test"]["object"]["for_each"]["reduce"]
+        self.assertTrue(list(self.validator.iter_errors(document)))
+
+    def test_every_capability_selector_scope_is_audited(self):
+        mappings = sorted((ROOT / "schema" / "capability-mappings" / "supported").glob("*.json"))
+        generated = load(ROOT / "schema" / "native-selector.schema.json")["$defs"]
+        contracts = load(ROOT / "schema" / "native-selector-contracts.json")["resolved"]
+        self.assertGreaterEqual(len(mappings), 100)
+        for path in mappings:
+            mapping = load(path)
+            capability = mapping["capability"]
+            selectors = mapping.get("native", {}).get("selector_map", {})
+            definition_name = capability.replace(".", "_") + "_object"
+            with self.subTest(capability=capability):
+                reviewed = capability in contracts
+                if reviewed:
+                    # Only reviewed selector contracts get a closed generated
+                    # overlay.  Unreviewed selector mappings remain a deliberate
+                    # runtime/source-conformance hold, not an invented schema.
+                    self.assertIn(definition_name, generated)
+                    properties = generated[definition_name]["oneOf"][1]["properties"]
+                    self.assertIn("for_each", properties)
+                    for selector in selectors:
+                        node = properties[selector]
+                        options = node.get("oneOf", [node])
+                        binding = [option for option in options
+                                   if option.get("$ref", "").endswith("/$defs/foreach_selector_binding")]
+                        self.assertEqual(len(binding), 1, selector)
+                    for parameter in mapping.get("native", {}).get("collection_parameters", {}):
+                        node = properties.get(parameter, {})
+                        self.assertNotIn("foreach_selector_binding", json.dumps(node))
+                else:
+                    # Unreviewed selector mappings, parameter-only, and fixed-result capabilities cannot use a
+                    # selector binding.  They must not acquire a generated
+                    # overlay that could make for_each an untyped command
+                    # repeater.  Their explicit disposition is recorded by this
+                    # all-mapping audit rather than silently omitted.
+                    self.assertNotIn(definition_name, generated)
 
 
 if __name__ == "__main__":

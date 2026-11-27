@@ -65,7 +65,10 @@ def object_schema(capability, selectors, mapping):
     props = {
         'capability': {'type': 'string', 'minLength': 1},
         'filters': {'type': 'array', 'minItems': 1, 'items': {'$ref': 'capability-common.schema.json#/$defs/state_filter'}},
-        'for_each': {'$ref': 'capability-common.schema.json#/$defs/foreach_binding'},
+        # for_each is meaningful only when at least one capability selector can
+        # be bound from the source Item. Parameter-only capabilities must fail
+        # closed rather than treating a loop as an untyped command repeater.
+        **({'for_each': {'$ref': 'capability-common.schema.json#/$defs/foreach_binding'}} if selectors else {}),
         # Set expressions are Object-level acquisition composition. Keep them
         # in every generated capability overlay so capability-specific
         # additionalProperties checks do not reject the OVAL 5.12.3 Set form.

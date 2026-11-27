@@ -4,7 +4,7 @@
 
 Pin: `d707aad6a916bb4e2e61767d836c681fc9d0084b`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
 
-Discovered **36 schema documents** among 147 JSON inputs. Audited 8254 schema nodes, including 2067 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
+Discovered **36 schema documents** among 147 JSON inputs. Audited 8255 schema nodes, including 2068 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
 
 Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.
 
@@ -18,14 +18,14 @@ Found **1561 deduplicated findings** at 1559 canonical proposal locations. Prese
 | --- | ---: |
 | inherited | 54 |
 | missing | 1582 |
-| own | 431 |
+| own | 432 |
 
 ### Useful-quality review state
 
 | Value | Count |
 | --- | ---: |
 | missing | 1582 |
-| present_not_semantically_reviewed | 485 |
+| present_not_semantically_reviewed | 486 |
 
 ### Review decision kind
 

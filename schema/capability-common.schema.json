@@ -681,7 +681,8 @@
       "type": "object",
       "required": [
         "item",
-        "in"
+        "in",
+        "reduce"
       ],
       "properties": {
         "item": {
@@ -692,10 +693,15 @@
         "in": {
           "$ref": "#/$defs/object_reference",
           "description": "Named shared Object that supplies the source Items. The reference must resolve in the enclosing Assessment; source Objects are not inline values."
+        },
+        "reduce": {
+          "$ref": "assessment-language.schema.json#/$defs/cardinality",
+          "title": "Iteration reduction",
+          "description": "Reduce per-source-Item Require outcomes. every requires every iteration, one_or_more requires at least one, exactly_one requires exactly one, and none requires no iteration to pass. A complete empty source is not silently treated as PASS for every."
         }
       },
       "additionalProperties": false,
-      "description": "A bounded collection expansion over one named shared Object. The dependent Object runs once per source Item, preserving one-to-one lexical correlation; multiple source Objects are never implicitly combined. Source status, completeness, duplicate identity and budgets are evaluated by the compiler/runtime."
+      "description": "A bounded collection expansion over one named shared Object. The dependent Object runs once per source Item, preserving one-to-one lexical correlation; `reduce` explicitly combines per-Item Require outcomes. Multiple source Objects are never implicitly combined. Source status, completeness, duplicate identity and budgets are evaluated by the compiler/runtime."
     },
     "foreach_selector_binding": {
       "type": "object",

@@ -16,9 +16,9 @@ Selection forms: `filepath` **or** `path` + `filename`. The schema does not enfo
 
 | Field | Type | Occurrences | Description |
 | --- | --- | --- | --- |
-| `filepath` | string selector | 0..1 | Full path of the selected entry. |
-| `path` | string selector | 0..1 | Directory containing the selected entry. |
-| `filename` | string selector or null | 0..1 | Entry name within the selected directory; null selects the directory itself. |
+| `filepath` | string selector or object | 0..1 | Full path of the selected entry. |
+| `path` | string selector or object | 0..1 | Directory containing the selected entry. |
+| `filename` | string selector or object or null | 0..1 | Entry name within the selected directory; null selects the directory itself. |
 | `filesystem` | string | 0..1 | Filesystem scope: all, local, or the starting filesystem (same). `all`, `local`, `same`. Editor suggestion: `local`. |
 | `traversal` | object | 0..1 | Controls recursive searching through directories and symbolic links. |
 

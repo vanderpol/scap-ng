@@ -21,7 +21,7 @@ EXAMPLES = {
     'windows-optional-organizational-input.assessment.yaml':
         '87a43b33c38e96edfc03d7926c53c2a94820d761d8c7db9c9e956a358c49e96a',
     'foreach-correlated-files.assessment.yaml':
-        'c26cbbecf954522b0f755ca214f0cdc8b9c5bb47a7e87db64512effbea93e060',
+        '3c60868ae225b1ecbadbefdfa8d3ead4bdf183f8d13630060d2f83f08ea08a91',
 }
 
 
