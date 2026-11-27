@@ -131,3 +131,8 @@ checks distinguish byte integrity and same-target execution identity from
 schema admission. Studio's exact-pin metadata pack admitted all six
 documents. Existing RI Result assembly tests passed independently of the
 fixture. Scanner generation and package verification remain unqualified.
+
+The [canonical content package replay](../content-package/README.md) builds
+from the same YAML sources. RI accepted the exact package and rejected
+four separately controlled integrity, reference and signature-policy
+mutations. This evidence concerns content admission.
