@@ -11,7 +11,7 @@ from check_semantic_conformance import check
 class SemanticConformance(unittest.TestCase):
     def test_frozen_syntax_and_positive_negative_population_cases(self):
         result = check()
-        self.assertEqual(result['schema_validated'], 15)
+        self.assertEqual(result['schema_validated'], 16)
         self.assertEqual(result['actually_executed'], 0, 'syntax check must not claim evaluation')
         manifest = json.loads((ROOT / 'conformance/0.4/model-a/manifest.json').read_text())
         self.assertEqual({c['expected']['technical_outcome'] for c in manifest['cases']}, {'true', 'false'})
