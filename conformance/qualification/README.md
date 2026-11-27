@@ -23,6 +23,32 @@ The after counts combine the three canonical XML additions with the pinned
 upstream corpus. [Coverage and qualification matrix](coverage.json) records the exact
 consumer revisions, source pins and remaining gaps.
 
+## Exact schema value occurrences
+
+The [enum and const occurrence audit](schema-value-occurrences.json) records
+each value at its canonical JSON Pointer, its public entry-point reachability,
+and the first matching published corpus document in each qualification scope.
+It instruments the same JSON Schema dialect and checks every selected
+document against the ordinary validator. Active, experimental and draft
+transport witnesses appear in separate columns in the receipt.
+
+The audit observes individual enum and const comparisons during validation.
+An observed value may belong to an alternative that fails another
+constraint. These counts provide a structural starting point for authoring
+coverage. Semantic, converter and scanner receipts retain their own counts.
+
+| Measure | Published documents before adding the manual Result variants | With all six manual Results |
+| --- | ---: | ---: |
+| Reachable enum and const occurrences | 345 | 345 |
+| Values at reachable occurrences | 850 | 850 |
+| Reachable values matched by active documents | 136 | 143 |
+| Reachable values matched by experimental documents | 60 | 60 |
+| Reachable values matched by draft transport documents | 27 | 27 |
+| Reachable values without a match in any scope | 685 | 678 |
+
+Matches can overlap across scopes. The local gate regenerates the audit in
+check mode and rejects stale receipts.
+
 ## Local regression commands
 
 From the canonical repository root with `requirements-dev.txt` installed:

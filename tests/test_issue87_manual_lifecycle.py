@@ -25,17 +25,28 @@ class ManualLifecycleCases(unittest.TestCase):
             with self.subTest(case=name):
                 authored = choices[row["answer"]]
                 self.assertEqual(authored["outcome"], row["outcome"])
-                candidate = deepcopy(positive)
-                body = candidate["manual_assessment_result"]
-                body.update(execution_id=f'conformance-manual-{name}', answer=row["answer"],
-                            answer_label=authored["label"], outcome=row["outcome"], comment=row["reason"])
+                candidate = load(CONFORMANCE / expected["standalone_results"][name])
                 schema.validate(candidate)
+                body = candidate["manual_assessment_result"]
+                self.assertEqual(body["answer"], row["answer"])
+                self.assertEqual(body["answer_label"], authored["label"])
+                self.assertEqual(body["outcome"], row["outcome"])
                 self.assertEqual(body["assessment"], {"id": assessment["id"], "version": assessment["version"]})
                 self.assertTrue(body["evidence_refs"])
 
+        self.assertEqual(set(expected["standalone_results"]), set(outcomes))
         invalid = deepcopy(positive)
         invalid["manual_assessment_result"]["outcome"] = "disabled"
         self.assertFalse(schema.is_valid(invalid))
+
+    def test_studio_exact_pack_admitted_all_published_manual_results(self):
+        expected = load(FIXTURE / "expected.json")
+        receipt = load(FIXTURE / "studio-receipt.json")
+        self.assertEqual(receipt["schema_pin"], load(FIXTURE / "sources.json")["schema_pin"])
+        observed = receipt["model_schema_admitted"]
+        self.assertEqual(set(observed), set(expected["standalone_results"].values()))
+        for path, wanted in observed.items():
+            self.assertEqual(sha256((CONFORMANCE / path).read_bytes()).hexdigest(), wanted)
 
     def test_workbook_receipt_distinguishes_explicit_answers_and_stale_revisions(self):
         expected = load(FIXTURE / "expected.json")
