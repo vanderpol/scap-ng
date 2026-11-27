@@ -356,7 +356,7 @@ class SupplementalConformance(unittest.TestCase):
         db.execute("PRAGMA query_only = ON")
         outcomes = {}
         for name, test in assessment["tests"].items():
-            obj = assessment["shared_objects"][test["object"]["object_ref"]]
+            obj = assessment["shared_objects"][test["object"]]
             rows = [dict(item) for item in db.execute(obj["sql"]["equals"])]
             self.assertEqual(rows, [expected["observed_record"]])
             comparisons = test["require"]["fields"]["result"]["record"]["fields"]
