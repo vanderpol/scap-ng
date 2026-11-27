@@ -1,0 +1,87 @@
+{
+  "format": "scap-ng-conformance-expected-0.1",
+  "schema_version": "0.4.1",
+  "case_id": "core-foreach-semantic-vectors",
+  "oracle": "independent-reduction-v1",
+  "vectors": {
+    "empty-source-every": {
+      "source": "complete_empty",
+      "reduce": "every",
+      "iterations": [],
+      "outcome": "unknown",
+      "reason": "every does not silently turn a complete empty source into PASS"
+    },
+    "empty-source-none": {
+      "source": "complete_empty",
+      "reduce": "none",
+      "iterations": [],
+      "outcome": "true",
+      "reason": "no iteration passes in an explicitly complete empty source"
+    },
+    "missing-dependent-cannot-disappear": {
+      "source": "complete_nonempty",
+      "reduce": "every",
+      "iterations": ["false", "true"],
+      "outcome": "false",
+      "reason": "the zero-dependent-match iteration is retained and fails one_or_more"
+    },
+    "duplicate-source-identity": {
+      "source": "complete_nonempty_duplicate_identity",
+      "reduce": "every",
+      "iterations": ["true", "false"],
+      "outcome": "false",
+      "reason": "duplicate source Items remain distinct iterations"
+    },
+    "incomplete-source-all-observed-pass": {
+      "source": "partial",
+      "reduce": "every",
+      "iterations": ["true"],
+      "outcome": "unknown",
+      "reason": "unseen source Items prevent a complete every claim"
+    },
+    "unknown-iteration": {
+      "source": "complete_nonempty",
+      "reduce": "every",
+      "iterations": ["true", "unknown"],
+      "outcome": "unknown",
+      "reason": "unknown dependent evidence is not an empty population"
+    },
+    "error-iteration": {
+      "source": "complete_nonempty",
+      "reduce": "every",
+      "iterations": ["true", "error"],
+      "outcome": "error",
+      "reason": "collector error remains visible in the reduction"
+    },
+    "cancelled-without-decisive-result": {
+      "source": "cancelled",
+      "reduce": "every",
+      "iterations": ["true"],
+      "outcome": "not_evaluated",
+      "reason": "cancellation prevents a complete reduction"
+    },
+    "cancelled-after-decisive-false": {
+      "source": "cancelled",
+      "reduce": "every",
+      "iterations": ["false"],
+      "outcome": "false",
+      "reason": "an observed failed iteration remains decisive despite cancellation"
+    },
+    "conditional-branch-suppression": {
+      "source": "input_absent",
+      "reduce": "every",
+      "iterations": [],
+      "outcome": "not_evaluated",
+      "reason": "the branch was suppressed before source collection"
+    }
+  },
+  "binding_vectors": [
+    {"name": "current-alias-scalar", "binding": "source.full_path", "expected": "valid"},
+    {"name": "inherited-alias-scalar", "binding": "parent.home_dir", "expected": "valid_if_chained"},
+    {"name": "unknown-alias", "binding": "missing.full_path", "expected": "reject"},
+    {"name": "unknown-field", "binding": "source.password_hash", "expected": "reject"},
+    {"name": "sibling-alias", "binding": "sibling.full_path", "expected": "reject"},
+    {"name": "multi-valued-field", "binding": "source.paths", "expected": "reject_without_list_selector"},
+    {"name": "unreviewed-capability", "binding": "source.full_path", "expected": "reject_before_collection"}
+  ]
+}

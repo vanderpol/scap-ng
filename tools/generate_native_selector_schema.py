@@ -60,10 +60,15 @@ def object_schema(capability, selectors, mapping):
     selector_props = {}
     for field in selectors:
         ref = {'$ref': f'#/$defs/{prefix}_{field}_selector'}
-        selector_props[field] = {'oneOf': [ref, {'type': 'null'}]} if field in nullable else ref
+        selector_options = [ref, {'$ref': 'capability-common.schema.json#/$defs/foreach_selector_binding'}]
+        selector_props[field] = {'oneOf': [*selector_options, {'type': 'null'}]} if field in nullable else {'oneOf': selector_options}
     props = {
         'capability': {'type': 'string', 'minLength': 1},
         'filters': {'type': 'array', 'minItems': 1, 'items': {'$ref': 'capability-common.schema.json#/$defs/state_filter'}},
+        # for_each is meaningful only when at least one capability selector can
+        # be bound from the source Item. Parameter-only capabilities must fail
+        # closed rather than treating a loop as an untyped command repeater.
+        **({'for_each': {'$ref': 'capability-common.schema.json#/$defs/foreach_binding'}} if selectors else {}),
         # Set expressions are Object-level acquisition composition. Keep them
         # in every generated capability overlay so capability-specific
         # additionalProperties checks do not reject the OVAL 5.12.3 Set form.

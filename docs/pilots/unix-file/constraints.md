@@ -8,8 +8,8 @@ Object reference versus inline Object is a separate `oneOf` from selector pairin
 
 | Field | Source / technical details |
 | --- | --- |
-| `filepath` | `required`: `[]` |
-| `path` | `required`: `[]` |
+| `filepath` | [Selector grammar](../../../schema/native-selector.schema.json#/$defs/unix_file_filepath_selector) |
+| `path` | [Selector grammar](../../../schema/native-selector.schema.json#/$defs/unix_file_path_selector) |
 | `filename` | [Selector grammar](../../../schema/native-selector.schema.json#/$defs/unix_file_filename_selector) |
 | `filesystem` | `enum`: `["all", "local", "same"]`; `default`: `"local"` |
 | `traversal` | `required`: `["max_depth", "recurse"]` |

@@ -1,0 +1,77 @@
+assessment:
+  id: conformance-core-foreach-semantics
+  version: 1
+  assessment_title: SCAP-NG 0.4.1 correlated Object expansion semantics
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  inputs:
+    optional-policy-input:
+      datatype: string
+      cardinality: exactly_one
+      required: false
+      description: Optional input used only to prove conditional branch suppression.
+  shared_objects:
+    source-files-object:
+      object_title: Source file Items
+      capability: unix.file
+      filepath:
+        equals: /etc/passwd
+  tests:
+    correlated-dependent-test:
+      test_title: Expand a dependent file Object once per source Item
+      capability: unix.file
+      reported_elements: all
+      object:
+        for_each:
+          item: source
+          in: source-files-object
+          reduce: every
+        filepath:
+          from: source.full_path
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          full_path:
+            equals: /etc/passwd
+    unknown-condition-test:
+      test_title: Deliberately unknown condition witness
+      capability: independent.unknown
+      require:
+        item_requirement:
+          items_found: one_or_more
+    suppressed-branch-test:
+      test_title: Branch that must not be collected when input is absent
+      capability: unix.file
+      reported_elements: all
+      object:
+        for_each:
+          item: source
+          in: source-files-object
+          reduce: every
+        filepath:
+          from: source.full_path
+      require:
+        item_requirement:
+          items_found: one_or_more
+  evaluate:
+    if:
+      input_provided: optional-policy-input
+    then:
+      test: correlated-dependent-test
+    else_if:
+      - if:
+          test: unknown-condition-test
+        then:
+          test: suppressed-branch-test
+    else:
+      not_evaluated:
+        reason: Optional policy input was not provided; correlated collection branch is suppressed.
+        follow_up: Supply the optional policy input before evaluating the dependent branch.

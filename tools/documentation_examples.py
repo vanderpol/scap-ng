@@ -107,6 +107,9 @@ class Examples:
                 ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
                  'dc650646a24e727e68de242027cca3058683accc531f07bf6ace217609755b24'):
                     '0.4.1 declarative Benchmark CPE identity metadata and Result passthrough',
+                ('ef009d2b6fb4596476b0dbbd219285409a875988da16ef2cb6acb49d14dbd260',
+                 'b7789d9e84d1b8064d115c6e60671b3bf1d373410c126200d117461f45b1b2ad'):
+                    '0.4.1 for_each review candidate (PR #130); runtime support remains unqualified',
             }
             if (historical_digest, active_digest) not in reviewed_amendments:
                 raise ValueError('Example schema family differs from immutable pin')
