@@ -91,8 +91,12 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
   host qualification remain open under [Studio #75](https://github.com/vanderpol/scap-ng-vscode/issues/75).
 - The Studio sample repository contains overlapping ordered conditional and
   manual authoring examples pinned to an earlier 0.4.1 commit. These samples
-  are useful for comparison. The normative fixtures, independent oracle and
-  current source manifest live in the canonical repository.
+  are useful for comparison. The [sample audit](studio-sample-audit.json)
+  checks 18 pinned documents against the current schema. All nine positive
+  Assessments and four policy documents were admitted, and three syntax
+  negatives were rejected. The two semantic negatives were schema-valid and
+  remain unqualified by the limited canonical semantic gate. The normative
+  fixtures, independent oracle and current source manifest live here.
 - Four OVAL 6.0 ESXi mappings are experimental. Sixteen additional XSD Test
   families remain proposal-only. Case qualification stays separate from
   active 0.4.1 coverage. The [experimental fixture](../experimental/esxi/README.md)
