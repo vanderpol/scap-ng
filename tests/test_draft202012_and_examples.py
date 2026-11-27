@@ -20,6 +20,8 @@ EXAMPLES = {
         '9522416a793f1db62e1530ccfbcdd5cc14ddc0e35e5788c215443423e398ac6d',
     'windows-optional-organizational-input.assessment.yaml':
         '87a43b33c38e96edfc03d7926c53c2a94820d761d8c7db9c9e956a358c49e96a',
+    'foreach-correlated-files.assessment.yaml':
+        'c26cbbecf954522b0f755ca214f0cdc8b9c5bb47a7e87db64512effbea93e060',
 }
 
 
@@ -82,6 +84,9 @@ class Draft202012AndExamples(unittest.TestCase):
                 self.assertEqual(sha256(raw).hexdigest(), expected_hash)
                 self.assertIn(b'item_requirement: {', raw)
                 self.assertIn(b'field_requirement: {', raw)
+                if name == 'foreach-correlated-files.assessment.yaml':
+                    self.assertIn(b'for_each:', raw)
+                    self.assertIn(b'from: source.full_path', raw)
                 if name == 'windows-server-2025-lock-screen.assessment.yaml':
                     self.assertIn(b'fields: {type: {equals: dword}, value: {equals: 1}}', raw)
                 if name == 'linux-home-nosuid.assessment.yaml':

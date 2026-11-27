@@ -98,17 +98,15 @@ Filesystem scope is independent of recursion. Link/target metadata, cycle handli
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/foreach_binding](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_binding) | {"type": "object", "required": ["item", "in"], "additionalProperties": false} | withheld |
+| [/$defs/foreach_binding](../../../schema/capability-common.schema.json#/$defs/foreach_binding) | {"type": "object", "required": ["item", "in"], "additionalProperties": false} | active-0.4.1 |
 
-[/$defs/foreach_binding](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_binding): Native 0.4 collection-expansion foreach binding. The source is one named shared/referenceable Object. Chaining is permitted: a source Object may itself use for_each, creating correlated lexical lineage. Independent multi-source Cartesian expansion is not implicit.
-
-No author-facing description is approved or offered. Neither foreach helper is reachable from accepted Assessment authoring; resolve placement/activation with Jack before advertising support or providing an authored for_each example.
+[/$defs/foreach_binding](../../../schema/capability-common.schema.json#/$defs/foreach_binding): A bounded expansion over one named shared Object. The dependent Object runs once per source Item with correlated lexical lineage; multiple source Objects are never implicitly combined. Chaining is admitted only with bounded, correlated evaluation. See [the active for_each contract](../../contracts/0.4.1-foreach.md).
 
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
-| [/$defs/foreach_binding/properties/item](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_binding/properties/item) | {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"} | existing-native |
-| [/$defs/foreach_selector_binding](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_selector_binding) | {"type": "object", "required": ["from"], "additionalProperties": false} | existing-native |
-| [/$defs/foreach_selector_binding/properties/from](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/foreach_selector_binding/properties/from) | {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]*\\.[A-Za-z_][A-Za-z0-9_-]*$"} | existing-native |
+| [/$defs/foreach_binding/properties/item](../../../schema/capability-common.schema.json#/$defs/foreach_binding/properties/item) | {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"} | existing-native |
+| [/$defs/foreach_selector_binding](../../../schema/capability-common.schema.json#/$defs/foreach_selector_binding) | {"type": "object", "required": ["from"], "additionalProperties": false} | existing-native |
+| [/$defs/foreach_selector_binding/properties/from](../../../schema/capability-common.schema.json#/$defs/foreach_selector_binding/properties/from) | {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_-]*\\.[A-Za-z_][A-Za-z0-9_-]*$"} | existing-native |
 | [/$defs/object_reference](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/object_reference) | {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*-object$"} | editorially-approved |
 
 [/$defs/object_reference](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/object_reference): Reuses a named Object for collection.
@@ -118,8 +116,9 @@ Editorial receipt: editorial-batch.json case 03
 | Pointer | Local constraints | Documentation status |
 | --- | --- | --- |
 | [/$defs/inline_object](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object) | {"type": "object", "required": [], "additionalProperties": true} | existing-native |
-| [/$defs/inline_object/properties/capability](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object/properties/capability) | {"type": "string", "minLength": 1} | existing-native |
-| [/$defs/inline_object/properties/filters](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object/properties/filters) | {"type": "array", "minItems": 1} | existing-native |
+| [/$defs/inline_object/properties/capability](../../../schema/capability-common.schema.json#/$defs/inline_object/properties/capability) | {"type": "string", "minLength": 1} | existing-native |
+| [/$defs/inline_object/properties/filters](../../../schema/capability-common.schema.json#/$defs/inline_object/properties/filters) | {"type": "array", "minItems": 1} | existing-native |
+| [/$defs/inline_object/properties/for_each](../../../schema/capability-common.schema.json#/$defs/inline_object/properties/for_each) | {"$ref": "#/$defs/foreach_binding"} | active-0.4.1 |
 | [/$defs/inline_object/not/anyOf/0](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object/not/anyOf/0) | {"required": ["result"]} | existing-native |
 | [/$defs/inline_object/not/anyOf/1](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object/not/anyOf/1) | {"required": ["collect"]} | existing-native |
 | [/$defs/inline_object/allOf/0/not](../../../proposed-schema/documentation/capability-common.schema.json#/$defs/inline_object/allOf/0/not) | {"required": ["set", "filters"]} | existing-native |

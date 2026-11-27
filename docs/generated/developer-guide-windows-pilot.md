@@ -249,7 +249,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `filepath` OR `path` + `filename`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filesystem`](../../schema/capability-common.schema.json#/$defs/filesystem_scope), [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/windows_file_traversal). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filesystem`](../../schema/capability-common.schema.json#/$defs/filesystem_scope), [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/windows_file_traversal). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -310,7 +310,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `filepath` + `trustee_sid` OR `path` + `filename` + `trustee_sid`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filesystem`](../../schema/capability-common.schema.json#/$defs/filesystem_scope), [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/windows_file_traversal). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filesystem`](../../schema/capability-common.schema.json#/$defs/filesystem_scope), [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/windows_file_traversal). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -443,7 +443,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `key` + `name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`include_default`](../../schema/native-selector.schema.json), [`item_creation`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`include_default`](../../schema/native-selector.schema.json), [`item_creation`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
 
 ### Collection parameters
 
@@ -537,7 +537,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `hive` + `key` + `name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -642,7 +642,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `hive` + `key` + `trustee_sid`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression), [`traversal`](../../schema/capability-common.schema.json#/$defs/hierarchy_traversal). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -700,7 +700,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `service_name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 

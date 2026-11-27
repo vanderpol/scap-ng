@@ -4,7 +4,7 @@
 
 Pin: `d707aad6a916bb4e2e61767d836c681fc9d0084b`; renderer dependency: PR #39 `f61fff037f18832aa04db140b3e3209dfddf7219`. All JSON inputs are enumerated in [schema-manifest.json](schema-manifest.json).
 
-Discovered **36 schema documents** among 147 JSON inputs. Audited 8249 schema nodes, including 2066 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
+Discovered **36 schema documents** among 147 JSON inputs. Audited 8254 schema nodes, including 2067 public current-core/shared nodes. 43 generated capability definitions are explicit scope exclusions; no capability expansion is authorized.
 
 Public prose owners are named properties/definitions and roots. Anonymous array/map/alternative schemas and guard overrides remain inventoried with their exact constraints; their containing public element owns explanatory prose, while named fields inside them remain public. Fields introduced only in conditional branches are included, rather than discarded as guard overrides. Curated branch notes are additional targeted findings.
 
@@ -17,15 +17,15 @@ Found **1561 deduplicated findings** at 1559 canonical proposal locations. Prese
 | Value | Count |
 | --- | ---: |
 | inherited | 54 |
-| missing | 1583 |
-| own | 429 |
+| missing | 1582 |
+| own | 431 |
 
 ### Useful-quality review state
 
 | Value | Count |
 | --- | ---: |
-| missing | 1583 |
-| present_not_semantically_reviewed | 483 |
+| missing | 1582 |
+| present_not_semantically_reviewed | 485 |
 
 ### Review decision kind
 
@@ -83,7 +83,7 @@ Found **1561 deduplicated findings** at 1559 canonical proposal locations. Prese
 
 Active Variable forms: `literal`, `variable`, `input`, `values`, `to_integer`, `time_difference`, `concat`, `regex_capture`, `unique`, `count`, `split`, `substring`, `arithmetic`, `begin`, `end`, `merge`.
 
-The broader canonical function-call migration document is inactive; its names are not active authoring/runtime support. The actual branch spelling is `else_if`, not `elseif`. Shared foreach helper definitions exist but have no Assessment reference path; they are not a demonstrated authored placement.
+The broader canonical function-call migration document is inactive; its names are not active authoring/runtime support. The actual branch spelling is `else_if`, not `elseif`. Native `for_each` is reachable through the canonical Object overlays; the active grammar and runtime obligations are recorded in `docs/contracts/0.4.1-foreach.md`.
 
 ## Review priorities
 

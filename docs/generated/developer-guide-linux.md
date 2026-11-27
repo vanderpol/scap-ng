@@ -63,7 +63,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -188,7 +188,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `mount_point`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -419,7 +419,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `name`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -542,7 +542,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `unit`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 
@@ -579,7 +579,7 @@ Operators/types: [resolved selector contracts](../../schema/native-selector-cont
 
 Mapping selector alternatives: `unit` + `property`. These mapping requirements are distinct from JSON Schema required-property checks.
 
-Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
+Closed Object overlay: [native-selector.schema.json](../../schema/native-selector.schema.json). Additional declared properties: [`filters`](../../schema/native-selector.schema.json), [`for_each`](../../schema/capability-common.schema.json#/$defs/foreach_binding), [`set`](../../schema/capability-common.schema.json#/$defs/set_expression). Presence here does not assert a complete runtime contract.
 
 ### Evidence and comparison fields
 

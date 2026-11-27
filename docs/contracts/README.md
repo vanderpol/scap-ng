@@ -1,6 +1,6 @@
 # Native semantic maintenance
 
-Read [SCAP-NG 0.4 evaluation contracts](0.4-evaluation.md) and the [pinned compatibility matrix](0.4-compatibility.json). Existing requirements, newly approved Model A, unresolved rules and RI limitations are explicitly separate. The schema files are unchanged.
+Read [SCAP-NG 0.4 evaluation contracts](0.4-evaluation.md), the [pinned compatibility matrix](0.4-compatibility.json), and the active [`for_each` contract](0.4.1-foreach.md). Existing requirements, newly approved Model A, unresolved rules and RI limitations are explicitly separate. The 0.4.1 schema is the single active authoring family.
 
 Each implementation increment must update these contracts/mappings and add positive/negative fixtures before claiming behavior complete. Review the original pinned OVAL XSD annotations and Self-Assertion XML; do not use source expectations as evaluator inputs. Keep exact pins and evidence in the linked separate canonical/RI draft PRs. `AGENTS.md` records the permanent requirement.
 

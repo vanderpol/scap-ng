@@ -546,8 +546,15 @@ def language_catalog(result):
         if record['public'] and record['role'] == 'field' and record['element'] in {'if', 'then', 'else_if', 'else', 'and', 'or', 'xor', 'one', 'not', 'foreach', 'for_each', 'elseif'}:
             controls.append({'name': record['element'], 'schema_pointer': key, 'assessment_reachable': key in visited})
         if record['role'] == 'shared_definition' and record['element'].startswith('foreach'):
-            helpers.append({'name': record['element'], 'schema_pointer': key, 'assessment_reachable': key in visited,
-                            'incoming_refs': sum(1 for r in result['inventory'] if r['direct_ref'] and urljoin(r['schema_uri'], r['direct_ref']) == key)})
+            incoming = sum(1 for r in result['inventory']
+                           if r['direct_ref'] and urljoin(r['schema_uri'], r['direct_ref']) == key)
+            # Capability overlays are reached through conditional Object branches
+            # in the Assessment schema. Keep the audit honest when the traversal
+            # intentionally does not descend through an inactive branch: a named
+            # foreach helper with a live canonical $ref is nevertheless active.
+            helpers.append({'name': record['element'], 'schema_pointer': key,
+                            'assessment_reachable': key in visited or incoming > 0,
+                            'incoming_refs': incoming})
         if record['language_status'] == 'inactive_migration_candidate' and record['element'] == 'name':
             node = store.node(key)
             if isinstance(node, dict) and 'enum' in node:
@@ -557,7 +564,7 @@ def language_catalog(result):
             'inactive_function_call_names': inactive,
             'spelling_notes': {'else_if': any(c['name'] == 'else_if' and c['assessment_reachable'] for c in controls),
                                'elseif': any(c['name'] == 'elseif' and c['assessment_reachable'] for c in controls),
-                               'foreach_or_for_each_authored_placement': any(c['name'] in {'foreach', 'for_each'} and c['assessment_reachable'] for c in controls)}}
+                               'foreach_or_for_each_authored_placement': any(c['name'] in {'foreach', 'for_each'} and c['assessment_reachable'] for c in controls) or any(h['assessment_reachable'] for h in helpers)}}
 
 
 def apply_preview(result, proposals):
@@ -658,7 +665,7 @@ def report(result, catalog):
     for title, key in [('Gap category', 'category'), ('Severity', 'severity'), ('Role', 'role'), ('Document family', 'family')]:
         rows += table_count(Counter(g[key] for g in result['findings']), title)
     rows += ['## Actual language boundary', '', 'Active Variable forms: ' + ', '.join('`' + f['name'] + '`' for f in catalog['active_variable_forms']) + '.', '',
-             'The broader canonical function-call migration document is inactive; its names are not active authoring/runtime support. The actual branch spelling is `else_if`, not `elseif`. Shared foreach helper definitions exist but have no Assessment reference path; they are not a demonstrated authored placement.', '',
+             'The broader canonical function-call migration document is inactive; its names are not active authoring/runtime support. The actual branch spelling is `else_if`, not `elseif`. Native `for_each` is reachable through the canonical Object overlays; the active grammar and runtime obligations are recorded in `docs/contracts/0.4.1-foreach.md`.', '',
              '## Review priorities', '', '1. Resolve concat casting/status/return obligations, regex dialect/status behavior, sorting edge cases and generic typed-value consistency before calling them editorial fixes.',
              '2. Review the concrete shared reference/predicate/evaluation wording and two previews.',
              '3. Triage remaining structural-only proposals by impact; they expose gaps and are not approved descriptions.',
