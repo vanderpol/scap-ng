@@ -165,6 +165,23 @@ class SourceAccountingCases(unittest.TestCase):
             self.assertTrue(hold["schema_validated"] and hold["parity_diagnostic"])
 
 
+
+    def test_studio_replayed_the_exact_converted_holds(self):
+        production = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        studio = load(CONFORMANCE / "qualification/studio-converter-holds.json")
+        self.assertEqual(studio["schema_pin"], production["schema_pin"])
+        self.assertEqual(studio["converter_revision"], production["tools_revision"])
+        self.assertEqual(
+            studio["assessment_yaml_sha256"],
+            {row["definition_id"]: row["assessment_yaml_sha256"] for row in production["holds"]},
+        )
+        count = len(production["holds"])
+        for name in ("files", "ok", "noOpRoundTrips", "editRoundTrips", "undoRoundTrips"):
+            self.assertEqual(studio["observed"][name], count)
+        self.assertEqual(studio["observed"]["failed"], 0)
+        self.assertEqual(studio["observed"]["excludedExperimentalFiles"], 0)
+
+
     def test_merge_receipt_matches_source_and_native_hashes(self):
         root = CONFORMANCE / "variable-merge"
         expected = load(root / "expected.json")

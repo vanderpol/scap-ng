@@ -1,10 +1,11 @@
 # Native SCAP-NG 0.4.1 conformance corpus
 
 This is the issue #87 native Self-Assertion and Conformance Test Content. The
-active corpus is **only** the root `manifest.json`, `schema-coverage.json`,
-`cases/`, `fixtures/`, and `expected/` generated from the exact canonical
-0.4.1 schema family. The older `0.4/` material is retained as historical
-Model-A evidence and is not an active 0.4.1 authoring corpus.
+root `manifest.json` and its supplemental suite index identify the
+active cases, fixtures, and expectations for the exact canonical 0.4.1
+schema family. The index also identifies experimental and draft cases
+separately. The older `0.4/` material is retained as historical Model-A
+evidence.
 
 Generated Assessment YAML follows Issue #95: each Test serializes `object`
 before `require` when both are present. This is deterministic presentation
@@ -21,10 +22,14 @@ and semantic validator rules. Regenerate it after a canonical schema change:
 
 ```sh
 python conformance/tools/generate.py
-python conformance/tools/runner.py validate
-python conformance/tools/runner.py coverage
-python -m unittest tests/test_issue87_conformance.py -v
+python conformance/tools/audit.py
+bash conformance/check.sh
 ```
+
+Run `bash conformance/check.sh` from the repository with
+`requirements-dev.txt` installed to verify exact artifact pins, the tracked
+coverage audit and the portable corpus tests. The manually dispatched
+conformance workflow uses the same gate.
 
 The current mainline-rebased inventory is pinned to schema commit
 `cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876` and contains 105 capability

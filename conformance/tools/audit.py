@@ -8,9 +8,11 @@ as semantic coverage.
 """
 from __future__ import annotations
 
+import argparse
 import copy
 import json
 import subprocess
+import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -54,6 +56,9 @@ def predicate_matches(observed: Any, predicate: Any) -> bool:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Fail if the tracked audit is stale")
+    args = parser.parse_args()
     manifest = load(CONF / "manifest.json")
     inventory = load(CONF / "schema-coverage.json")
     authored: dict[str, Any] = {}
@@ -304,8 +309,16 @@ def main() -> int:
         "presentation_order": {"issue": 95, "tests_with_object_and_require": presentation_order_witnesses, "violations": presentation_order_violations, "deterministic": True},
         "capability_rows": mapping_rows,
     }
-    (CONF / "coverage-audit.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps(report, indent=2))
+    path = CONF / "coverage-audit.json"
+    rendered = json.dumps(report, indent=2) + "\n"
+    if args.check:
+        if not path.is_file() or path.read_text(encoding="utf-8") != rendered:
+            print(f"Coverage audit is stale: {path}", file=sys.stderr)
+            return 1
+        print("Coverage audit matches the tracked receipt.")
+        return 0
+    path.write_text(rendered, encoding="utf-8")
+    print(rendered, end="")
     return 0
 
 

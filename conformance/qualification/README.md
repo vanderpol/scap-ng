@@ -149,3 +149,8 @@ RI Test evaluation. The original clock-dependent Test also returns false,
 false and true at one second below, exactly at and one second above its
 threshold. The Object-backed case returned all 16 matching product
 values. Assessment rollup and the general Tools parity hold remain open.
+
+The [Studio model receipt](studio-converter-holds.json) covers the exact
+converted YAML for all five parity holds, with each file checked against
+the production replay digest. The exact-pin metadata pack admitted all
+five documents. All five passed open/save, scalar edit, reopen and undo.

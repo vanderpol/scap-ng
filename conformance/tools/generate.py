@@ -1035,6 +1035,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("result-package", "draft-transport", "result-package/manifest.json"),
         ("oval-self-assertion", "oval-5.12.3", "oval-self-assertion/expected.json"),
         ("oval-merge", "oval-5.12.3", "variable-merge/expected.json"),
+        ("oval-time-difference", "oval-5.12.3", "variable-time-difference/expected.json"),
         ("esxi", "experimental", "experimental/esxi/expected.json"),
     )
     suites = []
@@ -1044,7 +1045,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         if entry.parent != OUT:
             paths = sorted(
                 path for path in entry.parent.rglob("*")
-                if path.is_file() and path.suffix in {".json", ".yaml", ".xml", ".sql"}
+                if path.is_file() and path.suffix in {".json", ".yaml", ".xml", ".sql", ".go"}
             )
         suites.append({
             "id": name,
