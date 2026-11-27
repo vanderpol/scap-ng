@@ -138,6 +138,29 @@ def family_digest() -> str:
     return checksum.hexdigest()
 
 
+def suite_index_errors(index: dict[str, Any], schema_commit: str,
+                       directory: Path = CONFORMANCE) -> list[str]:
+    errors: list[str] = []
+    if index.get("schema_commit") != schema_commit:
+        errors.append("supplemental suite index uses a different schema pin")
+    suite_ids = [suite["id"] for suite in index["suites"]]
+    if len(suite_ids) != len(set(suite_ids)):
+        errors.append("supplemental suite index contains duplicate IDs")
+    root = directory.resolve()
+    for suite in index["suites"]:
+        digests = suite["artifact_sha256"]
+        if suite["entrypoint"] not in digests:
+            errors.append(f"{suite['id']}: suite entry point is missing its digest")
+        for artifact, expected in digests.items():
+            path = (root / artifact).resolve()
+            if not path.is_relative_to(root) or not path.is_file():
+                errors.append(f"{suite['id']}: missing or out-of-scope artifact {artifact}")
+                continue
+            if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                errors.append(f"{suite['id']}: suite artifact digest differs for {artifact}")
+    return errors
+
+
 def validate() -> int:
     manifest = load(CONFORMANCE / "manifest.json")
     errors: list[str] = []
@@ -285,6 +308,8 @@ def validate() -> int:
             errors.append(f"{invalid_case['id']}: could not load invalid-authoring witness: {exc}")
         else:
             errors.append(f"{invalid_case['id']} unexpectedly passed schema validation")
+    index = load(CONFORMANCE / manifest["suite_index"])
+    errors.extend(suite_index_errors(index, source_commit))
     supplemental = load(CONFORMANCE / manifest["supplemental_manifest"])
     if supplemental["schema_commit"] != manifest["schema_commit"]:
         errors.append("supplemental corpus schema pin differs from the canonical corpus")

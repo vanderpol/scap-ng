@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from conformance.tools.build_content_fixture import build
-from conformance.tools.runner import CONFORMANCE, load
+from conformance.tools.runner import CONFORMANCE, load, suite_index_errors
 
 FIXTURE = CONFORMANCE / "content-package"
 
@@ -64,3 +64,15 @@ class ContentPackageCases(unittest.TestCase):
                 self.assertEqual(packaged, original)
             self.assertEqual(sorted(ids["assessment"]), expected["assessment_ids"])
             self.assertEqual(sorted(ids["rule"]), expected["rule_ids"])
+
+
+    def test_runner_rejects_stale_suite_artifacts(self):
+        manifest = load(CONFORMANCE / "manifest.json")
+        index = load(CONFORMANCE / manifest["suite_index"])
+        self.assertEqual(suite_index_errors(index, manifest["schema_commit"]), [])
+        row = next(suite for suite in index["suites"] if suite["id"] == "content-package")
+        row["artifact_sha256"][row["entrypoint"]] = "0" * 64
+        self.assertEqual(
+            suite_index_errors(index, manifest["schema_commit"]),
+            ["content-package: suite artifact digest differs for content-package/sources.json"],
+        )
