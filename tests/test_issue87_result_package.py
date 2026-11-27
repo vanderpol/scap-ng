@@ -171,3 +171,36 @@ class ResultPackageCases(unittest.TestCase):
 
         manifest = self.manifest | {"signature_status": "signed"}
         self.assertFalse(schema_validator("result-package-manifest.schema.json").is_valid(manifest))
+
+    def test_conditional_trace_keeps_guard_outcome_separate_from_body(self):
+        cases = load(FIXTURE / "guard-trace.json")["cases"]
+        self.assertEqual(
+            {case["condition_outcome"] for case in cases},
+            {"true", "false", "error", "unknown", "not_evaluated", "not_applicable"},
+        )
+        schema = schema_validator("expression-invocation.schema.json")
+        for case in cases:
+            with self.subTest(guard=case["condition_outcome"]):
+                doc = {
+                    "assessment": "trace-fixture",
+                    "invocation_ref": "guard-invocation",
+                    "outcome": case["outcome"],
+                    "executed_tests": [],
+                    "trace": [{
+                        "path": "/evaluate",
+                        "kind": "conditional",
+                        "owner_invocation_ref": "guard-invocation",
+                        "branch_index": 0,
+                        **case,
+                    }],
+                    "diagnostics": [],
+                }
+                schema.validate(doc)
+                changed = deepcopy(doc)
+                trace = changed["trace"][0]
+                trace["selected_branch"] = "else" if case["selected_branch"] == "then" else "then"
+                self.assertFalse(schema.is_valid(changed))
+                if case["selected_branch"] is None:
+                    trace["selected_branch"] = None
+                    trace["outcome"] = "true"
+                    self.assertFalse(schema.is_valid(changed))
