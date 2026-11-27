@@ -77,5 +77,40 @@ class SemanticAuthoringCases(unittest.TestCase):
         self.assertEqual(corrected["assessment"]["dependencies"][alias]["expected_version"], target["version"])
 
 
+class LogicalCardinalityCases(unittest.TestCase):
+    def test_one_and_xor_diverge_for_three_matching_tests(self):
+        root = CONFORMANCE / "logical-cardinality"
+        source = load(root / "one-xor.assessment.yaml")
+        expected = load(root / "expected.json")["variants"]
+        fixture = load(root / "fixture.json")
+        self.assertEqual(fixture["assessment"], source["assessment"]["id"])
+        self.assertEqual(fixture["literal_mutations"].keys(), expected.keys())
+        schema = validator()
+        for variant, changes in fixture["literal_mutations"].items():
+            with self.subTest(variant=variant):
+                doc = copy.deepcopy(source)
+                assessment = doc["assessment"]
+                for reference, value in changes.items():
+                    assessment["variables"][reference]["expression"]["literal"] = value
+                schema.validate(doc)
+
+                observed = {}
+                for name, test in assessment["tests"].items():
+                    value = assessment["variables"][test["variable"]]["expression"]["literal"]
+                    wanted = test["require"]["fields"]["value"]["equals"]
+                    self.assertIs(type(value), int)
+                    observed[name] = value == wanted
+                self.assertEqual(
+                    {name: str(value).lower() for name, value in observed.items()},
+                    expected[variant]["test_outcomes"],
+                )
+                xor, negated = assessment["evaluate"]["and"]
+                odd = sum(observed[child["test"]] for child in xor["xor"]) % 2 == 1
+                exactly_one = sum(observed[child["test"]] for child in negated["not"]["one"]) == 1
+                self.assertEqual(str(odd).lower(), expected[variant]["xor"])
+                self.assertEqual(str(exactly_one).lower(), expected[variant]["one"])
+                self.assertEqual(str(odd and not exactly_one).lower(), expected[variant]["assessment_outcome"])
+
+
 if __name__ == "__main__":
     unittest.main()
