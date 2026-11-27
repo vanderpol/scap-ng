@@ -1036,6 +1036,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("oval-self-assertion", "oval-5.12.3", "oval-self-assertion/expected.json"),
         ("oval-merge", "oval-5.12.3", "variable-merge/expected.json"),
         ("oval-time-difference", "oval-5.12.3", "variable-time-difference/expected.json"),
+        ("oval-external-input", "oval-5.12.3", "variable-external-input/expected.json"),
         ("esxi", "experimental", "experimental/esxi/expected.json"),
     )
     suites = []

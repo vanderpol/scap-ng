@@ -154,3 +154,10 @@ The [Studio model receipt](studio-converter-holds.json) covers the exact
 converted YAML for all five parity holds, with each file checked against
 the production replay digest. The exact-pin metadata pack admitted all
 five documents. All five passed open/save, scalar edit, reopen and undo.
+
+The [pinned external Variable witness](../variable-external-input/README.md)
+checks Definition 562 with its companion OVAL bindings. All 18 direct RI
+Test evaluations matched the independent source expectations. The missing,
+empty, wrong-type and nonmatching binding controls preserve distinct
+failure or comparison dispositions. Full policy enforcement and rollup
+remain open.

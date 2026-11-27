@@ -237,5 +237,34 @@ class SourceAccountingCases(unittest.TestCase):
             self.assertRegex(observed["explanation"], rf"\bvalue {delta}\b")
 
 
+    def test_external_input_receipt_matches_source_native_and_binding_expectations(self):
+        root = CONFORMANCE / "variable-external-input"
+        expected = load(root / "expected.json")
+        witness = load(root / "ri-receipt.json")
+        full = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        hold, = [row for row in full["holds"] if row["definition_id"] == expected["definition"]]
+        self.assertEqual(witness["source_sha256"], hold["source_sha256"])
+        self.assertEqual(witness["source_sha256"], expected["definition_sha256"])
+        self.assertEqual(witness["source_bindings_sha256"], expected["bindings_sha256"])
+        self.assertEqual(witness["native_assessment_sha256"], hold["assessment_json_sha256"])
+        self.assertEqual(witness["schema_commit"], full["schema_pin"])
+        self.assertEqual(witness["converter_revision"], full["tools_revision"])
+
+        positives = expected["positive"]
+        leaves = witness["leaves"].values()
+        self.assertEqual(len(leaves), positives["test_count"])
+        self.assertEqual(sum(row["values"] == 1 for row in leaves), positives["single_value"])
+        self.assertEqual(sum(row["values"] == 4 for row in leaves), positives["four_values"])
+        self.assertEqual(sum(row["restricted"] for row in leaves), positives["restricted_inputs"])
+        self.assertEqual(len({row["native_input"] for row in leaves}), len(leaves))
+        for row in leaves:
+            self.assertEqual(row["outcome"], positives["outcome"])
+            self.assertEqual(row["values_found"], row["values"])
+            self.assertEqual(row["values_matching"], row["values"])
+        controls = {name: {key: value for key, value in row.items() if key != "values"}
+                    for name, row in expected["controls"].items()}
+        self.assertEqual(witness["controls"], controls)
+
+
 if __name__ == "__main__":
     unittest.main()
