@@ -1,0 +1,41 @@
+assessment:
+  id: conformance-typed-policy-input
+  version: 1
+  assessment_title: Typed Input cardinality and alternative constraints
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  inputs:
+    approved-values-input:
+      datatype: integer
+      cardinality: one_or_more
+      required: false
+      constraints:
+        allowed: [99]
+        predicate:
+          and:
+            - greater_than_or_equal: 10
+            - less_than_or_equal: 20
+      description: A legacy exception or an integer in the approved interval
+  variables:
+    lookup-variable:
+      kind: local
+      expression:
+        input: approved-values-input
+  tests:
+    input-contains-threshold-test:
+      test_title: At least one approved input value equals the threshold
+      capability: variable.value
+      variable: lookup-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: one_or_more}
+        fields:
+          value: {equals: 15}
+  evaluate:
+    if: {input_provided: approved-values-input}
+    then: {test: input-contains-threshold-test}
+    else:
+      not_evaluated:
+        reason: No approved values were provided

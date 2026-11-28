@@ -1,0 +1,35 @@
+{
+  "source": "typed-policy.assessment.yaml",
+  "contract": "docs/contracts/0.4.1-input-variable-expression.md#typed-input-constraint-expressions",
+  "schema_commit": "cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876",
+  "predicate_limits": {
+    "logical_operators": ["and", "or", "one", "xor"],
+    "maximum_branches": 64,
+    "maximum_literal_characters": 4096,
+    "string_source": "string-predicate.assessment.yaml",
+    "string_operations": ["equals", "matches_regex"],
+    "resource_bounds": {
+      "maximum_depth": 32,
+      "maximum_nodes": 256,
+      "cases": {
+        "depth-limit": {"unary_depth": 32, "nodes": 32, "depth": 32, "result": "admitted"},
+        "depth-exceeded": {"unary_depth": 33, "nodes": 33, "depth": 33, "result": "resource_rejected"},
+        "node-limit": {"group_sizes": [63, 63, 63, 62], "nodes": 256, "depth": 3, "result": "admitted"},
+        "nodes-exceeded": {"group_sizes": [63, 63, 63, 63], "nodes": 257, "depth": 3, "result": "resource_rejected"}
+      }
+    }
+  },
+  "selection_expectations": "selection-expected.json",
+  "variants": {
+    "optional-omitted": {"bindings": {}, "admission": "accepted", "assessment_outcome": "not_evaluated", "executed_tests": []},
+    "present-empty": {"bindings": {"approved-values-input": []}, "admission": "cardinality_rejected"},
+    "exceptions-only": {"bindings": {"approved-values-input": [99, 99]}, "admission": "accepted", "assessment_outcome": "false", "executed_tests": ["input-contains-threshold-test"]},
+    "inclusive-endpoints": {"bindings": {"approved-values-input": [10, 20]}, "admission": "accepted", "assessment_outcome": "false", "executed_tests": ["input-contains-threshold-test"]},
+    "two-alternatives": {"bindings": {"approved-values-input": [99, 15]}, "admission": "accepted", "assessment_outcome": "true", "executed_tests": ["input-contains-threshold-test"]},
+    "threshold-as-string": {"bindings": {"approved-values-input": ["15"]}, "admission": "datatype_rejected"},
+    "boolean-is-not-integer": {"bindings": {"approved-values-input": [true]}, "admission": "datatype_rejected"},
+    "first-valid-second-low": {"bindings": {"approved-values-input": [99, 9]}, "admission": "constraint_rejected"},
+    "first-valid-second-high": {"bindings": {"approved-values-input": [15, 21]}, "admission": "constraint_rejected"},
+    "first-invalid-second-valid": {"bindings": {"approved-values-input": [9, 15]}, "admission": "constraint_rejected"}
+  }
+}
