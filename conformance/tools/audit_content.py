@@ -69,9 +69,15 @@ def supplemental_datatypes():
     result_path = "result-evidence/owner.result.yaml"
     result = load(CONFORMANCE / result_path)["assessment_result"]
     items = [row["item"] for test in result["tests"] for row in test["per_item_results"]]
+    metadata_path = "file-metadata/expected.json"
+    metadata = load(CONFORMANCE / metadata_path)["fields"]
+    datatype = {str: "string", int: "integer", bool: "boolean"}
     return {
-        "unix.file": (result_path, field_datatypes("unix.file", items)),
-        "variable.value": (equality_path, {"value": {literal["datatype"] for literal in literals}}),
+        "unix.file": {
+            result_path: field_datatypes("unix.file", items),
+            metadata_path: {field: {datatype[type(value)]} for field, value in metadata.items()},
+        },
+        "variable.value": {equality_path: {"value": {literal["datatype"] for literal in literals}}},
     }
 
 
@@ -130,7 +136,7 @@ def build():
         typed = field_datatypes(capability, (
             item for details in fixture["variants"].values() for item in details.get("items", [])
         ))
-        targeted_path, targeted = supplemental.get(capability, (None, {}))
+        targeted = supplemental.get(capability, {})
         missing = {}
         supplemental_matches = {}
         counters = counts[scope]
@@ -138,14 +144,16 @@ def build():
         for field, datatypes in spec["field_datatypes"].items():
             seen = typed.get(field, set())
             absent = set(datatypes) - seen
-            newly_matched = absent & targeted.get(field, set())
-            if newly_matched:
-                supplemental_matches[field] = sorted(newly_matched)
-            if still_missing := absent - newly_matched:
-                missing[field] = sorted(still_missing)
+            remaining = set(absent)
+            for source, fields in targeted.items():
+                if witnessed := absent & fields.get(field, set()):
+                    supplemental_matches.setdefault(source, {})[field] = sorted(witnessed)
+                    remaining.difference_update(witnessed)
+            if remaining:
+                missing[field] = sorted(remaining)
             counters["declared_field_datatypes"] += len(datatypes)
             counters["typed_baseline_fixture_matches"] += len(datatypes) - len(absent)
-            counters["typed_indexed_fixture_matches"] += len(datatypes) - len(absent) + len(newly_matched)
+            counters["typed_indexed_fixture_matches"] += len(datatypes) - len(remaining)
         capabilities[scope][capability] = {
             "mapping": spec["source_path"],
             "assessment": witness["assessment"],
@@ -155,9 +163,7 @@ def build():
         }
 
         if supplemental_matches:
-            capabilities[scope][capability]["supplemental_datatypes"] = {
-                "source": targeted_path, "fields": supplemental_matches,
-            }
+            capabilities[scope][capability]["supplemental_datatypes"] = supplemental_matches
 
     comparison = inventory["operator_inventory"]["comparison"]
     return {
@@ -193,6 +199,7 @@ def build():
         "new_independent_witnesses": {
             "exact_integer_string_equality": "exact-equality/expected.json",
             "complete_result_evidence": "result-evidence/expected.json",
+            "unix_file_metadata": "file-metadata/expected.json",
             "variable_function_boundaries": "function-boundaries/expected.json",
             "typed_input_policy_boundaries": "input-policy/expected.json",
         },

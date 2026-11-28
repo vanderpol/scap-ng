@@ -18,7 +18,7 @@ have a separate suite and accounting.
 | Active mapped capabilities with an authored native baseline | 101/101 | 101/101 |
 | Experimental capabilities with an authored native baseline | 4/4 | 4/4 |
 | Mapped fields with a typed structural witness across both cohorts | 718/718 | 718/718 |
-| Active mapped field/datatype pairs with a value in indexed fixtures | 619/910 | 622/910 |
+| Active mapped field/datatype pairs with a value in indexed fixtures | 619/910 | 639/910 |
 | Experimental field/datatype pairs with a value in the baseline fixture | 17/28 | 17/28 |
 | Reachable enum and const values matched by active native documents | 143/850 | 173/850 |
 | Reachable enum and const values without any scoped match | 678/850 | 655/850 |
@@ -38,7 +38,7 @@ Schema matching counts exact locations visited during validation, including
 sibling branches that can fail a different constraint. Draft transport and
 experimental matches are recorded separately and can overlap active matches.
 Typed fixture counts record a value labeled with the mapped datatype. The current
-count adds the exact-equality and Result evidence suites. These counts carry no assertion about field-specific behavior or acquisition. Property and
+count adds the exact-equality, Result evidence and UNIX file metadata suites. These counts carry no assertion about field-specific behavior or acquisition. Property and
 boundary counts compare the same audit on mainline before and after the
 zero-retention fixture.
 
@@ -46,7 +46,7 @@ zero-retention fixture.
 
 | Surface | Coverage and exact follow-up |
 | --- | --- |
-| Capabilities and datatypes | The [machine matrix](content-coverage.json) identifies missing indexed datatype evidence by mapping and field. Reconcile those rows against targeted suites before authoring further comparisons. For example, `windows.registry.value` has supplied integer evidence in the [paired fixtures](0.4/supplied-evidence.json) beyond the generic baseline, but binary/version examples require a separate review of operand encodings and applicability. |
+| Capabilities and datatypes | The [machine matrix](content-coverage.json) identifies missing indexed datatype evidence by mapping and field. Reconcile those rows against targeted suites before authoring further comparisons. The [UNIX file metadata](file-metadata/expected.json) suite now exercises all 24 native field names and independently toggles every mode bit. For example, `windows.registry.value` has supplied integer evidence in the [paired fixtures](0.4/supplied-evidence.json) beyond the generic baseline, but binary/version examples require a separate review of operand encodings and applicability. |
 | Selectors and schema constraints | The [audit](coverage-audit.json) records 94 selector alternatives and 718 mapped fields across both scopes. The [source inventory](schema-coverage.json) lists all 1,620 property groups and 11,346 constraint occurrences. Complete positive, rejection and cross-property boundary coverage remains open. The [enum and const ledger](qualification/schema-value-occurrences.json) gives every reachable unmatched value and its exact pointer. The [shape ledger](qualification/schema-shape-occurrences.json) records property presence, exact numeric and size boundaries, interior matches and local rejections. Compound-constraint branches and semantic cases still need targeted witnesses. |
 | Comparisons and cardinality | The common authoring suite covers 67 field operations, including the active regex spelling. The [exact equality suite](exact-equality/expected.json) adds native integer precision, negative and zero, empty and whitespace, Unicode identity and case boundaries. The [Model A oracle](0.4/model-a/manifest.json) establishes nonempty cardinality, and the [ONE/XOR suite](logical-cardinality/expected.json) distinguishes known Boolean folds. Primitive datatype operations, field-specific operator constraints, and cross-status folds still require independently justified cases. |
 | Variables and functions | [Core witnesses](expected/core-variable-functions.json) cover the 14 active operations, with alias/constant and ordered output controls. [Merge](variable-merge/expected.json), [time difference](variable-time-difference/expected.json) and [external Input](variable-external-input/expected.json) add source-specific expected outcomes. [Function boundaries](function-boundaries/expected.json) cover Cartesian multiply and concat, ordered component flattening, literal-delimiter empty parts, substring bounds, and first and empty captures. Complete parameter, datatype, empty and exceptional combinations remain open. General empty-population reduction and Variable cardinality semantics are under review in [#135](https://github.com/vanderpol/scap-ng/pull/135) and [#136](https://github.com/vanderpol/scap-ng/pull/136). |

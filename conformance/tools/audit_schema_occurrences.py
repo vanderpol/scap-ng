@@ -128,6 +128,9 @@ def case_sources(experimental_capabilities):
     for path in manual["standalone_results"].values():
         register(path, "manual-assessment-result.schema.json", True)
 
+    metadata = load(CONFORMANCE / "file-metadata/expected.json")
+    register("file-metadata/" + metadata["source"], assessment, True)
+
     result_evidence = load(CONFORMANCE / "result-evidence/expected.json")
     register("result-evidence/" + result_evidence["source"], assessment, True)
     for name, schema in result_evidence["documents"].items():

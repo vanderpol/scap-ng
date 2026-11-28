@@ -1,0 +1,48 @@
+assessment:
+  id: conformance-native-unix-file-fields
+  version: 1
+  assessment_title: Native UNIX file metadata and permission bits
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  shared_objects:
+    fixed-file-object:
+      object_title: Selected file metadata
+      capability: unix.file
+      full_path:
+        equals: /scap-ng-file-fixture/mode.bin
+  tests:
+    file-metadata-test:
+      test_title: Every typed UNIX file field matches the fixed metadata
+      capability: unix.file
+      reported_elements: all
+      object: fixed-file-object
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields:
+          full_path: {equals: /scap-ng-file-fixture/mode.bin}
+          directory: {equals: /scap-ng-file-fixture}
+          name: {equals: mode.bin}
+          type: {equals: regular}
+          owner_uid: {equals: 1100}
+          owner_gid: {equals: 2100}
+          access_time: {equals: 1700000001}
+          change_time: {equals: 1700000002}
+          modify_time: {equals: 1700000000}
+          size: {equals: 7}
+          setuid: {equals: true}
+          setgid: {equals: true}
+          sticky: {equals: true}
+          owner_read: {equals: true}
+          owner_write: {equals: true}
+          owner_execute: {equals: false}
+          group_read: {equals: true}
+          group_write: {equals: false}
+          group_execute: {equals: false}
+          other_read: {equals: false}
+          other_write: {equals: false}
+          other_execute: {equals: true}
+          has_extended_acl: {equals: false}
+  evaluate:
+    test: file-metadata-test

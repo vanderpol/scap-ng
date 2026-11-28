@@ -1072,6 +1072,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("manual-lifecycle", "active", "manual-lifecycle/expected.json"),
         ("result-package", "draft-transport", "result-package/manifest.json"),
         ("result-evidence", "active", "result-evidence/expected.json"),
+        ("file-metadata", "active", "file-metadata/expected.json"),
         ("exact-equality", "active", "exact-equality/expected.json"),
         ("function-boundaries", "active", "function-boundaries/expected.json"),
         ("input-policy", "active", "input-policy/expected.json"),
