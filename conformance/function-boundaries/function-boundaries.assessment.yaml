@@ -1,0 +1,371 @@
+assessment:
+  id: conformance-function-boundaries
+  version: 1
+  assessment_title: Variable function options and ordered population boundaries
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  variables:
+    multiply-values-variable:
+      kind: local
+      expression:
+        arithmetic:
+          arithmetic_operation: multiply
+          values:
+          - literal:
+            - 2
+            - -3
+          - literal:
+            - 4
+            - 0
+            - 4
+    unique-components-variable:
+      kind: local
+      expression:
+        unique:
+        - literal:
+          - b
+          - a
+          - b
+        - literal:
+          - c
+          - a
+    split-parts-variable:
+      kind: local
+      expression:
+        split:
+          delimiter: '::'
+          value:
+            literal:
+            - '::a::::'
+            - plain
+    concat-cartesian-variable:
+      kind: local
+      expression:
+        concat:
+        - literal:
+          - x
+          - y
+        - literal:
+          - '1'
+          - '2'
+    substring-minimum-start-variable:
+      kind: local
+      expression:
+        substring:
+          substring_start: -2147483648
+          substring_length: 3
+          value:
+            literal: abcdef
+    substring-negative-length-variable:
+      kind: local
+      expression:
+        substring:
+          substring_start: 4
+          substring_length: -1
+          value:
+            literal: abcdef
+    substring-maximum-length-variable:
+      kind: local
+      expression:
+        substring:
+          substring_start: 4
+          substring_length: 2147483647
+          value:
+            literal: abcdef
+    substring-zero-length-variable:
+      kind: local
+      expression:
+        substring:
+          substring_start: 2
+          substring_length: 0
+          value:
+            literal: abc
+    first-and-empty-capture-variable:
+      kind: local
+      expression:
+        regex_capture:
+          pattern: ([a-z]*)/([0-9]+)
+          value:
+            literal:
+            - a/7 b/8
+            - no-match
+            - /9
+    no-capture-group-variable:
+      kind: local
+      expression:
+        regex_capture:
+          pattern: match
+          value:
+            literal: match
+    multiply-count-variable:
+      kind: local
+      expression:
+        count:
+          variable: multiply-values-variable
+    unique-components-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: unique-components-variable
+    split-parts-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: split-parts-variable
+    concat-cartesian-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: concat-cartesian-variable
+    substring-minimum-start-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: substring-minimum-start-variable
+    substring-negative-length-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: substring-negative-length-variable
+    substring-maximum-length-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: substring-maximum-length-variable
+    substring-zero-length-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: substring-zero-length-variable
+    first-and-empty-capture-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: first-and-empty-capture-variable
+    no-capture-group-joined-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: no-capture-group-variable
+  tests:
+    multiply-value-membership-test:
+      test_title: Multiply value membership
+      capability: variable.value
+      variable: multiply-values-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            equals:
+            - 8
+            - 0
+            - -12
+            value_match: exactly_one
+    multiply-cartesian-count-test:
+      test_title: Multiply cartesian count
+      capability: variable.value
+      variable: multiply-count-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 6
+    unique-components-ordered-test:
+      test_title: Unique components ordered
+      capability: variable.value
+      variable: unique-components-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: b|a|c
+    split-parts-ordered-test:
+      test_title: Split parts ordered
+      capability: variable.value
+      variable: split-parts-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: '|a|||plain'
+    concat-cartesian-ordered-test:
+      test_title: Concat cartesian ordered
+      capability: variable.value
+      variable: concat-cartesian-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: x1|x2|y1|y2
+    substring-minimum-start-ordered-test:
+      test_title: Substring minimum start ordered
+      capability: variable.value
+      variable: substring-minimum-start-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: abc
+    substring-negative-length-ordered-test:
+      test_title: Substring negative length ordered
+      capability: variable.value
+      variable: substring-negative-length-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: def
+    substring-maximum-length-ordered-test:
+      test_title: Substring maximum length ordered
+      capability: variable.value
+      variable: substring-maximum-length-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: def
+    substring-zero-length-ordered-test:
+      test_title: Substring zero length ordered
+      capability: variable.value
+      variable: substring-zero-length-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: ''
+    first-and-empty-capture-ordered-test:
+      test_title: First and empty capture ordered
+      capability: variable.value
+      variable: first-and-empty-capture-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: a||
+    no-capture-group-ordered-test:
+      test_title: No capture group ordered
+      capability: variable.value
+      variable: no-capture-group-joined-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: ''
+  evaluate:
+    and:
+    - test: multiply-value-membership-test
+    - test: multiply-cartesian-count-test
+    - test: unique-components-ordered-test
+    - test: split-parts-ordered-test
+    - test: concat-cartesian-ordered-test
+    - test: substring-minimum-start-ordered-test
+    - test: substring-negative-length-ordered-test
+    - test: substring-maximum-length-ordered-test
+    - test: substring-zero-length-ordered-test
+    - test: first-and-empty-capture-ordered-test
+    - test: no-capture-group-ordered-test

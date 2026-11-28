@@ -1,0 +1,40 @@
+{
+  "source": "function-boundaries.assessment.yaml",
+  "schema_commit": "cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876",
+  "contract": "schema/variable-expression.schema.json#/$defs/expression",
+  "oval_version": "5.12.3",
+  "oval_schema_commit": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+  "oval_type_anchors": [
+    "ArithmeticFunctionType",
+    "ConcatFunctionType",
+    "SplitFunctionType",
+    "SubstringFunctionType",
+    "RegexCaptureFunctionType",
+    "UniqueFunctionType"
+  ],
+  "populations": {
+    "multiply-values-variable": {"datatype": "integer", "values": [8, 0, 8, -12, 0, -12], "basis": "2 and -3 are each multiplied by 4, 0 and a duplicate 4 in Cartesian order."},
+    "unique-components-variable": {"datatype": "string", "values": ["b", "a", "c"], "basis": "Flatten [b,a,b] then [c,a] and retain the first occurrence of each distinct string."},
+    "split-parts-variable": {"datatype": "string", "values": ["", "a", "", "", "plain"], "basis": "Literal :: delimiters preserve the leading, adjacent and trailing empty segments of ::a::::. The absent delimiter leaves plain intact."},
+    "concat-cartesian-variable": {"datatype": "string", "values": ["x1", "x2", "y1", "y2"], "basis": "Both two-value components contribute to the ordered Cartesian product."},
+    "substring-minimum-start-variable": {"datatype": "string", "values": ["abc"], "basis": "The lowest signed 32-bit start is treated as position one by the source rule."},
+    "substring-negative-length-variable": {"datatype": "string", "values": ["def"], "basis": "Starting at position four with negative length selects the remainder."},
+    "substring-maximum-length-variable": {"datatype": "string", "values": ["def"], "basis": "Length above the remaining text selects the remainder from position four."},
+    "substring-zero-length-variable": {"datatype": "string", "values": [""], "basis": "Starting at position two of abc and including zero characters yields a present empty string."},
+    "first-and-empty-capture-variable": {"datatype": "string", "values": ["a", "", ""], "basis": "Use the first capture of the first match. No match and an empty capture each produce a present empty string."},
+    "no-capture-group-variable": {"datatype": "string", "values": [""], "basis": "A successful text match without a capture group yields an empty string."}
+  },
+  "exceptional_expression": {
+    "source": "substring-out-of-range.assessment.yaml",
+    "variable": "out-of-range-variable",
+    "status": "error",
+    "basis": "Start position 4 exceeds the three-character source. The inherited substring rule reports an error.",
+    "assessment_outcome": "held"
+  },
+  "authoring_controls": [
+    {"variable": "substring-minimum-start-variable", "operation": "substring", "parameter": "substring_start", "replacement": -2147483649},
+    {"variable": "substring-maximum-length-variable", "operation": "substring", "parameter": "substring_length", "replacement": 2147483648},
+    {"variable": "multiply-values-variable", "operation": "arithmetic", "parameter": "arithmetic_operation", "replacement": "subtract"},
+    {"variable": "multiply-values-variable", "operation": "arithmetic", "parameter": "values", "replacement": [{"literal": 2}]}
+  ]
+}

@@ -1,0 +1,28 @@
+assessment:
+  id: conformance-substring-range-error
+  version: 1
+  assessment_title: Substring start exceeds the source string length
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  variables:
+    out-of-range-variable:
+      kind: local
+      expression:
+        substring:
+          substring_start: 4
+          substring_length: 1
+          value: {literal: abc}
+  tests:
+    out-of-range-test:
+      test_title: A substring range error cannot serve as a complete value
+      capability: variable.value
+      variable: out-of-range-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields:
+          value: {equals: ''}
+  evaluate:
+    test: out-of-range-test
