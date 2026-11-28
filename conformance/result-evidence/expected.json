@@ -1,0 +1,55 @@
+{
+  "schema_commit": "cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876",
+  "source": "owner.assessment.yaml",
+  "fixture": "supplied.yaml",
+  "documents": {
+    "owner.result.yaml": "assessment-result.schema.json",
+    "owner.item-report.yaml": "item-report.schema.json"
+  },
+  "observations": {
+    "outcome": "true",
+    "variable_values": [42, 42],
+    "item_order": ["owner-a", "owner-b"],
+    "test_items_observed": 2,
+    "test_items_evaluated": 2,
+    "test_mismatches": 0
+  },
+  "schema_controls": {
+    "collection-result.schema.json": {
+      "base": {"id": "controls-object", "capability": "unix.file", "item_refs": []},
+      "accept": {
+        "complete-empty": {"status": "complete", "logical_complete": true, "population_complete": true},
+        "absent": {"status": "does_not_exist"},
+        "not-collected": {"status": "not_collected"},
+        "inapplicable": {"status": "not_applicable"},
+        "error": {"status": "error", "stop_reason": "denied", "diagnostics": [{"code": "access_denied", "message": "Read was denied"}]},
+        "partial": {"status": "incomplete", "population_complete": false, "item_refs": ["owner-a"], "stop_reason": "stopped", "diagnostics": [{"code": "limit_reached", "message": "Enumeration stopped"}]}
+      },
+      "reject": {
+        "boolean-status": {"status": true},
+        "error-without-diagnostics": {"status": "error", "stop_reason": "denied", "diagnostics": []},
+        "blank-diagnostic": {"status": "error", "stop_reason": "denied", "diagnostics": [{"code": "access_denied", "message": " "}]},
+        "partial-marked-complete": {"status": "incomplete", "population_complete": true, "stop_reason": "stopped", "diagnostics": [{"code": "limit_reached", "message": "Enumeration stopped"}]}
+      }
+    },
+    "variable-result.schema.json": {
+      "base": {"id": "controls-variable", "datatype": "integer", "values": [], "item_refs": [], "cardinality": "zero"},
+      "accept": {
+        "complete-empty": {"status": "complete"},
+        "zero-values": {"status": "zero_values"},
+        "incomplete-observed-one": {"status": "incomplete", "cardinality": "one", "values": [{"datatype": "integer", "status": "exists", "value": 42}], "item_refs": ["owner-a"]},
+        "error": {"status": "error"},
+        "unknown": {"status": "unknown"},
+        "not-evaluated": {"status": "not_evaluated"},
+        "not-applicable": {"status": "not_applicable"}
+      },
+      "reject": {
+        "record-variable": {"status": "complete", "datatype": "record"},
+        "resolved-cardinality-mismatch": {"status": "complete", "cardinality": "one"},
+        "incomplete-many-with-one": {"status": "incomplete", "cardinality": "many", "values": [{"datatype": "integer", "status": "exists", "value": 42}]},
+        "zero-values-with-observation": {"status": "zero_values", "values": [{"datatype": "integer", "status": "exists", "value": 42}]},
+        "duplicate-consumed-reference": {"status": "incomplete", "item_refs": ["owner-a", "owner-a"]}
+      }
+    }
+  }
+}

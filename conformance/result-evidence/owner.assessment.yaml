@@ -1,0 +1,42 @@
+assessment:
+  id: conformance-result-evidence
+  version: 1
+  assessment_title: File owner comparison and retained evidence
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  shared_objects:
+    owner-file-object:
+      object_title: Two supplied files
+      capability: unix.file
+      full_path:
+        matches_regex: ^/scap-ng-result-fixture/[ab]$
+  variables:
+    owner-values-variable:
+      kind: local
+      expression:
+        values:
+          object: {object_ref: owner-file-object}
+          field: owner_uid
+  tests:
+    owner-test:
+      test_title: Owners match an extracted value
+      capability: unix.file
+      reported_elements: all
+      object: owner-file-object
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          owner_uid:
+            value_match: one_or_more
+            equals:
+              variable: owner-values-variable
+  evaluate:
+    test: owner-test

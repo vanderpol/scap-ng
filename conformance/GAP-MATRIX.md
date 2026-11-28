@@ -1,41 +1,63 @@
-# Issue #87 conformance gap matrix
+# Issue #87 specification-to-test-content coverage
 
-This matrix separates authoring/schema proof, independent semantic-oracle proof,
-and runtime qualification. It is intentionally falsifiable; green schema gates
-do not imply scanner equivalence.
+The corpus targets canonical SCAP-NG 0.4.1 at
+`cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876`. Use the
+[suite index](suite-index.json) to acquire the Assessment, fixture and expected
+outcome at the same repository revision. `bash conformance/check.sh` checks
+source pins, inventory, corpus content and independent local oracles. Consumer
+receipts live in the [qualification ledger](qualification/coverage.json).
 
-| Issue #87 requirement | Current evidence | Status / remaining gap |
-| --- | --- | --- |
-| Exact canonical 0.4.1 pin and closure | `manifest.json`, 147-resource digest, source `d1ab028...` | **Proved after explicit mainline repin**; family SHA-256 is `1755c893...`; no parallel active schema is introduced. |
-| Issue #95 YAML presentation order | Generated Assessments and core suites; actual YAML-order regression | **Proved for newly generated corpus**: every Test containing both keys serializes `object` before `require`; key order remains non-semantic. |
-| Exhaustive schema/mapping inventory | `schema-coverage.json`, 105 mappings, 718 fields, 142 enums, 11,327 constraints, 700 refs | **Proved as inventory**; occurrence-level executable semantic coverage is not claimed. |
-| Schema-valid Assessment per active capability | 105 generated Assessments; offline Draft 2020-12 validation | **Proved structurally**; collector support/runtime semantics unproved. |
-| Field coverage | Source mappings → authored positive Assessments → positive fixtures: 718/718/718 | **Proved structurally and witness-linked**. |
-| Comparison operators | Source language → authored operator suite: 67/67 | **Proved as typed schema-valid witnesses**; independent runtime operator behavior remains unqualified. |
-| Selector alternatives | Source mappings → authored selector suite: 94/94, no duplicate/missing witnesses | **Proved structurally**; enum boundaries and acquisition behavior remain open. |
-| Cardinality layers | All five cardinality tokens; Model A oracle covers Item/field/value folds | **Proved for approved Model A domain**; empty/indeterminate population semantics remain open. |
-| Variable/Evaluate/Require interactions | Canonical local-alias Assessment with two values, independent 15-case Model A oracle, and explicit FALSE leaf enclosed by `not` | **Partially proved**: known nonempty integer/string equality, aliases, and one field-cardinality rollup are witnessed; both direct RI leaves match the intended clause outcomes. Broader datatypes, status-bearing Variables, and cross-Assessment rollups remain open. |
-| Set/Filter shared semantics | Eight canonical ordered population cases and four exceptional controls. [RI Set replay](set-replay/README.md) | **RI shared evaluator** matches all 12 cases in memory and streaming. Indexed union, intersection and difference passed at 100,000 and 1,000,000 Items per operand. Capability acquisition and scan-wide execution remain open. |
-| Variable functions and dependency resolution | Canonical Assessment covers all 14 Variable operations and ten exact ordered populations. [RI replay](variable-function-replay/README.md) | **Direct RI Test execution** passed for the 24 positives and 20 projection controls. Some evidence statuses remain direct evaluator diagnostics. Whole-Assessment rollup, host acquisition and resource-limit qualification remain open. |
-| Inputs and input-presence guards | Canonical `core-input-guards` Assessment with provided, absent, explicit-empty, too-many, and out-of-range bindings | **Partially proved**: presence, optional absence, exactly-one cardinality, and bounded predicate distinctions are independently justified; policy graph binding and scanner invocation receipts remain RI/runtime work. |
-| Shared Assessments and applicability inheritance | Canonical `core-applicability` dependency/purpose identity with applicable, NOT_APPLICABLE, and NOT_EVALUATED handoff variants | **Partially proved**: authoring identity and typed handoff expectations are explicit; graph resolution, policy inheritance, and runtime precedence remain unqualified. |
-| FALSE/UNKNOWN/ERROR/NOT_APPLICABLE/NOT_EVALUATED | Typed fixtures/status Assessments and strict receipt outcome checks | **Authoring/status witness proved**; canonical propagation precedence is not complete and requires normative/runtime qualification. |
-| Disabled/profile behavior | Schema-valid Benchmark/Profile/Tailoring witnesses | **Policy structure proved**; scanner application and result accounting remain unqualified. |
-| Enum/constraint boundaries | Six native hive enum values × two capabilities; 20 authoring enum/oneOf cases; ten invalid enum/constraint vectors; selector sentinel mutation audit; 180 semantic-validator rules inventoried; `core-semantic-boundaries` and the fixed-result witness add sixty semantic witnesses, 19 structural witnesses, 4 deterministic authoring-rejected branches, 81 source-only native-equivalence dispositions, and 16 explicitly not-run rules | **Partial**: native selector and active Assessment authoring branches plus sixty independently justified semantic witnesses and four explicit invalid-authoring boundaries are recorded; the 81 repeated filter rules share a schema-pointer-backed Set/Filter witness rather than artificial capability copies. Non-selector schema enum nodes, cross-property combinations, and 11,327 constraint occurrences need targeted boundary families; unresolved rule dispositions remain explicit. |
-| Approved normative decisions | `core-approved-decisions.assessment.yaml`, decision fixture/expected, semantic validator, and `coverage-audit.json.approved_normative_decisions` | **Resolved for 0.4.1 authoring**: entailed Variable identity may be omitted with proof; nonredundant identity fails closed; wildcard/unverifiable cmdlet selection rejects before collection while explicit/null selection remains valid. |
-| Shared semantic-validator boundary family | `core-semantic-boundaries.assessment.yaml`, `core-approved-decisions.assessment.yaml`, deterministic typed evidence, 58 boundary rule IDs, 60 rule dispositions, and adversarial mutations | **Partially proved**: authored semantic outcomes and approved pre-collection rejections are independently justified; the remaining 16 collector/runtime rules plus 81 source-only filter identities require RI/source-crosswalk evidence. |
-| Deterministic evidence/replay | Fixed clock/locale/order, hashes, fixture-linked strict receipts | **Proved for portable fixtures**; real-host evidence is excluded. |
-| Independent expected-result justification | Separate expected documents, strict oracle, Model A oracle, adversarial regressions | **Proved for documented scopes**; no RI output is treated as oracle input. |
-| Platform/capability execution | Capability mappings and source witnesses | **Unproved**; scanner-neutral execution belongs to RI #196. The exact 16-rule handoff is `conformance/0.4/execution-boundaries/RI-196-HANDOFF.json`. |
-| Scale/concurrency (100K/1M Items) | None | **Unproved**, evidence issue #3 / RI execution work. |
-| Independent multi-scanner corroboration | None | **Unproved**, intentionally excluded from this repository increment. |
+`for_each` is deferred to 0.5.0 consideration. Deprecated OVAL 5.12.3 ESX
+Tests are excluded. The four experimental OVAL 6.0-derived ESXi capabilities
+have a separate suite and accounting.
 
-## RI #196 handoff requirements
+## Counts and scope
 
-An RI adapter must consume the exact manifest and selected fixture variant,
-execute the authored Assessment without rewriting it, and emit a receipt that
-passes `conformance/tools/oracle.py`. The receipt must bind schema commit,
-fixture/expected hashes, exact Test outcome keys, typed evidence, decisive reason,
-and provenance. It must report unsupported acquisition, incomplete/error/unknown
-status, permission boundaries, resource limits, and cancellation explicitly.
-A passing schema or portable oracle check alone is never an RI execution receipt.
+| Measure | Before | Current |
+| --- | ---: | ---: |
+| Active mapped capabilities with an authored native baseline | 101/101 | 101/101 |
+| Experimental capabilities with an authored native baseline | 4/4 | 4/4 |
+| Mapped fields with a typed structural witness across both cohorts | 718/718 | 718/718 |
+| Active mapped field/datatype pairs with a value in indexed fixtures | 619/910 | 622/910 |
+| Experimental field/datatype pairs with a value in the baseline fixture | 17/28 | 17/28 |
+| Reachable enum and const values matched by active native documents | 143/850 | 169/850 |
+| Reachable enum and const values without any scoped match | 678/850 | 659/850 |
+| Active mapped capabilities with OVAL 5.12.3 source Tests | 99/101 | 101/101 |
+| OVAL Self-Assertion XML Definitions / Tests, including archived members | 167 / 799 | 196 / 828 |
+| Dedicated exact scalar-equality boundary Test leaves | 0 | 10 |
+| Linked automated Result and Item-report fixtures over the same supplied evidence | 0 | 1 |
+
+The OVAL baseline is the pinned upstream Self-Assertion corpus. Native
+comparison counts use merged baseline `b5b99e997450741a0444ec7b631e71fe2d49b001`.
+Schema matching counts exact locations visited during validation, including
+sibling branches that can fail a different constraint. Draft transport and
+experimental matches are recorded separately and can overlap active matches.
+Typed fixture counts record a value labeled with the mapped datatype. The current
+count adds the exact-equality and Result evidence suites. These counts carry no assertion about field-specific behavior or acquisition.
+
+## Remaining content and specification decisions
+
+| Surface | Coverage and exact follow-up |
+| --- | --- |
+| Capabilities and datatypes | The [machine matrix](content-coverage.json) identifies missing indexed datatype evidence by mapping and field. Reconcile those rows against targeted suites before authoring further comparisons. For example, `windows.registry.value` has supplied integer evidence in the [paired fixtures](0.4/supplied-evidence.json) beyond the generic baseline, but binary/version examples require a separate review of operand encodings and applicability. |
+| Selectors and schema constraints | The [audit](coverage-audit.json) records 94 selector alternatives and 718 mapped fields across both scopes. The [source inventory](schema-coverage.json) lists all 1,620 property groups and 11,346 constraint occurrences. Complete positive, rejection and cross-property boundary coverage remains open. The [enum and const ledger](qualification/schema-value-occurrences.json) gives every reachable unmatched value and its exact pointer. |
+| Comparisons and cardinality | The common authoring suite covers 67 field operations, including the active regex spelling. The [exact equality suite](exact-equality/expected.json) adds native integer precision, negative and zero, empty and whitespace, Unicode identity and case boundaries. The [Model A oracle](0.4/model-a/manifest.json) establishes nonempty cardinality, and the [ONE/XOR suite](logical-cardinality/expected.json) distinguishes known Boolean folds. Primitive datatype operations, field-specific operator constraints, and cross-status folds still require independently justified cases. |
+| Variables and functions | [Core witnesses](expected/core-variable-functions.json) cover the 14 active operations, with alias/constant and ordered output controls. [Merge](variable-merge/expected.json), [time difference](variable-time-difference/expected.json) and [external Input](variable-external-input/expected.json) add source-specific expected outcomes. Complete parameter, datatype, empty and exceptional combinations remain open. General empty-population reduction and Variable cardinality semantics are under review in [#135](https://github.com/vanderpol/scap-ng/pull/135) and [#136](https://github.com/vanderpol/scap-ng/pull/136). |
+| Shared Objects, Sets and Filters | [Core Set/Filter witnesses](expected/core-set-filters.json) establish ordered overlap, nesting, single-operand and include/exclude behavior. The mapping audit links 81 repeated source rules to the shared native Filter rather than counting the same behavior 81 times. Field-specific predicate restrictions and combinations of partial acquisition and filters remain open. |
+| Conditional and applicability | [Ordered guards](conditional-replay/expected.json) cover branch ordering, indeterminate guards and fallback. [Applicability](expected/core-applicability.json) covers the common dependency handoff. Add native combinations of guard, applicability and shared dependencies across scopes, including provenance of reused and excluded invocations. |
+| Manual, Inputs, Profiles and Tailoring | [Manual lifecycle](manual-lifecycle/expected.json) exercises the six authored answer choices, missing and stale answers, and direct/imported/delegated provenance. [Content package](content-package/sources.json) and [Input guards](expected/core-input-guards.json) cover basic rollout and absent/empty/boundary bindings. Profile inheritance and selection conflicts, Tailoring/Organizational Input precedence, and policy-to-Result interactions still need an explicit occurrence and behavior audit. |
+| Results and evidence | [Result evidence](result-evidence/expected.json) links collection and Variable audit records, field uses, Test-local Items and a projected Item report. It includes all six Collection and seven Variable status tokens as schema controls. [Result package](result-package/expected.json) adds cross-target references, disabled versus invoked distinction, and exact bytes for unsigned draft transport. Broader materialization, projection domain, and completeness/counter combinations remain open. The [contract decision ledger](../docs/DOCUMENTATION-CONTRACT-DECISIONS.md#item-materialization-and-projection) records the unresolved projection authority and count definitions. |
+| OVAL 5.12.3 Self-Assertion | [Supplement](oval-self-assertion/expected.json) covers UNIX and Windows YAML file-content and SQLite SQL512. Eight [boundary cases](oval-self-assertion/yaml-boundaries/expected.json) add empty, missing, malformed and unreadable cases across both platforms. The [source ledger](oval-source-coverage.json) lists source Tests outside adopted mappings and keeps the original XML identities. Investigate additional source edge cases in already represented families. UNIX Set/Filter source parity remains open in [#132](https://github.com/vanderpol/scap-ng/issues/132). |
+| OVAL 6.0 ESXi | [Experimental expected cases](experimental/esxi/expected.json) and the source ledger distinguish the 4 experimental and 16 proposed source Tests. Keep the 16 proposals outside active 0.4.1. Track the partial DISA evidence and conflicting timeout direction in [#86](https://github.com/vanderpol/scap-ng/issues/86), and experimental selector isolation in [#133](https://github.com/vanderpol/scap-ng/issues/133). |
+
+The [unresolved operational contracts](../docs/contracts/0.4-semantic-holds.md)
+document questions that affect independent expectations, including mixed
+datatype casts and six-state reduction. Existing structural and independently
+derivable outcome cases can be authored while those decisions are pending.
+
+## Consumer discrepancies and historical failures
+
+- SQL512 conversion is tracked in [Tools #127](https://github.com/vanderpol/scap-ng-tools/issues/127), and source evidence datatype ambiguity in [Tools #128](https://github.com/vanderpol/scap-ng-tools/issues/128).
+- RI tracks native replay in [#196](https://github.com/vanderpol/scap-ng-ri/issues/196), ESXi in [#202](https://github.com/vanderpol/scap-ng-ri/issues/202), YAML acquisition in [#305](https://github.com/vanderpol/scap-ng-ri/issues/305), and guard trace discrepancies in [#309](https://github.com/vanderpol/scap-ng-ri/issues/309). Runtime, scale, performance and backend qualification belong to RI.
+- Studio extension-host checks are tracked in [Studio #75](https://github.com/vanderpol/scap-ng-vscode/issues/75). The [sample audit](qualification/studio-sample-audit.json) records the sample scope examined. The same canonical fixture revisions can be consumed by Tools, RI and Studio.
+- The reproducible stale documentation-fidelity manifest was repaired. The six historical failures reported for Issue #87 could not be recovered as an exact list from the available logs. Current local gate results and the archived [qualification ledger](qualification/README.md) provide the reproducible record.
