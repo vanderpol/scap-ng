@@ -1,0 +1,56 @@
+{
+  "format": "scap-ng-oval-yaml-boundary-expectations-1",
+  "source_schema_pin": "2f140ee5c5dd1ed9606fcd5afc301f6baeb48706",
+  "oracle_anchor": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/oval-results-schema.xsd#L504",
+  "yamlpath": "$.settings",
+  "platforms": {
+    "unix": {
+      "fixture_root": "/tmp/scap-ng-issue87-yaml-boundary",
+      "xml": "unix/ind-def_yamlfilecontent_boundaries.xml",
+      "native": "unix/yaml-file-boundaries.assessment.yaml",
+      "permissions": "Mode 0000 file and traversable directory. Execute as an unprivileged account without a file-access override."
+    },
+    "windows": {
+      "fixture_root": "C:\\scap-ng-issue87-yaml-boundary",
+      "xml": "windows/ind-def_yamlfilecontent_boundaries.xml",
+      "native": "windows/yaml-file-boundaries.assessment.yaml",
+      "permissions": "Deny the scanner principal read-data access to the unreadable fixture. The principal must lack effective backup privilege and retain directory traversal."
+    }
+  },
+  "cases": {
+    "empty-map": {
+      "source_ids": [111, 211],
+      "source_fixture": "yaml-boundaries/fixtures/empty-map.yaml",
+      "destination": "empty-map.yaml",
+      "observed_value": {},
+      "complete_expectation": "false",
+      "reason": "The selected readable mapping contains no amber field."
+    },
+    "missing-path": {
+      "source_ids": [112, 212],
+      "source_fixture": "yaml-boundaries/fixtures/missing-path.yaml",
+      "destination": "missing-path.yaml",
+      "complete_expectation": "false",
+      "reason": "The readable document contains no matching YAMLPath."
+    },
+    "malformed": {
+      "source_ids": [113, 213],
+      "source_fixture": "fixtures/yaml/malformed.yaml",
+      "destination": "malformed.yaml",
+      "reason": "An unclosed YAML sequence prevents collection of an authoritative comparison."
+    },
+    "unreadable": {
+      "source_ids": [114, 214],
+      "source_fixture": "fixtures/yaml/settings.yaml",
+      "destination": "unreadable.yaml",
+      "reason": "The bytes are valid, but the scanner lacks permission to acquire them."
+    }
+  },
+  "outcomes_by_source_collection_flag": {
+    "does not exist": "false",
+    "error": "error",
+    "not collected": "unknown",
+    "not applicable": "not applicable"
+  },
+  "expectation_boundary": "A complete readable observation cannot match absent data. Exceptional outcomes follow the actual collection flag under the pinned OVAL result contract. Native collector status mapping requires independent qualification."
+}

@@ -1070,6 +1070,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("result-package", "draft-transport", "result-package/manifest.json"),
         ("variable-function-replay", "active", "variable-function-replay/controls.json"),
         ("oval-self-assertion", "oval-5.12.3", "oval-self-assertion/expected.json"),
+        ("oval-yaml-boundaries", "oval-5.12.3", "oval-self-assertion/yaml-boundaries/expected.json"),
         ("oval-merge", "oval-5.12.3", "variable-merge/expected.json"),
         ("oval-time-difference", "oval-5.12.3", "variable-time-difference/expected.json"),
         ("oval-external-input", "oval-5.12.3", "variable-external-input/expected.json"),
@@ -1082,7 +1083,9 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         if entry.parent != OUT:
             paths = sorted(
                 path for path in entry.parent.rglob("*")
-                if path.is_file() and path.suffix in {".json", ".yaml", ".xml", ".sql", ".go"}
+                if path.is_file()
+                and path.suffix in {".json", ".yaml", ".xml", ".sql", ".go"}
+                and (name != "oval-self-assertion" or "yaml-boundaries" not in path.relative_to(entry.parent).parts)
             )
         suites.append({
             "id": name,

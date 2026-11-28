@@ -87,6 +87,10 @@ def case_sources(experimental_capabilities):
         for member in load(CONFORMANCE / source)["members"]:
             register(member["source"], f'{member["kind"]}.schema.json', True)
 
+    boundaries = "oval-self-assertion/yaml-boundaries"
+    for platform in load(CONFORMANCE / boundaries / "expected.json")["platforms"].values():
+        register(f'{boundaries}/{platform["native"]}', assessment, True)
+
     manual = load(CONFORMANCE / "manual-lifecycle/expected.json")
     for path in manual["standalone_results"].values():
         register(path, "manual-assessment-result.schema.json", True)
