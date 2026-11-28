@@ -23,13 +23,17 @@ and semantic validator rules. Regenerate it after a canonical schema change:
 ```sh
 python conformance/tools/generate.py
 python conformance/tools/audit.py
+python conformance/tools/audit_schema_occurrences.py
+python conformance/tools/audit_content.py
 bash conformance/check.sh
 ```
 
 Run `bash conformance/check.sh` from the repository with
 `requirements-dev.txt` installed to verify exact artifact pins, the tracked
 coverage audit and the portable corpus tests. The manually dispatched
-conformance workflow uses the same gate.
+conformance workflow uses the same gate. The [coverage matrix](content-coverage.json)
+links the source inventories to the fixture ledgers, and the
+[remaining-gap report](GAP-MATRIX.md) summarizes the counts and open cases.
 
 The current mainline-rebased inventory is pinned to schema commit
 `cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876` and contains 105 capability

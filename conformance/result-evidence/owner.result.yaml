@@ -1,0 +1,235 @@
+assessment_result:
+  result_schema_version: 0.4.1
+  execution_id: execution-owner
+  assessment:
+    id: conformance-result-evidence
+    version: 1
+  purpose: assessment
+  mode: automated
+  class: miscellaneous
+  outcome: 'true'
+  summary: Both observed owners match a value extracted from the same supplied Object.
+  logical_complete: true
+  population_complete: true
+  evidence_complete: true
+  target_ref: target-owner
+  tests:
+  - id: owner-test
+    invocation_ref: execution-owner
+    outcome: 'true'
+    existence_outcome: 'true'
+    object_refs:
+    - owner-file-object
+    item_refs:
+    - owner-a
+    - owner-b
+    per_item_results:
+    - item_ref: owner-a
+      outcome: 'true'
+      item:
+        id: owner-a
+        capability: unix.file
+        status: exists
+        fields:
+          full_path:
+            datatype: string
+            status: exists
+            value: /scap-ng-result-fixture/a
+          owner_uid:
+            datatype: integer
+            status: exists
+            value: 42
+          group_id:
+            datatype: string
+            status: exists
+            value: '5'
+        provenance:
+          source_ref: supplied-owner-snapshot
+          target_ref: target-owner
+      require_results:
+      - require_ref: /tests/owner-test/require
+        outcome: 'true'
+        field_results:
+        - field: owner_uid
+          require_ref: /tests/owner-test/require/fields/owner_uid
+          outcome: 'true'
+          operation: equals
+          observed_values:
+          - datatype: integer
+            status: exists
+            value: 42
+          observation_complete: true
+          values_found: exactly_one
+          values_matching: every
+          requirement_ref: /tests/owner-test/require/fields/owner_uid
+          expected_values:
+          - datatype: integer
+            status: exists
+            value: 42
+          - datatype: integer
+            status: exists
+            value: 42
+          variable_refs:
+          - owner-values-variable
+    - item_ref: owner-b
+      outcome: 'true'
+      item:
+        id: owner-b
+        capability: unix.file
+        status: exists
+        fields:
+          full_path:
+            datatype: string
+            status: exists
+            value: /scap-ng-result-fixture/b
+          owner_uid:
+            datatype: integer
+            status: exists
+            value: 42
+          group_id:
+            datatype: string
+            status: exists
+            value: '7'
+        provenance:
+          source_ref: supplied-owner-snapshot
+          target_ref: target-owner
+      require_results:
+      - require_ref: /tests/owner-test/require
+        outcome: 'true'
+        field_results:
+        - field: owner_uid
+          require_ref: /tests/owner-test/require/fields/owner_uid
+          outcome: 'true'
+          operation: equals
+          observed_values:
+          - datatype: integer
+            status: exists
+            value: 42
+          observation_complete: true
+          values_found: exactly_one
+          values_matching: every
+          requirement_ref: /tests/owner-test/require/fields/owner_uid
+          expected_values:
+          - datatype: integer
+            status: exists
+            value: 42
+          - datatype: integer
+            status: exists
+            value: 42
+          variable_refs:
+          - owner-values-variable
+    require_refs:
+    - /tests/owner-test/require
+    items_found: one_or_more
+    items_observed: 2
+    item_summary:
+      evaluated_items: 2
+      observed_mismatches: 0
+      actual_mismatches: 0
+      returned_items: 2
+      truncated_evidence: false
+  objects:
+  - id: owner-file-object
+    capability: unix.file
+    status: complete
+    item_refs:
+    - owner-a
+    - owner-b
+    logical_complete: true
+    population_complete: true
+    source_execution_ref: execution-owner
+  variables:
+  - id: owner-values-variable
+    datatype: integer
+    status: complete
+    cardinality: many
+    values:
+    - datatype: integer
+      status: exists
+      value: 42
+    - datatype: integer
+      status: exists
+      value: 42
+    item_refs:
+    - owner-a
+    - owner-b
+    source: local
+    provenance:
+      source_ref: owner-file-object
+  diagnostics: []
+  field_uses:
+  - test_ref: owner-test
+    item_ref: owner-a
+    used_elements:
+    - owner_uid
+    required_elements:
+    - owner_uid
+    relationship: direct
+  - test_ref: owner-test
+    item_ref: owner-a
+    used_elements:
+    - owner_uid
+    required_elements:
+    - owner_uid
+    relationship: variable
+  - test_ref: owner-test
+    item_ref: owner-a
+    used_elements:
+    - full_path
+    required_elements:
+    - full_path
+    relationship: selection
+  - test_ref: owner-test
+    item_ref: owner-b
+    used_elements:
+    - owner_uid
+    required_elements:
+    - owner_uid
+    relationship: direct
+  - test_ref: owner-test
+    item_ref: owner-b
+    used_elements:
+    - owner_uid
+    required_elements:
+    - owner_uid
+    relationship: variable
+  - test_ref: owner-test
+    item_ref: owner-b
+    used_elements:
+    - full_path
+    required_elements:
+    - full_path
+    relationship: selection
+  dependent_assessments: []
+  evidence_retention:
+    scope: per_test
+    maximum_items: null
+    source: run_request
+  item_materialization:
+    scope: all
+    available_count: 2
+    included_count: 2
+    omitted_count: 0
+    consumed_item_refs:
+    - owner-a
+    - owner-b
+    collections:
+    - object_ref: owner-file-object
+      available_count: 2
+      included_count: 2
+      omitted_count: 0
+  expression_execution:
+    assessment: conformance-result-evidence
+    invocation_ref: execution-owner
+    outcome: 'true'
+    executed_tests:
+    - owner-test
+    diagnostics: []
+    trace:
+    - path: /evaluate
+      kind: test
+      test: owner-test
+      outcome: 'true'
+      assessment: conformance-result-evidence
+      reused: false
+      owner_invocation_ref: execution-owner

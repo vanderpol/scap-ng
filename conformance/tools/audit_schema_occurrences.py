@@ -82,6 +82,7 @@ def case_sources(experimental_capabilities):
     for row in supplemental["cases"]:
         register(row["source"], row["schema"], row["valid"])
 
+    register("exact-equality/exact-equality.assessment.yaml", assessment, True)
     register("logical-cardinality/one-xor.assessment.yaml", assessment, True)
     register("conditional-replay/mixed-guards.assessment.yaml", assessment, True)
     register("empty-projection/empty-collection.assessment.yaml", assessment, True)
@@ -96,6 +97,11 @@ def case_sources(experimental_capabilities):
     manual = load(CONFORMANCE / "manual-lifecycle/expected.json")
     for path in manual["standalone_results"].values():
         register(path, "manual-assessment-result.schema.json", True)
+
+    result_evidence = load(CONFORMANCE / "result-evidence/expected.json")
+    register("result-evidence/" + result_evidence["source"], assessment, True)
+    for name, schema in result_evidence["documents"].items():
+        register("result-evidence/" + name, schema, True)
 
     result_package = load(CONFORMANCE / "result-package/manifest.json")
     register("result-package/manifest.json", "result-package-manifest.schema.json", True, "draft-transport")

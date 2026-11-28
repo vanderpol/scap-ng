@@ -1,0 +1,239 @@
+assessment:
+  id: conformance-exact-equality
+  version: 1
+  assessment_title: Exact integer and string equality boundaries
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  variables:
+    large-same-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value: 9007199254740993
+    large-adjacent-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value: 9007199254740993
+    negative-same-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value: -17
+    negative-zero-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: integer
+          value: -17
+    empty-same-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: ''
+    empty-space-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: ''
+    unicode-same-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: "\xE9"
+    unicode-normalized-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: "\xE9"
+    case-different-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: alpha
+    trailing-space-variable:
+      kind: constant
+      expression:
+        literal:
+          datatype: string
+          value: alpha
+  tests:
+    large-same-test:
+      test_title: Equal integers above the binary64 exact-integer boundary
+      capability: variable.value
+      variable: large-same-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 9007199254740993
+    large-adjacent-test:
+      test_title: Adjacent integers distinguishable only without binary64 rounding
+      capability: variable.value
+      variable: large-adjacent-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 9007199254740992
+    negative-same-test:
+      test_title: Equal negative integers
+      capability: variable.value
+      variable: negative-same-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: -17
+    negative-zero-test:
+      test_title: Negative integer differs from zero
+      capability: variable.value
+      variable: negative-zero-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 0
+    empty-same-test:
+      test_title: Two present empty strings are equal
+      capability: variable.value
+      variable: empty-same-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: ''
+    empty-space-test:
+      test_title: Empty string differs from one space
+      capability: variable.value
+      variable: empty-space-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: ' '
+    unicode-same-test:
+      test_title: Identical non-ASCII strings compare equal
+      capability: variable.value
+      variable: unicode-same-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: "\xE9"
+    unicode-normalized-test:
+      test_title: Different Unicode encodings of a spelling remain distinct strings
+      capability: variable.value
+      variable: unicode-normalized-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: "e\u0301"
+    case-different-test:
+      test_title: Case is significant for exact equality
+      capability: variable.value
+      variable: case-different-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: Alpha
+    trailing-space-test:
+      test_title: Trailing space is significant for exact equality
+      capability: variable.value
+      variable: trailing-space-variable
+      reported_elements: all
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 'alpha '
+  evaluate:
+    and:
+    - test: large-same-test
+    - not:
+        test: large-adjacent-test
+    - test: negative-same-test
+    - not:
+        test: negative-zero-test
+    - test: empty-same-test
+    - not:
+        test: empty-space-test
+    - test: unicode-same-test
+    - not:
+        test: unicode-normalized-test
+    - not:
+        test: case-different-test
+    - not:
+        test: trailing-space-test
