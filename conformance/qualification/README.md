@@ -232,3 +232,10 @@ the production report-side reducer at RI revision ca4fabfe. Eleven of
 Four cases record exact status or canonical trace disagreements. Actual
 branch acquisition remains unqualified.
 [RI #309](https://github.com/vanderpol/scap-ng-ri/issues/309).
+
+The [collected empty projection comparison](../empty-projection/README.md)
+uses a real UNIX file Object shape in native authoring. With explicit
+complete-empty supplied evidence, current RI returns zero through
+`count` and false through a separate existence Test. Earlier RI held
+both. Missing, failed and incomplete cases retain their diagnostics.
+Exact current Studio model replay also passed.

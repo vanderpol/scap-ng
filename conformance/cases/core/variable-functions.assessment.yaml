@@ -14,9 +14,11 @@ assessment:
       required: true
       description: Deterministic supplied value for the native input expression witness.
   shared_objects:
-    function-family-object:
-      object_title: Deterministic family source
-      capability: independent.family
+    function-file-object:
+      object_title: Files in the deterministically supplied projection
+      capability: unix.file
+      full_path:
+        matches_regex: ^/scap-ng-function-fixture/[a-z]+$
   variables:
     source-values-variable:
       kind: constant
@@ -131,8 +133,8 @@ assessment:
       expression:
         values:
           object:
-            object_ref: function-family-object
-          field: family
+            object_ref: function-file-object
+          field: full_path
     expected-unique-variable:
       kind: constant
       expression:
@@ -236,8 +238,8 @@ assessment:
         literal:
           datatype: string
           value:
-          - unix
-          - windows
+          - /scap-ng-function-fixture/alpha
+          - /scap-ng-function-fixture/beta
     function-unique-ordered-variable:
       kind: local
       expression:
@@ -752,7 +754,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            equals: unix|windows
+            equals: /scap-ng-function-fixture/alpha|/scap-ng-function-fixture/beta
   evaluate:
     and:
     - test: function-unique-test

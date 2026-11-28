@@ -507,14 +507,14 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["functions"]["begin"]["values"], ["/etc", "/var"])
         self.assertEqual(expected["functions"]["end"]["values"], ["etc/", "var/"])
         self.assertEqual(expected["functions"]["input"]["values"], [7])
-        self.assertEqual(expected["functions"]["values"]["values"], ["unix", "windows"])
+        self.assertEqual(expected["functions"]["values"]["values"], ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"])
         self.assertEqual(assessment["assessment"]["variables"]["begin-values-variable"]["expression"]["begin"]["character"], "/")
         self.assertEqual(assessment["assessment"]["variables"]["end-values-variable"]["expression"]["end"]["character"], "/")
         self.assertEqual(assessment["assessment"]["variables"]["input-values-variable"]["expression"], {"input": "function-value-input"})
         values_expr = assessment["assessment"]["variables"]["collected-values-variable"]["expression"]["values"]
-        self.assertEqual(values_expr, {"object": {"object_ref": "function-family-object"}, "field": "family"})
+        self.assertEqual(values_expr, {"object": {"object_ref": "function-file-object"}, "field": "full_path"})
         self.assertEqual(fixture["bindings"]["function-value-input"], [7])
-        self.assertEqual([item["family"] for item in fixture["populations"]["function-family-object"]], ["unix", "windows"])
+        self.assertEqual([item["full_path"] for item in fixture["populations"]["function-file-object"]], ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"])
         for name in ("function-begin-test", "function-end-test", "function-input-test", "function-values-test"):
             self.assertEqual(fixture["test_outcomes"][name], "true")
             self.assertEqual(expected["functions"][name.removeprefix("function-").removesuffix("-test")]["outcome"], "true")

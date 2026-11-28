@@ -100,7 +100,7 @@ class VariableFunctionReplayCases(unittest.TestCase):
         baseline = load(CONFORMANCE / EXPECTED)["functions"]["values"]["values"]
         first, second = baseline
         populations = {
-            "nonmatching": ["unknown", second],
+            "nonmatching": ["/scap-ng-function-fixture/gamma", second],
             "reordered": [second, first],
             "duplicate": [first, second, first],
             "one-item": [first],

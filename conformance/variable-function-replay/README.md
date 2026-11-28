@@ -16,9 +16,12 @@ and missing values. The original independent expected values are unchanged.
 
 The current [RI receipt](ri-receipt.json) records 24 true direct Test
 evaluations and 20 paired projection controls. A reordered, duplicate or
-short projection can pass membership and fails the sequence check. Empty,
-absent, incomplete and error sources retain diagnostics without a
-technical outcome. Collection inputs are supplied through the public RI
+short projection can pass membership and fails the sequence check. At the RI revision in this receipt, empty, absent, incomplete and error
+sources retain diagnostics without a technical outcome. The separate
+[empty projection replay](../empty-projection/README.md) exercises the
+current RI's complete-empty behavior. The current corpus projects a
+meaningful UNIX file field. The historical replay still uses the exact
+old source and fixture bytes, including their singleton family Object. Collection inputs are supplied through the public RI
 evaluator API. The corrected alias interaction reports one true and one false leaf,
 with both values matching before the intended existence requirement
 rejects the latter. Whole-Assessment rollup and host acquisition remain open.

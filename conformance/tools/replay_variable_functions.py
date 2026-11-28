@@ -22,32 +22,34 @@ INTERACTION_EXPECTED = "expected/core-variable-interactions.json"
 REPLAY = CONFORMANCE / "variable-function-replay"
 PROJECTION = "function-values-test"
 ORDERED_PROJECTION = "function-values-ordered-test"
-SOURCE_OBJECT = "function-family-object"
-CAPABILITY = "independent.family"
 
 
-def bind_collected_items(assessment, fixture):
-    require_equal(assessment["shared_objects"][SOURCE_OBJECT]["capability"], CAPABILITY, SOURCE_OBJECT)
+def bind_collected_items(assessment, fixture, variable="collected-values-variable"):
+    planned = assessment["variables"][variable]["expression"]["values"]
+    object_ref = planned["object"]["object_ref"]
+    field = planned["field"]
+    capability = assessment["shared_objects"][object_ref]["capability"]
     items = []
-    for row in fixture["populations"][SOURCE_OBJECT]:
+    for row in fixture["populations"][object_ref]:
         require_equal(row["status"], "collected", row["id"])
         items.append({
-            "id": row["id"], "capability": CAPABILITY, "status": "exists",
+            "id": row["id"], "capability": capability, "status": "exists",
             "provenance": {"source": "canonical variable-functions fixture"},
-            "fields": {"family": [{"datatype": "string", "status": "exists", "value": row["family"]}]},
+            "fields": {field: [{"datatype": "string", "status": "exists", "value": row[field]}]},
         })
-    return {SOURCE_OBJECT: {
-        "Collection": {"id": "function-family-collection", "capability": CAPABILITY,
+    evidence = {object_ref: {
+        "Collection": {"id": "projection-source-collection", "capability": capability,
                        "status": "complete", "logical_complete": True, "population_complete": True},
         "Items": items,
     }}
+    return evidence, field
 
 
-def projection_variant(baseline, name):
+def projection_variant(baseline, field, name):
     if name == "absent":
         return {}
     variant = deepcopy(baseline)
-    collection = variant[SOURCE_OBJECT]
+    collection, = variant.values()
     items = collection["Items"]
     if name == "empty":
         items.clear()
@@ -56,16 +58,18 @@ def projection_variant(baseline, name):
     elif name == "collection-error":
         collection["Collection"]["status"] = "error"
     elif name == "field-error":
-        items[0]["fields"]["family"] = [{"datatype": "string", "status": "error"}]
+        items[0]["fields"][field] = [{"datatype": "string", "status": "error"}]
     elif name == "field-empty":
-        items[0]["fields"]["family"] = []
+        items[0]["fields"][field] = []
+    elif name == "missing-field":
+        del items[0]["fields"][field]
     elif name == "nonmatching":
-        items[0]["fields"]["family"][0]["value"] = "unknown"
+        items[0]["fields"][field][0]["value"] = "/scap-ng-function-fixture/gamma"
     elif name == "reordered":
         items.reverse()
     elif name == "duplicate":
         duplicate = deepcopy(items[0])
-        duplicate["id"] = "family-unix-again"
+        duplicate["id"] = "extra-" + duplicate["id"]
         items.append(duplicate)
     elif name == "one-item":
         items.pop()
@@ -134,10 +138,10 @@ def replay(ri, go):
     validator().validate(document)
     fixture = load(CONFORMANCE / EVIDENCE)
     expected = load(CONFORMANCE / EXPECTED)
-    evidence = bind_collected_items(document["assessment"], fixture)
+    evidence, field = bind_collected_items(document["assessment"], fixture)
     cases = source_cases(document["assessment"], evidence)
     for name in control["projection_variants"]:
-        variant = projection_variant(evidence, name)
+        variant = projection_variant(evidence, field, name)
         for test in (PROJECTION, ORDERED_PROJECTION):
             cases.append({"name": f"{name}/{test}", "test": test, "evidence": variant})
 
@@ -152,7 +156,13 @@ def replay(ri, go):
         ["git", "show", f'{control["prior_commit"]}:conformance/{ASSESSMENT}'], cwd=ROOT
     )
     baseline = yaml.safe_load(baseline_raw)
-    previous = run(ri, go, baseline, fixture, schema_hash, source_cases(baseline["assessment"], evidence))
+    baseline_fixture_raw = subprocess.check_output(
+        ["git", "show", f'{control["prior_commit"]}:conformance/{EVIDENCE}'], cwd=ROOT
+    )
+    baseline_fixture = json.loads(baseline_fixture_raw)
+    baseline_evidence, _ = bind_collected_items(baseline["assessment"], baseline_fixture)
+    previous = run(ri, go, baseline, baseline_fixture, schema_hash,
+                   source_cases(baseline["assessment"], baseline_evidence))
     prior_false = sorted(name for name, row in previous.items() if row.get("outcome") == "false")
     require_equal(prior_false, control["prior_false"], "original core function contradictions")
     require_equal(sum(row.get("outcome") == "true" for row in previous.values()) + len(prior_false),
