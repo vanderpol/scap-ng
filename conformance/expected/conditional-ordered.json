@@ -1,0 +1,35 @@
+{
+  "case_id": "conformance-conditional-ordered",
+  "variants": {
+    "primary-preempts-present-alternatives": {
+      "assessment_outcome": "true",
+      "test_outcomes": {"primary-test": "true"},
+      "guards_in_order": ["primary-input"],
+      "reason": "The first provided input selects the primary Test. Neither alternative guard is evaluated."
+    },
+    "provided-empty-selects-nested": {
+      "assessment_outcome": "true",
+      "test_outcomes": {"nested-test": "true"},
+      "guards_in_order": ["primary-input", "secondary-input", "detail-input"],
+      "reason": "Empty is a permitted supplied population for both guards. The secondary guard wins, then its nested detail guard selects the live comparison."
+    },
+    "first-alternative-false-body-is-decisive": {
+      "assessment_outcome": "false",
+      "test_outcomes": {"secondary-test": "false"},
+      "guards_in_order": ["primary-input", "secondary-input", "detail-input"],
+      "reason": "The secondary guard wins. Its body compares live with retired and returns false. The tertiary route stays inactive."
+    },
+    "last-alternative": {
+      "assessment_outcome": "true",
+      "test_outcomes": {"tertiary-test": "true"},
+      "guards_in_order": ["primary-input", "secondary-input", "tertiary-input"],
+      "reason": "Both earlier inputs are absent. The last supplied input selects the live comparison."
+    },
+    "fallback": {
+      "assessment_outcome": "not_evaluated",
+      "test_outcomes": {},
+      "guards_in_order": ["primary-input", "secondary-input", "tertiary-input"],
+      "reason": "All three outer inputs are absent. The fallback declares the Assessment not evaluated."
+    }
+  }
+}

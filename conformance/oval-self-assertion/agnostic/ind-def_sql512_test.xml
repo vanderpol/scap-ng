@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<oval_definitions xmlns="http://oval.mitre.org/XMLSchema/oval-definitions-5" xmlns:oval="http://oval.mitre.org/XMLSchema/oval-common-5" xmlns:ind-def="http://oval.mitre.org/XMLSchema/oval-definitions-5#independent" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <generator>
+    <oval:product_name>SCAP-NG conformance</oval:product_name>
+    <oval:schema_version>5.12.3</oval:schema_version>
+    <oval:timestamp>2026-11-27T00:00:00Z</oval:timestamp>
+  </generator>
+  <definitions>
+    <definition id="oval:org.scapng.conformance:def:301" version="1" class="miscellaneous">
+      <metadata>
+        <title>Select one typed SQLite row</title>
+        <description>Select one typed SQLite row.</description>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:org.scapng.conformance:tst:301" comment="Select one typed SQLite row"/>
+      </criteria>
+    </definition>
+    <definition id="oval:org.scapng.conformance:def:302" version="1" class="miscellaneous">
+      <metadata>
+        <title>Same SQLite row fails a deliberately false comparison</title>
+        <description>Same SQLite row fails a deliberately false comparison.</description>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:org.scapng.conformance:tst:302" comment="Same SQLite row fails a deliberately false comparison"/>
+      </criteria>
+    </definition>
+    <definition id="oval:org.scapng.conformance:def:303" version="1" class="miscellaneous">
+      <metadata>
+        <title>SQLite query has no matching rows</title>
+        <description>SQLite query has no matching rows.</description>
+      </metadata>
+      <criteria>
+        <criterion test_ref="oval:org.scapng.conformance:tst:303" comment="SQLite query has no matching rows"/>
+      </criteria>
+    </definition>
+  </definitions>
+  <tests>
+    <ind-def:sql512_test id="oval:org.scapng.conformance:tst:301" version="1" comment="Select one typed SQLite row" check="all" check_existence="at_least_one_exists">
+      <ind-def:object object_ref="oval:org.scapng.conformance:obj:301"/>
+      <ind-def:state state_ref="oval:org.scapng.conformance:ste:301"/>
+    </ind-def:sql512_test>
+    <ind-def:sql512_test id="oval:org.scapng.conformance:tst:302" version="1" comment="Same SQLite row fails a deliberately false comparison" check="all" check_existence="at_least_one_exists">
+      <ind-def:object object_ref="oval:org.scapng.conformance:obj:302"/>
+      <ind-def:state state_ref="oval:org.scapng.conformance:ste:302"/>
+    </ind-def:sql512_test>
+    <ind-def:sql512_test id="oval:org.scapng.conformance:tst:303" version="1" comment="SQLite query has no matching rows" check="all" check_existence="at_least_one_exists">
+      <ind-def:object object_ref="oval:org.scapng.conformance:obj:303"/>
+    </ind-def:sql512_test>
+  </tests>
+  <objects>
+    <ind-def:sql512_object id="oval:org.scapng.conformance:obj:301" version="1" comment="Select one typed SQLite row">
+      <ind-def:engine>sqlite</ind-def:engine>
+      <ind-def:version operation="pattern match">^3\.</ind-def:version>
+      <ind-def:instance>scap-ng-issue87</ind-def:instance>
+      <ind-def:database>main</ind-def:database>
+      <ind-def:sql>SELECT measurement, label FROM observations WHERE id = 1</ind-def:sql>
+    </ind-def:sql512_object>
+    <ind-def:sql512_object id="oval:org.scapng.conformance:obj:302" version="1" comment="Same SQLite row fails a deliberately false comparison">
+      <ind-def:engine>sqlite</ind-def:engine>
+      <ind-def:version operation="pattern match">^3\.</ind-def:version>
+      <ind-def:instance>scap-ng-issue87</ind-def:instance>
+      <ind-def:database>main</ind-def:database>
+      <ind-def:sql>SELECT measurement, label FROM observations WHERE id = 1</ind-def:sql>
+    </ind-def:sql512_object>
+    <ind-def:sql512_object id="oval:org.scapng.conformance:obj:303" version="1" comment="SQLite query has no matching rows">
+      <ind-def:engine>sqlite</ind-def:engine>
+      <ind-def:version operation="pattern match">^3\.</ind-def:version>
+      <ind-def:instance>scap-ng-issue87</ind-def:instance>
+      <ind-def:database>main</ind-def:database>
+      <ind-def:sql>SELECT measurement, label FROM observations WHERE id = 99</ind-def:sql>
+    </ind-def:sql512_object>
+  </objects>
+  <states>
+    <ind-def:sql512_state id="oval:org.scapng.conformance:ste:301" version="1" comment="Select one typed SQLite row">
+      <ind-def:result datatype="record">
+        <field name="measurement" datatype="int">7</field>
+        <field name="label" datatype="string">amber</field>
+      </ind-def:result>
+    </ind-def:sql512_state>
+    <ind-def:sql512_state id="oval:org.scapng.conformance:ste:302" version="1" comment="Same SQLite row fails a deliberately false comparison">
+      <ind-def:result datatype="record">
+        <field name="measurement" datatype="int">3</field>
+        <field name="label" datatype="string">amber</field>
+      </ind-def:result>
+    </ind-def:sql512_state>
+  </states>
+</oval_definitions>

@@ -16,6 +16,11 @@ from typing import Any
 
 import yaml
 
+try:
+    from .specification import inventory as specification_inventory
+except ImportError:  # direct script execution
+    from specification import inventory as specification_inventory
+
 HERE = Path(__file__).resolve()
 ROOT = HERE.parents[2]
 SCHEMA = ROOT / "schema"
@@ -1023,6 +1028,7 @@ def write_json(path: Path, value: Any) -> None:
 def inventory() -> dict[str, Any]:
     paths = sorted(SCHEMA.glob("*.json")) + sorted((SCHEMA / "capability-mappings").rglob("*.json"))
     schema_docs = []
+    schemas = {}
     enums = []
     constraints = []
     property_groups = []
@@ -1030,7 +1036,11 @@ def inventory() -> dict[str, Any]:
     for path in paths:
         doc = load(path)
         rel = path.relative_to(ROOT).as_posix()
+        if path.name.endswith(".schema.json"):
+            schemas[rel] = doc
         e, c, p = enums_and_constraints(doc, rel)
+        for row in (*e, *c, *p):
+            row["source"] = rel
         schema_docs.append({"path": rel, "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "kind": "root" if path.parent == SCHEMA else "mapping"})
         enums.extend(e); constraints.extend(c); property_groups.extend(p)
         for pointer_path, node in walk_schema(doc):
@@ -1122,6 +1132,7 @@ def inventory() -> dict[str, Any]:
             "schema_constraints": len(constraints), "schema_references": len(refs),
             "comparison_operations": len(ops),
         },
+        "specification": specification_inventory(ROOT, schemas),
         "schema_documents": schema_docs,
         "capabilities": mappings,
         "operations": sorted(ops),
@@ -1347,6 +1358,7 @@ def main() -> None:
     manifest = {
         "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
+        "supplemental_manifest": "supplemental-manifest.json",
         "authoring_cases": authoring_rows,
         "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
         "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-approved-decisions", "assessment": "cases/core/approved-decisions.assessment.yaml", "fixture": "fixtures/core-approved-decisions.json", "expected": "expected/core-approved-decisions.json", "vectors": ["variable-state-identity", "cmdlet-select"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference", "single-operand", "nested-set", "logical-filter-predicate", "empty-collected-population"]}, {"id": "core-semantic-boundaries", "assessment": "cases/core/semantic-boundaries.assessment.yaml", "fixture": "fixtures/core-semantic-boundaries.json", "expected": "expected/core-semantic-boundaries.json", "vectors": ["file-selection-traversal", "windows-literal-name"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": ["unique", "count", "concat", "merge"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],

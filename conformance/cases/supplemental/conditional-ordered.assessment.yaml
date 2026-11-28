@@ -1,0 +1,65 @@
+assessment:
+  id: conformance-conditional-ordered
+  version: 1
+  assessment_title: Ordered alternatives and nested branch evaluation
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  evaluate:
+    if: {input_provided: primary-input}
+    then: {test: primary-test}
+    else_if:
+      - if: {input_provided: secondary-input}
+        then:
+          if: {input_provided: detail-input}
+          then: {test: nested-test}
+          else: {test: secondary-test}
+      - if: {input_provided: tertiary-input}
+        then: {test: tertiary-test}
+    else:
+      not_evaluated:
+        reason: No route was authorized by the supplied inputs
+  inputs:
+    primary-input: {datatype: string, cardinality: zero_or_more, required: false}
+    secondary-input: {datatype: string, cardinality: zero_or_more, required: false}
+    detail-input: {datatype: string, cardinality: zero_or_more, required: false}
+    tertiary-input: {datatype: string, cardinality: zero_or_more, required: false}
+  tests:
+    primary-test:
+      test_title: Test selected by the primary route
+      capability: variable.value
+      variable: route-variable
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: live}}
+      reported_elements: compared
+    secondary-test:
+      test_title: Test selected when the secondary route has no detail input
+      capability: variable.value
+      variable: route-variable
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: retired}}
+      reported_elements: compared
+    nested-test:
+      test_title: Test selected when the secondary route has detail input
+      capability: variable.value
+      variable: route-variable
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: live}}
+      reported_elements: compared
+    tertiary-test:
+      test_title: Test selected by the last alternative
+      capability: variable.value
+      variable: route-variable
+      require:
+        item_requirement: {items_found: one_or_more, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: live}}
+      reported_elements: compared
+  variables:
+    route-variable: {kind: constant, expression: {literal: live}}

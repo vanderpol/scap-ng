@@ -130,3 +130,7 @@ Scanner-neutral replay and receipt integration is coordinated with RI issue
 #196. Platform collector qualification, large-scale execution evidence, and
 independent multi-scanner evidence remain explicit follow-up gates rather than
 being fabricated by this source corpus.
+
+The [Issue #87 qualification checkpoint](qualification/README.md) records the
+current source census, supplemental native and OVAL cases, local checks and
+separate consumer qualifications.

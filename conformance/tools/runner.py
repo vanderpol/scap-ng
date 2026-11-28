@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, ValidationError
 from referencing import Registry, Resource
 try:
     from .semantic import validate as semantic_validate
@@ -279,10 +279,33 @@ def validate() -> int:
         invalid = CONFORMANCE / invalid_case["assessment"]
         try:
             v.validate(load(invalid))
-        except Exception:
+        except ValidationError:
             pass
+        except (ValueError, OSError, yaml.YAMLError) as exc:
+            errors.append(f"{invalid_case['id']}: could not load invalid-authoring witness: {exc}")
         else:
             errors.append(f"{invalid_case['id']} unexpectedly passed schema validation")
+    supplemental = load(CONFORMANCE / manifest["supplemental_manifest"])
+    if supplemental["schema_commit"] != manifest["schema_commit"]:
+        errors.append("supplemental corpus schema pin differs from the canonical corpus")
+    for row in supplemental["cases"]:
+        try:
+            document = load(CONFORMANCE / row["source"])
+            value = next(iter(document.values()))
+            if value.get("id", value.get("execution_id")) != row["id"]:
+                errors.append(f"{row['id']}: document identity differs from the supplemental manifest")
+            actual = schema_validator(row["schema"]).is_valid(document)
+            if actual != row["valid"]:
+                errors.append(f"{row['id']}: expected schema validity {row['valid']}, got {actual}")
+            receipt_paths = row["artifact_sha256"]
+            required_paths = {row[key] for key in ("source", "fixture", "expected") if key in row}
+            if required_paths - receipt_paths.keys():
+                errors.append(f"{row['id']}: supplemental inputs are missing digests")
+            for name, expected_sha in receipt_paths.items():
+                if hashlib.sha256((CONFORMANCE / name).read_bytes()).hexdigest() != expected_sha:
+                    errors.append(f"{row['id']}: stale supplemental artifact digest for {name}")
+        except (ValueError, KeyError, OSError, yaml.YAMLError) as exc:
+            errors.append(f"{row['id']}: {exc}")
     if errors:
         for error in errors:
             print("ERROR", error, file=sys.stderr)

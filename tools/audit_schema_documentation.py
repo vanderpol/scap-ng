@@ -500,12 +500,8 @@ def schema_children(node, path):
             yield path + '/' + key
 
 
-def language_catalog(result):
-    docs, store = result['documents'], result['store']
-    candidates = [uri for uri, doc in docs.items() if 'automated' in doc.get('properties', {}).get('assessment', {}).get('properties', {}).get('mode', {}).get('enum', [])]
-    if len(candidates) != 1:
-        raise ValueError('Assessment entry discovery is ambiguous: ' + str(candidates))
-    entry = candidates[0]
+def reachable_schema_locations(store, entry):
+    """Follow local JSON Schema applicators and references from one entry point."""
     visited, queue = set(), deque([entry + '#'])
     while queue:
         key = queue.popleft()
@@ -518,6 +514,16 @@ def language_catalog(result):
             target = urljoin(uri, node['$ref'])
             queue.append(target if '#' in target else target + '#')
         queue.extend(uri + '#' + child for child in schema_children(node, path))
+    return visited
+
+
+def language_catalog(result):
+    docs, store = result['documents'], result['store']
+    candidates = [uri for uri, doc in docs.items() if 'automated' in doc.get('properties', {}).get('assessment', {}).get('properties', {}).get('mode', {}).get('enum', [])]
+    if len(candidates) != 1:
+        raise ValueError('Assessment entry discovery is ambiguous: ' + str(candidates))
+    entry = candidates[0]
+    visited = reachable_schema_locations(store, entry)
     root = docs[entry]['properties']['assessment']['properties']
     variable_uri = urljoin(entry, root['variables']['additionalProperties']['$ref'])
     variable_document = store.node(variable_uri)

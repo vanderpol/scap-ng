@@ -1,0 +1,154 @@
+{
+  "format": "scap-ng-oval-collector-comparison-1",
+  "scanner": {
+    "name": "OpenSCAP",
+    "version": "1.4.2",
+    "distribution_package": "openscap-scanner 1.4.2+dfsg-1",
+    "advertised_oval_version": "5.11.1",
+    "binary_sha256": "42ade4eb0a520bbe7440cb824c366976f38369d40b02841755bd151a7853661b"
+  },
+  "host_scope": "Debian 13 Linux x86_64 container, unprivileged",
+  "source": "oval-self-assertion/unix/ind-def_yamlfilecontent_test.xml",
+  "source_sha256": "2c4771f451720b4c18a21cb280b3fa185409d617fe1e8f2253fed748fcca42a4",
+  "source_validation": "Pinned external OVAL 5.12.3 XSD and embedded Schematron passed. OpenSCAP packaged validation lacks 5.12.3 and the diagnostic run used --skip-valid.",
+  "operation": "Read actual UNIX fixture files and inline documents with OpenSCAP.",
+  "definition_results": [
+    {
+      "definition": "oval:org.scapng.conformance:def:101",
+      "test": "oval:org.scapng.conformance:tst:101",
+      "expected": "true",
+      "observed": "true",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:102",
+      "test": "oval:org.scapng.conformance:tst:102",
+      "expected": "false",
+      "observed": "false",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:103",
+      "test": "oval:org.scapng.conformance:tst:103",
+      "expected": "true",
+      "observed": "true",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:104",
+      "test": "oval:org.scapng.conformance:tst:104",
+      "expected": "true",
+      "observed": "true",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:105",
+      "test": "oval:org.scapng.conformance:tst:105",
+      "expected": "true",
+      "observed": "true",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:106",
+      "test": "oval:org.scapng.conformance:tst:106",
+      "expected": "false",
+      "observed": "false",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:107",
+      "test": "oval:org.scapng.conformance:tst:107",
+      "expected": "true",
+      "observed": "true",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:108",
+      "test": "oval:org.scapng.conformance:tst:108",
+      "expected": "true",
+      "observed": "true",
+      "matched": true
+    },
+    {
+      "definition": "oval:org.scapng.conformance:def:109",
+      "test": "oval:org.scapng.conformance:tst:109",
+      "expected": "true",
+      "observed": "false",
+      "matched": false
+    }
+  ],
+  "set_filter": {
+    "issue": "https://github.com/vanderpol/scap-ng/issues/132",
+    "full_run": {
+      "flag": "complete",
+      "population": [
+        {
+          "file": "other.yaml",
+          "observed_key_value": "blue"
+        },
+        {
+          "file": "settings.yaml",
+          "observed_key_value": "amber"
+        }
+      ]
+    },
+    "isolated_run": {
+      "flag": "complete",
+      "population": [
+        {
+          "file": "other.yaml",
+          "observed_key_value": "blue"
+        },
+        {
+          "file": "settings.yaml",
+          "observed_key_value": "amber"
+        }
+      ],
+      "definition_outcome": "false"
+    },
+    "normative_basis": "https://github.com/OVAL-Community/OVAL/blob/2f140ee5c5dd1ed9606fcd5afc301f6baeb48706/oval-schemas/oval-definitions-schema.xsd#L424",
+    "reason": "The include State matches amber. Both runs retain blue as well, and check all subsequently fails."
+  },
+  "boundary_observations": {
+    "empty-map": {
+      "precondition": "The YAML document is readable and the selected mapping has no fields.",
+      "fixture_mode": "0600",
+      "fixture_sha256": "290099a5222678627d876abe184096ef0b8230960e3078ec6cf6625dd04bcd08",
+      "fixture_text": "settings: {}\n",
+      "target_definition": "oval:org.scapng.conformance:def:109",
+      "observed_definition_outcome": "not evaluated",
+      "observed_object_flag": "does not exist",
+      "observed_item_count": 0
+    },
+    "missing-path": {
+      "precondition": "The YAML document is readable and has no settings key.",
+      "fixture_mode": "0600",
+      "fixture_sha256": "bddd85fc98f54bbf1c63fdaac9f35988a6811a78dac7545edad027167c1f0686",
+      "fixture_text": "other: {enabled: true}\n",
+      "target_definition": "oval:org.scapng.conformance:def:109",
+      "observed_definition_outcome": "not evaluated",
+      "observed_object_flag": "does not exist",
+      "observed_item_count": 0
+    },
+    "malformed": {
+      "precondition": "The YAML stream contains an unclosed sequence.",
+      "fixture_mode": "0600",
+      "fixture_sha256": "e2702d5c12187469c1ba2201641eea19c12f53d811570510828242b8c605cdbd",
+      "fixture_text": "settings: [\n",
+      "target_definition": "oval:org.scapng.conformance:def:109",
+      "observed_definition_outcome": "not evaluated",
+      "observed_object_flag": "error",
+      "observed_item_count": 0
+    },
+    "unreadable": {
+      "precondition": "The positive YAML bytes are present and file mode denies the unprivileged scanner.",
+      "fixture_mode": "0000",
+      "fixture_sha256": "0a85f237129b6c7a521b310b047e774d1caedae93a55db5e0f40c475a96d336f",
+      "fixture_text": "settings:\n  myCamelCase^Key: amber\n  Limit: 7\n  Enabled: true\n  ratio: 1.25\nsequence:\n  - amber\n  - amber\n  - blue\nsingle: amber\nempty: {}\nnested:\n  child:\n    value: amber\n",
+      "target_definition": "oval:org.scapng.conformance:def:109",
+      "observed_definition_outcome": "not evaluated",
+      "observed_object_flag": "error",
+      "observed_item_count": 0
+    }
+  }
+}
