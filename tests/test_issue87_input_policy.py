@@ -93,6 +93,40 @@ class InputPolicyCases(unittest.TestCase):
                     self.assertEqual(self.schema.is_valid(doc), valid)
 
 
+    def test_nested_resource_bounds_are_independent_of_branch_width(self):
+        # Each logical node is counted once, including the root and each leaf.
+        def measure(expression):
+            operator, value = next(iter(expression.items()))
+            if operator == "equals":
+                return 1, 1
+            children = [measure(child) for child in value]
+            return 1 + sum(nodes for nodes, _ in children), 1 + max(depth for _, depth in children)
+
+        controls = self.manifest["predicate_limits"]["resource_bounds"]
+        language = schema_validator("assessment-language.schema.json")
+        value_expression = language.schema["$defs"]["value_constraint_expression"]
+        limits = value_expression["x-scap-ng-resource-limits"]
+        self.assertEqual(limits["max_expression_depth"], controls["maximum_depth"])
+        self.assertEqual(limits["max_expression_nodes"], controls["maximum_nodes"])
+        for name, case in controls["cases"].items():
+            with self.subTest(case=name):
+                if "unary_depth" in case:
+                    expression = {"equals": 99}
+                    for _ in range(case["unary_depth"] - 1):
+                        expression = {"and": [expression]}
+                else:
+                    expression = {"or": [{"and": [{"equals": n} for n in range(size)]}
+                                         for size in case["group_sizes"]]}
+                doc = deepcopy(self.source)
+                constraint = doc["assessment"]["inputs"]["approved-values-input"]["constraints"]
+                constraint["predicate"] = expression
+                self.schema.validate(doc)
+                nodes, depth = measure(expression)
+                self.assertEqual((nodes, depth), (case["nodes"], case["depth"]))
+                rejected = nodes > controls["maximum_nodes"] or depth > controls["maximum_depth"]
+                self.assertEqual(case["result"], "resource_rejected" if rejected else "admitted")
+
+
 class PolicySelectionCases(unittest.TestCase):
     def setUp(self):
         entry = load(SUITE / "expected.json")

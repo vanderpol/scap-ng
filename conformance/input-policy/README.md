@@ -12,7 +12,9 @@ their later Result projection.
 The [string Assessment](string-predicate.assessment.yaml) provides the
 source for schema mutations at 4,096 and 4,097 characters. The numeric
 Assessment supplies the Boolean predicate mutations at 0, 64 and 65
-branches. These are authoring controls drawn from the
+branches. Separate schema-valid trees isolate the 32/33 depth and 256/257
+node boundaries without exceeding any branch width. These authoring
+controls are drawn from the
 [Input contract](../../docs/contracts/0.4.1-input-variable-expression.md#typed-input-constraint-expressions).
 
 The [selection cases](selection-expected.json) reuse the canonical
