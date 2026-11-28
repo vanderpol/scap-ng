@@ -23,6 +23,12 @@ The after counts combine the three canonical XML additions with the pinned
 upstream corpus. [Coverage and qualification matrix](coverage.json) records the exact
 consumer revisions, source pins and remaining gaps.
 
+The separate [ESXi V2R5 qualification](../experimental/esxi/stig/README.md)
+pins the October 2026 DISA archive. It accounts for 76 manual checks,
+including 48 candidate projections and 28 held checks. Three typed
+experimental Tests have separate expectations and current RI admission
+diagnostics.
+
 ## Exact schema value occurrences
 
 The [enum and const occurrence audit](schema-value-occurrences.json) records
