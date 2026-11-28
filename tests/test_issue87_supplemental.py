@@ -226,8 +226,22 @@ class SupplementalConformance(unittest.TestCase):
                 disagreements.append(number)
         self.assertEqual(disagreements, [109])
         self.assertEqual(receipt["set_filter"]["isolated_run"]["definition_outcome"], "false")
-        for probe in receipt["boundary_observations"].values():
+        boundary_outcomes = {
+            "empty-map": ("false", "does not exist"),
+            "missing-path": ("false", "does not exist"),
+            "malformed": ("error", "error"),
+            "unreadable": ("error", "error"),
+        }
+        self.assertEqual(set(receipt["boundary_observations"]), set(boundary_outcomes))
+        for name, probe in receipt["boundary_observations"].items():
             self.assertEqual(sha256(probe["fixture_text"].encode()).hexdigest(), probe["fixture_sha256"])
+            for kind, abbreviation in (("definition", "def"), ("test", "tst"), ("object", "obj")):
+                self.assertEqual(probe[f"target_{kind}"], f"oval:org.scapng.conformance:{abbreviation}:101")
+            self.assertEqual((probe["observed_definition_outcome"], probe["observed_object_flag"]),
+                             boundary_outcomes[name])
+            self.assertEqual(probe["observed_test_outcome"], probe["observed_definition_outcome"])
+            self.assertEqual(probe["observed_item_count"], 0)
+            self.assertRegex(probe["raw_result_sha256"], r"^[a-f0-9]{64}$")
 
         diagnostic = load(qualification / "ri-conditional-diagnostics.json")
         source = CONFORMANCE / diagnostic["source"]

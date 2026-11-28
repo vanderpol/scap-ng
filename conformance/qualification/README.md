@@ -102,9 +102,10 @@ open. The SQL512 rejection is tracked in [Tools #127](https://github.com/vanderp
   advertises OVAL 5.11.1, so the replay uses the separately pinned 5.12.3 XSD
   and Schematron check. See [the normalized receipt](openscap-unix-yaml.json)
   and [canonical #132](https://github.com/vanderpol/scap-ng/issues/132).
-  Four additional UNIX probes record observed empty-map, missing-path,
-  malformed and unreadable behavior. They leave native collector expectations
-  open until their status and authority rules are qualified.
+  Four UNIX probes selected Definition 101. Empty mapping and missing
+  YAMLPath returned false with an Object flag of does not exist. Malformed
+  and unreadable files returned error at the Definition, Test and Object
+  levels. Native collection behavior remains open.
 - The RI evaluator unit suite and focused existing Profile, Tailoring and
   manual Result unit tests passed. The two guard-status Benchmark test cases
   stopped at VM filesystem admission, before evaluator execution.
