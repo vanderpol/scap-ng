@@ -176,29 +176,39 @@ class SupplementalConformance(unittest.TestCase):
             self.assertEqual(matrix["baseline"][key], manifest[key])
 
         counts = matrix["coverage_counts"]
-        validation = load(qualification / "oval-supplement-validation.json")
-        conversion = load(qualification / "oval-supplement-conversion.json")
-        self.assertEqual(conversion["schema_pin"], manifest["schema_commit"])
-        self.assertEqual(conversion["converter"]["flat_schema_family_sha256"], manifest["schema_family_sha256"])
+        boundaries = CORPUS / "yaml-boundaries"
+        validation = {
+            **load(qualification / "oval-supplement-validation.json"),
+            **load(boundaries / "validation.json"),
+        }
+        conversion_rows = []
+        for path in (qualification / "oval-supplement-conversion.json", boundaries / "converter.json"):
+            conversion = load(path)
+            self.assertEqual(conversion["schema_pin"], manifest["schema_commit"])
+            self.assertEqual(conversion["converter"]["flat_schema_family_sha256"], manifest["schema_family_sha256"])
+            conversion_rows.extend(conversion["definitions"])
+
         declarations = {}
-        for path in sorted(CORPUS.glob("*/*.xml")):
+        definitions = set()
+        paths = sorted(CORPUS.rglob("*.xml"))
+        self.assertEqual(set(validation), {path.relative_to(CONFORMANCE.parent).as_posix() for path in paths})
+        for path in paths:
             raw = path.read_bytes()
             entry = validation[path.relative_to(CONFORMANCE.parent).as_posix()]
             self.assertEqual(entry["sha256"], sha256(raw).hexdigest())
             self.assertEqual((entry["xsd"], entry["schematron"]), ("pass", "pass"))
             self.assertGreater(entry["schematron_fired_rules"], 0)
-            _, tests = scan_xml(raw)
+            document, tests = scan_xml(raw)
+            definitions.update(document["ids"]["definitions"])
             declarations.update({test_id: xml_type for xml_type, test_id in tests})
         self.assertEqual(len(validation), counts["source_xml_files_added"])
-        self.assertEqual(
-            counts["source_tests_after_canonical_supplement"] - counts["source_tests_before"],
-            len(declarations),
-        )
-        self.assertEqual(
-            sorted(declarations),
-            sorted(row["source_test"] for row in conversion["definitions"]),
-        )
-        for row in conversion["definitions"]:
+        self.assertEqual(counts["source_definitions_after_canonical_supplement"] -
+                         counts["source_definitions_before"], len(definitions))
+        self.assertEqual(counts["source_tests_after_canonical_supplement"] -
+                         counts["source_tests_before"], len(declarations))
+        self.assertEqual(sorted(definitions), sorted(row["definition"] for row in conversion_rows))
+        self.assertEqual(sorted(declarations), sorted(row["source_test"] for row in conversion_rows))
+        for row in conversion_rows:
             if row["structural"] == "schema-valid":
                 self.assertEqual(set(row["native_tests"].values()), {row["source_test"]})
                 self.assertEqual(row["exit_code"], 0)
