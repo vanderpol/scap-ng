@@ -83,6 +83,9 @@ def case_sources(experimental_capabilities):
         register(row["source"], row["schema"], row["valid"])
 
     register("exact-equality/exact-equality.assessment.yaml", assessment, True)
+    functions = load(CONFORMANCE / "function-boundaries/expected.json")
+    register("function-boundaries/" + functions["source"], assessment, True)
+    register("function-boundaries/" + functions["exceptional_expression"]["source"], assessment, True)
     register("logical-cardinality/one-xor.assessment.yaml", assessment, True)
     register("conditional-replay/mixed-guards.assessment.yaml", assessment, True)
     register("empty-projection/empty-collection.assessment.yaml", assessment, True)
