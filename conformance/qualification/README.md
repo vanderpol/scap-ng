@@ -225,3 +225,10 @@ independent expected values, adds exact sequence comparisons and passes
 all 24 direct RI function Tests plus 20 projection controls. A matching
 repair to the two alias interaction Tests preserves the intended false
 cardinality leaf and restores the expected two matching values.
+
+The [ordered conditional replay](../conditional-replay/README.md) uses
+the production report-side reducer at RI revision ca4fabfe. Eleven of
+15 scenarios matched the independent outcome and branch expectations.
+Four cases record exact status or canonical trace disagreements. Actual
+branch acquisition remains unqualified.
+[RI #309](https://github.com/vanderpol/scap-ng-ri/issues/309).

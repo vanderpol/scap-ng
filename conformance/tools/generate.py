@@ -1065,6 +1065,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("native-authoring", "active", "supplemental-manifest.json"),
         ("native-semantic-negatives", "active", "semantic-negatives/expected.json"),
         ("logical-cardinality", "active", "logical-cardinality/expected.json"),
+        ("conditional-report-replay", "active", "conditional-replay/expected.json"),
         ("content-package", "active", "content-package/sources.json"),
         ("manual-lifecycle", "active", "manual-lifecycle/expected.json"),
         ("result-package", "draft-transport", "result-package/manifest.json"),

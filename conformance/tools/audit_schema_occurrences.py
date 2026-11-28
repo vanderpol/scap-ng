@@ -83,6 +83,7 @@ def case_sources(experimental_capabilities):
         register(row["source"], row["schema"], row["valid"])
 
     register("logical-cardinality/one-xor.assessment.yaml", assessment, True)
+    register("conditional-replay/mixed-guards.assessment.yaml", assessment, True)
     for source in ("content-package/sources.json", "manual-lifecycle/sources.json"):
         for member in load(CONFORMANCE / source)["members"]:
             register(member["source"], f'{member["kind"]}.schema.json', True)
