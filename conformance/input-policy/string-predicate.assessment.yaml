@@ -1,0 +1,35 @@
+assessment:
+  id: conformance-string-input-boundaries
+  version: 1
+  assessment_title: Optional string Input with bounded predicate
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  inputs:
+    approved-label-input:
+      datatype: string
+      cardinality: zero_or_one
+      required: false
+      constraints:
+        predicate: {equals: label}
+  variables:
+    label-variable:
+      kind: local
+      expression: {input: approved-label-input}
+  tests:
+    label-test:
+      test_title: Provided label matches the expected string
+      capability: variable.value
+      variable: label-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields:
+          value: {equals: label}
+  evaluate:
+    if: {input_provided: approved-label-input}
+    then: {test: label-test}
+    else:
+      not_evaluated:
+        reason: No approved label was provided

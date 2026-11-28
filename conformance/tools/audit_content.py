@@ -190,6 +190,7 @@ def build():
             "exact_integer_string_equality": "exact-equality/expected.json",
             "complete_result_evidence": "result-evidence/expected.json",
             "variable_function_boundaries": "function-boundaries/expected.json",
+            "typed_input_policy_boundaries": "input-policy/expected.json",
         },
         "remaining": {
             "field_datatype_combinations": "Use each capability row's missing_datatypes_from_indexed_fixtures "
