@@ -9,8 +9,8 @@ with family SHA-256 `dc650646a24e727e68de242027cca3058683accc531f07bf6ace2176097
 | Active native capabilities with a structural capability Assessment | 101/101 | 101/101 |
 | Nondeprecated mapped OVAL 5.12.3 Test families with source content | 97/99 | 99/99 |
 | Native capabilities linked to a source Test | 99/101 | 101/101 |
-| Source Definitions | 167 | 188 |
-| Source Tests | 799 | 820 |
+| Source Definitions | 167 | 196 |
+| Source Tests | 799 | 828 |
 | Additional native Assessments | 0 | 6 |
 | Additional policy documents | 0 | 6 |
 | Additional invalid Assessment and manual Result documents | 0 | 2 |
@@ -19,7 +19,7 @@ Two additional active native mappings retain deprecated OVAL Solaris source
 Tests, `package_test` and `package511_test`. Both are already present in
 Self-Assertion. Twelve nondeprecated OVAL Test declarations have no
 canonical 0.4.1 mapping and remain outside the active native denominator.
-The after counts combine the three canonical XML additions with the pinned
+The after counts combine the five canonical XML additions with the pinned
 upstream corpus. [Coverage and qualification matrix](coverage.json) records the exact
 consumer revisions, source pins and remaining gaps.
 
@@ -28,6 +28,11 @@ pins the October 2026 DISA archive. It accounts for 76 manual checks,
 including 48 candidate projections and 28 held checks. Three typed
 experimental Tests have separate expectations and current RI admission
 diagnostics.
+
+The [YAML file-content boundary suite](../oval-self-assertion/yaml-boundaries/README.md)
+adds eight dedicated OVAL Definitions and two native Assessments. UNIX
+OpenSCAP reproduced all four selected boundary outcomes. The pinned
+converter emitted the same native Test payloads for both platforms.
 
 ## Exact schema value occurrences
 
