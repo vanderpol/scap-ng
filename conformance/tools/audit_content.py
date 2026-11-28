@@ -19,6 +19,8 @@ DETAILS = {
     "schema_constraints": "schema-coverage.json#/constraints",
     "canonical_operators_and_functions": "schema-coverage.json#/operator_inventory",
     "schema_enum_const_matches": "qualification/schema-value-occurrences.json#/occurrences",
+    "schema_property_presence": "qualification/schema-shape-occurrences.json#/properties",
+    "schema_literal_and_size_bounds": "qualification/schema-shape-occurrences.json#/bounds",
     "capability_constraints": "coverage-audit.json#/capability_constraints",
     "comparison_operators": "coverage-audit.json#/operators",
     "cardinalities": "coverage-audit.json#/cardinalities",
@@ -105,10 +107,11 @@ def build():
     inventory = load(CONFORMANCE / "schema-coverage.json")
     manifest = load(CONFORMANCE / "manifest.json")
     occurrences = load(CONFORMANCE / "qualification/schema-value-occurrences.json")
+    shapes = load(CONFORMANCE / "qualification/schema-shape-occurrences.json")
     oval = load(CONFORMANCE / "oval-source-coverage.json")
     aggregate = load(CONFORMANCE / "coverage-audit.json")
     index = load(CONFORMANCE / "suite-index.json")
-    if {data["schema_commit"] for data in (inventory, manifest, occurrences, aggregate, index)} != {inventory["schema_commit"]}:
+    if {data["schema_commit"] for data in (inventory, manifest, occurrences, shapes, aggregate, index)} != {inventory["schema_commit"]}:
         raise ValueError("Coverage sources disagree on the canonical schema pin")
     for reference in DETAILS.values():
         pointer_value(reference)
@@ -170,6 +173,7 @@ def build():
             "inventory": inventory["counts"],
             "mapped_capability_content": {scope: dict(rows) for scope, rows in counts.items()},
             "enum_const": occurrences["coverage"],
+            "schema_shapes": shapes["coverage"],
             "oval_5_12_3_sources": oval_source_counts(oval),
             "oval_6_0_esxi_dispositions": dict(Counter(
                 row["status"] for row in oval["oval_6_0_esxi_tests"].values()
@@ -183,8 +187,8 @@ def build():
             "typed_indexed_fixture_matches": "Also includes typed evidence in supplemental suites linked to these rows. "
                                              "Only explicitly indexed supplemental suites enter this measure.",
             "schema_enum_const_matches": occurrences["interpretation"],
-            "schema_properties_and_constraints": "Complete source inventory. Per-occurrence exercised and rejected "
-                                                 "coverage remains open beyond the linked enum and const audit.",
+            "schema_properties_and_constraints": "Source inventory plus observed property presence and applicable bounds. "
+                                                 "Compound constraints still require explicit exercised and rejection witnesses.",
         },
         "new_independent_witnesses": {
             "exact_integer_string_equality": "exact-equality/expected.json",

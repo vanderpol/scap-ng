@@ -113,6 +113,50 @@ class ResultEvidenceCases(unittest.TestCase):
             self.assertEqual(field["observed_values"], [item["fields"]["owner_uid"]])
             self.assertEqual(field["expected_values"], variable["values"])
 
+    def test_zero_test_retention_does_not_change_authoritative_observations(self):
+        case = self.manifest["retention_case"]
+        capped = load(SUITE / case["document"])["assessment_result"]
+        full = self.result_document["assessment_result"]
+        self.assertEqual(capped["evidence_retention"]["maximum_items"], case["maximum_test_items"])
+        self.assertEqual(len(capped["tests"]), 1)
+        observed, = capped["tests"]
+        reference, = full["tests"]
+        computed = source_projection(self.source["assessment"], self.supplied)
+        self.assertEqual(observed["outcome"], computed["outcome"])
+        self.assertEqual(observed["items_observed"], computed["test_items_observed"])
+        self.assertEqual(observed["item_summary"], {
+            "evaluated_items": computed["test_items_evaluated"],
+            "observed_mismatches": computed["test_mismatches"],
+            "actual_mismatches": computed["test_mismatches"],
+            "returned_items": case["test_items_returned"],
+            "truncated_evidence": case["truncated_evidence"],
+        })
+        self.assertFalse(observed["item_refs"])
+        self.assertFalse(observed["per_item_results"])
+        self.assertEqual(capped["items"], [row["item"] for row in reference["per_item_results"]])
+        ids = case["variable_evidence_item_ids"]
+        self.assertEqual([item["id"] for item in capped["items"]], ids)
+        self.assertEqual(capped["variables"][0]["item_refs"], ids)
+        for field in ("logical_complete", "population_complete", "evidence_complete",
+                      "expression_execution", "field_uses", "objects", "variables"):
+            self.assertEqual(full[field], capped[field])
+
+    def test_reporting_modes_are_distinct_from_object_and_require_authoring(self):
+        schema = schema_validator("assessment.schema.json")
+        for mode, valid in (("all", True), ("compared", True),
+                            (["full_path", "owner_uid"], True),
+                            (["owner_uid", "owner_uid"], False), ([" "], False)):
+            with self.subTest(mode=mode):
+                assessment = deepcopy(self.source)
+                test = assessment["assessment"]["tests"]["owner-test"]
+                test["reported_elements"] = mode
+                self.assertEqual(schema.is_valid(assessment), valid)
+                self.assertEqual(source_projection(assessment["assessment"], self.supplied),
+                                 self.manifest["observations"])
+        assessment = deepcopy(self.source)
+        del assessment["assessment"]["tests"]["owner-test"]["reported_elements"]
+        self.assertFalse(schema.is_valid(assessment))
+
     def test_item_report_preserves_source_and_marks_omissions(self):
         result = self.result_document["assessment_result"]
         report = self.report_document["item_report"]

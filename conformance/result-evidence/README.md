@@ -12,8 +12,11 @@ The [Assessment Result](owner.result.yaml) retains the original Items beside
 their individual verdicts, the completed Object, and the Variable audit record
 with its consumed Item references. The [Item report](owner.item-report.yaml)
 keeps each Item identity, provenance, owner UID and path and explicitly marks
-the group field omitted. The test checks these two documents against the
-source, the snapshot, and the expected manifest. Schema controls exercise all
+the group field omitted. The [zero-retention Result](owner-capped.result.yaml)
+keeps no Test-local Item observations. Its Test still evaluated two Items,
+and the raw Items remain at Assessment scope to explain Variable extraction.
+The local checks compare the Results and report with the source, the
+snapshot and the expected manifest. Schema controls exercise all
 Collection and Variable status tokens and invalid status/diagnostic and
 status/cardinality combinations.
 
