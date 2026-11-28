@@ -1,0 +1,67 @@
+assessment:
+  id: conformance-conditional-mixed-guards
+  version: 1
+  assessment_title: Ordered Test and Input presence guards
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  inputs:
+    fallback-input:
+      datatype: string
+      cardinality: zero_or_more
+      required: false
+      description: Optional route containing a supplied value population
+  variables:
+    known-value-variable:
+      kind: constant
+      expression: {literal: 1}
+  tests:
+    initial-guard-test:
+      test_title: Initial Test-backed guard
+      capability: variable.value
+      variable: known-value-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: 1}}
+    secondary-guard-test:
+      test_title: First alternative Test-backed guard
+      capability: variable.value
+      variable: known-value-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: 1}}
+    primary-body-test:
+      test_title: Selected primary body evaluates false
+      capability: variable.value
+      variable: known-value-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: 2}}
+    input-body-test:
+      test_title: Selected Input route evaluates true
+      capability: variable.value
+      variable: known-value-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: 1}}
+  evaluate:
+    if: {test: initial-guard-test}
+    then: {test: primary-body-test}
+    else_if:
+      - if: {test: secondary-guard-test}
+        then:
+          not_applicable:
+            reason: The fixture target lies outside the secondary route.
+      - if: {input_provided: fallback-input}
+        then: {test: input-body-test}
+    else:
+      not_evaluated:
+        reason: The fixture provides no valid execution route.

@@ -1,0 +1,45 @@
+assessment:
+  id: conformance-empty-collected-projection
+  version: 1
+  assessment_title: Count an authoritative empty collection
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  shared_objects:
+    function-file-object:
+      object_title: Files in the supplied projection
+      capability: unix.file
+      full_path: {matches_regex: '^/scap-ng-function-fixture/[a-z]+$'}
+  variables:
+    observed-values-variable:
+      kind: local
+      expression:
+        values:
+          object: {object_ref: function-file-object}
+          field: full_path
+    counted-values-variable:
+      kind: local
+      expression: {count: {variable: observed-values-variable}}
+  tests:
+    count-empty-test:
+      test_title: An authoritative empty projection has count zero
+      capability: variable.value
+      variable: counted-values-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields: {value: {equals: 0}}
+    projection-has-values-test:
+      test_title: A complete projection must contain a known path
+      capability: variable.value
+      variable: observed-values-variable
+      reported_elements: all
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields: {value: {equals: /scap-ng-function-fixture/alpha}}
+  evaluate:
+    and:
+      - test: count-empty-test
+      - not: {test: projection-has-values-test}

@@ -1,0 +1,118 @@
+assessment:
+  id: conformance-yaml-file-boundaries-windows
+  version: 1
+  assessment_title: YAML file content boundaries on windows
+  mode: automated
+  class: miscellaneous
+  specification:
+    id: scap-ng.pre-alpha.assessment
+    version: 0.4.1
+  tests:
+    empty-map-test:
+      test_title: The selected YAML mapping is empty
+      capability: independent.yamlfilecontent
+      object:
+        full_path:
+          equals: C:\scap-ng-issue87-yaml-boundary\empty-map.yaml
+        yamlpath:
+          equals: $.settings
+        filesystem: all
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                myCamelCase^Key:
+                  equals: amber
+      reported_elements: all
+    missing-path-test:
+      test_title: The YAML path selects no value
+      capability: independent.yamlfilecontent
+      object:
+        full_path:
+          equals: C:\scap-ng-issue87-yaml-boundary\missing-path.yaml
+        yamlpath:
+          equals: $.settings
+        filesystem: all
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                myCamelCase^Key:
+                  equals: amber
+      reported_elements: all
+    malformed-test:
+      test_title: The selected YAML document cannot be parsed
+      capability: independent.yamlfilecontent
+      object:
+        full_path:
+          equals: C:\scap-ng-issue87-yaml-boundary\malformed.yaml
+        yamlpath:
+          equals: $.settings
+        filesystem: all
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                myCamelCase^Key:
+                  equals: amber
+      reported_elements: all
+    unreadable-test:
+      test_title: The scanner cannot read the YAML document
+      capability: independent.yamlfilecontent
+      object:
+        full_path:
+          equals: C:\scap-ng-issue87-yaml-boundary\unreadable.yaml
+        yamlpath:
+          equals: $.settings
+        filesystem: all
+      require:
+        item_requirement:
+          items_found: one_or_more
+          items_satisfying: every
+        field_requirement:
+          values_found: one_or_more
+          values_matching: every
+        fields:
+          value:
+            record:
+              records_found: one_or_more
+              records_matching: every
+              fields:
+                myCamelCase^Key:
+                  equals: amber
+      reported_elements: all
+  evaluate:
+    and:
+    - not:
+        test: empty-map-test
+    - not:
+        test: missing-path-test
+    - test: malformed-test
+    - test: unreadable-test

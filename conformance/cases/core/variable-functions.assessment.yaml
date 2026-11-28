@@ -14,9 +14,11 @@ assessment:
       required: true
       description: Deterministic supplied value for the native input expression witness.
   shared_objects:
-    function-family-object:
-      object_title: Deterministic family source
-      capability: independent.family
+    function-file-object:
+      object_title: Files in the deterministically supplied projection
+      capability: unix.file
+      full_path:
+        matches_regex: ^/scap-ng-function-fixture/[a-z]+$
   variables:
     source-values-variable:
       kind: constant
@@ -131,8 +133,8 @@ assessment:
       expression:
         values:
           object:
-            object_ref: function-family-object
-          field: family
+            object_ref: function-file-object
+          field: full_path
     expected-unique-variable:
       kind: constant
       expression:
@@ -236,8 +238,98 @@ assessment:
         literal:
           datatype: string
           value:
-          - unix
-          - windows
+          - /scap-ng-function-fixture/alpha
+          - /scap-ng-function-fixture/beta
+    function-unique-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: unique-values-variable
+    function-concat-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: concat-values-variable
+    function-split-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: split-values-variable
+    function-regex-capture-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: regex-capture-values-variable
+    function-substring-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: substring-values-variable
+    function-arithmetic-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: arithmetic-values-variable
+    function-to-integer-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: to-integer-values-variable
+    function-begin-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: begin-values-variable
+    function-end-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: end-values-variable
+    function-values-ordered-variable:
+      kind: local
+      expression:
+        merge:
+          delimiter: '|'
+          sort: document
+          order: ascending
+          values:
+            variable: collected-values-variable
   tests:
     function-unique-test:
       test_title: Unique removes duplicate values preserving first occurrence
@@ -253,7 +345,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -272,7 +364,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: one_or_more
+            value_match: every
             values_found: one_or_more
             values_matching: every
             equals:
@@ -291,7 +383,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -329,7 +421,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -348,7 +440,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -367,7 +459,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -405,7 +497,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: one_or_more
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -424,7 +516,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -444,7 +536,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -463,7 +555,7 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
@@ -501,11 +593,168 @@ assessment:
           values_matching: every
         fields:
           value:
-            value_match: every
+            value_match: exactly_one
             values_found: one_or_more
             values_matching: every
             equals:
               variable: expected-collected-variable
+    function-unique-ordered-test:
+      test_title: Unique removes duplicate values preserving first occurrence in exact
+        document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-unique-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: a|b
+    function-concat-ordered-test:
+      test_title: Concat preserves ordered Cartesian values in exact document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-concat-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: prefix-a|prefix-b
+    function-split-ordered-test:
+      test_title: Split preserves adjacent empty parts in exact document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-split-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: a||b
+    function-regex-capture-ordered-test:
+      test_title: Regex capture returns the first group per value in exact document
+        order
+      capability: variable.value
+      reported_elements: all
+      variable: function-regex-capture-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: one.example|two.example
+    function-substring-ordered-test:
+      test_title: Substring uses the explicit one-based source boundary in exact document
+        order
+      capability: variable.value
+      reported_elements: all
+      variable: function-substring-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: abc|xyz
+    function-arithmetic-ordered-test:
+      test_title: Arithmetic preserves Cartesian multiplicity in exact document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-arithmetic-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 5|6
+    function-to-integer-ordered-test:
+      test_title: To-integer converts signed decimal strings elementwise in exact
+        document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-to-integer-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: 7|-12
+    function-begin-ordered-test:
+      test_title: Begin adds a missing leading boundary and preserves an existing
+        one in exact document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-begin-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: /etc|/var
+    function-end-ordered-test:
+      test_title: End adds a missing trailing boundary and preserves an existing one
+        in exact document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-end-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: etc/|var/
+    function-values-ordered-test:
+      test_title: Values projects the selected field from collected Items in exact
+        document order
+      capability: variable.value
+      reported_elements: all
+      variable: function-values-ordered-variable
+      require:
+        item_requirement:
+          items_found: exactly_one
+          items_satisfying: every
+        field_requirement:
+          values_found: exactly_one
+          values_matching: every
+        fields:
+          value:
+            equals: /scap-ng-function-fixture/alpha|/scap-ng-function-fixture/beta
   evaluate:
     and:
     - test: function-unique-test
@@ -522,3 +771,13 @@ assessment:
     - test: function-end-test
     - test: function-input-test
     - test: function-values-test
+    - test: function-unique-ordered-test
+    - test: function-concat-ordered-test
+    - test: function-split-ordered-test
+    - test: function-regex-capture-ordered-test
+    - test: function-substring-ordered-test
+    - test: function-arithmetic-ordered-test
+    - test: function-to-integer-ordered-test
+    - test: function-begin-ordered-test
+    - test: function-end-ordered-test
+    - test: function-values-ordered-test

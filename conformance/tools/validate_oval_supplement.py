@@ -50,6 +50,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--oval", type=Path, required=True)
     parser.add_argument("--schematron", type=Path, required=True)
+    parser.add_argument("paths", type=Path, nargs="*", help="optional explicit corpus XML documents")
     args = parser.parse_args()
     require_pin(args.oval, PIN)
     require_pin(args.schematron, SCHEMATRON_PIN)
@@ -65,7 +66,8 @@ def main():
         validator = xslt.compile_stylesheet(stylesheet_text=compiled)
         rows = {}
         negative_checked = False
-        for path in sorted(corpus.glob("*/*.xml")):
+        paths = [path.resolve(strict=True) for path in args.paths] or sorted(corpus.glob("*/*.xml"))
+        for path in sorted(paths):
             xsd.assertValid(etree.parse(str(path), xml_parser))
             report = etree.fromstring(validator.transform_to_string(source_file=str(path)).encode())
             failed = report.findall(SVRL + "failed-assert")

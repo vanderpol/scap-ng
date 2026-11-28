@@ -1,0 +1,359 @@
+{
+  "explicit_projections": {
+    "ESXI-80-000008": {
+      "capabilities": {
+        "esx.host_lockdown": [
+          "lockdown"
+        ]
+      },
+      "marker": "Extensiondata.Config.LockdownMode",
+      "qualification_gap": "Management through vCenter determines applicability."
+    },
+    "ESXI-80-000049": {
+      "capabilities": {
+        "esx.host_authentication": [
+          "domain",
+          "domain_membership_status"
+        ]
+      },
+      "marker": "Get-VMHostAuthentication",
+      "qualification_gap": "Organizational identity authority and local-account exceptions remain separate."
+    },
+    "ESXI-80-000124": {
+      "capabilities": {
+        "esx.host_ntpserver": [
+          "ntp_server_name"
+        ],
+        "esx.host_service": [
+          "service_policy",
+          "service_running"
+        ]
+      },
+      "marker": "Get-VMHostNTPServer",
+      "qualification_gap": "The PTP alternative and DoW time-source authority require additional evidence."
+    },
+    "ESXI-80-000133": {
+      "capabilities": {
+        "esx.host_acceptancelevel": [
+          "acceptance_level"
+        ]
+      },
+      "marker": "esxcli.software.acceptance.get",
+      "qualification_gap": "The check reads a host acceptance level. Individual VIB Item evidence cannot resolve the host setting."
+    },
+    "ESXI-80-000145": {
+      "capabilities": {
+        "esx.host_busadapter": [
+          "busadapter_type",
+          "chap_type",
+          "mutual_chap_enabled"
+        ]
+      },
+      "marker": "Get-VMHostHba",
+      "qualification_gap": "Unique secret use and absence of iSCSI require separate evidence."
+    },
+    "ESXI-80-000193": {
+      "capabilities": {
+        "esx.host_service": [
+          "service_label",
+          "service_running"
+        ]
+      },
+      "marker": "Get-VMHostService",
+      "qualification_gap": "Qualify collector identity and absent-service semantics."
+    },
+    "ESXI-80-000194": {
+      "capabilities": {
+        "esx.host_service": [
+          "service_label",
+          "service_running"
+        ]
+      },
+      "marker": "Get-VMHostService",
+      "qualification_gap": "Qualify collector identity and absent-service semantics."
+    },
+    "ESXI-80-000201": {
+      "capabilities": {
+        "esx.host_lockdown": [
+          "lockdown_user"
+        ]
+      },
+      "marker": "QueryLockdownExceptions",
+      "qualification_gap": "The approved exception population and management applicability are organization-specific."
+    },
+    "ESXI-80-000216": {
+      "capabilities": {
+        "esx.host_vswitchpolicy": [
+          "forged_transmits"
+        ]
+      },
+      "marker": "Get-VirtualSwitch",
+      "qualification_gap": "Standard port-group override and effective inheritance evidence are also required."
+    },
+    "ESXI-80-000217": {
+      "capabilities": {
+        "esx.host_vswitchpolicy": [
+          "mac_changes"
+        ]
+      },
+      "marker": "Get-VirtualSwitch",
+      "qualification_gap": "Standard port-group override and effective inheritance evidence are also required."
+    },
+    "ESXI-80-000218": {
+      "capabilities": {
+        "esx.host_vswitchpolicy": [
+          "promiscuous_mode"
+        ]
+      },
+      "marker": "Get-VirtualSwitch",
+      "qualification_gap": "Standard port-group override and effective inheritance evidence are also required."
+    },
+    "ESXI-80-000220": {
+      "capabilities": {
+        "esx.host_portgroup": [
+          "port_group_name",
+          "virtual_switch_name",
+          "vlan_id"
+        ]
+      },
+      "marker": "Get-VirtualPortGroup",
+      "qualification_gap": "Qualify source enumeration of applicable standard switches and authorized tagging exceptions."
+    },
+    "ESXI-80-000228": {
+      "capabilities": {
+        "esx.host_service": [
+          "service_label",
+          "service_policy",
+          "service_running"
+        ]
+      },
+      "marker": "Get-VMHostService",
+      "qualification_gap": "Qualify collector identity and absent-service semantics."
+    },
+    "ESXI-80-000229": {
+      "capabilities": {
+        "esx.host_webserverssl": [
+          "issuer"
+        ]
+      },
+      "marker": "issuer",
+      "qualification_gap": "Issuer text does not establish the organization's certificate trust decision."
+    },
+    "ESXI-80-000231": {
+      "capabilities": {
+        "esx.host_service": [
+          "service_label",
+          "service_policy",
+          "service_running"
+        ]
+      },
+      "marker": "Get-VMHostService",
+      "qualification_gap": "Qualify collector identity and absent-service semantics."
+    },
+    "ESXI-80-000239": {
+      "capabilities": {
+        "esx.host_firewallexception": [
+          "exception_enabled",
+          "allowed_hosts_all_ip"
+        ]
+      },
+      "marker": "IpListUserConfigurable",
+      "qualification_gap": "The source checks whether the interface permits users to configure the IP list. The mapped fields omit that attribute."
+    },
+    "ESXI-80-000243": {
+      "capabilities": {
+        "esx.host_advancedsetting": [
+          "advanced_setting_name",
+          "advanced_setting_value"
+        ]
+      },
+      "marker": "LocalLogOutputIsPersistent",
+      "qualification_gap": "The GUI path settings are a partial projection. The persistence flag and filesystem-backed location require separate authority.",
+      "selectors": [
+        "Syslog.global.logDir",
+        "ScratchConfig.CurrentScratchLocation"
+      ]
+    },
+    "ESXI-80-000249": {
+      "capabilities": {
+        "esx.host_account": [
+          "account_name",
+          "shell_access_enabled"
+        ]
+      },
+      "marker": "system.account.list",
+      "qualification_gap": "Qualify collector identity and explicit disabled versus unavailable shell access."
+    }
+  },
+  "source_holds": {
+    "ESXI-80-000014": {
+      "markers": [
+        "fips140 ssh get"
+      ],
+      "reason": "The check reads the SSH FIPS setting. None of the OVAL 6.0 projected service fields contains that setting."
+    },
+    "ESXI-80-000052": {
+      "markers": [
+        "ignorerhosts"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000085": {
+      "markers": [
+        "RequireSecureBoot"
+      ],
+      "reason": "Secure Boot enforcement and compatible TPM evidence need host security fields beyond these OVAL 6.0 families."
+    },
+    "ESXI-80-000094": {
+      "markers": [
+        "secureBoot.py"
+      ],
+      "reason": "The check reads the current Secure Boot state. A host acceptance level or VIB does not establish that state."
+    },
+    "ESXI-80-000111": {
+      "markers": [
+        "900\" or less",
+        "less than 900"
+      ],
+      "reason": "The configuration instruction and finding condition disagree on the direction of the 900-second bound. Keep the expected outcome held."
+    },
+    "ESXI-80-000160": {
+      "markers": [
+        "vMotion"
+      ],
+      "reason": "Network isolation requires VMkernel service bindings and effective network topology. A port group name and VLAN identifier give partial context."
+    },
+    "ESXI-80-000187": {
+      "markers": [
+        "config list -k ciphers"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000192": {
+      "markers": [
+        "config list -k banner"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000198": {
+      "markers": [
+        "VMkernel adapters"
+      ],
+      "reason": "Network isolation requires VMkernel service bindings and effective network topology. A port group name and VLAN identifier give partial context."
+    },
+    "ESXI-80-000199": {
+      "markers": [
+        "IP-based storage"
+      ],
+      "reason": "Network isolation requires VMkernel service bindings and effective network topology. A port group name and VLAN identifier give partial context."
+    },
+    "ESXI-80-000202": {
+      "markers": [
+        "hostbasedauthentication"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000204": {
+      "markers": [
+        "permituserenvironment"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000207": {
+      "markers": [
+        "gatewayports"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000209": {
+      "markers": [
+        "permittunnel"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000210": {
+      "markers": [
+        "clientalivecountmax"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000211": {
+      "markers": [
+        "clientaliveinterval"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000212": {
+      "markers": [
+        "Get-VMHostSnmp"
+      ],
+      "reason": "The check requires effective SNMP protocol and authentication for targets. Host Service fields omit the protocol configuration."
+    },
+    "ESXI-80-000214": {
+      "markers": [
+        "network firewall get"
+      ],
+      "reason": "Host default firewall action is distinct from a per-service firewall exception."
+    },
+    "ESXI-80-000221": {
+      "markers": [
+        "current version and build"
+      ],
+      "reason": "Patch currency requires an external release baseline and host build evidence. Individual VIB records alone cannot demonstrate patch currency."
+    },
+    "ESXI-80-000230": {
+      "markers": [
+        "allowtcpforwarding"
+      ],
+      "reason": "SSH option values are outside the projected OVAL 6.0 host Service fields. A service entry only supplies service-level evidence."
+    },
+    "ESXI-80-000236": {
+      "markers": [
+        "/etc/vmware/settings"
+      ],
+      "reason": "The check inspects a host configuration file. The OVAL 6.0 VM advanced-setting family addresses individual virtual machines."
+    },
+    "ESXI-80-000237": {
+      "markers": [
+        "/etc/vmware/config"
+      ],
+      "reason": "The check inspects a host configuration file. The OVAL 6.0 VM advanced-setting family addresses individual virtual machines."
+    },
+    "ESXI-80-000238": {
+      "markers": [
+        "system settings encryption get"
+      ],
+      "reason": "TPM-based configuration encryption needs host security state beyond these OVAL 6.0 families."
+    },
+    "ESXI-80-000240": {
+      "markers": [
+        "Get-VMHostProfile"
+      ],
+      "reason": "Host Profile applicability and Authentication Proxy settings require vCenter configuration evidence."
+    },
+    "ESXI-80-000245": {
+      "markers": [
+        "entropySources"
+      ],
+      "reason": "The check inspects kernel entropy configuration. The available Module fields concern module identity and metadata."
+    },
+    "ESXI-80-000246": {
+      "markers": [
+        "logfilter get"
+      ],
+      "reason": "The check inspects the effective log-filter configuration, which is outside these OVAL 6.0 projections."
+    },
+    "ESXI-80-000247": {
+      "markers": [
+        "show-current-boot-profile"
+      ],
+      "reason": "Effective TLS profiles, protocol versions and crypto policy need evidence beyond an endpoint certificate."
+    },
+    "ESXI-80-000248": {
+      "markers": [
+        "keypersistence get"
+      ],
+      "reason": "The check inspects TPM applicability and key persistence, which are outside these OVAL 6.0 projections."
+    }
+  }
+}

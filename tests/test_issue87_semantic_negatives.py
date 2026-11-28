@@ -1,0 +1,304 @@
+"""Check semantic-invalid native fixtures and their single-change controls."""
+import copy
+from datetime import datetime
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from hashlib import sha256
+import unittest
+
+from conformance.tools.runner import CONFORMANCE, load, validator
+from conformance.tools.build_content_fixture import build
+
+
+class SemanticAuthoringCases(unittest.TestCase):
+    def setUp(self):
+        self.root = CONFORMANCE / "semantic-negatives"
+        self.manifest = load(self.root / "expected.json")
+        self.schema = validator()
+
+    def assessment(self, case_id):
+        row = self.manifest["cases"][case_id]
+        source = self.root / row["file"]
+        document = load(source)
+        self.schema.validate(document)
+        self.assertEqual(document["assessment"]["id"], case_id)
+        anchor = row["anchor"].split("#", 1)[0]
+        self.assertTrue((CONFORMANCE.parent / anchor).is_file())
+        return document
+
+    def test_named_object_reference_requires_local_binding(self):
+        case_id = "conformance-dangling-object"
+        doc = self.assessment(case_id)
+        assessment = doc["assessment"]
+        ref = assessment["tests"]["file-test"]["object"]
+        self.assertIsInstance(ref, str)
+        self.assertNotIn(ref, assessment.get("shared_objects", {}))
+        self.assertEqual(self.manifest["cases"][case_id]["authoring_expectation"], "unresolved_named_object")
+        corrected = copy.deepcopy(doc)
+        corrected["assessment"]["shared_objects"] = {
+            ref: {"object_title": "Named control", "capability": "unix.file",
+                  "full_path": {"equals": "/tmp/scap-ng-fixture"}},
+        }
+        self.schema.validate(corrected)
+        self.assertIn(ref, corrected["assessment"]["shared_objects"])
+
+    def test_optional_input_guard_does_not_protect_the_false_branch(self):
+        case_id = "conformance-unguarded-input"
+        doc = self.assessment(case_id)
+        assessment = doc["assessment"]
+        expression = assessment["evaluate"]
+        reference = expression["if"]["input_provided"]
+        self.assertFalse(assessment["inputs"][reference]["required"])
+        self.assertEqual(expression["else"]["test"], expression["then"]["test"])
+        test = assessment["tests"][expression["else"]["test"]]
+        operand = test["require"]["fields"]["value"]["equals"]
+        self.assertEqual(operand["input"], reference)
+        self.assertEqual(
+            self.manifest["cases"][case_id]["authoring_expectation"],
+            "optional_input_reference_not_dominated",
+        )
+        corrected = copy.deepcopy(doc)
+        corrected["assessment"]["evaluate"]["else"] = {
+            "not_evaluated": {"reason": "Optional policy value was omitted"},
+        }
+        self.schema.validate(corrected)
+        self.assertNotIn("test", corrected["assessment"]["evaluate"]["else"])
+        self.assertEqual(corrected["assessment"]["evaluate"]["then"], expression["then"])
+
+    def test_dependency_version_must_match_the_resolved_identity(self):
+        case_id = "conformance-dependency-version"
+        row = self.manifest["cases"][case_id]
+        doc = self.assessment(case_id)
+        assessment = doc["assessment"]
+        alias = assessment["applicability"]["assessment"]
+        dependency = assessment["dependencies"][alias]
+        target = load(CONFORMANCE / row["target"])["assessment"]
+        self.assertEqual(dependency["assessment"], target["id"])
+        self.assertNotEqual(dependency["expected_version"], target["version"])
+        self.assertEqual(row["authoring_expectation"], "dependency_version_mismatch")
+        corrected = copy.deepcopy(doc)
+        corrected["assessment"]["dependencies"][alias]["expected_version"] = target["version"]
+        self.schema.validate(corrected)
+        self.assertEqual(corrected["assessment"]["dependencies"][alias]["expected_version"], target["version"])
+
+
+    def test_dependency_version_has_exact_ri_resolution_receipt(self):
+        receipt = load(self.root / "ri-resolver-receipt.json")
+        premises = receipt["premise"]
+        authored = CONFORMANCE / premises["case"]
+        self.assertEqual(sha256(authored.read_bytes()).hexdigest(), premises["case_sha256"])
+        with TemporaryDirectory() as directory:
+            package = Path(directory) / "package"
+            build(package)
+            resolved = package / premises["target_member"]
+            proof = receipt["results"]
+            self.assertEqual(sha256(resolved.read_bytes()).hexdigest(),
+                             proof["matching_version_member_sha256"])
+            self.assertEqual(proof["version_mismatch"], "Assessment expected version mismatch")
+            self.assertEqual(proof["identity_mismatch"], "Assessment expected ID mismatch")
+
+
+class LogicalCardinalityCases(unittest.TestCase):
+    def test_one_and_xor_diverge_for_three_matching_tests(self):
+        root = CONFORMANCE / "logical-cardinality"
+        source = load(root / "one-xor.assessment.yaml")
+        expected = load(root / "expected.json")["variants"]
+        fixture = load(root / "fixture.json")
+        self.assertEqual(fixture["assessment"], source["assessment"]["id"])
+        self.assertEqual(fixture["literal_mutations"].keys(), expected.keys())
+        receipt = load(root / "ri-leaf-receipt.json")
+        for name, digest in receipt["sha256"].items():
+            self.assertEqual(sha256((root / name).read_bytes()).hexdigest(), digest)
+        self.assertEqual(
+            receipt["observed_test_outcomes"],
+            {name: outcome["test_outcomes"] for name, outcome in expected.items()},
+        )
+        schema = validator()
+        for variant, changes in fixture["literal_mutations"].items():
+            with self.subTest(variant=variant):
+                doc = copy.deepcopy(source)
+                assessment = doc["assessment"]
+                for reference, value in changes.items():
+                    assessment["variables"][reference]["expression"]["literal"] = value
+                schema.validate(doc)
+
+                observed = {}
+                for name, test in assessment["tests"].items():
+                    value = assessment["variables"][test["variable"]]["expression"]["literal"]
+                    wanted = test["require"]["fields"]["value"]["equals"]
+                    self.assertIs(type(value), int)
+                    observed[name] = value == wanted
+                self.assertEqual(
+                    {name: str(value).lower() for name, value in observed.items()},
+                    expected[variant]["test_outcomes"],
+                )
+                xor, negated = assessment["evaluate"]["and"]
+                odd = sum(observed[child["test"]] for child in xor["xor"]) % 2 == 1
+                exactly_one = sum(observed[child["test"]] for child in negated["not"]["one"]) == 1
+                self.assertEqual(str(odd).lower(), expected[variant]["xor"])
+                self.assertEqual(str(exactly_one).lower(), expected[variant]["one"])
+                self.assertEqual(str(odd and not exactly_one).lower(), expected[variant]["assessment_outcome"])
+
+
+class SourceAccountingCases(unittest.TestCase):
+    def test_production_and_parity_receipts_cover_the_independent_source_census(self):
+        receipt = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        source = load(CONFORMANCE / "oval-source-coverage.json")
+        manifest = load(CONFORMANCE / "manifest.json")
+        parity = receipt["independent_parity_audit"]
+        self.assertEqual(receipt["schema_pin"], manifest["schema_commit"])
+        self.assertEqual(parity["schema_family_sha256"], manifest["schema_family_sha256"])
+        self.assertEqual(parity["source_commit"], source["pins"]["self_assertion"])
+        self.assertTrue(receipt["source_accounted"])
+        self.assertFalse(receipt["runtime_equivalence_proved"])
+        for key in ("definitions", "tests"):
+            count = source["self_assertion_counts"][key]
+            self.assertEqual(receipt["original"][key], count)
+            self.assertEqual(receipt["production_conversion"][key], count)
+        self.assertEqual(parity["source_tests_without_disposition"], 0)
+        self.assertEqual(parity["source_definitions_without_disposition"], 0)
+        self.assertEqual(
+            parity["parity_checked_definitions"] + len(receipt["holds"]),
+            parity["converted_definitions"],
+        )
+        for hold in receipt["holds"]:
+            self.assertTrue(hold["schema_validated"] and hold["parity_diagnostic"])
+
+
+
+    def test_studio_replayed_the_exact_converted_holds(self):
+        production = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        studio = load(CONFORMANCE / "qualification/studio-converter-holds.json")
+        self.assertEqual(studio["schema_pin"], production["schema_pin"])
+        self.assertEqual(studio["converter_revision"], production["tools_revision"])
+        self.assertEqual(
+            studio["assessment_yaml_sha256"],
+            {row["definition_id"]: row["assessment_yaml_sha256"] for row in production["holds"]},
+        )
+        count = len(production["holds"])
+        for name in ("files", "ok", "noOpRoundTrips", "editRoundTrips", "undoRoundTrips"):
+            self.assertEqual(studio["observed"][name], count)
+        self.assertEqual(studio["observed"]["failed"], 0)
+        self.assertEqual(studio["observed"]["excludedExperimentalFiles"], 0)
+
+
+    def test_merge_receipt_matches_source_and_native_hashes(self):
+        root = CONFORMANCE / "variable-merge"
+        expected = load(root / "expected.json")
+        witness = load(root / "ri-receipt.json")
+        full = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        hold, = [row for row in full["holds"] if row["definition_id"] == expected["definition"]]
+        self.assertEqual(witness["source_sha256"], hold["source_sha256"])
+        self.assertEqual(witness["native_assessment_sha256"], hold["assessment_json_sha256"])
+        self.assertEqual(witness["source_sha256"], expected["source_sha256"])
+        self.assertEqual(witness["schema_commit"], full["schema_pin"])
+        self.assertEqual(witness["converter_revision"], full["tools_revision"])
+        self.assertEqual(witness["leaves"].keys(), expected["tests"].keys())
+        for name, row in expected["tests"].items():
+            raw = row["values"]
+            ordered = sorted(raw) if row["sort"] == "natural" else raw
+            independent = row["delimiter"].join(map(str, ordered))
+            self.assertEqual(independent, row["joined"])
+            self.assertIn(f'"{independent}"', witness["leaves"][name]["explanation"])
+            self.assertEqual(witness["leaves"][name]["outcome"], "true")
+        self.assertEqual(witness["reordered_integers"], expected["reordered_integers"]["outcomes"])
+
+
+    def test_time_difference_receipt_matches_source_native_and_clock_expectations(self):
+        root = CONFORMANCE / "variable-time-difference"
+        expected = load(root / "expected.json")
+        witness = load(root / "ri-receipt.json")
+        full = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        hold, = [row for row in full["holds"] if row["definition_id"] == expected["definition"]]
+        self.assertEqual(witness["source_sha256"], hold["source_sha256"])
+        self.assertEqual(witness["source_sha256"], expected["source_sha256"])
+        self.assertEqual(witness["native_assessment_sha256"], hold["assessment_json_sha256"])
+        self.assertEqual(witness["schema_commit"], full["schema_pin"])
+        self.assertEqual(witness["converter_revision"], full["tools_revision"])
+        self.assertEqual(witness["leaves"].keys(), expected["static_expected_seconds"].keys())
+        product = expected["cartesian_case"]
+        for source_id, seconds in expected["static_expected_seconds"].items():
+            observation = witness["leaves"][source_id]
+            counts = product["values"] if source_id == product["test"] else 1
+            self.assertEqual(observation["outcome"], "true")
+            self.assertEqual((observation["values_found"], observation["values_matching"]), (counts, counts))
+            if counts == 1:
+                self.assertRegex(observation["explanation"], rf"\bvalue {seconds}\b")
+
+        clock = expected["clock_case"]
+        self.assertEqual(witness["fixed_clock"].keys(), clock["variants"].keys())
+        for instant, expectation in clock["variants"].items():
+            observed = witness["fixed_clock"][instant]
+            delta = int(datetime.fromisoformat(instant).timestamp()) - clock["operand_seconds_since_epoch"]
+            outcome = str(delta > clock["strictly_greater_than"]).lower()
+            self.assertEqual(expectation, {"seconds": delta, "outcome": outcome})
+            self.assertEqual(observed["outcome"], outcome)
+            self.assertEqual(observed["values_matching"], int(outcome == "true"))
+            self.assertRegex(observed["explanation"], rf"\bvalue {delta}\b")
+
+
+    def test_external_input_receipt_matches_source_native_and_binding_expectations(self):
+        root = CONFORMANCE / "variable-external-input"
+        expected = load(root / "expected.json")
+        witness = load(root / "ri-receipt.json")
+        full = load(CONFORMANCE / "qualification/upstream-converter-audit.json")
+        hold, = [row for row in full["holds"] if row["definition_id"] == expected["definition"]]
+        self.assertEqual(witness["source_sha256"], hold["source_sha256"])
+        self.assertEqual(witness["source_sha256"], expected["definition_sha256"])
+        self.assertEqual(witness["source_bindings_sha256"], expected["bindings_sha256"])
+        self.assertEqual(witness["native_assessment_sha256"], hold["assessment_json_sha256"])
+        self.assertEqual(witness["schema_commit"], full["schema_pin"])
+        self.assertEqual(witness["converter_revision"], full["tools_revision"])
+
+        positives = expected["positive"]
+        leaves = witness["leaves"].values()
+        self.assertEqual(len(leaves), positives["test_count"])
+        self.assertEqual(sum(row["values"] == 1 for row in leaves), positives["single_value"])
+        self.assertEqual(sum(row["values"] == 4 for row in leaves), positives["four_values"])
+        self.assertEqual(sum(row["restricted"] for row in leaves), positives["restricted_inputs"])
+        self.assertEqual(len({row["native_input"] for row in leaves}), len(leaves))
+        for row in leaves:
+            self.assertEqual(row["outcome"], positives["outcome"])
+            self.assertEqual(row["values_found"], row["values"])
+            self.assertEqual(row["values_matching"], row["values"])
+        controls = {name: {key: value for key, value in row.items() if key != "values"}
+                    for name, row in expected["controls"].items()}
+        self.assertEqual(witness["controls"], controls)
+
+
+    def test_collected_type_holds_remain_explicit_for_polymorphic_fields(self):
+        root = CONFORMANCE / "qualification"
+        full = load(root / "upstream-converter-audit.json")
+        receipt = load(root / "collected-datatype-holds.json")
+        census = load(CONFORMANCE / "oval-source-coverage.json")
+        self.assertEqual(receipt["status"], "unqualified")
+        self.assertEqual(receipt["schema_commit"], full["schema_pin"])
+        self.assertEqual(receipt["converter_revision"], full["tools_revision"])
+        self.assertEqual(receipt["oval_schema_commit"], census["pins"]["oval_5_12_3"])
+        expected = {
+            row["definition_id"]: (row["source_sha256"], row["assessment_json_sha256"])
+            for row in full["holds"] if row["parity_diagnostic"] == "native collected-field datatype is unresolved"
+        }
+        self.assertEqual(
+            {row["definition_id"]: (row["source_sha256"], row["native_assessment_sha256"]) for row in receipt["holds"]},
+            expected,
+        )
+        schema = CONFORMANCE.parent / "schema/capability-mappings/supported"
+        source_types = {}
+        for row in receipt["holds"]:
+            for record in row["projections"]:
+                capability = record["native_capability"]
+                field = record["native_field"]
+                datatypes = load(schema / f"{capability}.json")["native"]["field_datatypes"][field]
+                self.assertEqual(record["native_datatypes"], datatypes)
+                self.assertGreater(len(datatypes), 1)
+                self.assertEqual(record["xsd_item_field_type"], "oval-sc:EntityItemAnySimpleType")
+                source_types.setdefault((capability, field), []).append(record["source_datatype"])
+        self.assertEqual(source_types, {
+            ("independent.environmentvariable", "value"): ["string"],
+            ("independent.shellcommand", "subexpression"): ["version", "version"],
+        })
+
+
+if __name__ == "__main__":
+    unittest.main()

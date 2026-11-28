@@ -1,0 +1,46 @@
+{
+  "format": "scap-ng-semantic-authoring-expected-1",
+  "schema_pin": "cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876",
+  "cases": {
+    "conformance-dangling-object": {
+      "file": "dangling-object.assessment.yaml",
+      "schema_admission": "valid",
+      "authoring_expectation": "unresolved_named_object",
+      "reason": "The Assessment-scoped Test refers to a shared Object that the Assessment does not declare.",
+      "anchor": "schema/assessment.schema.json#/properties/assessment/properties/shared_objects"
+    },
+    "conformance-unguarded-input": {
+      "file": "unguarded-input.assessment.yaml",
+      "schema_admission": "valid",
+      "authoring_expectation": "optional_input_reference_not_dominated",
+      "reason": "A presence check dominates the then branch, but the else branch invokes the very same Test when the Input is absent. An Input guard elsewhere in the document is insufficient.",
+      "anchor": "docs/contracts/0.4.1-input-variable-expression.md"
+    },
+    "conformance-dependency-version": {
+      "file": "dependency-version.assessment.yaml",
+      "schema_admission": "valid",
+      "authoring_expectation": "dependency_version_mismatch",
+      "target": "cases/policy/organizational-binding/scope.assessment.yaml",
+      "reason": "Within the fixed fixture scope the target has version 1. The dependency explicitly requires version 2.",
+      "anchor": "schema/assessment.schema.json#/properties/assessment/properties/dependencies"
+    }
+  },
+  "qualification": {
+    "ri_revision": "f39ac725b820353e6f6b8fc71af673c08857d895",
+    "observations": {
+      "conformance-dangling-object": {
+        "stage": "standalone_evaluator",
+        "diagnostic": "missing_object_reference"
+      },
+      "conformance-unguarded-input": {
+        "stage": "standalone_evaluator",
+        "diagnostic": "variable_operand_held"
+      },
+      "conformance-dependency-version": {
+        "stage": "standalone_evaluator",
+        "diagnostic": "unsupported_or_invalid_shape"
+      }
+    },
+    "scope": "The dangling reference diagnostic matches the authoring expectation. The two generic holds do not qualify optional Input dominance or a version mismatch."
+  }
+}

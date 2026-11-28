@@ -1,0 +1,47 @@
+assessment:
+  id: conformance-one-xor-parity
+  version: 1
+  assessment_title: Exact-one and odd parity diverge for three true Tests
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  evaluate:
+    and:
+      - xor: [{test: first-test}, {test: second-test}, {test: third-test}]
+      - not:
+          one: [{test: first-test}, {test: second-test}, {test: third-test}]
+  tests:
+    first-test:
+      test_title: First enabled value
+      capability: variable.value
+      variable: first-variable
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields:
+          value: {datatype: integer, equals: 1}
+      reported_elements: all
+    second-test:
+      test_title: Second enabled value
+      capability: variable.value
+      variable: second-variable
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields:
+          value: {datatype: integer, equals: 1}
+      reported_elements: all
+    third-test:
+      test_title: Third enabled value
+      capability: variable.value
+      variable: third-variable
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: exactly_one, values_matching: every}
+        fields:
+          value: {datatype: integer, equals: 1}
+      reported_elements: all
+  variables:
+    first-variable: {kind: constant, expression: {literal: 1}}
+    second-variable: {kind: constant, expression: {literal: 1}}
+    third-variable: {kind: constant, expression: {literal: 1}}

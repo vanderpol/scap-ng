@@ -8,6 +8,7 @@
   },
   "inventories": {
     "native_schema_locations": "../schema-coverage.json",
+    "schema_enum_and_const_occurrences": "schema-value-occurrences.json",
     "canonical_fixture_audit": "../coverage-audit.json",
     "oval_source_test_qnames": "../oval-source-coverage.json",
     "supplemental_cases": "../supplemental-manifest.json"
@@ -23,26 +24,27 @@
     "oval_deprecated_source_families_with_active_native_mapping_and_source_test": 2,
     "oval_nondeprecated_test_families_without_active_mapping": 12,
     "source_definitions_before": 167,
-    "source_definitions_after_canonical_supplement": 188,
+    "source_definitions_after_canonical_supplement": 196,
     "source_tests_before": 799,
-    "source_tests_after_canonical_supplement": 820,
-    "source_xml_files_added": 3,
+    "source_tests_after_canonical_supplement": 828,
+    "source_xml_files_added": 5,
     "native_positive_assessment_documents_added": 6,
     "native_invalid_assessment_documents_added": 1,
     "native_result_documents_added": 1,
     "new_policy_documents": 6,
-    "new_platform_specific_yaml_leaf_tests": 18,
+    "new_platform_specific_yaml_leaf_tests": 26,
+    "new_yaml_boundary_assessments": 2,
     "new_sql_leaf_tests": 2
   },
   "qualification": {
     "yaml_file_content": {
       "scope": ["UNIX", "Windows"],
-      "structure": "18 source Definitions pass pinned XSD and embedded Schematron. Both native Assessments pass the canonical 0.4.1 structural gate.",
+      "structure": "26 source Definitions pass pinned XSD and embedded Schematron. All four native Assessments pass the canonical 0.4.1 structural gate.",
       "semantics": "Independent fixture and expectation checks cover typed key identity, decisive mismatch, duplicates, inline and Variable input, missing file, depth and filters. YAMLPath parser, permission, empty and malformed evidence behavior await runtime coverage.",
-      "converter": "18 of 18 Definitions schema-admitted with exact source and native Test IDs. Behavioral equivalence remains unqualified.",
-      "ri_execution": "No collector receipt for either platform.",
-      "studio": "Both native Assessments passed the exact-pin Studio model open/save/reopen/undo smoke.",
-      "independent_oval_execution": "OpenSCAP 1.4.2 matched eight of nine UNIX Definitions. Both the full and isolated runs disagreed on YAML Set/Filter Definition 109. Windows remains unexecuted.",
+      "converter": "26 of 26 Definitions schema-admitted with exact source and native Test IDs. All eight boundary Test payloads match the authored native Tests exactly. Native collection equivalence remains unqualified.",
+      "ri_execution": "Direct RI admission held all eight boundary Tests. No RI collection receipt for either platform.",
+      "studio": "All four native Assessments passed the exact-pin Studio model open/save/reopen/undo smoke.",
+      "independent_oval_execution": "OpenSCAP 1.4.2 matched eight of nine UNIX Definitions. Both the full and isolated runs disagreed on YAML Set/Filter Definition 109. Definition 101 and the dedicated boundary Definitions reproduce false for empty and missing selections and error for malformed and unreadable files. Windows remains unexecuted.",
       "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/305", "https://github.com/vanderpol/scap-ng/issues/132"]
     },
     "sql512": {
@@ -56,19 +58,19 @@
     },
     "conditional_input_and_variables": {
       "structure": "The nested ordered Assessment passes. A separate missing-else document is rejected and the exact repair restores validity.",
-      "semantics": "Independent tests verify provided-empty versus absent inputs, guard order, active branch outcomes and fallback. Branch collection suppression and indeterminate guard precedence still need canonical runner receipts.",
+      "semantics": "Independent tests verify provided-empty versus absent inputs, guard order, active branch outcomes and fallback. The report-side RI replay exercises ordered and indeterminate guard precedence. Branch collection suppression still needs canonical runner receipts.",
       "converter": "Native authoring feature.",
-      "ri_execution": "The RI evaluate package passed its local unit suite. RI guard-status Benchmark unit tests and the canonical conditional ri-native041 replay were blocked by unknown_mount_not_authorized in the VM before branch evaluation. Standalone evaluator calls reject canonical reported_elements: compared. A diagnostic copy changing only that field to all returns the expected technical leaves.",
+      "ri_execution": "The RI evaluate package passed its local unit suite. RI guard-status Benchmark unit tests and the canonical conditional ri-native041 replay were blocked by unknown_mount_not_authorized in the VM before branch evaluation. Standalone evaluator calls reject canonical reported_elements: compared. A diagnostic copy changing only that field to all returns the expected technical leaves. RI ca4fabfe matches 11 of 15 report-side guard scenarios. Two normalized statuses and two invalid projected traces remain linked to RI #309.",
       "studio": "Ordered conditional Assessment passed exact-pin model open/save/reopen/undo smoke.",
-      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-ri/issues/306", "https://github.com/vanderpol/scap-ng-ri/issues/307", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-ri/issues/306", "https://github.com/vanderpol/scap-ng-ri/issues/307", "https://github.com/vanderpol/scap-ng-ri/issues/309", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
     },
     "manual_assessment_and_result": {
-      "structure": "Manual Assessment and signed response Result pass. The validator admits all six declared technical outcomes.",
-      "semantics": "Independent authored response mapping covers six outcomes and the signed response binds the expected identity, version, evaluator, comment and evidence.",
+      "structure": "The manual Assessment, Benchmark, Rule and package pass structural validation. Standalone manual Result vectors exercise all six declared technical outcomes.",
+      "semantics": "Independent authored response mapping covers six outcomes and binds the original identity, version, reviewer, comment and evidence. Lifecycle vectors distinguish unanswered workbooks, accepted responses and stale responses after a changed procedure.",
       "converter": "Native authoring witness. OCIL migration remains unqualified.",
-      "ri_execution": "Runner unit test passed for the existing completed true response. Pending and error completed responses, stale revision and unanswered handling still need a canonical replay receipt.",
-      "studio": "Manual Assessment passed the exact-pin model open/save/reopen/undo smoke. Manual Result and full UI lifecycle remain unqualified.",
-      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/10", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+      "ri_execution": "RI generated all six choices. Workbook import accepted four completed outcomes and rejected completed error and not_evaluated. The same-question upgrade preserved the response, and the changed procedure invalidated it. Benchmark scheduling and Result delivery remain blocked by filesystem admission in this VM.",
+      "studio": "The manual Assessment passed exact-pin model round-trip. The pack also admitted all six published Manual Result documents. Extension-host editing and workbook UI remain open.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/10", "https://github.com/vanderpol/scap-ng-ri/issues/306", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
     },
     "policy_and_results": {
       "structure": "Canonical existing disabled Profile/Tailoring, applicability, Organizational Input examples, Result schemas and new manual Result are inventoried. Coverage varies by schema occurrence.",
@@ -78,11 +80,59 @@
       "studio": "Model-only Assessment smoke. Policy and Result authoring behavior is unqualified.",
       "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
     },
+    "oval_merge_and_time_difference": {
+      "structure": "Exact current converter output for the two pinned OVAL Definitions passes the canonical Assessment schema.",
+      "semantics": "Independent source checks verify four merge cases and a reorder control, 29 static time differences, Cartesian operand multiplicity and three clock threshold cases.",
+      "converter": "The independent replay verifies the represented options, operands, source identities and Test predicates for these two Definitions. The general Tools parity checker still holds them.",
+      "ri_execution": "Direct Test evaluation matched all merge and time difference expectations with a fixed clock for the dynamic case. Definition and Assessment rollup remain unqualified.",
+      "studio": "Both exact converted Assessments passed Studio model open, edit, reopen and undo with the pinned metadata pack. Extension-host qualification remains open.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-tools/issues/128", "https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "oval_external_input": {
+      "structure": "The exact current converted Assessment for OVAL Self-Assertion Definition 562 passed the canonical schema.",
+      "semantics": "Independent source checks use the paired external binding XML and original States, including seven datatypes, eleven single-value and seven four-value Inputs, and four constrained Inputs. Runtime controls distinguish absent, explicitly empty, wrong-type and valid nonmatching bindings.",
+      "converter": "The replay verifies source identity, typed required Input declarations, restrictions, and State comparisons for the pinned Definition. The general parity checker retains its Input hold.",
+      "ri_execution": "All 18 direct Test leaves matched the source oracle with effective bindings supplied through the public API. Benchmark policy resolution and Assessment rollup remain unqualified.",
+      "studio": "The exact converted Assessment passed the current pinned Studio model round trip.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-tools/issues/128", "https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "oval_collected_datatype_holds": {
+      "structure": "Exact current converter output for both Definitions is schema-valid.",
+      "semantics": "Independent OVAL XSD and SCAP-NG mapping checks confirm that both collected fields are polymorphic. Original string and version Variable declarations are preserved in source trace. Source-to-native collected type equivalence remains unresolved.",
+      "converter": "The generic parity check holds both Definitions. The precise source Object, Item field and native projection identities are preserved in the collected datatype receipt.",
+      "ri_execution": "No macOS keychain or Solaris IPS execution receipt for these exact cross-capability Assessments.",
+      "studio": "Both exact converted Assessments passed the current pinned Studio model round trip.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-tools/issues/128", "https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "native_variable_function_suite": {
+      "structure": "The exact current canonical Assessment covers all 14 Variable operations and adds ten companion sequence Tests.",
+      "semantics": "Original independent expected sequences are preserved. Model A checks each observed value against exactly one expected operand. A separate ordered comparison rejects missing, duplicate and reordered values even when membership alone succeeds.",
+      "converter": "Native conformance Assessment. Separate OVAL source witnesses qualify bounded function cases.",
+      "ri_execution": "The baseline Assessment returned false for nine Tests whose independent outcomes are true. After correcting the authoring, 24 direct function Tests, two alias interaction Tests and 20 projection controls matched the oracle. The controls use supplied Items and hold incomplete or error evidence without a technical outcome.",
+      "studio": "The exact revised function Assessment passed Studio model open/save, edit, reopen and undo with the current pinned pack.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-ri/issues/306", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "native_collected_empty_projection": {
+      "structure": "A shared UNIX file Object supplies the collected full_path field to values and count expressions.",
+      "semantics": "A complete zero-Item projection counts as zero. Absence, incomplete collection, error, an omitted field and an explicit empty field array retain separate evidence dispositions.",
+      "converter": "Native conformance witness. Corresponding OVAL empty-source semantics may differ.",
+      "ri_execution": "Current RI counts zero for the complete-empty fixture and returns false for the separate existence Test. Earlier RI held both. Test-level diagnostic controls distinguish missing and invalid evidence before technical evaluation.",
+      "studio": "The exact document passed Studio model round trip.",
+      "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-ri/issues/306", "https://github.com/vanderpol/scap-ng-vscode/issues/75"]
+    },
+    "native_sets_and_filters": {
+      "structure": "Eight schema-valid Set/Filter Tests cover individual and nested operand forms.",
+      "semantics": "Independent populations check filter-before-membership, first-seen order and complete empty results. Controls cover incomplete difference, duplicate source IDs, errored fields and cancellation.",
+      "converter": "Native conformance witness. The separate OpenSCAP YAML Set discrepancy remains open.",
+      "ri_execution": "Both current compiled-filter membership paths match all eight native cases and four controls. Streaming union, intersection and difference passed with 100,000 and 1,000,000 Items per operand. Shared budget checks passed.",
+      "studio": "Existing corpus Assessment covered by the exact-pack model smoke.",
+      "gaps": ["https://github.com/vanderpol/scap-ng/issues/132", "https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-evidence/issues/3"]
+    },
     "oval_6_esxi": {
       "structure": "Four experimental capability mappings have canonical schema-valid vectors. The 20 OVAL 6.0 Test QNames have checked XSD crosswalk entries. Sixteen of these are proposal-only. Experimental JSON Schema admits a cross-capability selector, which the fixture mapping check rejects.",
-      "semantics": "A separate experimental 0.4.1 Assessment checks four typed evidence pairs. Two OVAL 6.0 proposal Assessments pass the proposal fixture validator. Real VMware acquisition, current DISA STIG requirements and authority remain unqualified.",
+      "semantics": "A separate experimental 0.4.1 Assessment checks four typed evidence pairs. The pinned October 2026 DISA ESXi 8.0 V2R5 crosswalk accounts for all 76 manual checks and includes three source-backed experimental native Tests. VMware acquisition and complete STIG authority remain unqualified.",
       "converter": "Unqualified.",
-      "ri_execution": "No new ESXi runtime receipt.",
+      "ri_execution": "Standalone RI rejected all three experimental STIG Test selectors as unsupported before acquisition.",
       "studio": "Four experimental capabilities are absent from the active pack. Two baseline mixed-purpose docs contain experimental Tests and remain outside the active Studio claim.",
       "gaps": ["https://github.com/vanderpol/scap-ng/issues/86", "https://github.com/vanderpol/scap-ng/issues/133", "https://github.com/vanderpol/scap-ng-ri/issues/202"]
     },
@@ -93,6 +143,27 @@
       "ri_execution": "The gate retains the 16 canonical collector-dependent rules with not_run dispositions. No new platform, scale or independent scanner claim.",
       "studio": "132 of 134 baseline Assessment model-smoke documents used only active capabilities and passed the exact-pin check. Two documents with experimental Tests are excluded.",
       "gaps": ["https://github.com/vanderpol/scap-ng-ri/issues/196", "https://github.com/vanderpol/scap-ng-vscode/issues/75", "https://github.com/vanderpol/scap-ng-evidence/issues/3"]
+    },
+    "content_package": {
+      "structure": "Six pinned canonical YAML members and a deterministic unsigned content manifest.",
+      "semantics": "Packed member identities and exact bytes match their source. The compiled presence requirement matches the authored Input guard.",
+      "converter": "Deterministic fixture assembly. General compilation remains a separate qualification.",
+      "ri_execution": "RI installed the fixture and rejected four controlled invalid package variants without host collection.",
+      "studio": "Authoring documents use the active canonical schema. Package installation is an RI qualification.",
+      "gaps": [
+        "https://github.com/vanderpol/scap-ng-ri/issues/196"
+      ]
+    },
+    "result_package": {
+      "structure": "Two targets, two Assessment invocations and Benchmark/Scan links checked through canonical validators.",
+      "semantics": "The test distinguishes changed bytes, cross-target invocation reuse and dangling execution membership. It also checks retention and redaction guards and all six conditional trace outcomes.",
+      "converter": "Native Result fixture.",
+      "ri_execution": "Existing RI assembly tests passed. Whole-package verification and scanner emission of this exact fixture remain unqualified.",
+      "studio": "The current pinned metadata pack admitted all six Result and manifest documents.",
+      "gaps": [
+        "https://github.com/vanderpol/scap-ng-ri/issues/196",
+        "https://github.com/vanderpol/scap-ng-evidence/issues/3"
+      ]
     }
   },
   "scope_exclusions": {

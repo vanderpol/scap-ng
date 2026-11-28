@@ -19,10 +19,11 @@ SOURCE_PIN = "4f116d86ac1218586aa0a1294c696947121a1ccc"
 CORPUS = CONFORMANCE / "oval-self-assertion"
 
 
-def convert(converter, schema, schema_commit, path, checksum, definition, test, output):
+def convert(converter, schema, schema_commit, source_pin, path, checksum, definition, test, output,
+            expected_native_test=None):
     command = [
         converter, "--schema-root", str(schema), "--sha256", checksum,
-        "--source-commit", SOURCE_PIN, "--source-path", path.relative_to(ROOT).as_posix(),
+        "--source-commit", source_pin, "--source-path", path.relative_to(ROOT).as_posix(),
         "--oval-definition", definition, "--output", str(output), str(path),
     ]
     process = subprocess.run(command, capture_output=True, text=True)
@@ -38,7 +39,7 @@ def convert(converter, schema, schema_commit, path, checksum, definition, test, 
         raise ValueError(f"{definition}: JSON and YAML Assessment disagree")
     validator().validate(assessment)
     trace = load(trace_path)
-    if (trace["definition_id"], trace["source_commit"], trace["source_sha256"]) != (definition, SOURCE_PIN, checksum):
+    if (trace["definition_id"], trace["source_commit"], trace["source_sha256"]) != (definition, source_pin, checksum):
         raise ValueError(f"{definition}: incorrect source identity in trace")
     if trace["schema_commit"] != schema_commit:
         raise ValueError(f"{definition}: converter trace scanned a different schema commit")
@@ -48,12 +49,31 @@ def convert(converter, schema, schema_commit, path, checksum, definition, test, 
     }
     if test_bindings.keys() != assessment["assessment"]["tests"].keys() or set(test_bindings.values()) != {test}:
         raise ValueError(f"{definition}: silently omitted or changed native/source Test identity")
+    if expected_native_test is not None:
+        actual_test, = assessment["assessment"]["tests"].values()
+        if actual_test != expected_native_test:
+            raise ValueError(f"{definition}: production Test differs from the authored boundary Test")
+        row["authored_test_equivalent"] = True
     row.update(
         structural="schema-valid",
         native_tests=test_bindings,
         output_sha256={p.name: sha256(p.read_bytes()).hexdigest() for p in (yaml_path, json_path, trace_path)},
     )
     return row
+
+
+def authored_boundary_tests(expectation_path):
+    if expectation_path is None:
+        return {}
+    manifest = load(expectation_path)
+    by_source = {}
+    for index, platform in enumerate(manifest["platforms"].values()):
+        source = (expectation_path.parent / platform["xml"]).resolve(strict=True)
+        native = load(expectation_path.parent / platform["native"])["assessment"]["tests"]
+        for case, row in manifest["cases"].items():
+            number = row["source_ids"][index]
+            by_source[(source, str(number))] = native[f"{case}-test"]
+    return by_source
 
 
 def main():
@@ -63,6 +83,11 @@ def main():
                         help="flat schema/ directory checked out at the exact conformance schema commit")
     parser.add_argument("--jobs", type=int, default=4)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--source-pin", default=SOURCE_PIN)
+    parser.add_argument("--boundary-expectations", type=Path,
+                        help="paired boundary manifest used to compare exact emitted Test payloads")
+    parser.add_argument("--receipt", type=Path, default=CONFORMANCE / "qualification/oval-supplement-conversion.json")
+    parser.add_argument("paths", type=Path, nargs="*", help="optional explicit corpus XML documents")
     args = parser.parse_args()
     version = json.loads(subprocess.check_output([args.converter, "--version"], text=True))
     manifest = load(CONFORMANCE / "manifest.json")
@@ -72,13 +97,15 @@ def main():
     if version["flat_schema_family_sha256"] != manifest["schema_family_sha256"]:
         raise SystemExit("production converter schema family differs from canonical corpus")
 
+    authored = authored_boundary_tests(args.boundary_expectations)
     jobs = []
     with TemporaryDirectory(prefix="scap-ng-oval-conversion-") as directory:
         output_root = Path(directory)
-        for path in sorted(CORPUS.glob("*/*.xml")):
+        paths = [path.resolve(strict=True) for path in args.paths] or sorted(CORPUS.glob("*/*.xml"))
+        for path in sorted(paths):
             raw = path.read_bytes()
             source_raw = subprocess.check_output(
-                ["git", "-C", str(ROOT), "show", f"{SOURCE_PIN}:{path.relative_to(ROOT).as_posix()}"],
+                ["git", "-C", str(ROOT), "show", f"{args.source_pin}:{path.relative_to(ROOT).as_posix()}"],
             )
             if raw != source_raw:
                 raise SystemExit(f"source bytes changed since the pinned commit: {path}")
@@ -88,21 +115,22 @@ def main():
             for definition in doc["ids"]["definitions"]:
                 suffix = definition.rsplit(":", 1)[-1]
                 jobs.append((
-                    args.converter, schema, schema_commit, path, checksum, definition,
-                    by_suffix[suffix], output_root / suffix,
+                    args.converter, schema, schema_commit, args.source_pin, path, checksum, definition,
+                    by_suffix[suffix], output_root / suffix, authored.pop((path, suffix), None),
                 ))
+        if authored:
+            raise SystemExit("missing XML for authored YAML boundary Tests")
         try:
             with ThreadPoolExecutor(max_workers=args.jobs) as pool:
                 records = list(pool.map(lambda job: convert(*job), jobs))
         except (ValueError, ValidationError) as error:
             raise SystemExit(str(error)) from error
-    report = {"source_pin": SOURCE_PIN, "schema_pin": schema_commit,
+    report = {"source_pin": args.source_pin, "schema_pin": schema_commit,
               "converter": version, "definitions": records}
     rendered = json.dumps(report, indent=2, sort_keys=True) + "\n"
     if args.check:
-        receipt = CONFORMANCE / "qualification/oval-supplement-conversion.json"
-        if receipt.read_text(encoding="utf-8") != rendered:
-            raise SystemExit(f"stale conversion receipt: {receipt}")
+        if args.receipt.read_text(encoding="utf-8") != rendered:
+            raise SystemExit(f"stale conversion receipt: {args.receipt}")
     print(rendered, end="")
 
 

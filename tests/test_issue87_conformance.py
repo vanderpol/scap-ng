@@ -11,7 +11,7 @@ from copy import deepcopy
 import yaml
 from jsonschema import Draft202012Validator, ValidationError
 
-from conformance.tools.generate import inventory as derive_inventory
+from conformance.tools.generate import inventory as derive_inventory, suite_index
 from conformance.tools.oracle import compare
 from conformance.tools.runner import validator, check_semantic_witnesses
 
@@ -54,6 +54,17 @@ class Issue87Conformance(unittest.TestCase):
         unreachable = specification["unreachable_schema_nodes"]
         self.assertIn("/$defs/foreach_binding", unreachable["schema/capability-common.schema.json"])
         self.assertIn("/$defs/foreach_selector_binding", unreachable["schema/capability-common.schema.json"])
+
+    def test_supplemental_suite_index_matches_published_artifacts(self):
+        commit = self.manifest["schema_commit"]
+        published = read(CONF / self.manifest["suite_index"])
+        self.assertEqual(published, suite_index(commit))
+        suites = {row["id"]: row for row in published["suites"]}
+        self.assertEqual(len(suites), len(published["suites"]))
+        self.assertEqual(suites["esxi"]["adoption"], "experimental")
+        self.assertEqual(suites["result-package"]["adoption"], "draft-transport")
+        for row in suites.values():
+            self.assertIn(row["entrypoint"], row["artifact_sha256"])
 
     def test_inventory_and_vectors_are_exhaustive_for_mappings(self):
         capabilities = {row["capability"] for row in self.inventory["capabilities"]}
@@ -253,6 +264,7 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(audit["set_filter_semantics"]["set_operators"], ["union", "intersection", "difference"])
         self.assertEqual(audit["variable_functions"]["functions"], ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer", "begin", "end", "input", "values"])
         self.assertEqual(audit["variable_functions"]["witness_tests"], 14)
+        self.assertEqual(audit["variable_functions"]["ordered_population_tests"], 10)
         self.assertEqual(audit["variable_functions"]["expression_schema_branches"], ["arithmetic", "begin", "concat", "count", "end", "input", "literal", "merge", "regex_capture", "split", "substring", "time_difference", "to_integer", "unique", "values", "variable"])
         self.assertEqual(audit["variable_functions"]["uncovered_expression_branches"], [])
         self.assertEqual(audit["input_guards"]["variants"], ["provided", "absent", "explicit-empty", "too-many", "out-of-range"])
@@ -495,14 +507,14 @@ class Issue87Conformance(unittest.TestCase):
         self.assertEqual(expected["functions"]["begin"]["values"], ["/etc", "/var"])
         self.assertEqual(expected["functions"]["end"]["values"], ["etc/", "var/"])
         self.assertEqual(expected["functions"]["input"]["values"], [7])
-        self.assertEqual(expected["functions"]["values"]["values"], ["unix", "windows"])
+        self.assertEqual(expected["functions"]["values"]["values"], ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"])
         self.assertEqual(assessment["assessment"]["variables"]["begin-values-variable"]["expression"]["begin"]["character"], "/")
         self.assertEqual(assessment["assessment"]["variables"]["end-values-variable"]["expression"]["end"]["character"], "/")
         self.assertEqual(assessment["assessment"]["variables"]["input-values-variable"]["expression"], {"input": "function-value-input"})
         values_expr = assessment["assessment"]["variables"]["collected-values-variable"]["expression"]["values"]
-        self.assertEqual(values_expr, {"object": {"object_ref": "function-family-object"}, "field": "family"})
+        self.assertEqual(values_expr, {"object": {"object_ref": "function-file-object"}, "field": "full_path"})
         self.assertEqual(fixture["bindings"]["function-value-input"], [7])
-        self.assertEqual([item["family"] for item in fixture["populations"]["function-family-object"]], ["unix", "windows"])
+        self.assertEqual([item["full_path"] for item in fixture["populations"]["function-file-object"]], ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"])
         for name in ("function-begin-test", "function-end-test", "function-input-test", "function-values-test"):
             self.assertEqual(fixture["test_outcomes"][name], "true")
             self.assertEqual(expected["functions"][name.removeprefix("function-").removesuffix("-test")]["outcome"], "true")

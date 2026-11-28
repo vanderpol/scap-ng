@@ -1,0 +1,37 @@
+{
+  "format": "scap-ng-native-logical-expected-1",
+  "schema_pin": "cc5eac4bfd89f2f5a5df30b7ecc1be59527c5876",
+  "anchor": "schema/expression.schema.json#/$defs/expression",
+  "assessment": "conformance-one-xor-parity",
+  "variants": {
+    "three-matches": {
+      "test_outcomes": {"first-test": "true", "second-test": "true", "third-test": "true"},
+      "xor": "true",
+      "one": "false",
+      "assessment_outcome": "true",
+      "reason": "Three successes are odd and exceed exactly one."
+    },
+    "two-matches": {
+      "test_outcomes": {"first-test": "true", "second-test": "true", "third-test": "false"},
+      "xor": "false",
+      "one": "false",
+      "assessment_outcome": "false",
+      "reason": "Two successes are even and exceed exactly one."
+    },
+    "one-match": {
+      "test_outcomes": {"first-test": "true", "second-test": "false", "third-test": "false"},
+      "xor": "true",
+      "one": "true",
+      "assessment_outcome": "false",
+      "reason": "A single success satisfies both groups. Negation of ONE makes the conjunction false."
+    },
+    "zero-matches": {
+      "test_outcomes": {"first-test": "false", "second-test": "false", "third-test": "false"},
+      "xor": "false",
+      "one": "false",
+      "assessment_outcome": "false",
+      "reason": "Zero successes are even and insufficient for ONE."
+    }
+  },
+  "scope": "The complete known Boolean subdomain. Unknown, error, not applicable and short-circuit trace behavior need separate qualification."
+}

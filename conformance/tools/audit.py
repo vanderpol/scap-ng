@@ -8,9 +8,11 @@ as semantic coverage.
 """
 from __future__ import annotations
 
+import argparse
 import copy
 import json
 import subprocess
+import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -54,6 +56,9 @@ def predicate_matches(observed: Any, predicate: Any) -> bool:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true", help="Fail if the tracked audit is stale")
+    args = parser.parse_args()
     manifest = load(CONF / "manifest.json")
     inventory = load(CONF / "schema-coverage.json")
     authored: dict[str, Any] = {}
@@ -294,7 +299,7 @@ def main() -> int:
         "independent_oracle": {"model_a_scope": "complete known nonempty integer/string Model A", "source_cases": 15, "source_manifest": "conformance/0.4/model-a/manifest.json", "implementation": "conformance/tools/model_a_oracle.py", "executed_by": "tests/test_model_a_oracle.py", "runtime_qualification": False},
         "variable_interactions": {"case": "core-variable-interactions", "canonical_assessment": True, "local_alias": True, "multi_value_observation": 2, "false_leaf_visible": True, "enclosing_not_result": "true", "independently_justified": True, "runtime_qualification": False},
         "set_filter_semantics": {"case": "core-set-filters", "filter_actions": set_filter_expected["filter_actions"], "set_operators": set_filter_expected["set_operators"], "operations": len(set_filter_expected["set_operators"]), "witness_tests": len(set_filter_fixture.get("test_outcomes", {})), "operand_branches": set_filter_expected.get("operand_branches", []), "filter_predicates": set_filter_expected.get("filter_predicates", []), "cardinality_boundaries": set_filter_expected.get("cardinality_boundaries", []), "independently_justified": True, "runtime_qualification": False, "source_only_rule_count": semantic_rules_source_only_count, "source_rule_schema_pointer": "schema/capability-common.schema.json#/$defs/state_filter", "native_set_operand_pointer": "schema/capability-common.schema.json#/$defs/set_object_operand", "native_nested_operand_pointer": "schema/capability-common.schema.json#/$defs/set_nested_operand", "native_filter_form": "inline state_entry predicate; capability inherited from enclosing Test/Object", "shared_witness": "core-set-filters"},
-        "variable_functions": {"case": "core-variable-functions", "functions": variable_function_expected["function_names"], "witness_tests": len(variable_function_expected["functions"]), "expression_schema_branches": sorted(expression_branches), "authored_expression_branches": sorted(expression_branches & authored_expression_branches), "uncovered_expression_branches": sorted(expression_branches - authored_expression_branches), "ordered_duplicate_source": True, "independently_justified": True, "runtime_qualification": False},
+        "variable_functions": {"case": "core-variable-functions", "functions": variable_function_expected["function_names"], "witness_tests": len(variable_function_expected["functions"]), "ordered_population_tests": len(variable_function_expected.get("ordered_population_checks", {})), "expression_schema_branches": sorted(expression_branches), "authored_expression_branches": sorted(expression_branches & authored_expression_branches), "uncovered_expression_branches": sorted(expression_branches - authored_expression_branches), "ordered_duplicate_source": True, "independently_justified": True, "runtime_qualification": False},
         "input_guards": {"case": "core-input-guards", "guard": "input_provided", "variants": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"], "independently_justified": True, "runtime_qualification": False},
         "applicability": {"case": "core-applicability", "dependency": "shared-applicability-assessment", "variants": ["applicable", "not-applicable", "deferred"], "independently_justified": True, "runtime_qualification": False},
         "semantic_boundaries": {"case": "core-semantic-boundaries", "rules": sorted({rule for witness in semantic_boundary_fixture.get("semantic_witnesses", []) for rule in witness.get("rules", [])}), "witnesses": len(semantic_boundary_fixture.get("semantic_witnesses", [])), "independently_justified": True, "runtime_qualification": False},
@@ -304,8 +309,16 @@ def main() -> int:
         "presentation_order": {"issue": 95, "tests_with_object_and_require": presentation_order_witnesses, "violations": presentation_order_violations, "deterministic": True},
         "capability_rows": mapping_rows,
     }
-    (CONF / "coverage-audit.json").write_text(json.dumps(report, indent=2) + "\n")
-    print(json.dumps(report, indent=2))
+    path = CONF / "coverage-audit.json"
+    rendered = json.dumps(report, indent=2) + "\n"
+    if args.check:
+        if not path.is_file() or path.read_text(encoding="utf-8") != rendered:
+            print(f"Coverage audit is stale: {path}", file=sys.stderr)
+            return 1
+        print("Coverage audit matches the tracked receipt.")
+        return 0
+    path.write_text(rendered, encoding="utf-8")
+    print(rendered, end="")
     return 0
 
 

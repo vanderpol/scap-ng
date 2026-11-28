@@ -496,15 +496,15 @@ def build_variable_interaction_suite() -> dict[str, Any]:
         "expected-values-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["alpha", "beta"]}}},
     }
     common = {"item_requirement": {"items_found": "exactly_one", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}}
-    every_require = {**common, "fields": {"value": {"value_match": "every", "values_found": "one_or_more", "values_matching": "every", "equals": {"variable": "expected-values-variable"}}}}
-    exact_require = {**common, "fields": {"value": {"value_match": "every", "values_found": "exactly_one", "values_matching": "every", "equals": {"variable": "expected-values-variable"}}}}
+    every_require = {**common, "fields": {"value": {"value_match": "exactly_one", "values_found": "one_or_more", "values_matching": "every", "equals": {"variable": "expected-values-variable"}}}}
+    exact_require = {**common, "fields": {"value": {"value_match": "exactly_one", "values_found": "exactly_one", "values_matching": "every", "equals": {"variable": "expected-values-variable"}}}}
     tests = {
         "variable-alias-every-test": {"test_title": "Variable alias preserves ordered values", "capability": "variable.value", "reported_elements": "all", "variable": "alias-values-variable", "require": every_require},
         "variable-alias-exactly-one-test": {"test_title": "Variable alias exposes field cardinality failure", "capability": "variable.value", "reported_elements": "all", "variable": "alias-values-variable", "require": exact_require},
     }
     assessment = {"assessment": {"id": "conformance-core-variable-interactions", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Variable, Require and Evaluate interactions", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": "variable-alias-every-test"}, {"not": {"test": "variable-alias-exactly-one-test"}}]}}}
     fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-variable-interactions", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "variables": {"source-values-variable": ["alpha", "beta"], "alias-values-variable": ["alpha", "beta"], "expected-values-variable": ["alpha", "beta"]}, "test_outcomes": {"variable-alias-every-test": "true", "variable-alias-exactly-one-test": "false"}}
-    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-variable-interactions", "assertions": {"variable-alias-every-test": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values_found": 2, "values_matching": 2, "reason": "The local alias preserves the two ordered source values; every observed value matches the expected Variable."}, "variable-alias-exactly-one-test": {"outcome": "false", "items_found": 1, "items_satisfying": 0, "values_found": 2, "values_matching": 2, "reason": "The same two-value alias fails values_found: exactly_one; the FALSE leaf remains visible."}}, "enclosing_outcome": "true", "reason": "Variable alias resolution, field cardinality, and canonical not are independently asserted; the enclosing AND is TRUE without negating the FALSE leaf."}
+    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-variable-interactions", "assertions": {"variable-alias-every-test": {"outcome": "true", "items_found": 1, "items_satisfying": 1, "values_found": 2, "values_matching": 2, "reason": "The local alias preserves the two ordered source values; every observed value matches exactly one value from the expected Variable."}, "variable-alias-exactly-one-test": {"outcome": "false", "items_found": 1, "items_satisfying": 0, "values_found": 2, "values_matching": 2, "reason": "The same two-value alias fails values_found: exactly_one; the FALSE leaf remains visible."}}, "enclosing_outcome": "true", "reason": "Variable alias resolution, field cardinality, and canonical not are independently asserted; the enclosing AND is TRUE without negating the FALSE leaf."}
     return {"assessment": assessment, "fixture": fixture, "expected": expected}
 
 
@@ -888,7 +888,7 @@ def build_variable_function_suite() -> dict[str, Any]:
         "begin-values-variable": {"kind": "local", "expression": {"begin": {"character": "/", "value": {"literal": ["etc", "/var"]}}}},
         "end-values-variable": {"kind": "local", "expression": {"end": {"character": "/", "value": {"literal": ["etc", "var/"]}}}},
         "input-values-variable": {"kind": "local", "expression": {"input": "function-value-input"}},
-        "collected-values-variable": {"kind": "local", "expression": {"values": {"object": {"object_ref": "function-family-object"}, "field": "family"}}},
+        "collected-values-variable": {"kind": "local", "expression": {"values": {"object": {"object_ref": "function-file-object"}, "field": "full_path"}}},
         "expected-unique-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["a", "b"]}}},
         "expected-count-variable": {"kind": "constant", "expression": {"literal": {"datatype": "integer", "value": 3}}},
         "expected-concat-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["prefix-a", "prefix-b"]}}},
@@ -902,29 +902,65 @@ def build_variable_function_suite() -> dict[str, Any]:
         "expected-begin-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["/etc", "/var"]}}},
         "expected-end-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["etc/", "var/"]}}},
         "expected-input-variable": {"kind": "constant", "expression": {"literal": {"datatype": "integer", "value": 7}}},
-        "expected-collected-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["unix", "windows"]}}},
+        "expected-collected-variable": {"kind": "constant", "expression": {"literal": {"datatype": "string", "value": ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"]}}},
     }
-    def test(name: str, variable: str, expected: str, title: str, value_match: str = "every") -> dict[str, Any]:
+    def test(name: str, variable: str, expected: str, title: str) -> dict[str, Any]:
+        wanted = variables[expected]["expression"]["literal"]["value"]
+        value_match = "exactly_one" if isinstance(wanted, list) else "every"
         return {"test_title": title, "capability": "variable.value", "reported_elements": "all", "variable": variable, "require": {"item_requirement": {"items_found": "one_or_more", "items_satisfying": "every"}, "field_requirement": {"values_found": "one_or_more", "values_matching": "every"}, "fields": {"value": {"value_match": value_match, "values_found": "one_or_more", "values_matching": "every", "equals": {"variable": expected}}}}}
     tests = {
         "function-unique-test": test("unique", "unique-values-variable", "expected-unique-variable", "Unique removes duplicate values preserving first occurrence"),
-        "function-count-test": test("count", "count-values-variable", "expected-count-variable", "Count counts duplicate values", "one_or_more"),
+        "function-count-test": test("count", "count-values-variable", "expected-count-variable", "Count counts duplicate values"),
         "function-concat-test": test("concat", "concat-values-variable", "expected-concat-variable", "Concat preserves ordered Cartesian values"),
         "function-merge-test": test("merge", "merge-values-variable", "expected-merge-variable", "Merge sorts and joins values"),
         "function-split-test": test("split", "split-values-variable", "expected-split-variable", "Split preserves adjacent empty parts"),
         "function-regex-capture-test": test("regex_capture", "regex-capture-values-variable", "expected-regex-capture-variable", "Regex capture returns the first group per value"),
         "function-substring-test": test("substring", "substring-values-variable", "expected-substring-variable", "Substring uses the explicit one-based source boundary"),
         "function-time-difference-test": test("time_difference", "time-difference-values-variable", "expected-time-difference-variable", "Time difference returns UTC seconds"),
-        "function-arithmetic-test": test("arithmetic", "arithmetic-values-variable", "expected-arithmetic-variable", "Arithmetic preserves Cartesian multiplicity", "one_or_more"),
+        "function-arithmetic-test": test("arithmetic", "arithmetic-values-variable", "expected-arithmetic-variable", "Arithmetic preserves Cartesian multiplicity"),
         "function-to-integer-test": test("to_integer", "to-integer-values-variable", "expected-to-integer-variable", "To-integer converts signed decimal strings elementwise"),
         "function-begin-test": test("begin", "begin-values-variable", "expected-begin-variable", "Begin adds a missing leading boundary and preserves an existing one"),
         "function-end-test": test("end", "end-values-variable", "expected-end-variable", "End adds a missing trailing boundary and preserves an existing one"),
         "function-input-test": test("input", "input-values-variable", "expected-input-variable", "Input expression retains the supplied typed binding"),
         "function-values-test": test("values", "collected-values-variable", "expected-collected-variable", "Values projects the selected field from collected Items"),
     }
-    assessment = {"assessment": {"id": "conformance-core-variable-functions", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Variable function semantics", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "inputs": {"function-value-input": {"datatype": "integer", "cardinality": "exactly_one", "required": True, "description": "Deterministic supplied value for the native input expression witness."}}, "shared_objects": {"function-family-object": {"object_title": "Deterministic family source", "capability": "independent.family"}}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
-    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-variable-functions", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "bindings": {"function-value-input": [7]}, "populations": {"function-family-object": [{"id": "family-unix", "family": "unix", "status": "collected"}, {"id": "family-windows", "family": "windows", "status": "collected"}]}, "variables": {"source-values-variable": ["a", "a", "b"], "unique-values-variable": ["a", "b"], "count-values-variable": [3], "concat-values-variable": ["prefix-a", "prefix-b"], "merge-values-variable": ["a,b"], "split-values-variable": ["a", "", "b"], "regex-capture-values-variable": ["one.example", "two.example"], "substring-values-variable": ["abc", "xyz"], "time-difference-values-variable": [86400], "arithmetic-values-variable": [5, 6], "to-integer-values-variable": [7, -12], "begin-values-variable": ["/etc", "/var"], "end-values-variable": ["etc/", "var/"], "input-values-variable": [7], "collected-values-variable": ["unix", "windows"]}, "test_outcomes": {name: "true" for name in tests}}
-    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-variable-functions", "functions": {"unique": {"outcome": "true", "values_found": 2, "values": ["a", "b"], "reason": "Unique removes the second a and preserves first occurrence order."}, "count": {"outcome": "true", "values_found": 1, "values": [3], "reason": "Count returns one integer equal to the source population length three, including duplicates."}, "concat": {"outcome": "true", "values_found": 2, "values": ["prefix-a", "prefix-b"], "reason": "Concat combines the literal prefix with each unique value in document order."}, "merge": {"outcome": "true", "values_found": 1, "values": ["a,b"], "reason": "Lexical ascending merge joins the unique values with the explicit comma delimiter."}, "split": {"outcome": "true", "values_found": 3, "values": ["a", "", "b"], "reason": "Literal comma splitting preserves the adjacent empty middle part."}, "regex_capture": {"outcome": "true", "values_found": 2, "values": ["one.example", "two.example"], "reason": "The first capture group is independently extracted from each ordered URL value."}, "substring": {"outcome": "true", "values_found": 2, "values": ["abc", "xyz"], "reason": "One-based start 1 and length 3 produce the first three characters of each input."}, "time_difference": {"outcome": "true", "values_found": 1, "values": [86400], "reason": "The UTC date difference between 2026-01-02 and 2026-01-01 is 86,400 seconds."}, "arithmetic": {"outcome": "true", "values_found": 2, "values": [5, 6], "reason": "Adding scalar 2 to the ordered [3, 4] population preserves the two Cartesian results."}, "to_integer": {"outcome": "true", "values_found": 2, "values": [7, -12], "reason": "Signed decimal strings, including leading zeros, convert elementwise without changing order."}, "begin": {"outcome": "true", "values_found": 2, "values": ["/etc", "/var"], "reason": "The source begin transformation prepends / only when absent, so etc becomes /etc while /var remains unchanged."}, "end": {"outcome": "true", "values_found": 2, "values": ["etc/", "var/"], "reason": "The source end transformation appends / only when absent, so etc becomes etc/ while var/ remains unchanged."}, "input": {"outcome": "true", "values_found": 1, "values": [7], "reason": "The required exactly-one integer binding is supplied as [7] and is not replaced by a literal or default."}, "values": {"outcome": "true", "values_found": 2, "values": ["unix", "windows"], "reason": "The values projection reads family from two collected Items in document order; no field or status is synthesized."}}, "function_names": ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer", "begin", "end", "input", "values"], "reason": "Expected values are independently derived from deterministic literals, a required Input binding, and two typed collected Items. Collector/runtime status propagation remains separate and scanner execution is not claimed."}
+    ordered_population_checks = {}
+    for name, authored_test in tuple(tests.items()):
+        expected_id = authored_test["require"]["fields"]["value"]["equals"]["variable"]
+        wanted = variables[expected_id]["expression"]["literal"]["value"]
+        if not isinstance(wanted, list):
+            continue
+
+        # Model A compares the two populations without positional pairing.
+        # Compare a second, scalar witness to retain count and document order.
+        delimiter = "|"
+        if any(delimiter in str(value) for value in wanted):
+            raise ValueError(f"{name}: expected value contains the sequence delimiter")
+        variable = name.removesuffix("-test") + "-ordered-variable"
+        sequence_test = name.removesuffix("-test") + "-ordered-test"
+        sequence = delimiter.join(map(str, wanted))
+        variables[variable] = {"kind": "local", "expression": {"merge": {
+            "delimiter": delimiter, "sort": "document", "order": "ascending",
+            "values": {"variable": authored_test["variable"]},
+        }}}
+        tests[sequence_test] = {
+            "test_title": f'{authored_test["test_title"]} in exact document order',
+            "capability": "variable.value", "reported_elements": "all", "variable": variable,
+            "require": {
+                "item_requirement": {"items_found": "exactly_one", "items_satisfying": "every"},
+                "field_requirement": {"values_found": "exactly_one", "values_matching": "every"},
+                "fields": {"value": {"equals": sequence}},
+            },
+        }
+        function = name.removeprefix("function-").removesuffix("-test").replace("-", "_")
+        ordered_population_checks[sequence_test] = {"function": function, "sequence": sequence, "outcome": "true"}
+
+    assessment = {"assessment": {"id": "conformance-core-variable-functions", "version": 1, "assessment_title": "SCAP-NG 0.4.1 Variable function semantics", "mode": "automated", "class": "miscellaneous", "specification": {"id": "scap-ng.pre-alpha.assessment", "version": "0.4.1"}, "inputs": {"function-value-input": {"datatype": "integer", "cardinality": "exactly_one", "required": True, "description": "Deterministic supplied value for the native input expression witness."}}, "shared_objects": {"function-file-object": {"object_title": "Files in the deterministically supplied projection", "capability": "unix.file",
+         "full_path": {"matches_regex": "^/scap-ng-function-fixture/[a-z]+$"}}}, "variables": variables, "tests": tests, "evaluate": {"and": [{"test": name} for name in tests]}}}
+    fixture = {"format": "scap-ng-conformance-evidence-0.1", "schema_version": "0.4.1", "case_id": "core-variable-functions", "clock": {"now_utc": "2026-01-01T00:00:00Z", "timezone": "UTC", "locale": "C", "ordering": "document"}, "bindings": {"function-value-input": [7]}, "populations": {"function-file-object": [{"id": "file-alpha", "full_path": "/scap-ng-function-fixture/alpha", "status": "collected"},
+         {"id": "file-beta", "full_path": "/scap-ng-function-fixture/beta", "status": "collected"}]}, "variables": {"source-values-variable": ["a", "a", "b"], "unique-values-variable": ["a", "b"], "count-values-variable": [3], "concat-values-variable": ["prefix-a", "prefix-b"], "merge-values-variable": ["a,b"], "split-values-variable": ["a", "", "b"], "regex-capture-values-variable": ["one.example", "two.example"], "substring-values-variable": ["abc", "xyz"], "time-difference-values-variable": [86400], "arithmetic-values-variable": [5, 6], "to-integer-values-variable": [7, -12], "begin-values-variable": ["/etc", "/var"], "end-values-variable": ["etc/", "var/"], "input-values-variable": [7], "collected-values-variable": ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"]}, "test_outcomes": {name: "true" for name in tests}}
+    expected = {"format": "scap-ng-conformance-expected-0.1", "schema_version": "0.4.1", "case_id": "core-variable-functions", "functions": {"unique": {"outcome": "true", "values_found": 2, "values": ["a", "b"], "reason": "Unique removes the second a and preserves first occurrence order."}, "count": {"outcome": "true", "values_found": 1, "values": [3], "reason": "Count returns one integer equal to the source population length three, including duplicates."}, "concat": {"outcome": "true", "values_found": 2, "values": ["prefix-a", "prefix-b"], "reason": "Concat combines the literal prefix with each unique value in document order."}, "merge": {"outcome": "true", "values_found": 1, "values": ["a,b"], "reason": "Lexical ascending merge joins the unique values with the explicit comma delimiter."}, "split": {"outcome": "true", "values_found": 3, "values": ["a", "", "b"], "reason": "Literal comma splitting preserves the adjacent empty middle part."}, "regex_capture": {"outcome": "true", "values_found": 2, "values": ["one.example", "two.example"], "reason": "The first capture group is independently extracted from each ordered URL value."}, "substring": {"outcome": "true", "values_found": 2, "values": ["abc", "xyz"], "reason": "One-based start 1 and length 3 produce the first three characters of each input."}, "time_difference": {"outcome": "true", "values_found": 1, "values": [86400], "reason": "The UTC date difference between 2026-01-02 and 2026-01-01 is 86,400 seconds."}, "arithmetic": {"outcome": "true", "values_found": 2, "values": [5, 6], "reason": "Adding scalar 2 to the ordered [3, 4] population preserves the two Cartesian results."}, "to_integer": {"outcome": "true", "values_found": 2, "values": [7, -12], "reason": "Signed decimal strings, including leading zeros, convert elementwise without changing order."}, "begin": {"outcome": "true", "values_found": 2, "values": ["/etc", "/var"], "reason": "The source begin transformation prepends / only when absent, so etc becomes /etc while /var remains unchanged."}, "end": {"outcome": "true", "values_found": 2, "values": ["etc/", "var/"], "reason": "The source end transformation appends / only when absent, so etc becomes etc/ while var/ remains unchanged."}, "input": {"outcome": "true", "values_found": 1, "values": [7], "reason": "The required exactly-one integer binding is supplied as [7] and is not replaced by a literal or default."}, "values": {"outcome": "true", "values_found": 2, "values": ["/scap-ng-function-fixture/alpha", "/scap-ng-function-fixture/beta"], "reason": "The values projection reads full_path from two collected file Items in document order; no field or status is synthesized."}}, "function_names": ["unique", "count", "concat", "merge", "split", "regex_capture", "substring", "time_difference", "arithmetic", "to_integer", "begin", "end", "input", "values"], "reason": "Expected values are independently derived from deterministic literals, a required Input binding, and two typed collected Items. Collector/runtime status propagation remains separate and scanner execution is not claimed."}
+    expected["ordered_population_checks"] = ordered_population_checks
     return {"assessment": assessment, "fixture": fixture, "expected": expected}
 
 
@@ -1023,6 +1059,54 @@ def build_core() -> dict[str, Any]:
 def write_json(path: Path, value: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+
+
+def suite_index(schema_commit: str) -> dict[str, Any]:
+    """Pin the supplemental corpus entry points and their published artifacts."""
+    definitions = (
+        ("native-authoring", "active", "supplemental-manifest.json"),
+        ("native-semantic-negatives", "active", "semantic-negatives/expected.json"),
+        ("logical-cardinality", "active", "logical-cardinality/expected.json"),
+        ("conditional-report-replay", "active", "conditional-replay/expected.json"),
+        ("content-package", "active", "content-package/sources.json"),
+        ("manual-lifecycle", "active", "manual-lifecycle/expected.json"),
+        ("result-package", "draft-transport", "result-package/manifest.json"),
+        ("variable-function-replay", "active", "variable-function-replay/controls.json"),
+        ("empty-projection", "active", "empty-projection/expected.json"),
+        ("set-replay", "active", "set-replay/controls.json"),
+        ("oval-self-assertion", "oval-5.12.3", "oval-self-assertion/expected.json"),
+        ("oval-yaml-boundaries", "oval-5.12.3", "oval-self-assertion/yaml-boundaries/expected.json"),
+        ("oval-merge", "oval-5.12.3", "variable-merge/expected.json"),
+        ("oval-time-difference", "oval-5.12.3", "variable-time-difference/expected.json"),
+        ("oval-external-input", "oval-5.12.3", "variable-external-input/expected.json"),
+        ("esxi", "experimental", "experimental/esxi/expected.json"),
+    )
+    suites = []
+    for name, adoption, entrypoint in definitions:
+        entry = OUT / entrypoint
+        paths = [entry]
+        if entry.parent != OUT:
+            paths = sorted(
+                path for path in entry.parent.rglob("*")
+                if path.is_file()
+                and path.suffix in {".json", ".yaml", ".xml", ".sql", ".go"}
+                and (name != "oval-self-assertion" or "yaml-boundaries" not in path.relative_to(entry.parent).parts)
+            )
+        suites.append({
+            "id": name,
+            "adoption": adoption,
+            "entrypoint": entrypoint,
+            "artifact_sha256": {
+                path.relative_to(OUT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in paths
+            },
+        })
+    return {
+        "format": "scap-ng-conformance-suite-index-1",
+        "schema_version": "0.4.1",
+        "schema_commit": schema_commit,
+        "suites": suites,
+    }
 
 
 def inventory() -> dict[str, Any]:
@@ -1164,6 +1248,7 @@ def inventory() -> dict[str, Any]:
 def main() -> None:
     inv = inventory()
     write_json(OUT / "schema-coverage.json", inv)
+    write_json(OUT / "suite-index.json", suite_index(inv["schema_commit"]))
     selector_contracts = load(SCHEMA / "native-selector-contracts.json")
     selector_contracts["_selector_defs"] = load(SCHEMA / "native-selector.schema.json").get("$defs", {})
     rows = []
@@ -1359,9 +1444,10 @@ def main() -> None:
         "format": "scap-ng-native-conformance-manifest-0.1", "schema_version": "0.4.1", "schema_commit": inv["schema_commit"], "schema_family_sha256": inv["schema_family_sha256"],
         "source": "vanderpol/scap-ng", "issue": 87, "runner_contract": "conformance/CONTRACT.md", "schema_inventory": "conformance/schema-coverage.json", "coverage_audit": "conformance/coverage-audit.json", "capability_case_count": len(rows), "capabilities": rows,
         "supplemental_manifest": "supplemental-manifest.json",
+        "suite_index": "suite-index.json",
         "authoring_cases": authoring_rows,
         "status_cases": status_rows + [{"id": "disabled-profile-tailoring", "schema": "tailoring.schema.json", "case": "cases/policy/disabled-profile-tailoring.json", "expected": "expected/disabled-profile.json"}, {"id": "disabled-profile-benchmark", "schema": "benchmark.schema.json", "case": "cases/policy/disabled-profile-benchmark.json", "expected": "expected/disabled-profile.json"}],
-        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-approved-decisions", "assessment": "cases/core/approved-decisions.assessment.yaml", "fixture": "fixtures/core-approved-decisions.json", "expected": "expected/core-approved-decisions.json", "vectors": ["variable-state-identity", "cmdlet-select"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference", "single-operand", "nested-set", "logical-filter-predicate", "empty-collected-population"]}, {"id": "core-semantic-boundaries", "assessment": "cases/core/semantic-boundaries.assessment.yaml", "fixture": "fixtures/core-semantic-boundaries.json", "expected": "expected/core-semantic-boundaries.json", "vectors": ["file-selection-traversal", "windows-literal-name"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": ["unique", "count", "concat", "merge"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
+        "core_cases": [{"id": "core-evaluate-not", "assessment": "cases/core/evaluate-not.assessment.yaml", "fixture": "fixtures/core-evaluate-not.json", "expected": "expected/core-evaluate-not.json", "vectors": ["evaluate", "not", "double-not", "and", "or", "one", "xor", "unknown", "error", "not_applicable"]}, {"id": "core-variable-interactions", "assessment": "cases/core/variable-interactions.assessment.yaml", "fixture": "fixtures/core-variable-interactions.json", "expected": "expected/core-variable-interactions.json", "vectors": ["local-alias", "values-found-exactly-one", "false-leaf", "not-false"]}, {"id": "core-approved-decisions", "assessment": "cases/core/approved-decisions.assessment.yaml", "fixture": "fixtures/core-approved-decisions.json", "expected": "expected/core-approved-decisions.json", "vectors": ["variable-state-identity", "cmdlet-select"]}, {"id": "core-set-filters", "assessment": "cases/core/set-filters.assessment.yaml", "fixture": "fixtures/core-set-filters.json", "expected": "expected/core-set-filters.json", "vectors": ["include", "exclude", "union", "intersection", "difference", "single-operand", "nested-set", "logical-filter-predicate", "empty-collected-population"]}, {"id": "core-semantic-boundaries", "assessment": "cases/core/semantic-boundaries.assessment.yaml", "fixture": "fixtures/core-semantic-boundaries.json", "expected": "expected/core-semantic-boundaries.json", "vectors": ["file-selection-traversal", "windows-literal-name"]}, {"id": "core-variable-functions", "assessment": "cases/core/variable-functions.assessment.yaml", "fixture": "fixtures/core-variable-functions.json", "expected": "expected/core-variable-functions.json", "vectors": variable_functions["expected"]["function_names"] + ["ordered-populations"]}, {"id": "core-input-guards", "assessment": "cases/core/input-guards.assessment.yaml", "fixture": "fixtures/core-input-guards.json", "expected": "expected/core-input-guards.json", "vectors": ["provided", "absent", "explicit-empty", "too-many", "out-of-range"]}, {"id": "core-applicability", "assessment": "cases/core/applicability.assessment.yaml", "fixture": "fixtures/core-applicability.json", "expected": "expected/core-applicability.json", "vectors": ["applicable", "not-applicable", "deferred"]}, {"id": "core-comparison-operators", "assessment": "cases/core/comparison-operators.assessment.yaml", "fixture": "fixtures/core-comparison-operators.json", "expected": "expected/core-comparison-operators.json", "vectors": sorted(inv["operator_inventory"]["field_predicate_properties"])}, {"id": "core-selector-alternatives", "assessment": "cases/core/selector-alternatives.assessment.yaml", "fixture": "fixtures/core-selector-alternatives.json", "expected": "expected/core-selector-alternatives.json", "vectors": ["every-valid-selector-alternative"]}, {"id": "core-multi-values", "assessment": "cases/core/multi-values.assessment.yaml", "fixture": "fixtures/core-multi-values.json", "expected": "expected/core-multi-values.json", "vectors": ["applicable-capability-fields"]}, {"id": "core-enum-boundaries", "assessment": "cases/core/enum-boundaries.assessment.yaml", "fixture": "fixtures/core-enum-boundaries.json", "expected": "expected/core-enum-boundaries.json", "vectors": ["schema-admitted-selector-enums"]}, {"id": "core-cardinalities", "assessment": "cases/core/cardinalities.assessment.yaml", "fixture": "fixtures/core-cardinalities.json", "expected": "expected/core-cardinalities.json", "vectors": ["remaining-cardinalities"]}],
         "invalid_cases": [
             {"id": "invalid-negate", "assessment": "cases/invalid/negate.assessment.yaml", "expected": "schema-invalid", "reason": "negate is not canonical; not is the sole negation operator."},
             {"id": "invalid-variable-datatype", "assessment": "cases/invalid/variable-datatype.assessment.yaml", "expected": "schema-invalid", "reason": "Variables infer datatype from typed expressions; declaration datatype is not canonical."},

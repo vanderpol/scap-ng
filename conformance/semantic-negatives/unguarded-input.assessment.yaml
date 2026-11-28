@@ -1,0 +1,29 @@
+assessment:
+  id: conformance-unguarded-input
+  version: 1
+  assessment_title: Optional Input used outside a presence guard
+  mode: automated
+  class: miscellaneous
+  specification: {id: scap-ng.pre-alpha.assessment, version: 0.4.1}
+  evaluate:
+    if: {input_provided: approved-input}
+    then: {test: reference-test}
+    else: {test: reference-test}
+  inputs:
+    approved-input: {datatype: integer, cardinality: zero_or_one, required: false}
+  tests:
+    reference-test:
+      test_title: Compare the observed value with the optional policy input
+      capability: variable.value
+      variable: observed-variable
+      require:
+        item_requirement: {items_found: exactly_one, items_satisfying: every}
+        field_requirement: {values_found: one_or_more, values_matching: every}
+        fields:
+          value:
+            datatype: integer
+            equals: {input: approved-input}
+            value_match: every
+      reported_elements: all
+  variables:
+    observed-variable: {kind: constant, expression: {literal: 3}}
