@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Record exact enum and const matches at canonical schema locations."""
+"""Record enum, const, property and boundary evidence at canonical schema locations."""
 from __future__ import annotations
 
 import argparse
@@ -16,6 +16,13 @@ from specification import ENTRY_POINTS, reachable_schema_locations, walk
 from schema_documentation import SchemaStore
 
 REPORT = CONFORMANCE / "qualification/schema-value-occurrences.json"
+SHAPE_REPORT = CONFORMANCE / "qualification/schema-shape-occurrences.json"
+BOUNDS = {
+    "minimum": "number", "maximum": "number",
+    "minLength": "string", "maxLength": "string",
+    "minItems": "array", "maxItems": "array",
+    "minProperties": "object", "maxProperties": "object",
+}
 
 
 def encode(data):
@@ -46,22 +53,39 @@ def schema_locations(schemas):
 
     occurrences = {}
     by_node = {}
+    shapes = {"properties": {}, "bounds": {}}
     for source, document in schemas.items():
         for pointer, node, *_ in walk(document):
             if not isinstance(node, dict):
                 continue
+            scope = reached.get(document["$id"] + "#" + pointer, [])
+            entry_names = [row["entry_point"] for row in scope]
+            property_rows = {}
+            for name in node.get("properties", {}):
+                escaped = name.replace("~", "~0").replace("/", "~1")
+                key = f"{source}#{pointer}/properties/{escaped}"
+                row = {"entry_points": entry_names, "witnesses": {}}
+                shapes["properties"][key] = row
+                property_rows[name] = row
+            if property_rows:
+                by_node[(id(node), "properties")] = property_rows
+            for keyword in BOUNDS.keys() & node.keys():
+                key = f"{source}#{pointer}/{keyword}"
+                row = {"entry_points": entry_names, "value": node[keyword], "witnesses": {}}
+                shapes["bounds"][key] = row
+                by_node[(id(node), keyword)] = row
             for keyword in ("enum", "const"):
                 if keyword not in node:
                     continue
                 values = node[keyword] if keyword == "enum" else [node[keyword]]
                 key = f"{source}#{pointer}/{keyword}"
                 occurrences[key] = {
-                    "entry_points": reached.get(document["$id"] + "#" + pointer, []),
+                    "entry_points": scope,
                     "values": [{"value": value, "matches": {}} for value in values],
                     "rejections": {},
                 }
                 by_node[(id(node), keyword)] = key
-    return occurrences, by_node
+    return occurrences, by_node, shapes
 
 
 def case_sources(experimental_capabilities):
@@ -153,7 +177,37 @@ def validator_class(schemas, by_node, occurrences, context):
 
         return wrapped
 
-    traced_validator = validators.extend(Draft202012Validator, {name: track(name) for name in ("enum", "const")})
+    def properties(validator, expected, instance, schema):
+        if context["valid"] and validator.is_type(instance, "object"):
+            names = expected.keys() & instance.keys()
+            if names:
+                rows = by_node[(id(schema), "properties")]
+                for name in names:
+                    rows[name]["witnesses"].setdefault(context["scope"], context["path"])
+        yield from Draft202012Validator.VALIDATORS["properties"](validator, expected, instance, schema)
+
+    def bound(keyword, datatype):
+        original = Draft202012Validator.VALIDATORS[keyword]
+
+        def wrapped(validator, expected, instance, schema):
+            error = next(original(validator, expected, instance, schema), None)
+            applicable = validator.is_type(instance, datatype)
+            if applicable:
+                valid_document = context["valid"]
+                if (error is None) == valid_document:
+                    observed = instance if datatype == "number" else len(instance)
+                    kind = ("boundary" if observed == expected else "interior") if valid_document else "rejected"
+                    scope = context["scope"]
+                    row = by_node[(id(schema), keyword)]
+                    row["witnesses"].setdefault(scope, {}).setdefault(kind, context["path"])
+            if error is not None:
+                yield error
+        return wrapped
+
+    traced_validator = validators.extend(Draft202012Validator, {
+        "enum": track("enum"), "const": track("const"), "properties": properties,
+        **{name: bound(name, datatype) for name, datatype in BOUNDS.items()},
+    })
     # Pin the dialect directly for every resource so referenced roots retain
     # the same instrumented validator when a reference is resolved.
     resources = {}
@@ -168,7 +222,7 @@ def audit():
     inventory = load(CONFORMANCE / "schema-coverage.json")
     experimental = {row["capability"] for row in inventory["capabilities"] if row["status"] == "experimental"}
     schemas = source_schema(inventory)
-    occurrences, by_node = schema_locations(schemas)
+    occurrences, by_node, shapes = schema_locations(schemas)
     context = {}
     traced_validator, registry = validator_class(schemas, by_node, occurrences, context)
     traced = {}
@@ -195,7 +249,7 @@ def audit():
                     counts[f"matched_by_{scope}"] += 1
                 if not value["matches"]:
                     counts["without_match"] += 1
-    return {
+    enum_report = {
         "format": "scap-ng-schema-value-occurrences-1",
         "schema_commit": inventory["schema_commit"], "schema_family_sha256": inventory["schema_family_sha256"],
         "interpretation": "Each match is a successful enum or const comparison while checking a schema-valid document. "
@@ -207,15 +261,46 @@ def audit():
     }
 
 
+    shape_counts = {}
+    for kind, rows in shapes.items():
+        totals = Counter()
+        for row in rows.values():
+            if row["entry_points"]:
+                totals["reachable"] += 1
+                if not row["witnesses"]:
+                    totals["without_witness"] += 1
+                for scope, witness in row["witnesses"].items():
+                    totals[f"witnessed_by_{scope}"] += 1
+                    if kind == "bounds":
+                        for disposition in witness:
+                            totals[f"{disposition}_by_{scope}"] += 1
+            else:
+                totals["unreachable"] += 1
+        shape_counts[kind] = dict(totals)
+    return enum_report, {
+        "format": "scap-ng-schema-shape-occurrences-1",
+        "schema_commit": inventory["schema_commit"],
+        "schema_family_sha256": inventory["schema_family_sha256"],
+        "interpretation": "Property rows identify a member present during validation of a schema-valid "
+                          "document. Bound rows identify an applicable comparison at the exact bound, "
+                          "inside it, or rejected in an invalid document. Individual comparisons can "
+                          "occur in a sibling branch that fails another constraint. Mutations run in "
+                          "separate local tests and do not enter these static-document counts.",
+        "coverage": shape_counts,
+        "documents": cases,
+        **shapes,
+    }
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    report = audit()
-    rendered = json.dumps(report, indent=2, sort_keys=True) + "\n"
-    if args.check:
-        if not REPORT.is_file() or REPORT.read_text(encoding="utf-8") != rendered:
-            raise SystemExit("Schema enum and const occurrence coverage receipt is stale")
-    else:
-        REPORT.write_text(rendered, encoding="utf-8")
-    print(encode(report["coverage"]))
+    for path, report in zip((REPORT, SHAPE_REPORT), audit(), strict=True):
+        rendered = json.dumps(report, indent=2, sort_keys=True) + "\n"
+        if args.check:
+            if not path.is_file() or path.read_text(encoding="utf-8") != rendered:
+                raise SystemExit(f"Schema occurrence receipt is stale: {path.name}")
+        else:
+            path.write_text(rendered, encoding="utf-8")
+        print(encode(report["coverage"]))

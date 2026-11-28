@@ -66,6 +66,19 @@ class Issue87Conformance(unittest.TestCase):
         for row in suites.values():
             self.assertIn(row["entrypoint"], row["artifact_sha256"])
 
+    def test_shape_audit_records_field_presence_and_exact_bounds(self):
+        report = read(CONF / "qualification/schema-shape-occurrences.json")
+        self.assertEqual(report["schema_commit"], self.manifest["schema_commit"])
+        properties = report["properties"]
+        field = "schema/assessment-result.schema.json#/properties/assessment_result/properties/items"
+        self.assertIn("assessment-result", properties[field]["entry_points"])
+        self.assertEqual(properties[field]["witnesses"]["active"], "result-evidence/owner-capped.result.yaml")
+        key = "schema/assessment-result.schema.json#/properties/assessment_result/properties"
+        key += "/evidence_retention/properties/maximum_items/minimum"
+        bound = report["bounds"][key]
+        self.assertEqual(bound["value"], 0)
+        self.assertEqual(bound["witnesses"]["active"]["boundary"], "result-evidence/owner-capped.result.yaml")
+
     def test_inventory_and_vectors_are_exhaustive_for_mappings(self):
         capabilities = {row["capability"] for row in self.inventory["capabilities"]}
         cases = {row["capability"] for row in self.manifest["capabilities"]}
