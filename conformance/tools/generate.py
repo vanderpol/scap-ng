@@ -1073,6 +1073,7 @@ def suite_index(schema_commit: str) -> dict[str, Any]:
         ("result-package", "draft-transport", "result-package/manifest.json"),
         ("variable-function-replay", "active", "variable-function-replay/controls.json"),
         ("empty-projection", "active", "empty-projection/expected.json"),
+        ("set-replay", "active", "set-replay/controls.json"),
         ("oval-self-assertion", "oval-5.12.3", "oval-self-assertion/expected.json"),
         ("oval-yaml-boundaries", "oval-5.12.3", "oval-self-assertion/yaml-boundaries/expected.json"),
         ("oval-merge", "oval-5.12.3", "variable-merge/expected.json"),

@@ -239,3 +239,9 @@ complete-empty supplied evidence, current RI returns zero through
 `count` and false through a separate existence Test. Earlier RI held
 both. Missing, failed and incomplete cases retain their diagnostics.
 Exact current Studio model replay also passed.
+
+The [native Set and Filter replay](../set-replay/README.md) verifies
+the expected populations in both current RI Set implementations. All
+six streaming scale runs passed, covering union, intersection and
+difference with 100,000 and 1,000,000 Items per operand. The scoped
+resource-budget tests also passed.
